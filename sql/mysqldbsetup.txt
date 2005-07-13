@@ -1,0 +1,1 @@
+GRANT ALL PRIVILEGES ON *.* TO emfuser@localhost IDENTIFIED BY 'emfsu' WITH GRANT OPTION;
