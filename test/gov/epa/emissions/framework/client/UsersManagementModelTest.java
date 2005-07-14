@@ -12,7 +12,9 @@ import junit.framework.TestCase;
 public class UsersManagementModelTest extends TestCase {
 
     private List users;
+
     private User joe;
+
     private UsersManagementModel model;
 
     protected void setUp() {
@@ -22,22 +24,22 @@ public class UsersManagementModelTest extends TestCase {
         joe.setUserName("joe");
         joe.setFullName("Joe Diller");
         joe.setEmailAddr("joe@joe.org");
-        
+
         users.add(joe);
-        
+
         model = new UsersManagementModel(users);
     }
 
     public void testShouldReturnColumnsNames() {
-        TableModel model = new UsersManagementModel(null);
+        TableModel model = new UsersManagementModel(new ArrayList());
 
         assertEquals(5, model.getColumnCount());
 
         assertEquals("Select", model.getColumnName(0));
-        assertEquals("#", model.getColumnName(1));        
+        assertEquals("#", model.getColumnName(1));
         assertEquals("Username", model.getColumnName(2));
         assertEquals("Name", model.getColumnName(3));
-        assertEquals("Email", model.getColumnName(4));        
+        assertEquals("Email", model.getColumnName(4));
     }
 
     public void testShouldReturnRowsEqualingNumberOfUsers() {
@@ -56,12 +58,6 @@ public class UsersManagementModelTest extends TestCase {
         assertEquals(joe.getUserName(), model.getValueAt(0, 2));
         assertEquals(joe.getFullName(), model.getValueAt(0, 3));
         assertEquals(joe.getEmailAddr(), model.getValueAt(0, 4));
-
-        assertNull("Should not have returned a value for user 100 "
-                + "as only 2 users exist in the list", model.getValueAt(100, 1));
-
-        assertNull("Should not have returned a value for column 100 "
-                + "as the model has only 5 columns", model.getValueAt(0, 100));
     }
 
     public void testShouldBeAbleToUpdateUserOnSettingValuesAtSpecifiedIndexes() {
@@ -71,7 +67,7 @@ public class UsersManagementModelTest extends TestCase {
         model.setValueAt("Joe Jumper", 0, 3);
         assertEquals("Joe Jumper", model.getValueAt(0, 3));
         assertEquals("Joe Jumper", joe.getFullName());
-        
+
         model.setValueAt("joe@jumper.net", 0, 4);
         assertEquals("joe@jumper.net", model.getValueAt(0, 4));
         assertEquals("joe@jumper.net", joe.getEmailAddr());
@@ -80,4 +76,19 @@ public class UsersManagementModelTest extends TestCase {
     public void testShouldReturnBooleanAsClassForSelectColumn() {
         assertEquals(Boolean.class, model.getColumnClass(0));
     }
+
+    public void testShouldMarkSelectColumnAsEditable() {
+        assertTrue("Select column should be editable", model.isCellEditable(0,
+                0));
+    }
+
+    public void testShouldMarkNameColumnAsEditable() {
+        assertTrue("Name column should be editable", model.isCellEditable(0, 3));
+    }
+
+    public void testShouldMarkEmailColumnAsEditable() {
+        assertTrue("Email column should be editable", model
+                .isCellEditable(0, 4));
+    }
+
 }
