@@ -33,11 +33,11 @@ public class UsersManagementModelTest extends TestCase {
 
         assertEquals(5, model.getColumnCount());
 
-        assertEquals("#", model.getColumnName(0));
-        assertEquals("Username", model.getColumnName(1));
-        assertEquals("Name", model.getColumnName(2));
-        assertEquals("Email", model.getColumnName(3));
-        assertEquals("Select", model.getColumnName(4));
+        assertEquals("Select", model.getColumnName(0));
+        assertEquals("#", model.getColumnName(1));        
+        assertEquals("Username", model.getColumnName(2));
+        assertEquals("Name", model.getColumnName(3));
+        assertEquals("Email", model.getColumnName(4));        
     }
 
     public void testShouldReturnRowsEqualingNumberOfUsers() {
@@ -51,11 +51,11 @@ public class UsersManagementModelTest extends TestCase {
     }
 
     public void testShouldReturnUserAttributesAtSpecifiedIndex() {
-        assertEquals("1", model.getValueAt(0, 0));
-        assertEquals(joe.getUserName(), model.getValueAt(0, 1));
-        assertEquals(joe.getFullName(), model.getValueAt(0, 2));
-        assertEquals(joe.getEmailAddr(), model.getValueAt(0, 3));
-        assertEquals(Boolean.FALSE, model.getValueAt(0, 4));
+        assertEquals(Boolean.FALSE, model.getValueAt(0, 0));
+        assertEquals("1", model.getValueAt(0, 1));
+        assertEquals(joe.getUserName(), model.getValueAt(0, 2));
+        assertEquals(joe.getFullName(), model.getValueAt(0, 3));
+        assertEquals(joe.getEmailAddr(), model.getValueAt(0, 4));
 
         assertNull("Should not have returned a value for user 100 "
                 + "as only 2 users exist in the list", model.getValueAt(100, 1));
@@ -65,16 +65,19 @@ public class UsersManagementModelTest extends TestCase {
     }
 
     public void testShouldBeAbleToUpdateUserOnSettingValuesAtSpecifiedIndexes() {
-        model.setValueAt("Joey", 0, 1);//username unchanged
-        assertEquals(joe.getUserName(), model.getValueAt(0, 1));
+        model.setValueAt("Joey", 0, 2);//username unchanged
+        assertEquals(joe.getUserName(), model.getValueAt(0, 2));
 
-        model.setValueAt("Joe Jumper", 0, 2);
-        assertEquals("Joe Jumper", model.getValueAt(0, 2));
+        model.setValueAt("Joe Jumper", 0, 3);
+        assertEquals("Joe Jumper", model.getValueAt(0, 3));
         assertEquals("Joe Jumper", joe.getFullName());
         
-        model.setValueAt("joe@jumper.net", 0, 3);
-        assertEquals("joe@jumper.net", model.getValueAt(0, 3));
+        model.setValueAt("joe@jumper.net", 0, 4);
+        assertEquals("joe@jumper.net", model.getValueAt(0, 4));
         assertEquals("joe@jumper.net", joe.getEmailAddr());
     }
 
+    public void testShouldReturnBooleanAsClassForSelectColumn() {
+        assertEquals(Boolean.class, model.getColumnClass(0));
+    }
 }

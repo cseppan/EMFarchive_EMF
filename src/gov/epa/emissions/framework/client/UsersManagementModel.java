@@ -7,7 +7,7 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 public class UsersManagementModel extends AbstractTableModel {
-    private String[] columnNames = { "#", "Username", "Name", "Email", "Select" };
+    private String[] columnNames = { "Select", "#", "Username", "Name", "Email"};
 
     private List users;
 
@@ -38,15 +38,15 @@ public class UsersManagementModel extends AbstractTableModel {
 
         switch (column) {
         case 0:
-            return "" + (row + 1);
-        case 1:
-            return user.getUserName();
-        case 2:
-            return user.getFullName();
-        case 3:
-            return user.getEmailAddr();
-        case 4:
             return selected;//TODO: selected functionality
+        case 1:
+            return "" + (row + 1);
+        case 2:
+            return user.getUserName();
+        case 3:
+            return user.getFullName();
+        case 4:
+            return user.getEmailAddr();
         }
 
         return null;
@@ -59,11 +59,27 @@ public class UsersManagementModel extends AbstractTableModel {
         User user = (User) users.get(row);
 
         switch (column) {
-        case 2:
-            user.setFullName((String) value);
         case 3:
+            user.setFullName((String) value);
+        case 4:
             user.setEmailAddr((String) value);
         }
     }
 
+    public Class getColumnClass(int column) {
+        if (column > 4)
+            return null;
+
+        switch (column) {
+        case 0:
+            return Boolean.class;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            return String.class;
+        }
+
+        return null;
+    }
 }

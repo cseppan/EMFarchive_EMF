@@ -15,23 +15,23 @@ import javax.swing.JFrame;
 import org.jmock.Mock;
 import org.jmock.core.stub.ReturnStub;
 
-public class UserManagementConsoleLauncher {
+public class UsersManagementConsoleLauncher {
 
     public static void main(String[] args) {
-        UserManagementConsoleLauncher launcher = new UserManagementConsoleLauncher();
+        UsersManagementConsoleLauncher launcher = new UsersManagementConsoleLauncher();
         
-        UserManagementConsole console = launcher.createConsole();
+        UsersManagementConsole console = launcher.createConsole();
         launcher.show(console);        
     }
 
-    private void show(UserManagementConsole console) {        
+    private void show(UsersManagementConsole console) {        
         JFrame frame = new JFrame();
         frame.addWindowListener(new WindowAdapter(){
             public void windowClosing(WindowEvent event) {
                 System.exit(0);
             }
         });
-        frame.setSize(new Dimension(500, 150));
+        frame.setSize(new Dimension(800, 150));
         frame.setLocation(new Point(400, 200));
         frame.setTitle("User Management Console");
         
@@ -40,10 +40,10 @@ public class UserManagementConsoleLauncher {
         frame.show();	
     }
 
-    private UserManagementConsole createConsole() {
+    private UsersManagementConsole createConsole() {
         Mock userAdmin = createUserAdmin();
 
-        UserManagementConsole console = new UserManagementConsole(
+        UsersManagementConsole console = new UsersManagementConsole(
                 (EMFUserAdmin) userAdmin.proxy());
         return console;
     }
