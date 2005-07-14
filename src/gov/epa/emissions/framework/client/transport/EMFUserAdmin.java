@@ -8,7 +8,7 @@
  */
 package gov.epa.emissions.framework.client.transport;
 
-import java.util.Collection;
+import java.util.List;
 
 import gov.epa.emissions.framework.commons.User;
 
@@ -26,9 +26,9 @@ public interface EMFUserAdmin {
     public String authenticate(String userName, String pwd, boolean wantAdminStatus);    
     public boolean resetPassword();
     public User getUser(String userName);
-    public Collection getUsers();
+    public List getUsers();
     public String createUser(User newUser);
     public String updateUser(User newUser);
-    public String updateUsers(Collection users);
+    public String updateUsers(List users);
     public String deleteUser(String userName);
 }

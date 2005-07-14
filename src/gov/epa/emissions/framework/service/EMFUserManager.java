@@ -4,7 +4,7 @@
  */
 package gov.epa.emissions.framework.service;
 
-import java.util.Collection;
+import java.util.List;
 
 import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
@@ -125,7 +125,7 @@ public class EMFUserManager implements EMFUserAdmin{
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#getUsers()
      */
-    public Collection getUsers() {
+    public List getUsers() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -133,7 +133,7 @@ public class EMFUserManager implements EMFUserAdmin{
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#updateUsers(java.util.Collection)
      */
-    public String updateUsers(Collection users) {
+    public String updateUsers(List users) {
         // TODO Auto-generated method stub
         return null;
     }

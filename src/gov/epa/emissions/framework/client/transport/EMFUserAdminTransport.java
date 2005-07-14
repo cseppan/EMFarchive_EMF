@@ -12,7 +12,7 @@ import gov.epa.emissions.framework.commons.User;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
-import java.util.Collection;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
@@ -147,7 +147,7 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#getUsers()
      */
-    public Collection getUsers() {
+    public List getUsers() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -155,7 +155,7 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#updateUsers(java.util.Collection)
      */
-    public String updateUsers(Collection users) {
+    public String updateUsers(List users) {
         // TODO Auto-generated method stub
         return null;
     }
