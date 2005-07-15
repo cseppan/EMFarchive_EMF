@@ -1,5 +1,6 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.client.security;
 
+import gov.epa.emissions.framework.client.security.UsersManagementModel;
 import gov.epa.emissions.framework.commons.User;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.client.security;
 
 public class UsersManagementPresenter {
 

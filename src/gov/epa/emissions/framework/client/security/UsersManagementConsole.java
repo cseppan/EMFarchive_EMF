@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.client.security;
 
 import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
 
@@ -16,12 +16,9 @@ import javax.swing.JTable;
 
 public class UsersManagementConsole extends JFrame implements UsersManagementView {
 
-    private EMFUserAdmin userAdmin;
-
     private UsersManagementPresenter presenter;
 
     public UsersManagementConsole(EMFUserAdmin userAdmin) {
-        this.userAdmin = userAdmin;
         UsersManagementModel model = new UsersManagementModel(userAdmin.getUsers());
 
         JPanel layoutPanel = layout(model);
