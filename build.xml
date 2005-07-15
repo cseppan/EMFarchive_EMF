@@ -20,6 +20,7 @@
 		</fileset>
 	</path>
 
+	<!-- basic targets -->
 	<target name="init" depends="clean">
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${classes.dir}" />
@@ -52,5 +53,21 @@
 
 	<target name="all" depends="compile, test" />
 
+	<!-- CVS targets -->
+	<target name="cvs-properties-load">
+		<property file=".cvs"/>
+	</target>
+    <target name="cvs-username-check" depends="cvs-properties-load" unless="cvs.username">
+        <echo message="Please create a .cvs file in your project home directory w/ the following properties:"/>
+        <echo message="username='cvs username'"/>
+    </target>
+        
+	<target name="cvs-update" depends="cvs-username-check" if="cvs.username">
+		<cvs command="update" cvsroot=":pserver:${cvs.username}@cvs.sourceforge.net:/cvsroot/emisview" quiet="yes" reallyquiet="yes" failonerror="yes" />
+		<echo message="EMF update is complete." />
+	</target>
+
+
+	<target name="pre-checkin" depends="cvs-update, compile, test" />
 </project>
 
