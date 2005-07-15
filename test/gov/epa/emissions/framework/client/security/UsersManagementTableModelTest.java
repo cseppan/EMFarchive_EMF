@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.security;
 
-import gov.epa.emissions.framework.client.security.UsersManagementModel;
+import gov.epa.emissions.framework.client.security.UsersManagementTableModel;
 import gov.epa.emissions.framework.commons.User;
 
 import java.util.ArrayList;
@@ -10,13 +10,13 @@ import javax.swing.table.TableModel;
 
 import junit.framework.TestCase;
 
-public class UsersManagementModelTest extends TestCase {
+public class UsersManagementTableModelTest extends TestCase {
 
     private List users;
 
     private User joe;
 
-    private UsersManagementModel model;
+    private UsersManagementTableModel model;
 
     protected void setUp() {
         users = new ArrayList();
@@ -28,11 +28,11 @@ public class UsersManagementModelTest extends TestCase {
 
         users.add(joe);
 
-        model = new UsersManagementModel(users);
+        model = new UsersManagementTableModel(users);
     }
 
     public void testShouldReturnColumnsNames() {
-        TableModel model = new UsersManagementModel(new ArrayList());
+        TableModel model = new UsersManagementTableModel(new ArrayList());
 
         assertEquals(5, model.getColumnCount());
 
@@ -48,7 +48,7 @@ public class UsersManagementModelTest extends TestCase {
         users.add(new User());
         users.add(new User());
 
-        TableModel model = new UsersManagementModel(users);
+        TableModel model = new UsersManagementTableModel(users);
 
         assertEquals(2, model.getRowCount());
     }

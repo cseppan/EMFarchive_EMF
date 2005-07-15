@@ -8,13 +8,13 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-public class UsersManagementModel extends AbstractTableModel {
+public class UsersManagementTableModel extends AbstractTableModel {
 
     private HeaderRow header;
 
     private List rows;
 
-    public UsersManagementModel(List users) {
+    public UsersManagementTableModel(List users) {
         this.header = new HeaderRow(new String[] { "Select", "#", "Username",
                 "Name", "Email" });
 

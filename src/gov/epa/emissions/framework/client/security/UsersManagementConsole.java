@@ -19,7 +19,7 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
     private UsersManagementPresenter presenter;
 
     public UsersManagementConsole(EMFUserAdmin userAdmin) {
-        UsersManagementModel model = new UsersManagementModel(userAdmin.getUsers());
+        UsersManagementTableModel model = new UsersManagementTableModel(userAdmin.getUsers());
 
         JPanel layoutPanel = layout(model);
 
@@ -30,7 +30,7 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
         this.getContentPane().add(layoutPanel);
     }
 
-    private JPanel layout(UsersManagementModel model) {
+    private JPanel layout(UsersManagementTableModel model) {
         JTable table = new JTable(model);
 
         JScrollPane scrollPane = new JScrollPane(table);
