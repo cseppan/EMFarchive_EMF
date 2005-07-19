@@ -3,6 +3,7 @@ package gov.epa.emissions.commons.gui;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.security.UsersManagementTableModel;
+import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
 import java.awt.Dimension;
@@ -12,6 +13,9 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.table.TableModel;
+
+import org.jmock.Mock;
+import org.jmock.core.stub.ReturnStub;
 
 public class SortFilterSelectUsersLauncher {
 
@@ -36,11 +40,14 @@ public class SortFilterSelectUsersLauncher {
     private TableModel createUserManagementTableModel() {
         List users = new ArrayList();
 
-        users.add(createUser("joe", "Joe Fullman", "joef@zukoswky.com"));
+        users.add(createUser("joe", "Joe Fullman", "joef@fullman.com"));
         users.add(createUser("mary", "Mary Joe", "mary@wonderful.net"));
         users.add(createUser("kevin", "Kevin Spacey", "kevin@spacey.com"));
 
-        return new UsersManagementTableModel(users);
+        Mock userAdmin = new Mock(EMFUserAdmin.class);
+        userAdmin.stubs().method("getUsers").withNoArguments().will(new ReturnStub(users));
+
+        return new UsersManagementTableModel((EMFUserAdmin) userAdmin.proxy());
     }
 
     private User createUser(String username, String name, String email) {

@@ -20,7 +20,7 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
     private UsersManagementPresenter presenter;
 
     public UsersManagementConsole(EMFUserAdmin userAdmin) {        
-        UsersManagementTableModel delegateModel = new UsersManagementTableModel(userAdmin.getUsers());
+        UsersManagementTableModel delegateModel = new UsersManagementTableModel(userAdmin);
         SortFilterSelectModel selectModel = new SortFilterSelectModel(delegateModel);
         
         SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(this, selectModel);

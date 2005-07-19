@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.security;
 
+import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
 import java.util.ArrayList;
@@ -10,20 +11,21 @@ import javax.swing.table.AbstractTableModel;
 
 public class UsersManagementTableModel extends AbstractTableModel {
 
-    private HeaderRow header;
+    private Header header;
 
     private List rows;
 
-    public UsersManagementTableModel(List users) {
-        this.header = new HeaderRow(new String[] { "Username", "Name", "Email" });
+    public UsersManagementTableModel(EMFUserAdmin admin) {
+        this.header = new Header(new String[] { "Username", "Name", "Email" });
 
         this.rows = new ArrayList();
         int i = 0;
-        for (Iterator iter = users.iterator(); iter.hasNext();) {
+        for (Iterator iter = admin.getUsers().iterator(); iter.hasNext();) {
             User user = (User) iter.next();
             Row row = new Row(user, i++);
             rows.add(row);
         }
+        
     }
 
     public String getColumnName(int i) {
@@ -59,10 +61,10 @@ public class UsersManagementTableModel extends AbstractTableModel {
     }
 
     // inner classes
-    private class HeaderRow {
+    private class Header {
         private String[] columnNames;
 
-        public HeaderRow(String[] columnNames) {
+        public Header(String[] columnNames) {
             this.columnNames = columnNames;
         }
 

@@ -1,22 +1,23 @@
 package gov.epa.emissions.framework.client.security;
 
-import gov.epa.emissions.framework.client.security.UsersManagementTableModel;
+import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.table.TableModel;
+import org.jmock.Mock;
+import org.jmock.MockObjectTestCase;
 
-import junit.framework.TestCase;
-
-public class UsersManagementTableModelTest extends TestCase {
+public class UsersManagementTableModelTest extends MockObjectTestCase {
 
     private List users;
 
     private User joe;
 
     private UsersManagementTableModel model;
+
+    private Mock emfUserAdmin;
 
     protected void setUp() {
         users = new ArrayList();
@@ -28,12 +29,13 @@ public class UsersManagementTableModelTest extends TestCase {
 
         users.add(joe);
 
-        model = new UsersManagementTableModel(users);
+        emfUserAdmin = mock(EMFUserAdmin.class);
+        emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users));
+
+        model = new UsersManagementTableModel((EMFUserAdmin) emfUserAdmin.proxy());
     }
 
     public void testShouldReturnColumnsNames() {
-        TableModel model = new UsersManagementTableModel(new ArrayList());
-
         assertEquals(3, model.getColumnCount());
 
         assertEquals("Username", model.getColumnName(0));
@@ -42,11 +44,12 @@ public class UsersManagementTableModelTest extends TestCase {
     }
 
     public void testShouldReturnRowsEqualingNumberOfUsers() {
-        List users = new ArrayList();
+        users = new ArrayList();
         users.add(new User());
         users.add(new User());
 
-        TableModel model = new UsersManagementTableModel(users);
+        emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users));
+        model = new UsersManagementTableModel((EMFUserAdmin) emfUserAdmin.proxy());
 
         assertEquals(2, model.getRowCount());
     }
@@ -81,8 +84,7 @@ public class UsersManagementTableModelTest extends TestCase {
     }
 
     public void testShouldMarkEmailColumnAsEditable() {
-        assertTrue("Email column should be editable", model
-                .isCellEditable(0, 2));
+        assertTrue("Email column should be editable", model.isCellEditable(0, 2));
     }
 
 }
