@@ -48,7 +48,7 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
     }
 
     private JPanel createButtonsPanel() {
-        JButton closeButton = new JButton("Close");//TODO: add event handler
+        JButton closeButton = new JButton("Close");
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 if(presenter != null) {

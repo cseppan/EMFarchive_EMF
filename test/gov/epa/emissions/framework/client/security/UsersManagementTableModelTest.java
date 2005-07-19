@@ -34,13 +34,11 @@ public class UsersManagementTableModelTest extends TestCase {
     public void testShouldReturnColumnsNames() {
         TableModel model = new UsersManagementTableModel(new ArrayList());
 
-        assertEquals(5, model.getColumnCount());
+        assertEquals(3, model.getColumnCount());
 
-        assertEquals("Select", model.getColumnName(0));
-        assertEquals("#", model.getColumnName(1));
-        assertEquals("Username", model.getColumnName(2));
-        assertEquals("Name", model.getColumnName(3));
-        assertEquals("Email", model.getColumnName(4));
+        assertEquals("Username", model.getColumnName(0));
+        assertEquals("Name", model.getColumnName(1));
+        assertEquals("Email", model.getColumnName(2));
     }
 
     public void testShouldReturnRowsEqualingNumberOfUsers() {
@@ -54,42 +52,37 @@ public class UsersManagementTableModelTest extends TestCase {
     }
 
     public void testShouldReturnUserAttributesAtSpecifiedIndex() {
-        assertEquals(Boolean.FALSE, model.getValueAt(0, 0));
-        assertEquals("1", model.getValueAt(0, 1));
-        assertEquals(joe.getUserName(), model.getValueAt(0, 2));
-        assertEquals(joe.getFullName(), model.getValueAt(0, 3));
-        assertEquals(joe.getEmailAddr(), model.getValueAt(0, 4));
+        assertEquals(joe.getUserName(), model.getValueAt(0, 0));
+        assertEquals(joe.getFullName(), model.getValueAt(0, 1));
+        assertEquals(joe.getEmailAddr(), model.getValueAt(0, 2));
     }
 
     public void testShouldBeAbleToUpdateUserOnSettingValuesAtSpecifiedIndexes() {
-        model.setValueAt("Joey", 0, 2);//username unchanged
-        assertEquals(joe.getUserName(), model.getValueAt(0, 2));
+        model.setValueAt("Joey", 0, 0);//username unchanged
+        assertEquals(joe.getUserName(), model.getValueAt(0, 0));
 
-        model.setValueAt("Joe Jumper", 0, 3);
-        assertEquals("Joe Jumper", model.getValueAt(0, 3));
+        model.setValueAt("Joe Jumper", 0, 1);
+        assertEquals("Joe Jumper", model.getValueAt(0, 1));
         assertEquals("Joe Jumper", joe.getFullName());
 
-        model.setValueAt("joe@jumper.net", 0, 4);
-        assertEquals("joe@jumper.net", model.getValueAt(0, 4));
+        model.setValueAt("joe@jumper.net", 0, 2);
+        assertEquals("joe@jumper.net", model.getValueAt(0, 2));
         assertEquals("joe@jumper.net", joe.getEmailAddr());
     }
 
-    public void testShouldReturnBooleanAsClassForSelectColumn() {
-        assertEquals(Boolean.class, model.getColumnClass(0));
-    }
-
-    public void testShouldMarkSelectColumnAsEditable() {
-        assertTrue("Select column should be editable", model.isCellEditable(0,
-                0));
+    public void testShouldReturnStringAsClassForAllColumns() {
+        assertEquals(String.class, model.getColumnClass(0));
+        assertEquals(String.class, model.getColumnClass(1));
+        assertEquals(String.class, model.getColumnClass(2));
     }
 
     public void testShouldMarkNameColumnAsEditable() {
-        assertTrue("Name column should be editable", model.isCellEditable(0, 3));
+        assertTrue("Name column should be editable", model.isCellEditable(0, 1));
     }
 
     public void testShouldMarkEmailColumnAsEditable() {
         assertTrue("Email column should be editable", model
-                .isCellEditable(0, 4));
+                .isCellEditable(0, 2));
     }
 
 }

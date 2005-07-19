@@ -15,11 +15,10 @@ public class UsersManagementTableModel extends AbstractTableModel {
     private List rows;
 
     public UsersManagementTableModel(List users) {
-        this.header = new HeaderRow(new String[] { "Select", "#", "Username",
-                "Name", "Email" });
+        this.header = new HeaderRow(new String[] { "Username", "Name", "Email" });
 
         this.rows = new ArrayList();
-        int i = 1;
+        int i = 0;
         for (Iterator iter = users.iterator(); iter.hasNext();) {
             User user = (User) iter.next();
             Row row = new Row(user, i++);
@@ -56,7 +55,7 @@ public class UsersManagementTableModel extends AbstractTableModel {
     }
 
     public boolean isCellEditable(int row, int column) {
-        return (column == 0 || column == 3 || column == 4) ? true : false;
+        return (column == 1 || column == 2) ? true : false;
     }
 
     // inner classes
@@ -68,7 +67,7 @@ public class UsersManagementTableModel extends AbstractTableModel {
         }
 
         public Class getColumnClass(int column) {
-            return (column == 0) ? Boolean.class : String.class;
+            return String.class;
         }
 
         public int columnsSize() {
@@ -94,14 +93,11 @@ public class UsersManagementTableModel extends AbstractTableModel {
 
         public void setValue(Object value, int column) {
             switch (column) {
-            case 0:
-                this.selected = ((Boolean)value);
-                break;
-            case 3:
+            case 1:
                 user.setFullName((String) value);
                 break;
-            case 4:
-                user.setEmailAddr((String) value);                
+            case 2:
+                user.setEmailAddr((String) value);
             }
 
         }
@@ -109,16 +105,13 @@ public class UsersManagementTableModel extends AbstractTableModel {
         public Object getValueAt(int column) {
             switch (column) {
             case 0:
-                return selected;
-            case 1:
-                return "" + index;
-            case 2:
                 return user.getUserName();
-            case 3:
+            case 1:
                 return user.getFullName();
-            case 4:
+            case 2:
                 return user.getEmailAddr();
             }
+            
             return null;
         }
     }
