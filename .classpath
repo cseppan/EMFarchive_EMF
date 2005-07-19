@@ -14,5 +14,12 @@
 	<classpathentry kind="lib" path="lib/soap.jar"/>
 	<classpathentry kind="lib" path="lib/dev/junit.jar"/>
 	<classpathentry kind="lib" path="lib/dev/jmock-1.0.1.jar"/>
+	<classpathentry sourcepath="lib/analysis-engine.jar" kind="lib" path="lib/analysis-engine.jar"/>
+	<classpathentry kind="lib" path="lib/colt.jar"/>
+	<classpathentry kind="lib" path="lib/cosu.jar"/>
+	<classpathentry kind="lib" path="lib/java_cup.jar"/>
+	<classpathentry kind="lib" path="lib/jh.jar"/>
+	<classpathentry kind="lib" path="lib/jlfgr-1_0.jar"/>
+	<classpathentry kind="lib" path="lib/weka.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
