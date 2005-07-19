@@ -1,4 +1,4 @@
-package gov.epa.emissions.gui;
+package gov.epa.emissions.commons.gui;
 
 import gov.epa.mims.analysisengine.table.MultiRowHeaderTableModel;
 

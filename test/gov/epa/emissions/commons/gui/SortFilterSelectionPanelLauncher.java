@@ -1,4 +1,7 @@
-package gov.epa.emissions.gui;
+package gov.epa.emissions.commons.gui;
+
+import gov.epa.emissions.commons.gui.SortFilterSelectModel;
+import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 
 import java.awt.Dimension;
 import java.awt.Point;

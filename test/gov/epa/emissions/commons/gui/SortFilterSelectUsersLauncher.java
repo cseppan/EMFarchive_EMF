@@ -1,5 +1,7 @@
-package gov.epa.emissions.gui;
+package gov.epa.emissions.commons.gui;
 
+import gov.epa.emissions.commons.gui.SortFilterSelectModel;
+import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.security.UsersManagementTableModel;
 import gov.epa.emissions.framework.commons.User;
 
