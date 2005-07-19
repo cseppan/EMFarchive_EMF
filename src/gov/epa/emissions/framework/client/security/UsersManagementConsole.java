@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.security;
 
 import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
+import gov.epa.emissions.gui.SortFilterSelectModel;
+import gov.epa.emissions.gui.SortFilterSelectionPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -12,37 +14,35 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 public class UsersManagementConsole extends JFrame implements UsersManagementView {
 
     private UsersManagementPresenter presenter;
 
-    public UsersManagementConsole(EMFUserAdmin userAdmin) {
-        UsersManagementTableModel model = new UsersManagementTableModel(userAdmin.getUsers());
+    public UsersManagementConsole(EMFUserAdmin userAdmin) {        
+        UsersManagementTableModel delegateModel = new UsersManagementTableModel(userAdmin.getUsers());
+        SortFilterSelectModel selectModel = new SortFilterSelectModel(delegateModel);
+        
+        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(this, selectModel);
+        
+        JPanel layoutPanel = layout(sortFilterSelectPanel);
 
-        JPanel layoutPanel = layout(model);
-
-        this.setSize(new Dimension(800, 150));
+        this.setSize(new Dimension(500, 200));
         this.setLocation(new Point(400, 200));
         this.setTitle("User Management Console");
 
         this.getContentPane().add(layoutPanel);
     }
 
-    private JPanel layout(UsersManagementTableModel model) {
-        JTable table = new JTable(model);
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        table.setPreferredScrollableViewportSize(new Dimension(600, 70));
-
-        JPanel buttonsPanel = createButtonsPanel();
+    private JPanel layout(JPanel sortFilterSelectPanel) {
+        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
+        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
 
         JPanel layout = new JPanel();
-
         layout.setLayout(new BorderLayout());
-        layout.add(scrollPane, BorderLayout.CENTER);
-        layout.add(buttonsPanel, BorderLayout.SOUTH);
+
+        layout.add(scrollPane, BorderLayout.CENTER);        
+        layout.add(createButtonsPanel(), BorderLayout.SOUTH);
 
         return layout;
     }
