@@ -16,8 +16,18 @@ public class UserCreationPresenter {
     public void notifyCreate() {
         User user = new User();
         user.setUserName(view.getUsername());
+        user.setPassword(view.getPassword());
+        
+        user.setFullName(view.getName());
+        user.setEmailAddr(view.getEmail());
+        user.setWorkPhone(view.getPhone());
+        user.setAffiliation(view.getAffiliation());
         
         model.createUser(user);
+    }
+
+    public void notifyCancel() {
+        view.close();
     }
 
 }

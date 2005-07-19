@@ -9,7 +9,7 @@ public class UsersManagementPresenter {
     }
 
     public void notifyCloseView() {
-        this.view.closeView();
+        this.view.close();
     }
 
     public void init() {

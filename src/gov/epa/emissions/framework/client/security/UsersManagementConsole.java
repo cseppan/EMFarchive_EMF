@@ -68,7 +68,7 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
         this.presenter = presenter;
     }
 
-    public void closeView() {
+    public void close() {
         super.hide();
     }
 
