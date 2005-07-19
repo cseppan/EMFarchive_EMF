@@ -28,6 +28,8 @@ public class SortFilterSelectModel extends MultiRowHeaderTableModel {
     /** temporarly stores whether the rows are selected or not */
     private Boolean[] selValues;
 
+    private SimpleTableModel delegate;
+
     /**
      * @param data
      *            two dimensional array: Array of row data
@@ -35,8 +37,8 @@ public class SortFilterSelectModel extends MultiRowHeaderTableModel {
      * @pre each column should have the same type as the first cell in the
      *      column
      */
-    public SortFilterSelectModel(Object[][] data, String[] columnnHeaders) {
-        setColHeaders(columnnHeaders);
+    public SortFilterSelectModel(Object[][] data, String[] columnHeaders) {
+        setColHeaders(columnHeaders);
         this.data = data;
 
         this.selValues = new Boolean[getRowCount()];
@@ -44,6 +46,10 @@ public class SortFilterSelectModel extends MultiRowHeaderTableModel {
         for (int i = 0; i < getRowCount(); i++) {
             selValues[i] = new Boolean(false);
         }
+    }
+
+    public SortFilterSelectModel(SimpleTableModel model) {
+        this.delegate = model;
     }
 
     private void setColHeaders(String[] attributes) {
@@ -61,24 +67,15 @@ public class SortFilterSelectModel extends MultiRowHeaderTableModel {
         super.columnRowHeaders[0] = "#";
     }
 
-    private void initializeSelVars() {
-        selValues = new Boolean[getRowCount()];
-
-        for (int i = 0; i < getRowCount(); i++) {
-            selValues[i] = new Boolean(false);
-        }
-    }
-
     public int getColumnCount() {
-        if (columnHeaders == null) {
-            return 0;
-        }
-
-        return columnHeaders.length;
+        return 2 + delegate.getColumnCount();
     }
 
     public String getColumnName(int col) {
-        return super.columnHeaders[col][0];
+        if (col == 0) return "#";
+        if (col == 1) return SELECT_COL_NAME;
+        
+        return delegate.getColumnName(col - 2);//the first two are: # & Select
     }
 
     public int getRowCount() {
