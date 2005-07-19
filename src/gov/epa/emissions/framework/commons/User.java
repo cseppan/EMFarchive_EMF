@@ -35,6 +35,23 @@ public class User implements Serializable {
     private boolean dirty = false;  
     
     /**
+     *
+     */
+
+    public boolean equals(Object other) {
+        if(!(other instanceof User)) return false;
+        
+        User otherUser = (User)other;
+        return this.userName.equals(otherUser.userName);
+    }
+    /**
+     *
+     */
+
+    public int hashCode() {
+        return userName.hashCode();
+    }
+    /**
      * The no argument constructor is needed to comply to the
      * Java Beans specification. 
      * 

@@ -8,9 +8,9 @@
  */
 package gov.epa.emissions.framework.client.transport;
 
-import java.util.List;
-
 import gov.epa.emissions.framework.commons.User;
+
+import java.util.List;
 
 /**
  * @author Conrad F. D'Cruz
