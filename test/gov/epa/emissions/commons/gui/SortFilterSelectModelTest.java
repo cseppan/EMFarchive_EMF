@@ -66,6 +66,7 @@ public class SortFilterSelectModelTest extends MockObjectTestCase {
         model.setValueAt(Boolean.TRUE, 1, 0);
 
         assertEquals(Boolean.TRUE, model.getValueAt(1, 0));
+        assertEquals(1, model.getSelectedIndexes()[0]);
     }
 
     public void testShouldReturnBaseModelRowIndexTheSameAsSpecifiedInTheArgument() {
@@ -88,4 +89,5 @@ public class SortFilterSelectModelTest extends MockObjectTestCase {
         assertEquals("Age", columnNames[1]);
         assertEquals("Country", columnNames[2]);
     }
+        
 }

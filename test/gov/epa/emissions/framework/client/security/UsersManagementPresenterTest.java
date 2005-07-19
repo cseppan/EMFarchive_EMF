@@ -10,7 +10,7 @@ public class UsersManagementPresenterTest extends MockObjectTestCase {
     public void testShouldCloseViewOnClickOfCloseButton() {
         Mock view = mock(UsersManagementView.class);
 
-        UsersManagementPresenter presenter = new UsersManagementPresenter((UsersManagementView) view.proxy());
+        UsersManagementPresenter presenter = new UsersManagementPresenter(null, (UsersManagementView) view.proxy());
 
         view.expects(once()).method("setViewObserver").with(eq(presenter));
         view.expects(once()).method("close").withNoArguments();

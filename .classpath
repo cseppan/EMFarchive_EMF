@@ -21,5 +21,6 @@
 	<classpathentry kind="lib" path="lib/jh.jar"/>
 	<classpathentry kind="lib" path="lib/jlfgr-1_0.jar"/>
 	<classpathentry kind="lib" path="lib/weka.jar"/>
+	<classpathentry kind="lib" path="lib/commons-primitives-1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

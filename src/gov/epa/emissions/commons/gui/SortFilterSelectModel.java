@@ -7,6 +7,9 @@ import java.util.List;
 
 import javax.swing.table.TableModel;
 
+import org.apache.commons.collections.primitives.ArrayIntList;
+import org.apache.commons.collections.primitives.IntList;
+
 /**
  * <p>
  * A table that adds the 'selectable' behavior to a MultiRowHeaderTableModel.
@@ -105,5 +108,14 @@ public class SortFilterSelectModel extends MultiRowHeaderTableModel {
         }
 
         return (String[]) names.toArray(new String[0]);
+    }
+
+    public int[] getSelectedIndexes() {
+        IntList indexes = new ArrayIntList();
+        for (int i = 0; i < selects.length; i++) {
+            if(selects[i] == Boolean.TRUE) indexes.add(i);
+        }
+        
+        return indexes.toArray();
     }
 }

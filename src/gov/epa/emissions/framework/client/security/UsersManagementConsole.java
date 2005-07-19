@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,10 +19,12 @@ import javax.swing.JScrollPane;
 public class UsersManagementConsole extends JFrame implements UsersManagementView {
 
     private UsersManagementPresenter presenter;
+    private SortFilterSelectModel selectModel;
+    private UsersManagementTableModel model;
 
     public UsersManagementConsole(EMFUserAdmin userAdmin) {        
-        UsersManagementTableModel delegateModel = new UsersManagementTableModel(userAdmin);
-        SortFilterSelectModel selectModel = new SortFilterSelectModel(delegateModel);
+        model = new UsersManagementTableModel(userAdmin);
+        selectModel = new SortFilterSelectModel(model);
         
         SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(this, selectModel);
         
@@ -42,12 +45,14 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
         layout.setLayout(new BorderLayout());
 
         layout.add(scrollPane, BorderLayout.CENTER);        
-        layout.add(createButtonsPanel(), BorderLayout.SOUTH);
+        layout.add(createControlPanel(), BorderLayout.SOUTH);
 
         return layout;
     }
 
-    private JPanel createButtonsPanel() {
+    private JPanel createControlPanel() {
+        JPanel crudPanel = createCrudPanel();
+
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -57,11 +62,37 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
             }
         });
 
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.setLayout(new BorderLayout());
-        buttonsPanel.add(closeButton, BorderLayout.EAST);
+        JPanel controlPanel = new JPanel();
+        controlPanel.setLayout(new BorderLayout());
+       
+        
+        controlPanel.add(crudPanel, BorderLayout.WEST);
+        controlPanel.add(closeButton, BorderLayout.EAST);
 
-        return buttonsPanel;
+        return controlPanel;
+    }
+
+    private JPanel createCrudPanel() {
+        JButton newButton = new JButton("New");
+        
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                if(presenter != null) {
+                    int[] selected = selectModel.getSelectedIndexes();
+                    for (int i = 0; i < selected.length; i++) {
+                      presenter.notifyDelete(model.getUser(i).getUserName());                        
+                    }
+                }
+            }
+        });
+        
+        
+        JPanel crudPanel = new JPanel();
+        crudPanel.setLayout(new FlowLayout());
+        crudPanel.add(newButton);
+        crudPanel.add(deleteButton);
+        return crudPanel;
     }
 
     public void setViewObserver(UsersManagementPresenter presenter) {

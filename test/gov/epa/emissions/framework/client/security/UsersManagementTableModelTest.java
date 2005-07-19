@@ -86,5 +86,18 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
     public void testShouldMarkEmailColumnAsEditable() {
         assertTrue("Email column should be editable", model.isCellEditable(0, 2));
     }
+    
+    public void testShouldReturnUserAtSpecifiedIndex() {
+        User jill = new User();
+        users.add(jill);
+
+        emfUserAdmin = mock(EMFUserAdmin.class);
+        emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users));
+
+        model = new UsersManagementTableModel((EMFUserAdmin) emfUserAdmin.proxy());
+
+        assertSame(joe, model.getUser(0));
+        assertSame(jill, model.getUser(1));
+    }
 
 }

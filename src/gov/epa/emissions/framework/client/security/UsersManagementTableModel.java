@@ -24,8 +24,7 @@ public class UsersManagementTableModel extends AbstractTableModel {
             User user = (User) iter.next();
             Row row = new Row(user, i++);
             rows.add(row);
-        }
-        
+        }        
     }
 
     public String getColumnName(int i) {
@@ -116,6 +115,12 @@ public class UsersManagementTableModel extends AbstractTableModel {
             
             return null;
         }
+    }
+
+    public User getUser(int index) {
+        Row row = (Row) rows.get(index);
+        
+        return row.user;
     }
 
 }

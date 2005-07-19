@@ -15,17 +15,16 @@ public class UsersManagementConsoleLauncher {
 
     public static void main(String[] args) {
         UsersManagementConsoleLauncher launcher = new UsersManagementConsoleLauncher();
-        UsersManagementConsole console = launcher.createConsole();
         
-        UsersManagementPresenter presenter = new UsersManagementPresenter(console);
+        Mock userAdmin = launcher.createUserAdmin();
+        EMFUserAdmin userAdminProxy = (EMFUserAdmin) userAdmin.proxy();
+        
+        UsersManagementConsole console = new UsersManagementConsole(userAdminProxy);
+        
+        UsersManagementPresenter presenter = new UsersManagementPresenter(userAdminProxy, console);
         presenter.init();
         
         console.show();
-    }
-
-    private UsersManagementConsole createConsole() {
-        Mock userAdmin = createUserAdmin();
-        return new UsersManagementConsole((EMFUserAdmin) userAdmin.proxy());
     }
 
     private Mock createUserAdmin() {
@@ -37,7 +36,8 @@ public class UsersManagementConsoleLauncher {
 
         Mock userAdmin = new Mock(EMFUserAdmin.class);
         userAdmin.stubs().method("getUsers").withNoArguments().will(new ReturnStub(users));
-
+        userAdmin.stubs().method("deleteUser");
+        
         return userAdmin;
     }
 
