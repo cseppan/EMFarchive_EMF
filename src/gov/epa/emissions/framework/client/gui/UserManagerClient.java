@@ -106,11 +106,13 @@ public class UserManagerClient extends JFrame
     
     
     // resetPassword, to send the user an email with a new password
-    // The returns on this method will change, so for now, let it be void
-    public void resetPassword()
+    // The returns a string whose values are "Success" or the three
+    // communications-relatd error messages
+    public String resetPassword()
     {
         // Temporarily, just print a message
         JOptionPane.showMessageDialog(this, "Reset Password is not ready");
+        return "Success";
     }
 
     
