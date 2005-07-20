@@ -7,6 +7,7 @@ package gov.epa.emissions.framework.client.gui;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import gov.epa.emissions.framework.commons.User;
 
 public abstract class FrameworkObservable
 {
