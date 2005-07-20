@@ -1,10 +1,9 @@
 package gov.epa.emissions.framework.client.security;
 
-import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
@@ -19,9 +18,9 @@ public class UsersManagementTableModel extends AbstractTableModel {
         this.header = new Header(new String[] { "Username", "Name", "Email" });
 
         this.rows = new ArrayList();
-        int i = 0;
-        for (Iterator iter = admin.getUsers().iterator(); iter.hasNext();) {
-            User user = (User) iter.next();
+        User[] users = admin.getUsers();
+        for (int i=0; i < users.length;i++) {
+            User user = users[i];
             Row row = new Row(user, i++);
             rows.add(row);
         }        

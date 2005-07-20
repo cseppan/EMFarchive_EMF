@@ -7,12 +7,21 @@
 package gov.epa.emissions.framework.client.gui;
 
 // Use Java swing classes
-import java.awt.*;
-import javax.swing.*;
-import java.awt.event.*;
-import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
 import gov.epa.emissions.framework.client.transport.EMFUserAdminTransport;
 import gov.epa.emissions.framework.commons.User;
+
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
 
 

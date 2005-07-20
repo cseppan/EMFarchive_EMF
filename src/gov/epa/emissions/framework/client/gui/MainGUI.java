@@ -4,10 +4,16 @@
 package gov.epa.emissions.framework.client.gui;
 
 // Use Java swing classes
-import java.awt.*;
-import javax.swing.*;
-import java.awt.event.*;
 import gov.epa.emissions.framework.commons.User;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 
 public class MainGUI extends JFrame implements ActionListener

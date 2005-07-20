@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.security;
 
-import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
 public class UserCreationPresenter {

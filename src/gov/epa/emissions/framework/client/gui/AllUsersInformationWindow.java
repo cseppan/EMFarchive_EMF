@@ -3,10 +3,13 @@
 
 package gov.epa.emissions.framework.client.gui;
 
-import java.awt.*;
-import javax.swing.*;
-import java.awt.event.*;
 import gov.epa.emissions.framework.commons.User;
+
+import java.awt.Container;
+import java.awt.FlowLayout;
+
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 
 public class AllUsersInformationWindow extends JDialog
 {

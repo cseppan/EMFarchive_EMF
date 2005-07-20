@@ -4,9 +4,6 @@
 
 package gov.epa.emissions.framework.client.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
 import gov.epa.emissions.framework.commons.User;
 
 

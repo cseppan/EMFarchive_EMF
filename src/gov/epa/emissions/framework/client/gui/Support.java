@@ -4,9 +4,8 @@
 
 package gov.epa.emissions.framework.client.gui;
 
-import java.awt.*;
-import javax.swing.*;
-import java.awt.event.*;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class Support extends JFrame
 {

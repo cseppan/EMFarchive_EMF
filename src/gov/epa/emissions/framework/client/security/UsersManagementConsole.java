@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.security;
 
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
-import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

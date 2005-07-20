@@ -3,9 +3,7 @@
 package gov.epa.emissions.framework.client.gui;
 
 // Use Java swing classes
-import java.awt.*;
-import javax.swing.*;
-import java.awt.event.*;
+import javax.swing.JDialog;
 
 public abstract class FrameworkFrame extends JDialog implements FrameworkWindow
 {
