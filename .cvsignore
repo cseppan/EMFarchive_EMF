@@ -5,3 +5,4 @@ dist
 etc
 .cvsignore
 .cvs
+wsdl_build
