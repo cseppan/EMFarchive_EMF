@@ -1,2 +1,7 @@
 build
+bin
+classes
+dist
+etc
+.cvsignore
 .cvs
