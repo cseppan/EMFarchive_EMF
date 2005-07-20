@@ -7,6 +7,7 @@ package gov.epa.emissions.framework.client.gui;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import gov.epa.emissions.framework.commons.User;
 
 public class UserInformationWindow extends FrameworkFrame implements ActionListener
 {
@@ -57,7 +58,7 @@ public class UserInformationWindow extends FrameworkFrame implements ActionListe
         // If this is an existing user who can be an administrator, make the window
         // longer to allow for an extra message
         setTitle("User Information");
-        if (!NewUser  &&  user.getCanBeAdmin()) setSize(450,450);
+        if (!NewUser  &&  user.isInAdminGroup()) setSize(450,450);
         else setSize(450,400);
         setLocation(300,200);
         setModal(true);
@@ -142,7 +143,7 @@ public class UserInformationWindow extends FrameworkFrame implements ActionListe
         
         // The User Can Be Administrator label...this cannot be edited
         // Present this only for an existing user who can be an administrator
-        if (!NewUser  &&  user.getCanBeAdmin())
+        if (!NewUser  &&  user.isInAdminGroup())
         {
             usercanbeadminlabel = new JLabel
                 ("This user can log in as an administrator                     ");

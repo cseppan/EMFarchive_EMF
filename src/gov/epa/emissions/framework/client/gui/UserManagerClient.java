@@ -9,6 +9,7 @@ package gov.epa.emissions.framework.client.gui;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import gov.epa.emissions.framework.commons.User;
 
 
 public class UserManagerClient extends JFrame
@@ -50,7 +51,7 @@ public class UserManagerClient extends JFrame
         // Here the user exists.  If he didn't log in as administrator he is good
         if (!AdmIn) return "Valid";
         // If he did, check that he is allowed to
-        if (user[UserNumber].getCanBeAdmin())  return "Valid";
+        if (user[UserNumber].isInAdminGroup())  return "Valid";
         return "Cant Be Admin";
     }
     
@@ -99,8 +100,8 @@ public class UserManagerClient extends JFrame
         user[UserNumber].setEmailAddr(userin.getEmailAddr());
         user[UserNumber].setUserName(userin.getUserName());
         user[UserNumber].setPassword(userin.getPassword());
-        user[UserNumber].setCanBeAdmin(userin.getCanBeAdmin());
-        user[UserNumber].setAcctDisabled(userin.getAcctDisabled());
+        user[UserNumber].setInAdminGroup(userin.isInAdminGroup());
+        user[UserNumber].setAcctDisabled(userin.isAcctDisabled());
         return "Success";
     }
     
