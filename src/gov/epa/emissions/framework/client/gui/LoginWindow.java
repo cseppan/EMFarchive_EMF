@@ -185,6 +185,8 @@ public class LoginWindow extends JDialog implements ActionListener
             {    
                 // This calls Joe's method
           //    CurrentUser = umc.getUser(CurrentUserName);
+                JOptionPane.showMessageDialog(this,"To Conrad getUser  " + 
+                		CurrentUserName);
             	// This calls Conrad's method
             	CurrentUser = uat.getUser(CurrentUserName);
             	// Temp print out Conrad's return
