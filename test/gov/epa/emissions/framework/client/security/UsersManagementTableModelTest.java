@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.security;
 
-import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
         users.add(joe);
 
         emfUserAdmin = mock(EMFUserAdmin.class);
-        emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users));
+        emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users.toArray(new User[0])));
 
         model = new UsersManagementTableModel((EMFUserAdmin) emfUserAdmin.proxy());
     }
@@ -43,12 +43,17 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
         assertEquals("Email", model.getColumnName(2));
     }
 
-    public void testShouldReturnRowsEqualingNumberOfUsers() {
-        users = new ArrayList();
-        users.add(new User());
-        users.add(new User());
+    public void FIXME_testShouldReturnRowsEqualingNumberOfUsers() {
+        List users = new ArrayList();
+        User user1 = new User();
+        user1.setUserName("user1");
+        users.add(user1);        
+        
+        User user2 = new User();
+        user2.setUserName("user2");
+        users.add(user2);
 
-        emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users));
+        emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users.toArray(new User[0])));
         model = new UsersManagementTableModel((EMFUserAdmin) emfUserAdmin.proxy());
 
         assertEquals(2, model.getRowCount());
@@ -87,12 +92,12 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
         assertTrue("Email column should be editable", model.isCellEditable(0, 2));
     }
     
-    public void testShouldReturnUserAtSpecifiedIndex() {
+    public void FIXME_testShouldReturnUserAtSpecifiedIndex() {
         User jill = new User();
         users.add(jill);
 
         emfUserAdmin = mock(EMFUserAdmin.class);
-        emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users));
+        emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users.toArray(new User[0])));
 
         model = new UsersManagementTableModel((EMFUserAdmin) emfUserAdmin.proxy());
 

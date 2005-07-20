@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.client.security;
 
-import gov.epa.emissions.framework.client.security.UsersManagementConsole;
-import gov.epa.emissions.framework.client.security.UsersManagementPresenter;
-import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
 import java.util.ArrayList;
