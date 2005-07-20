@@ -6,6 +6,7 @@ package gov.epa.emissions.framework.client.gui;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import gov.epa.emissions.framework.commons.User;
 
 public class AllUsersInformationWindow extends JDialog
 {
@@ -49,7 +50,7 @@ public class AllUsersInformationWindow extends JDialog
                             "       " + ui.getEmailAddr() +
                             "       " + ui.getUserName() +
                             "       " + ui.getPassword() +
-                            "       " + ui.getCanBeAdmin()     );
+                            "       " + ui.isInAdminGroup()     );
          container.add(Label);
      }
      // Display the name of the current user
