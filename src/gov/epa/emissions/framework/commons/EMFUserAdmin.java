@@ -6,11 +6,10 @@
  * File Name: EMFUserAdmin.java
  * Author: Conrad F. D'Cruz
  */
-package gov.epa.emissions.framework.client.transport;
-
-import gov.epa.emissions.framework.commons.User;
+package gov.epa.emissions.framework.commons;
 
 import java.util.List;
+
 
 /**
  * @author Conrad F. D'Cruz
@@ -26,9 +25,10 @@ public interface EMFUserAdmin {
     public String authenticate(String userName, String pwd, boolean wantAdminStatus);    
     public boolean resetPassword();
     public User getUser(String userName);
-    public List getUsers();
+    public User[] getUsers();
     public String createUser(User newUser);
     public String updateUser(User newUser);
     public String updateUsers(List users);
     public String deleteUser(String userName);
+    public EMFUser[] getEmfUsers();
 }
