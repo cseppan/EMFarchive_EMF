@@ -7,12 +7,13 @@
 package gov.epa.emissions.framework.client.gui;
 
 // Use Java swing classes
-import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
-import gov.epa.emissions.framework.client.transport.EMFUserAdminTransport;
-
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
+import gov.epa.emissions.framework.client.transport.EMFUserAdminTransport;
+import gov.epa.emissions.framework.commons.User;
+
 
 
 public class LoginWindow extends JDialog implements ActionListener
@@ -20,6 +21,8 @@ public class LoginWindow extends JDialog implements ActionListener
     
     // The ref variable of the current user
     User CurrentUser = null;
+
+    
     // Current user name and password
     String CurrentUserName = null;
     String CurrentPassword = null;
@@ -165,20 +168,27 @@ public class LoginWindow extends JDialog implements ActionListener
             // Go authenticate the user
 
             // This statement calls Joe's method
-    //        String UserStatus = umc.Authenticate(CurrentUserName,CurrentPassword,AdmLogin);
-            
+    //      String UserStatus = umc.Authenticate(CurrentUserName,CurrentPassword,AdmLogin);
+            // Print what I'm sending to Conrad
+            JOptionPane.showMessageDialog(this,"To Conrad authen  " + CurrentUserName +
+            		"   " + CurrentPassword  + "    " + AdmLogin);
             // These statements call Conrad's method
             EMFUserAdminTransport uat = new EMFUserAdminTransport();
             String UserStatus =
             	uat.authenticate(CurrentUserName,CurrentPassword,AdmLogin);
-            // Temp print to see what Conrad returns
-            JOptionPane.showMessageDialog(this,"Conrad returns:  " + UserStatus);
-                       
+        	// Temp print out Conrad's return
+            JOptionPane.showMessageDialog(this,"Conrad from authen  " + UserStatus);
+                        
             // If the user is authentic, get the user object and delete the window
             // indicating success
             if (UserStatus.equals("Valid"))
             {    
-                CurrentUser = umc.getUser(CurrentUserName);
+                // This calls Joe's method
+          //    CurrentUser = umc.getUser(CurrentUserName);
+            	// This calls Conrad's method
+            	CurrentUser = uat.getUser(CurrentUserName);
+            	// Temp print out Conrad's return
+                JOptionPane.showMessageDialog(this,"Conrad from getUser  " + CurrentUser);
                 GoodReturn = true;
                 dispose();
             }
