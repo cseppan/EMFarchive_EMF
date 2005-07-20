@@ -7,6 +7,9 @@
 package gov.epa.emissions.framework.client.gui;
 
 // Use Java swing classes
+import gov.epa.emissions.framework.client.transport.EMFUserAdmin;
+import gov.epa.emissions.framework.client.transport.EMFUserAdminTransport;
+
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
@@ -160,7 +163,17 @@ public class LoginWindow extends JDialog implements ActionListener
             CurrentPassword = passwordtext.getText();
             AdmLogin = loginadmckbox.isSelected();
             // Go authenticate the user
-            String UserStatus = umc.Authenticate(CurrentUserName,CurrentPassword,AdmLogin);
+
+            // This statement calls Joe's method
+    //        String UserStatus = umc.Authenticate(CurrentUserName,CurrentPassword,AdmLogin);
+            
+            // These statements call Conrad's method
+            EMFUserAdminTransport uat = new EMFUserAdminTransport();
+            String UserStatus =
+            	uat.authenticate(CurrentUserName,CurrentPassword,AdmLogin);
+            // Temp print to see what Conrad returns
+            JOptionPane.showMessageDialog(this,"Conrad returns:  " + UserStatus);
+                       
             // If the user is authentic, get the user object and delete the window
             // indicating success
             if (UserStatus.equals("Valid"))
@@ -228,8 +241,7 @@ public class LoginWindow extends JDialog implements ActionListener
             if (n == JOptionPane.YES_OPTION)
             {
                 // Here he replied yes.  Call the method that does the work.
-                // The type of return will change, so for now, don't use any return
-                umc.resetPassword();
+                String result = umc.resetPassword();
             }
         }
    }
