@@ -25,7 +25,7 @@ public class Main
       // Instantiate the User Manager Client
       UserManagerClient umc = new UserManagerClient();
       // Temporarily create 3 Initial Users
-      umc.Create3InitialUsers();
+  //    umc.Create3InitialUsers();
       // Create the object for the current user with blank fields
       User CurrentUser = new User("", "", "", "","", "", false, false);
       
