@@ -1,11 +1,12 @@
 package gov.epa.emissions.framework.client.security;
 
-import java.util.Iterator;
-import java.util.List;
-
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUser;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class EMFUserAdminStub implements EMFUserAdmin {
 
@@ -63,7 +64,7 @@ public class EMFUserAdminStub implements EMFUserAdmin {
         return null;
     }
 
-    public EMFUser[] getEmfUsers() {
+    public EMFUser[] getEmfUsers() throws EmfException {
         return null;
     }
 

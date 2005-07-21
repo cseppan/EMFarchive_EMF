@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.security;
 
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import org.jmock.Mock;
@@ -19,7 +20,7 @@ public class UsersManagementPresenterTest extends MockObjectTestCase {
         presenter.notifyCloseView();
     }
 
-    public void testShouldDeleteUserViaEMFUserAdminOnNotifyDelete() {
+    public void testShouldDeleteUserViaEMFUserAdminOnNotifyDelete() throws EmfException {
         Mock emfUserAdmin = mock(EMFUserAdmin.class);
         emfUserAdmin.expects(once()).method("deleteUser").with(eq("matts"));
         

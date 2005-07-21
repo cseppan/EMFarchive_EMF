@@ -8,9 +8,7 @@
  */
 package gov.epa.emissions.framework.client.dummy;
   
-import java.util.Iterator;
-import java.util.List;
-
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.EMFUserAdminTransport;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
@@ -29,7 +27,7 @@ public class EMFClient {
         // TODO Auto-generated constructor stub
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws EmfException {
         String statuscode = null;
         
         EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport();

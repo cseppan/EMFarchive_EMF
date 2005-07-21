@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.security;
 
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 public class UsersManagementPresenter {
@@ -20,7 +21,7 @@ public class UsersManagementPresenter {
         view.setViewObserver(this);
     }
 
-    public void notifyDelete(String username) {
+    public void notifyDelete(String username) throws EmfException {
         model.deleteUser(username);
         view.refresh();
     }

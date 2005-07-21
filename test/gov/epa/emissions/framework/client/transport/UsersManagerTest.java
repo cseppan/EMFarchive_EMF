@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -8,7 +9,7 @@ import org.jmock.MockObjectTestCase;
 
 public class UsersManagerTest extends MockObjectTestCase {
     
-    public void testShouldDelegateCreateUserToEMFUserAdmin() {
+    public void testShouldDelegateCreateUserToEMFUserAdmin() throws EmfException {
         User user = new User();
         
         Mock userAdmin = mock(EMFUserAdmin.class);

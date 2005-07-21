@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.security;
 
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -8,7 +9,7 @@ import org.jmock.MockObjectTestCase;
 
 public class UsersCreationPresenterTest extends MockObjectTestCase {
 
-    public void testShouldAttemptToCreateUserViaEMFUserAdminOnNotifyCreateUser() {
+    public void testShouldAttemptToCreateUserViaEMFUserAdminOnNotifyCreateUser() throws EmfException {
         User expectedUser = new User();
         expectedUser.setUserName("joey");
 

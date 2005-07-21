@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.security;
 
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -13,7 +14,7 @@ public class UserCreationPresenter {
         this.view = view;
     }
 
-    public void notifyCreate() {
+    public void notifyCreate() throws EmfException {
         User user = new User();
         user.setUserName(view.getUsername());
         user.setPassword(view.getPassword());

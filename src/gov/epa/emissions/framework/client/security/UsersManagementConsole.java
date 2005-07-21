@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.security;
 
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
@@ -86,7 +87,11 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
                 if(presenter != null) {
                     int[] selected = selectModel.getSelectedIndexes();
                     for (int i = 0; i < selected.length; i++) {
-                      presenter.notifyDelete(model.getUser(selected[i]).getUserName());                        
+                      try {
+                        presenter.notifyDelete(model.getUser(selected[i]).getUserName());
+                    } catch (EmfException e) {
+                        //TODO: handle exceptions
+                    }                        
                     }
                 }
             }

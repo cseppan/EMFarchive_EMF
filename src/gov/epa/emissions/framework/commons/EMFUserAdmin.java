@@ -8,6 +8,8 @@
  */
 package gov.epa.emissions.framework.commons;
 
+import gov.epa.emissions.framework.EmfException;
+
 import java.util.List;
 
 
@@ -20,16 +22,15 @@ import java.util.List;
  */
 public interface EMFUserAdmin {
 
-    public boolean isNewUser();
-    public boolean validate();
-    public String authenticate(String userName, String pwd, boolean wantAdminStatus);    
-    public boolean resetPassword();
-    public User getUser(String userName);
-    public User[] getUsers();
-    //public List getUsers();
-    public String createUser(User newUser);
-    public String updateUser(User newUser);
-    public String updateUsers(List users);
-    public String deleteUser(String userName);
-    public EMFUser[] getEmfUsers();
+    public boolean isNewUser() throws EmfException;
+    public boolean validate() throws EmfException;
+    public String authenticate(String userName, String pwd, boolean wantAdminStatus) throws EmfException;    
+    public boolean resetPassword() throws EmfException;
+    public User getUser(String userName) throws EmfException;
+    public User[] getUsers() throws EmfException;
+    public String createUser(User newUser) throws EmfException;
+    public String updateUser(User newUser) throws EmfException;
+    public String updateUsers(List users) throws EmfException;
+    public String deleteUser(String userName) throws EmfException;
+    public EMFUser[] getEmfUsers() throws EmfException;
 }

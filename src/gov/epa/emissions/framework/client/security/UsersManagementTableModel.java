@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.security;
 
 import gov.epa.emissions.commons.gui.RefreshableTableModel;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -30,7 +31,12 @@ public class UsersManagementTableModel extends AbstractTableModel implements Ref
     
     private void createRows(EMFUserAdmin admin) {
         this.rows = new ArrayList();
-        User[] users = admin.getUsers();
+        User[] users;
+        try {
+            users = admin.getUsers();
+        } catch (EmfException e) {//TODO: need to write exception handlers
+            throw new RuntimeException("could not fetch users");
+        }
         for (int i=0; i < users.length;i++) {
             User user = users[i];
             Row row = new Row(user);

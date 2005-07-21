@@ -119,7 +119,6 @@ public class SortFilterSelectModel extends MultiRowHeaderTableModel {
         return indexes.toArray();
     }
 
-    //TODO: needs to be unit tested
     public void refresh() {
         delegate.refresh();
         resetSelections();        
