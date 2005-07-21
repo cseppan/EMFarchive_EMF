@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.security;
 
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
+import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
@@ -14,7 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 public class UsersManagementConsole extends JFrame implements UsersManagementView {
 
@@ -28,10 +28,10 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
         selectModel = new SortFilterSelectModel(model);
         
         //TODO: fix the row-count issue w/ OverallTableModel hierarchy
-//        sortFilterSelectPanel = new SortFilterSelectionPanel(this, selectModel);
-        sortFilterSelectPanel = new JPanel();
-        JTable table = new JTable(selectModel);
-        sortFilterSelectPanel.add(table);
+        sortFilterSelectPanel = new SortFilterSelectionPanel(this, selectModel);
+//        sortFilterSelectPanel = new JPanel();
+//        JTable table = new JTable(selectModel);
+//        sortFilterSelectPanel.add(table);
         
         JPanel layoutPanel = layout(sortFilterSelectPanel);
 
@@ -111,6 +111,7 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
     public void refresh() {
         selectModel.refresh();
         sortFilterSelectPanel.validate();
+        System.out.println("UI refresh complete");
     }
 
 }
