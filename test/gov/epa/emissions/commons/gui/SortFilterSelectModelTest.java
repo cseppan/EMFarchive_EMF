@@ -1,8 +1,5 @@
 package gov.epa.emissions.commons.gui;
 
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-
-import javax.swing.table.TableModel;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -14,7 +11,7 @@ public class SortFilterSelectModelTest extends MockObjectTestCase {
     private SortFilterSelectModel model;
 
     protected void setUp() {
-        delegate = mock(TableModel.class);
+        delegate = mock(RefreshableTableModel.class);
         delegate.stubs().method("getRowCount").withNoArguments().will(returnValue(7));
 
         delegate.stubs().method("getColumnCount").withNoArguments().will(returnValue(3));
@@ -23,7 +20,7 @@ public class SortFilterSelectModelTest extends MockObjectTestCase {
         delegate.stubs().method("getColumnName").with(eq(1)).will(returnValue("Age"));
         delegate.stubs().method("getColumnName").with(eq(2)).will(returnValue("Country"));
 
-        model = new SortFilterSelectModel((TableModel) delegate.proxy());
+        model = new SortFilterSelectModel((RefreshableTableModel) delegate.proxy());
     }
 
     public void testShouldReturnSelectAsFirstColumn() {
@@ -90,4 +87,11 @@ public class SortFilterSelectModelTest extends MockObjectTestCase {
         assertEquals("Country", columnNames[2]);
     }
         
+    public void testShouldRefreshDelegateTableModelAndResetSelectionsOnRefresh() {
+        delegate.expects(once()).method("refresh").withNoArguments();
+        
+        model.refresh();
+        
+        assertEquals(0, model.getSelectedIndexes().length);
+    }
 }

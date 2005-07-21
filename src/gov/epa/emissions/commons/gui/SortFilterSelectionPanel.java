@@ -142,7 +142,6 @@ public class SortFilterSelectionPanel extends SortFilterTablePanel {
         int numRows = overallModel.getRowCount();
         int boolColNo = overallModel.findColumn(SELECT_COL_NAME);
         ArrayList selList = new ArrayList();
-        int size = 0;
         for (int i = 0; i < numRows; i++) {
             Boolean selected = (Boolean) overallModel.getValueAt(i, boolColNo);
             if (selected.booleanValue()) {

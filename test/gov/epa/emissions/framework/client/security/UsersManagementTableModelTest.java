@@ -106,4 +106,14 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
         assertSame(jill, model.getUser(1));
     }
 
+    public void testShouldRecreateRowsOnRefresh() {
+        assertEquals(1, model.getRowCount());
+        
+        //remove user (implicit)
+        emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(new User[0]));
+        
+        model.refresh();
+        
+        assertEquals(0, model.getRowCount());//model recreates rows on updates to EMFUserAdmin
+    }
 }

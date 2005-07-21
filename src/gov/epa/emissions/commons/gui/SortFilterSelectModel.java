@@ -5,8 +5,6 @@ import gov.epa.mims.analysisengine.table.MultiRowHeaderTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.table.TableModel;
-
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntList;
 
@@ -26,21 +24,23 @@ public class SortFilterSelectModel extends MultiRowHeaderTableModel {
 
     private static final String SELECT_COL_NAME = "Select";
 
-    private Object[][] data;
-
     private Boolean[] selects;
 
-    private TableModel delegate;
+    private RefreshableTableModel delegate;
 
-    public SortFilterSelectModel(TableModel delegate) {
+    public SortFilterSelectModel(RefreshableTableModel delegate) {
         this.delegate = delegate;
 
+        resetSelections();
+
+        setColumnHeaders(getDelegateColumnNames());
+    }
+
+    private void resetSelections() {
         this.selects = new Boolean[getRowCount()];
         for (int i = 0; i < getRowCount(); i++) {
             selects[i] = Boolean.FALSE;
         }
-
-        setColumnHeaders(getDelegateColumnNames());
     }
 
     void setColumnHeaders(String[] columnNames) {
@@ -117,5 +117,11 @@ public class SortFilterSelectModel extends MultiRowHeaderTableModel {
         }
         
         return indexes.toArray();
+    }
+
+    //TODO: needs to be unit tested
+    public void refresh() {
+        delegate.refresh();
+        resetSelections();        
     }
 }

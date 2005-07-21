@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.security;
 
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
@@ -15,18 +14,24 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 public class UsersManagementConsole extends JFrame implements UsersManagementView {
 
     private UsersManagementPresenter presenter;
     private SortFilterSelectModel selectModel;
     private UsersManagementTableModel model;
+    private JPanel sortFilterSelectPanel;
 
     public UsersManagementConsole(EMFUserAdmin userAdmin) {        
         model = new UsersManagementTableModel(userAdmin);
         selectModel = new SortFilterSelectModel(model);
         
-        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(this, selectModel);
+        //TODO: fix the row-count issue w/ OverallTableModel hierarchy
+//        sortFilterSelectPanel = new SortFilterSelectionPanel(this, selectModel);
+        sortFilterSelectPanel = new JPanel();
+        JTable table = new JTable(selectModel);
+        sortFilterSelectPanel.add(table);
         
         JPanel layoutPanel = layout(sortFilterSelectPanel);
 
@@ -81,7 +86,7 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
                 if(presenter != null) {
                     int[] selected = selectModel.getSelectedIndexes();
                     for (int i = 0; i < selected.length; i++) {
-                      presenter.notifyDelete(model.getUser(i).getUserName());                        
+                      presenter.notifyDelete(model.getUser(selected[i]).getUserName());                        
                     }
                 }
             }
@@ -104,6 +109,8 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
     }
 
     public void refresh() {
+        selectModel.refresh();
+        sortFilterSelectPanel.validate();
     }
 
 }

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.security;
 
+import gov.epa.emissions.commons.gui.RefreshableTableModel;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -8,22 +9,34 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-public class UsersManagementTableModel extends AbstractTableModel {
+public class UsersManagementTableModel extends AbstractTableModel implements RefreshableTableModel {
 
     private Header header;
 
     private List rows;
 
-    public UsersManagementTableModel(EMFUserAdmin admin) {
-        this.header = new Header(new String[] { "Username", "Name", "Email" });
+    private EMFUserAdmin userAdmin;
 
+    public UsersManagementTableModel(EMFUserAdmin userAdmin) {
+        this.header = new Header(new String[] { "Username", "Name", "Email" });
+        this.userAdmin = userAdmin;
+        
+        createRows(this.userAdmin);        
+    }
+    
+    public void refresh() {
+        this.createRows(this.userAdmin);
+        super.fireTableDataChanged();
+    }
+    
+    private void createRows(EMFUserAdmin admin) {
         this.rows = new ArrayList();
         User[] users = admin.getUsers();
         for (int i=0; i < users.length;i++) {
             User user = users[i];
-            Row row = new Row(user, i);
+            Row row = new Row(user);
             rows.add(row);
-        }        
+        }
     }
 
     public String getColumnName(int i) {
@@ -82,13 +95,8 @@ public class UsersManagementTableModel extends AbstractTableModel {
     private class Row {
         private User user;
 
-        private int index;
-
-        private Boolean selected = Boolean.FALSE;
-
-        public Row(User user, int index) {
+        public Row(User user) {
             this.user = user;
-            this.index = index;
         }
 
         public void setValue(Object value, int column) {

@@ -20,7 +20,7 @@ public class SortFilterSelectionPanelLauncher {
 
         Mock delegate = createModel();
 
-        SortFilterSelectModel model = new SortFilterSelectModel((TableModel) delegate.proxy());
+        SortFilterSelectModel model = new SortFilterSelectModel((RefreshableTableModel) delegate.proxy());
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(frame, model);
 
         frame.getContentPane().add(panel);

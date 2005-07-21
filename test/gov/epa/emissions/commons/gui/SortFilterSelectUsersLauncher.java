@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
-import javax.swing.table.TableModel;
 
 import org.jmock.Mock;
 import org.jmock.core.stub.ReturnStub;
@@ -20,7 +19,7 @@ public class SortFilterSelectUsersLauncher {
     public static void main(String[] args) {
         SortFilterSelectUsersLauncher launcher = new SortFilterSelectUsersLauncher();
         
-        TableModel delegate = launcher.createUserManagementTableModel();
+        RefreshableTableModel delegate = launcher.createUserManagementTableModel();
         SortFilterSelectModel model = new SortFilterSelectModel(delegate);
         
         JFrame frame = new JFrame();
@@ -35,7 +34,7 @@ public class SortFilterSelectUsersLauncher {
         
     }
 
-    private TableModel createUserManagementTableModel() {
+    private RefreshableTableModel createUserManagementTableModel() {
         List users = new ArrayList();
 
         users.add(createUser("joe", "Joe Fullman", "joef@fullman.com"));
