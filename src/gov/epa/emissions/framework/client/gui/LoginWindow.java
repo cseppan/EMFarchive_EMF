@@ -174,32 +174,23 @@ public class LoginWindow extends JDialog implements ActionListener
             CurrentUserName = usernametext.getText();
             CurrentPassword = passwordtext.getText();
             AdmLogin = loginadmckbox.isSelected();
-            // Go authenticate the user
 
+            // Go authenticate the user
             // This statement calls Joe's method
-    //      String UserStatus = umc.Authenticate(CurrentUserName,CurrentPassword,AdmLogin);
-            // Print what I'm sending to Conrad
-            JOptionPane.showMessageDialog(this,"To Conrad authen  " + CurrentUserName +
-            		"   " + CurrentPassword  + "    " + AdmLogin);
+            // String UserStatus = umc.Authenticate(CurrentUserName,CurrentPassword,AdmLogin);
             // These statements call Conrad's method
             EMFUserAdminTransport uat = new EMFUserAdminTransport();
             String UserStatus =
             	uat.authenticate(CurrentUserName,CurrentPassword,AdmLogin);
-        	// Temp print out Conrad's return
-            JOptionPane.showMessageDialog(this,"Conrad from authen  " + UserStatus);
                         
             // If the user is authentic, get the user object and delete the window
             // indicating success
             if (UserStatus.equals("Valid"))
             {    
                 // This calls Joe's method
-          //    CurrentUser = umc.getUser(CurrentUserName);
-                JOptionPane.showMessageDialog(this,"To Conrad getUser  " + 
-                		CurrentUserName);
+                // CurrentUser = umc.getUser(CurrentUserName);
             	// This calls Conrad's method
             	CurrentUser = uat.getUser(CurrentUserName);
-            	// Temp print out Conrad's return
-                JOptionPane.showMessageDialog(this,"Conrad from getUser  " + CurrentUser);
                 GoodReturn = true;
                 dispose();
             }
@@ -232,7 +223,11 @@ public class LoginWindow extends JDialog implements ActionListener
             if (Success)
             {
                // Create a new user in the database with this user object's info
-               String Result = umc.createUser(CurrentUser);
+               // This calls Joe's code
+               // String Result = umc.createUser(CurrentUser);
+               // This calls Conrad's code
+               EMFUserAdminTransport uat = new EMFUserAdminTransport();
+               String Result = uat.createUser(CurrentUser);
                // If the user was created successfully, display a message, delete the
                // login window, and return with success to the main program
                if (Result.equals("Success"))
@@ -245,7 +240,7 @@ public class LoginWindow extends JDialog implements ActionListener
                // window completely, and return with failure to the main program
                else
                {
-                   JOptionPane.showMessageDialog(this, "Result from creating new user  " + Result);
+                   JOptionPane.showMessageDialog(this, "Failure in creating new user: " + Result);
                    GoodReturn = false;
                    dispose();
                }
@@ -262,8 +257,15 @@ public class LoginWindow extends JDialog implements ActionListener
             if (n == JOptionPane.YES_OPTION)
             {
                 // Here he replied yes.  Call the method that does the work.
-                String result = umc.resetPassword();
-            }
+            	// This calls Joe's code
+                // String result = umc.resetPassword();
+                // This calls Conrad's code
+                EMFUserAdminTransport uat = new EMFUserAdminTransport();
+                // This is not ready...eventually it will return a string
+                uat.resetPassword();
+                // Temp print a message
+                JOptionPane.showMessageDialog(this, "Reset Password is not ready");
+                           }
         }
    }
 }

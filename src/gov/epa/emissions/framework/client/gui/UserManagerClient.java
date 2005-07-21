@@ -3,13 +3,15 @@
 // about the user to and from the user database that is stored on the server.
 // Joe Capowski  June 15, 2005
 
+// These are Joe's methods, and will be replaced by Conrad's
+
 package gov.epa.emissions.framework.client.gui;
 
 // Use Java swing classes
+import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
 import gov.epa.emissions.framework.commons.User;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 
 
 public class UserManagerClient extends JFrame

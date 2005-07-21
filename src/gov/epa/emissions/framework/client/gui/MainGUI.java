@@ -4,16 +4,12 @@
 package gov.epa.emissions.framework.client.gui;
 
 // Use Java swing classes
+import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
+
+import gov.epa.emissions.framework.client.transport.EMFUserAdminTransport;
 import gov.epa.emissions.framework.commons.User;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 
 
 public class MainGUI extends JFrame implements ActionListener
@@ -89,13 +85,10 @@ public class MainGUI extends JFrame implements ActionListener
         }
                 
         // Create the items of the Tools menu and add listeners to them
-        JMenuItem JoeSummaryItem = new JMenuItem("Joes Summary");
         JMenuItem EditUserInfoItem = new JMenuItem("Edit User Info");
         JMenuItem OptionsItem = new JMenuItem("Options");
-        ToolsMenu.add(JoeSummaryItem);
         ToolsMenu.add(EditUserInfoItem);
         ToolsMenu.add(OptionsItem);
-        JoeSummaryItem.addActionListener(this);
         EditUserInfoItem.addActionListener(this);
         OptionsItem.addActionListener(this);
         
@@ -170,15 +163,6 @@ public class MainGUI extends JFrame implements ActionListener
         if (ActionText.equals("Users"))
                 JOptionPane.showMessageDialog(this, "Users not ready");
         
-        // If he selected Tools-Joe's Summary, display a summary of all the users
-        if (ActionText.equals("Joes Summary"))
-        {
-            // Create the all users info window
-            AllUsersInformationWindow auiw = 
-                new AllUsersInformationWindow(user, umc);
-            // The code pauses here until the auiw window is closed
-        }
-       
         // If he selected Tools-Edit User Info, build the user information window
         if (ActionText.equals("Edit User Info"))
         {
@@ -186,14 +170,25 @@ public class MainGUI extends JFrame implements ActionListener
             // indicate that this is not a new user
             boolean Success = FrameworkObservable.showGUI(user,false);
             // The code pauses here until the user has updated the information
-            // and closed the window
-            // If the return was successful, update the user info in the data base
+            // only in the current user object and closed the window
+            // If the return was successful, update the data base of users
+            // Temp print
+            JOptionPane.showMessageDialog(this,
+               		"Return from showGUI:  " + Success);
             if (Success)
             {
-                String result = umc.updateUser(user);
-                // If the user could not be updated, print why
+            	// This line calls Joe's code
+                // String result = umc.updateUser(user);
+            	// These lines call Conrad's code
+                EMFUserAdminTransport uat = new EMFUserAdminTransport();
+                String result = uat.updateUser(user);
+                // Temp print
+                JOptionPane.showMessageDialog(this,
+                   		"Return from updateUser:  " + result);
+                    // If the user could not be updated, print why
                 if (!result.equals("Success"))
-                   JOptionPane.showMessageDialog(this, result);
+                   JOptionPane.showMessageDialog(this,
+                   		"Failure to update user info:  " + result);
             }
         }
         
@@ -220,7 +215,7 @@ public class MainGUI extends JFrame implements ActionListener
         // If he selected Help-About, print a message
         if (ActionText.equals("About"))
                 JOptionPane.showMessageDialog(this, "About not ready");
-        
     }
+   
 }
         
