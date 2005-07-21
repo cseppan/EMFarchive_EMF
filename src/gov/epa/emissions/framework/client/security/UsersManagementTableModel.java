@@ -26,7 +26,6 @@ public class UsersManagementTableModel extends AbstractTableModel implements Ref
     
     public void refresh() {
         this.createRows(this.userAdmin);
-        super.fireTableDataChanged();
     }
     
     private void createRows(EMFUserAdmin admin) {
