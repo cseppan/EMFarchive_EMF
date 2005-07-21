@@ -14,11 +14,13 @@ import gov.epa.emissions.framework.commons.User;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 
+import org.apache.axis.Constants;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.encoding.ser.ArrayDeserializerFactory;
@@ -235,7 +237,51 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#getUsers()
      */
-    public User[] getUsers() {
+    /*
+    public List getUsers() {
+
+
+        String statusCode = null;
+        List users = null;;
+        
+        Service  service = new Service();
+        Call     call;
+        
+        try {
+            call = (Call) service.createCall();
+            call.setTargetEndpointAddress( new java.net.URL(endpoint) );
+            call.setOperationName(new QName("http://soapinterop.org/", "getUsers") );
+            QName qname1 = new QName("urn:EMFUserManager","ns1:User");
+            QName qname2 = new QName("urn:EMFUserManager","ns1:Users");
+            
+            Class cls1 = gov.epa.emissions.framework.commons.User.class;
+            Class cls2 = java.util.ArrayList.class;
+            //Class cls2 = gov.epa.emissions.framework.commons.User[].class;
+            call.registerTypeMapping(cls1,qname1,BeanSerializerFactory.class, BeanDeserializerFactory.class);
+            call.registerTypeMapping(cls2,qname2,ArraySerializerFactory.class, ArrayDeserializerFactory.class);
+            call.setReturnType(qname2);
+            
+            Object obj = call.invoke( new Object[] {} );
+                            
+            users = (ArrayList)obj;
+            
+        } catch (ServiceException e) {
+            System.out.println("Error invoking the service");
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            System.out.println("Error in format of URL string");
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            System.out.println("Error communicating with WS end point");
+            e.printStackTrace();
+        }
+
+        return users;
+}
+*/
+    
+
+        public User[] getUsers() {
 
 
             String statusCode = null;
@@ -276,7 +322,7 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
 
             return users;
     }
-
+    
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#updateUsers(java.util.Collection)
      */

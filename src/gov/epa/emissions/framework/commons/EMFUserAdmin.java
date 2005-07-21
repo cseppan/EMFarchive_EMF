@@ -26,6 +26,7 @@ public interface EMFUserAdmin {
     public boolean resetPassword();
     public User getUser(String userName);
     public User[] getUsers();
+    //public List getUsers();
     public String createUser(User newUser);
     public String updateUser(User newUser);
     public String updateUsers(List users);

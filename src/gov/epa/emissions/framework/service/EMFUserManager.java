@@ -162,6 +162,7 @@ public class EMFUserManager implements EMFUserAdmin{
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#getUsers()
      */
+    
     public User[] getUsers() {
         User[] users = null;
         
@@ -176,7 +177,25 @@ public class EMFUserManager implements EMFUserAdmin{
         
         return users;        
     }
+/*
+//Fixme: if the Arraylist/collection deser works use this method
 
+    public List getUsers() {
+        List allUsers = null;
+        
+        UserManagerDAO umDAO;
+        try {
+            umDAO = new UserManagerDAO();
+            allUsers = umDAO.getUsers();  
+             	
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return allUsers;        
+    }
+*/
+    
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#updateUsers(java.util.Collection)
      */

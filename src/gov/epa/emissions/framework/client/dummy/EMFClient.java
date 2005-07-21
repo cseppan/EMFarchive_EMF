@@ -8,6 +8,9 @@
  */
 package gov.epa.emissions.framework.client.dummy;
   
+import java.util.Iterator;
+import java.util.List;
+
 import gov.epa.emissions.framework.client.transport.EMFUserAdminTransport;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
@@ -32,8 +35,8 @@ public class EMFClient {
         EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport();
         System.out.println("IN EMFCLIENT main");
        
-        String uname = "ejones";
-        String pwd = "erin12345";
+        String uname = "cdcruz";
+        String pwd = "conrad12345";
         
         statuscode = emfUserAdmin.authenticate(uname, pwd, true);        
         System.out.println(uname + " login status is: " + statuscode);
@@ -80,15 +83,35 @@ public class EMFClient {
 
 //            System.out.println(eusers.length);
 //        }
-        
+
+        /*
+        List users = emfUserAdmin.getUsers();
+        if (users == null){
+            System.out.println("List of Users was NULL");
+        }else{
+            Iterator iter = users.iterator();
+            
+            while (iter.hasNext()){
+                User aUser = (User) iter.next();
+                if (aUser !=null){
+                    System.out.println(aUser.getFullName());                    
+                }else{
+                    System.out.println("User was null");
+                }
+                //System.out.println((String)iter.next());
+            }//while iter
+            
+        }
+*/
       User[] users = emfUserAdmin.getUsers();
       if (users == null){
           System.out.println("Call returned a null USERS list");
       }else{
-
-          System.out.println(users.length);
+          for (int i=0; i<users.length; i++){
+              User aUser = users[i];
+              System.out.println("user #" + i + " " + aUser.getFullName());
+          }
       }
-        
 /*
         User[] users = emfUserAdmin.getUsers();
         if (users == null){
