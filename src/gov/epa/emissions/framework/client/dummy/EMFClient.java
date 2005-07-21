@@ -109,8 +109,18 @@ public class EMFClient {
       }else{
           for (int i=0; i<users.length; i++){
               User aUser = users[i];
-              System.out.println("user #" + i + " " + aUser.getFullName());
+              System.out.println("user #" + i + "************************");
+              System.out.println(aUser.getUserName());
+              System.out.println(aUser.getPassword());
+              System.out.println(aUser.getFullName());
+              System.out.println(aUser.getEmailAddr());
+              System.out.println(aUser.getAffiliation());
+              System.out.println(aUser.getWorkPhone());
+              System.out.println("Admin? " + aUser.isInAdminGroup());
+              System.out.println("Disabled? " + aUser.isAcctDisabled());
           }
+          System.out.println("****************************");
+
       }
 /*
         User[] users = emfUserAdmin.getUsers();
