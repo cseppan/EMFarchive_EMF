@@ -1,7 +1,7 @@
 // The FrameworkObservable class
 // This is the non-GUI base class for objects
 
-package gov.epa.emissions.framework.client.login;
+package gov.epa.emissions.framework.client.login.old;
 
 // Use Java swing classes
 import gov.epa.emissions.framework.commons.User;

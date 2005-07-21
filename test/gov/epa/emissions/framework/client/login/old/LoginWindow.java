@@ -4,7 +4,7 @@
 // The strategy here is that when we exit this window with a good return, the
 // current user object will have been updated with the latest user information.
 
-package gov.epa.emissions.framework.client.login;
+package gov.epa.emissions.framework.client.login.old;
 
 // Use Java swing classes
 import gov.epa.emissions.framework.client.transport.EMFUserAdminTransport;
