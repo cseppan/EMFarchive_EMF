@@ -22,6 +22,7 @@ public class UsersManagementPresenter {
 
     public void notifyDelete(String username) {
         model.deleteUser(username);
+        view.refresh();
     }
 
 }

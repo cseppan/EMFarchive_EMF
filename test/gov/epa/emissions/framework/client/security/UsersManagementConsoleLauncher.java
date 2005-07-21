@@ -33,7 +33,7 @@ public class UsersManagementConsoleLauncher {
         users.add(createUser("kevin", "Kevin Spacey", "kevin@spacey.com"));
 
         Mock userAdmin = new Mock(EMFUserAdmin.class);
-        userAdmin.stubs().method("getUsers").withNoArguments().will(new ReturnStub(users));
+        userAdmin.stubs().method("getUsers").withNoArguments().will(new ReturnStub(users.toArray(new User[0])));
         userAdmin.stubs().method("deleteUser");
         
         return userAdmin;

@@ -103,4 +103,7 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
         super.hide();
     }
 
+    public void refresh() {
+    }
+
 }

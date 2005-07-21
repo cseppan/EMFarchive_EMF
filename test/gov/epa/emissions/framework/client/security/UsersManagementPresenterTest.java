@@ -23,7 +23,11 @@ public class UsersManagementPresenterTest extends MockObjectTestCase {
         Mock emfUserAdmin = mock(EMFUserAdmin.class);
         emfUserAdmin.expects(once()).method("deleteUser").with(eq("matts"));
         
-        UsersManagementPresenter presenter = new UsersManagementPresenter((EMFUserAdmin)emfUserAdmin.proxy(), null);
+        Mock view = mock(UsersManagementView.class);
+        view.expects(once()).method("refresh").withNoArguments();
+        
+        UsersManagementPresenter presenter = 
+            new UsersManagementPresenter((EMFUserAdmin)emfUserAdmin.proxy(), (UsersManagementView) view.proxy());
         
         presenter.notifyDelete("matts");
     }

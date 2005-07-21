@@ -43,7 +43,7 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
         assertEquals("Email", model.getColumnName(2));
     }
 
-    public void FIXME_testShouldReturnRowsEqualingNumberOfUsers() {
+    public void testShouldReturnRowsEqualingNumberOfUsers() {
         List users = new ArrayList();
         User user1 = new User();
         user1.setUserName("user1");
@@ -92,7 +92,7 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
         assertTrue("Email column should be editable", model.isCellEditable(0, 2));
     }
     
-    public void FIXME_testShouldReturnUserAtSpecifiedIndex() {
+    public void testShouldReturnUserAtSpecifiedIndex() {
         User jill = new User();
         users.add(jill);
 
@@ -101,6 +101,7 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
 
         model = new UsersManagementTableModel((EMFUserAdmin) emfUserAdmin.proxy());
 
+        assertEquals(2, model.getRowCount());
         assertSame(joe, model.getUser(0));
         assertSame(jill, model.getUser(1));
     }

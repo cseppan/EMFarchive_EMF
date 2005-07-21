@@ -21,7 +21,7 @@ public class UsersManagementTableModel extends AbstractTableModel {
         User[] users = admin.getUsers();
         for (int i=0; i < users.length;i++) {
             User user = users[i];
-            Row row = new Row(user, i++);
+            Row row = new Row(user, i);
             rows.add(row);
         }        
     }
