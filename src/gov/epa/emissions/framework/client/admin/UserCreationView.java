@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.security;
+package gov.epa.emissions.framework.client.admin;
 
 public interface UserCreationView {
     String getUsername();

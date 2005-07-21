@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.security;
+package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.gui.RefreshableTableModel;
 import gov.epa.emissions.framework.EmfException;

@@ -1,5 +1,7 @@
-package gov.epa.emissions.framework.client.security;
+package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.framework.client.admin.UsersManagementConsole;
+import gov.epa.emissions.framework.client.admin.UsersManagementPresenter;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 

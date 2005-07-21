@@ -2,7 +2,7 @@
 // Joe Capowski   June 3, 2005
 
 
-package gov.epa.emissions.framework.client.gui;
+package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.commons.User;
 

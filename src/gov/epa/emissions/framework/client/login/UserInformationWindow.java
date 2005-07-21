@@ -2,7 +2,7 @@
 // This displays the current information for a user and allows him to edit it.
 // Joe Capowski     June 2005
 
-package gov.epa.emissions.framework.client.gui;
+package gov.epa.emissions.framework.client.login;
 
 import java.awt.*;
 import javax.swing.*;

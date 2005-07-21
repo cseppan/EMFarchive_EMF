@@ -1,7 +1,7 @@
 //All Users Information Window, to display a summary of all users
 //Joe Capowski     July 2005
 
-package gov.epa.emissions.framework.client.gui;
+package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.commons.User;
 

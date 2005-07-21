@@ -1,6 +1,6 @@
 package gov.epa.emissions.commons.gui;
 
-import gov.epa.emissions.framework.client.security.UsersManagementTableModel;
+import gov.epa.emissions.framework.client.admin.UsersManagementTableModel;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 

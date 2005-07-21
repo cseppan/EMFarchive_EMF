@@ -1,6 +1,6 @@
 // FrameworkFrame, the GUI base class
 
-package gov.epa.emissions.framework.client.gui;
+package gov.epa.emissions.framework.client.login;
 
 // Use Java swing classes
 import javax.swing.JDialog;

@@ -3,7 +3,7 @@
 // is now writing, because the real database of users will be stored on a server.
 // Joe Capowski   June 15, 2005
 
-package gov.epa.emissions.framework.client.gui;
+package gov.epa.emissions.framework.client.login;
 
 // Use Java swing classes
 

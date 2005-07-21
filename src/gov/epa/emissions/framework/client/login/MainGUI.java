@@ -1,7 +1,7 @@
 // The MainGUI class
 // Joe Capowski   June 13, 2005
 
-package gov.epa.emissions.framework.client.gui;
+package gov.epa.emissions.framework.client.login;
 
 // Use Java swing classes
 import gov.epa.emissions.framework.client.transport.EMFUserAdminTransport;

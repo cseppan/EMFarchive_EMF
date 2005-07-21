@@ -5,7 +5,7 @@
 
 // These are Joe's methods, and will be replaced by Conrad's
 
-package gov.epa.emissions.framework.client.gui;
+package gov.epa.emissions.framework.client.login;
 
 // Use Java swing classes
 import gov.epa.emissions.framework.commons.User;

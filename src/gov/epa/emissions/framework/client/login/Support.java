@@ -2,7 +2,7 @@
 // Joe Capowski  June 2005
 
 
-package gov.epa.emissions.framework.client.gui;
+package gov.epa.emissions.framework.client.login;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;

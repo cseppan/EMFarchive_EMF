@@ -1,6 +1,6 @@
 // The FrameworkWindow interface
 
-package gov.epa.emissions.framework.client.gui;
+package gov.epa.emissions.framework.client.login;
 
 
 public interface FrameworkWindow
