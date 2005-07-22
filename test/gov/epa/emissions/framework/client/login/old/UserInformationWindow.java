@@ -180,10 +180,10 @@ public class UserInformationWindow extends JDialog implements ActionListener, Fr
         user.setEmailAddr(emailaddresstext.getText());
         try {
             user.setUserName(usernametext.getText());
+            user.setPassword(passwordtext.getText());
         } catch (UserException e) {
             throw new RuntimeException("cannot save data to model", e);
-        }
-        user.setPassword(passwordtext.getText());
+        }        
     }
 
     // getGoodReturn, to get whether this window closed with success

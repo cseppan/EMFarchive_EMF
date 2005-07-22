@@ -20,7 +20,7 @@ public class UsersCreationPresenterTest extends MockObjectTestCase {
 
         Mock view = mock(UserCreationView.class);
         view.stubs().method("getUsername").will(returnValue("joey"));
-        view.stubs().method("getPassword").will(returnValue("passwd"));
+        view.stubs().method("getPassword").will(returnValue("passwd234"));
         view.stubs().method("getEmail").will(returnValue("joey@qqq.unc.edu"));
         view.stubs().method("getName").will(returnValue("Joe Shay"));
         view.stubs().method("getAffiliation").will(returnValue("UNC"));

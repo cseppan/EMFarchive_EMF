@@ -8,6 +8,7 @@
  */
 package gov.epa.emissions.framework.dummy;
 
+import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.commons.User;
 
 import java.util.Hashtable;
@@ -21,9 +22,10 @@ public class UserAdminDummy {
     Hashtable allUsers = null;
 
     /**
+     * @throws UserException 
      *  
      */
-    public UserAdminDummy() {
+    public UserAdminDummy() throws UserException {
         super();
         allUsers = new Hashtable();
 

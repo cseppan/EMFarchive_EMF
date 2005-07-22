@@ -17,11 +17,11 @@ public class CreateUserPresenterTest extends MockObjectTestCase {
         user.setEmailAddr("jim@jom.com");
         
         user.setUserName("jimmy");
-        user.setPassword("jimjam");
+        user.setPassword("jimjam1234");
         
         Mock userAdmin = mock(EMFUserAdmin.class);
         userAdmin.expects(once()).method("createUser").with(eq(user));
-        userAdmin.expects(once()).method("authenticate").with(eq("jimmy"), eq("jimjam"), eq(false)).will(returnValue(null));
+        userAdmin.expects(once()).method("authenticate").with(eq("jimmy"), eq("jimjam1234"), eq(false)).will(returnValue(null));
         
         CreateUserPresenter presenter = new CreateUserPresenter((EMFUserAdmin) userAdmin.proxy());
         

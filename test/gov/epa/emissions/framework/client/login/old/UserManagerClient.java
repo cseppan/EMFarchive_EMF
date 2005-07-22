@@ -80,10 +80,10 @@ public class UserManagerClient extends JFrame {
         user[UserNumber].setEmailAddr(userin.getEmailAddr());
         try {
             user[UserNumber].setUserName(userin.getUserName());
+            user[UserNumber].setPassword(userin.getPassword());
         } catch (UserException e) {
            throw new RuntimeException("update user failure", e);
         }
-        user[UserNumber].setPassword(userin.getPassword());
         user[UserNumber].setInAdminGroup(userin.isInAdminGroup());
         user[UserNumber].setAcctDisabled(userin.isAcctDisabled());
         return "Success";
@@ -109,15 +109,6 @@ public class UserManagerClient extends JFrame {
         // To satisfy the compiler, should there be a failure, return the first
         // user
         return user[0];
-    }
-
-    // Create3InitialUsers, a temporary method to do this
-    public void Create3InitialUsers() {
-        // Temporarily create several new users with names and passwords
-        Nusers = 3;
-        user[0] = new User("Robert", "UNC", "966-1234", "bob@unc.edu", "Bob", "bob12345", true, false);
-        user[1] = new User("Joseph", "UNC", "966-2345", "joe@unc.edu", "Joe", "joe12345", true, false);
-        user[2] = new User("Suzanne", "UNC", "966-3456", "suzy@unc.edu", "Suzy", "suzy12345", false, false);
     }
 
     // getNumUsers, to return the current number of users

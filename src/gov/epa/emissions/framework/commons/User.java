@@ -72,15 +72,16 @@ public class User implements Serializable {
      * @param pwd
      * @param beAdmin
      * @param diabled
+     * @throws UserException 
      */
-    public User(String name, String affil, String wkPhone, String emailAddr, String uname, String pwd, boolean beAdmin, boolean disabled){
+    public User(String name, String affil, String wkPhone, String emailAddr, String uname, String pwd, boolean beAdmin, boolean disabled) throws UserException{
     
         this.fullName=name;
         this.affiliation=affil;
         this.workPhone=wkPhone;
         this.emailAddr=emailAddr;
-        this.userName=uname;
-        this.password=pwd;
+        setUserName(uname);
+        setPassword(pwd);
         this.inAdminGroup=beAdmin;
         this.acctDisabled=disabled;
         this.dirty=true;
@@ -171,7 +172,11 @@ public class User implements Serializable {
     /**
      * @param password The password to set.
      */
-    public void setPassword(String password) {
+    public void setPassword(String password) throws UserException {
+        if(password.length() < 8) {
+            throw new UserException("Password must have at least 8 characters");
+        }
+        
         this.password = password;
         this.dirty = true;
     }

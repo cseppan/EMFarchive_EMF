@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.login.old;
 
+import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.commons.User;
 
 public class Main {
@@ -8,7 +9,7 @@ public class Main {
 
     public static boolean LoggedOnAdmin = false;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UserException {
         UserManagerClient umc = new UserManagerClient();
         User CurrentUser = new User("", "", "", "", "", "", false, false);
 
