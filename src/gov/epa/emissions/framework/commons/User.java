@@ -12,6 +12,7 @@ package gov.epa.emissions.framework.commons;
 import gov.epa.emissions.framework.UserException;
 
 import java.io.Serializable;
+import java.util.regex.Pattern;
 
 /**
  * @author Conrad F. D'Cruz
@@ -177,6 +178,16 @@ public class User implements Serializable {
             throw new UserException("Password must have at least 8 characters");
         }
         
+        // password should start w/ an alphabet, contain atleast one digit, 
+        // and only contains digits or alphabets
+        if(!Pattern.matches("^([a-zA-Z]+)(\\d+)(\\w)*", password)) {             
+            throw new UserException("One or more characters of password must be a non-letter");
+        }
+        
+        if(password.equals(userName)) {
+            throw new UserException("Username must be different from Password");
+        }
+        
         this.password = password;
         this.dirty = true;
     }
@@ -194,6 +205,10 @@ public class User implements Serializable {
     public void setUserName(String userName) throws UserException {
         if(userName.length() < 3) {
             throw new UserException("Username must have at least 3 characters");
+        }
+        
+        if(userName.equals(password)) {
+            throw new UserException("Username must be different from Password");
         }
         
         this.userName = userName;
