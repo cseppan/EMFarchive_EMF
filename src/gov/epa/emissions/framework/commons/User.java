@@ -25,10 +25,10 @@ import java.util.regex.Pattern;
 public class User implements Serializable {
 
     //State variables for the User bean
-    private String fullName;
+    private String name;
     private String affiliation;
     private String workPhone;
-    private String emailAddr;
+    private String email;
     private String userName;
     private String password;
     private boolean inAdminGroup = false;
@@ -66,23 +66,23 @@ public class User implements Serializable {
     /**
      * 
      * @param name
-     * @param affil
+     * @param affiliation
      * @param workPhone
-     * @param emailAddr
-     * @param uname
-     * @param pwd
+     * @param email
+     * @param username
+     * @param password
      * @param beAdmin
      * @param diabled
      * @throws UserException 
      */
-    public User(String name, String affil, String wkPhone, String emailAddr, String uname, String pwd, boolean beAdmin, boolean disabled) throws UserException{
+    public User(String name, String affiliation, String phone, String email, String username, String password, boolean beAdmin, boolean disabled) throws UserException{
     
-        this.fullName=name;
-        setAffiliation(affil);
-        this.workPhone=wkPhone;
-        this.emailAddr=emailAddr;
-        setUserName(uname);
-        setPassword(pwd);
+        this.name=name;
+        setAffiliation(affiliation);
+        setWorkPhone(phone);
+        setEmailAddr(email);
+        setUserName(username);
+        setPassword(password);
         this.inAdminGroup=beAdmin;
         this.acctDisabled=disabled;
         this.dirty=true;
@@ -115,7 +115,7 @@ public class User implements Serializable {
      */
     public void setAffiliation(String affiliation) throws UserException {
         if(affiliation.length() < 3) {
-            throw new UserException("Affiliation must have 2 or more characters");
+            throw new UserException("Affiliation should have 2 or more characters");
         }
         
         this.affiliation = affiliation;
@@ -126,14 +126,19 @@ public class User implements Serializable {
      * @return Returns the emailAddr.
      */
     public String getEmailAddr() {
-        return emailAddr;
+        return email;
     }
     
     /**
      * @param emailAddr The emailAddr to set.
+     * @throws UserException 
      */
-    public void setEmailAddr(String emailAddr) {
-        this.emailAddr = emailAddr;
+    public void setEmailAddr(String emailAddr) throws UserException {
+        if(!Pattern.matches("^([a-zA-Z]+)(\\w)*@(\\w)+.(\\w)+(.\\w+)*", emailAddr)) {
+            throw new UserException("Email should have 2 or more characters");
+        }
+        
+        this.email = emailAddr;
         this.dirty = true;
     }
     
@@ -141,14 +146,14 @@ public class User implements Serializable {
      * @return Returns the fullName.
      */
     public String getFullName() {
-        return fullName;
+        return name;
     }
     
     /**
      * @param fullName The fullName to set.
      */
     public void setFullName(String fullName) {
-        this.fullName = fullName;
+        this.name = fullName;
         this.dirty = true;
     }
     
@@ -179,17 +184,17 @@ public class User implements Serializable {
      */
     public void setPassword(String password) throws UserException {
         if(password.length() < 8) {
-            throw new UserException("Password must have at least 8 characters");
+            throw new UserException("Password should have at least 8 characters");
         }
         
         // password should start w/ an alphabet, contain atleast one digit, 
         // and only contains digits or alphabets
         if(!Pattern.matches("^([a-zA-Z]+)(\\d+)(\\w)*", password)) {             
-            throw new UserException("One or more characters of password must be a non-letter");
+            throw new UserException("One or more characters of password should be a non-letter");
         }
         
         if(password.equals(userName)) {
-            throw new UserException("Username must be different from Password");
+            throw new UserException("Username should be different from Password");
         }
         
         this.password = password;
@@ -208,11 +213,11 @@ public class User implements Serializable {
      */
     public void setUserName(String userName) throws UserException {
         if(userName.length() < 3) {
-            throw new UserException("Username must have at least 3 characters");
+            throw new UserException("Username should have at least 3 characters");
         }
         
         if(userName.equals(password)) {
-            throw new UserException("Username must be different from Password");
+            throw new UserException("Username should be different from Password");
         }
         
         this.userName = userName;
@@ -229,7 +234,11 @@ public class User implements Serializable {
     /**
      * @param workPhone The workPhone to set.
      */
-    public void setWorkPhone(String workPhone) {
+    public void setWorkPhone(String workPhone) throws UserException {
+        if(!Pattern.matches("(\\d)+(-\\d+)*", workPhone)) {
+            throw new UserException("Phone should have format xxx-yyy-zzzz or xxxx or x-yyyy");
+        }
+        
         this.workPhone = workPhone;
         this.dirty = true;
 

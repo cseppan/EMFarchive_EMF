@@ -176,12 +176,12 @@ public class UserInformationWindow extends JDialog implements ActionListener, Fr
     public void saveDataToModel() {
         user.setFullName(fullnametext.getText());
         
-        user.setWorkPhone(workphonetext.getText());
-        user.setEmailAddr(emailaddresstext.getText());
         try {
             user.setAffiliation(affiliationtext.getText());
             user.setUserName(usernametext.getText());
             user.setPassword(passwordtext.getText());
+            user.setEmailAddr(emailaddresstext.getText());
+            user.setWorkPhone(workphonetext.getText());
         } catch (UserException e) {
             throw new RuntimeException("cannot save data to model", e);
         }        

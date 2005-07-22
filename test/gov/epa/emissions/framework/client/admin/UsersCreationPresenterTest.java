@@ -24,7 +24,7 @@ public class UsersCreationPresenterTest extends MockObjectTestCase {
         view.stubs().method("getEmail").will(returnValue("joey@qqq.unc.edu"));
         view.stubs().method("getName").will(returnValue("Joe Shay"));
         view.stubs().method("getAffiliation").will(returnValue("UNC"));
-        view.stubs().method("getPhone").will(returnValue("919 111 2222"));
+        view.stubs().method("getPhone").will(returnValue("919-111-2222"));
 
         UserCreationPresenter presenter = new UserCreationPresenter((EMFUserAdmin) emfUserAdmin.proxy(),
                 (UserCreationView) view.proxy());

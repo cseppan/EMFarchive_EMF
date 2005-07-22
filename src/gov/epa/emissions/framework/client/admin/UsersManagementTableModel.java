@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.gui.RefreshableTableModel;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -21,23 +22,23 @@ public class UsersManagementTableModel extends AbstractTableModel implements Ref
     public UsersManagementTableModel(EMFUserAdmin userAdmin) {
         this.header = new Header(new String[] { "Username", "Name", "Email" });
         this.userAdmin = userAdmin;
-        
-        createRows(this.userAdmin);        
+
+        createRows(this.userAdmin);
     }
-    
+
     public void refresh() {
         this.createRows(this.userAdmin);
     }
-    
+
     private void createRows(EMFUserAdmin admin) {
         this.rows = new ArrayList();
         User[] users;
         try {
             users = admin.getUsers();
-        } catch (EmfException e) {//TODO: need to write exception handlers
+        } catch (EmfException e) {// TODO: need to write exception handlers
             throw new RuntimeException("could not fetch users");
         }
-        for (int i=0; i < users.length;i++) {
+        for (int i = 0; i < users.length; i++) {
             User user = users[i];
             Row row = new Row(user);
             rows.add(row);
@@ -110,7 +111,12 @@ public class UsersManagementTableModel extends AbstractTableModel implements Ref
                 user.setFullName((String) value);
                 break;
             case 2:
-                user.setEmailAddr((String) value);
+                try {
+                    user.setEmailAddr((String) value);
+                } catch (UserException e) {
+                    //TODO: attach a exception handler
+                    throw new RuntimeException(e.getMessage());
+                }
             }
 
         }
@@ -124,14 +130,14 @@ public class UsersManagementTableModel extends AbstractTableModel implements Ref
             case 2:
                 return user.getEmailAddr();
             }
-            
+
             return null;
         }
     }
 
     public User getUser(int index) {
         Row row = (Row) rows.get(index);
-        
+
         return row.user;
     }
 

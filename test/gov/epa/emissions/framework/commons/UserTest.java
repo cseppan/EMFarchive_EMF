@@ -10,9 +10,9 @@ public class UserTest extends TestCase {
         assertInvalidUsername("ab");
         assertInvalidUsername("");
         try {
-            new User(null, "abc", null, null, "a2", null, false, false);
+            new User(null, "abc", "123", "a@a.org", "a2", null, false, false);            
         } catch (UserException ex) {
-            assertEquals("Username must have at least 3 characters", ex.getMessage());
+            assertEquals("Username should have at least 3 characters", ex.getMessage());
             return;
         }
 
@@ -20,7 +20,7 @@ public class UserTest extends TestCase {
     }
 
     public void testShouldAllowUsernameIfSizeIsGreaterThan2CharactersOnConstruction() throws UserException {
-        new User(null, "abc", null, null, "ab62", "abcd1234", false, false);
+        new User(null, "abc", "123", "a@a.org", "ab62", "abcd1234", false, false);
     }
 
     public void testShouldAllowUsernameIfSizeIsGreaterThan2Characters() throws UserException {
@@ -33,7 +33,7 @@ public class UserTest extends TestCase {
         try {
             user.setUserName(username);
         } catch (UserException ex) {
-            assertEquals("Username must have at least 3 characters", ex.getMessage());
+            assertEquals("Username should have at least 3 characters", ex.getMessage());
             return;
         }
 
@@ -44,11 +44,13 @@ public class UserTest extends TestCase {
         assertInvalidPasswordDueToSize("");
         assertInvalidPasswordDueToSize("a");
         assertInvalidPasswordDueToSize("1234567");
+    }
 
+    public void testShouldFailIfPasswordSizeIsLessThanEightCharactersOnConstruction() {
         try {
-            new User(null, "abc", null, null, "abc", "1234567", false, false);
+            new User(null, "abc", "123", "a@a.org", "abc", "1234567", false, false);
         } catch (UserException ex) {
-            assertEquals("Password must have at least 8 characters", ex.getMessage());
+            assertEquals("Password should have at least 8 characters", ex.getMessage());
             return;
         }
 
@@ -73,7 +75,7 @@ public class UserTest extends TestCase {
         try {
             user.setPassword("abcdefg1");
         } catch (UserException ex) {
-            assertEquals("Username must be different from Password", ex.getMessage());
+            assertEquals("Username should be different from Password", ex.getMessage());
             return;
         }
 
@@ -87,7 +89,7 @@ public class UserTest extends TestCase {
         try {
             user.setUserName("abcdefg1");
         } catch (UserException ex) {
-            assertEquals("Username must be different from Password", ex.getMessage());
+            assertEquals("Username should be different from Password", ex.getMessage());
             return;
         }
 
@@ -96,9 +98,9 @@ public class UserTest extends TestCase {
 
     public void testShouldFailIfUsernameMatchesPasswordOnConstruction() throws UserException {
         try {
-            new User(null, "abd", null, null, "abcd1234", "abcd1234", false, false);
+            new User(null, "abd", "123", "a@a.org", "abcd1234", "abcd1234", false, false);
         } catch (UserException ex) {
-            assertEquals("Username must be different from Password", ex.getMessage());
+            assertEquals("Username should be different from Password", ex.getMessage());
             return;
         }
 
@@ -110,7 +112,7 @@ public class UserTest extends TestCase {
         try {
             user.setPassword(password);
         } catch (UserException ex) {
-            assertEquals("One or more characters of password must be a non-letter", ex.getMessage());
+            assertEquals("One or more characters of password should be a non-letter", ex.getMessage());
             return;
         }
 
@@ -122,7 +124,7 @@ public class UserTest extends TestCase {
         try {
             user.setPassword(password);
         } catch (UserException ex) {
-            assertEquals("Password must have at least 8 characters", ex.getMessage());
+            assertEquals("Password should have at least 8 characters", ex.getMessage());
             return;
         }
 
@@ -132,14 +134,14 @@ public class UserTest extends TestCase {
     public void testShouldFailIfAffiliationHasLessThanThreeCharacters() {
         assertInvalidAffiliatioDueToSize("a");
         assertInvalidAffiliatioDueToSize("1");
-        assertInvalidAffiliatioDueToSize("ab"); 
+        assertInvalidAffiliatioDueToSize("ab");
     }
 
     public void testShouldFailIfAffiliationHasLessThanThreeCharacatersOnConstruction() {
         try {
             new User(null, "ab", null, null, "abcd", "abcd1234", false, false);
         } catch (UserException ex) {
-            assertEquals("Affiliation must have 2 or more characters", ex.getMessage());
+            assertEquals("Affiliation should have 2 or more characters", ex.getMessage());
             return;
         }
 
@@ -147,20 +149,87 @@ public class UserTest extends TestCase {
     }
 
     public void testShouldPassIfAffiliationHasThreeOrMoreCharacters() throws UserException {
-        new User(null, "abc", null, null, "abcd", "abcd1234", false, false);
-        new User(null, "abc34", null, null, "abcd", "abcd1234", false, false);
+        new User(null, "abc", "123", "a@a.org", "abcd", "abcd1234", false, false);
+        new User(null, "abc34", "123", "a@a.org", "abcd", "abcd1234", false, false);
     }
-    
+
     private void assertInvalidAffiliatioDueToSize(String affiliation) {
         User user = new User();
-        
+
         try {
             user.setAffiliation(affiliation);
         } catch (UserException ex) {
-            assertEquals("Affiliation must have 2 or more characters", ex.getMessage());
+            assertEquals("Affiliation should have 2 or more characters", ex.getMessage());
             return;
         }
 
         fail("should fail when affiliation is less than 3 characters in lengh");
     }
+
+    public void testShouldFailIfPhoneHasLessThanThreeCharacters() {
+        assertInvalidPhoneFormat("1x");
+        assertInvalidPhoneFormat("ab");
+    }
+
+    public void testShouldFailIfPhoneIsInvalidOnConstruction() {
+        try {
+            new User(null, "abc", "12d", null, "abcd", "abcd1234", false, false);
+        } catch (UserException ex) {
+            assertEquals("Phone should have format xxx-yyy-zzzz or xxxx or x-yyyy", ex.getMessage());
+            return;
+        }
+
+        fail("should fail when Phone has invalid format");
+    }
+
+    private void assertInvalidPhoneFormat(String phone) {
+        User user = new User();
+
+        try {
+            user.setWorkPhone(phone);
+        } catch (UserException ex) {
+            assertEquals("Phone should have format xxx-yyy-zzzz or xxxx or x-yyyy", ex.getMessage());
+            return;
+        }
+
+        fail("should fail when Phone has invalid format");
+    }
+
+    public void testShouldFailIfEmailHasInvalidFormat() {
+        assertInvalidEmail("a");
+        assertInvalidEmail("1");
+        assertInvalidEmail("ab");
+        assertInvalidEmail("ab@");
+        assertInvalidEmail("ab@.");
+        assertInvalidEmail("ab2");
+        assertInvalidEmail("ab@s.");
+        assertInvalidEmail("ab@.s.23");
+        assertInvalidEmail("ab@sd2..");
+        assertInvalidEmail("@s.sdr");
+    }
+
+    public void testShouldFailOnConstructionIfEmailIsInvalid() {
+        try {
+            new User(null, "abc", "12", "ab@", "abcd", "abcd1234", false, false);
+        } catch (UserException ex) {
+            assertEquals("Email should have 2 or more characters", ex.getMessage());
+            return;
+        }
+
+        fail("should fail when Phone is less than 3 characters in lengh");
+    }
+
+    private void assertInvalidEmail(String email) {
+        User user = new User();
+
+        try {
+            user.setEmailAddr(email);
+        } catch (UserException ex) {
+            assertEquals("Email should have 2 or more characters", ex.getMessage());
+            return;
+        }
+
+        fail("should fail when Phone is less than 3 characters in lengh");
+    }
+
 }
