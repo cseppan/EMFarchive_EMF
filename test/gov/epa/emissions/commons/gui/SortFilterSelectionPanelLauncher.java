@@ -5,6 +5,8 @@ import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.table.TableModel;
@@ -27,6 +29,12 @@ public class SortFilterSelectionPanelLauncher {
         
         frame.setSize(new Dimension(500, 200));
         frame.setLocation(new Point(400, 200));
+
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent arg0) {
+                System.exit(0);
+            }
+        });
 
         frame.show();
     }

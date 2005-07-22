@@ -4,12 +4,12 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
-public class UserCreationPresenter {
+public class CreateUserPresenter {
 
     private EMFUserAdmin model;
-    private UserCreationView view;
+    private CreateUserView view;
 
-    public UserCreationPresenter(EMFUserAdmin model, UserCreationView view) {
+    public CreateUserPresenter(EMFUserAdmin model, CreateUserView view) {
         this.model = model;
         this.view = view;
     }
@@ -32,6 +32,10 @@ public class UserCreationPresenter {
 
     public void notifyCancel() {
         view.close();
+    }
+
+    public void init() {
+        view.setObserver(this);
     }
 
 }

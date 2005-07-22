@@ -1,22 +1,22 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.admin.UserCreationPresenter;
-import gov.epa.emissions.framework.client.admin.UserCreationView;
+import gov.epa.emissions.framework.client.admin.CreateUserPresenter;
+import gov.epa.emissions.framework.client.admin.CreateUserView;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
-public class UsersCreationPresenterTest extends MockObjectTestCase {
+public class CreateUserPresenterTest extends MockObjectTestCase {
 
-    private UserCreationPresenter presenter;
+    private CreateUserPresenter presenter;
 
     private Mock view;
 
     protected void setUp() {
-        view = mock(UserCreationView.class);
+        view = mock(CreateUserView.class);
         view.stubs().method("getUsername").will(returnValue("joey"));
         view.stubs().method("getPassword").will(returnValue("passwd234"));
         view.stubs().method("getConfirmPassword").will(returnValue("passwd234"));
@@ -25,7 +25,7 @@ public class UsersCreationPresenterTest extends MockObjectTestCase {
         view.stubs().method("getAffiliation").will(returnValue("UNC"));
         view.stubs().method("getPhone").will(returnValue("919-111-2222"));
 
-        presenter = new UserCreationPresenter(null, (UserCreationView) view.proxy());
+        presenter = new CreateUserPresenter(null, (CreateUserView) view.proxy());
     }
 
     public void testShouldCreateUserAndLoginOnNotifyCreateUser() throws EmfException {
@@ -37,7 +37,7 @@ public class UsersCreationPresenterTest extends MockObjectTestCase {
         emfUserAdmin.expects(once()).method("authenticate").with(eq("joey"), eq("passwd234"), eq(false)).will(
                 returnValue(null));
 
-        Mock view = mock(UserCreationView.class);
+        Mock view = mock(CreateUserView.class);
         view.stubs().method("getUsername").will(returnValue("joey"));
         view.stubs().method("getPassword").will(returnValue("passwd234"));
         view.stubs().method("getConfirmPassword").will(returnValue("passwd234"));
@@ -46,17 +46,23 @@ public class UsersCreationPresenterTest extends MockObjectTestCase {
         view.stubs().method("getAffiliation").will(returnValue("UNC"));
         view.stubs().method("getPhone").will(returnValue("919-111-2222"));
 
-        UserCreationPresenter presenter = new UserCreationPresenter((EMFUserAdmin) emfUserAdmin.proxy(),
-                (UserCreationView) view.proxy());
+        CreateUserPresenter presenter = new CreateUserPresenter((EMFUserAdmin) emfUserAdmin.proxy(),
+                (CreateUserView) view.proxy());
 
         presenter.notifyCreate();
     }
 
+    public void testShouldRegisterAsObserverOnInit() {
+        view.expects(once()).method("setObserver").with(eq(presenter));
+        
+        presenter.init();
+    }
+    
     public void testShouldCloseViewOnCancelAction() {
-        Mock view = mock(UserCreationView.class);
+        Mock view = mock(CreateUserView.class);
         view.expects(once()).method("close").withNoArguments();
 
-        UserCreationPresenter presenter = new UserCreationPresenter(null, (UserCreationView) view.proxy());
+        CreateUserPresenter presenter = new CreateUserPresenter(null, (CreateUserView) view.proxy());
 
         presenter.notifyCancel();
     }

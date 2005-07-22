@@ -30,11 +30,8 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
         
         //TODO: fix the row-count issue w/ OverallTableModel hierarchy
         sortFilterSelectPanel = new SortFilterSelectionPanel(this, selectModel);
-//        sortFilterSelectPanel = new JPanel();
-//        JTable table = new JTable(selectModel);
-//        sortFilterSelectPanel.add(table);
         
-        JPanel layoutPanel = layout(sortFilterSelectPanel);
+        JPanel layoutPanel = createLayout(sortFilterSelectPanel);
 
         this.setSize(new Dimension(500, 200));
         this.setLocation(new Point(400, 200));
@@ -43,7 +40,7 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
         this.getContentPane().add(layoutPanel);
     }
 
-    private JPanel layout(JPanel sortFilterSelectPanel) {
+    private JPanel createLayout(JPanel sortFilterSelectPanel) {
         JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
         sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
 

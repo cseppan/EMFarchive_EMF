@@ -7,6 +7,8 @@ import gov.epa.emissions.framework.commons.User;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +32,12 @@ public class SortFilterSelectUsersLauncher {
         
         frame.setSize(new Dimension(500, 200));
         frame.setLocation(new Point(400, 200));
+
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent arg0) {
+                System.exit(0);
+            }
+        });
 
         frame.show();
         

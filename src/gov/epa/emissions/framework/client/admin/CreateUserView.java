@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
-public interface UserCreationView {
+public interface CreateUserView {
     String getUsername();
 
     String getPassword();
@@ -17,4 +17,5 @@ public interface UserCreationView {
     
     void close();
     
+    void setObserver(CreateUserPresenter presenter);
 }
