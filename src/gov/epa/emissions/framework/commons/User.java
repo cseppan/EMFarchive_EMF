@@ -78,7 +78,7 @@ public class User implements Serializable {
     public User(String name, String affil, String wkPhone, String emailAddr, String uname, String pwd, boolean beAdmin, boolean disabled) throws UserException{
     
         this.fullName=name;
-        this.affiliation=affil;
+        setAffiliation(affil);
         this.workPhone=wkPhone;
         this.emailAddr=emailAddr;
         setUserName(uname);
@@ -113,7 +113,11 @@ public class User implements Serializable {
     /**
      * @param affiliation The affiliation to set.
      */
-    public void setAffiliation(String affiliation) {
+    public void setAffiliation(String affiliation) throws UserException {
+        if(affiliation.length() < 3) {
+            throw new UserException("Affiliation must have 2 or more characters");
+        }
+        
         this.affiliation = affiliation;
         this.dirty = true;
     }

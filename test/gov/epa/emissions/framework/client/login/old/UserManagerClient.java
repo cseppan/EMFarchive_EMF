@@ -75,10 +75,11 @@ public class UserManagerClient extends JFrame {
         }
         // Save the data for this user
         user[UserNumber].setFullName(userin.getFullName());
-        user[UserNumber].setAffiliation(userin.getAffiliation());
+        
         user[UserNumber].setWorkPhone(userin.getWorkPhone());
         user[UserNumber].setEmailAddr(userin.getEmailAddr());
         try {
+            user[UserNumber].setAffiliation(userin.getAffiliation());
             user[UserNumber].setUserName(userin.getUserName());
             user[UserNumber].setPassword(userin.getPassword());
         } catch (UserException e) {

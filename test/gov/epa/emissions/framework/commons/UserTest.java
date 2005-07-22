@@ -10,7 +10,7 @@ public class UserTest extends TestCase {
         assertInvalidUsername("ab");
         assertInvalidUsername("");
         try {
-            new User(null, null, null, null, "a2", null, false, false);
+            new User(null, "abc", null, null, "a2", null, false, false);
         } catch (UserException ex) {
             assertEquals("Username must have at least 3 characters", ex.getMessage());
             return;
@@ -20,7 +20,7 @@ public class UserTest extends TestCase {
     }
 
     public void testShouldAllowUsernameIfSizeIsGreaterThan2CharactersOnConstruction() throws UserException {
-        new User(null, null, null, null, "ab62", "abcd1234", false, false);
+        new User(null, "abc", null, null, "ab62", "abcd1234", false, false);
     }
 
     public void testShouldAllowUsernameIfSizeIsGreaterThan2Characters() throws UserException {
@@ -46,7 +46,7 @@ public class UserTest extends TestCase {
         assertInvalidPasswordDueToSize("1234567");
 
         try {
-            new User(null, null, null, null, "abc", "1234567", false, false);
+            new User(null, "abc", null, null, "abc", "1234567", false, false);
         } catch (UserException ex) {
             assertEquals("Password must have at least 8 characters", ex.getMessage());
             return;
@@ -96,7 +96,7 @@ public class UserTest extends TestCase {
 
     public void testShouldFailIfUsernameMatchesPasswordOnConstruction() throws UserException {
         try {
-            new User(null, null, null, null, "abcd1234", "abcd1234", false, false);
+            new User(null, "abd", null, null, "abcd1234", "abcd1234", false, false);
         } catch (UserException ex) {
             assertEquals("Username must be different from Password", ex.getMessage());
             return;
@@ -129,4 +129,38 @@ public class UserTest extends TestCase {
         fail("should fail when password is less than 8 characters in lengh");
     }
 
+    public void testShouldFailIfAffiliationHasLessThanThreeCharacters() {
+        assertInvalidAffiliatioDueToSize("a");
+        assertInvalidAffiliatioDueToSize("1");
+        assertInvalidAffiliatioDueToSize("ab"); 
+    }
+
+    public void testShouldFailIfAffiliationHasLessThanThreeCharacatersOnConstruction() {
+        try {
+            new User(null, "ab", null, null, "abcd", "abcd1234", false, false);
+        } catch (UserException ex) {
+            assertEquals("Affiliation must have 2 or more characters", ex.getMessage());
+            return;
+        }
+
+        fail("should fail when affiliation is less than 3 characters in lengh");
+    }
+
+    public void testShouldPassIfAffiliationHasThreeOrMoreCharacters() throws UserException {
+        new User(null, "abc", null, null, "abcd", "abcd1234", false, false);
+        new User(null, "abc34", null, null, "abcd", "abcd1234", false, false);
+    }
+    
+    private void assertInvalidAffiliatioDueToSize(String affiliation) {
+        User user = new User();
+        
+        try {
+            user.setAffiliation(affiliation);
+        } catch (UserException ex) {
+            assertEquals("Affiliation must have 2 or more characters", ex.getMessage());
+            return;
+        }
+
+        fail("should fail when affiliation is less than 3 characters in lengh");
+    }
 }

@@ -175,10 +175,11 @@ public class UserInformationWindow extends JDialog implements ActionListener, Fr
     // saveDataToModel, to save the data from the components to the user object
     public void saveDataToModel() {
         user.setFullName(fullnametext.getText());
-        user.setAffiliation(affiliationtext.getText());
+        
         user.setWorkPhone(workphonetext.getText());
         user.setEmailAddr(emailaddresstext.getText());
         try {
+            user.setAffiliation(affiliationtext.getText());
             user.setUserName(usernametext.getText());
             user.setPassword(passwordtext.getText());
         } catch (UserException e) {
