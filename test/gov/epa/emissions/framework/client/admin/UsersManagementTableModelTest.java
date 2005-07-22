@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.framework.client.admin.UsersManagementTableModel;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -20,7 +20,7 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
 
     private Mock emfUserAdmin;
 
-    protected void setUp() {
+    protected void setUp() throws EmfException {
         users = new ArrayList();
 
         joe = new User();
@@ -44,7 +44,7 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
         assertEquals("Email", model.getColumnName(2));
     }
 
-    public void testShouldReturnRowsEqualingNumberOfUsers() {
+    public void testShouldReturnRowsEqualingNumberOfUsers() throws EmfException{
         List users = new ArrayList();
         User user1 = new User();
         user1.setUserName("user1");

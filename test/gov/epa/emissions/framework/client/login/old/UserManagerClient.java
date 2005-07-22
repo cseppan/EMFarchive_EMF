@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.login.old;
 
+import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.commons.User;
 
 import javax.swing.JFrame;
@@ -77,7 +78,11 @@ public class UserManagerClient extends JFrame {
         user[UserNumber].setAffiliation(userin.getAffiliation());
         user[UserNumber].setWorkPhone(userin.getWorkPhone());
         user[UserNumber].setEmailAddr(userin.getEmailAddr());
-        user[UserNumber].setUserName(userin.getUserName());
+        try {
+            user[UserNumber].setUserName(userin.getUserName());
+        } catch (UserException e) {
+           throw new RuntimeException("update user failure", e);
+        }
         user[UserNumber].setPassword(userin.getPassword());
         user[UserNumber].setInAdminGroup(userin.isInAdminGroup());
         user[UserNumber].setAcctDisabled(userin.isAcctDisabled());

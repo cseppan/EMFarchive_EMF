@@ -9,6 +9,8 @@
  */
 package gov.epa.emissions.framework.commons;
 
+import gov.epa.emissions.framework.UserException;
+
 import java.io.Serializable;
 
 /**
@@ -184,7 +186,11 @@ public class User implements Serializable {
     /**
      * @param userName The userName to set.
      */
-    public void setUserName(String userName) {
+    public void setUserName(String userName) throws UserException {
+        if(userName.length() < 3) {
+            throw new UserException("Username must have at least 3 characters");
+        }
+        
         this.userName = userName;
         this.dirty = true;
     }

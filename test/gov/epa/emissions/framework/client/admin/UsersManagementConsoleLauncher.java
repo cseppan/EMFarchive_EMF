@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.framework.client.admin.UsersManagementConsole;
-import gov.epa.emissions.framework.client.admin.UsersManagementPresenter;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -10,7 +9,7 @@ import java.util.List;
 
 public class UsersManagementConsoleLauncher {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws EmfException {
         UsersManagementConsoleLauncher launcher = new UsersManagementConsoleLauncher();
         
         EMFUserAdmin userAdmin = launcher.createUserAdmin();        
@@ -22,7 +21,7 @@ public class UsersManagementConsoleLauncher {
         console.show();
     }
 
-    private EMFUserAdmin createUserAdmin() {
+    private EMFUserAdmin createUserAdmin() throws EmfException {
         List users = new ArrayList();
 
         users.add(createUser("joe", "Joe Fullman", "joef@zukoswky.com"));
@@ -34,7 +33,7 @@ public class UsersManagementConsoleLauncher {
         return userAdmin;
     }
 
-    private User createUser(String username, String name, String email) {
+    private User createUser(String username, String name, String email) throws EmfException {
         User user = new User();
         user.setUserName(username);
         user.setFullName(name);

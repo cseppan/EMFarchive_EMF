@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.login.old;
 
+import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.commons.User;
 
 import java.awt.Container;
@@ -177,7 +178,11 @@ public class UserInformationWindow extends JDialog implements ActionListener, Fr
         user.setAffiliation(affiliationtext.getText());
         user.setWorkPhone(workphonetext.getText());
         user.setEmailAddr(emailaddresstext.getText());
-        user.setUserName(usernametext.getText());
+        try {
+            user.setUserName(usernametext.getText());
+        } catch (UserException e) {
+            throw new RuntimeException("cannot save data to model", e);
+        }
         user.setPassword(passwordtext.getText());
     }
 
