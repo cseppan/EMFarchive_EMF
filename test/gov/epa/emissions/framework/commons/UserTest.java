@@ -19,6 +19,19 @@ public class UserTest extends TestCase {
         fail("should fail if username is less than 3 characters");
     }
 
+    public void testShouldFailIfPasswordDoesNotMatchConfirmPassword() {
+        User user = new User();
+        try {
+            user.setPassword("password123");
+            user.confirmPassword("psdfssdfsdf21");
+        } catch (UserException ex) {
+            assertEquals("Password does not match Confirm Password", ex.getMessage());
+            return;
+        }
+
+        fail("should fail if Password does not match Confirm Password");       
+    }
+    
     public void testShouldAllowUsernameIfSizeIsGreaterThan2CharactersOnConstruction() throws UserException {
         new User(null, "abc", "123", "a@a.org", "ab62", "abcd1234", false, false);
     }

@@ -11,7 +11,7 @@ public class Main {
 
     public static void main(String[] args) throws UserException {
         UserManagerClient umc = new UserManagerClient();
-        User CurrentUser = new User("", "", "", "", "", "", false, false);
+        User CurrentUser = new User();
 
         while (true) {
             LoginWindow logwin = new LoginWindow(CurrentUser, umc);

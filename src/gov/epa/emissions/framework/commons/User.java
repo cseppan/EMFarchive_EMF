@@ -257,4 +257,11 @@ public class User implements Serializable {
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
     }
+    
+    public void confirmPassword(String confirmPassword) throws UserException {
+        if(!password.equals(confirmPassword)) {
+            throw new UserException("Password does not match Confirm Password");
+        }
+            
+    }
 }

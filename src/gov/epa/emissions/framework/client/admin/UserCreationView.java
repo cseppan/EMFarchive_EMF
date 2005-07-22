@@ -5,6 +5,8 @@ public interface UserCreationView {
 
     String getPassword();
 
+    String getConfirmPassword();
+    
     String getName();
 
     String getEmail();

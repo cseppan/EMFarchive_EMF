@@ -16,8 +16,10 @@ public class UserCreationPresenter {
 
     public void notifyCreate() throws EmfException {
         User user = new User();
+        
         user.setUserName(view.getUsername());
         user.setPassword(view.getPassword());
+        user.confirmPassword(view.getConfirmPassword());
         
         user.setFullName(view.getName());
         user.setEmailAddr(view.getEmail());
@@ -25,6 +27,7 @@ public class UserCreationPresenter {
         user.setAffiliation(view.getAffiliation());
         
         model.createUser(user);
+        model.authenticate(user.getUserName(), user.getPassword(), false);//TODO: admin status ?
     }
 
     public void notifyCancel() {
