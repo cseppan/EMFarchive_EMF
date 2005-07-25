@@ -6,3 +6,4 @@ etc
 .cvsignore
 .cvs
 wsdl_build
+*.jpage
