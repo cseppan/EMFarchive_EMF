@@ -6,7 +6,7 @@
 	<property name="J2EE_HOME" value="${env.J2EE_HOME}" />
 	<property name="JAVA_HOME" value="${env.JAVA_HOME}" />
 	<property name="src.dir" value="src" />
-	<property name="test.dir" value="test" />
+	<property name="unittest.dir" value="test/unit" />
 	<property name="build.dir" value="build" />
 	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="lib.dir" value="lib" />
@@ -35,7 +35,7 @@
 
 	<target name="compile" depends="init">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" debug="on" />
-		<javac srcdir="${test.dir}" destdir="${classes.dir}" classpathref="classpath" debug="on" />
+		<javac srcdir="${unittest.dir}" destdir="${classes.dir}" classpathref="classpath" debug="on" />
 	</target>
 
 	<target name="test" depends="compile">
@@ -44,7 +44,7 @@
 			<formatter type="xml" />
 
 			<batchtest fork="yes" todir="${reports.test}">
-				<fileset dir="${test.dir}">
+				<fileset dir="${unittest.dir}">
 					<include name="**/*Test*.java" />
 				</fileset>
 			</batchtest>

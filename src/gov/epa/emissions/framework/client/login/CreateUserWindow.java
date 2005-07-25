@@ -25,7 +25,7 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
     public CreateUserWindow() {
         JPanel layoutPanel = createLayout();
 
-        this.setSize(new Dimension(350, 350));
+        this.setSize(new Dimension(350, 375));
         this.setLocation(new Point(400, 200));
         this.setTitle("Create a New User");
 
