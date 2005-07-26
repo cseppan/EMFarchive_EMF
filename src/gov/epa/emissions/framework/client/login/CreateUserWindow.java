@@ -26,7 +26,20 @@ import javax.swing.border.TitledBorder;
 public class CreateUserWindow extends JFrame implements CreateUserView {
 
     private CreateUserPresenter presenter;
+
     private JTextField username;
+
+    private JPasswordField password;
+
+    private JPasswordField confirmPassword;
+
+    private JTextField name;
+
+    private JTextField affiliation;
+
+    private JTextField phone;
+
+    private JTextField email;
 
     public CreateUserWindow() {
         JPanel layoutPanel = createLayout();
@@ -77,6 +90,7 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
                     } catch (EmfException e) {// TODO: attach a error handler
                         e.printStackTrace();
                     }
+                    //TODO: launch the main window ??
                 }
             }
         });
@@ -103,10 +117,13 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
         GridLayout valuesLayoutManager = new GridLayout(3, 1);
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
+
         username = new JTextField(10);
         valuesPanel.add(username);
-        valuesPanel.add(new JPasswordField(10));
-        valuesPanel.add(new JPasswordField(10));
+        password = new JPasswordField(10);
+        valuesPanel.add(password);
+        confirmPassword = new JPasswordField(10);
+        valuesPanel.add(confirmPassword);
 
         panel.add(valuesPanel);
 
@@ -134,10 +151,15 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
         GridLayout valuesLayoutManager = new GridLayout(4, 1);
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
-        valuesPanel.add(new JTextField(10));
-        valuesPanel.add(new JTextField(10));
-        valuesPanel.add(new JTextField(10));
-        valuesPanel.add(new JTextField(10));
+
+        name = new JTextField(10);
+        valuesPanel.add(name);
+        affiliation = new JTextField(10);
+        valuesPanel.add(affiliation);
+        phone = new JTextField(10);
+        valuesPanel.add(phone);
+        email = new JTextField(10);
+        valuesPanel.add(email);
 
         panel.add(valuesPanel);
 
@@ -158,23 +180,27 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
     }
 
     public String getPassword() {
-        return null;
+        return password.getText();
     }
 
     public String getConfirmPassword() {
-        return null;
+        return confirmPassword.getText();
     }
 
     public String getEmail() {
-        return null;
+        return email.getText();
     }
 
     public String getPhone() {
-        return null;
+        return phone.getText();
     }
 
     public String getAffiliation() {
-        return null;
+        return affiliation.getText();
+    }
+
+    public String getFullName() {
+        return name.getText();
     }
 
     public void close() {

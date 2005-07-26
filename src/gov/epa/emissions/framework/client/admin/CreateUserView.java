@@ -7,7 +7,7 @@ public interface CreateUserView {
 
     String getConfirmPassword();
     
-    String getName();
+    String getFullName();
 
     String getEmail();
 
