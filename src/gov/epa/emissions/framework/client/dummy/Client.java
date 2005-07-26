@@ -16,10 +16,9 @@
 
 package gov.epa.emissions.framework.client.dummy;
 
-import java.rmi.RemoteException;
-import java.util.List;
-
 import gov.epa.emissions.framework.service.Order;
+
+import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
