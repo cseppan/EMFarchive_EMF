@@ -113,7 +113,6 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
     public void refresh() {
         selectModel.refresh();
         sortFilterSelectPanel.validate();
-        System.out.println("UI refresh complete");
     }
 
 }

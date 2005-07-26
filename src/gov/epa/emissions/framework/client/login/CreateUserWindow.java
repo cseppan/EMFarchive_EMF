@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.admin.CreateUserPresenter;
 import gov.epa.emissions.framework.client.admin.CreateUserView;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -41,10 +42,12 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
 
     private JTextField email;
 
+    private JLabel errorMessage;
+
     public CreateUserWindow() {
         JPanel layoutPanel = createLayout();
 
-        this.setSize(new Dimension(350, 375));
+        this.setSize(new Dimension(350, 400));
         this.setLocation(new Point(400, 200));
         this.setTitle("Create a New User");
 
@@ -55,11 +58,20 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
+        panel.add(createErrorMessagePanel());
         panel.add(createProfilePanel());
         panel.add(createLoginPanel());
         panel.add(createButtonsPanel());
 
         return panel;
+    }
+
+    private JPanel createErrorMessagePanel() {
+        JPanel errorMessagePanel = new JPanel();
+        errorMessage = new JLabel();
+        errorMessagePanel.add(errorMessage);
+
+        return errorMessagePanel;
     }
 
     private JPanel createButtonsPanel() {
@@ -87,10 +99,10 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
                 if (CreateUserWindow.this.presenter != null) {
                     try {
                         CreateUserWindow.this.presenter.notifyCreate();
-                    } catch (EmfException e) {// TODO: attach a error handler
-                        e.printStackTrace();
+                    } catch (EmfException e) {
+                        CreateUserWindow.this.setError(e.getMessage());
                     }
-                    //TODO: launch the main window ??
+                    // TODO: launch the main window ??
                 }
             }
         });
@@ -99,6 +111,18 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
         panel.add(container, BorderLayout.EAST);
 
         return panel;
+    }
+
+    private void setError(String message) {
+        errorMessage.setText("");
+        errorMessage.setForeground(Color.RED);
+        errorMessage.setText(message);
+        
+        this.refresh();
+    }
+
+    public void refresh() {
+        this.validate();
     }
 
     private JPanel createLoginPanel() {

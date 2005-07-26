@@ -145,7 +145,7 @@ public class User implements Serializable {
     public void setPassword(String password) throws UserException {
         if (password == null)
             throw new UserException("Password should be specified");
-        
+
         if (password.length() < 8) {
             throw new UserException("Password should have at least 8 characters");
         }
@@ -211,8 +211,7 @@ public class User implements Serializable {
 
     public void confirmPassword(String confirmPassword) throws UserException {
         if (!password.equals(confirmPassword)) {
-            throw new UserException("Confirm Password '" + confirmPassword + "' does not match Password '" + password
-                    + "'");
+            throw new UserException("Confirm Password does not match Password");
         }
 
     }
