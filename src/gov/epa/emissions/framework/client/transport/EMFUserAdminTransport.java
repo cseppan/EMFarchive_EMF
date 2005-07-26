@@ -8,23 +8,18 @@
  */
 package gov.epa.emissions.framework.client.transport;
 
-import gov.epa.emissions.framework.commons.EMFUser;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 import javax.xml.rpc.ServiceException;
 
-import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
-import org.apache.axis.encoding.ser.ArrayDeserializerFactory;
-import org.apache.axis.encoding.ser.ArraySerializerFactory;
 import org.apache.axis.encoding.ser.BeanDeserializerFactory;
 import org.apache.axis.encoding.ser.BeanSerializerFactory;
 
@@ -36,8 +31,7 @@ import org.apache.axis.encoding.ser.BeanSerializerFactory;
  */
 public class EMFUserAdminTransport implements EMFUserAdmin {
 
-    private static String endpoint = 
-        "http://ben.cep.unc.edu:8080/emf/services/EMFUserManagerService";
+    private static String endpoint = "";
 
     /**
      * 
@@ -46,6 +40,11 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
         super();
     }
 
+    public EMFUserAdminTransport(String endpt) {
+        super();
+        endpoint=endpt;
+    }
+    
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#isNewUser()
      */
