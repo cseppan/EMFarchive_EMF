@@ -108,17 +108,21 @@ public class UsersManagementTableModel extends AbstractTableModel implements Ref
         public void setValue(Object value, int column) {
             switch (column) {
             case 1:
-                user.setFullName((String) value);
+                try {
+                    user.setFullName((String) value);
+                } catch (UserException e) {
+                    // TODO: attach a error handler
+                    throw new RuntimeException(e.getMessage());
+                }
                 break;
             case 2:
                 try {
                     user.setEmailAddr((String) value);
                 } catch (UserException e) {
-                    //TODO: attach a exception handler
+                    // TODO: attach a error handler
                     throw new RuntimeException(e.getMessage());
                 }
             }
-
         }
 
         public Object getValueAt(int column) {

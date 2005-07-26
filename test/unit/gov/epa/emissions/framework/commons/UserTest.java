@@ -5,12 +5,24 @@ import junit.framework.TestCase;
 
 public class UserTest extends TestCase {
 
+    public void testShouldFailIfNameIsNull() {
+        User user = new User();
+        try {
+            user.setFullName(null);
+        } catch (UserException ex) {
+            assertEquals("Name should be specified", ex.getMessage());
+            return;
+        }
+
+        fail("should fail if Name is unspecified");
+    }
+
     public void testShouldFailIfUsernameIsLessThanThreeCharacters() throws UserException {
         assertInvalidUsername("a");
         assertInvalidUsername("ab");
         assertInvalidUsername("");
         try {
-            new User(null, "abc", "123", "a@a.org", "a2", null, false, false);            
+            new User("sdfsdfsdf", "abc", "123", "a@a.org", "a2", null, false, false);
         } catch (UserException ex) {
             assertEquals("Username should have at least 3 characters", ex.getMessage());
             return;
@@ -23,17 +35,17 @@ public class UserTest extends TestCase {
         User user = new User();
         try {
             user.setPassword("password123");
-            user.confirmPassword("psdfssdfsdf21");
+            user.confirmPassword("password12345");
         } catch (UserException ex) {
-            assertEquals("Password does not match Confirm Password", ex.getMessage());
+            assertEquals("Confirm Password 'password12345' does not match Password 'password123'", ex.getMessage());
             return;
         }
 
-        fail("should fail if Password does not match Confirm Password");       
+        fail("should fail if Password does not match Confirm Password");
     }
-    
+
     public void testShouldAllowUsernameIfSizeIsGreaterThan2CharactersOnConstruction() throws UserException {
-        new User(null, "abc", "123", "a@a.org", "ab62", "abcd1234", false, false);
+        new User("sdfsf", "abc", "123", "a@a.org", "ab62", "abcd1234", false, false);
     }
 
     public void testShouldAllowUsernameIfSizeIsGreaterThan2Characters() throws UserException {
@@ -61,7 +73,7 @@ public class UserTest extends TestCase {
 
     public void testShouldFailIfPasswordSizeIsLessThanEightCharactersOnConstruction() {
         try {
-            new User(null, "abc", "123", "a@a.org", "abc", "1234567", false, false);
+            new User("sdfsdf", "abc", "123", "a@a.org", "abc", "1234567", false, false);
         } catch (UserException ex) {
             assertEquals("Password should have at least 8 characters", ex.getMessage());
             return;
@@ -94,7 +106,7 @@ public class UserTest extends TestCase {
 
         fail("should fail if password matches username");
     }
-    
+
     public void testShouldFailIfUsernameIsUnspecified() throws UserException {
         User user = new User();
 
@@ -124,7 +136,7 @@ public class UserTest extends TestCase {
 
     public void testShouldFailIfUsernameMatchesPasswordOnConstruction() throws UserException {
         try {
-            new User(null, "abd", "123", "a@a.org", "abcd1234", "abcd1234", false, false);
+            new User("SdfsdfSD", "abd", "123", "a@a.org", "abcd1234", "abcd1234", false, false);
         } catch (UserException ex) {
             assertEquals("Username should be different from Password", ex.getMessage());
             return;
@@ -143,6 +155,18 @@ public class UserTest extends TestCase {
         }
 
         fail("should fail when password does not contain atleast one non-alphabetic character");
+    }
+
+    public void testShouldFailIfPasswordIsUnspecified() {
+        User user = new User();
+        try {
+            user.setPassword(null);
+        } catch (UserException ex) {
+            assertEquals("Password should be specified", ex.getMessage());
+            return;
+        }
+
+        fail("should fail when Password is unspecified");
     }
 
     private void assertInvalidPasswordDueToSize(String password) {
@@ -165,7 +189,7 @@ public class UserTest extends TestCase {
 
     public void testShouldFailIfAffiliationHasLessThanThreeCharacatersOnConstruction() {
         try {
-            new User(null, "ab", null, null, "abcd", "abcd1234", false, false);
+            new User("Sdfsf", "ab", null, null, "abcd", "abcd1234", false, false);
         } catch (UserException ex) {
             assertEquals("Affiliation should have 2 or more characters", ex.getMessage());
             return;
@@ -175,8 +199,21 @@ public class UserTest extends TestCase {
     }
 
     public void testShouldPassIfAffiliationHasThreeOrMoreCharacters() throws UserException {
-        new User(null, "abc", "123", "a@a.org", "abcd", "abcd1234", false, false);
-        new User(null, "abc34", "123", "a@a.org", "abcd", "abcd1234", false, false);
+        new User("Sdfs", "abc", "123", "a@a.org", "abcd", "abcd1234", false, false);
+        new User("werw", "abc34", "123", "a@a.org", "abcd", "abcd1234", false, false);
+    }
+
+    public void testShouldFailIfAffiliationIsUnspecified() {
+        User user = new User();
+
+        try {
+            user.setAffiliation(null);
+        } catch (UserException ex) {
+            assertEquals("Affiliation should hbe specified", ex.getMessage());
+            return;
+        }
+
+        fail("should fail when Affiliation is unspecified");
     }
 
     private void assertInvalidAffiliatioDueToSize(String affiliation) {
@@ -212,7 +249,7 @@ public class UserTest extends TestCase {
 
     public void testShouldFailIfPhoneIsInvalidOnConstruction() {
         try {
-            new User(null, "abc", "12d", null, "abcd", "abcd1234", false, false);
+            new User("sdf", "abc", "12d", null, "abcd", "abcd1234", false, false);
         } catch (UserException ex) {
             assertEquals("Phone should have format xxx-yyy-zzzz or xxxx or x-yyyy", ex.getMessage());
             return;
@@ -249,13 +286,13 @@ public class UserTest extends TestCase {
 
     public void testShouldFailOnConstructionIfEmailIsInvalid() {
         try {
-            new User(null, "abc", "12", "ab@", "abcd", "abcd1234", false, false);
+            new User("fghas", "abc", "12", "ab@", "abcd", "abcd1234", false, false);
         } catch (UserException ex) {
-            assertEquals("Email should have 2 or more characters", ex.getMessage());
+            assertEquals("Email should have the format xx@yy.zz", ex.getMessage());
             return;
         }
 
-        fail("should fail when Phone is less than 3 characters in lengh");
+        fail("should fail when Email is in invalid format");
     }
 
     private void assertInvalidEmail(String email) {
@@ -264,11 +301,24 @@ public class UserTest extends TestCase {
         try {
             user.setEmailAddr(email);
         } catch (UserException ex) {
-            assertEquals("Email should have 2 or more characters", ex.getMessage());
+            assertEquals("Email should have the format xx@yy.zz", ex.getMessage());
             return;
         }
 
-        fail("should fail when Phone is less than 3 characters in lengh");
+        fail("should fail when Email is in invalid format");
+    }
+
+    public void testShouldFailWhenEmailIsUnspecified() {
+        User user = new User();
+
+        try {
+            user.setEmailAddr(null);
+        } catch (UserException ex) {
+            assertEquals("Email should be specified", ex.getMessage());
+            return;
+        }
+
+        fail("should fail when Email is unspecified");
     }
 
 }

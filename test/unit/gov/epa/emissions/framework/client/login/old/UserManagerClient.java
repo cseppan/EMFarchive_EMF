@@ -73,10 +73,9 @@ public class UserManagerClient extends JFrame {
             if (usernamein.equals(usernametest))
                 UserNumber = i;
         }
-        // Save the data for this user
-        user[UserNumber].setFullName(userin.getFullName());        
-        
+        // Save the data for this user                        
         try {
+            user[UserNumber].setFullName(userin.getFullName());
             user[UserNumber].setAffiliation(userin.getAffiliation());
             user[UserNumber].setEmailAddr(userin.getEmailAddr());
             user[UserNumber].setUserName(userin.getUserName());
