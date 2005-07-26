@@ -18,6 +18,8 @@ import gov.epa.emissions.framework.commons.User;
  *
  */
 public class EMFClient {
+    private static String endpoint = 
+        "http://ben.cep.unc.edu:8080/emf/services/EMFUserManagerService";
 
     /**
      * 
@@ -30,7 +32,7 @@ public class EMFClient {
     public static void main(String[] args) throws EmfException {
         String statuscode = null;
         
-        EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport();
+        EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport(endpoint);
         System.out.println("IN EMFCLIENT main");
        
         String uname = "cdcruz";
