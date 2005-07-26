@@ -227,23 +227,9 @@ public class LoginWindow extends JDialog implements ActionListener
                // String Result = umc.createUser(CurrentUser);
                // This calls Conrad's code
                EMFUserAdminTransport uat = new EMFUserAdminTransport();
-               String Result = uat.createUser(CurrentUser);
+               uat.createUser(CurrentUser);
                // If the user was created successfully, display a message, delete the
                // login window, and return with success to the main program
-               if (Result.equals("Success"))
-               {
-                   JOptionPane.showMessageDialog(this, "New user created in data base successfully");
-                   GoodReturn = true;
-                   dispose();
-               }
-               // If the user could not be created, display the returned message, delete the
-               // window completely, and return with failure to the main program
-               else
-               {
-                   JOptionPane.showMessageDialog(this, "Failure in creating new user: " + Result);
-                   GoodReturn = false;
-                   dispose();
-               }
             }
         }
 

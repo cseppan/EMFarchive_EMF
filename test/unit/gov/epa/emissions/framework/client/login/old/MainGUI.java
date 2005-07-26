@@ -158,12 +158,8 @@ public class MainGUI extends JFrame implements ActionListener {
                 // String result = umc.updateUser(user);
                 // These lines call Conrad's code
                 EMFUserAdminTransport uat = new EMFUserAdminTransport();
-                String result = uat.updateUser(user);
+                uat.updateUser(user);
                 // Temp print
-                JOptionPane.showMessageDialog(this, "Return from updateUser:  " + result);
-                // If the user could not be updated, print why
-                if (!result.equals("Success"))
-                    JOptionPane.showMessageDialog(this, "Failure to update user info:  " + result);
             }
         }
 

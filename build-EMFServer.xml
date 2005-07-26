@@ -57,6 +57,7 @@
   <mkdir dir="${bld.ear.dir}" />
   <mkdir dir="${bld.ear.dir}/META-INF" />
   <mkdir dir="${bld.web.dir}/WEB-INF/classes" />
+  <mkdir dir="${bld.web.dir}/WEB-INF/attachments" />
   <mkdir dir="${bld.web.dir}/WEB-INF/lib" />	
   <mkdir dir="${basedir}/classes" /> 
   <mkdir dir="${dist.dir}/lib"/>

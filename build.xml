@@ -20,6 +20,7 @@
     <property name="build.classes.dir" value="${build.web-inf.dir}/classes" />
 
     <property name="test-reports.dir" value="${build.home}/reports/test" />
+    <property name="app.name" value="emf" />
     <property name="app.path" value="/${app.name}" />
 
     <path id="classpath">

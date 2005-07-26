@@ -47,21 +47,51 @@ public class EMFClient {
             System.out.println("getUser succeeded: " + user.getFullName());
             
         }
-/*        
-        String status = null;
-        uname = "fflintstone";
-        pwd = "freddie";
-        if (user != null){
-            user.setUserName(uname);
-            status = emfUserAdmin.createUser(user);            
-        }else{
-            System.out.println("encountered null user object");
-        }
-        System.out.println("status of create= " + status);
-*/
+
+        user.setFullName("Peter Rabbit 222");
+        
+        User[] users = new User[1];
+        users[0]= user;
+        
+        emfUserAdmin.updateUsers(users);
+        
+        //emfUserAdmin.updateUser(user);
+//        User[] users = emfUserAdmin.getUsers();
+//        if (users == null){
+//            System.out.println("Call returned a null USERS list");
+//        }else{
+//            for (int i=0; i<users.length; i++){
+//                User aUser = users[i];
+//                System.out.println("user #" + i + "************************");
+//                System.out.println(aUser.getUserName());
+//                System.out.println(aUser.getPassword());
+//                System.out.println(aUser.getFullName());
+//                System.out.println(aUser.getEmailAddr());
+//                System.out.println(aUser.getAffiliation());
+//                System.out.println(aUser.getWorkPhone());
+//                System.out.println("Admin? " + aUser.isInAdminGroup());
+//                System.out.println("Disabled? " + aUser.isAcctDisabled());
+//            }
+//            System.out.println("****************************");
+//
+//        }
+//       
+
 //        user = emfUserAdmin.getUser(uname);
 //        System.out.println("current password= " + user.getPassword());
-//        System.out.println("setting password to " + pwd);
+//        String status = null;
+//        uname = "fflintstone2";
+//        pwd = "freddie";
+//        if (user != null){
+//            user.setUserName(uname);
+//            user.setPassword(pwd);
+//            emfUserAdmin.createUser(user);            
+//        }else{
+//            System.out.println("encountered null user object");
+//        }
+//        System.out.println("status of create= " + status);
+// 
+//        user.setUserName("fflintstone");
 //        user.setPassword(pwd);
 //       emfUserAdmin.updateUser(user);
 //        user = emfUserAdmin.getUser(uname);
@@ -100,45 +130,28 @@ public class EMFClient {
             }//while iter
             
         }
-*/
-      User[] users = emfUserAdmin.getUsers();
-      if (users == null){
-          System.out.println("Call returned a null USERS list");
-      }else{
-          for (int i=0; i<users.length; i++){
-              User aUser = users[i];
-              System.out.println("user #" + i + "************************");
-              System.out.println(aUser.getUserName());
-              System.out.println(aUser.getPassword());
-              System.out.println(aUser.getFullName());
-              System.out.println(aUser.getEmailAddr());
-              System.out.println(aUser.getAffiliation());
-              System.out.println(aUser.getWorkPhone());
-              System.out.println("Admin? " + aUser.isInAdminGroup());
-              System.out.println("Disabled? " + aUser.isAcctDisabled());
-          }
-          System.out.println("****************************");
 
-      }
-/*
-        User[] users = emfUserAdmin.getUsers();
-        if (users == null){
-            System.out.println("Call returned a null USERS list");
-        }else{
 
-            Iterator iter = users.iterator();
-            
-            while (iter.hasNext()){
-                User aUser = (User) iter.next();
-                if (aUser !=null){
-                    System.out.println(aUser.getFullName());                    
-                }else{
-                    System.out.println("User was null");
-                }
-                //System.out.println((String)iter.next());
-            }//while iter
-            System.out.println(users.length);
-*/
+ */   
+       
+//        User[] users = emfUserAdmin.getUsers();
+//        if (users == null){
+//            System.out.println("Call returned a null USERS list");
+//        }else{
+//
+//            Iterator iter = users.iterator();
+//            
+//            while (iter.hasNext()){
+//                User aUser = (User) iter.next();
+//                if (aUser !=null){
+//                    System.out.println(aUser.getFullName());                    
+//                }else{
+//                    System.out.println("User was null");
+//                }
+//                //System.out.println((String)iter.next());
+//            }//while iter
+//            System.out.println(users.length);
+
 
         
         

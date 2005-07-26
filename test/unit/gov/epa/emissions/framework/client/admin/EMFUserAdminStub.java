@@ -40,19 +40,17 @@ public class EMFUserAdminStub implements EMFUserAdmin {
         return (User[]) users.toArray(new User[0]);
     }
 
-    public String createUser(User newUser) {
-        return null;
+    public void createUser(User newUser) {
     }
 
-    public String updateUser(User newUser) {
-        return null;
+    public void updateUser(User newUser) {
     }
 
     public String updateUsers(List users) {
         return null;
     }
 
-    public String deleteUser(String userName) {
+    public void deleteUser(String userName) {
         for (Iterator iter = users.iterator(); iter.hasNext();) {
             User user = (User) iter.next();
             if(user.getUserName().equals(userName)) {
@@ -61,11 +59,18 @@ public class EMFUserAdminStub implements EMFUserAdmin {
             }
             
         }
-        return null;
     }
 
     public EMFUser[] getEmfUsers() throws EmfException {
         return null;
+    }
+
+    /* (non-Javadoc)
+     * @see gov.epa.emissions.framework.commons.EMFUserAdmin#updateUsers(gov.epa.emissions.framework.commons.User[])
+     */
+    public void updateUsers(User[] users) throws EmfException {
+        // TODO Auto-generated method stub
+        
     }
 
 }

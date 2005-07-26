@@ -117,8 +117,8 @@ public class EMFUserManager implements EMFUserAdmin{
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#createUser(gov.epa.emissions.framework.commons.User)
      */
-    public String createUser(User newUser) {
-        String statuscode = "Success";
+    public void createUser(User newUser) {
+        
         UserManagerDAO umDAO;
         try {
             umDAO = new UserManagerDAO();
@@ -126,14 +126,14 @@ public class EMFUserManager implements EMFUserAdmin{
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return statuscode;       
+        
     }
 
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#updateUser(gov.epa.emissions.framework.commons.User)
      */
-    public String updateUser(User newUser) {
-        String statuscode = "Success";
+    public void updateUser(User newUser) {
+        
         UserManagerDAO umDAO;
         try {
             umDAO = new UserManagerDAO();
@@ -141,14 +141,14 @@ public class EMFUserManager implements EMFUserAdmin{
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return statuscode;       
+               
     }
 
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#deleteUser(java.lang.String)
      */
-    public String deleteUser(String userName) {
-        String statuscode = "Success";
+    public void deleteUser(String userName) {
+        
         UserManagerDAO umDAO;
         try {
             umDAO = new UserManagerDAO();
@@ -156,7 +156,7 @@ public class EMFUserManager implements EMFUserAdmin{
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return statuscode;       
+          
     }
 
     /* (non-Javadoc)
@@ -195,31 +195,25 @@ public class EMFUserManager implements EMFUserAdmin{
         return allUsers;        
     }
 */
-    
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#updateUsers(java.util.Collection)
-     */
-    public String updateUsers(List users) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.commons.EMFUserAdmin#getEmfUsers()
+     * @see gov.epa.emissions.framework.commons.EMFUserAdmin#updateUsers(gov.epa.emissions.framework.commons.User[])
      */
-    public EMFUser[] getEmfUsers() {
-        System.out.println("In getEmfUsers");
-        EMFUser[] all = new EMFUser[2];
+    public void updateUsers(User[] users) {
+        System.out.println("Start update Users");
+        UserManagerDAO umDAO;
+        try {
+            umDAO = new UserManagerDAO();
+            umDAO.updateUsers(users);  
+             	
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         
-        EMFUser user = new EMFUser();
-        user.setName("Fredreick");
-        all[0] = user;
-        EMFUser user2 = new EMFUser();
-        user.setName("Joanne");
-        all[1] = user2;
-        System.out.println("End getEmfUsers: " + all.length);
-
-        return all;
+        System.out.println("End Update Users");
+       
     }
-	
+    
+
+
 }

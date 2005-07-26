@@ -25,50 +25,20 @@
           type="java:org.apache.axis.handlers.http.URLMapper"/>
  <handler name="Authenticate"
           type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
- <service name="AdminService" provider="java:MSG">
-  <parameter name="allowedMethods" value="AdminService"/>
-  <parameter name="enableRemoteAdmin" value="false"/>
-  <parameter name="className" value="org.apache.axis.utils.Admin"/>
-  <namespace>http://xml.apache.org/axis/wsdd/</namespace>
- </service>
- <service name="Version" provider="java:RPC">
-  <parameter name="allowedMethods" value="getVersion"/>
-  <parameter name="className" value="org.apache.axis.Version"/>
- </service>
- 
- <service name="EMFUserManagerService" provider="java:RPC">
+          
+  <service name="EMFUserManagerService" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
+  <parameter name="scope" value="application"/>
   <parameter name="className" value="gov.epa.emissions.framework.service.EMFUserManager"/>
-
- 	<typeMapping qname="ns1:User" xmlns:ns1="urn:EMFUserManager"
-	    languageSpecificType="java:gov.epa.emissions.framework.commons.User"
-	    serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-	    deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-	    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>  
-
-	<typeMapping qname="ns1:Users" xmlns:ns1="urn:EMFUserManager"
-        languageSpecificType="java:gov.epa.emissions.framework.commons.User[]"
-        serializer="org.apache.axis.encoding.ser.ArraySerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.ArrayDeserializerFactory"
-		innerType="ns1:User" 
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
-
- 	<typeMapping qname="ns1:EMFUser" xmlns:ns1="urn:EMFUserManager"
-	    languageSpecificType="java:gov.epa.emissions.framework.commons.EMFUser"
-	    serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
-	    deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
-	    encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>  
-
-	<typeMapping qname="ns1:EMFUsers" xmlns:ns1="urn:EMFUserManager"
-        languageSpecificType="java:gov.epa.emissions.framework.commons.EMFUser[]"
-        serializer="org.apache.axis.encoding.ser.ArraySerializerFactory"
-        deserializer="org.apache.axis.encoding.ser.ArrayDeserializerFactory"
-		innerType="ns1:EMFUser" 
-        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
-	    
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.commons.User" qname="ns1:User" xmlns:ns1="urn:EMFUserManagerService"/>
  </service>
 
-<transport name="http">
+ <arrayMapping qname="ns1:Users" xmlns:ns1="urn:EMFUserManagerService"
+             languageSpecificType="java:gov.epa.emissions.framework.commons.User[]"
+			 innerType="ns1:User" 
+             encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
+ 
+ <transport name="http">
   <requestFlow>
    <handler type="URLMapper"/>
    <handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler"/>

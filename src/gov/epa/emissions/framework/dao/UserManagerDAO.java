@@ -29,8 +29,8 @@ import javax.sql.DataSource;
 public class UserManagerDAO {
 
     DataSource ds = null;
-    private static final String GET_USER_QUERY="select * from users where user_name='";
-    private static final String GET_USERS_QUERY="select * from users";
+    private static final String GET_USER_QUERY="select * from users where user_name=? order by user_name";
+    private static final String GET_USERS_QUERY="select * from users order by user_name";
     private static final String INSERT_USER_QUERY="INSERT INTO users (user_name,user_pass,fullname,affiliation,workphone,emailaddr,inadmingrp,acctdisabled) VALUES (?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_QUERY="UPDATE users SET user_name=?,user_pass=?,fullname=?,affiliation=?,workphone=?,emailaddr=?,inadmingrp=?,acctdisabled=? WHERE user_name=?";
     private static final String DELETE_USER_QUERY="DELETE FROM users where user_name=?";
@@ -66,11 +66,13 @@ public class UserManagerDAO {
           System.out.println("Is connection null? " + (conn ==null));
 
           if(conn != null)  {
-              Statement stmt = conn.createStatement();
-              System.out.println("Is statement null? " + (stmt ==null));
-              System.out.println("The query string " + GET_USER_QUERY + userName + "'");
+              PreparedStatement selectStmt = conn.prepareStatement(GET_USER_QUERY);
+              System.out.println("Is statement null? " + (selectStmt ==null));
+              System.out.println("The query string " + GET_USER_QUERY);
 
-              ResultSet rst = stmt.executeQuery(GET_USER_QUERY + userName + "'");
+              selectStmt.setString(1,userName);                  
+              
+              ResultSet rst = selectStmt.executeQuery();
               System.out.println("Is result set null? " + (rst ==null));
               
                   while( rst.next() ){
@@ -88,7 +90,7 @@ public class UserManagerDAO {
               
               // Close the result set, statement and the connection
               rst.close() ;
-              stmt.close() ;
+              selectStmt.close() ;
               conn.close() ;
           }//conn not null
       }//ds not null
@@ -103,7 +105,17 @@ public class UserManagerDAO {
       return emfUser;
     }//getUser
 
- 
+    public void updateUsers(User[] users) throws Exception{
+        System.out.println("Start DAO:updateUsers");
+
+        int count = users.length;
+        for (int i=0; i<count; i++){
+            this.updateUser(users[i]);
+        }        
+        System.out.println("End transport:updateUsers");
+
+    }//setUsers
+    
     public List getUsers() throws Exception{
       System.out.println("In getUsers");
       
@@ -116,11 +128,11 @@ public class UserManagerDAO {
               System.out.println("Is connection null? " + (conn ==null));
 
               if(conn != null)  {
-                  Statement stmt = conn.createStatement();
-                  System.out.println("Is statement null? " + (stmt ==null));
+                  PreparedStatement selectStmt = conn.prepareStatement(GET_USERS_QUERY);
+                  System.out.println("Is statement null? " + (selectStmt ==null));
                   System.out.println("The query string " + GET_USERS_QUERY);
-
-                  ResultSet rst = stmt.executeQuery(GET_USERS_QUERY);
+                  
+                  ResultSet rst = selectStmt.executeQuery();
                   System.out.println("Is result set null? " + (rst ==null));
                   
                       while( rst.next() ){
@@ -142,7 +154,7 @@ public class UserManagerDAO {
                   
                   // Close the result set, statement and the connection
                   rst.close() ;
-                  stmt.close() ;
+                  selectStmt.close() ;
                   conn.close() ;
               }//conn not null
           }//ds not null
@@ -203,7 +215,7 @@ public class UserManagerDAO {
                     updateStmt.setString(6,user.getEmailAddr());
                     updateStmt.setBoolean(7,user.isInAdminGroup());
                     updateStmt.setBoolean(8,user.isAcctDisabled());
-                    
+                    updateStmt.setString(9,user.getUserName());
                     updateStmt.executeUpdate();
                     
                     

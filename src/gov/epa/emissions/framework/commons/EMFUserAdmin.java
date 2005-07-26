@@ -28,9 +28,8 @@ public interface EMFUserAdmin {
     public boolean resetPassword() throws EmfException;
     public User getUser(String userName) throws EmfException;
     public User[] getUsers() throws EmfException;
-    public String createUser(User newUser) throws EmfException;
-    public String updateUser(User newUser) throws EmfException;
-    public String updateUsers(List users) throws EmfException;
-    public String deleteUser(String userName) throws EmfException;
-    public EMFUser[] getEmfUsers() throws EmfException;
+    public void createUser(User newUser) throws EmfException;
+    public void updateUser(User newUser) throws EmfException;
+    public void updateUsers(User[] users) throws EmfException;
+    public void deleteUser(String userName) throws EmfException;
 }

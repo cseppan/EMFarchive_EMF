@@ -14,13 +14,13 @@ import gov.epa.emissions.framework.commons.User;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
+import javax.xml.rpc.ParameterMode;
 import javax.xml.rpc.ServiceException;
 
-import org.apache.axis.Constants;
+import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.encoding.ser.ArrayDeserializerFactory;
@@ -68,7 +68,7 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
     public String authenticate(String userName, String pwd,
             boolean wantAdminStatus) {
 
-        String statusCode = null;
+        String statuscode = "success";
         
         Service  service = new Service();
         Call     call;
@@ -94,20 +94,23 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
 
             call.setReturnType(org.apache.axis.Constants.XSD_STRING);
 
-            statusCode = (String) call.invoke( new Object[] {userName, pwd, new Boolean(wantAdminStatus)} );
+            statuscode = (String) call.invoke( new Object[] {userName, pwd, new Boolean(wantAdminStatus)} );
 
         } catch (ServiceException e) {
             System.out.println("Error invoking the service");
             e.printStackTrace();
+            statuscode="failed";
         } catch (MalformedURLException e) {
             System.out.println("Error in format of URL string");
             e.printStackTrace();
+            statuscode="failed";
         } catch (RemoteException e) {
             System.out.println("Error communicating with WS end point");
             e.printStackTrace();
+            statuscode="failed";
         }
 
-        return statusCode;
+        return statuscode;
     }
 
     /* (non-Javadoc)
@@ -129,16 +132,20 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
         try {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            call.setOperationName(new QName("http://soapinterop.org/", "getUser") );
-            QName qname = new QName("urn:EMFUserManager","ns1:User");
+            
+            QName qname1 = new QName("urn:EMFUserManager","ns1:User");
+            QName qname2 = new QName("urn:WsAdminService", "getUser");
+            call.setOperationName(qname2);
             Class cls = gov.epa.emissions.framework.commons.User.class;
-            call.registerTypeMapping(cls,qname,BeanSerializerFactory.class, BeanDeserializerFactory.class);
+	        call.registerTypeMapping(User.class, qname1,
+	    			  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls, qname1),        
+	    			  new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls, qname1));        			  
 
             call.addParameter("uname",
                                org.apache.axis.Constants.XSD_STRING,
                                javax.xml.rpc.ParameterMode.IN);
 
-            call.setReturnType(qname);
+            call.setReturnType(qname1);
             user = (User) call.invoke( new Object[] {userName} );
 
         } catch (ServiceException e) {
@@ -159,20 +166,21 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#createUser(gov.epa.emissions.framework.commons.User)
      */
-    public String createUser(User newUser) {
-        String statuscode = "null";
+    public void createUser(User newUser) {
+        String statuscode = "success";
         Service  service = new Service();
         Call     call;
         try {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            call.setOperationName(new QName("http://soapinterop.org/", "getUser") );
-            QName qname = new QName("urn:EMFUserManager","ns1:User");
+            call.setOperationName(new QName("urn:EMFUserManagerService", "createUser") );
+            QName qname = new QName("urn:EMFUserManagerService","ns1:User");
             Class cls = gov.epa.emissions.framework.commons.User.class;
-            call.registerTypeMapping(cls,qname,BeanSerializerFactory.class, BeanDeserializerFactory.class);
-            call.addParameter(qname,
-                               org.apache.axis.Constants.XSD_ANY,
-                               javax.xml.rpc.ParameterMode.IN);
+            call.registerTypeMapping(cls, qname,
+					   new org.apache.axis.encoding.ser.BeanSerializerFactory(cls, qname),        
+					   new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls, qname)); 
+
+            call.addParameter( "newuser", qname, ParameterMode.IN );
 
             call.setReturnType(org.apache.axis.Constants.XSD_STRING);
             statuscode = (String) call.invoke( new Object[] {newUser} );
@@ -180,31 +188,66 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
         } catch (ServiceException e) {
             System.out.println("Error invoking the service");
             e.printStackTrace();
+            statuscode="failed";
         } catch (MalformedURLException e) {
             System.out.println("Error in format of URL string");
             e.printStackTrace();
+            statuscode="failed";
         } catch (RemoteException e) {
             System.out.println("Error communicating with WS end point");
             e.printStackTrace();
-        }
+            statuscode="failed";
+        } 
 
-        return statuscode;
+        
 
     }
 
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#updateUser(gov.epa.emissions.framework.commons.User)
      */
-    public String updateUser(User newUser) {
-        // TODO Auto-generated method stub
-        return null;
+    public void updateUser(User newUser) {
+        String statuscode = "success";
+        Service  service = new Service();
+        Call     call;
+        try {
+            call = (Call) service.createCall();
+            call.setTargetEndpointAddress( new java.net.URL(endpoint) );
+            call.setOperationName(new QName("urn:EMFUserManagerService", "updateUser") );
+            QName qname = new QName("urn:EMFUserManagerService","ns1:User");
+            Class cls = gov.epa.emissions.framework.commons.User.class;
+            call.registerTypeMapping(cls, qname,
+					   new org.apache.axis.encoding.ser.BeanSerializerFactory(cls, qname),        
+					   new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls, qname)); 
+
+            call.addParameter( "updateuser", qname, ParameterMode.IN );
+
+            call.setReturnType(org.apache.axis.Constants.XSD_STRING);
+            statuscode = (String) call.invoke( new Object[] {newUser} );
+
+        } catch (ServiceException e) {
+            System.out.println("Error invoking the service");
+            e.printStackTrace();
+            statuscode="failed";
+        } catch (MalformedURLException e) {
+            System.out.println("Error in format of URL string");
+            e.printStackTrace();
+            statuscode="failed";
+        } catch (RemoteException e) {
+            System.out.println("Error communicating with WS end point");
+            e.printStackTrace();
+            statuscode="failed";
+        } 
+
+        
+
     }
 
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#deleteUser(java.lang.String)
      */
-    public String deleteUser(String userName) {
-        String statuscode = null;
+    public void deleteUser(String userName) {
+        String statuscode = "success";
                
         Service  service = new Service();
         Call     call;
@@ -222,69 +265,22 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
         } catch (ServiceException e) {
             System.out.println("Error invoking the service");
             e.printStackTrace();
+            statuscode="failed";
         } catch (MalformedURLException e) {
             System.out.println("Error in format of URL string");
             e.printStackTrace();
+            statuscode="failed";
         } catch (RemoteException e) {
             System.out.println("Error communicating with WS end point");
             e.printStackTrace();
+            statuscode="failed";
         }
 
-        return statuscode;
+
 
     }
 
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#getUsers()
-     */
-    /*
-    public List getUsers() {
-
-
-        String statusCode = null;
-        List users = null;;
-        
-        Service  service = new Service();
-        Call     call;
-        
-        try {
-            call = (Call) service.createCall();
-            call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            call.setOperationName(new QName("http://soapinterop.org/", "getUsers") );
-            QName qname1 = new QName("urn:EMFUserManager","ns1:User");
-            QName qname2 = new QName("urn:EMFUserManager","ns1:Users");
-            
-            Class cls1 = gov.epa.emissions.framework.commons.User.class;
-            Class cls2 = java.util.ArrayList.class;
-            //Class cls2 = gov.epa.emissions.framework.commons.User[].class;
-            call.registerTypeMapping(cls1,qname1,BeanSerializerFactory.class, BeanDeserializerFactory.class);
-            call.registerTypeMapping(cls2,qname2,ArraySerializerFactory.class, ArrayDeserializerFactory.class);
-            call.setReturnType(qname2);
-            
-            Object obj = call.invoke( new Object[] {} );
-                            
-            users = (ArrayList)obj;
-            
-        } catch (ServiceException e) {
-            System.out.println("Error invoking the service");
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            System.out.println("Error in format of URL string");
-            e.printStackTrace();
-        } catch (RemoteException e) {
-            System.out.println("Error communicating with WS end point");
-            e.printStackTrace();
-        }
-
-        return users;
-}
-*/
-    
-
         public User[] getUsers() {
-
-
-            String statusCode = null;
             User[] users = null;;
             
             Service  service = new Service();
@@ -293,16 +289,23 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
             try {
                 call = (Call) service.createCall();
                 call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-                call.setOperationName(new QName("http://soapinterop.org/", "getUsers") );
+                
+                //call.setOperationName(new QName("urn:EMFUserManager", "getUsers") );
                 QName qname1 = new QName("urn:EMFUserManager","ns1:User");
                 QName qname2 = new QName("urn:EMFUserManager","ns1:Users");
-                //QName qname3 = new QName("urn:EMFUserManager","ArrayOf_xsd_anyType");
+                QName qname3 = new QName("urn:EMFUserManager", "getUsers");
+                
+                call.setOperationName(qname3);
                 
                 Class cls1 = gov.epa.emissions.framework.commons.User.class;
-                //Class cls2 = java.util.ArrayList.class;
                 Class cls2 = gov.epa.emissions.framework.commons.User[].class;
-                call.registerTypeMapping(cls1,qname1,BeanSerializerFactory.class, BeanDeserializerFactory.class);
-                call.registerTypeMapping(cls2,qname2,ArraySerializerFactory.class, ArrayDeserializerFactory.class);
+  	          call.registerTypeMapping(cls1, qname1,
+  					  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),        
+  					  new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));        			  
+  		          call.registerTypeMapping(cls2, qname2,
+  						  new org.apache.axis.encoding.ser.ArraySerializerFactory(cls2, qname2),        
+  						  new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname2));        			  
+  		          
                 call.setReturnType(qname2);
                 
                 Object obj = call.invoke( new Object[] {} );
@@ -323,40 +326,42 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
             return users;
     }
     
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#updateUsers(java.util.Collection)
+     /* (non-Javadoc)
+     * @see gov.epa.emissions.framework.commons.EMFUserAdmin#updateUsers(gov.epa.emissions.framework.commons.User[])
      */
-    public String updateUsers(List users) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.commons.EMFUserAdmin#getEmfUsers()
-     */
-    public EMFUser[] getEmfUsers() {
-        String statusCode = null;
-        EMFUser[] users = null;;
-        
+    public void updateUsers(User[] users) {
+        System.out.println("Start transport:updateUsers " + users[0].getFullName());
+        System.out.println("Number of elements: " + users.length);
+        String statuscode = "default status code";
         Service  service = new Service();
         Call     call;
         
         try {
             call = (Call) service.createCall();
+            
+            System.out.println("Endpoint: " + endpoint);
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            call.setOperationName(new QName("http://soapinterop.org/", "getEmfUsers") );
-            QName qname1 = new QName("urn:EMFUserManager","ns1:EMFUser");
-            //QName qname3 = new QName("urn:EMFUserManager","ArrayOf_xsd_anyType");
-            QName qname2 = new QName("urn:EMFUserManager","ns1:EMFUsers");
-            
-            Class cls1 = gov.epa.emissions.framework.commons.EMFUser.class;
-            Class cls2 = gov.epa.emissions.framework.commons.EMFUser[].class;
-            call.registerTypeMapping(cls1,qname1,BeanSerializerFactory.class, BeanDeserializerFactory.class);
-            call.registerTypeMapping(cls2,qname2,ArraySerializerFactory.class, ArrayDeserializerFactory.class);
-            
-            call.setReturnType(qname2);
-            Object obj = call.invoke( new Object[] {} );
-            users = (EMFUser[])obj;
+            QName qname1 = new QName("urn:EMFUserManager","ns1:User");
+            QName qname2 = new QName("urn:EMFUserManager","ns1:Users");
+            QName qname3 = new QName("urn:EMFUserManager", "updateUsers");
+                        
+            Class cls1 = gov.epa.emissions.framework.commons.User.class;
+            Class cls2 = gov.epa.emissions.framework.commons.User[].class;
+	        call.registerTypeMapping(cls1, qname1,
+					  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),        
+					  new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));  
+	        
+		    call.registerTypeMapping(cls2, qname2,
+						  new org.apache.axis.encoding.ser.ArraySerializerFactory(cls2, qname2),        
+						  new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname2));        			  
+            call.addParameter( "users", qname2, ParameterMode.IN );
+            call.setOperationName(qname3);
+      
+            call.setReturnType(org.apache.axis.Constants.XSD_STRING);
+            System.out.println("Before invoke: " + users.length);
+           statuscode = (String) call.invoke( new Object[] {users} );
+           System.out.println("after invoke: " + users.length);
+            System.out.println("Status of updateUsers: " + statuscode);
             
         } catch (ServiceException e) {
             System.out.println("Error invoking the service");
@@ -368,9 +373,9 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
             System.out.println("Error communicating with WS end point");
             e.printStackTrace();
         }
-
-        return users;
+        System.out.println("End transport:updateUsers");
+        
+      
     }
-
 
 }
