@@ -94,6 +94,19 @@ public class UserTest extends TestCase {
 
         fail("should fail if password matches username");
     }
+    
+    public void testShouldFailIfUsernameIsUnspecified() throws UserException {
+        User user = new User();
+
+        try {
+            user.setUserName(null);
+        } catch (UserException ex) {
+            assertEquals("Username should be specified", ex.getMessage());
+            return;
+        }
+
+        fail("should fail if username is unspecified");
+    }
 
     public void testShouldFailIfUsernameMatchesPasswordOnSetUsername() throws UserException {
         User user = new User();
@@ -179,9 +192,22 @@ public class UserTest extends TestCase {
         fail("should fail when affiliation is less than 3 characters in lengh");
     }
 
-    public void testShouldFailIfPhoneHasLessThanThreeCharacters() {
+    public void testShouldFailIfPhoneIsInInvalidFormat() {
         assertInvalidPhoneFormat("1x");
         assertInvalidPhoneFormat("ab");
+    }
+
+    public void testShouldFailIfPhoneIsUnspecified() {
+        User user = new User();
+
+        try {
+            user.setWorkPhone(null);
+        } catch (UserException ex) {
+            assertEquals("Phone should be specified", ex.getMessage());
+            return;
+        }
+
+        fail("should fail when Phone is unspecified");
     }
 
     public void testShouldFailIfPhoneIsInvalidOnConstruction() {

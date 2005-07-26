@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.login;
 
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.admin.CreateUserPresenter;
 import gov.epa.emissions.framework.client.admin.CreateUserView;
 
@@ -8,6 +9,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -22,6 +25,9 @@ import javax.swing.border.TitledBorder;
 
 public class CreateUserWindow extends JFrame implements CreateUserView {
 
+    private CreateUserPresenter presenter;
+    private JTextField username;
+
     public CreateUserWindow() {
         JPanel layoutPanel = createLayout();
 
@@ -35,11 +41,11 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
     private JPanel createLayout() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        
+
         panel.add(createProfilePanel());
         panel.add(createLoginPanel());
         panel.add(createButtonsPanel());
-        
+
         return panel;
     }
 
@@ -51,16 +57,38 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
         layout.setHgap(20);
         layout.setVgap(25);
         container.setLayout(layout);
-        container.add(new JButton("Cancel"));
-        container.add(new JButton("Ok"));
-        
+
+        JButton cancel = new JButton("Cancel");
+        cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                if (CreateUserWindow.this.presenter != null) {
+                    CreateUserWindow.this.presenter.notifyCancel();
+                }
+            }
+        });
+        container.add(cancel);
+
+        JButton ok = new JButton("Ok");
+        ok.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                if (CreateUserWindow.this.presenter != null) {
+                    try {
+                        CreateUserWindow.this.presenter.notifyCreate();
+                    } catch (EmfException e) {// TODO: attach a error handler
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        container.add(ok);
+
         panel.add(container, BorderLayout.EAST);
-        
+
         return panel;
     }
 
     private JPanel createLoginPanel() {
-        JPanel panel = new JPanel();        
+        JPanel panel = new JPanel();
         panel.setBorder(createBorder("Login"));
 
         GridLayout labelsLayoutManager = new GridLayout(3, 1);
@@ -75,14 +103,15 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
         GridLayout valuesLayoutManager = new GridLayout(3, 1);
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
-        valuesPanel.add(new JTextField(10));
+        username = new JTextField(10);
+        valuesPanel.add(username);
         valuesPanel.add(new JPasswordField(10));
         valuesPanel.add(new JPasswordField(10));
 
         panel.add(valuesPanel);
-     
+
         panel.setMaximumSize(new Dimension(300, 125));
-        
+
         return panel;
     }
 
@@ -113,19 +142,19 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
         panel.add(valuesPanel);
 
         panel.setMaximumSize(new Dimension(300, 175));
-        
+
         return panel;
     }
 
     private Border createBorder(String title) {
         TitledBorder border = BorderFactory.createTitledBorder(title);
         border.setTitleJustification(TitledBorder.LEFT);
-        
+
         return border;
     }
 
     public String getUsername() {
-        return null;
+        return username.getText();
     }
 
     public String getPassword() {
@@ -149,9 +178,11 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
     }
 
     public void close() {
+        this.dispose();
     }
 
     public void setObserver(CreateUserPresenter presenter) {
+        this.presenter = presenter;
     }
 
 }

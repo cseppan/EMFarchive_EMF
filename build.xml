@@ -149,9 +149,9 @@
     <target name="app-install"
             description="Install application to servlet container"
     >
-        <install url="${manager.url}"
-                 username="${manager.username}"
-                 password="${manager.password}"
+        <install url="${tomcat.manager.url}"
+                 username="${tomcat.manager.username}"
+                 password="${tomcat.manager.password}"
                  path="${app.path}"
                  war="file://${build.home}/${app.name}.war"
         />
@@ -159,8 +159,8 @@
 
     <target name="apps-list" description="List installed applications ">
         <list url="${manager.url}"
-              username="${manager.username}"
-              password="${manager.password}"
+              username="${tomcat.manager.username}"
+              password="${tomcat.manager.password}"
         />
     </target>
 
@@ -174,8 +174,8 @@
             description="Reload application on servlet container"
     >
         <reload url="${manager.url}"
-                username="${manager.username}"
-                password="${manager.password}"
+                username="${tomcat.manager.username}"
+                password="${tomcat.manager.password}"
                 path="${app.path}"
         />
     </target>
@@ -186,8 +186,8 @@
             description="Remove application on servlet container"
     >
         <remove url="${manager.url}"
-                username="${manager.username}"
-                password="${manager.password}"
+                username="${tomcat.manager.username}"
+                password="${tomcat.manager.password}"
                 path="${app.path}"
         />
     </target>

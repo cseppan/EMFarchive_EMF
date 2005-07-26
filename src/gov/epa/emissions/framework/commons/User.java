@@ -27,7 +27,7 @@ public class User implements Serializable {
     //State variables for the User bean
     private String name;
     private String affiliation;
-    private String workPhone;
+    private String phone;
     private String email;
     private String userName;
     private String password;
@@ -67,7 +67,7 @@ public class User implements Serializable {
      * 
      * @param name
      * @param affiliation
-     * @param workPhone
+     * @param phone
      * @param email
      * @param username
      * @param password
@@ -209,18 +209,21 @@ public class User implements Serializable {
     }
     
     /**
-     * @param userName The userName to set.
+     * @param username The userName to set.
      */
-    public void setUserName(String userName) throws UserException {
-        if(userName.length() < 3) {
+    public void setUserName(String username) throws UserException {
+        if(username == null) {
+            throw new UserException("Username should be specified");
+        }
+        if(username.length() < 3) {
             throw new UserException("Username should have at least 3 characters");
         }
         
-        if(userName.equals(password)) {
+        if(username.equals(password)) {
             throw new UserException("Username should be different from Password");
         }
         
-        this.userName = userName;
+        this.userName = username;
         this.dirty = true;
     }
     
@@ -228,18 +231,21 @@ public class User implements Serializable {
      * @return Returns the workPhone.
      */
     public String getWorkPhone() {
-        return workPhone;
+        return phone;
     }
     
     /**
-     * @param workPhone The workPhone to set.
+     * @param phone The workPhone to set.
      */
-    public void setWorkPhone(String workPhone) throws UserException {
-        if(!Pattern.matches("(\\d)+(-\\d+)*", workPhone)) {
+    public void setWorkPhone(String phone) throws UserException {
+        if(phone == null) 
+            throw new UserException("Phone should be specified");
+        
+        if(!Pattern.matches("(\\d)+(-\\d+)*", phone)) {
             throw new UserException("Phone should have format xxx-yyy-zzzz or xxxx or x-yyyy");
         }
         
-        this.workPhone = workPhone;
+        this.phone = phone;
         this.dirty = true;
 
     }
