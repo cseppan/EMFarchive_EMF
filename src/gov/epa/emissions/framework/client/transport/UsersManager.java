@@ -6,14 +6,14 @@ import gov.epa.emissions.framework.commons.User;
 
 public class UsersManager {
 
-    private EMFUserAdmin usersAdmin;
+    private EMFUserAdmin userAdmin;
 
-    public UsersManager(EMFUserAdmin usersAdmin) {
-        this.usersAdmin = usersAdmin;
+    public UsersManager(EMFUserAdmin userAdmin) {
+        this.userAdmin = userAdmin;
     }
 
     public void createUser(User user) throws EmfException {
-        this.usersAdmin.createUser(user);
+        this.userAdmin.createUser(user);
     }
 
 }

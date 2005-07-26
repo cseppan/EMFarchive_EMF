@@ -7,6 +7,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Collections;
 
+import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -31,8 +32,8 @@ public class CreateUserWindowLauncher {
     }
 
     private static void setLookAndFeel() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
-        String nativeLF = UIManager.getSystemLookAndFeelClassName();
-        UIManager.setLookAndFeel(nativeLF);
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");        
     }
 
 }
