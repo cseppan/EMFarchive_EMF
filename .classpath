@@ -26,5 +26,6 @@
 	<classpathentry kind="lib" path="lib/dev/activation.jar"/>
 	<classpathentry kind="lib" path="lib/dev/mail.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat/mysql-connector-java-3.1.10-bin.jar"/>
+	<classpathentry kind="lib" path="lib/tomcat/catalina-ant.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -99,7 +99,7 @@
 <!-- Copies all of the .jsp and .htm* files for the web application -->
 <target name="web-jsp" depends="setup">
   <copy todir="${bld.web.dir}">
-    <fileset dir="${basedir}\WEB_CONTENT\jsp" includes="index.html, *.jsp, *.htm*" />
+    <fileset dir="${basedir}\web\jsp" includes="index.html, *.jsp, *.htm*" />
   </copy>
 </target>
 	
@@ -107,7 +107,7 @@
 <target name="web-descriptor" depends="setup">
   <copy todir="${bld.web.dir}/WEB-INF">
     <fileset dir="${etc.dir}" includes="web.xml,*.tld,*.wsdd"/>
-    <fileset dir="${basedir}\WEB_CONTENT\WEB-INF" includes="web.xml,*.tld,*.wsdd"/>
+    <fileset dir="${basedir}\web\WEB-INF" includes="web.xml,*.tld,*.wsdd"/>
   </copy>
 </target>
 

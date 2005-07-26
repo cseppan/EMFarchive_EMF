@@ -7,3 +7,4 @@ etc
 .cvs
 wsdl_build
 *.jpage
+build.properties
