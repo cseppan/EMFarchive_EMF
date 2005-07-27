@@ -11,20 +11,31 @@ public class AuthenticateTest extends TestCase {
         EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport(
                 "http://localhost:8080/emf/services/EMFUserManagerService");
 
-        emfUserAdmin.authenticate("cdcruz", "conrad12345", false);
+        emfUserAdmin.authenticate("cdcruz", "conrad123", false);
     }
 
-    //TODO: idled until the authenticate interface changes to throw exception on failures
-    public void IDLED_testShouldFailOnInvalidUsernamePassword() {
+    public void testShouldFailOnInvalidPassword() {
         EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport(
                 "http://localhost:8080/emf/services/EMFUserManagerService");
         try {
-            emfUserAdmin.authenticate("unknown", "password", false);
+            emfUserAdmin.authenticate("cdcruz", "password", false);
         } catch (EmfException ex) {
             return;
         }
 
         fail("should have failed on invalid username/password");
     }
+    
+    public void testShouldFailOnUnknownUsername() {
+        EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport(
+                "http://localhost:8080/emf/services/EMFUserManagerService");
+        try {
+            emfUserAdmin.authenticate("sdfsfr45gn", "password", false);
+        } catch (EmfException ex) {
+            return;
+        }
+
+        fail("should have failed on unknown username");
+    }    
 
 }

@@ -1,9 +1,10 @@
 package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfWindow;
-import gov.epa.emissions.framework.client.admin.CreateUserPresenter;
-import gov.epa.emissions.framework.client.admin.CreateUserView;
+import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
+import gov.epa.emissions.framework.client.admin.RegisterUserView;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -24,9 +25,9 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
-public class CreateUserWindow extends EmfWindow implements CreateUserView {
+public class RegisterUserWindow extends EmfWindow implements RegisterUserView {
 
-    private CreateUserPresenter presenter;
+    private RegisterUserPresenter presenter;
 
     private JTextField username;
 
@@ -44,7 +45,7 @@ public class CreateUserWindow extends EmfWindow implements CreateUserView {
 
     private JLabel errorMessage;
 
-    public CreateUserWindow() throws Exception {
+    public RegisterUserWindow() throws Exception {
         JPanel layoutPanel = createLayout();
 
         this.setSize(new Dimension(350, 400));
@@ -86,8 +87,8 @@ public class CreateUserWindow extends EmfWindow implements CreateUserView {
         JButton cancel = new JButton("Cancel");
         cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (CreateUserWindow.this.presenter != null) {
-                    CreateUserWindow.this.presenter.notifyCancel();
+                if (RegisterUserWindow.this.presenter != null) {
+                    RegisterUserWindow.this.presenter.notifyCancel();
                 }
             }
         });
@@ -96,13 +97,14 @@ public class CreateUserWindow extends EmfWindow implements CreateUserView {
         JButton ok = new JButton("Ok");
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (CreateUserWindow.this.presenter != null) {
+                if (RegisterUserWindow.this.presenter != null) {
                     try {
-                        CreateUserWindow.this.presenter.notifyCreate();
+                        RegisterUserWindow.this.presenter.notifyCreate();
                     } catch (EmfException e) {
-                        CreateUserWindow.this.setError(e.getMessage());
+                        RegisterUserWindow.this.setError(e.getMessage());
+                        return;
                     }
-                    // TODO: launch the main window ??
+                    launchConsole();
                 }
             }
         });
@@ -113,11 +115,22 @@ public class CreateUserWindow extends EmfWindow implements CreateUserView {
         return panel;
     }
 
+    private void launchConsole() {
+        try {
+            EmfConsole console = new EmfConsole();
+            console.setVisible(true);
+        } catch (Exception e) {
+            // TODO: exit app w/ error notification ?
+        }
+
+        this.close();
+    }
+
     private void setError(String message) {
         errorMessage.setText("");
         errorMessage.setForeground(Color.RED);
         errorMessage.setText(message);
-        
+
         this.refresh();
     }
 
@@ -231,7 +244,7 @@ public class CreateUserWindow extends EmfWindow implements CreateUserView {
         this.dispose();
     }
 
-    public void setObserver(CreateUserPresenter presenter) {
+    public void setObserver(RegisterUserPresenter presenter) {
         this.presenter = presenter;
     }
 

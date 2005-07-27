@@ -39,7 +39,7 @@ public class User implements Serializable {
 
     private boolean inAdminGroup = false;
 
-    private boolean acctDisabled = true;
+    private boolean acctDisabled = false;
 
     // dirty flag to indicate some value in the bean has changed
     private boolean dirty = false;

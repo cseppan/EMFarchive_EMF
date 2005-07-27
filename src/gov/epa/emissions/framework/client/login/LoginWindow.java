@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.login;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfWindow;
-import gov.epa.emissions.framework.client.admin.CreateUserPresenter;
+import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
@@ -151,7 +151,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
         panel.add(forgotPasswordPanel, BorderLayout.EAST);
 
-        JLabel register = new JLabel("<html><a href=''>Register New User</a></html>");
+        JLabel register = new JLabel("<html><a href=''>Not yet registered ?</a></html>");
         register.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent arg0) {
                 try {
@@ -172,8 +172,8 @@ public class LoginWindow extends EmfWindow implements LoginView {
     }
 
     private void launchCreateUser() throws Exception {
-        CreateUserWindow window = new CreateUserWindow();
-        CreateUserPresenter presenter = new CreateUserPresenter(userAdmin, window);
+        RegisterUserWindow window = new RegisterUserWindow();
+        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, window);
         presenter.init();
 
         window.setVisible(true);        
