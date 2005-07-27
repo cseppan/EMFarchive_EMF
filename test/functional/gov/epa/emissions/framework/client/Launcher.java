@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import javax.swing.JFrame;
 
-public class EmfLauncher {
+public class Launcher {
 
     public static void main(String[] args) throws Exception {
         String endpoint = "http://localhost:8080/emf/services/EMFUserManagerService";

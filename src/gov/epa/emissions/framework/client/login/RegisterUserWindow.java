@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfWindow;
 import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
 import gov.epa.emissions.framework.client.admin.RegisterUserView;
+import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -45,7 +46,11 @@ public class RegisterUserWindow extends EmfWindow implements RegisterUserView {
 
     private JLabel errorMessage;
 
-    public RegisterUserWindow() throws Exception {
+    private EMFUserAdmin userAdmin;
+
+    public RegisterUserWindow(EMFUserAdmin userAdmin) throws Exception {
+        this.userAdmin = userAdmin;
+        
         JPanel layoutPanel = createLayout();
 
         this.setSize(new Dimension(350, 400));
@@ -117,7 +122,7 @@ public class RegisterUserWindow extends EmfWindow implements RegisterUserView {
 
     private void launchConsole() {
         try {
-            EmfConsole console = new EmfConsole();
+            EmfConsole console = new EmfConsole(userAdmin);
             console.setVisible(true);
         } catch (Exception e) {
             // TODO: exit app w/ error notification ?

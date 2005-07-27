@@ -103,7 +103,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
     private void launchConsole() {
         try {
-            EmfConsole console = new EmfConsole();
+            EmfConsole console = new EmfConsole(userAdmin);
             console.setVisible(true);
         } catch (Exception e) {
             // TODO: exit app w/ error notification ?
@@ -172,7 +172,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
     }
 
     private void launchCreateUser() throws Exception {
-        RegisterUserWindow window = new RegisterUserWindow();
+        RegisterUserWindow window = new RegisterUserWindow(userAdmin);
         RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, window);
         presenter.init();
 

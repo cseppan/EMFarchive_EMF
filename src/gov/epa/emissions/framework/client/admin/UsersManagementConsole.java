@@ -3,28 +3,33 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfWindow;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class UsersManagementConsole extends EmfWindow implements UsersManagementView {
+public class UsersManagementConsole extends JInternalFrame implements UsersManagementView {
 
     private UsersManagementPresenter presenter;
     private SortFilterSelectModel selectModel;
     private UsersManagementTableModel model;
     private JPanel sortFilterSelectPanel;
 
-    public UsersManagementConsole(EMFUserAdmin userAdmin) throws Exception  {        
+    public UsersManagementConsole(EMFUserAdmin userAdmin) throws Exception  { 
+        super("User Management Console", 
+                true, //resizable
+                true, //closable
+                true, //maximizable
+                true);//iconifiable
+        
         model = new UsersManagementTableModel(userAdmin);
         selectModel = new SortFilterSelectModel(model);
         
@@ -34,8 +39,6 @@ public class UsersManagementConsole extends EmfWindow implements UsersManagement
         JPanel layoutPanel = createLayout(sortFilterSelectPanel);
 
         this.setSize(new Dimension(500, 200));
-        this.setLocation(new Point(400, 200));
-        this.setTitle("User Management Console");
 
         this.getContentPane().add(layoutPanel);
     }
