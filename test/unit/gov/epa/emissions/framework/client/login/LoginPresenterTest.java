@@ -45,4 +45,13 @@ public class LoginPresenterTest extends MockObjectTestCase {
         presenter.notifyCancel();
     }
 
+    public void testShouldRegisterWithViewOnInit() {
+        Mock view = mock(LoginView.class);
+
+        LoginPresenter presenter = new LoginPresenter(null, (LoginView) view.proxy());
+        view.expects(once()).method("setObserver").with(eq(presenter));
+
+        presenter.init();        
+    }
+
 }

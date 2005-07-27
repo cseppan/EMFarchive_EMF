@@ -4,28 +4,24 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JFrame;
+
 public class UsersManagementConsoleLauncher {
 
-    public static void main(String[] args) throws EmfException {
+    public static void main(String[] args) throws Exception {
         UsersManagementConsoleLauncher launcher = new UsersManagementConsoleLauncher();
         
         EMFUserAdmin userAdmin = launcher.createUserAdmin();        
-        UsersManagementConsole console = new UsersManagementConsole(userAdmin);
-        console.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent arg0) {
-                System.exit(0);
-            }
-        });
-        
+        UsersManagementConsole console = new UsersManagementConsole(userAdmin);        
         UsersManagementPresenter presenter = new UsersManagementPresenter(userAdmin, console);
         presenter.init();
         
-        console.show();
+        console.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        console.setVisible(true);
     }
 
     private EMFUserAdmin createUserAdmin() throws EmfException {

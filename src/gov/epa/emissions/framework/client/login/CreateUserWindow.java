@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfWindow;
 import gov.epa.emissions.framework.client.admin.CreateUserPresenter;
 import gov.epa.emissions.framework.client.admin.CreateUserView;
 
@@ -16,7 +17,6 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -24,7 +24,7 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
-public class CreateUserWindow extends JFrame implements CreateUserView {
+public class CreateUserWindow extends EmfWindow implements CreateUserView {
 
     private CreateUserPresenter presenter;
 
@@ -44,7 +44,7 @@ public class CreateUserWindow extends JFrame implements CreateUserView {
 
     private JLabel errorMessage;
 
-    public CreateUserWindow() {
+    public CreateUserWindow() throws Exception {
         JPanel layoutPanel = createLayout();
 
         this.setSize(new Dimension(350, 400));

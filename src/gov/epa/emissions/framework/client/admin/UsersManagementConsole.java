@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfWindow;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
@@ -13,18 +14,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class UsersManagementConsole extends JFrame implements UsersManagementView {
+public class UsersManagementConsole extends EmfWindow implements UsersManagementView {
 
     private UsersManagementPresenter presenter;
     private SortFilterSelectModel selectModel;
     private UsersManagementTableModel model;
     private JPanel sortFilterSelectPanel;
 
-    public UsersManagementConsole(EMFUserAdmin userAdmin) {        
+    public UsersManagementConsole(EMFUserAdmin userAdmin) throws Exception  {        
         model = new UsersManagementTableModel(userAdmin);
         selectModel = new SortFilterSelectModel(model);
         
@@ -107,7 +107,7 @@ public class UsersManagementConsole extends JFrame implements UsersManagementVie
     }
 
     public void close() {
-        super.hide();
+        super.dispose();
     }
 
     public void refresh() {

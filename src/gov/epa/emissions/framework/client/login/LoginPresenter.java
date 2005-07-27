@@ -22,4 +22,11 @@ public class LoginPresenter {
         view.close();
     }
 
+    public void init() {
+        view.setObserver(this);
+    }
+
+    public void notifyResetPassword(String username) {
+    }
+
 }

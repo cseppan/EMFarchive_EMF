@@ -22,6 +22,9 @@
     <property name="test-reports.dir" value="${build.home}/reports/test" />
     <property name="app.name" value="emf" />
     <property name="app.path" value="/${app.name}" />
+    <property name="war-path"
+              value="file:///${basedir}/${build.home}/${app.name}"
+    />
 
     <path id="classpath">
         <pathelement location="${build.classes.dir}" />
@@ -38,10 +41,7 @@
         of these tasks, see <http://localhost:8080/tomcat-docs/manager-howto.html>.
     -->
 
-    <taskdef name="install" classname="org.apache.catalina.ant.InstallTask" />
-    <taskdef name="list" classname="org.apache.catalina.ant.ListTask" />
-    <taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask" />
-    <taskdef name="remove" classname="org.apache.catalina.ant.RemoveTask" />
+    <taskdef file="tomcatTasks.properties" />
 
     <!--  =================== Basic (Java) Targets ====================================== -->
     <target name="init">
@@ -64,7 +64,7 @@
                debug="on"
         />
         <copy todir="${build.classes.dir}">
-            <fileset dir="${src.dir}" includes="**/*.properties"/>
+            <fileset dir="${src.dir}" includes="**/*.properties" />
         </copy>
         <javac srcdir="${test.unit.dir}"
                destdir="${build.classes.dir}"
@@ -154,12 +154,12 @@
                  username="${tomcat.manager.username}"
                  password="${tomcat.manager.password}"
                  path="${app.path}"
-                 war="file://${build.home}/${app.name}.war"
+                 war="${war-path}"
         />
     </target>
 
     <target name="apps-list" description="List installed applications ">
-        <list url="${manager.url}"
+        <list url="${tomcat.manager.url}"
               username="${tomcat.manager.username}"
               password="${tomcat.manager.password}"
         />
@@ -174,19 +174,29 @@
     <target name="app-reload"
             description="Reload application on servlet container"
     >
-        <reload url="${manager.url}"
+        <reload url="${tomcat.manager.url}"
                 username="${tomcat.manager.username}"
                 password="${tomcat.manager.password}"
                 path="${app.path}"
         />
     </target>
 
+    <target name="app-deploy"
+            description="Reload application on servlet container"
+    >
+        <deploy url="${tomcat.manager.url}"
+                username="${tomcat.manager.username}"
+                password="${tomcat.manager.password}"
+                path="${app.path}"
+                war="${war-path}"
+        />
+    </target>
 
     <!-- 'dynamically' removes the app from Tomcat. Restart negates this effect ?? -->
     <target name="app-remove"
             description="Remove application on servlet container"
     >
-        <remove url="${manager.url}"
+        <remove url="${tomcat.manager.url}"
                 username="${tomcat.manager.username}"
                 password="${tomcat.manager.password}"
                 path="${app.path}"
