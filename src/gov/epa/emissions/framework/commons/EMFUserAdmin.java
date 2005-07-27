@@ -22,7 +22,7 @@ public interface EMFUserAdmin {
 
     public boolean isNewUser() throws EmfException;
     public boolean validate() throws EmfException;
-    public String authenticate(String userName, String pwd, boolean wantAdminStatus) throws EmfException;    
+    public void authenticate(String userName, String pwd, boolean wantAdminStatus) throws EmfException;    
     public boolean resetPassword() throws EmfException;
     public User getUser(String userName) throws EmfException;
     public User[] getUsers() throws EmfException;

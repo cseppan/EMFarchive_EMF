@@ -34,8 +34,7 @@ public class CreateUserPresenterTest extends MockObjectTestCase {
 
         Mock emfUserAdmin = mock(EMFUserAdmin.class);
         emfUserAdmin.expects(once()).method("createUser").with(eq(expectedUser));
-        emfUserAdmin.expects(once()).method("authenticate").with(eq("joey"), eq("passwd234"), eq(false)).will(
-                returnValue(null));
+        emfUserAdmin.expects(once()).method("authenticate").with(eq("joey"), eq("passwd234"), eq(false));
 
         Mock view = mock(CreateUserView.class);
         view.stubs().method("getUsername").will(returnValue("joey"));

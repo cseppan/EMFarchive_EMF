@@ -24,8 +24,7 @@ public class EMFUserAdminStub implements EMFUserAdmin {
         return false;
     }
 
-    public String authenticate(String userName, String pwd, boolean wantAdminStatus) {
-        return null;
+    public void authenticate(String userName, String pwd, boolean wantAdminStatus) {
     }
 
     public boolean resetPassword() {

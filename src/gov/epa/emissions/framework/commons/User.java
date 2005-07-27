@@ -93,7 +93,7 @@ public class User implements Serializable {
 
     public void setAffiliation(String affiliation) throws UserException {
         if (affiliation == null)
-            throw new UserException("Affiliation should hbe specified");
+            throw new UserException("Affiliation should be specified");
 
         if (affiliation.length() < 3) {
             throw new UserException("Affiliation should have 2 or more characters");

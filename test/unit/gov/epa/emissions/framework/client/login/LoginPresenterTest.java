@@ -10,8 +10,7 @@ public class LoginPresenterTest extends MockObjectTestCase {
 
     public void testShouldAuthenticateWithEmfUserAdminOnNotifyLogin() throws EmfException {
         Mock userAdmin = mock(EMFUserAdmin.class);
-        userAdmin.expects(once()).method("authenticate").with(eq("username"), eq("password"), eq(false)).will(
-                returnValue(null));
+        userAdmin.expects(once()).method("authenticate").with(eq("username"), eq("password"), eq(false));
 
         LoginPresenter presenter = new LoginPresenter((EMFUserAdmin) userAdmin.proxy(), null);
 

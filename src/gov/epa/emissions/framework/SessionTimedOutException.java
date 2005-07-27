@@ -2,8 +2,12 @@ package gov.epa.emissions.framework;
 
 public class SessionTimedOutException extends EmfException {
 
-    public SessionTimedOutException(String message, Throwable details) {
-        super(message, details);
+    public SessionTimedOutException(String description, String details, Throwable cause) {
+        super(description, details,cause);
+    }
+
+    public SessionTimedOutException(String description, String details) {
+        super(description,details);
     }
 
     public SessionTimedOutException(String message) {

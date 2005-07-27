@@ -8,18 +8,20 @@
  */
 package gov.epa.emissions.framework.dao;
 
+import gov.epa.emissions.framework.InfrastructureException;
+import gov.epa.emissions.framework.UserException;
+import gov.epa.emissions.framework.commons.User;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import gov.epa.emissions.framework.commons.User;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 /**
@@ -36,10 +38,12 @@ public class UserManagerDAO {
     private static final String DELETE_USER_QUERY="DELETE FROM users where user_name=?";
     
     /**
+     * @throws InfrastructureException
+     * @throws NamingException
      * @throws Exception
      * 
      */
-    public UserManagerDAO() throws Exception {
+    public UserManagerDAO() throws InfrastructureException {
         super();
         try{
             Context ctx = new InitialContext();
@@ -48,14 +52,17 @@ public class UserManagerDAO {
             System.out.println("BEFORE: Is datasource null? " + (ds ==null));
             ds = (DataSource)ctx.lookup("java:/comp/env/jdbc/EMFDB");
             System.out.println("AFTER: Is datasource null? " + (ds ==null));
+        }catch (NamingException ex){
+            ex.printStackTrace();
+            throw new InfrastructureException("Server configuration error");
         }catch(Exception ex) {
             ex.printStackTrace();
-            throw new Exception(ex);
-        }   
+            throw new InfrastructureException("Server configuration error");
+        }  
     }//constructor
     
     
-    public User getUser(String userName) throws Exception{
+    public User getUser(String userName) throws InfrastructureException, UserException {
       System.out.println("in getUser for username= " + userName);
   
       User emfUser = new User();
@@ -96,8 +103,7 @@ public class UserManagerDAO {
       }//ds not null
       }catch(SQLException ex){
           ex.printStackTrace();
-          throw new Exception(ex);
-
+          throw new InfrastructureException("Database error");
       }
 
       System.out.println("End of getUser with fullname= " + emfUser.getFullName());
@@ -105,7 +111,7 @@ public class UserManagerDAO {
       return emfUser;
     }//getUser
 
-    public void updateUsers(User[] users) throws Exception{
+    public void updateUsers(User[] users) throws InfrastructureException {
         System.out.println("Start DAO:updateUsers");
 
         int count = users.length;
@@ -116,7 +122,7 @@ public class UserManagerDAO {
 
     }//setUsers
     
-    public List getUsers() throws Exception{
+    public List getUsers() throws InfrastructureException, UserException {
       System.out.println("In getUsers");
       
       ArrayList users = new ArrayList();
@@ -160,14 +166,14 @@ public class UserManagerDAO {
           }//ds not null
           }catch(SQLException ex){
               ex.printStackTrace();
-              throw new Exception(ex);
+              throw new InfrastructureException("Database error");
           }
       
           System.out.println("End of getUsers size is " + users.size());
       return users;
     }
     
-    public void deleteUser(String userName) throws Exception{
+    public void deleteUser(String userName) throws InfrastructureException {
       System.out.println("Begin delete user");    
       try{
           if (ds != null) {
@@ -189,13 +195,13 @@ public class UserManagerDAO {
           }//ds not null
           }catch(SQLException ex){
               ex.printStackTrace();
-              throw new Exception(ex);
+              throw new InfrastructureException("Database error");
           }
         
       System.out.println("End delete user");    
     }
 
-    public void updateUser (User user) throws Exception{
+    public void updateUser (User user) throws InfrastructureException {
         System.out.println("Begin update user");
         try{
             if (ds != null) {
@@ -226,13 +232,13 @@ public class UserManagerDAO {
             }//ds not null
             }catch(SQLException ex){
                 ex.printStackTrace();
-                throw new Exception(ex);
+                throw new InfrastructureException("Database error");
             }
 
     System.out.println("End update user");
 }
     
-    public void insertUser(User user) throws Exception{
+    public void insertUser(User user) throws InfrastructureException {
         System.out.println("Begin insert user");
             try{
                 if (ds != null) {
@@ -263,7 +269,7 @@ public class UserManagerDAO {
                 }//ds not null
                 }catch(SQLException ex){
                     ex.printStackTrace();
-                    throw new Exception(ex);
+                    throw new InfrastructureException("Database error");
                 }
 
         System.out.println("End insert user");

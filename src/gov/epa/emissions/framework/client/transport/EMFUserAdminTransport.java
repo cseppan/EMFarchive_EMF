@@ -8,6 +8,8 @@
  */
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.framework.CommunicationFailureException;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -18,6 +20,7 @@ import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 import javax.xml.rpc.ServiceException;
 
+import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.encoding.ser.BeanDeserializerFactory;
@@ -64,8 +67,8 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#authenticate(java.lang.String, java.lang.String, boolean)
      */
-    public String authenticate(String userName, String pwd,
-            boolean wantAdminStatus) {
+    public void authenticate(String userName, String pwd,
+            boolean wantAdminStatus) throws CommunicationFailureException {
 
         String statuscode = "success";
         
@@ -73,6 +76,7 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
         Call     call;
         try {
             call = (Call) service.createCall();
+            call.setMaintainSession(true);
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             call.setOperationName(new QName("http://soapinterop.org/", "authenticate") );
             QName qname = new QName("urn:EMFUserManager","ns1:User");
@@ -96,20 +100,19 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
             statuscode = (String) call.invoke( new Object[] {userName, pwd, new Boolean(wantAdminStatus)} );
 
         } catch (ServiceException e) {
-            System.out.println("Error invoking the service");
             e.printStackTrace();
             statuscode="failed";
+            throw new CommunicationFailureException("Error invoking the service");
         } catch (MalformedURLException e) {
-            System.out.println("Error in format of URL string");
             e.printStackTrace();
             statuscode="failed";
+            throw new CommunicationFailureException("Error in format of URL string");
         } catch (RemoteException e) {
-            System.out.println("Error communicating with WS end point");
             e.printStackTrace();
             statuscode="failed";
+            throw new CommunicationFailureException("Error communicating with WS end point");
         }
-
-        return statuscode;
+        
     }
 
     /* (non-Javadoc)
@@ -123,7 +126,7 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#getUser(java.lang.String)
      */
-    public User getUser(String userName) {
+    public User getUser(String userName) throws CommunicationFailureException {
         User user = null;
         
         Service  service = new Service();
@@ -148,16 +151,15 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
             user = (User) call.invoke( new Object[] {userName} );
 
         } catch (ServiceException e) {
-            System.out.println("Error invoking the service");
             e.printStackTrace();
+            throw new CommunicationFailureException("Error invoking the service");
         } catch (MalformedURLException e) {
-            System.out.println("Error in format of URL string");
             e.printStackTrace();
+            throw new CommunicationFailureException("Error in format of URL string");
         } catch (RemoteException e) {
-            System.out.println("Error communicating with WS end point");
             e.printStackTrace();
+            throw new CommunicationFailureException("Error communicating with WS end point");
         }
-
         return user;
 
     }
@@ -165,7 +167,7 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#createUser(gov.epa.emissions.framework.commons.User)
      */
-    public void createUser(User newUser) {
+    public void createUser(User newUser) throws CommunicationFailureException {
         String statuscode = "success";
         Service  service = new Service();
         Call     call;
@@ -185,18 +187,18 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
             statuscode = (String) call.invoke( new Object[] {newUser} );
 
         } catch (ServiceException e) {
-            System.out.println("Error invoking the service");
             e.printStackTrace();
             statuscode="failed";
+            throw new CommunicationFailureException("Error invoking the service");
         } catch (MalformedURLException e) {
-            System.out.println("Error in format of URL string");
             e.printStackTrace();
             statuscode="failed";
+            throw new CommunicationFailureException("Error in format of URL string");
         } catch (RemoteException e) {
-            System.out.println("Error communicating with WS end point");
             e.printStackTrace();
             statuscode="failed";
-        } 
+            throw new CommunicationFailureException("Error communicating with WS end point");
+        }
 
         
 
@@ -237,9 +239,6 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
             e.printStackTrace();
             statuscode="failed";
         } 
-
-        
-
     }
 
     /* (non-Javadoc)

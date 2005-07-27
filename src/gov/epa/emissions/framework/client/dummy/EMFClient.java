@@ -38,9 +38,9 @@ public class EMFClient {
         String uname = "cdcruz";
         String pwd = "conrad12345";
         
-        statuscode = emfUserAdmin.authenticate(uname, pwd, true);        
+        emfUserAdmin.authenticate(uname, pwd, true);        
         System.out.println(uname + " login status is: " + statuscode);
-        statuscode = emfUserAdmin.authenticate(uname, pwd, false);        
+        emfUserAdmin.authenticate(uname, pwd, false);        
         System.out.println(uname + " login status is: " + statuscode);
         User user = emfUserAdmin.getUser(uname);
         if (user == null){

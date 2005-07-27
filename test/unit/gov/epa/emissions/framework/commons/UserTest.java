@@ -209,7 +209,7 @@ public class UserTest extends TestCase {
         try {
             user.setAffiliation(null);
         } catch (UserException ex) {
-            assertEquals("Affiliation should hbe specified", ex.getMessage());
+            assertEquals("Affiliation should be specified", ex.getMessage());
             return;
         }
 
