@@ -51,48 +51,36 @@ public class EMFUserManager implements EMFUserAdmin{
     public void authenticate(String userName, String pwd, boolean wantAdminStatus) throws EmfException {
 
         System.out.println("called authenticate for username= " + userName);
-
-        String status = null;
-        
+       
         UserManagerDAO umDAO;
         try {
             umDAO = new UserManagerDAO();
             User emfUser = umDAO.getUser(userName);
             if (emfUser == null){
                 System.out.println("In the manager.  emfUser was NULL");
-                status = "Incorrect User Name";
-                throw new AuthenticationException("Incorrect User Name");
+                throw new AuthenticationException("Invalid username");
             }//emfUser is null
             else{
              if (emfUser.isAcctDisabled()){
-                 status="Account Disabled";
                  throw new AuthenticationException("Account Disabled");
              }else{
-                 if (emfUser.getPassword().equals(pwd)){
-                     if (!wantAdminStatus){
-                         status="Valid";
-                     }else{
-                         if (emfUser.isInAdminGroup()){
-                             status="Valid";
-                         }else{
-                             status="Cant Be Admin";
-                             throw new AuthenticationException("Cant Be Admin");
-                         }
-                     }
+                 if (!emfUser.getPassword().equals(pwd)){
+                   throw new AuthenticationException("Incorrect Password");
                  }else{
-                     status="Incorrect Password";
-                     throw new AuthenticationException("Incorrect Password");
-                 }
-                 
-             }
+                     if (wantAdminStatus){
+                         if (!emfUser.isInAdminGroup()){
+                             throw new AuthenticationException("Not authorized to log in as Administrator");
+                         }//user not in Admin group   
+                     }//want admin status
+                 }//pwd correct                
+             }//Acct not disabled
             }//emfUser is not null
-
         } catch (InfrastructureException ex) {
             ex.printStackTrace();
             throw new EmfException(ex.getMessage());
         } 
 
-        System.out.println("end of authenticate with status= " + status);
+        System.out.println("end of authenticate");
  
     }//authenticate
 
