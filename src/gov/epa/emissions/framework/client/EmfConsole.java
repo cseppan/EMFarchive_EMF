@@ -91,7 +91,8 @@ public class EmfConsole extends EmfWindow {
             }
         });
         menu.add(users);
-
+        menu.add(createDisabledMenuItem("My Profile"));
+        
         return menu;
     }
 

@@ -84,7 +84,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
 
-        name = new JTextField(user.getFullName(), 10);
+        name = new JTextField(user.getFullName(), 10);    
         valuesPanel.add(name);
         affiliation = new JTextField(user.getAffiliation(), 10);
         valuesPanel.add(affiliation);
@@ -147,8 +147,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
                     presenter.notifyCancel();
                 }
             }
-        });
-        container.add(cancel);
+        });      
 
         JButton ok = new JButton("Ok");
         ok.addActionListener(new ActionListener() {
@@ -156,8 +155,10 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
                 updateUser();
             }
         });
+        
         container.add(ok);
-
+        container.add(cancel);
+        
         panel.add(container, BorderLayout.EAST);
 
         return panel;

@@ -83,7 +83,6 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
                 }
             }
         });
-        container.add(cancel);
 
         JButton ok = new JButton("Ok");
         ok.addActionListener(new ActionListener() {
@@ -100,7 +99,9 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
                 }
             }
         });
+
         container.add(ok);
+        container.add(cancel);
 
         panel.add(container, BorderLayout.EAST);
 

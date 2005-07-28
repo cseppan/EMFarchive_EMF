@@ -77,13 +77,13 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
                 ListSelectionModel selectionModel = (ListSelectionModel) event.getSource();
                 if (!selectionModel.isSelectionEmpty()) {
                     User user = model.getUser(selectionModel.getMinSelectionIndex());
-                    displayUpdateUser(user);
+                    updateUser(user);
                 }
             }
         });
     }
 
-    private void displayUpdateUser(User user) {
+    private void updateUser(User user) {
         UpdateUserWindow view = new UpdateUserWindow(user);
         UpdateUserPresenter presenter = new UpdateUserPresenter(userAdmin, view);
         presenter.observe();
@@ -149,12 +149,32 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
             }
         });
 
+        JButton updateButton = new JButton("Update");
+        updateButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                updateUsers();
+            }
+        });
+
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
         crudPanel.add(newButton);
+        crudPanel.add(updateButton);
         crudPanel.add(deleteButton);
 
         return crudPanel;
+    }
+
+    private void updateUsers() {
+        if (presenter == null)
+            return;
+        int[] selected = selectModel.getSelectedIndexes();
+        if (selected.length == 0)
+            return;
+
+        for (int i = 0; i < selected.length; i++) {
+            updateUser(model.getUser(i));
+        }
     }
 
     private void deleteUser() {
