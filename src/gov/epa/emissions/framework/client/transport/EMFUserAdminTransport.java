@@ -76,6 +76,7 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
         if (message.equals("Connection refused: connect")){
             message = "Cannot communicate with EMF Server";
         }
+        
         return message;
     }
    
@@ -179,7 +180,7 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#createUser(gov.epa.emissions.framework.commons.User)
      */
-    public void createUser(User newUser) throws CommunicationFailureException {
+    public void createUser(User newUser) throws CommunicationFailureException, AuthenticationException {
         String statuscode = "success";
         Service  service = new Service();
         Call     call;
@@ -199,16 +200,12 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
             statuscode = (String) call.invoke( new Object[] {newUser} );
 
         } catch (ServiceException e) {
-            e.printStackTrace();
-            statuscode="failed";
             throw new CommunicationFailureException("Error invoking the service");
         } catch (MalformedURLException e) {
-            e.printStackTrace();
-            statuscode="failed";
             throw new CommunicationFailureException("Error in format of URL string");
+        } catch(AxisFault fault) {
+            throw new AuthenticationException(extractMessage(fault.getMessage()));
         } catch (RemoteException e) {
-            e.printStackTrace();
-            statuscode="failed";
             throw new CommunicationFailureException("Error communicating with WS end point");
         }
 

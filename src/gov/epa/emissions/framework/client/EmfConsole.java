@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client;
 
-import gov.epa.emissions.framework.client.admin.UserManagerConsole;
+import gov.epa.emissions.framework.client.admin.UserManagerWindow;
 import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
@@ -97,7 +97,7 @@ public class EmfConsole extends EmfWindow {
 
     private void launchUsersManagementWindow() {
         try {
-            UserManagerConsole console = new UserManagerConsole(userAdmin);
+            UserManagerWindow console = new UserManagerWindow(userAdmin);
             UserManagerPresenter presenter = new UserManagerPresenter(userAdmin, console);
             presenter.observe();
             

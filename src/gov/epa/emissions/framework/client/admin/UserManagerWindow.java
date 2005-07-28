@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
+import gov.epa.emissions.framework.client.ErrorMessagePanel;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
@@ -18,7 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-public class UserManagerConsole extends EmfInteralFrame implements UsersManagementView {
+public class UserManagerWindow extends EmfInteralFrame implements UsersManagementView {
 
     private UserManagerPresenter presenter;
 
@@ -32,7 +33,9 @@ public class UserManagerConsole extends EmfInteralFrame implements UsersManageme
 
     private JPanel layout;
 
-    public UserManagerConsole(EMFUserAdmin userAdmin) throws Exception {
+    private ErrorMessagePanel errorMessagePanel;
+
+    public UserManagerWindow(EMFUserAdmin userAdmin) throws Exception {
         super("User Management Console");
         this.userAdmin = userAdmin;
         model = new UserManagerTableModel(userAdmin);
@@ -60,7 +63,9 @@ public class UserManagerConsole extends EmfInteralFrame implements UsersManageme
         
         JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
         sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
-
+        
+        errorMessagePanel = new ErrorMessagePanel();
+        layout.add(errorMessagePanel, BorderLayout.NORTH);
         layout.add(scrollPane, BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
     }
@@ -106,7 +111,8 @@ public class UserManagerConsole extends EmfInteralFrame implements UsersManageme
                             String username = model.getUser(selected[i]).getUserName();
                             presenter.notifyDelete(username);
                         } catch (EmfException e) {
-                            // TODO: handle exceptions
+                            errorMessagePanel.setMessage(e.getMessage());
+                            validate();//TODO: temp, until the HACK is addressed (then, use refresh)
                         }
                     }
                 }

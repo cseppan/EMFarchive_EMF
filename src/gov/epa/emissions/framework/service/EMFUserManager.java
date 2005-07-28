@@ -120,7 +120,7 @@ public class EMFUserManager implements EMFUserAdmin{
             if (umDAO.isNewUser(newUser.getUserName())){
                 umDAO.insertUser(newUser);                
             }else{
-                throw new UserException("Duplicate username: A record for this username exists in the database");
+                throw new UserException("Duplicate username");
             }
         } catch (InfrastructureException ex) {
             ex.printStackTrace();

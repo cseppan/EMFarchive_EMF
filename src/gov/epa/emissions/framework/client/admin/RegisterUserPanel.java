@@ -2,10 +2,10 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
+import gov.epa.emissions.framework.client.ErrorMessagePanel;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -40,13 +40,14 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     private JTextField email;
 
-    private JLabel errorMessage;
-
     private PostRegisterStrategy postRegisterStrategy;
 
     private EmfWidgetContainer parent;
 
-    public RegisterUserPanel(EMFUserAdmin userAdmin, PostRegisterStrategy postRegisterStrategy, EmfWidgetContainer parent) {
+    private ErrorMessagePanel errorMessagePanel;
+
+    public RegisterUserPanel(EMFUserAdmin userAdmin, PostRegisterStrategy postRegisterStrategy,
+            EmfWidgetContainer parent) {
         this.postRegisterStrategy = postRegisterStrategy;
         this.parent = parent;
 
@@ -58,18 +59,11 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
     private void createLayout() {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        this.add(createErrorMessagePanel());
+        errorMessagePanel = new ErrorMessagePanel();
+        this.add(errorMessagePanel);
         this.add(createProfilePanel());
         this.add(createLoginPanel());
         this.add(createButtonsPanel());
-    }
-
-    private JPanel createErrorMessagePanel() {
-        JPanel errorMessagePanel = new JPanel();
-        errorMessage = new JLabel();
-        errorMessagePanel.add(errorMessage);
-
-        return errorMessagePanel;
     }
 
     private JPanel createButtonsPanel() {
@@ -100,7 +94,8 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
                         postRegisterStrategy.execute();
                         RegisterUserPanel.this.close();
                     } catch (EmfException e) {
-                        RegisterUserPanel.this.setError(e.getMessage());
+                        errorMessagePanel.setMessage(e.getMessage());
+                        refresh();
                     }
                 }
             }
@@ -110,14 +105,6 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         panel.add(container, BorderLayout.EAST);
 
         return panel;
-    }
-
-    private void setError(String message) {
-        errorMessage.setText("");
-        errorMessage.setForeground(Color.RED);
-        errorMessage.setText(message);
-
-        this.refresh();
     }
 
     public void refresh() {

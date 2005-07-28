@@ -12,13 +12,13 @@ import java.util.List;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 
-public class UserManagerConsoleLauncher {
+public class UserManagerWindowLauncher {
 
     public static void main(String[] args) throws Exception {
-        UserManagerConsoleLauncher launcher = new UserManagerConsoleLauncher();
+        UserManagerWindowLauncher launcher = new UserManagerWindowLauncher();
 
         EMFUserAdmin userAdmin = launcher.createUserAdmin();
-        UserManagerConsole console = new UserManagerConsole(userAdmin);
+        UserManagerWindow console = new UserManagerWindow(userAdmin);
         UserManagerPresenter presenter = new UserManagerPresenter(userAdmin, console);
         presenter.observe();
 
@@ -34,7 +34,7 @@ public class UserManagerConsoleLauncher {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);        
     }
 
-    private void addAsInternalFrame(UserManagerConsole console, JFrame frame) {
+    private void addAsInternalFrame(UserManagerWindow console, JFrame frame) {
         JDesktopPane desktop = new JDesktopPane();
         desktop.setName("EMF Console");
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);

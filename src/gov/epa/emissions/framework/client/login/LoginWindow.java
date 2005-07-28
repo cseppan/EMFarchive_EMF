@@ -4,13 +4,13 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.client.EmfWindow;
+import gov.epa.emissions.framework.client.ErrorMessagePanel;
 import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
 import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
 import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -35,11 +35,11 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
     private JPasswordField password;
 
-    private JLabel errorMessage;
-
     private LoginPresenter presenter;
 
     private EMFUserAdmin userAdmin;
+
+    private ErrorMessagePanel errorMessagePanel;
 
     public LoginWindow(EMFUserAdmin userAdmin) {
         this.userAdmin = userAdmin;
@@ -56,21 +56,14 @@ public class LoginWindow extends EmfWindow implements LoginView {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        panel.add(createErrorMessagePanel());
+        errorMessagePanel = new ErrorMessagePanel();
+        panel.add(errorMessagePanel);
         panel.add(createLoginPanel());
         panel.add(createButtonsPanel());
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
         panel.add(createLoginOptionsPanel());
 
         return panel;
-    }
-
-    private JPanel createErrorMessagePanel() {
-        JPanel errorMessagePanel = new JPanel();
-        errorMessage = new JLabel();
-        errorMessagePanel.add(errorMessage);
-
-        return errorMessagePanel;
     }
 
     private JPanel createButtonsPanel() {
@@ -88,11 +81,12 @@ public class LoginWindow extends EmfWindow implements LoginView {
                 if (presenter != null) {
                     try {
                         presenter.notifyLogin(username.getText(), password.getText());
-                        clearError();
+                        errorMessagePanel.clear();
+                        refresh();
                         launchConsole();
                         close();
                     } catch (EmfException e) {
-                        setError(e.getMessage());
+                        errorMessagePanel.setMessage(e.getMessage());
                     }
                 }
             }
@@ -170,26 +164,16 @@ public class LoginWindow extends EmfWindow implements LoginView {
     }
 
     private void launchCreateUser() throws Exception {
-        PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(userAdmin);        
+        PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(userAdmin);
         EmfWidgetContainer window = new RegisterUserWindow(userAdmin, strategy);
         RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, window.getView());
         presenter.observe();
-        
+
         window.display();
     }
 
-    private void clearError() {
-        errorMessage.setText("");
-
-        this.validate();
-    }
-
-    private void setError(String message) {
-        errorMessage.setText("");
-        errorMessage.setForeground(Color.RED);
-        errorMessage.setText(message);
-
-        this.validate();
+    private void refresh() {
+        super.validate();
     }
 
     public void close() {
