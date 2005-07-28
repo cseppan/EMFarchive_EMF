@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -86,9 +87,9 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         UpdateUserWindow view = new UpdateUserWindow(user);
         UpdateUserPresenter presenter = new UpdateUserPresenter(userAdmin, view);
         presenter.observe();
-        
+
         getDesktopPane().add(view);
-        
+
         view.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosed(InternalFrameEvent event) {
                 refresh();
@@ -144,19 +145,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         JButton deleteButton = new JButton("Delete");
         deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (presenter != null) {
-                    int[] selected = selectModel.getSelectedIndexes();
-                    for (int i = 0; i < selected.length; i++) {
-                        try {
-                            String username = model.getUser(selected[i]).getUserName();
-                            presenter.notifyDelete(username);
-                        } catch (EmfException e) {
-                            errorMessagePanel.setMessage(e.getMessage());
-                            validate();// TODO: temp, until the HACK is
-                            // addressed (then, use refresh)
-                        }
-                    }
-                }
+                deleteUser();
             }
         });
 
@@ -166,6 +155,31 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         crudPanel.add(deleteButton);
 
         return crudPanel;
+    }
+
+    private void deleteUser() {
+        if (presenter == null)
+            return;
+        int[] selected = selectModel.getSelectedIndexes();
+        if (selected.length == 0)
+            return;
+        int option = JOptionPane.showConfirmDialog(null, "Would you like to Delete User - ", "Delete User",
+                JOptionPane.YES_NO_OPTION);
+        if (option == 1) {
+            refresh();
+            return;
+        }
+
+        for (int i = 0; i < selected.length; i++) {
+            try {
+                String username = model.getUser(selected[i]).getUserName();
+                presenter.notifyDelete(username);
+            } catch (EmfException e) {
+                errorMessagePanel.setMessage(e.getMessage());
+                // TODO: temp, until the HACK is addressed (then, use refresh)
+                validate();
+            }
+        }
     }
 
     private void displayRegisterUser() {

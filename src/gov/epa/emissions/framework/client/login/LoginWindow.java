@@ -93,6 +93,15 @@ public class LoginWindow extends EmfWindow implements LoginView {
         });
         container.add(signIn);
 
+        JButton cancel = new JButton("Cancel");
+        cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                close();
+            }
+
+        });
+        container.add(cancel);
+
         panel.add(container, BorderLayout.EAST);
 
         return panel;
