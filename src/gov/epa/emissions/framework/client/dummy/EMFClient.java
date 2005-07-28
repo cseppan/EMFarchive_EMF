@@ -29,33 +29,38 @@ public class EMFClient {
         // TODO Auto-generated constructor stub
     }
 
-    public static void main(String[] args) throws EmfException {
-        String statuscode = null;
+    public static void main(String[] args) {
         
         EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport(endpoint);
         System.out.println("IN EMFCLIENT main");
        
-        String uname = "cdcruz";
+        String uname = "cdcruz2";
         String pwd = "conrad12345";
         
-        emfUserAdmin.authenticate(uname, pwd, true);        
-        System.out.println(uname + " login status is: " + statuscode);
-        emfUserAdmin.authenticate(uname, pwd, false);        
-        System.out.println(uname + " login status is: " + statuscode);
-        User user = emfUserAdmin.getUser(uname);
-        if (user == null){
-            System.out.println("User object is null");
-        }else{
-            System.out.println("getUser succeeded: " + user.getFullName());
-            
-        }
+        try {
+            emfUserAdmin.authenticate(uname, pwd, true);
+            emfUserAdmin.authenticate(uname, pwd, false);        
+            User user = emfUserAdmin.getUser(uname);
+            if (user == null){
+                System.out.println("User object is null");
+            }else{
+                System.out.println("getUser succeeded: " + user.getFullName());
+                
+            }
+        } catch (EmfException ex) {
+            // TODO Auto-generated catch block
+            //e.printStackTrace();
+            System.out.println(ex.getMessage());
+        }        
+//        System.out.println(uname + " login status is: " + statuscode);
 
-        user.setFullName("Peter Rabbit 222");
-        
-        User[] users = new User[1];
-        users[0]= user;
-        
-        emfUserAdmin.updateUsers(users);
+
+//        user.setFullName("Peter Rabbit 222");
+//        
+//        User[] users = new User[1];
+//        users[0]= user;
+//        
+//        emfUserAdmin.updateUsers(users);
         
         //emfUserAdmin.updateUser(user);
 //        User[] users = emfUserAdmin.getUsers();
