@@ -8,6 +8,7 @@
  */
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.framework.AuthenticationException;
 import gov.epa.emissions.framework.CommunicationFailureException;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
@@ -65,6 +66,16 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
         return false;
     }
     
+    /**
+     * 
+     * This utility method extracts the significat message from the Axis Fault
+     * @param faultReason
+     * @return
+     */
+    private String extractMessage(String faultReason) {    
+        return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
+    }
+   
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#authenticate(java.lang.String, java.lang.String, boolean)
      */
@@ -99,16 +110,15 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
             call.invoke( new Object[] {userName, pwd, new Boolean(wantAdminStatus)} );
 
         } catch (ServiceException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             throw new CommunicationFailureException("Error invoking the service");
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             throw new CommunicationFailureException("Error in format of URL string");
         } catch(AxisFault fault) {
-            fault.printStackTrace();
-            throw new UserException(fault.getMessage());
+            throw new AuthenticationException(extractMessage(fault.getMessage()));
         } catch (RemoteException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             throw new CommunicationFailureException("Error communicating with WS end point");
         }
         
