@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.ErrorMessagePanel;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.User;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -16,8 +17,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class UserManagerWindow extends EmfInteralFrame implements UsersManagementView {
 
@@ -27,7 +32,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
 
     private UserManagerTableModel model;
 
-    private JPanel sortFilterSelectPanel;
+    private SortFilterSelectionPanel sortFilterSelectPanel;
 
     private EMFUserAdmin userAdmin;
 
@@ -43,11 +48,11 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
 
         layout = new JPanel();
         this.getContentPane().add(layout);
-        
+
         // TODO: OverallTableModel has a bug w/ respect to row-count &
         // cannot refresh itself. So, we will regen the layout on every
         // refresh - it's a HACK. Will need to be addressed
-        createLayout();        
+        createLayout();
 
         this.setSize(new Dimension(500, 300));
     }
@@ -56,14 +61,49 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         layout.removeAll();
         sortFilterSelectPanel = new SortFilterSelectionPanel(this, selectModel);
         createLayout(layout, sortFilterSelectPanel);
+        listenForUpdateSelection(sortFilterSelectPanel.getTable());
+    }
+
+    private void listenForUpdateSelection(JTable table) {
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        ListSelectionModel selectionModel = table.getSelectionModel();
+        selectionModel.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent event) {
+                if (event.getValueIsAdjusting())
+                    return;// Ignore extra messages.
+
+                ListSelectionModel selectionModel = (ListSelectionModel) event.getSource();
+                if (!selectionModel.isSelectionEmpty()) {
+                    User user = model.getUser(selectionModel.getMinSelectionIndex());
+                    displayUpdateUser(user);
+                }
+            }
+        });
+    }
+
+    private void displayUpdateUser(User user) {
+        UpdateUserWindow view = new UpdateUserWindow(user);
+        UpdateUserPresenter presenter = new UpdateUserPresenter(userAdmin, view);
+        presenter.observe();
+        
+        getDesktopPane().add(view);
+        
+        view.addInternalFrameListener(new InternalFrameAdapter() {
+            public void internalFrameClosed(InternalFrameEvent event) {
+                refresh();
+            }
+        });
+
+        view.display();
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
         layout.setLayout(new BorderLayout());
-        
+
         JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
         sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
-        
+
         errorMessagePanel = new ErrorMessagePanel();
         layout.add(errorMessagePanel, BorderLayout.NORTH);
         layout.add(scrollPane, BorderLayout.CENTER);
@@ -112,7 +152,8 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
                             presenter.notifyDelete(username);
                         } catch (EmfException e) {
                             errorMessagePanel.setMessage(e.getMessage());
-                            validate();//TODO: temp, until the HACK is addressed (then, use refresh)
+                            validate();// TODO: temp, until the HACK is
+                            // addressed (then, use refresh)
                         }
                     }
                 }
@@ -153,7 +194,8 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
 
     public void refresh() {
         selectModel.refresh();
-        createLayout();//TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
+        createLayout();// TODO: A HACK, until we fix row-count issues w/
+        // SortFilterSelectPanel
         this.validate();
     }
 
