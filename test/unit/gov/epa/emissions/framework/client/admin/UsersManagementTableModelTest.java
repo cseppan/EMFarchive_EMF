@@ -16,7 +16,7 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
 
     private User joe;
 
-    private UsersManagementTableModel model;
+    private UserManagerTableModel model;
 
     private Mock emfUserAdmin;
 
@@ -33,7 +33,7 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
         emfUserAdmin = mock(EMFUserAdmin.class);
         emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users.toArray(new User[0])));
 
-        model = new UsersManagementTableModel((EMFUserAdmin) emfUserAdmin.proxy());
+        model = new UserManagerTableModel((EMFUserAdmin) emfUserAdmin.proxy());
     }
 
     public void testShouldReturnColumnsNames() {
@@ -55,7 +55,7 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
         users.add(user2);
 
         emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users.toArray(new User[0])));
-        model = new UsersManagementTableModel((EMFUserAdmin) emfUserAdmin.proxy());
+        model = new UserManagerTableModel((EMFUserAdmin) emfUserAdmin.proxy());
 
         assertEquals(2, model.getRowCount());
     }
@@ -100,7 +100,7 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
         emfUserAdmin = mock(EMFUserAdmin.class);
         emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users.toArray(new User[0])));
 
-        model = new UsersManagementTableModel((EMFUserAdmin) emfUserAdmin.proxy());
+        model = new UserManagerTableModel((EMFUserAdmin) emfUserAdmin.proxy());
 
         assertEquals(2, model.getRowCount());
         assertSame(joe, model.getUser(0));

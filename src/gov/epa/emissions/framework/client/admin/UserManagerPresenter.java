@@ -3,12 +3,12 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
-public class UsersManagementPresenter {
+public class UserManagerPresenter {
 
     private UsersManagementView view;
     private EMFUserAdmin model;
 
-    public UsersManagementPresenter(EMFUserAdmin model, UsersManagementView view) {
+    public UserManagerPresenter(EMFUserAdmin model, UsersManagementView view) {
         this.model = model;
         this.view = view;
     }

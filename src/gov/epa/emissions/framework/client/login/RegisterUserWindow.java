@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
-import gov.epa.emissions.framework.client.EmfWindow;
+import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
 import gov.epa.emissions.framework.client.admin.RegisterUserView;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
@@ -12,7 +12,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -26,7 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
-public class RegisterUserWindow extends EmfWindow implements RegisterUserView {
+public class RegisterUserWindow extends EmfInteralFrame implements RegisterUserView {
 
     private RegisterUserPresenter presenter;
 
@@ -49,13 +48,13 @@ public class RegisterUserWindow extends EmfWindow implements RegisterUserView {
     private EMFUserAdmin userAdmin;
 
     public RegisterUserWindow(EMFUserAdmin userAdmin) throws Exception {
+        super("Register New User");
+        
         this.userAdmin = userAdmin;
         
         JPanel layoutPanel = createLayout();
 
         this.setSize(new Dimension(350, 400));
-        this.setLocation(new Point(400, 200));
-        this.setTitle("Create a New User");
 
         this.getContentPane().add(layoutPanel);
     }

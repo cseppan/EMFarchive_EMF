@@ -11,7 +11,7 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-public class UsersManagementTableModel extends AbstractTableModel implements RefreshableTableModel {
+public class UserManagerTableModel extends AbstractTableModel implements RefreshableTableModel {
 
     private Header header;
 
@@ -19,7 +19,7 @@ public class UsersManagementTableModel extends AbstractTableModel implements Ref
 
     private EMFUserAdmin userAdmin;
 
-    public UsersManagementTableModel(EMFUserAdmin userAdmin) {
+    public UserManagerTableModel(EMFUserAdmin userAdmin) {
         this.header = new Header(new String[] { "Username", "Name", "Email" });
         this.userAdmin = userAdmin;
 

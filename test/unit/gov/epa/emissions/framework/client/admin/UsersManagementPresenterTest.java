@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.admin.UsersManagementPresenter;
+import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
 import gov.epa.emissions.framework.client.admin.UsersManagementView;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
@@ -13,7 +13,7 @@ public class UsersManagementPresenterTest extends MockObjectTestCase {
     public void testShouldCloseViewOnClickOfCloseButton() {
         Mock view = mock(UsersManagementView.class);
 
-        UsersManagementPresenter presenter = new UsersManagementPresenter(null, (UsersManagementView) view.proxy());
+        UserManagerPresenter presenter = new UserManagerPresenter(null, (UsersManagementView) view.proxy());
 
         view.expects(once()).method("setViewObserver").with(eq(presenter));
         view.expects(once()).method("close").withNoArguments();
@@ -29,8 +29,8 @@ public class UsersManagementPresenterTest extends MockObjectTestCase {
         Mock view = mock(UsersManagementView.class);
         view.expects(once()).method("refresh").withNoArguments();
         
-        UsersManagementPresenter presenter = 
-            new UsersManagementPresenter((EMFUserAdmin)emfUserAdmin.proxy(), (UsersManagementView) view.proxy());
+        UserManagerPresenter presenter = 
+            new UserManagerPresenter((EMFUserAdmin)emfUserAdmin.proxy(), (UsersManagementView) view.proxy());
         
         presenter.notifyDelete("matts");
     }

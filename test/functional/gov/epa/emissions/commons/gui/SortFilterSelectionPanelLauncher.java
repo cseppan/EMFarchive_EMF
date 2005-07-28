@@ -36,7 +36,7 @@ public class SortFilterSelectionPanelLauncher {
             }
         });
 
-        frame.show();
+        frame.setVisible(true);
     }
 
     private static Mock createModel() {

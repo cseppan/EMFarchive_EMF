@@ -1,7 +1,7 @@
 package gov.epa.emissions.commons.gui;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.admin.UsersManagementTableModel;
+import gov.epa.emissions.framework.client.admin.UserManagerTableModel;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -39,7 +39,7 @@ public class SortFilterSelectUsersLauncher {
             }
         });
 
-        frame.show();
+        frame.setVisible(true);
         
     }
 
@@ -53,7 +53,7 @@ public class SortFilterSelectUsersLauncher {
         Mock userAdmin = new Mock(EMFUserAdmin.class);
         userAdmin.stubs().method("getUsers").withNoArguments().will(new ReturnStub(users));
 
-        return new UsersManagementTableModel((EMFUserAdmin) userAdmin.proxy());
+        return new UserManagerTableModel((EMFUserAdmin) userAdmin.proxy());
     }
 
     private User createUser(String username, String name, String email) throws EmfException {

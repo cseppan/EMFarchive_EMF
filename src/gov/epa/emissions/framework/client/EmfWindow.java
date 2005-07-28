@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client;
 
 import javax.swing.JFrame;
-import javax.swing.UIManager;
 
 public class EmfWindow extends JFrame {
 

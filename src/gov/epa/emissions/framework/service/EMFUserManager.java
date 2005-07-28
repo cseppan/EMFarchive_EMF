@@ -7,7 +7,6 @@ package gov.epa.emissions.framework.service;
 import gov.epa.emissions.framework.AuthenticationException;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
-import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 import gov.epa.emissions.framework.dao.UserManagerDAO;
