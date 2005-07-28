@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client;
 
-import gov.epa.emissions.framework.client.admin.RegisterUserView;
 
 /**
  * Can contain EMF UI widgets. It's specifically introduced so that either a
@@ -11,8 +10,6 @@ import gov.epa.emissions.framework.client.admin.RegisterUserView;
 public interface EmfWidgetContainer {
 
     void close();
-
-    RegisterUserView getView();
 
     void display();
 }

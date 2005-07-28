@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
-import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.client.EmfWindow;
 import gov.epa.emissions.framework.client.ErrorMessagePanel;
 import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
@@ -165,7 +164,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
     private void launchCreateUser() throws Exception {
         PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(userAdmin);
-        EmfWidgetContainer window = new RegisterUserWindow(userAdmin, strategy);
+        RegisterUserWindow window = new RegisterUserWindow(userAdmin, strategy);
         RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, window.getView());
         presenter.observe();
 
