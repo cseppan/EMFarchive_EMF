@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JDesktopPane;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -26,12 +27,13 @@ public class EmfConsole extends EmfWindow {
     public EmfConsole(EMFUserAdmin userAdmin) {
         this.userAdmin = userAdmin;
 
-        this.setJMenuBar(createMenuBar());
+        super.setJMenuBar(createMenuBar());
 
-        this.setSize(new Dimension(900, 700));
-        this.setLocation(new Point(300, 150));
-        this.setTitle("Emissions Modeling Framework (EMF)");
-
+        super.setSize(new Dimension(900, 700));
+        super.setLocation(new Point(300, 150));
+        super.setTitle("Emissions Modeling Framework (EMF)");
+        super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
         desktop = new JDesktopPane();
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 

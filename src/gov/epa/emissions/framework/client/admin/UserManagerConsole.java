@@ -103,10 +103,10 @@ public class UserManagerConsole extends EmfInteralFrame implements UsersManageme
                     int[] selected = selectModel.getSelectedIndexes();
                     for (int i = 0; i < selected.length; i++) {
                         try {
-                            presenter.notifyDelete(model.getUser(selected[i]).getUserName());
+                            String username = model.getUser(selected[i]).getUserName();
+                            presenter.notifyDelete(username);
                         } catch (EmfException e) {
                             // TODO: handle exceptions
-                            e.printStackTrace();
                         }
                     }
                 }
@@ -148,7 +148,7 @@ public class UserManagerConsole extends EmfInteralFrame implements UsersManageme
     public void refresh() {
         selectModel.refresh();
         createLayout();//TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
-        sortFilterSelectPanel.validate();
+        this.validate();
     }
 
 }
