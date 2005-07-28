@@ -7,6 +7,7 @@ package gov.epa.emissions.framework.service;
 import gov.epa.emissions.framework.AuthenticationException;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
+import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 import gov.epa.emissions.framework.dao.UserManagerDAO;
@@ -116,7 +117,11 @@ public class EMFUserManager implements EMFUserAdmin{
         UserManagerDAO umDAO;
         try {
             umDAO = new UserManagerDAO();
-            umDAO.insertUser(newUser);
+            if (umDAO.isNewUser(newUser.getUserName())){
+                umDAO.insertUser(newUser);                
+            }else{
+                throw new UserException("Duplicate username: A record for this username exists in the database");
+            }
         } catch (InfrastructureException ex) {
             ex.printStackTrace();
             throw new EmfException(ex.getMessage());
