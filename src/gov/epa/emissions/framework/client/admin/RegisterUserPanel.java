@@ -90,7 +90,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
             public void actionPerformed(ActionEvent event) {
                 if (RegisterUserPanel.this.presenter != null) {
                     try {
-                        RegisterUserPanel.this.presenter.notifyCreate();
+                        RegisterUserPanel.this.presenter.notifyRegister();
                         postRegisterStrategy.execute();
                         RegisterUserPanel.this.close();
                     } catch (EmfException e) {

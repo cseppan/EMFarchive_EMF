@@ -53,7 +53,7 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("setObserver").with(eq(presenter));        
         presenter.observe();
 
-        presenter.notifyCreate();
+        presenter.notifyRegister();
     }
 
     public void testShouldCloseViewOnCancelAction() {
@@ -71,7 +71,7 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
         view.stubs().method("getConfirmPassword").will(returnValue("tryryhd23"));
 
         try {
-            presenter.notifyCreate();
+            presenter.notifyRegister();
         } catch (EmfException e) {
             return;
         }
@@ -83,7 +83,7 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
         view.stubs().method("getEmail").will(returnValue("tryryhd23"));
 
         try {
-            presenter.notifyCreate();
+            presenter.notifyRegister();
         } catch (EmfException e) {
             return;
         }

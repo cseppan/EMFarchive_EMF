@@ -16,7 +16,7 @@ public class RegisterUserPresenter implements EmfPresenter {
         this.view = view;
     }
 
-    public void notifyCreate() throws EmfException {
+    public void notifyRegister() throws EmfException {
         User user = new User();
 
         user.setUserName(view.getUsername());
