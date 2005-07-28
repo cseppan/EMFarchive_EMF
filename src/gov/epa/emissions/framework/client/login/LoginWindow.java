@@ -2,8 +2,11 @@ package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
+import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.client.EmfWindow;
+import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
 import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
+import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
@@ -167,11 +170,11 @@ public class LoginWindow extends EmfWindow implements LoginView {
     }
 
     private void launchCreateUser() throws Exception {
-        PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(userAdmin);
-        RegisterUserWindow view = new RegisterUserWindow(userAdmin, strategy);
-        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, view);
+        PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(userAdmin);        
+        EmfWidgetContainer window = new RegisterUserWindow(userAdmin, strategy);
+        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, window.getView());
 
-        view.setVisible(true);
+        window.display();
     }
 
     private void clearError() {

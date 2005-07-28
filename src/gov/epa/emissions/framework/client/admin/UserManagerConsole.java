@@ -4,8 +4,6 @@ import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
-import gov.epa.emissions.framework.client.login.NoOpPostRegisterStrategy;
-import gov.epa.emissions.framework.client.login.RegisterUserWindow;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
@@ -87,10 +85,10 @@ public class UserManagerConsole extends EmfInteralFrame implements UsersManageme
         newButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    RegisterUserWindow view = new RegisterUserWindow(userAdmin, new NoOpPostRegisterStrategy());
-                    RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, view);
-                    getDesktopPane().add(view);
-                    view.setVisible(true);
+                    RegisterUserInternalFrame container = new RegisterUserInternalFrame(userAdmin, new NoOpPostRegisterStrategy());
+                    RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, container.getView());
+                    getDesktopPane().add(container);
+                    container.show();
                 } catch (Exception e) {
                     // TODO: display error message
                 }

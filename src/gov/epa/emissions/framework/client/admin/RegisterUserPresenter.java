@@ -1,10 +1,11 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfPresenter;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
-public class RegisterUserPresenter {
+public class RegisterUserPresenter implements EmfPresenter {
 
     private EMFUserAdmin model;
     private RegisterUserView view;

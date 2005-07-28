@@ -1,9 +1,7 @@
-package gov.epa.emissions.framework.client.login;
+package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfInteralFrame;
-import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
-import gov.epa.emissions.framework.client.admin.RegisterUserView;
+import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.awt.BorderLayout;
@@ -24,7 +22,7 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
-public class RegisterUserWindow extends EmfInteralFrame implements RegisterUserView {
+public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     private RegisterUserPresenter presenter;
 
@@ -46,27 +44,24 @@ public class RegisterUserWindow extends EmfInteralFrame implements RegisterUserV
 
     private PostRegisterStrategy postRegisterStrategy;
 
-    public RegisterUserWindow(EMFUserAdmin userAdmin, PostRegisterStrategy postRegisterStrategy) {
-        super("Register New User");
-        this.postRegisterStrategy = postRegisterStrategy;
+    private EmfWidgetContainer parent;
 
-        JPanel layoutPanel = createLayout();
+    public RegisterUserPanel(EMFUserAdmin userAdmin, PostRegisterStrategy postRegisterStrategy, EmfWidgetContainer parent) {
+        this.postRegisterStrategy = postRegisterStrategy;
+        this.parent = parent;
+
+        createLayout();
 
         this.setSize(new Dimension(350, 400));
-
-        this.getContentPane().add(layoutPanel);
     }
 
-    private JPanel createLayout() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    private void createLayout() {
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        panel.add(createErrorMessagePanel());
-        panel.add(createProfilePanel());
-        panel.add(createLoginPanel());
-        panel.add(createButtonsPanel());
-
-        return panel;
+        this.add(createErrorMessagePanel());
+        this.add(createProfilePanel());
+        this.add(createLoginPanel());
+        this.add(createButtonsPanel());
     }
 
     private JPanel createErrorMessagePanel() {
@@ -89,8 +84,8 @@ public class RegisterUserWindow extends EmfInteralFrame implements RegisterUserV
         JButton cancel = new JButton("Cancel");
         cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (RegisterUserWindow.this.presenter != null) {
-                    RegisterUserWindow.this.presenter.notifyCancel();
+                if (RegisterUserPanel.this.presenter != null) {
+                    RegisterUserPanel.this.presenter.notifyCancel();
                 }
             }
         });
@@ -99,13 +94,13 @@ public class RegisterUserWindow extends EmfInteralFrame implements RegisterUserV
         JButton ok = new JButton("Ok");
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (RegisterUserWindow.this.presenter != null) {
+                if (RegisterUserPanel.this.presenter != null) {
                     try {
-                        RegisterUserWindow.this.presenter.notifyCreate();
+                        RegisterUserPanel.this.presenter.notifyCreate();
                         postRegisterStrategy.execute();
-                        RegisterUserWindow.this.close();
+                        RegisterUserPanel.this.close();
                     } catch (EmfException e) {
-                        RegisterUserWindow.this.setError(e.getMessage());
+                        RegisterUserPanel.this.setError(e.getMessage());
                     }
                 }
             }
@@ -232,7 +227,7 @@ public class RegisterUserWindow extends EmfInteralFrame implements RegisterUserV
     }
 
     public void close() {
-        this.dispose();
+        parent.close();
     }
 
     public void setObserver(RegisterUserPresenter presenter) {

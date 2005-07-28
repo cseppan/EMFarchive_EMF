@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.client.EmfConsole;
+import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 public class LaunchEmfConsolePostRegisterStrategy implements PostRegisterStrategy {
