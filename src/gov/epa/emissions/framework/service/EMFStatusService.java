@@ -9,19 +9,19 @@
 package gov.epa.emissions.framework.service;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.EMFData;
 import gov.epa.emissions.framework.commons.EMFStatus;
+import gov.epa.emissions.framework.commons.Status;
 
 /**
  * @author Conrad F. D'Cruz
  *
  */
-public class EMFDataService implements EMFData{
+public class EMFStatusService implements EMFStatus{
 
     /**
      * 
      */
-    public EMFDataService() {
+    public EMFStatusService() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -29,7 +29,7 @@ public class EMFDataService implements EMFData{
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.commons.EMFData#getMessages(java.lang.String)
      */
-    public EMFStatus[] getMessages(String userName) throws EmfException {
+    public Status[] getMessages(String userName) throws EmfException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -37,7 +37,7 @@ public class EMFDataService implements EMFData{
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.commons.EMFData#getMessages(java.lang.String, java.lang.String)
      */
-    public EMFStatus[] getMessages(String userName, String type) throws EmfException {
+    public Status[] getMessages(String userName, String type) throws EmfException {
         // TODO Auto-generated method stub
         return null;
     }
