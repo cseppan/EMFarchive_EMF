@@ -14,10 +14,12 @@ public class RegisterUserWindowLauncher {
 
         PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(userAdmin);
         RegisterUserWindow window = new RegisterUserWindow(userAdmin, strategy);
-        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, window.getView());
-        window.display();
-
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);        
+
+        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, window.getView());
+        presenter.observe();
+        
+        window.display();
     }
 
 }

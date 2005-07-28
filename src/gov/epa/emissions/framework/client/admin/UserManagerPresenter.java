@@ -1,9 +1,10 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfPresenter;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
-public class UserManagerPresenter {
+public class UserManagerPresenter implements EmfPresenter{
 
     private UsersManagementView view;
     private EMFUserAdmin model;
@@ -17,7 +18,7 @@ public class UserManagerPresenter {
         view.close();
     }
 
-    public void init() {
+    public void observe() {
         view.setViewObserver(this);
     }
 

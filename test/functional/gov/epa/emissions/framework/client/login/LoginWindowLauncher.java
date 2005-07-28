@@ -25,7 +25,7 @@ public class LoginWindowLauncher {
         login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         LoginPresenter presenter = new LoginPresenter(userAdminProxy, login);
-        presenter.init();
+        presenter.observe();
 
         login.setVisible(true);
     }

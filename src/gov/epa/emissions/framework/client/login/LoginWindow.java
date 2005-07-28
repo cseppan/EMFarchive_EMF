@@ -173,7 +173,8 @@ public class LoginWindow extends EmfWindow implements LoginView {
         PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(userAdmin);        
         EmfWidgetContainer window = new RegisterUserWindow(userAdmin, strategy);
         RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, window.getView());
-
+        presenter.observe();
+        
         window.display();
     }
 

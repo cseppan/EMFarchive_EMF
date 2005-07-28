@@ -84,14 +84,13 @@ public class UserManagerConsole extends EmfInteralFrame implements UsersManageme
         JButton newButton = new JButton("New");
         newButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    RegisterUserInternalFrame container = new RegisterUserInternalFrame(userAdmin, new NoOpPostRegisterStrategy());
-                    RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, container.getView());
-                    getDesktopPane().add(container);
-                    container.show();
-                } catch (Exception e) {
-                    // TODO: display error message
-                }
+                RegisterUserInternalFrame container = new RegisterUserInternalFrame(userAdmin,
+                        new NoOpPostRegisterStrategy());
+                RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, container.getView());
+                presenter.observe();
+
+                getDesktopPane().add(container);
+                container.display();
             }
         });
 

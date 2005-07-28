@@ -18,7 +18,7 @@ public class UsersManagementPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("setViewObserver").with(eq(presenter));
         view.expects(once()).method("close").withNoArguments();
 
-        presenter.init();
+        presenter.observe();
         presenter.notifyCloseView();
     }
 

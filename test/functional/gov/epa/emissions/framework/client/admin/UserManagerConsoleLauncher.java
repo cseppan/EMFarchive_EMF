@@ -20,7 +20,7 @@ public class UserManagerConsoleLauncher {
         EMFUserAdmin userAdmin = launcher.createUserAdmin();
         UserManagerConsole console = new UserManagerConsole(userAdmin);
         UserManagerPresenter presenter = new UserManagerPresenter(userAdmin, console);
-        presenter.init();
+        presenter.observe();
 
         console.setVisible(true);
 

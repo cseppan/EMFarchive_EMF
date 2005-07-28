@@ -25,9 +25,10 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
         view.stubs().method("getAffiliation").will(returnValue("UNC"));
         view.stubs().method("getPhone").will(returnValue("919-111-2222"));
 
-        // TODO: should be presenter, but it's a chicken-egg problem
-        view.expects(once()).method("setObserver").with(ANYTHING);
         presenter = new RegisterUserPresenter(null, (RegisterUserView) view.proxy());
+
+        view.expects(once()).method("setObserver").with(eq(presenter));        
+        presenter.observe();
     }
 
     public void testShouldCreateUserAndLoginOnNotifyCreateUser() throws EmfException {
@@ -46,11 +47,11 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
         view.stubs().method("getFullName").will(returnValue("Joe Shay"));
         view.stubs().method("getAffiliation").will(returnValue("UNC"));
         view.stubs().method("getPhone").will(returnValue("919-111-2222"));
-        // TODO: should be presenter, but it's a chicken-egg problem
-        view.expects(once()).method("setObserver").with(ANYTHING);
 
         RegisterUserPresenter presenter = new RegisterUserPresenter((EMFUserAdmin) emfUserAdmin.proxy(),
                 (RegisterUserView) view.proxy());
+        view.expects(once()).method("setObserver").with(eq(presenter));        
+        presenter.observe();
 
         presenter.notifyCreate();
     }
@@ -58,10 +59,10 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
     public void testShouldCloseViewOnCancelAction() {
         Mock view = mock(RegisterUserView.class);
         view.expects(once()).method("close").withNoArguments();
-        //TODO: should be presenter, but it's a chicken-egg problem
-        view.expects(once()).method("setObserver").with(ANYTHING);
 
         RegisterUserPresenter presenter = new RegisterUserPresenter(null, (RegisterUserView) view.proxy());
+        view.expects(once()).method("setObserver").with(eq(presenter));        
+        presenter.observe();
 
         presenter.notifyCancel();
     }

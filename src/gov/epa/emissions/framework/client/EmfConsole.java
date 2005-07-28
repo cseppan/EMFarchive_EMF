@@ -97,8 +97,8 @@ public class EmfConsole extends EmfWindow {
         try {
             UserManagerConsole console = new UserManagerConsole(userAdmin);
             UserManagerPresenter presenter = new UserManagerPresenter(userAdmin, console);
-
-            presenter.init();
+            presenter.observe();
+            
             desktop.add(console);
             console.setVisible(true);
         } catch (Exception e) {

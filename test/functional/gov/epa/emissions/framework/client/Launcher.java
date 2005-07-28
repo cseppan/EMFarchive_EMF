@@ -17,7 +17,7 @@ public class Launcher {
         login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         LoginPresenter presenter = new LoginPresenter(userAdmin, login);
-        presenter.init();
+        presenter.observe();
 
         login.setVisible(true);
     }

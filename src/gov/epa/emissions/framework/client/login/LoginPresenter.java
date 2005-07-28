@@ -1,9 +1,10 @@
 package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfPresenter;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
-public class LoginPresenter {
+public class LoginPresenter implements EmfPresenter {
 
     private EMFUserAdmin userAdmin;
 
@@ -22,7 +23,7 @@ public class LoginPresenter {
         view.close();
     }
 
-    public void init() {
+    public void observe() {
         view.setObserver(this);
     }
 
