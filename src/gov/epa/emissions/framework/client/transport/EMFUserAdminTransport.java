@@ -11,7 +11,6 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.framework.AuthenticationException;
 import gov.epa.emissions.framework.CommunicationFailureException;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -72,8 +71,12 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
      * @param faultReason
      * @return
      */
-    private String extractMessage(String faultReason) {    
-        return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
+    private String extractMessage(String faultReason) {
+        String message = faultReason.substring(faultReason.indexOf("Exception: ") + 11);
+        if (message.equals("Connection refused: connect")){
+            message = "Cannot communicate with EMF Server";
+        }
+        return message;
     }
    
     /* (non-Javadoc)
