@@ -31,7 +31,7 @@ import javax.sql.DataSource;
 public class UserManagerDAO {
 
     DataSource ds = null;
-    private static final String GET_USER_QUERY="select * from users where user_name=? order by user_name";
+    private static final String GET_USER_QUERY="select * from users where user_name=?";
     private static final String GET_USERS_QUERY="select * from users order by user_name";
     private static final String INSERT_USER_QUERY="INSERT INTO users (user_name,user_pass,fullname,affiliation,workphone,emailaddr,inadmingrp,acctdisabled) VALUES (?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_QUERY="UPDATE users SET user_name=?,user_pass=?,fullname=?,affiliation=?,workphone=?,emailaddr=?,inadmingrp=?,acctdisabled=? WHERE user_name=?";
@@ -61,11 +61,43 @@ public class UserManagerDAO {
         }  
     }//constructor
     
+    public boolean isNewUser(String userName) throws InfrastructureException{
+        boolean newuser = true;
+        try{
+            if (ds != null) {
+                Connection conn = ds.getConnection();
+                System.out.println("Is connection null? " + (conn ==null));
+
+                if(conn != null)  {
+                    PreparedStatement selectStmt = conn.prepareStatement(GET_USER_QUERY);
+                    System.out.println("Is statement null? " + (selectStmt ==null));
+                    System.out.println("The query string " + GET_USER_QUERY);
+
+                    selectStmt.setString(1,userName);                  
+                    
+                    ResultSet rst = selectStmt.executeQuery();
+                    System.out.println("Is result set null? " + (rst ==null));
+                    
+                    if (rst.next()) newuser = false;
+                    
+                    // Close the result set, statement and the connection
+                    rst.close() ;
+                    selectStmt.close() ;
+                    conn.close() ;
+                }//conn not null
+            }//ds not null
+            }catch(SQLException ex){
+                ex.printStackTrace();
+                throw new InfrastructureException("Database error");
+            }
+        
+        return newuser;        
+    }
     
     public User getUser(String userName) throws InfrastructureException, UserException {
       System.out.println("in getUser for username= " + userName);
   
-      User emfUser = new User();
+      User emfUser = null;
 
       try{
       if (ds != null) {
@@ -84,6 +116,7 @@ public class UserManagerDAO {
               
                   while( rst.next() ){
                       System.out.println("An rst record found ");
+                      emfUser = new User();
                       emfUser.setAcctDisabled(rst.getBoolean("acctdisabled"));
                       emfUser.setAffiliation(rst.getString("affiliation"));
                       emfUser.setEmailAddr(rst.getString("emailaddr"));
@@ -106,7 +139,11 @@ public class UserManagerDAO {
           throw new InfrastructureException("Database error");
       }
 
-      System.out.println("End of getUser with fullname= " + emfUser.getFullName());
+      if (emfUser != null) {
+          System.out.println("End of getUser with fullname= " + emfUser.getFullName());
+      }else{
+          System.out.println("No record found for username= " + userName);
+      }
 
       return emfUser;
     }//getUser
