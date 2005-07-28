@@ -11,12 +11,13 @@ public class RegisterUserWindow extends EmfWindow implements EmfWidgetContainer 
 
     private RegisterUserPanel view;
 
+    //TODO: should the app exit if 'x-close' is clicked ?
     public RegisterUserWindow(EMFUserAdmin userAdmin, PostRegisterStrategy postRegisterStrategy) {
         view = new RegisterUserPanel(userAdmin, postRegisterStrategy, this);
         this.getContentPane().add(view);
 
         this.setTitle("Register New User");
-        this.setSize(new Dimension(800, 600));
+        this.setSize(new Dimension(500, 400));
         this.setLocation(new Point(400, 200));
         this.setVisible(true);        
     }

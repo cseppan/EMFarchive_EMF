@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.framework.client.login.LaunchEmfConsolePostRegisterStrategy;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
 import java.util.Collections;
@@ -11,7 +12,8 @@ public class RegisterUserWindowLauncher {
     public static void main(String[] args) throws Exception {
         EMFUserAdmin userAdmin = new EMFUserAdminStub(Collections.EMPTY_LIST);
 
-        RegisterUserWindow window = new RegisterUserWindow(userAdmin, new NoOpPostRegisterStrategy());
+        PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(userAdmin);
+        RegisterUserWindow window = new RegisterUserWindow(userAdmin, strategy);
         RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, window.getView());
         window.display();
 

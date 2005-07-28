@@ -29,6 +29,8 @@ public class RegisterUserPresenter implements EmfPresenter {
         user.setAffiliation(view.getAffiliation());
         
         model.createUser(user);
+        
+        //TODO: should not autologin if request is from UserManager
         model.authenticate(user.getUserName(), user.getPassword(), false);//TODO: admin status ?        
     }
 
