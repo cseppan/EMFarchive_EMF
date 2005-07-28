@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.EMFUser;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -40,6 +39,7 @@ public class EMFUserAdminStub implements EMFUserAdmin {
     }
 
     public void createUser(User newUser) {
+        users.add(newUser);
     }
 
     public void updateUser(User newUser) {
@@ -60,9 +60,6 @@ public class EMFUserAdminStub implements EMFUserAdmin {
         }
     }
 
-    public EMFUser[] getEmfUsers() throws EmfException {
-        return null;
-    }
 
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.commons.EMFUserAdmin#updateUsers(gov.epa.emissions.framework.commons.User[])

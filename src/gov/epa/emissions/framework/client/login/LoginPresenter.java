@@ -10,8 +10,8 @@ public class LoginPresenter implements EmfPresenter {
 
     private LoginView view;
 
-    public LoginPresenter(EMFUserAdmin userAdmin, LoginView view) {
-        this.userAdmin = userAdmin;
+    public LoginPresenter(EMFUserAdmin model, LoginView view) {
+        this.userAdmin = model;
         this.view = view;
     }
 

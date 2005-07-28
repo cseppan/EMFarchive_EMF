@@ -36,6 +36,7 @@ public class UserManagerConsoleLauncher {
 
     private void addAsInternalFrame(UserManagerConsole console, JFrame frame) {
         JDesktopPane desktop = new JDesktopPane();
+        desktop.setName("EMF Console");
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
         desktop.add(console);
 

@@ -28,8 +28,8 @@ public class EmfConsole extends EmfWindow {
 
         this.setJMenuBar(createMenuBar());
 
-        this.setSize(new Dimension(700, 500));
-        this.setLocation(new Point(400, 200));
+        this.setSize(new Dimension(900, 700));
+        this.setLocation(new Point(300, 150));
         this.setTitle("Emissions Modeling Framework (EMF)");
 
         desktop = new JDesktopPane();

@@ -15,6 +15,8 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 public class UserManagerConsole extends EmfInteralFrame implements UsersManagementView {
 
@@ -28,33 +30,39 @@ public class UserManagerConsole extends EmfInteralFrame implements UsersManageme
 
     private EMFUserAdmin userAdmin;
 
+    private JPanel layout;
+
     public UserManagerConsole(EMFUserAdmin userAdmin) throws Exception {
         super("User Management Console");
         this.userAdmin = userAdmin;
         model = new UserManagerTableModel(userAdmin);
         selectModel = new SortFilterSelectModel(model);
 
-        // TODO: fix the row-count issue w/ OverallTableModel hierarchy
-        sortFilterSelectPanel = new SortFilterSelectionPanel(this, selectModel);
+        layout = new JPanel();
+        this.getContentPane().add(layout);
+        
+        // TODO: OverallTableModel has a bug w/ respect to row-count &
+        // cannot refresh itself. So, we will regen the layout on every
+        // refresh - it's a HACK. Will need to be addressed
+        createLayout();        
 
-        JPanel layoutPanel = createLayout(sortFilterSelectPanel);
-
-        this.setSize(new Dimension(500, 200));
-
-        this.getContentPane().add(layoutPanel);
+        this.setSize(new Dimension(500, 300));
     }
 
-    private JPanel createLayout(JPanel sortFilterSelectPanel) {
+    private void createLayout() {
+        layout.removeAll();
+        sortFilterSelectPanel = new SortFilterSelectionPanel(this, selectModel);
+        createLayout(layout, sortFilterSelectPanel);
+    }
+
+    private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
+        layout.setLayout(new BorderLayout());
+        
         JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
         sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
 
-        JPanel layout = new JPanel();
-        layout.setLayout(new BorderLayout());
-
         layout.add(scrollPane, BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
-
-        return layout;
     }
 
     private JPanel createControlPanel() {
@@ -84,13 +92,7 @@ public class UserManagerConsole extends EmfInteralFrame implements UsersManageme
         JButton newButton = new JButton("New");
         newButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                RegisterUserInternalFrame container = new RegisterUserInternalFrame(userAdmin,
-                        new NoOpPostRegisterStrategy());
-                RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, container.getView());
-                presenter.observe();
-
-                getDesktopPane().add(container);
-                container.display();
+                displayRegisterUser();
             }
         });
 
@@ -104,6 +106,7 @@ public class UserManagerConsole extends EmfInteralFrame implements UsersManageme
                             presenter.notifyDelete(model.getUser(selected[i]).getUserName());
                         } catch (EmfException e) {
                             // TODO: handle exceptions
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -118,6 +121,22 @@ public class UserManagerConsole extends EmfInteralFrame implements UsersManageme
         return crudPanel;
     }
 
+    private void displayRegisterUser() {
+        RegisterUserInternalFrame container = new RegisterUserInternalFrame(userAdmin, new NoOpPostRegisterStrategy());
+        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, container.getView());
+        presenter.observe();
+
+        getDesktopPane().add(container);
+
+        container.addInternalFrameListener(new InternalFrameAdapter() {
+            public void internalFrameClosed(InternalFrameEvent event) {
+                refresh();
+            }
+        });
+
+        container.display();
+    }
+
     public void setViewObserver(UserManagerPresenter presenter) {
         this.presenter = presenter;
     }
@@ -128,6 +147,7 @@ public class UserManagerConsole extends EmfInteralFrame implements UsersManageme
 
     public void refresh() {
         selectModel.refresh();
+        createLayout();//TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
         sortFilterSelectPanel.validate();
     }
 
