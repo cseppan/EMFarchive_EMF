@@ -12,7 +12,7 @@ import javax.swing.JFrame;
 
 public class EmfConsoleLauncherWithMockData {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws EmfException {
         EmfConsole console = new EmfConsole(createUserAdmin());
         console.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

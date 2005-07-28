@@ -18,12 +18,14 @@ import javax.swing.JOptionPane;
 public class EmfConsole extends EmfWindow {
 
     private EMFUserAdmin userAdmin;
+
     private JDesktopPane desktop;
 
-    //TODO: should we user 'ServiceLocator' instead, since other services will also be needed
-    public EmfConsole(EMFUserAdmin userAdmin) throws Exception {
+    // TODO: should we user 'ServiceLocator' instead, since other services will
+    // also be needed
+    public EmfConsole(EMFUserAdmin userAdmin) {
         this.userAdmin = userAdmin;
-        
+
         this.setJMenuBar(createMenuBar());
 
         this.setSize(new Dimension(700, 500));
@@ -32,7 +34,7 @@ public class EmfConsole extends EmfWindow {
 
         desktop = new JDesktopPane();
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
-        
+
         this.setContentPane(desktop);
     }
 
@@ -100,7 +102,7 @@ public class EmfConsole extends EmfWindow {
             desktop.add(console);
             console.setVisible(true);
         } catch (Exception e) {
-            //TODO: error handling 
+            // TODO: error handling
         }
     }
 

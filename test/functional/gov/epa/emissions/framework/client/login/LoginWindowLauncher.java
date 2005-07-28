@@ -7,15 +7,14 @@ import javax.swing.JFrame;
 
 import org.jmock.Mock;
 import org.jmock.core.constraint.IsEqual;
-import org.jmock.core.stub.ReturnStub;
 import org.jmock.core.stub.ThrowStub;
 
-public class LoginWindowLauncher {  
+public class LoginWindowLauncher {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         Mock userAdmin = new Mock(EMFUserAdmin.class);
         setFailureExpectation(userAdmin);
-        setSuccessExpectation(userAdmin, "user", "user");        
+        setSuccessExpectation(userAdmin, "user", "user");
         EMFUserAdmin userAdminProxy = (EMFUserAdmin) userAdmin.proxy();
 
         LoginWindow login = new LoginWindow(userAdminProxy);
@@ -28,17 +27,13 @@ public class LoginWindowLauncher {
     }
 
     private static void setSuccessExpectation(Mock userAdmin, String username, String password) {
-        userAdmin.stubs()
-                 .method("authenticate")
-                 .with(new IsEqual(username), new IsEqual(password), new IsEqual(Boolean.FALSE))
-                 .will(new ReturnStub(null));
+        userAdmin.stubs().method("authenticate").with(new IsEqual(username), new IsEqual(password),
+                new IsEqual(Boolean.FALSE));
     }
 
     private static void setFailureExpectation(Mock userAdmin) {
-        userAdmin.stubs()
-                 .method("authenticate")
-                 .withAnyArguments()
-                 .will(new ThrowStub(new EmfException("invalid username/password")));
+        userAdmin.stubs().method("authenticate").withAnyArguments().will(
+                new ThrowStub(new EmfException("invalid username/password")));
     }
 
 }

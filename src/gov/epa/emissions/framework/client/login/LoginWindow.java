@@ -38,7 +38,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
     private EMFUserAdmin userAdmin;
 
-    public LoginWindow(EMFUserAdmin userAdmin) throws Exception {
+    public LoginWindow(EMFUserAdmin userAdmin) {
         this.userAdmin = userAdmin;
         JPanel layoutPanel = createLayout();
 
@@ -87,6 +87,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
                         presenter.notifyLogin(username.getText(), password.getText());
                         clearError();
                         launchConsole();
+                        close();
                     } catch (EmfException e) {
                         setError(e.getMessage());
                     }
@@ -102,14 +103,8 @@ public class LoginWindow extends EmfWindow implements LoginView {
     }
 
     private void launchConsole() {
-        try {
-            EmfConsole console = new EmfConsole(userAdmin);
-            console.setVisible(true);
-        } catch (Exception e) {
-            // TODO: exit app w/ error notification ?
-        }
-
-        this.close();
+        EmfConsole console = new EmfConsole(userAdmin);
+        console.setVisible(true);
     }
 
     private JPanel createLoginPanel() {
@@ -143,7 +138,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
         JLabel forgotPassword = new JLabel("<html><a href=''>Forgot your Password ?</a></html>");
         forgotPassword.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent event) {//TODO: deferred
+            public void mouseClicked(MouseEvent event) {// TODO: deferred
             }
         });
         JPanel forgotPasswordPanel = new JPanel(new BorderLayout());
@@ -157,12 +152,12 @@ public class LoginWindow extends EmfWindow implements LoginView {
                 try {
                     launchCreateUser();
                 } catch (Exception e) {
-                    //TODO: launch failure ??
+                    // TODO: launch failure ??
                 }
                 close();
             }
         });
-        
+
         JPanel registerPanel = new JPanel(new BorderLayout());
         registerPanel.add(register);
 
@@ -172,11 +167,11 @@ public class LoginWindow extends EmfWindow implements LoginView {
     }
 
     private void launchCreateUser() throws Exception {
-        RegisterUserWindow window = new RegisterUserWindow(userAdmin);
-        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, window);
-        presenter.init();
+        PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(userAdmin);
+        RegisterUserWindow view = new RegisterUserWindow(userAdmin, strategy);
+        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, view);
 
-        window.setVisible(true);        
+        view.setVisible(true);
     }
 
     private void clearError() {

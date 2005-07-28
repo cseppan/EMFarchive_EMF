@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
 import gov.epa.emissions.framework.client.admin.RegisterUserView;
@@ -45,13 +44,12 @@ public class RegisterUserWindow extends EmfInteralFrame implements RegisterUserV
 
     private JLabel errorMessage;
 
-    private EMFUserAdmin userAdmin;
+    private PostRegisterStrategy postRegisterStrategy;
 
-    public RegisterUserWindow(EMFUserAdmin userAdmin) throws Exception {
+    public RegisterUserWindow(EMFUserAdmin userAdmin, PostRegisterStrategy postRegisterStrategy) {
         super("Register New User");
-        
-        this.userAdmin = userAdmin;
-        
+        this.postRegisterStrategy = postRegisterStrategy;
+
         JPanel layoutPanel = createLayout();
 
         this.setSize(new Dimension(350, 400));
@@ -104,11 +102,11 @@ public class RegisterUserWindow extends EmfInteralFrame implements RegisterUserV
                 if (RegisterUserWindow.this.presenter != null) {
                     try {
                         RegisterUserWindow.this.presenter.notifyCreate();
+                        postRegisterStrategy.execute();
+                        RegisterUserWindow.this.close();
                     } catch (EmfException e) {
                         RegisterUserWindow.this.setError(e.getMessage());
-                        return;
                     }
-                    launchConsole();
                 }
             }
         });
@@ -117,17 +115,6 @@ public class RegisterUserWindow extends EmfInteralFrame implements RegisterUserV
         panel.add(container, BorderLayout.EAST);
 
         return panel;
-    }
-
-    private void launchConsole() {
-        try {
-            EmfConsole console = new EmfConsole(userAdmin);
-            console.setVisible(true);
-        } catch (Exception e) {
-            // TODO: exit app w/ error notification ?
-        }
-
-        this.close();
     }
 
     private void setError(String message) {

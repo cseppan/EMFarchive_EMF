@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 
 public class Launcher {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         String endpoint = "http://localhost:8080/emf/services/EMFUserManagerService";
         EMFUserAdmin userAdmin = new EMFUserAdminTransport(endpoint);
 

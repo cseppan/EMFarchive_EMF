@@ -4,7 +4,7 @@ import javax.swing.JFrame;
 
 public class EmfWindow extends JFrame {
 
-    public EmfWindow() throws Exception {
+    public EmfWindow() {
         JFrame.setDefaultLookAndFeelDecorated(true);
     }
 

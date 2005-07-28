@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.framework.client.login.NoOpPostRegisterStrategy;
 import gov.epa.emissions.framework.client.login.RegisterUserWindow;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 
@@ -16,17 +17,13 @@ public class RegisterUserWindowLauncher {
     public static void main(String[] args) throws Exception {
         EMFUserAdmin userAdmin = new EMFUserAdminStub(Collections.EMPTY_LIST);
 
-        RegisterUserWindow registerUser = new RegisterUserWindow(userAdmin);
-        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, registerUser);
-        presenter.init();
-
-        registerUser.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        registerUser.setVisible(true);
+        RegisterUserWindow view = new RegisterUserWindow(userAdmin, new NoOpPostRegisterStrategy());
+        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, view);
+        view.setVisible(true);
         
         JFrame frame = new JFrame();
 
-        addAsInternalFrame(registerUser, frame);
+        addAsInternalFrame(view, frame);
         
         frame.setSize(new Dimension(800, 600));
         frame.setLocation(new Point(400, 200));

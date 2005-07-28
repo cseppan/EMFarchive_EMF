@@ -12,6 +12,7 @@ public class RegisterUserPresenter {
     public RegisterUserPresenter(EMFUserAdmin model, RegisterUserView view) {
         this.model = model;
         this.view = view;
+        this.view.setObserver(this);
     }
 
     public void notifyCreate() throws EmfException {
@@ -32,10 +33,6 @@ public class RegisterUserPresenter {
 
     public void notifyCancel() {
         view.close();
-    }
-
-    public void init() {
-        view.setObserver(this);
     }
 
 }
