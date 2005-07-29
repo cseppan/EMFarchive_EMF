@@ -12,6 +12,7 @@ import org.jmock.Mock;
 import org.jmock.core.constraint.IsAnything;
 import org.jmock.core.constraint.IsEqual;
 import org.jmock.core.matcher.InvokeOnceMatcher;
+import org.jmock.core.stub.ReturnStub;
 import org.jmock.core.stub.ThrowStub;
 
 public class LoginWindowLauncher {
@@ -34,6 +35,7 @@ public class LoginWindowLauncher {
     private static void setSuccessExpectation(Mock userAdmin, String username, String password) throws UserException {
         userAdmin.stubs().method("authenticate").with(new IsEqual(username), new IsEqual(password),
                 new IsEqual(Boolean.FALSE));
+        userAdmin.stubs().method("getUser").with(new IsEqual(username)).will(new ReturnStub(new User()));
 
         User user = new User();
         user.setUserName("newuser");

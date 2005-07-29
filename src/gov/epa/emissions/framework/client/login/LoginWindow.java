@@ -76,7 +76,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
         container.setLayout(layout);
 
         JButton signIn = new JButton("Sign In");
-        signIn.setName("Sign In");
+        signIn.setName("signIn");
         signIn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 if (presenter != null) {
@@ -96,7 +96,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
         container.add(signIn);
 
         JButton cancel = new JButton("Cancel");
-        cancel.setName("Cancel");
+        cancel.setName("cancel");
         cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 close();
@@ -131,8 +131,10 @@ public class LoginWindow extends EmfWindow implements LoginView {
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
 
         username = new JTextField(10);
+        username.setName("username");
         valuesPanel.add(username);
         password = new JPasswordField(10);
+        password.setName("password");
         valuesPanel.add(password);
 
         panel.add(valuesPanel);

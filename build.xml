@@ -107,7 +107,7 @@
         </junit>
     </target>
 
-    <target name="all" depends="compile, unit-tests, functional-tests" />
+    <target name="all" depends="compile, unit-tests" />
 
     <!--  =================== CVS Targets ====================================== -->
     <target name="cvs-properties-load">
