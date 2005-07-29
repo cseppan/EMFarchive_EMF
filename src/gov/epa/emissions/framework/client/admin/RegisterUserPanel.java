@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.client.ErrorMessagePanel;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.User;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -78,8 +79,8 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         JButton cancel = new JButton("Cancel");
         cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (RegisterUserPanel.this.presenter != null) {
-                    RegisterUserPanel.this.presenter.notifyCancel();
+                if (presenter != null) {
+                    presenter.notifyCancel();
                 }
             }
         });
@@ -87,16 +88,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         JButton ok = new JButton("Ok");
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (RegisterUserPanel.this.presenter != null) {
-                    try {
-                        RegisterUserPanel.this.presenter.notifyRegister();
-                        postRegisterStrategy.execute();
-                        RegisterUserPanel.this.close();
-                    } catch (EmfException e) {
-                        errorMessagePanel.setMessage(e.getMessage());
-                        refresh();
-                    }
-                }
+                registerUser();
             }
         });
 
@@ -106,6 +98,19 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         panel.add(container, BorderLayout.EAST);
 
         return panel;
+    }
+
+    private void registerUser() {
+        if (presenter != null) {
+            try {
+                User user = presenter.notifyRegister();
+                postRegisterStrategy.execute(user);
+                close();
+            } catch (EmfException e) {
+                errorMessagePanel.setMessage(e.getMessage());
+                refresh();
+            }
+        }
     }
 
     public void refresh() {
@@ -191,11 +196,11 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
     }
 
     public String getPassword() {
-        return password.getText();
+        return new String(password.getPassword());
     }
 
     public String getConfirmPassword() {
-        return confirmPassword.getText();
+        return new String(confirmPassword.getPassword());
     }
 
     public String getEmail() {

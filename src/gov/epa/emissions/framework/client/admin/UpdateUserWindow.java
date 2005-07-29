@@ -117,7 +117,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
 
-        JTextField username = new JTextField(user.getUserName(), 10);
+        JLabel username = new JLabel(user.getUserName(), 10);
         valuesPanel.add(username);
         password = new JPasswordField(10);
         valuesPanel.add(password);
@@ -171,9 +171,9 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
                 user.setAffiliation(affiliation.getText());
                 user.setWorkPhone(phone.getText());
                 user.setEmailAddr(email.getText());
-                if (password.getText().length() > 0) {
-                    user.setPassword(password.getText());
-                    user.confirmPassword(confirmPassword.getText());
+                if (password.getPassword().length > 0) {
+                    user.setPassword(new String(password.getPassword()));
+                    user.confirmPassword(new String(confirmPassword.getPassword()));
                 }
 
                 presenter.notifyUpdate(user);

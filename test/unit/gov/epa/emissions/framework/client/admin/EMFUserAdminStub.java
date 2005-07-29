@@ -15,14 +15,6 @@ public class EMFUserAdminStub implements EMFUserAdmin {
         this.users = users;
     }
 
-    public boolean isNewUser() {
-        return false;
-    }
-
-    public boolean validate() {
-        return false;
-    }
-
     public void authenticate(String userName, String pwd, boolean wantAdminStatus) {
     }
 

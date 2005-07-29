@@ -48,23 +48,7 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
         super();
         endpoint=endpt;
     }
-    
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#isNewUser()
-     */
-    public boolean isNewUser() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#validate()
-     */
-    public boolean validate() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-    
+        
     /**
      * 
      * This utility method extracts the significat message from the Axis Fault

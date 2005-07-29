@@ -29,22 +29,6 @@ public class EMFUserManager implements EMFUserAdmin{
 		super();
 		System.out.println("Created EMFUserManager");
 	}
-	
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#isNewUser()
-     */
-    public boolean isNewUser() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#validate()
-     */
-    public boolean validate() {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#authenticate(java.lang.String, java.lang.String, boolean)

@@ -12,10 +12,7 @@ import gov.epa.emissions.framework.EmfException;
 
 /**
  * @author Conrad F. D'Cruz
- * 
- * This is the interface to the EMF systems User Admin functions The functions
- * are implemented in the EMFUserAdminTransport class.
- * 
+ * Provides services for Login and Administrative functions
  */
 public interface EMFUserAdmin {
 
@@ -34,10 +31,6 @@ public interface EMFUserAdmin {
     public void deleteUser(String userName) throws EmfException;
 
     // UNUSED methods
-    public boolean isNewUser() throws EmfException;
-
-    public boolean validate() throws EmfException;
-
     public boolean resetPassword() throws EmfException;
 
 }

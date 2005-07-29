@@ -16,7 +16,7 @@ public class RegisterUserPresenter implements EmfPresenter {
         this.view = view;
     }
 
-    public void notifyRegister() throws EmfException {
+    public User notifyRegister() throws EmfException {
         User user = new User();
 
         user.setUserName(view.getUsername());
@@ -33,6 +33,8 @@ public class RegisterUserPresenter implements EmfPresenter {
         // TODO: should not autologin if request is from UserManager.
         // TODO: what's the admin status ?
         model.authenticate(user.getUserName(), user.getPassword(), false);
+        
+        return user;
     }
 
     public void notifyCancel() {

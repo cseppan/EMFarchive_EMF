@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
 import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
 import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.User;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -80,10 +81,10 @@ public class LoginWindow extends EmfWindow implements LoginView {
             public void actionPerformed(ActionEvent event) {
                 if (presenter != null) {
                     try {
-                        presenter.notifyLogin(username.getText(), password.getText());
+                        User user = presenter.notifyLogin(username.getText(), new String(password.getPassword()));
                         errorMessagePanel.clear();
                         refresh();
-                        launchConsole();
+                        launchConsole(user);
                         close();
                     } catch (EmfException e) {
                         errorMessagePanel.setMessage(e.getMessage());
@@ -109,8 +110,8 @@ public class LoginWindow extends EmfWindow implements LoginView {
         return panel;
     }
 
-    private void launchConsole() {
-        EmfConsole console = new EmfConsole(userAdmin);
+    private void launchConsole(User user) {
+        EmfConsole console = new EmfConsole(user, userAdmin);
         console.setVisible(true);
     }
 

@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client;
 import gov.epa.emissions.framework.client.admin.UserManagerWindow;
 import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.User;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -22,9 +23,12 @@ public class EmfConsole extends EmfWindow {
 
     private JDesktopPane desktop;
 
+    private User user;
+
     // TODO: should we user 'ServiceLocator' instead, since other services will
     // also be needed
-    public EmfConsole(EMFUserAdmin userAdmin) {
+    public EmfConsole(User user, EMFUserAdmin userAdmin) {
+        this.user = user;
         this.userAdmin = userAdmin;
 
         super.setJMenuBar(createMenuBar());

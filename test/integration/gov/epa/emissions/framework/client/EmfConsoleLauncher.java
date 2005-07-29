@@ -11,7 +11,7 @@ public class EmfConsoleLauncher {
         String endpoint = "http://localhost:8080/emf/services/EMFUserManagerService";
         EMFUserAdmin userAdmin = new EMFUserAdminTransport(endpoint);
 
-        EmfConsole console = new EmfConsole(userAdmin);
+        EmfConsole console = new EmfConsole(null, userAdmin);
         console.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         console.setVisible(true);

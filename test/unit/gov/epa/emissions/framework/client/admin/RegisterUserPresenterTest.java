@@ -53,7 +53,7 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("setObserver").with(eq(presenter));        
         presenter.observe();
 
-        presenter.notifyRegister();
+        assertEquals(expectedUser, presenter.notifyRegister());
     }
 
     public void testShouldCloseViewOnCancelAction() {
