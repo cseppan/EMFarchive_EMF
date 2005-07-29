@@ -13,7 +13,10 @@ public class EmfConsoleLauncher {
 
         EmfConsole console = new EmfConsole(null, userAdmin);
         console.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        
+        EmfConsolePresenter presenter = new EmfConsolePresenter(console);
+        presenter.observe();
+        
         console.setVisible(true);
     }
 

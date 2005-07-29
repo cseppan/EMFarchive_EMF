@@ -84,7 +84,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
 
-        name = new JTextField(user.getFullName(), 10);    
+        name = new JTextField(user.getFullName(), 10);
         valuesPanel.add(name);
         affiliation = new JTextField(user.getAffiliation(), 10);
         valuesPanel.add(affiliation);
@@ -147,7 +147,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
                     presenter.notifyCancel();
                 }
             }
-        });      
+        });
 
         JButton ok = new JButton("Ok");
         ok.addActionListener(new ActionListener() {
@@ -155,32 +155,32 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
                 updateUser();
             }
         });
-        
+
         container.add(ok);
         container.add(cancel);
-        
+
         panel.add(container, BorderLayout.EAST);
 
         return panel;
     }
 
     private void updateUser() {
-        if (presenter != null) {
-            try {
-                user.setFullName(name.getText());
-                user.setAffiliation(affiliation.getText());
-                user.setWorkPhone(phone.getText());
-                user.setEmailAddr(email.getText());
-                if (password.getPassword().length > 0) {
-                    user.setPassword(new String(password.getPassword()));
-                    user.confirmPassword(new String(confirmPassword.getPassword()));
-                }
-
-                presenter.notifyUpdate(user);
-                close();
-            } catch (EmfException e) {
-                errorMessagePanel.setMessage(e.getMessage());
+        if (presenter == null)
+            return;
+        try {
+            user.setFullName(name.getText());
+            user.setAffiliation(affiliation.getText());
+            user.setWorkPhone(phone.getText());
+            user.setEmailAddr(email.getText());
+            if (password.getPassword().length > 0) {
+                user.setPassword(new String(password.getPassword()));
+                user.confirmPassword(new String(confirmPassword.getPassword()));
             }
+
+            presenter.notifyUpdate(user);
+            close();
+        } catch (EmfException e) {
+            errorMessagePanel.setMessage(e.getMessage());
         }
     }
 

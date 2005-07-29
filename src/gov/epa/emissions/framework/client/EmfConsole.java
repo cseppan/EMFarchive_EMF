@@ -17,13 +17,15 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-public class EmfConsole extends EmfWindow {
+public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     private EMFUserAdmin userAdmin;
 
     private JDesktopPane desktop;
 
     private User user;
+
+    private EmfConsolePresenter presenter;
 
     // TODO: should we user 'ServiceLocator' instead, since other services will
     // also be needed
@@ -37,7 +39,7 @@ public class EmfConsole extends EmfWindow {
         super.setLocation(new Point(300, 150));
         super.setTitle("Emissions Modeling Framework (EMF)");
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+
         desktop = new JDesktopPane();
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 
@@ -88,24 +90,27 @@ public class EmfConsole extends EmfWindow {
         menu.add(createDisabledMenuItem("Sectors"));
         menu.addSeparator();
 
-        JMenuItem users = new JMenuItem("Users");
-        users.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                launchUsersManagementWindow();
-            }
-        });
-        menu.add(users);
+        if (user.isInAdminGroup()) {
+            JMenuItem users = new JMenuItem("Users");
+            users.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    if (presenter != null)
+                        presenter.notifyManageUsers();
+                }
+            });
+            menu.add(users);
+        }
         menu.add(createDisabledMenuItem("My Profile"));
-        
+
         return menu;
     }
 
-    private void launchUsersManagementWindow() {
+    public void displayUserManager() {
         try {
             UserManagerWindow console = new UserManagerWindow(userAdmin);
             UserManagerPresenter presenter = new UserManagerPresenter(userAdmin, console);
             presenter.observe();
-            
+
             desktop.add(console);
             console.setVisible(true);
         } catch (Exception e) {
@@ -130,6 +135,14 @@ public class EmfConsole extends EmfWindow {
         menu.add(about);
 
         return menu;
+    }
+
+    public void setObserver(EmfConsolePresenter presenter) {
+        this.presenter = presenter;
+    }
+
+    public void display() {
+        super.setVisible(true);
     }
 
 }

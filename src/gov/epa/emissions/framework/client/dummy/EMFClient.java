@@ -21,14 +21,6 @@ public class EMFClient {
     private static String endpoint = 
         "http://ben.cep.unc.edu:8080/emf/services/EMFUserManagerService";
 
-    /**
-     * 
-     */
-    public EMFClient() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-
     public static void main(String[] args) {
         
         EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport(endpoint);
@@ -48,8 +40,7 @@ public class EMFClient {
                 
             }
         } catch (EmfException ex) {
-            // TODO Auto-generated catch block
-            //e.printStackTrace();
+              //e.printStackTrace();
             System.out.println(ex.getMessage());
         }        
 //        System.out.println(uname + " login status is: " + statuscode);

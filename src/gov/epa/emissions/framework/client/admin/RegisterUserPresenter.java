@@ -16,25 +16,12 @@ public class RegisterUserPresenter implements EmfPresenter {
         this.view = view;
     }
 
-    public User notifyRegister() throws EmfException {
-        User user = new User();
-
-        user.setUserName(view.getUsername());
-        user.setPassword(view.getPassword());
-        user.confirmPassword(view.getConfirmPassword());
-
-        user.setFullName(view.getFullName());
-        user.setEmailAddr(view.getEmail());
-        user.setWorkPhone(view.getPhone());
-        user.setAffiliation(view.getAffiliation());
-
+    public void notifyRegister(User user) throws EmfException {
         model.createUser(user);
 
         // TODO: should not autologin if request is from UserManager.
         // TODO: what's the admin status ?
         model.authenticate(user.getUserName(), user.getPassword(), false);
-        
-        return user;
     }
 
     public void notifyCancel() {

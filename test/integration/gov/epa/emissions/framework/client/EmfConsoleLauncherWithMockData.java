@@ -16,7 +16,10 @@ public class EmfConsoleLauncherWithMockData {
         EmfConsole console = new EmfConsole(null, createUserAdmin());
         console.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        console.setVisible(true);
+        EmfConsolePresenter presenter = new EmfConsolePresenter(console);
+        presenter.observe();
+
+        console.display();
     }
 
     static private EMFUserAdmin createUserAdmin() throws EmfException {

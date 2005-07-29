@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
+import gov.epa.emissions.framework.client.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.EmfWindow;
 import gov.epa.emissions.framework.client.ErrorMessagePanel;
 import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
@@ -79,16 +80,16 @@ public class LoginWindow extends EmfWindow implements LoginView {
         signIn.setName("signIn");
         signIn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (presenter != null) {
-                    try {
-                        User user = presenter.notifyLogin(username.getText(), new String(password.getPassword()));
-                        errorMessagePanel.clear();
-                        refresh();
-                        launchConsole(user);
-                        close();
-                    } catch (EmfException e) {
-                        errorMessagePanel.setMessage(e.getMessage());
-                    }
+                if (presenter == null)
+                    return;
+                try {
+                    User user = presenter.notifyLogin(username.getText(), new String(password.getPassword()));
+                    errorMessagePanel.clear();
+                    refresh();
+                    launchConsole(user);
+                    close();
+                } catch (EmfException e) {
+                    errorMessagePanel.setMessage(e.getMessage());
                 }
             }
 
@@ -112,7 +113,10 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
     private void launchConsole(User user) {
         EmfConsole console = new EmfConsole(user, userAdmin);
-        console.setVisible(true);
+        EmfConsolePresenter presenter = new EmfConsolePresenter(console);
+        presenter.observe();
+
+        console.display();
     }
 
     private JPanel createLoginPanel() {

@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -41,11 +42,15 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     private JTextField email;
 
+    private JCheckBox isAdmin;
+
     private PostRegisterStrategy postRegisterStrategy;
 
     private EmfWidgetContainer parent;
 
     private ErrorMessagePanel errorMessagePanel;
+
+    private JPanel profileValuesPanel;
 
     public RegisterUserPanel(EMFUserAdmin userAdmin, PostRegisterStrategy postRegisterStrategy,
             EmfWidgetContainer parent) {
@@ -54,7 +59,19 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
         createLayout();
 
-        this.setSize(new Dimension(350, 400));
+        this.setSize(new Dimension(350, 425));
+    }
+
+    //TODO: a simple, clear way ?
+    public static RegisterUserPanel createWithAdminOption(EMFUserAdmin userAdmin,
+            PostRegisterStrategy postRegisterStrategy, EmfWidgetContainer parent) {
+        RegisterUserPanel panel = new RegisterUserPanel(userAdmin, postRegisterStrategy, parent);
+        
+        panel.isAdmin = new JCheckBox("Administrator");
+        panel.profileValuesPanel.add(panel.isAdmin);
+        panel.refresh();
+        
+        return panel;
     }
 
     private void createLayout() {
@@ -101,15 +118,26 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
     }
 
     private void registerUser() {
-        if (presenter != null) {
-            try {
-                User user = presenter.notifyRegister();
-                postRegisterStrategy.execute(user);
-                close();
-            } catch (EmfException e) {
-                errorMessagePanel.setMessage(e.getMessage());
-                refresh();
-            }
+        if (presenter == null)
+            return;
+
+        try {
+            User user = new User();
+            user.setUserName(username.getText());
+            user.setPassword(new String(password.getPassword()));
+            user.confirmPassword(new String(confirmPassword.getPassword()));
+            user.setFullName(name.getText());
+            user.setAffiliation(affiliation.getText());
+            user.setEmailAddr(email.getText());
+            user.setWorkPhone(phone.getText());
+            user.setInAdminGroup(isAdmin.isSelected());
+
+            presenter.notifyRegister(user);
+            postRegisterStrategy.execute(user);
+            close();
+        } catch (EmfException e) {
+            errorMessagePanel.setMessage(e.getMessage());
+            refresh();
         }
     }
 
@@ -149,39 +177,41 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
     }
 
     private JPanel createProfilePanel() {
-        JPanel panel = new JPanel();
+        JPanel profilePanel = new JPanel();
 
         Border titledBorder = createBorder("Profile");
-        panel.setBorder(titledBorder);
+        profilePanel.setBorder(titledBorder);
 
-        GridLayout labelsLayoutManager = new GridLayout(4, 1);
+        GridLayout labelsLayoutManager = new GridLayout(5, 1);
         labelsLayoutManager.setVgap(15);
-        JPanel labelsPanel = new JPanel(labelsLayoutManager);
-        labelsPanel.add(new JLabel("Name"));
-        labelsPanel.add(new JLabel("Affiliation"));
-        labelsPanel.add(new JLabel("Phone"));
-        labelsPanel.add(new JLabel("Email"));
+        JPanel profileLabelsPanel = new JPanel(labelsLayoutManager);
+        
+        profileLabelsPanel.setLayout(labelsLayoutManager);
+        profileLabelsPanel.add(new JLabel("Name"));
+        profileLabelsPanel.add(new JLabel("Affiliation"));
+        profileLabelsPanel.add(new JLabel("Phone"));
+        profileLabelsPanel.add(new JLabel("Email"));
 
-        panel.add(labelsPanel);
+        profilePanel.add(profileLabelsPanel);
 
-        GridLayout valuesLayoutManager = new GridLayout(4, 1);
+        GridLayout valuesLayoutManager = new GridLayout(5, 1);
         valuesLayoutManager.setVgap(10);
-        JPanel valuesPanel = new JPanel(valuesLayoutManager);
-
+        profileValuesPanel = new JPanel(valuesLayoutManager);
+        
         name = new JTextField(10);
-        valuesPanel.add(name);
+        profileValuesPanel.add(name);
         affiliation = new JTextField(10);
-        valuesPanel.add(affiliation);
+        profileValuesPanel.add(affiliation);
         phone = new JTextField(10);
-        valuesPanel.add(phone);
+        profileValuesPanel.add(phone);
         email = new JTextField(10);
-        valuesPanel.add(email);
+        profileValuesPanel.add(email);
 
-        panel.add(valuesPanel);
+        profilePanel.add(profileValuesPanel);
 
-        panel.setMaximumSize(new Dimension(300, 175));
+        profilePanel.setMaximumSize(new Dimension(300, 175));
 
-        return panel;
+        return profilePanel;
     }
 
     private Border createBorder(String title) {
@@ -189,34 +219,6 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         border.setTitleJustification(TitledBorder.LEFT);
 
         return border;
-    }
-
-    public String getUsername() {
-        return username.getText();
-    }
-
-    public String getPassword() {
-        return new String(password.getPassword());
-    }
-
-    public String getConfirmPassword() {
-        return new String(confirmPassword.getPassword());
-    }
-
-    public String getEmail() {
-        return email.getText();
-    }
-
-    public String getPhone() {
-        return phone.getText();
-    }
-
-    public String getAffiliation() {
-        return affiliation.getText();
-    }
-
-    public String getFullName() {
-        return name.getText();
     }
 
     public void close() {
