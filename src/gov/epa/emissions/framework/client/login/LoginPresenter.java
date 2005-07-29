@@ -29,7 +29,4 @@ public class LoginPresenter implements EmfPresenter {
         view.setObserver(this);
     }
 
-    public void notifyResetPassword(String username) {
-    }
-
 }

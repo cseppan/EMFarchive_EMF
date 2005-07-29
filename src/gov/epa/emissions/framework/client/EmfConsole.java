@@ -31,11 +31,13 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     // TODO: should we user 'ServiceLocator' instead, since other services will
     // also be needed
+
+    // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(User user, EMFUserAdmin userAdmin) {
         this.user = user;
         this.userAdmin = userAdmin;
 
-        super.setJMenuBar(createMenuBar());
+        super.setJMenuBar(createMenuBarPostLogin());
 
         super.setSize(new Dimension(900, 700));
         super.setLocation(new Point(300, 150));
@@ -48,23 +50,30 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         this.setContentPane(desktop);
     }
 
-    private JMenuBar createMenuBar() {
+    private JMenuBar createMenuBarPostLogin() {
         JMenuBar menubar = new JMenuBar();
 
-        menubar.add(createFileMenu());
+        menubar.add(createFileMenuPostLogin());
         menubar.add(createManageMenu());
         menubar.add(createHelpMenu());
 
         return menubar;
     }
 
-    private JMenu createFileMenu() {
+    private JMenu createFileMenuPostLogin() {
         JMenu menu = new JMenu("File");
 
         menu.add(createDisabledMenuItem("Import"));
         menu.add(createDisabledMenuItem("Export"));
         menu.addSeparator();
-        menu.add(createDisabledMenuItem("Logout"));
+
+        JMenuItem logout = new JMenuItem("Logout");
+        logout.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                logout();
+            }
+        });
+        menu.add(logout);
 
         JMenuItem exit = new JMenuItem("Exit");
         exit.addActionListener(new ActionListener() {
@@ -76,6 +85,52 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         menu.add(exit);
 
         return menu;
+    }
+
+    private void logout() {
+        user = null;
+        super.setJMenuBar(createMenuBarPreLogin());
+
+        refresh();
+    }
+
+    private JMenuBar createMenuBarPreLogin() {
+        JMenuBar menubar = new JMenuBar();
+        menubar.add(createFileMenuPreLogin());
+        menubar.add(createHelpMenu());
+
+        return menubar;
+    }
+
+    private JMenu createFileMenuPreLogin() {
+        JMenu menu = new JMenu("File");
+
+        JMenuItem login = new JMenuItem("Login");
+        login.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                login();
+            }
+        });
+        menu.add(login);
+
+        JMenuItem exit = new JMenuItem("Exit");
+        exit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                // TODO: logout before exiting. Should prompt the user ?
+                System.exit(0);
+            }
+        });
+        menu.add(exit);
+
+        return menu;
+    }
+
+    private void login() {
+        
+    }
+
+    private void refresh() {
+        super.validate();
     }
 
     private JMenuItem createDisabledMenuItem(String name) {
