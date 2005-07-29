@@ -183,7 +183,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         int[] selected = selectModel.getSelectedIndexes();
         if (selected.length == 0)
             return;
-        int option = JOptionPane.showConfirmDialog(null, "Would you like to Delete User - ", "Delete User",
+        int option = JOptionPane.showConfirmDialog(null, "Are you sure about deleting user(s)", "Delete User",
                 JOptionPane.YES_NO_OPTION);
         if (option == 1) {
             refresh();

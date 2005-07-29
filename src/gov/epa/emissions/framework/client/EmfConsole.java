@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.client;
 
-import gov.epa.emissions.framework.client.admin.UserManagerWindow;
+import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
+import gov.epa.emissions.framework.client.admin.UpdateUserWindow;
 import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
+import gov.epa.emissions.framework.client.admin.UserManagerWindow;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -100,9 +102,26 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
             });
             menu.add(users);
         }
-        menu.add(createDisabledMenuItem("My Profile"));
+
+        JMenuItem myProfile = new JMenuItem("My Profile");
+        myProfile.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                displayUpdateUser();
+            }
+        });
+        menu.add(myProfile);
 
         return menu;
+    }
+
+    private void displayUpdateUser() {
+        UpdateUserWindow view = new UpdateUserWindow(user);
+        UpdateUserPresenter presenter = new UpdateUserPresenter(userAdmin, view);
+        presenter.observe();
+
+        desktop.add(view);
+
+        view.display();
     }
 
     public void displayUserManager() {
