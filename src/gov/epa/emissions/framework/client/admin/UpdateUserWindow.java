@@ -12,10 +12,13 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -42,9 +45,12 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
 
     private JPasswordField confirmPassword;
 
+    private String windowTitle;
+
     // TODO: refactor the duplication b/w register & update user widgets
     public UpdateUserWindow(User user) {
         super("Update User - " + user.getUserName());
+        this.windowTitle = "Update User - " + user.getUserName();
 
         this.user = user;
 
@@ -84,13 +90,13 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
 
-        name = new JTextField(user.getFullName(), 10);
+        name = createEditAwareTextField(user.getFullName());
         valuesPanel.add(name);
-        affiliation = new JTextField(user.getAffiliation(), 10);
+        affiliation = createEditAwareTextField(user.getAffiliation());
         valuesPanel.add(affiliation);
-        phone = new JTextField(user.getWorkPhone(), 10);
+        phone = createEditAwareTextField(user.getWorkPhone());
         valuesPanel.add(phone);
-        email = new JTextField(user.getEmailAddr(), 10);
+        email = createEditAwareTextField(user.getEmailAddr());
         valuesPanel.add(email);
 
         panel.add(valuesPanel);
@@ -98,6 +104,36 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
         panel.setMaximumSize(new Dimension(300, 175));
 
         return panel;
+    }
+
+    private JTextField createEditAwareTextField(String value) {
+        JTextField field = new JTextField(value, 10);
+
+        field.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent event) {
+                markAsEdited();
+            }
+        });
+
+        return field;
+    }
+
+    private JPasswordField createEditAwarePasswordField() {
+        JPasswordField field = new JPasswordField(10);
+
+        field.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent event) {
+                markAsEdited();
+            }
+        });
+
+        return field;
+    }
+
+    private void markAsEdited() {
+        this.setTitle(windowTitle + " *");
+        if (presenter != null)
+            presenter.notifyChanges();
     }
 
     private JPanel createLoginPanel() {
@@ -119,9 +155,9 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
 
         JLabel username = new JLabel(user.getUserName(), 10);
         valuesPanel.add(username);
-        password = new JPasswordField(10);
+        password = createEditAwarePasswordField();
         valuesPanel.add(password);
-        confirmPassword = new JPasswordField(10);
+        confirmPassword = createEditAwarePasswordField();
         valuesPanel.add(confirmPassword);
 
         panel.add(valuesPanel);
@@ -140,24 +176,24 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
         layout.setVgap(25);
         container.setLayout(layout);
 
-        JButton cancel = new JButton("Cancel");
-        cancel.addActionListener(new ActionListener() {
+        JButton close = new JButton("Close");
+        close.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 if (presenter != null) {
-                    presenter.notifyCancel();
+                    presenter.notifyClose();
                 }
             }
         });
 
-        JButton ok = new JButton("Ok");
-        ok.addActionListener(new ActionListener() {
+        JButton save = new JButton("Save");
+        save.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 updateUser();
             }
         });
 
-        container.add(ok);
-        container.add(cancel);
+        container.add(save);
+        container.add(close);
 
         panel.add(container, BorderLayout.EAST);
 
@@ -177,7 +213,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
                 user.confirmPassword(new String(confirmPassword.getPassword()));
             }
 
-            presenter.notifyUpdate(user);
+            presenter.notifySave(user);
             close();
         } catch (EmfException e) {
             errorMessagePanel.setMessage(e.getMessage());
@@ -201,6 +237,14 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
 
     public void setObserver(UpdateUserPresenter presenter) {
         this.presenter = presenter;
+    }
+
+    public void closeOnConfirmLosingChanges() {
+        int option = JOptionPane.showConfirmDialog(null,
+                "You will lose changes if you Close without Save. \nContinue ?",
+                "Close", JOptionPane.YES_NO_OPTION);
+        if (option == 0)
+            close();
     }
 
 }
