@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.client.admin.UpdateUserWindow;
 import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
 import gov.epa.emissions.framework.client.admin.UserManagerWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
-import gov.epa.emissions.framework.client.login.SimpleLoginWindow;
+import gov.epa.emissions.framework.client.login.LoginWindow;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -39,7 +39,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         this.user = user;
         this.userAdmin = userAdmin;
 
-        super.setJMenuBar(createPostLoginMenuBar());
+        super.setJMenuBar(createMenuBar());
 
         super.setSize(new Dimension(900, 700));
         super.setLocation(new Point(300, 150));
@@ -52,17 +52,17 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         this.setContentPane(desktop);
     }
 
-    private JMenuBar createPostLoginMenuBar() {
+    private JMenuBar createMenuBar() {
         JMenuBar menubar = new JMenuBar();
 
-        menubar.add(createPostLoginFileMenu());
+        menubar.add(createFileMenu());
         menubar.add(createManageMenu());
         menubar.add(createHelpMenu());
 
         return menubar;
     }
 
-    private JMenu createPostLoginFileMenu() {
+    private JMenu createFileMenu() {
         JMenu menu = new JMenu("File");
 
         menu.add(createDisabledMenuItem("Import"));
@@ -90,55 +90,17 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
     }
 
     private void logout() {
-        user = null;
-        super.setJMenuBar(createPreLoginMenuBar());
-
-        refresh();
-    }
-
-    private JMenuBar createPreLoginMenuBar() {
-        JMenuBar menubar = new JMenuBar();
-        menubar.add(createPreLoginFileMenu());
-        menubar.add(createHelpMenu());
-
-        return menubar;
-    }
-
-    private JMenu createPreLoginFileMenu() {
-        JMenu menu = new JMenu("File");
-
-        JMenuItem login = new JMenuItem("Login");
-        login.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                login();
-            }
-        });
-        menu.add(login);
-
-        JMenuItem exit = new JMenuItem("Exit");
-        exit.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                // TODO: logout before exiting. Should prompt the user ?
-                System.exit(0);
-            }
-        });
-        menu.add(exit);
-
-        return menu;
-    }
-
-    private void login() {
-        SimpleLoginWindow view = new SimpleLoginWindow(userAdmin);
-
+        LoginWindow view = new LoginWindow(userAdmin);
         LoginPresenter presenter = new LoginPresenter(userAdmin, view);
         presenter.observe();
 
-        desktop.add(view);
         view.display();
+        
+        close();
     }
 
-    private void refresh() {
-        super.validate();
+    private void close() {
+        super.dispose();
     }
 
     private JMenuItem createDisabledMenuItem(String name) {
@@ -189,7 +151,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     public void displayUserManager() {
         try {
-            UserManagerWindow console = new UserManagerWindow(userAdmin);
+            UserManagerWindow console = new UserManagerWindow(userAdmin, this);
             UserManagerPresenter presenter = new UserManagerPresenter(userAdmin, console);
             presenter.observe();
 

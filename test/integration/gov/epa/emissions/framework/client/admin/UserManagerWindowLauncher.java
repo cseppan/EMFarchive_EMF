@@ -18,13 +18,13 @@ public class UserManagerWindowLauncher {
         UserManagerWindowLauncher launcher = new UserManagerWindowLauncher();
 
         EMFUserAdmin userAdmin = launcher.createUserAdmin();
-        UserManagerWindow console = new UserManagerWindow(userAdmin);
+        JFrame frame = new JFrame();
+
+        UserManagerWindow console = new UserManagerWindow(userAdmin, frame);
         UserManagerPresenter presenter = new UserManagerPresenter(userAdmin, console);
         presenter.observe();
 
         console.setVisible(true);
-
-        JFrame frame = new JFrame();
 
         launcher.addAsInternalFrame(console, frame);
         

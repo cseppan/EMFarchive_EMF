@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -41,9 +42,12 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
 
     private ErrorMessagePanel errorMessagePanel;
 
-    public UserManagerWindow(EMFUserAdmin userAdmin) throws Exception {
+    private JFrame parentConsole;
+
+    public UserManagerWindow(EMFUserAdmin userAdmin, JFrame parentConsole) throws Exception {
         super("User Management Console");
         this.userAdmin = userAdmin;
+        this.parentConsole = parentConsole;
         model = new UserManagerTableModel(userAdmin);
         selectModel = new SortFilterSelectModel(model);
 
@@ -53,14 +57,14 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         // TODO: OverallTableModel has a bug w/ respect to row-count &
         // cannot refresh itself. So, we will regen the layout on every
         // refresh - it's a HACK. Will need to be addressed
-        createLayout();
+        createLayout(parentConsole);
 
         this.setSize(new Dimension(500, 300));
     }
 
-    private void createLayout() {
+    private void createLayout(JFrame parentConsole) {
         layout.removeAll();
-        sortFilterSelectPanel = new SortFilterSelectionPanel(this, selectModel);
+        sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         createLayout(layout, sortFilterSelectPanel);
         listenForUpdateSelection(sortFilterSelectPanel.getTable());
     }
@@ -228,7 +232,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
 
     public void refresh() {
         selectModel.refresh();
-        createLayout();// TODO: A HACK, until we fix row-count issues w/
+        createLayout(parentConsole);// TODO: A HACK, until we fix row-count issues w/
         // SortFilterSelectPanel
         this.validate();
     }
