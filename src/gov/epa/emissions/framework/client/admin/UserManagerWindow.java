@@ -233,4 +233,8 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         this.validate();
     }
 
+    public void display() {
+        super.setVisible(true);
+    }
+
 }

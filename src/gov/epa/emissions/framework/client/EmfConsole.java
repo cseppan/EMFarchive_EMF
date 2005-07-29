@@ -4,6 +4,8 @@ import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
 import gov.epa.emissions.framework.client.admin.UpdateUserWindow;
 import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
 import gov.epa.emissions.framework.client.admin.UserManagerWindow;
+import gov.epa.emissions.framework.client.login.LoginPresenter;
+import gov.epa.emissions.framework.client.login.SimpleLoginWindow;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -37,7 +39,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         this.user = user;
         this.userAdmin = userAdmin;
 
-        super.setJMenuBar(createMenuBarPostLogin());
+        super.setJMenuBar(createPostLoginMenuBar());
 
         super.setSize(new Dimension(900, 700));
         super.setLocation(new Point(300, 150));
@@ -50,17 +52,17 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         this.setContentPane(desktop);
     }
 
-    private JMenuBar createMenuBarPostLogin() {
+    private JMenuBar createPostLoginMenuBar() {
         JMenuBar menubar = new JMenuBar();
 
-        menubar.add(createFileMenuPostLogin());
+        menubar.add(createPostLoginFileMenu());
         menubar.add(createManageMenu());
         menubar.add(createHelpMenu());
 
         return menubar;
     }
 
-    private JMenu createFileMenuPostLogin() {
+    private JMenu createPostLoginFileMenu() {
         JMenu menu = new JMenu("File");
 
         menu.add(createDisabledMenuItem("Import"));
@@ -89,20 +91,20 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     private void logout() {
         user = null;
-        super.setJMenuBar(createMenuBarPreLogin());
+        super.setJMenuBar(createPreLoginMenuBar());
 
         refresh();
     }
 
-    private JMenuBar createMenuBarPreLogin() {
+    private JMenuBar createPreLoginMenuBar() {
         JMenuBar menubar = new JMenuBar();
-        menubar.add(createFileMenuPreLogin());
+        menubar.add(createPreLoginFileMenu());
         menubar.add(createHelpMenu());
 
         return menubar;
     }
 
-    private JMenu createFileMenuPreLogin() {
+    private JMenu createPreLoginFileMenu() {
         JMenu menu = new JMenu("File");
 
         JMenuItem login = new JMenuItem("Login");
@@ -126,7 +128,13 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
     }
 
     private void login() {
-        
+        SimpleLoginWindow view = new SimpleLoginWindow(userAdmin);
+
+        LoginPresenter presenter = new LoginPresenter(userAdmin, view);
+        presenter.observe();
+
+        desktop.add(view);
+        view.display();
     }
 
     private void refresh() {
@@ -186,7 +194,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
             presenter.observe();
 
             desktop.add(console);
-            console.setVisible(true);
+            console.display();
         } catch (Exception e) {
             // TODO: error handling
         }

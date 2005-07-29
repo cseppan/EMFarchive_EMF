@@ -19,7 +19,7 @@ public class Launcher {
         LoginPresenter presenter = new LoginPresenter(userAdmin, login);
         presenter.observe();
 
-        login.setVisible(true);
+        login.display();
     }
 
 }

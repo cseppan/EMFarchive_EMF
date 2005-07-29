@@ -1,13 +1,8 @@
 package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfConsole;
-import gov.epa.emissions.framework.client.EmfConsolePresenter;
-import gov.epa.emissions.framework.client.EmfWindow;
+import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.ErrorMessagePanel;
-import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
-import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
-import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
 import gov.epa.emissions.framework.commons.User;
 
@@ -15,22 +10,17 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JSeparator;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
-public class LoginWindow extends EmfWindow implements LoginView {
+public class SimpleLoginWindow extends EmfInteralFrame implements LoginView {
 
     private JTextField username;
 
@@ -38,19 +28,13 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
     private LoginPresenter presenter;
 
-    private EMFUserAdmin userAdmin;
-
     private ErrorMessagePanel errorMessagePanel;
 
-    public LoginWindow(EMFUserAdmin userAdmin) {
-        this.userAdmin = userAdmin;
-        JPanel layoutPanel = createLayout();
+    public SimpleLoginWindow(EMFUserAdmin userAdmin) {
+        super("Login");
 
-        this.setSize(new Dimension(350, 250));
-        this.setLocation(new Point(400, 200));
-        this.setTitle("Login");
-
-        this.getContentPane().add(layoutPanel);
+        this.getContentPane().add(createLayout());
+        this.setSize(new Dimension(350, 200));
     }
 
     private JPanel createLayout() {
@@ -61,8 +45,6 @@ public class LoginWindow extends EmfWindow implements LoginView {
         panel.add(errorMessagePanel);
         panel.add(createLoginPanel());
         panel.add(createButtonsPanel());
-        panel.add(new JSeparator(SwingConstants.HORIZONTAL));
-        panel.add(createLoginOptionsPanel());
 
         return panel;
     }
@@ -84,9 +66,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
                     return;
                 try {
                     User user = presenter.notifyLogin(username.getText(), new String(password.getPassword()));
-                    errorMessagePanel.clear();
-                    refresh();
-                    launchConsole(user);
+                    // TODO: return the user to the listener
                     close();
                 } catch (EmfException e) {
                     errorMessagePanel.setMessage(e.getMessage());
@@ -109,14 +89,6 @@ public class LoginWindow extends EmfWindow implements LoginView {
         panel.add(container, BorderLayout.EAST);
 
         return panel;
-    }
-
-    private void launchConsole(User user) {
-        EmfConsole console = new EmfConsole(user, userAdmin);
-        EmfConsolePresenter presenter = new EmfConsolePresenter(console);
-        presenter.observe();
-
-        console.display();
     }
 
     private JPanel createLoginPanel() {
@@ -146,53 +118,6 @@ public class LoginWindow extends EmfWindow implements LoginView {
         return panel;
     }
 
-    private JPanel createLoginOptionsPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        JLabel forgotPassword = new JLabel("<html><a href=''>Forgot your Password ?</a></html>");
-        forgotPassword.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent event) {// TODO: deferred
-            }
-        });
-        JPanel forgotPasswordPanel = new JPanel(new BorderLayout());
-        forgotPasswordPanel.add(forgotPassword);
-
-        panel.add(forgotPasswordPanel, BorderLayout.EAST);
-
-        JLabel register = new JLabel("<html><a href=''>Not yet registered ?</a></html>");
-        register.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent arg0) {
-                try {
-                    launchCreateUser();
-                } catch (Exception e) {
-                    // TODO: launch failure ??
-                }
-                close();
-            }
-        });
-
-        JPanel registerPanel = new JPanel(new BorderLayout());
-        registerPanel.add(register);
-
-        panel.add(registerPanel, BorderLayout.EAST);
-
-        return panel;
-    }
-
-    private void launchCreateUser() throws Exception {
-        PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(userAdmin);
-        RegisterUserWindow window = new RegisterUserWindow(userAdmin, strategy);
-        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, window.getView());
-        presenter.observe();
-
-        window.display();
-    }
-
-    private void refresh() {
-        super.validate();
-    }
-
     public void close() {
         this.dispose();
     }
@@ -204,5 +129,4 @@ public class LoginWindow extends EmfWindow implements LoginView {
     public void display() {
         super.setVisible(true);
     }
-
 }
