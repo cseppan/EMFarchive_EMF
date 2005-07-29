@@ -10,24 +10,34 @@ package gov.epa.emissions.framework.commons;
 
 import gov.epa.emissions.framework.EmfException;
 
-
 /**
  * @author Conrad F. D'Cruz
- *
- * This is the interface to the EMF systems User Admin functions
- * The functions are implemented in the EMFUserAdminTransport class.
+ * 
+ * This is the interface to the EMF systems User Admin functions The functions
+ * are implemented in the EMFUserAdminTransport class.
  * 
  */
 public interface EMFUserAdmin {
 
-    public boolean isNewUser() throws EmfException;
-    public boolean validate() throws EmfException;
-    public void authenticate(String userName, String pwd, boolean wantAdminStatus) throws EmfException;    
-    public boolean resetPassword() throws EmfException;
+    public void authenticate(String userName, String pwd, boolean wantAdminStatus) throws EmfException;
+
     public User getUser(String userName) throws EmfException;
+
     public User[] getUsers() throws EmfException;
+
     public void createUser(User newUser) throws EmfException;
+
     public void updateUser(User newUser) throws EmfException;
+
     public void updateUsers(User[] users) throws EmfException;
+
     public void deleteUser(String userName) throws EmfException;
+
+    // UNUSED methods
+    public boolean isNewUser() throws EmfException;
+
+    public boolean validate() throws EmfException;
+
+    public boolean resetPassword() throws EmfException;
+
 }

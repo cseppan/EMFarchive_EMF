@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test/integration"/>
 	<classpathentry kind="src" path="test/functional"/>
 	<classpathentry kind="src" path="test/unit"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
@@ -28,5 +29,8 @@
 	<classpathentry kind="lib" path="lib/tomcat/mysql-connector-java-3.1.10-bin.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat/catalina-ant.jar"/>
 	<classpathentry kind="lib" path="lib/analysis-engine.jar"/>
+	<classpathentry sourcepath="/Abbot/src.jar" kind="lib" path="lib/dev/abbot.jar"/>
+	<classpathentry kind="lib" path="lib/dev/jdom.jar"/>
+	<classpathentry kind="lib" path="lib/dev/gnu-regexp.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -12,14 +12,16 @@
     <property name="lib.dir" value="lib" />
     <property name="test.unit.dir" value="test/unit" />
     <property name="test.functional.dir" value="test/functional" />
-
+    <property name="test.integration.dir" value="test/integration" />
+    
     <property name="build.home" value="build" />
     <property name="web.dir" value="web" />
     <property name="build.dist.dir" value="${build.home}/dist" />
     <property name="build.web-inf.dir" value="${build.dist.dir}/WEB-INF" />
     <property name="build.classes.dir" value="${build.web-inf.dir}/classes" />
 
-    <property name="test-reports.dir" value="${build.home}/reports/test" />
+    <property name="reports.unittests.dir" value="${build.home}/reports/unit-tests" />
+    <property name="reports.functionaltests.dir" value="${build.home}/reports/functional-tests" />
     <property name="app.name" value="emf" />
     <property name="app.path" value="/${app.name}" />
     <property name="war-path"
@@ -48,7 +50,8 @@
         <mkdir dir="${build.home}" />
         <mkdir dir="${build.web-inf.dir}" />
         <mkdir dir="${build.classes.dir}" />
-        <mkdir dir="${test-reports.dir}" />
+        <mkdir dir="${reports.unittests.dir}" />
+        <mkdir dir="${reports.functionaltests.dir}" />
     </target>
 
     <target name="clean">
@@ -83,7 +86,7 @@
             <classpath refid="classpath" />
             <formatter type="xml" />
 
-            <batchtest fork="yes" todir="${test-reports.dir}">
+            <batchtest fork="yes" todir="${reports.unittests.dir}">
                 <fileset dir="${test.unit.dir}">
                     <include name="**/*Test*.java" />
                 </fileset>
@@ -91,7 +94,20 @@
         </junit>
     </target>
 
-    <target name="all" depends="compile, unit-tests" />
+    <target name="functional-tests" depends="compile">
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath refid="classpath" />
+            <formatter type="xml" />
+
+            <batchtest fork="yes" todir="${reports.functionaltests.dir}">
+                <fileset dir="${test.functional.dir}">
+                    <include name="**/*Test*.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="all" depends="compile, unit-tests, functional-tests" />
 
     <!--  =================== CVS Targets ====================================== -->
     <target name="cvs-properties-load">
