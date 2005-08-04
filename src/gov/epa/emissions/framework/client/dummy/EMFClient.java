@@ -8,9 +8,14 @@
  */
 package gov.epa.emissions.framework.client.dummy;
   
+import java.util.Date;
+
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.transport.EMFStatusTransport;
 import gov.epa.emissions.framework.client.transport.EMFUserAdminTransport;
+import gov.epa.emissions.framework.commons.EMFStatus;
 import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.Status;
 import gov.epa.emissions.framework.commons.User;
 
 /**
@@ -18,31 +23,58 @@ import gov.epa.emissions.framework.commons.User;
  *
  */
 public class EMFClient {
-    private static String endpoint = 
+    private static String endpoint1 = 
         "http://ben.cep.unc.edu:8080/emf/services/EMFUserManagerService";
-
+    private static String endpoint2 = 
+    "http://ben.cep.unc.edu:8080/emf/services/EMFStatusService";
+        
+    public EMFClient() throws EmfException{
+        super();
+        //callServiceForGet();
+        callServiceForInsert();
+    }
     public static void main(String[] args) {
         
-        EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport(endpoint);
-        System.out.println("IN EMFCLIENT main");
-       
-        String uname = "cdcruz2";
-        String pwd = "conrad12345";
-        
-        try {
-            emfUserAdmin.authenticate(uname, pwd, true);
-            emfUserAdmin.authenticate(uname, pwd, false);        
-            User user = emfUserAdmin.getUser(uname);
-            if (user == null){
-                System.out.println("User object is null");
-            }else{
-                System.out.println("getUser succeeded: " + user.getFullName());
-                
-            }
-        } catch (EmfException ex) {
-              //e.printStackTrace();
-            System.out.println(ex.getMessage());
-        }        
+//        EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport(endpoint1);
+//        EMFStatus emfStatus = new EMFStatusTransport(endpoint2);
+//
+//        System.out.println("IN EMFCLIENT main");
+//       
+//        String uname = "cdcruz";
+//        String pwd = "conrad12345";
+//  
+//        try{
+//            Status[] allStats = emfStatus.getMessages(uname);
+//            System.out.println("Array of status messages size= " + allStats.length);
+//            Status aStat = allStats[0];
+//            System.out.println("name: " + aStat.getUserName());
+//            System.out.println("" + aStat.getMsgType());
+//            System.out.println("" + aStat.getMessage());
+//            System.out.println("" + aStat.getTimestamp());
+//            Status aStat = new Status();
+//            aStat.setMessage("From the Dummy Client");
+//            aStat.setMsgType("DUMMY");
+//            aStat.setTimestamp(new Date());
+//            aStat.setUserName("cdcruz");
+//            emfStatus.setStatus(aStat);
+//            
+//        }catch(EmfException ex){
+//            ex.printStackTrace();
+//        }
+//        try {
+//            emfUserAdmin.authenticate(uname, pwd, true);
+//            emfUserAdmin.authenticate(uname, pwd, false);        
+//            User user = emfUserAdmin.getUser(uname);
+//            if (user == null){
+//                System.out.println("User object is null");
+//            }else{
+//                System.out.println("getUser succeeded: " + user.getFullName());
+//                
+//            }
+//        } catch (EmfException ex) {
+//              //e.printStackTrace();
+//            System.out.println(ex.getMessage());
+//        }        
 //        System.out.println(uname + " login status is: " + statuscode);
 
 
@@ -156,6 +188,47 @@ public class EMFClient {
         }
 
 
-        
-    }//main
+    /**
+     * @throws EmfException
+     * 
+     */
+    private void callServiceForInsert() throws EmfException {
+        Status aStat = new Status();
+        aStat.setMessage("import started for file XYZABC");
+        aStat.setMsgType("INFOMATICS");
+        aStat.setTimestamp(new Date());
+        aStat.setUserName("cdcruz");
+      EMFStatus emfStatusSvc= new EMFStatusTransport(endpoint2);
+
+        System.out.println("HibClient: Before call to setStatus");
+        emfStatusSvc.setStatus(aStat);
+        System.out.println("HibClient: After call to setStatus");
+
+    }
+
+    /**
+     * 
+     */
+    private void callServiceForGet() {
+        EMFStatus emfStatusSvc = new EMFStatusTransport(endpoint2);
+        try {
+            Status[] stats = emfStatusSvc.getMessages("cdcruz");
+            System.out.println("Total number of status messages: " + stats.length);
+            
+            for (int i=0; i<stats.length; i++){
+                Status aStat = stats[i];
+                //System.out.println("" + aStat.getStatusid());
+                System.out.println("" + aStat.getUserName());
+                System.out.println("" + aStat.getTimestamp());
+                System.out.println("" + aStat.getMsgType());
+                System.out.println("" + aStat.getMessage());
+                System.out.println("" + aStat.isMsgRead());
+                
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+   
+    }
 
