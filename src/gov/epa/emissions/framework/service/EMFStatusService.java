@@ -29,7 +29,6 @@ public class EMFStatusService implements EMFStatus{
      */
     public EMFStatusService() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     /* (non-Javadoc)
@@ -50,7 +49,7 @@ public class EMFStatusService implements EMFStatus{
         return null;
     }
 
-    public void setStatus(Status status){
+    public void setStatus(Status status) throws EmfException{
         System.out.println("EMFStatusService: setStatus " + status.getUserName());
         Session session = HibernateUtils.currentSession();
         System.out.println("EMFStatusService: Before insertStatusMessage");
