@@ -8,18 +8,55 @@
  */
 package gov.epa.emissions.framework.commons;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author Conrad F. D'Cruz
  *
  */
-public class Status {
+public class Status implements Serializable{
 
+    private String statusid=null;
     private String userName;
     private String msgType;
     private String message;
+    private boolean msgRead=false;
     private Date timestamp = null;
+
+    /**
+     * @return Returns the statusid.
+     */
+    public String getStatusid() {
+        return statusid;
+    }
+    /**
+     * @param statusid The statusid to set.
+     */
+    public void setStatusid(String statusid) {
+        this.statusid = statusid;
+    }
+
+    /**
+     * @return Returns the msgRead.
+     */
+    public boolean isMsgRead() {
+        return msgRead;
+    }
+
+    /**
+     * @param msgRead The msgRead to reset.
+     */
+    public void setMsgRead() {
+        this.msgRead=true;
+    }
+
+    /**
+     * @param msgRead The msgRead to set.
+     */
+    public void setMsgRead(boolean msgRead) {
+        this.msgRead = msgRead;
+    }
 
     /**
      * The default constructor 
