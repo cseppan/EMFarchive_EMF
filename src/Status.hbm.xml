@@ -2,17 +2,15 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 2.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
 
 <hibernate-mapping> 
-  <class name="gov.epa.emissions.framework.commons.Status" table="statusmessages">
- 
-    <id column="status_id" name="statusid" type="java.lang.Long"> 
-      <generator class="sequence"/> 
-    </id> 
-    
+  <class name="gov.epa.emissions.framework.commons.Status" table="statusmessages"> 
+ 	<id name="statusid" type="string" column="id" unsaved-value="0">
+	  <generator class="uuid"/>
+ 	</id>
 	<property column="user_name" length="15" name="userName" not-null="true" type="java.lang.String"/>
 	<property column="msg_type" length="255" name="msgType" not-null="true" type="java.lang.String"/>
 	<property column="message" length="255" name="message" type="java.lang.String"/>
 	<property column="date" length="10" name="timestamp" type="java.util.Date"/>
- 
+    <property column="msg_read" name="msgRead" type="yes_no"/>
   </class> 
 </hibernate-mapping>  
 
