@@ -32,10 +32,21 @@
   <parameter name="className" value="gov.epa.emissions.framework.service.EMFUserManager"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.commons.User" qname="ns1:User" xmlns:ns1="urn:EMFUserManagerService"/>
  </service>
+  <service name="EMFStatusService" provider="java:RPC" style="RPC" use="encoded">
+  <parameter name="allowedMethods" value="*"/>
+  <parameter name="scope" value="application"/>
+  <parameter name="className" value="gov.epa.emissions.framework.service.EMFStatusService"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.commons.Status" qname="ns1:Status" xmlns:ns1="urn:EMFStatusService"/>
+ </service>
 
  <arrayMapping qname="ns1:Users" xmlns:ns1="urn:EMFUserManagerService"
              languageSpecificType="java:gov.epa.emissions.framework.commons.User[]"
 			 innerType="ns1:User" 
+             encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
+
+ <arrayMapping qname="ns1:AllStatus" xmlns:ns1="urn:EMFStatusService"
+             languageSpecificType="java:gov.epa.emissions.framework.commons.Status[]"
+			 innerType="ns1:Status" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
  
  <transport name="http">
