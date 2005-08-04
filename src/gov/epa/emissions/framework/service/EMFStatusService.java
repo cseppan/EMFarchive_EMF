@@ -8,9 +8,15 @@
  */
 package gov.epa.emissions.framework.service;
 
+
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.commons.EMFStatus;
 import gov.epa.emissions.framework.commons.Status;
+import gov.epa.emissions.framework.dao.StatusDAO;
+
+import java.util.List;
+
+import org.hibernate.Session;
 
 /**
  * @author Conrad F. D'Cruz
@@ -30,8 +36,10 @@ public class EMFStatusService implements EMFStatus{
      * @see gov.epa.emissions.framework.commons.EMFData#getMessages(java.lang.String)
      */
     public Status[] getMessages(String userName) throws EmfException {
-        // TODO Auto-generated method stub
-        return null;
+        Session session = HibernateUtils.currentSession();
+        List allStats = StatusDAO.getMessages(userName,session);
+        System.out.println("Total number of messages in the List= " + allStats.size());
+        return (Status[]) allStats.toArray(new Status[allStats.size()]);
     }
 
     /* (non-Javadoc)
@@ -41,5 +49,14 @@ public class EMFStatusService implements EMFStatus{
         // TODO Auto-generated method stub
         return null;
     }
+
+    public void setStatus(Status status){
+        System.out.println("EMFStatusService: setStatus " + status.getUserName());
+        Session session = HibernateUtils.currentSession();
+        System.out.println("EMFStatusService: Before insertStatusMessage");
+        StatusDAO.insertStatusMessage(status,session);
+        System.out.println("EMFStatusService: After insertStatusMessage");
+    }
+    
 
 }
