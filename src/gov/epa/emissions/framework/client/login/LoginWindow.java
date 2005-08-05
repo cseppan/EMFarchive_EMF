@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.client.ErrorMessagePanel;
 import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
 import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
 import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import java.awt.BorderLayout;
@@ -38,11 +38,11 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
     private LoginPresenter presenter;
 
-    private EMFUserAdmin userAdmin;
+    private UserServices userAdmin;
 
     private ErrorMessagePanel errorMessagePanel;
 
-    public LoginWindow(EMFUserAdmin userAdmin) {
+    public LoginWindow(UserServices userAdmin) {
         this.userAdmin = userAdmin;
         JPanel layoutPanel = createLayout();
 

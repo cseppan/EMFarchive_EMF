@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.AuthenticationException;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
 import gov.epa.emissions.framework.UserException;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 import gov.epa.emissions.framework.dao.UserManagerDAO;
 
@@ -20,12 +20,12 @@ import java.util.List;
  * @author adm$wkstn
  *
  */
-public class EMFUserManager implements EMFUserAdmin{
+public class UserServicesImpl implements UserServices{
 
 	/**
 	 * 
 	 */
-	public EMFUserManager() {
+	public UserServicesImpl() {
 		super();
 		System.out.println("Created EMFUserManager");
 	}

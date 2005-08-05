@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import javax.swing.JFrame;
@@ -18,10 +18,10 @@ import org.jmock.core.stub.ThrowStub;
 public class LoginWindowLauncher {
 
     public static void main(String[] args) throws UserException {
-        Mock userAdmin = new Mock(EMFUserAdmin.class);
+        Mock userAdmin = new Mock(UserServices.class);
         setFailureExpectation(userAdmin);
         setSuccessExpectation(userAdmin, "user", "user");
-        EMFUserAdmin userAdminProxy = (EMFUserAdmin) userAdmin.proxy();
+        UserServices userAdminProxy = (UserServices) userAdmin.proxy();
 
         LoginWindow login = new LoginWindow(userAdminProxy);
         login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

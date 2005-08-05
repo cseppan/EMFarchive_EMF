@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.commons.gui.RefreshableTableModel;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import java.util.ArrayList;
@@ -17,9 +17,9 @@ public class UserManagerTableModel extends AbstractTableModel implements Refresh
 
     private List rows;
 
-    private EMFUserAdmin userAdmin;
+    private UserServices userAdmin;
 
-    public UserManagerTableModel(EMFUserAdmin userAdmin) {
+    public UserManagerTableModel(UserServices userAdmin) {
         this.header = new Header(new String[] { "Username", "Name", "Email" });
         this.userAdmin = userAdmin;
 
@@ -30,7 +30,7 @@ public class UserManagerTableModel extends AbstractTableModel implements Refresh
         this.createRows(this.userAdmin);
     }
 
-    private void createRows(EMFUserAdmin admin) {
+    private void createRows(UserServices admin) {
         this.rows = new ArrayList();
         User[] users;
         try {

@@ -2,7 +2,7 @@ package gov.epa.emissions.commons.gui;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.admin.UserManagerTableModel;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import java.awt.Dimension;
@@ -50,10 +50,10 @@ public class SortFilterSelectUsersLauncher {
         users.add(createUser("mary", "Mary Joe", "mary@wonderful.net"));
         users.add(createUser("kevin", "Kevin Spacey", "kevin@spacey.com"));
 
-        Mock userAdmin = new Mock(EMFUserAdmin.class);
+        Mock userAdmin = new Mock(UserServices.class);
         userAdmin.stubs().method("getUsers").withNoArguments().will(new ReturnStub(users));
 
-        return new UserManagerTableModel((EMFUserAdmin) userAdmin.proxy());
+        return new UserManagerTableModel((UserServices) userAdmin.proxy());
     }
 
     private User createUser(String username, String name, String email) throws EmfException {

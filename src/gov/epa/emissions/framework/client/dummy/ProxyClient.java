@@ -9,7 +9,7 @@
 package gov.epa.emissions.framework.client.dummy;
 
 import gov.epa.emissions.framework.client.transport.Proxy;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 /**
@@ -29,8 +29,8 @@ public class ProxyClient {
     public static void main(String[] args) {
     	try
     	{
-    	    Class[] interfaces = new Class[] {EMFUserAdmin.class};
-    	    EMFUserAdmin emfAdmin = (EMFUserAdmin)(Proxy.newInstance("urn:EMFUserAdmin",interfaces));
+    	    Class[] interfaces = new Class[] {UserServices.class};
+    	    UserServices emfAdmin = (UserServices)(Proxy.newInstance("urn:EMFUserAdmin",interfaces));
     	    User user = emfAdmin.getUser("cdcruz");
     	    System.out.println(user.getFullName());
 

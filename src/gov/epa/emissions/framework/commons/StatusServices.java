@@ -14,7 +14,7 @@ import gov.epa.emissions.framework.EmfException;
  * @author Conrad F. D'Cruz
  *
  */
-public interface EMFStatus {
+public interface StatusServices {
 
     public void setStatus(Status status) throws EmfException;
     public Status[] getMessages(String userName) throws EmfException;

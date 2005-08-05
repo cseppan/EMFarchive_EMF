@@ -2,16 +2,16 @@ package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfPresenter;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 public class LoginPresenter implements EmfPresenter {
 
-    private EMFUserAdmin userAdmin;
+    private UserServices userAdmin;
 
     private LoginView view;
 
-    public LoginPresenter(EMFUserAdmin model, LoginView view) {
+    public LoginPresenter(UserServices model, LoginView view) {
         this.userAdmin = model;
         this.view = view;
     }

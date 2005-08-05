@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import org.jmock.Mock;
@@ -14,12 +14,12 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         user.setUserName("joey");
         user.setFullName("Joey Moey");
 
-        Mock emfUserAdmin = mock(EMFUserAdmin.class);
+        Mock emfUserAdmin = mock(UserServices.class);
         emfUserAdmin.expects(once()).method("updateUser").with(eq(user));
 
         Mock view = mock(UpdateUserView.class);
 
-        UpdateUserPresenter presenter = new UpdateUserPresenter((EMFUserAdmin) emfUserAdmin.proxy(),
+        UpdateUserPresenter presenter = new UpdateUserPresenter((UserServices) emfUserAdmin.proxy(),
                 (UpdateUserView) view.proxy());
         view.expects(once()).method("setObserver").with(eq(presenter));
         presenter.observe();
@@ -55,13 +55,13 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         user.setUserName("joey");
         user.setFullName("Joey Moey");
 
-        Mock emfUserAdmin = mock(EMFUserAdmin.class);
+        Mock emfUserAdmin = mock(UserServices.class);
         emfUserAdmin.expects(once()).method("updateUser").with(eq(user));
 
         Mock view = mock(UpdateUserView.class);
         view.expects(once()).method("close").withNoArguments();
         
-        UpdateUserPresenter presenter = new UpdateUserPresenter((EMFUserAdmin) emfUserAdmin.proxy(),
+        UpdateUserPresenter presenter = new UpdateUserPresenter((UserServices) emfUserAdmin.proxy(),
                 (UpdateUserView) view.proxy());
         view.expects(once()).method("setObserver").with(eq(presenter));
         presenter.observe();

@@ -1,13 +1,13 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import java.util.Iterator;
 import java.util.List;
 
-public class EMFUserAdminStub implements EMFUserAdmin {
+public class EMFUserAdminStub implements UserServices {
 
     private List users;
 

@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.client.ErrorMessagePanel;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import java.awt.BorderLayout;
@@ -52,7 +52,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     private JPanel profileValuesPanel;
 
-    public RegisterUserPanel(EMFUserAdmin userAdmin, PostRegisterStrategy postRegisterStrategy,
+    public RegisterUserPanel(UserServices userAdmin, PostRegisterStrategy postRegisterStrategy,
             EmfWidgetContainer parent) {
         this.postRegisterStrategy = postRegisterStrategy;
         this.parent = parent;
@@ -63,7 +63,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
     }
 
     //TODO: a simple, clear way ?
-    public static RegisterUserPanel createWithAdminOption(EMFUserAdmin userAdmin,
+    public static RegisterUserPanel createWithAdminOption(UserServices userAdmin,
             PostRegisterStrategy postRegisterStrategy, EmfWidgetContainer parent) {
         RegisterUserPanel panel = new RegisterUserPanel(userAdmin, postRegisterStrategy, parent);
         

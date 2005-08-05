@@ -3,14 +3,14 @@ package gov.epa.emissions.framework.client.login;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 public class LaunchEmfConsolePostRegisterStrategy implements PostRegisterStrategy {
 
-    private EMFUserAdmin userAdmin;
+    private UserServices userAdmin;
 
-    public LaunchEmfConsolePostRegisterStrategy(EMFUserAdmin admin) {
+    public LaunchEmfConsolePostRegisterStrategy(UserServices admin) {
         userAdmin = admin;
     }
 

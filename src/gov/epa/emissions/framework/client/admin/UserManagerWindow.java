@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.ErrorMessagePanel;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import java.awt.BorderLayout;
@@ -36,7 +36,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
 
     private SortFilterSelectionPanel sortFilterSelectPanel;
 
-    private EMFUserAdmin userAdmin;
+    private UserServices userAdmin;
 
     private JPanel layout;
 
@@ -44,7 +44,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
 
     private JFrame parentConsole;
 
-    public UserManagerWindow(EMFUserAdmin userAdmin, JFrame parentConsole) throws Exception {
+    public UserManagerWindow(UserServices userAdmin, JFrame parentConsole) throws Exception {
         super("User Management Console");
         this.userAdmin = userAdmin;
         this.parentConsole = parentConsole;

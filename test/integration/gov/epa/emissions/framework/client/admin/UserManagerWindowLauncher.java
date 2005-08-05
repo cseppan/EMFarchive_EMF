@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import java.awt.Dimension;
@@ -17,7 +17,7 @@ public class UserManagerWindowLauncher {
     public static void main(String[] args) throws Exception {
         UserManagerWindowLauncher launcher = new UserManagerWindowLauncher();
 
-        EMFUserAdmin userAdmin = launcher.createUserAdmin();
+        UserServices userAdmin = launcher.createUserAdmin();
         JFrame frame = new JFrame();
 
         UserManagerWindow console = new UserManagerWindow(userAdmin, frame);
@@ -43,14 +43,14 @@ public class UserManagerWindowLauncher {
         frame.setContentPane(desktop);
     }
 
-    private EMFUserAdmin createUserAdmin() throws EmfException {
+    private UserServices createUserAdmin() throws EmfException {
         List users = new ArrayList();
 
         users.add(createUser("joe", "Joe Fullman", "joef@zukoswky.com"));
         users.add(createUser("mary", "Mary Joe", "mary@wonderful.net"));
         users.add(createUser("kevin", "Kevin Spacey", "kevin@spacey.com"));
 
-        EMFUserAdmin userAdmin = new EMFUserAdminStub(users);
+        UserServices userAdmin = new EMFUserAdminStub(users);
 
         return userAdmin;
     }

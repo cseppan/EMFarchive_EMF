@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.client.admin.EMFUserAdminStub;
-import gov.epa.emissions.framework.client.transport.EMFUserAdminTransport;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.client.transport.UserServicesTransport;
+import gov.epa.emissions.framework.commons.UserServices;
 
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
@@ -38,9 +38,9 @@ public class LoginTest extends ComponentTestFixture {
     }
 
     public void testShouldShowEmfConsoleOnLogin() throws Exception {
-        EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport(
-                "http://localhost:8080/emf/services/EMFUserManagerService");
-
+        UserServices emfUserAdmin = new UserServicesTransport(
+                "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.UserServices");
+        
         LoginWindow window = new LoginWindow(emfUserAdmin);
         showWindow(window);
 

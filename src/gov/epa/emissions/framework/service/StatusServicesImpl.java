@@ -10,7 +10,7 @@ package gov.epa.emissions.framework.service;
 
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.EMFStatus;
+import gov.epa.emissions.framework.commons.StatusServices;
 import gov.epa.emissions.framework.commons.Status;
 import gov.epa.emissions.framework.dao.StatusDAO;
 
@@ -22,12 +22,12 @@ import org.hibernate.Session;
  * @author Conrad F. D'Cruz
  *
  */
-public class EMFStatusService implements EMFStatus{
+public class StatusServicesImpl implements StatusServices{
 
     /**
      * 
      */
-    public EMFStatusService() {
+    public StatusServicesImpl() {
         super();
     }
 

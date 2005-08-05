@@ -14,7 +14,7 @@ import gov.epa.emissions.framework.EmfException;
  * @author Conrad F. D'Cruz
  * Provides services for Login and Administrative functions
  */
-public interface EMFUserAdmin {
+public interface UserServices {
 
     public void authenticate(String userName, String pwd, boolean wantAdminStatus) throws EmfException;
 

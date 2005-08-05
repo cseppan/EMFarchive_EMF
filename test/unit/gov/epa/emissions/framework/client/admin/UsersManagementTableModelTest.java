@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import java.util.ArrayList;
@@ -30,10 +30,10 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
 
         users.add(joe);
 
-        emfUserAdmin = mock(EMFUserAdmin.class);
+        emfUserAdmin = mock(UserServices.class);
         emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users.toArray(new User[0])));
 
-        model = new UserManagerTableModel((EMFUserAdmin) emfUserAdmin.proxy());
+        model = new UserManagerTableModel((UserServices) emfUserAdmin.proxy());
     }
 
     public void testShouldReturnColumnsNames() {
@@ -55,7 +55,7 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
         users.add(user2);
 
         emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users.toArray(new User[0])));
-        model = new UserManagerTableModel((EMFUserAdmin) emfUserAdmin.proxy());
+        model = new UserManagerTableModel((UserServices) emfUserAdmin.proxy());
 
         assertEquals(2, model.getRowCount());
     }
@@ -97,10 +97,10 @@ public class UsersManagementTableModelTest extends MockObjectTestCase {
         User jill = new User();
         users.add(jill);
 
-        emfUserAdmin = mock(EMFUserAdmin.class);
+        emfUserAdmin = mock(UserServices.class);
         emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users.toArray(new User[0])));
 
-        model = new UserManagerTableModel((EMFUserAdmin) emfUserAdmin.proxy());
+        model = new UserManagerTableModel((UserServices) emfUserAdmin.proxy());
 
         assertEquals(2, model.getRowCount());
         assertSame(joe, model.getUser(0));

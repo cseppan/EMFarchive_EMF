@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import java.awt.Container;
@@ -14,7 +14,7 @@ import javax.swing.JFrame;
 public class UpdateUserWindowLauncher {
 
     public static void main(String[] args) throws Exception {
-        EMFUserAdmin userAdmin = new EMFUserAdminStub(Collections.EMPTY_LIST);
+        UserServices userAdmin = new EMFUserAdminStub(Collections.EMPTY_LIST);
         User user = new User();
         user.setUserName("joes");
         user.setFullName("Joe Schmoe");

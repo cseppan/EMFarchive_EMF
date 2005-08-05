@@ -9,7 +9,7 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.EMFStatus;
+import gov.epa.emissions.framework.commons.StatusServices;
 import gov.epa.emissions.framework.commons.Status;
 
 import java.net.MalformedURLException;
@@ -26,21 +26,21 @@ import org.apache.axis.client.Service;
 /**
  * @author Conrad F. D'Cruz
  *
- *	This class implements the methods specified in the UserAdmin interface
+ *	This class implements the methods specified in the StatusServices interface
  *
  */
-public class EMFStatusTransport implements EMFStatus {
+public class StatusServicesTransport implements StatusServices {
 
     private static String endpoint = "";
 
     /**
      * 
      */
-    public EMFStatusTransport() {
+    public StatusServicesTransport() {
         super();
     }
 
-    public EMFStatusTransport(String endpt) {
+    public StatusServicesTransport(String endpt) {
         super();
         endpoint=endpt;
     }
@@ -74,9 +74,9 @@ public class EMFStatusTransport implements EMFStatus {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             
-            QName qname1 = new QName("urn:EMFStatusService","ns1:Status");
-            QName qname2 = new QName("urn:EMFStatusService","ns1:AllStatus");
-            QName qname3 = new QName("urn:EMFStatusService", "getMessages");
+            QName qname1 = new QName("urn:gov.epa.emf.StatusServices","ns1:Status");
+            QName qname2 = new QName("urn:gov.epa.emf.StatusServices","ns1:AllStatus");
+            QName qname3 = new QName("urn:gov.epa.emf.StatusServices", "getMessages");
             
             call.setOperationName(qname3);
             
@@ -133,8 +133,8 @@ public class EMFStatusTransport implements EMFStatus {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             
-            QName qname1 = new QName("urn:EMFStatusService","ns1:Status");
-            QName qname3 = new QName("urn:EMFStatusService", "setStatus");
+            QName qname1 = new QName("urn:gov.epa.emf.StatusServices","ns1:Status");
+            QName qname3 = new QName("urn:gov.epa.emf.StatusServices", "setStatus");
             
             call.setOperationName(qname3);
             
@@ -143,6 +143,7 @@ public class EMFStatusTransport implements EMFStatus {
 					  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),        
 					  new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));        			  
 		    call.addParameter( "status", qname1, ParameterMode.IN );
+            call.setReturnType(qname3);
             
             Object obj = call.invoke( new Object[] {status} );
         } catch (ServiceException e) {

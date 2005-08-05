@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.admin.EMFUserAdminStub;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import java.util.ArrayList;
@@ -22,14 +22,14 @@ public class EmfConsoleLauncherWithMockData {
         console.display();
     }
 
-    static private EMFUserAdmin createUserAdmin() throws EmfException {
+    static private UserServices createUserAdmin() throws EmfException {
         List users = new ArrayList();
 
         users.add(createUser("joe", "Joe Fullman", "joef@zukoswky.com"));
         users.add(createUser("mary", "Mary Joe", "mary@wonderful.net"));
         users.add(createUser("kevin", "Kevin Spacey", "kevin@spacey.com"));
 
-        EMFUserAdmin userAdmin = new EMFUserAdminStub(users);
+        UserServices userAdmin = new EMFUserAdminStub(users);
 
         return userAdmin;
     }

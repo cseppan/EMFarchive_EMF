@@ -26,25 +26,33 @@
  <handler name="Authenticate"
           type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
           
-  <service name="EMFUserManagerService" provider="java:RPC" style="RPC" use="encoded">
+  <service name="gov.epa.emf.UserServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
   <parameter name="scope" value="application"/>
-  <parameter name="className" value="gov.epa.emissions.framework.service.EMFUserManager"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.commons.User" qname="ns1:User" xmlns:ns1="urn:EMFUserManagerService"/>
+  <parameter name="className" value="gov.epa.emissions.framework.service.UserServicesImpl"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.commons.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.emf.UserServices"/>
  </service>
-  <service name="EMFStatusService" provider="java:RPC" style="RPC" use="encoded">
+  <service name="gov.epa.emf.StatusServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
   <parameter name="scope" value="application"/>
-  <parameter name="className" value="gov.epa.emissions.framework.service.EMFStatusService"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.commons.Status" qname="ns1:Status" xmlns:ns1="urn:EMFStatusService"/>
+  <parameter name="className" value="gov.epa.emissions.framework.service.StatusServicesImpl"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.commons.Status" qname="ns1:Status" xmlns:ns1="urn:gov.epa.emf.StatusServices"/>
  </service>
 
- <arrayMapping qname="ns1:Users" xmlns:ns1="urn:EMFUserManagerService"
+<!-- 
+  <service name="gov.epa.emf.ExImServices" provider="java:RPC" style="RPC" use="encoded">
+  <parameter name="allowedMethods" value="*"/>
+  <parameter name="scope" value="application"/>
+  <parameter name="className" value="gov.epa.emissions.framework.service.ExImServicesImpl"/>
+ </service>
+-->
+
+ <arrayMapping qname="ns1:Users" xmlns:ns1="urn:gov.epa.emf.UserServices"
              languageSpecificType="java:gov.epa.emissions.framework.commons.User[]"
 			 innerType="ns1:User" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
 
- <arrayMapping qname="ns1:AllStatus" xmlns:ns1="urn:EMFStatusService"
+ <arrayMapping qname="ns1:AllStatus" xmlns:ns1="urn:gov.epa.emf.StatusServices"
              languageSpecificType="java:gov.epa.emissions.framework.commons.Status[]"
 			 innerType="ns1:Status" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          

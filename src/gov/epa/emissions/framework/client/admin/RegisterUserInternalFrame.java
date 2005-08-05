@@ -2,13 +2,13 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 
 public class RegisterUserInternalFrame extends EmfInteralFrame implements EmfWidgetContainer {
 
     private RegisterUserPanel view;
 
-    public RegisterUserInternalFrame(EMFUserAdmin userAdmin, PostRegisterStrategy postRegisterStrategy) {
+    public RegisterUserInternalFrame(UserServices userAdmin, PostRegisterStrategy postRegisterStrategy) {
         super("Register New User");
 
         view = RegisterUserPanel.createWithAdminOption(userAdmin, postRegisterStrategy, this);

@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
 import gov.epa.emissions.framework.client.admin.UserManagerWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import java.awt.Dimension;
@@ -23,7 +23,7 @@ import javax.swing.JOptionPane;
 
 public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
-    private EMFUserAdmin userAdmin;
+    private UserServices userAdmin;
 
     private JDesktopPane desktop;
 
@@ -35,7 +35,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
     // also be needed
 
     // TODO: split the login & logout menu/actions in a separate class ??
-    public EmfConsole(User user, EMFUserAdmin userAdmin) {
+    public EmfConsole(User user, UserServices userAdmin) {
         this.user = user;
         this.userAdmin = userAdmin;
 

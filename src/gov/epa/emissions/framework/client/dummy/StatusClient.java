@@ -11,10 +11,10 @@ package gov.epa.emissions.framework.client.dummy;
 import java.util.Date;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.transport.EMFStatusTransport;
-import gov.epa.emissions.framework.client.transport.EMFUserAdminTransport;
-import gov.epa.emissions.framework.commons.EMFStatus;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.client.transport.StatusServicesTransport;
+import gov.epa.emissions.framework.client.transport.UserServicesTransport;
+import gov.epa.emissions.framework.commons.StatusServices;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.Status;
 import gov.epa.emissions.framework.commons.User;
 
@@ -22,18 +22,23 @@ import gov.epa.emissions.framework.commons.User;
  * @author Conrad F. D'Cruz
  *
  */
-public class EMFClient {
+public class StatusClient {
     private static String endpoint1 = 
         "http://ben.cep.unc.edu:8080/emf/services/EMFUserManagerService";
     private static String endpoint2 = 
-    "http://ben.cep.unc.edu:8080/emf/services/EMFStatusService";
+    "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.StatusServices";
         
-    public EMFClient() throws EmfException{
+    public StatusClient() throws EmfException{
         super();
         //callServiceForGet();
         callServiceForInsert();
     }
     public static void main(String[] args) {
+        try {
+            new StatusClient();
+        } catch (EmfException e) {
+            e.printStackTrace();
+        }
         
 //        EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport(endpoint1);
 //        EMFStatus emfStatus = new EMFStatusTransport(endpoint2);
@@ -195,10 +200,10 @@ public class EMFClient {
     private void callServiceForInsert() throws EmfException {
         Status aStat = new Status();
         aStat.setMessage("import started for file XYZABC");
-        aStat.setMsgType("INFOMATICS");
+        aStat.setMsgType("INFOMATICA");
         aStat.setTimestamp(new Date());
         aStat.setUserName("cdcruz");
-      EMFStatus emfStatusSvc= new EMFStatusTransport(endpoint2);
+      StatusServices emfStatusSvc= new StatusServicesTransport(endpoint2);
 
         System.out.println("HibClient: Before call to setStatus");
         emfStatusSvc.setStatus(aStat);
@@ -210,7 +215,7 @@ public class EMFClient {
      * 
      */
     private void callServiceForGet() {
-        EMFStatus emfStatusSvc = new EMFStatusTransport(endpoint2);
+        StatusServices emfStatusSvc = new StatusServicesTransport(endpoint2);
         try {
             Status[] stats = emfStatusSvc.getMessages("cdcruz");
             System.out.println("Total number of status messages: " + stats.length);

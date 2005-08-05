@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.client.EmfWindow;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 
 import java.awt.Point;
 
@@ -11,7 +11,7 @@ public class RegisterUserWindow extends EmfWindow implements EmfWidgetContainer 
     private RegisterUserPanel view;
 
     //TODO: should the app exit if 'x-close' is clicked ?
-    public RegisterUserWindow(EMFUserAdmin userAdmin, PostRegisterStrategy postRegisterStrategy) {
+    public RegisterUserWindow(UserServices userAdmin, PostRegisterStrategy postRegisterStrategy) {
         view = new RegisterUserPanel(userAdmin, postRegisterStrategy, this);
         this.getContentPane().add(view);
 

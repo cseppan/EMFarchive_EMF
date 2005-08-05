@@ -11,7 +11,7 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.framework.AuthenticationException;
 import gov.epa.emissions.framework.CommunicationFailureException;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.EMFUserAdmin;
+import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
 
 import java.net.MalformedURLException;
@@ -33,18 +33,18 @@ import org.apache.axis.encoding.ser.BeanSerializerFactory;
  *	This class implements the methods specified in the UserAdmin interface
  *
  */
-public class EMFUserAdminTransport implements EMFUserAdmin {
+public class UserServicesTransport implements UserServices {
 
     private static String endpoint = "";
 
     /**
      * 
      */
-    public EMFUserAdminTransport() {
+    public UserServicesTransport() {
         super();
     }
 
-    public EMFUserAdminTransport(String endpt) {
+    public UserServicesTransport(String endpt) {
         super();
         endpoint=endpt;
     }
@@ -77,7 +77,7 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
             call.setMaintainSession(true);
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             call.setOperationName(new QName("http://soapinterop.org/", "authenticate") );
-            QName qname = new QName("urn:EMFUserManager","ns1:User");
+            QName qname = new QName("urn:gov.epa.emf.UserServices","ns1:User");
             Class cls = gov.epa.emissions.framework.commons.User.class;
             call.registerTypeMapping(cls,qname,BeanSerializerFactory.class, BeanDeserializerFactory.class);
 
@@ -132,8 +132,8 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             
-            QName qname1 = new QName("urn:EMFUserManager","ns1:User");
-            QName qname2 = new QName("urn:WsAdminService", "getUser");
+            QName qname1 = new QName("urn:gov.epa.emf.UserServices","ns1:User");
+            QName qname2 = new QName("urn:gov.epa.emf.UserServices", "getUser");
             call.setOperationName(qname2);
             Class cls = gov.epa.emissions.framework.commons.User.class;
 	        call.registerTypeMapping(User.class, qname1,
@@ -171,8 +171,8 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
         try {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            call.setOperationName(new QName("urn:EMFUserManagerService", "createUser") );
-            QName qname = new QName("urn:EMFUserManagerService","ns1:User");
+            call.setOperationName(new QName("urn:gov.epa.emf.UserServices", "createUser") );
+            QName qname = new QName("urn:gov.epa.emf.UserServices","ns1:User");
             Class cls = gov.epa.emissions.framework.commons.User.class;
             call.registerTypeMapping(cls, qname,
 					   new org.apache.axis.encoding.ser.BeanSerializerFactory(cls, qname),        
@@ -207,8 +207,8 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
         try {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            call.setOperationName(new QName("urn:EMFUserManagerService", "updateUser") );
-            QName qname = new QName("urn:EMFUserManagerService","ns1:User");
+            call.setOperationName(new QName("urn:gov.epa.emf.UserServices", "updateUser") );
+            QName qname = new QName("urn:gov.epa.emf.UserServices","ns1:User");
             Class cls = gov.epa.emissions.framework.commons.User.class;
             call.registerTypeMapping(cls, qname,
 					   new org.apache.axis.encoding.ser.BeanSerializerFactory(cls, qname),        
@@ -282,9 +282,9 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
                 call.setTargetEndpointAddress( new java.net.URL(endpoint) );
                 
                 //call.setOperationName(new QName("urn:EMFUserManager", "getUsers") );
-                QName qname1 = new QName("urn:EMFUserManager","ns1:User");
-                QName qname2 = new QName("urn:EMFUserManager","ns1:Users");
-                QName qname3 = new QName("urn:EMFUserManager", "getUsers");
+                QName qname1 = new QName("urn:gov.epa.emf.UserServices","ns1:User");
+                QName qname2 = new QName("urn:gov.epa.emf.UserServices","ns1:Users");
+                QName qname3 = new QName("urn:gov.epa.emf.UserServices", "getUsers");
                 
                 call.setOperationName(qname3);
                 
@@ -332,9 +332,9 @@ public class EMFUserAdminTransport implements EMFUserAdmin {
             
             System.out.println("Endpoint: " + endpoint);
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            QName qname1 = new QName("urn:EMFUserManager","ns1:User");
-            QName qname2 = new QName("urn:EMFUserManager","ns1:Users");
-            QName qname3 = new QName("urn:EMFUserManager", "updateUsers");
+            QName qname1 = new QName("urn:gov.epa.emf.UserServices","ns1:User");
+            QName qname2 = new QName("urn:gov.epa.emf.UserServices","ns1:Users");
+            QName qname3 = new QName("urn:gov.epa.emf.UserServices", "updateUsers");
                         
             Class cls1 = gov.epa.emissions.framework.commons.User.class;
             Class cls2 = gov.epa.emissions.framework.commons.User[].class;
