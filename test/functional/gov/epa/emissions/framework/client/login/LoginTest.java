@@ -40,7 +40,7 @@ public class LoginTest extends ComponentTestFixture {
     public void testShouldShowEmfConsoleOnLogin() throws Exception {
         EMFUserAdmin emfUserAdmin = new EMFUserAdminTransport(
                 "http://localhost:8080/emf/services/EMFUserManagerService");
-        
+
         LoginWindow window = new LoginWindow(emfUserAdmin);
         showWindow(window);
 
@@ -52,13 +52,13 @@ public class LoginTest extends ComponentTestFixture {
 
         Component signIn = getFinder().find(window, new NameMatcher("signIn"));
         JTextField username = (JTextField) getFinder().find(window, new NameMatcher("username"));
-        username.setText("cdcruz");        
+        username.setText("admin");
         JTextField password = (JTextField) getFinder().find(window, new NameMatcher("password"));
-        password.setText("conrad123");
-        
+        password.setText("admin123");
+
         ComponentTester tester = new ComponentTester();
         tester.actionClick(signIn);
-        
+
         assertTrue(isWindowClosed);
     }
 

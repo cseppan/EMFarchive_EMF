@@ -11,7 +11,7 @@ app.name=emf
 app.version=0.1
   
 # basic settings
-catalina.home=<full path to Tomcat home i.e. installation directory >
+tomcat.home=<full path to Tomcat home i.e. installation directory >
 
 
 # Tomcat Manager

@@ -1,15 +1,11 @@
 package gov.epa.emissions.commons.gui;
 
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
-
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
-import javax.swing.table.TableModel;
 
 import org.jmock.Mock;
 import org.jmock.core.constraint.IsEqual;
@@ -40,7 +36,7 @@ public class SortFilterSelectionPanelLauncher {
     }
 
     private static Mock createModel() {
-        Mock delegate = new Mock(TableModel.class);
+        Mock delegate = new Mock(RefreshableTableModel.class);
 
         delegate.stubs().method("getColumnCount").withNoArguments().will(new ReturnStub(new Integer(3)));
 
