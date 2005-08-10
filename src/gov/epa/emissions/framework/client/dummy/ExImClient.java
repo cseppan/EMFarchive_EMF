@@ -28,7 +28,7 @@ public class ExImClient {
         super();
         System.out.println("START IMPORT CLIENT");
         ExImTransport emfData1 = new ExImTransport(endpoint1);
-        emfData1.startImport("ejones","FOOBAR_ONEONE","ORL");
+        emfData1.startImport("ejones","conrad.txt","ORL");
         System.out.println("END IMPORT CLIENT");
 //        ExImTransport emfData2 = new ExImTransport(endpoint1);
 //        emfData1.startImport("cdcruz","FOOBAR_TWO","IDA");
