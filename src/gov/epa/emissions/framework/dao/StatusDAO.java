@@ -60,6 +60,7 @@ public class StatusDAO {
         Transaction tx = session.beginTransaction();
         System.out.println("StatusDAO: insertStatusMessage before session.save");
         session.save(status);
+        session.flush();
         System.out.println("StatusDAO: insertStatusMessage after session.save");
         tx.commit();
     }
