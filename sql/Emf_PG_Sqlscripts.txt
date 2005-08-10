@@ -1,0 +1,35 @@
+CREATE TABLE users
+(
+  user_name varchar(15) NOT NULL,
+  user_pass varchar(15) NOT NULL,
+  fullname varchar(255) NOT NULL,
+  affiliation varchar(255) NOT NULL,
+  workphone varchar(15) NOT NULL,
+  emailaddr varchar(128) NOT NULL,
+  inadmingrp bool NOT NULL DEFAULT false,
+  acctdisabled bool NOT NULL DEFAULT false,
+  CONSTRAINT pk_users PRIMARY KEY (user_name)
+) 
+WITH OIDS;
+ALTER TABLE users OWNER TO postgres;
+
+CREATE TABLE user_roles
+(
+  user_name varchar(15) NOT NULL,
+  role_name varchar(15) NOT NULL,
+  CONSTRAINT pv_user_roles PRIMARY KEY (user_name, role_name)
+) 
+WITH OIDS;
+ALTER TABLE user_roles OWNER TO postgres;
+
+CREATE TABLE statusmessages
+(
+  user_name varchar(15) NOT NULL,
+  msg_type varchar(255) NOT NULL,
+  message varchar(255) NOT NULL,
+  id varchar(32) NOT NULL,
+  msg_read bool NOT NULL DEFAULT false,
+  date timestamp NOT NULL
+) 
+WITHOUT OIDS;
+ALTER TABLE statusmessages OWNER TO postgres;
