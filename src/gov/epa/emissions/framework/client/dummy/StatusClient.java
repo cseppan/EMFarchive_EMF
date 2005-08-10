@@ -30,8 +30,8 @@ public class StatusClient {
         
     public StatusClient() throws EmfException{
         super();
-        //callServiceForGet();
-        callServiceForInsert();
+        callServiceForGet();
+        //callServiceForInsert();
     }
     public static void main(String[] args) {
         try {
@@ -217,7 +217,7 @@ public class StatusClient {
     private void callServiceForGet() {
         StatusServices emfStatusSvc = new StatusServicesTransport(endpoint2);
         try {
-            Status[] stats = emfStatusSvc.getMessages("cdcruz");
+            Status[] stats = emfStatusSvc.getMessages("ejones");
             System.out.println("Total number of status messages: " + stats.length);
             
             for (int i=0; i<stats.length; i++){
