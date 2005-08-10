@@ -52,9 +52,9 @@ public class ExImTransport implements ExImServices {
      */
     private String extractMessage(String faultReason) {
         String message = faultReason.substring(faultReason.indexOf("Exception: ") + 11);
-        if (message.equals("Connection refused: connect")){
-            message = "Cannot communicate with EMF Server";
-        }
+//        if (message.equals("Connection refused: connect")){
+//            message = "Cannot communicate with EMF Server";
+//        }
         
         return message;
     }
@@ -70,20 +70,10 @@ public class ExImTransport implements ExImServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             
-//            QName qname1 = new QName("urn:EMFDataService","ns1:Data");
-//            QName qname2 = new QName("urn:EMFDataService","ns1:AllData");
             QName qname3 = new QName("urn:EMFDataService", "startImport");
             
             call.setOperationName(qname3);
             
-//            Class cls1 = gov.epa.emissions.framework.commons.Status.class;
-//            Class cls2 = gov.epa.emissions.framework.commons.Status[].class;
-//	          call.registerTypeMapping(cls1, qname1,
-//					  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),        
-//					  new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));        			  
-//		          call.registerTypeMapping(cls2, qname2,
-//						  new org.apache.axis.encoding.ser.ArraySerializerFactory(cls2, qname2),        
-//						  new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname2));        			  
             call.addParameter("username",
                     org.apache.axis.Constants.XSD_STRING,
                     javax.xml.rpc.ParameterMode.IN);
