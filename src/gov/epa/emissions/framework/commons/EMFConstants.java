@@ -22,5 +22,6 @@ public class EMFConstants {
     public static final String START_EXPORT_MESSAGE_Prefix="Started export for (FileType:Filename) ";
     public static final String END_EXPORT_MESSAGE_Prefix="Completed export for (FileType:Filename) ";
 
+    public static final String URI_FILENAME_PREFIX="file:///";
 
 }
