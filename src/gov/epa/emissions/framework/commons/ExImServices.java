@@ -14,7 +14,7 @@ import gov.epa.emissions.framework.EmfException;
  * @author Conrad F. D'Cruz
  *
  */
-public interface EMFData {
+public interface ExImServices {
 
-    public void startImport(String fileName, String fileType) throws EmfException;
+    public void startImport(String userName, String fileName, String fileType) throws EmfException;
 }
