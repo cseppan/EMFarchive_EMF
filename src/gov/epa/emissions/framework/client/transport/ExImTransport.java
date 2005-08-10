@@ -9,7 +9,7 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.EMFData;
+import gov.epa.emissions.framework.commons.ExImServices;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
@@ -27,18 +27,18 @@ import org.apache.axis.client.Service;
  *	This class implements the methods specified in the UserAdmin interface
  *
  */
-public class EMFDataTransport implements EMFData {
+public class ExImTransport implements ExImServices {
 
     private static String endpoint = "";
 
     /**
      * 
      */
-    public EMFDataTransport() {
+    public ExImTransport() {
         super();
     }
 
-    public EMFDataTransport(String endpt) {
+    public ExImTransport(String endpt) {
         super();
         endpoint=endpt;
     }
@@ -60,9 +60,9 @@ public class EMFDataTransport implements EMFData {
     }
 
     /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.commons.EMFData#startImport(java.lang.String, java.lang.String)
+     * @see gov.epa.emissions.framework.commons.ExImServices#startImport(java.lang.String, java.lang.String, java.lang.String)
      */
-    public void startImport(String fileName, String fileType) throws EmfException {
+    public void startImport(String userName, String fileName, String fileType) throws EmfException {
         Service  service = new Service();
         Call     call;
 
@@ -84,16 +84,20 @@ public class EMFDataTransport implements EMFData {
 //		          call.registerTypeMapping(cls2, qname2,
 //						  new org.apache.axis.encoding.ser.ArraySerializerFactory(cls2, qname2),        
 //						  new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname2));        			  
-		            call.addParameter("filename",
+            call.addParameter("username",
+                    org.apache.axis.Constants.XSD_STRING,
+                    javax.xml.rpc.ParameterMode.IN);
+
+            call.addParameter("filename",
                             org.apache.axis.Constants.XSD_STRING,
                             javax.xml.rpc.ParameterMode.IN);
-		            call.addParameter("filetype",
+		    call.addParameter("filetype",
                             org.apache.axis.Constants.XSD_STRING,
                             javax.xml.rpc.ParameterMode.IN);
 		          
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
             
-            Object obj = call.invoke( new Object[] {fileName, fileType} );
+            Object obj = call.invoke( new Object[] {userName, fileName, fileType} );
             
         } catch (ServiceException e) {
             System.out.println("Error invoking the service");
