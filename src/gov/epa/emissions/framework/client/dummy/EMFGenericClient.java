@@ -8,7 +8,6 @@
  */
 package gov.epa.emissions.framework.client.dummy;
 
-import gov.epa.emissions.framework.CommunicationFailureException;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.ExImServicesTransport;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;

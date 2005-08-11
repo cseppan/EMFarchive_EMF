@@ -8,15 +8,12 @@
  */
 package gov.epa.emissions.framework.client.dummy;
   
-import java.util.Date;
-
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.StatusServicesTransport;
-import gov.epa.emissions.framework.client.transport.UserServicesTransport;
-import gov.epa.emissions.framework.commons.StatusServices;
-import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.Status;
-import gov.epa.emissions.framework.commons.User;
+import gov.epa.emissions.framework.commons.StatusServices;
+
+import java.util.Date;
 
 /**
  * @author Conrad F. D'Cruz
