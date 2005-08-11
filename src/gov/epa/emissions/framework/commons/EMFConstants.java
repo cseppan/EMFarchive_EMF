@@ -23,5 +23,22 @@ public final class EMFConstants {
     public static final String END_EXPORT_MESSAGE_Prefix="Completed export for (FileType:Filename) ";
 
     public static final String URI_FILENAME_PREFIX="file:///";
+ 
+    // ids of the various services offered by the EMF system
+//    final public static int USER_SERVICE  = 0;
+//    final public static int STATUS_SERVICE = 1;
+//    final public static int EXIM_SERVICE = 2;
+  
+    public static final int HOST_NAME_BEN_ID=0;
+    public static final int HOST_NAME_LOCAL_ID=1;
+    public static final int HOST_NAME_PROD_ID=2;
+    
+    public static final String HOST_NAME_BEN="http://ben.cep.unc.edu:8080";
+    public static final String HOST_NAME_LOCAL="http://localhost:8080";
+    public static final String HOST_NAME_PROD="http://ben.cep.unc.edu:8080";
+
+    public static String usersEndpoint="/emf/services/gov.epa.emf.UserServices";
+    public static String statusEndpoint="/emf/services/gov.epa.emf.StatusServices";   
+    public static String eximEndpoint="/emf/services/gov.epa.emf.ExImServices";
 
 }
