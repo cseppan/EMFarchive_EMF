@@ -277,37 +277,37 @@ public class UserManagerDAO {
     
     public void insertUser(User user) throws InfrastructureException {
         System.out.println("Begin insert user");
-            try{
-                if (ds != null) {
-                    Connection conn = ds.getConnection();
-                    System.out.println("Is connection null? " + (conn ==null));
+        try{
+            if (ds != null) {
+                Connection conn = ds.getConnection();
+                System.out.println("Is connection null? " + (conn ==null));
 
-                    if(conn != null)  {
-                        PreparedStatement insertStmt = conn.prepareStatement(INSERT_USER_QUERY);
-                        System.out.println("Is statement null? " + (insertStmt ==null));
-                        System.out.println("The query string " + INSERT_USER_QUERY);
+                if(conn != null)  {
+                    PreparedStatement insertStmt = conn.prepareStatement(INSERT_USER_QUERY);
+                    System.out.println("Is statement null? " + (insertStmt ==null));
+                    System.out.println("The query string " + INSERT_USER_QUERY);
 
-                        insertStmt.setString(1,user.getUserName());
-                        insertStmt.setString(2,user.getPassword());
-                        insertStmt.setString(3,user.getFullName());
-                        insertStmt.setString(4,user.getAffiliation());
-                        insertStmt.setString(5,user.getWorkPhone());
-                        insertStmt.setString(6,user.getEmailAddr());
-                        insertStmt.setBoolean(7,user.isInAdminGroup());
-                        insertStmt.setBoolean(8,user.isAcctDisabled());
-                        
-                        insertStmt.executeUpdate();
-                        
-                        
-                        // Close the result set, statement and the connection
-                        insertStmt.close() ;
-                        conn.close() ;
-                    }//conn not null
-                }//ds not null
-                }catch(SQLException ex){
-                    ex.printStackTrace();
-                    throw new InfrastructureException("Database error");
-                }
+                    insertStmt.setString(1,user.getUserName());
+                    insertStmt.setString(2,user.getPassword());
+                    insertStmt.setString(3,user.getFullName());
+                    insertStmt.setString(4,user.getAffiliation());
+                    insertStmt.setString(5,user.getWorkPhone());
+                    insertStmt.setString(6,user.getEmailAddr());
+                    insertStmt.setBoolean(7,user.isInAdminGroup());
+                    insertStmt.setBoolean(8,user.isAcctDisabled());
+                    
+                    insertStmt.executeUpdate();
+                    
+                    
+                    // Close the result set, statement and the connection
+                    insertStmt.close() ;
+                    conn.close() ;
+                }//conn not null
+            }//ds not null
+            }catch(SQLException ex){
+                ex.printStackTrace();
+                throw new InfrastructureException("Database error");
+            }
 
         System.out.println("End insert user");
     }
