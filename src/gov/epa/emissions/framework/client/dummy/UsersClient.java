@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.dummy;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.transport.ExImTransport;
+import gov.epa.emissions.framework.client.transport.ExImServicesTransport;
 import gov.epa.emissions.framework.client.transport.UserServicesTransport;
 import gov.epa.emissions.framework.commons.User;
 

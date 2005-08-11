@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.dummy;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.transport.ExImTransport;
+import gov.epa.emissions.framework.client.transport.ExImServicesTransport;
 
 /*
  * Created on Aug 4, 2005
@@ -27,7 +27,7 @@ public class ExImClient {
     public ExImClient() throws EmfException {
         super();
         System.out.println("START IMPORT CLIENT");
-        ExImTransport emfData1 = new ExImTransport(endpoint1);
+        ExImServicesTransport emfData1 = new ExImServicesTransport(endpoint1);
         emfData1.startImport("ejones","conrad.txt","ORL");
         System.out.println("END IMPORT CLIENT");
 //        ExImTransport emfData2 = new ExImTransport(endpoint1);
