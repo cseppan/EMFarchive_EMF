@@ -9,8 +9,8 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.StatusServices;
 import gov.epa.emissions.framework.commons.Status;
+import gov.epa.emissions.framework.commons.StatusServices;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;

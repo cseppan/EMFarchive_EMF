@@ -8,7 +8,6 @@
  */
 package gov.epa.emissions.framework.client.transport;
 
-import gov.epa.emissions.framework.commons.EMFService;
 import gov.epa.emissions.framework.commons.EMFConstants;
 
 

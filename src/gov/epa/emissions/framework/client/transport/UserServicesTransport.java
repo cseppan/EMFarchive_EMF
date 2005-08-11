@@ -11,8 +11,8 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.framework.AuthenticationException;
 import gov.epa.emissions.framework.CommunicationFailureException;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.UserServices;
 import gov.epa.emissions.framework.commons.User;
+import gov.epa.emissions.framework.commons.UserServices;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
