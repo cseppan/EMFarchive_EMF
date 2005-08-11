@@ -12,7 +12,7 @@ package gov.epa.emissions.framework.commons;
  * @author Conrad F. D'Cruz
  *
  */
-public class EMFConstants {
+public final class EMFConstants {
 
     public static final String IMPORT_MESSAGE_TYPE="Import";
     public static final String EXPORT_MESSAGE_TYPE="Export";
