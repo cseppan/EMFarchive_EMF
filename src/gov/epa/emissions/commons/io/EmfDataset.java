@@ -1,6 +1,5 @@
 package gov.epa.emissions.commons.io;
 
-import gov.epa.emissions.commons.io.importer.Dataset;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -14,19 +13,9 @@ public class EmfDataset implements Dataset {
 
     private String description;
 
-    private Map dataSources;
-
     private Map dataTables;
 
     private String datasetType;
-
-    private Date startDateTime;
-
-    private Date stopDateTime;
-
-    private List units;
-
-    private String temporalResolution;
 
     private String region;
 
@@ -39,11 +28,9 @@ public class EmfDataset implements Dataset {
     }
 
     public void setUnits(List units) {
-        this.units = units;
     }
 
     public void setTemporalResolution(String temporalResolution) {
-        this.temporalResolution = temporalResolution;
     }
 
     public void setRegion(String region) {
@@ -55,11 +42,9 @@ public class EmfDataset implements Dataset {
     }
 
     public void setStartDateTime(Date time) {
-        this.startDateTime = time;
     }
 
     public void setStopDateTime(Date time) {
-        this.stopDateTime = time;
     }
 
     public String getRegion() {
@@ -95,7 +80,6 @@ public class EmfDataset implements Dataset {
     }
 
     public void setDataSources(Map dataSources) {
-        this.dataSources = dataSources;
     }
 
 }

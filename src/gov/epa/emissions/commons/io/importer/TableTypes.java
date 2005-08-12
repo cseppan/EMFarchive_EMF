@@ -1,6 +1,5 @@
 package gov.epa.emissions.commons.io.importer;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,7 +7,7 @@ import java.util.Map;
  * Table type String constants
  * 
  * @author Craig Mattocks, Keith Lee
- * @version $Id: TableTypes.java,v 1.1 2005/08/12 15:46:42 rhavaldar Exp $
+ * @version $Id: TableTypes.java,v 1.2 2005/08/12 16:44:09 rhavaldar Exp $
  */
 public final class TableTypes {
     public static final String IDA_AREA = "IDA Area Source Emissions";
@@ -208,22 +207,6 @@ public final class TableTypes {
      */
     public static final String[] getNamesArray(String datasetType) {
         return (String[]) DATASET_TYPE_TO_NAMES_ARRAY_MAP.get(datasetType);
-    }
-
-    public static final String[] getNIFPointTableTypes() {
-        return getNamesArray(DatasetTypes.NIF_POINT);
-    }
-
-    public static final String[] getNIFAreaTableTypes() {
-        return getNamesArray(DatasetTypes.NIF_AREA);
-    }
-
-    public static final String[] getNIFMobileEmissionsTableTypes() {
-        return getNamesArray(DatasetTypes.NIF_MOBILE_EMISSIONS);
-    }
-
-    public static final String getEmissionTableType(String datasetType) {
-        return (String) EMISSION_TABLE_NAMES.get(datasetType);
     }
 
     // some helper methods

@@ -2,9 +2,9 @@ package gov.epa.emissions.commons.io.importer.orl;
 
 import gov.epa.emissions.commons.db.SqlTypeMapper;
 import gov.epa.emissions.commons.io.ColumnType;
-import gov.epa.emissions.commons.io.importer.DataFormat;
+import gov.epa.emissions.commons.io.importer.FileColumnsMetadata;
 
-public abstract class ORLDataFormat extends DataFormat {
+public abstract class ORLDataFormat {
     public static final int NO_WIDTH = -1;
 
     public static final String CAS_NAME = "CAS";
@@ -27,8 +27,29 @@ public abstract class ORLDataFormat extends DataFormat {
 
     protected boolean extendedFormat;
 
+    protected SqlTypeMapper sqlTypeMapper;
+
+    public static final String FIPS_NAME = "FIPS";
+
+    protected static final ColumnType FIPS_TYPE = ColumnType.INT;
+
+    protected static final int FIPS_WIDTH = 5;
+
     ORLDataFormat(SqlTypeMapper sqlTypeMapper, boolean extendedFormat) {
-        super(sqlTypeMapper);
+        this.sqlTypeMapper = sqlTypeMapper;
         this.extendedFormat = extendedFormat;
     }
+
+    /** TODO should this be moved to FileColumnsMetadata ? */
+    public final void addDetail(FileColumnsMetadata details, String name, ColumnType type, int width) {
+        details.addColumnName(name);
+        try {
+            details.setType(name, type.getName());
+            details.setWidth(name, String.valueOf(width));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public abstract FileColumnsMetadata getFileImportDetails();
 }

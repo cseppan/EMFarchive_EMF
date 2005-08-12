@@ -9,12 +9,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Craig Mattocks
- * @version $Id: FieldDefinitionsFileReader.java,v 1.9 2005/07/05 14:32:47
- *          keithlee Exp $
- * 
- */
 public class FieldDefinitionsFileReader {
     private static final String NAMES = "names";
 
@@ -33,8 +27,6 @@ public class FieldDefinitionsFileReader {
 
     /**
      * @TODO fill out this constructor later
-     * @param fileName
-     * @throws IOException
      */
     public FieldDefinitionsFileReader(File file, SqlTypeMapper sqlTypeMapper) throws IOException {
         try {
@@ -47,16 +39,9 @@ public class FieldDefinitionsFileReader {
                 details = readTableDetails(buffer, sqlTypeMapper);
                 detailsMap.put(details.getTableName(), details);
             }
-
-            reader.close();
-            reader = null;
         } finally {
             if (reader != null) {
-                try {
-                    reader.close();
-                    reader = null;
-                } catch (IOException ignore) {
-                }
+                reader.close();
             }
         }
     }
@@ -102,7 +87,7 @@ public class FieldDefinitionsFileReader {
         // nameWidthMap: [A:1 | B:2 | C:3 | D:4]
         String[] nameSplitString = namesLine.split(DELIMITER);
         for (int i = 0; i < nameSplitString.length; i++) {
-            details.add(nameSplitString[i]);
+            details.addColumnName(nameSplitString[i]);
         }
 
         String[] typeSplitString = typesLine.split(DELIMITER);
@@ -141,7 +126,7 @@ public class FieldDefinitionsFileReader {
         return false;
     }
 
-    public FileColumnsMetadata getFileImportDetails(String fileImportType) throws Exception {
+    public FileColumnsMetadata getFileColumnsMetadata(String fileImportType) throws Exception {
         if (!detailsMap.containsKey(fileImportType))
             throw new Exception("The fileimportype " + fileImportType + " was not found in the field definitions file");
         return (FileColumnsMetadata) detailsMap.get(fileImportType);

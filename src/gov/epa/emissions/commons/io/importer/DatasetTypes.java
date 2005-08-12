@@ -1,14 +1,12 @@
 package gov.epa.emissions.commons.io.importer;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Dataset type String constants
- * 
- * @version $Id: DatasetTypes.java,v 1.1 2005/08/12 15:46:42 rhavaldar Exp $
+ * @version $Id: DatasetTypes.java,v 1.2 2005/08/12 16:44:09 rhavaldar Exp $
  * 
  */
 public final class DatasetTypes {
@@ -21,9 +19,6 @@ public final class DatasetTypes {
     public static final String NIF_POINT = "NIF3 Point Inventory";
 
     public static final String NIF_MOBILE_EMISSIONS = "NIF3 Mobile Onroad Emissions Inventory";
-
-    // public static final String NIF_MOBILE_ACTIVITY = "NIF3 Mobile Activity
-    // Inventory";
 
     public static final String IDA_AREA = "IDA Area Inventory";
 
@@ -44,14 +39,8 @@ public final class DatasetTypes {
     public static final String REFERENCE = "Reference";
 
     /** List of all NAMES in enumeration. */
-    public static final java.util.List NAMES /*
-                                                 * =
-                                                 * getAllNames(DatasetTypes.class)
-                                                 */;
+    public static final List NAMES;
 
-    /** List of all objects in enumeration. */
-    // public static final java.util.List VALUES =
-    // getInstances(DatasetTypes.class);
     /** Map of all table names for a given Dataset type. */
     private static final Map TABLE_NAMES;
 
@@ -120,20 +109,6 @@ public final class DatasetTypes {
         DESCRIPTIVE_COLUMN_NAMES.put(NIF_MOBILE_EMISSIONS, NIF_MOBILE_EMISSIONS_COLUMN_NAMES);
     }
 
-    public static boolean isNIFDataset(String datasetType) {
-        if (datasetType != null)
-            return (datasetType.equals(NIF_AREA) || datasetType.equals(NIF_POINT) || datasetType
-                    .equals(NIF_MOBILE_EMISSIONS));
-        return false;
-    }
-
-    public static boolean isIDADataset(String datasetType) {
-        if (datasetType != null)
-            return (datasetType.equals(IDA_AREA) || datasetType.equals(IDA_MOBILE_ACTIVITY)
-                    || datasetType.equals(IDA_MOBILE_EMISSIONS) || datasetType.equals(IDA_POINT));
-        return false;
-    }
-
     public static boolean isORLDataset(String datasetType) {
         if (datasetType != null)
             return (datasetType.equals(ORL_AREA_NONPOINT_TOXICS) || datasetType.equals(ORL_AREA_NONROAD_TOXICS)
@@ -141,34 +116,7 @@ public final class DatasetTypes {
         return false;
     }
 
-    public static boolean isDirRequired(String datasetType) {
-        if (datasetType != null)
-            return (datasetType.equals(NIF_AREA) || datasetType.equals(NIF_POINT) || datasetType
-                    .equals(NIF_MOBILE_EMISSIONS));
-        return false;
-    }
-
-    public static boolean isFileRequired(String datasetType) {
-        if (datasetType != null)
-            return (datasetType.equals(IDA_AREA) || datasetType.equals(IDA_MOBILE_ACTIVITY)
-                    || datasetType.equals(IDA_MOBILE_EMISSIONS) || datasetType.equals(IDA_POINT)
-                    || datasetType.equals(ORL_AREA_NONPOINT_TOXICS) || datasetType.equals(ORL_AREA_NONROAD_TOXICS)
-                    || datasetType.equals(ORL_MOBILE_TOXICS) || datasetType.equals(ORL_POINT_TOXICS));
-        return false;
-    }
-
-    /**
-     * Private constructor prevents construction outside of this class.
-     */
     private DatasetTypes() {
-        /** DO NOTHING * */
-    }
-
-    /**
-     * Get all dataset types (all names)
-     */
-    public static String[] getDatasetTypes() {
-        return getNamesArray();
     }
 
     /**
@@ -182,42 +130,4 @@ public final class DatasetTypes {
         return (String) SUMMARY_TABLE_TYPE.get(datasetType);
     }
 
-    public static final String[] getDescriptiveColumnNames(String datasetType) {
-        return (String[]) DESCRIPTIVE_COLUMN_NAMES.get(datasetType);
-    }
-
-    /* ########## DO NOT EDIT BELOW THIS LINE ########## */
-    /**
-     * Valid enumerator?
-     * 
-     * Not rigorous, just check for its name.
-     */
-    public static boolean isValid(final String name) {
-        return NAMES.contains(name);
-    }
-
-    /**
-     * Get a String array of all names in the enumeration.
-     * 
-     * @return An unmodifiable String[] Array of the names.
-     */
-    public static final String[] getNamesArray() {
-        return (String[]) NAMES.toArray(new String[NAMES.size()]);
-    }
-    //
-    // /**
-    // * Get a List of all names in the enumeration.
-    // *
-    // * @return A List of all names of the enumerated items.
-    // */
-    // public static java.util.List getAllNames(final Class clazz)
-    // {
-    // java.util.List names = new ArrayList();
-    // for (Iterator it = getInstances(clazz).iterator(); it.hasNext();)
-    // {
-    // names.add(((Enum)it.next()).getName());
-    // }
-    // return names;
-    // }
-    //
 }

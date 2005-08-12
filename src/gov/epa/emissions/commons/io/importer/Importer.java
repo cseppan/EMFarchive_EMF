@@ -1,10 +1,12 @@
 package gov.epa.emissions.commons.io.importer;
 
 import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.io.Dataset;
 
 import java.io.BufferedReader;
 import java.io.File;
 
+//TODO: diff b/w putIntoDatabase and importFile methods ?
 public interface Importer {
     /* read ahead limit ~ 100 MB */
     public static final long READ_AHEAD_LIMIT = 105000000L;
@@ -24,7 +26,7 @@ public interface Importer {
     public void putIntoDatabase(File[] files, boolean overwrite, Dataset dataset) throws Exception;
 
     /**
-     * this method will take in a file as an argument and ingest if into the
+     * this method will take in a file as an argument and ingest it into the
      * database
      * 
      * @param file

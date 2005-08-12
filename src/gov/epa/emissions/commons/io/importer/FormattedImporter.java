@@ -3,6 +3,7 @@ package gov.epa.emissions.commons.io.importer;
 import gov.epa.emissions.commons.db.DataAcceptor;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.io.Dataset;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,15 +16,12 @@ import java.util.List;
 
 /**
  * This class contains all the common features for importing formatted files.
- * 
- * @author Keith Lee, CEP UNC
- * @version $Id: FormattedImporter.java,v 1.3 2005/08/12 15:46:42 rhavaldar Exp $
+ * FIXME: split the larger methods, and reorganize
  */
 public abstract class FormattedImporter implements Importer {
     /** Dataset in which imported data is stored */
     protected Dataset dataset = null;
 
-    /** whether to use transactions * */
     protected boolean useTransactions = false;
 
     protected DbServer dbServer;
@@ -32,13 +30,6 @@ public abstract class FormattedImporter implements Importer {
         this.dbServer = dbServer;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.emisview.io.importer.Importer#importFile(java.io.File,
-     *      java.lang.String,
-     *      gov.epa.emissions.emisview.io.importer.FileImportDetails)
-     */
     public final String importFile(File file, Datasource datasource, BufferedReader reader, String[] columnNames,
             String[] columnTypes, int[] columnWidths, boolean overwrite) throws Exception {
         // get the name of the file

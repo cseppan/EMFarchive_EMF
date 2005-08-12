@@ -2,6 +2,7 @@ package gov.epa.emissions.commons.io.importer;
 
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
 
 import java.io.BufferedReader;
@@ -11,9 +12,6 @@ import java.io.FilenameFilter;
 
 /**
  * This class represents the ReferenceImporter for the reference database.
- * 
- * @author Keith Lee, CEP UNC
- * @version $Id: ReferenceImporter.java,v 1.1 2005/08/12 15:46:42 rhavaldar Exp $
  */
 public class ReferenceImporter extends FixedFormatImporter {
     private File fieldDefsFile;
@@ -25,7 +23,6 @@ public class ReferenceImporter extends FixedFormatImporter {
 
     private static final String REF_DIR_NAME = "refFiles";
 
-    // FIXME: what are these params ??
     public ReferenceImporter(DbServer dbServer, File fieldDefsFileName, File referenceFilesDir, boolean useTransactions) {
         super(dbServer);
         this.fieldDefsFile = fieldDefsFileName;
@@ -36,20 +33,11 @@ public class ReferenceImporter extends FixedFormatImporter {
     /**
      * Take a array of Files and put them database, overwriting existing
      * corresponding tables specified in dataset based on overwrite flag.
-     * 
-     * @param files -
-     *            an array of Files which are checked prior to import
-     * @param overwrite -
-     *            whether or not to overwrite corresponding tables
-     * @param dataset -
-     *            Dataset specifying needed properties such as datasetType and
-     *            table name (table name look-up is based on file name)
      */
     public void putIntoDatabase(File[] files, boolean overwrite, Dataset dataset) throws Exception {
         this.dataset = dataset;
 
         Datasource datasource = dbServer.getReferenceDatasource();
-        System.out.println("datasource - " + datasource.getName());
         String type = dataset.getDatasetType();
 
         files = checkFiles(type, files);
@@ -68,43 +56,24 @@ public class ReferenceImporter extends FixedFormatImporter {
             System.out.println("importing file - " + files[i]);
             importFile(files[i], datasource, getDetails(files[i]), overwrite);
             System.out.println("successfully imported file - " + files[i]);
-        }// for int i
+        }
     }
 
     /**
      * import a single file into the specified database
-     * 
-     * @param file -
-     *            the file to be ingested in
-     * @param dbName -
-     *            the database into which the data is ingested from the file
-     * @param details -
-     *            the details with which to import the file
      */
     public void importFile(File file, Datasource datasource, FileColumnsMetadata details, boolean overwrite)
             throws Exception {
-        String[] columnNames = details.getColumnNames();
-        String[] columnTypes = details.getColumnTypes();
-        int[] columnWidths = details.getColumnWidths();
-
-        // get a bufferedreader for the file to be imported in
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
-        super.importFile(file, datasource, reader, columnNames, columnTypes, columnWidths, overwrite);
+        super.importFile(file, datasource, reader, details.getColumnNames(), details.getColumnTypes(), details
+                .getColumnWidths(), overwrite);
     }
 
-    /**
-     * get the file import details for a particular file
-     * 
-     * @param file -
-     *            the file to find FileImportDetails for
-     * @return FileImportDetails for the file
-     */
     private FileColumnsMetadata getDetails(File file) throws Exception {
-        // get the fileimporttype
         String fileName = file.getName();
         String fileImportType = fileName.substring(0, fileName.length() - 4);
-        return fieldDefsReader.getFileImportDetails(fileImportType);
+        return fieldDefsReader.getFileColumnsMetadata(fileImportType);
     }
 
     public void createReferenceTables() throws Exception {
@@ -126,7 +95,6 @@ public class ReferenceImporter extends FixedFormatImporter {
         final String datasetType = DatasetTypes.REFERENCE;
         dataset.addDataTable(TableTypes.REF_CONTROL_DEVICE_CODES, "control_device_codes");
         dataset.addDataTable(TableTypes.REF_CONVERSION_FACTORS, "conversion_factors");
-        // dataset.addDataTable(TableTypes.REF_COUNTRIES, "countries");
         dataset.addDataTable(TableTypes.REF_EMISSION_TYPES, "emission_types");
         dataset.addDataTable(TableTypes.REF_EMISSION_UNITS_CODES, "emission_units_codes");
         dataset.addDataTable(TableTypes.REF_FIPS, "fips");
@@ -134,21 +102,13 @@ public class ReferenceImporter extends FixedFormatImporter {
         dataset.addDataTable(TableTypes.REF_MATERIAL_CODES, "material_codes");
         dataset.addDataTable(TableTypes.REF_NAICS_CODES, "naics_codes");
         dataset.addDataTable(TableTypes.REF_POLLUTANT_CODES, "pollutant_codes");
-        // dataset.addDataTable(TableTypes.REF_POLLUTANTS, "pollutants");
         dataset.addDataTable(TableTypes.REF_SCC, "scc");
-        // dataset.addDataTable(TableTypes.REF_SECTORS, "sectors");
         dataset.addDataTable(TableTypes.REF_SIC_CODES, "sic_codes");
-        // dataset.addDataTable(TableTypes.REF_STATES, "states");
         dataset.addDataTable(TableTypes.REF_TIME_ZONES, "time_zones");
         dataset.addDataTable(TableTypes.REF_TRIBAL_CODES, "tribal");
         dataset.setDatasetType(datasetType);
 
-        long currentTime = System.currentTimeMillis();
-
         putIntoDatabase(files, true, dataset);
-
-        System.out.println("The total time required was " + ((System.currentTimeMillis() - currentTime) / 1000)
-                + " seconds");
     }
 
 }

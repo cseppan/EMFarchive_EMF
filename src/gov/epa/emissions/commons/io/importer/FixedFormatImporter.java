@@ -2,14 +2,9 @@ package gov.epa.emissions.commons.io.importer;
 
 import gov.epa.emissions.commons.db.DbServer;
 
-
 /**
  * This class contains all the common features for importing files with a fixed
  * format.
- * 
- * @author Prashant Pai, CEP UNC
- * @version $Id: FixedFormatImporter.java,v 1.21 2005/08/10 18:14:30 rhavaldar
- *          Exp $
  */
 public abstract class FixedFormatImporter extends FormattedImporter {
     protected FixedFormatImporter(DbServer dbServer) {
@@ -47,5 +42,5 @@ public abstract class FixedFormatImporter extends FormattedImporter {
             lastIndex = nextIndex;
         }// for int i
         return stringlets;
-    }// breakUpLine(String, int[])
+    }
 }

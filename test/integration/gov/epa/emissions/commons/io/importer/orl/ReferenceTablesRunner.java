@@ -22,6 +22,9 @@ public class ReferenceTablesRunner {
 
         File referenceFilesDir = new File("config/refDbFiles");
         ReferenceTables tables = new ReferenceTables(referenceFilesDir, dbSetup.getDbServer().getTypeMapper());
+        
+        System.out.println("Started adding reference tables...");
         tables.createAdditionRefTables(dbSetup.getDbServer().getReferenceDatasource());
+        System.out.println("Completed adding reference tables.");
     }
 }

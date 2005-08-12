@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.db.DataAcceptor;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.ColumnType;
-import gov.epa.emissions.commons.io.importer.Dataset;
+import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.importer.DatasetTypes;
 import gov.epa.emissions.commons.io.importer.FileColumnsMetadata;
 import gov.epa.emissions.commons.io.importer.ListFormatImporter;
@@ -29,7 +29,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.3 2005/08/12 15:46:42 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.4 2005/08/12 16:44:09 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -167,8 +167,7 @@ public class ORLImporter extends ListFormatImporter {
         String[] columnTypes = metadata.getColumnTypes();
         int[] columnWidths = metadata.getColumnWidths();
 
-        String tableName = super
-                .importFile(file, datasource, reader, columnNames, columnTypes, columnWidths, overwrite);
+        super.importFile(file, datasource, reader, columnNames, columnTypes, columnWidths, overwrite);
 
         // set dataset variables not specified in files
         final TemporalResolution resolution;
@@ -403,26 +402,26 @@ public class ORLImporter extends ListFormatImporter {
     protected void postProcess(DataAcceptor acceptor, String tableType) throws Exception {
         // point
         if (tableType.equals(TableTypes.ORL_POINT_TOXICS)) {
-            String[] indexColumnNames = { ORLPointDataFormat.FIPS_NAME, ORLPointDataFormat.PLANT_ID_CODE_NAME,
+            String[] indexColumnNames = { ORLDataFormat.FIPS_NAME, ORLPointDataFormat.PLANT_ID_CODE_NAME,
                     ORLPointDataFormat.POINT_ID_CODE_NAME, ORLPointDataFormat.STACK_ID_CODE_NAME,
                     ORLPointDataFormat.DOE_PLANT_ID_NAME, ORLPointDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
             acceptor.addIndex("orl_point_key", indexColumnNames);
         }
         // nonpoint
         if (tableType.equals(TableTypes.ORL_AREA_NONPOINT_TOXICS)) {
-            String[] indexColumnNames = { ORLAreaNonpointDataFormat.FIPS_NAME,
+            String[] indexColumnNames = { ORLDataFormat.FIPS_NAME,
                     ORLAreaNonpointDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
             acceptor.addIndex("orl_nonpoint_key", indexColumnNames);
         }
         // nonroad
         if (tableType.equals(TableTypes.ORL_AREA_NONROAD_TOXICS)) {
-            String[] indexColumnNames = { ORLAreaNonroadDataFormat.FIPS_NAME,
+            String[] indexColumnNames = { ORLDataFormat.FIPS_NAME,
                     ORLAreaNonroadDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
             acceptor.addIndex("orl_nonroad_key", indexColumnNames);
         }
         // mobile/onroad
         if (tableType.equals(TableTypes.ORL_MOBILE_TOXICS)) {
-            String[] indexColumnNames = { ORLMobileDataFormat.FIPS_NAME,
+            String[] indexColumnNames = { ORLDataFormat.FIPS_NAME,
                     ORLMobileDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
             acceptor.addIndex("orl_mobile_key", indexColumnNames);
         }
@@ -472,7 +471,7 @@ public class ORLImporter extends ListFormatImporter {
             final int FIPS_WIDTH = 5;
             final ColumnType FIPS_TYPE = ColumnType.CHAR;
             FileColumnsMetadata fips = new FileColumnsMetadata(FIPS_NAME, dbServer.getTypeMapper());
-            fips.add(FIPS_NAME);
+            fips.addColumnName(FIPS_NAME);
 
             fips.setWidth(FIPS_NAME, String.valueOf(FIPS_WIDTH));
             fips.setType(FIPS_NAME, FIPS_TYPE.getName());
@@ -515,7 +514,7 @@ public class ORLImporter extends ListFormatImporter {
         final int STATE_WIDTH = 4;
         final ColumnType STATE_TYPE = ColumnType.CHAR;
         FileColumnsMetadata state = new FileColumnsMetadata(STATE_NAME, dbServer.getTypeMapper());
-        state.add(STATE_NAME);
+        state.addColumnName(STATE_NAME);
 
         state.setWidth(STATE_NAME, String.valueOf(STATE_WIDTH));
         state.setType(STATE_NAME, STATE_TYPE.getName());

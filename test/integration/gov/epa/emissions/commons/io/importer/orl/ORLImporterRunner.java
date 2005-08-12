@@ -1,8 +1,8 @@
 package gov.epa.emissions.commons.io.importer.orl;
 
 import gov.epa.emissions.commons.db.DatabaseSetup;
+import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
-import gov.epa.emissions.commons.io.importer.Dataset;
 import gov.epa.emissions.commons.io.importer.DatasetTypes;
 import gov.epa.emissions.commons.io.importer.TableTypes;
 

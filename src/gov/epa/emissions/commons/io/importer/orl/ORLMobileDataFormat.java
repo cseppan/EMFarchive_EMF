@@ -40,7 +40,7 @@ public final class ORLMobileDataFormat extends ORLDataFormat {
 
         // once per line
         if (extendedFormat) {
-            addDetail(details, FIPS_NAME, FIPS_TYPE, FIPS_WIDTH);
+            addDetail(details, ORLDataFormat.FIPS_NAME, ORLDataFormat.FIPS_TYPE, ORLDataFormat.FIPS_WIDTH);
         } else {
             addDetail(details, STATE_CODE_NAME, STATE_CODE_TYPE, STATE_CODE_WIDTH);
             addDetail(details, COUNTY_CODE_NAME, COUNTY_CODE_TYPE, COUNTY_CODE_WIDTH);

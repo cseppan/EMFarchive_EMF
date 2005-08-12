@@ -26,6 +26,9 @@ public class ReferenceImporterRunner {
 
         File fieldDefsFile = new File("config/field_defs.dat");
         File referenceFilesDir = new File("config/refDbFiles");
+        
+        System.out.println("Started Reference importer...");
         new ReferenceImporter(dbSetup.getDbServer(), fieldDefsFile, referenceFilesDir, false).createReferenceTables();
+        System.out.println("Completed importing Reference data");
     }
 }

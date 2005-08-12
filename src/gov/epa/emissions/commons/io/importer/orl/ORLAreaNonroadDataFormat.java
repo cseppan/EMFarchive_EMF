@@ -8,7 +8,7 @@ import gov.epa.emissions.commons.io.importer.FileColumnsMetadata;
  * ORL Nonroad Source Toxics Inventory (list-format)
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLAreaNonroadDataFormat.java,v 1.3 2005/08/12 15:46:42 rhavaldar Exp $
+ * @version $Id: ORLAreaNonroadDataFormat.java,v 1.4 2005/08/12 16:44:09 rhavaldar Exp $
  */
 public final class ORLAreaNonroadDataFormat extends ORLAreaDataFormat
 {
@@ -41,7 +41,7 @@ public final class ORLAreaNonroadDataFormat extends ORLAreaDataFormat
         // once per line
         if(extendedFormat)
         {
-            addDetail(details, FIPS_NAME, FIPS_TYPE, FIPS_WIDTH);
+            addDetail(details, ORLDataFormat.FIPS_NAME, ORLDataFormat.FIPS_TYPE, ORLDataFormat.FIPS_WIDTH);
         }
         else
         {

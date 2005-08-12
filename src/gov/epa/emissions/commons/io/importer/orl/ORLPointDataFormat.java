@@ -225,7 +225,7 @@ public final class ORLPointDataFormat extends ORLDataFormat {
         FileColumnsMetadata details = new FileColumnsMetadata("", super.sqlTypeMapper);
 
         // once per line
-        addDetail(details, FIPS_NAME, FIPS_TYPE, FIPS_WIDTH);
+        addDetail(details, ORLDataFormat.FIPS_NAME, ORLDataFormat.FIPS_TYPE, ORLDataFormat.FIPS_WIDTH);
         addDetail(details, PLANT_ID_CODE_NAME, PLANT_ID_CODE_TYPE, PLANT_ID_CODE_WIDTH);
         addDetail(details, POINT_ID_CODE_NAME, POINT_ID_CODE_TYPE, POINT_ID_CODE_WIDTH);
         addDetail(details, STACK_ID_CODE_NAME, STACK_ID_CODE_TYPE, STACK_ID_CODE_WIDTH);

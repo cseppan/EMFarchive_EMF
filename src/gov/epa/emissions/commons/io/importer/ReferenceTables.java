@@ -155,7 +155,6 @@ public class ReferenceTables {
         BufferedReader bfr = new BufferedReader(fr);
         String line = null;
 
-        // TODO: inject the type mapper
         String[] colTypes = { "VARCHAR(8)", "VARCHAR(32)", "VARCHAR(32)", "VARCHAR(32)", "VARCHAR(32)", "VARCHAR(32)",
                 sqlTypeMapper.getSqlType("", "N", 0), sqlTypeMapper.getSqlType("", "N", 0),
                 sqlTypeMapper.getSqlType("", "N", 0), sqlTypeMapper.getSqlType("", "N", 0),
@@ -188,15 +187,11 @@ public class ReferenceTables {
     }
 
     public void createAdditionRefTables(Datasource referenceDatasource) throws Exception {
-        System.out.println("Creating additional reference tables:\n");
-
         createPollutantsTable(referenceDatasource);
         createCountriesTable(referenceDatasource);
         createStatesTable(referenceDatasource);
         createSectorsTable(referenceDatasource);
         createCountyTable(referenceDatasource);
-
-        System.out.println("Sucessfully created additional reference tables\n");
     }
 
 }
