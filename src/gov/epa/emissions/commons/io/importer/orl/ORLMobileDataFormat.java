@@ -1,5 +1,9 @@
 package gov.epa.emissions.commons.io.importer.orl;
 
+import gov.epa.emissions.commons.db.SqlTypeMapper;
+import gov.epa.emissions.commons.io.ColumnType;
+import gov.epa.emissions.commons.io.importer.FileColumnsMetadata;
+
 /**
  * ORL Mobile Source Toxics Inventory (list-format)
  */

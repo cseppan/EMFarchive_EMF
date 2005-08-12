@@ -1,25 +1,29 @@
 package gov.epa.emissions.commons.io.importer.orl;
 
+import gov.epa.emissions.commons.db.SqlTypeMapper;
+import gov.epa.emissions.commons.io.ColumnType;
+import gov.epa.emissions.commons.io.importer.DataFormat;
+
 public abstract class ORLDataFormat extends DataFormat {
-    protected static final int NO_WIDTH = -1;
+    public static final int NO_WIDTH = -1;
 
-    protected static final String CAS_NAME = "CAS";
+    public static final String CAS_NAME = "CAS";
 
-    protected static final int CAS_WIDTH = 10;
+    public static final int CAS_WIDTH = 10;
 
-    protected static final ColumnType CAS_TYPE = ColumnType.CHAR;
+    public static final ColumnType CAS_TYPE = ColumnType.CHAR;
 
-    protected static final String ANNUAL_EMISSIONS_NAME = "ANN_EMIS";
+    public static final String ANNUAL_EMISSIONS_NAME = "ANN_EMIS";
 
-    protected static final int ANNUAL_EMISSIONS_WIDTH = NO_WIDTH;
+    public static final int ANNUAL_EMISSIONS_WIDTH = NO_WIDTH;
 
-    protected static final ColumnType ANNUAL_EMISSIONS_TYPE = ColumnType.REAL;
+    public static final ColumnType ANNUAL_EMISSIONS_TYPE = ColumnType.REAL;
 
-    protected static final String AVERAGE_DAY_EMISSIONS_NAME = "AVD_EMIS";// optional
+    public static final String AVERAGE_DAY_EMISSIONS_NAME = "AVD_EMIS";// optional
 
-    protected static final int AVERAGE_DAY_EMISSIONS_WIDTH = NO_WIDTH;
+    public static final int AVERAGE_DAY_EMISSIONS_WIDTH = NO_WIDTH;
 
-    protected static final ColumnType AVERAGE_DAY_EMISSIONS_TYPE = ColumnType.REAL;
+    public static final ColumnType AVERAGE_DAY_EMISSIONS_TYPE = ColumnType.REAL;
 
     protected boolean extendedFormat;
 

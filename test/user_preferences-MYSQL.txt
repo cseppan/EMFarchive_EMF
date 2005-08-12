@@ -1,0 +1,29 @@
+# db properties
+
+database.type=mysql
+
+#reference datasource
+datasource.reference.name=reference
+
+database.reference.host=localhost
+database.reference.port=3306
+database.reference.username=root
+database.reference.password=root
+
+
+#emission datasource
+datasource.emissions.name=emissions
+
+database.emissions.host=localhost
+database.emissions.port=3306
+database.emissions.username=root
+database.emissions.password=root
+
+
+#analysis datasource
+datasource.analysis.name=analysis
+
+database.analysis.host=localhost
+database.analysis.port=3306
+database.analysis.username=root
+database.analysis.password=root

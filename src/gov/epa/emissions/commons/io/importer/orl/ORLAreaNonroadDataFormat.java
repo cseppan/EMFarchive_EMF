@@ -1,10 +1,14 @@
 package gov.epa.emissions.commons.io.importer.orl;
 
+import gov.epa.emissions.commons.db.SqlTypeMapper;
+import gov.epa.emissions.commons.io.ColumnType;
+import gov.epa.emissions.commons.io.importer.FileColumnsMetadata;
+
 /**
  * ORL Nonroad Source Toxics Inventory (list-format)
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLAreaNonroadDataFormat.java,v 1.2 2005/08/12 14:12:14 rhavaldar Exp $
+ * @version $Id: ORLAreaNonroadDataFormat.java,v 1.3 2005/08/12 15:46:42 rhavaldar Exp $
  */
 public final class ORLAreaNonroadDataFormat extends ORLAreaDataFormat
 {

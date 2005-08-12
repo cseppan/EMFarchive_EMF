@@ -1,8 +1,11 @@
 package gov.epa.emissions.commons.io.importer.orl;
 
+import gov.epa.emissions.commons.db.SqlTypeMapper;
+import gov.epa.emissions.commons.io.ColumnType;
+
 /**
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLAreaDataFormat.java,v 1.2 2005/08/12 14:12:14 rhavaldar Exp $
+ * @version $Id: ORLAreaDataFormat.java,v 1.3 2005/08/12 15:46:42 rhavaldar Exp $
  */
 public abstract class ORLAreaDataFormat extends ORLDataFormat
 {
