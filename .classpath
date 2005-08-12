@@ -52,5 +52,6 @@
 	<classpathentry kind="lib" path="lib/proxool-0.8.3.jar"/>
 	<classpathentry kind="lib" path="lib/swarmcache-1.0rc2.jar"/>
 	<classpathentry kind="lib" path="lib/versioncheck.jar"/>
+	<classpathentry kind="lib" path="lib/tomcat/postgresql-8.0-311.jdbc3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

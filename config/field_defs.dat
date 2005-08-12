@@ -1,0 +1,166 @@
+# globals
+control_device_codes_names: control_device_code
+control_device_codes_types: C
+control_device_codes_widths: 4
+
+emission_units_codes_names: emission_units_code
+emission_units_codes_types: C
+emission_units_codes_widths: 10
+
+emission_types_names: emission_type, emission_type_name
+emission_types_types: C, C
+emission_types_widths: 5, 30
+
+fips_names: country_code, state_county_fips, state_abbr, county_name, time_zone, ignore_daylt_savings, county_ctr_lng, county_ctr_lat, county_area, county_west_lng, county_east_lng, county_north_lat, county_south_lat
+fips_types: C, C, C, C, C, C, N, N, N, N, N, N, N
+fips_widths: 2, 5, 4, 22, 3, 1, 11, 10, 13, 10, 10, 11, 10
+
+mact_codes_names: mact_code
+mact_codes_types: C
+mact_codes_widths: 6
+
+material_codes_names: material_code
+material_codes_types: C
+material_codes_widths: 4
+
+naics_codes_names: naics_code
+naics_codes_types: C
+naics_codes_widths: 6
+
+pollutant_codes_names: pollutant_code
+pollutant_codes_types: C
+pollutant_codes_widths: 9
+
+scc_names: scc, scc_desc
+scc_types: C, C
+scc_widths: 10, 400
+
+sic_codes_names: sic_code
+sic_codes_types: C
+sic_codes_widths: 4
+
+time_zones_names: time_zone, gmt_offset
+time_zones_types: C, N
+time_zones_widths: 6, 4
+
+conversion_factors_names: emission_units_code, emission_units_desc, factor_to_kg
+conversion_factors_types: C, C, N
+conversion_factors_widths: 10, 20, 20
+
+tribal_codes_names: tribal_code
+tribal_codes_types: C
+tribal_codes_widths: 4
+
+# rpo tables
+rpo_ts_names: record_type, country_code, state_county_fips, tribal_code, state_facility_id, emission_unit_id, emission_point_id, emission_process_id, scc, profile_type, profile_number, weekday_type, start_date, end_date
+rpo_ts_types: C, C, C, C, C, C, C, C, C, C, N, C, N, N
+rpo_ts_widths: 2, 2, 5, 5, 15, 6, 6, 6, 10, 10, 4, 2, 8, 8
+
+rpo_tm_names: record_type, profile_number, jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec, norm
+rpo_tm_types: C, N, N, N, N, N, N, N, N, N, N, N, N, N, N
+rpo_tm_widths: 2, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 8
+
+rpo_tw_names: record_type, profile_number, mon, tue, wed, thu, fri, sat, sun, norm
+rpo_tw_types: C, N, N, N, N, N, N, N, N, N
+rpo_tw_widths: 2, 4, 5, 5, 5, 5, 5, 5, 5, 8
+
+rpo_td_names: record_type, profile_number, hr01, hr02, hr03, hr04, hr05, hr06, hr07, hr08, hr09, hr10, hr11, hr12, hr13, hr14, hr15, hr16, hr17, hr18, hr19, hr20, hr21, hr22, hr23, hr24, norm
+rpo_td_types: C, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N
+rpo_td_widths: 2, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 8
+
+rpo_cr_names: record_type, country_code, state_county_fips, tribal_code, sic, scc, state_facility_id, emission_unit_id, emission_point_id, pollutant_code, emission_process_id, profile_code
+rpo_cr_types: C, C, C, C, C, C, C, C, C, C, C, C
+rpo_cr_widths: 2, 2, 5, 5, 4, 10, 15, 6, 6, 9, 6, 15
+
+rpo_cp_names: record_type, country_code, state_county_fips, tribal_code, sic, scc, site_id, emission_unit_id, emission_point_id, process_id, conversion_factor, pollutant_code_from, pollutant_code_to
+rpo_cp_types: C, C, C, C, C, C, C, C, C, C, N, C, C
+rpo_cp_widths: 2, 2, 5, 4, 2, 10, 15, 6, 6, 6, 5, 9, 9
+
+rpo_lp_names: record_type, profile_code, chemical_mechanism, pollutant_code, chem_mech_group, divisor, split_factor
+rpo_lp_types: C, C, C, C, C, N, N
+rpo_lp_widths: 2, 15, 10, 9, 10, 11, 11
+
+rpo_ss_names: record_type, country_code, state_county_fips, tribal_code, scc, ssc, weight
+rpo_ss_types: C, C, C, C, C, C, N
+rpo_ss_widths: 2, 2, 5, 5, 10, 10, 20
+
+rpo_sr_names: record_type, country_code, state_county_fips, tribal_code, icell, jcell, ssc, ratio
+rpo_sr_types: C, C, C, C, N, N, C, N
+rpo_sr_widths: 2, 2, 5, 5, 3, 3, 10, 10
+
+point_grid_xref_names: country_code, state_county_fips, tribal_code, state_facility_id, emission_point_id, icell, jcell
+point_grid_xref_types: C, C, C, C, C, N, N
+point_grid_xref_widths: 2, 5, 4, 15, 6, 3, 3
+
+# nei area tables
+nei_area_tr_names: record_type, state_county_fips, org_name, trans_type, inventory_year, inventory_type, trans_creation_date, incr_submittal_no, reliability_ind, trans_comments, contact_name, contact_phone, contact_phone_type, e_address, e_address_type, source_type, affiliation_type, format_version, tribal_code
+nei_area_tr_types: C, C, C, C, N, C, N, N, N, C, C, C, C, C, C, C, C, N, C
+nei_area_tr_widths: 2, 5, 80, 2, 4, 10, 8, 4, 5, 80, 70, 15, 10, 100, 10, 25, 40, 4, 4
+
+nei_area_ep_names: record_type, state_county_fips, scc, mact_code, process_desc, sic_code, naics_code, winter_thruput_pct, spring_thruput_pct, summer_thruput_pct, fall_thruput_pct, avg_days_per_week, avg_weeks_per_year, avg_hours_per_day, avg_hours_per_year, heat_content, sulfur_content, ash_content, mact_compliance, submittal_flag, tribal_code
+nei_area_ep_types: C, C, C, C, C, C, C, N, N, N, N, N, N, N, N, N, N, N, C, C, C
+nei_area_ep_widths: 2, 5, 10, 6, 78, 4, 6, 3, 3, 3, 3, 1, 2, 2, 4, 8, 5, 5, 6, 4, 4
+
+nei_area_pe_names: record_type, state_county_fips, scc, start_date, end_date, spacer1, start_time, end_time, thruput, thruput_units, material_code, material_io, days_per_week, weeks_per_period, hours_per_day, hours_per_period, submittal_flag, tribal_code
+nei_area_pe_types: C, C, C, C, C, C, N, N, N, C, N, C, N, N, N, N, C, C
+nei_area_pe_widths: 2, 5, 10, 8, 8, 2, 4, 4, 10, 10, 4, 10, 1, 2, 2, 4, 4, 4
+
+nei_area_ce_names: record_type, state_county_fips, scc, pollutant_code, control_eff, capture_eff, total_eff, pri_device_type_code, sec_device_type_code, control_system_desc, submittal_flag, tribal_code
+nei_area_ce_types: C, C, C, C, N, N, N, C, C, C, C, C
+nei_area_ce_widths: 2, 5, 10, 9, 5, 5, 5, 4, 4, 40, 4, 4
+
+nei_area_em_names: record_type, state_county_fips, scc, pollutant_code, spacer1, start_date, end_date, spacer2, start_time, end_time, emission_value, emission_units_code, emission_type, reliability_ind, factor_value, factor_units_num, factor_units_denom, material_code, material_io, spacer3, calc_method_code, ef_reliability_ind, rule_effect, rule_effect_method, rule_penetration, submittal_flag, tribal_code
+nei_area_em_types: C, C, C, C, C, C, C, C, N, N, N, C, C, N, N, C, C, N, C, C, C, C, N, C, N, C, C
+nei_area_em_widths: 2, 5, 10, 9, 11, 8, 8, 2, 4, 4, 20, 10, 2, 5, 10, 10, 10, 4, 10, 5, 2, 5, 5, 2, 5, 4, 4
+
+# nei point tables
+nei_point_tr_names: record_type, state_county_fips, org_name, trans_type, inventory_year, inventory_type, trans_creation_date, incr_submittal_no, reliability_ind, trans_comments, contact_name, contact_phone, contact_phone_type, e_address, e_address_type, source_type, affiliation_type, format_version, tribal_code
+nei_point_tr_types: C, C, C, C, N, C, C, N, N, C, C, C, C, C, C, C, C, N, C
+nei_point_tr_widths: 2, 5, 80, 2, 4, 10, 8, 4, 5, 80, 70, 15, 10, 100, 10, 25, 40, 4, 4
+
+nei_point_si_names: record_type, state_county_fips, state_facility_id, facility_registry_id, facility_category, oris_facility_code, sic_code, naics_code, facility_name, site_desc, location_address, location_city, location_state, location_zip, location_country, nti_site_id, d_b_no, tri_id, submittal_flag, tribal_code
+nei_point_si_types: C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C
+nei_point_si_widths: 2, 5, 15, 12, 2, 6, 4, 6, 80, 40, 50, 60, 2, 14, 40, 20, 9, 20, 4, 4
+
+nei_point_eu_names: record_type, state_county_fips, state_facility_id, emission_unit_id, oris_boiler_id, unit_sic_code, unit_naics_code, spacer1, dsgn_cap, dsgn_cap_unit_enum, dsgn_cap_unit_denom, max_nameplate_cap, emission_unit_desc, submittal_flag, tribal_code
+nei_point_eu_types: C, C, C, C, C, C, C, C, N, C, C, N, C, C, C
+nei_point_eu_widths: 2, 5, 15, 6, 5, 4, 6, 2, 10, 10, 10, 10, 80, 4, 4
+
+nei_point_er_names: record_type, state_county_fips, state_facility_id, spacer1, emission_point_id, emission_point_type, spacer2, stack_height, stack_diameter, stack_fenceline_dist, exit_gas_temp, exit_gas_velocity, exit_gas_flow_rate, x_coordinate, y_coordinate, utm_zone, coordinate_type, horiz_area_fugitive, rel_height_fugitive, fugitive_dims_units, emission_point_desc, submittal_flag, horiz_coll_method_code, horiz_acc_measure, horiz_ref_datum_code, reference_point_code, source_map_scale_no, coord_data_source_code, tribal_code
+nei_point_er_types: C, C, C, C, C, C, C, N, N, N, N, N, N, N, N, N, C, N, N, C, C, C, C, C, C, C, C, C, C
+nei_point_er_widths: 2, 5, 15, 6, 6, 2, 10, 10, 10, 8, 10, 10, 10, 11, 10, 2, 8, 8, 8, 10, 80, 4, 3, 6, 3, 3, 10, 3, 4
+
+nei_point_ep_names: record_type, state_county_fips, state_facility_id, emission_unit_id, emission_point_id, emission_process_id, scc, mact_code, process_desc, winter_thruput_pct, spring_thruput_pct, summer_thruput_pct, fall_thruput_pct, avg_days_per_week, avg_weeks_per_year, avg_hours_per_day, avg_hours_per_year, heat_content, sulfur_content, ash_content, mact_compliance, submittal_flag, tribal_code
+nei_point_ep_types: C, C, C, C, C, C, C, C, C, N, N, N, N, N, N, N, N, N, N, N, C, C, C
+nei_point_ep_widths: 2, 5, 15, 6, 6, 6, 10, 6, 78, 3, 3, 3, 3, 1, 2, 2, 4, 9, 5, 5, 6, 4, 4
+
+nei_point_pe_names: record_type, state_county_fips, state_facility_id, emission_unit_id, emission_process_id, start_date, end_date, spacer1, start_time, end_time, spacer2, thruput, thruput_units, material_code, material_io, days_per_week, weeks_per_period, hours_per_day, hours_per_period, submittal_flag, tribal_code
+nei_point_pe_types: C, C, C, C, C, C, C, C, N, N, C, N, C, N, C, N, N, N, N, C, C
+nei_point_pe_widths: 2, 5, 15, 6, 6, 8, 8, 2, 4, 4, 10, 10, 10, 4, 10, 1, 2, 2, 4, 4, 4
+
+nei_point_ce_names: record_type, state_county_fips, state_facility_id, emission_unit_id, emission_process_id, pollutant_code, spacer1, control_eff, capture_eff, total_eff, pri_device_type_code, sec_device_type_code, spacer2, control_system_desc, ter_device_type_code, qua_device_type_code, submittal_flag, tribal_code
+nei_point_ce_types: C, C, C, C, C, C, C, N, N, N, C, C, C, C, C, C, C, C
+nei_point_ce_widths: 2, 5, 15, 6, 6, 9, 11, 5, 5, 5, 4, 4, 25, 40, 4, 4, 4, 4
+
+nei_point_em_names: record_type, state_county_fips, state_facility_id, emission_unit_id, emission_process_id, pollutant_code, spacer1, emission_point_id, start_date, end_date, start_time, end_time, spacer2, emission_value, emission_units_code, emission_type, reliability_ind, factor_value, factor_units_num, factor_units_denom, material_code, material_io, spacer3, calc_method_code, ef_reliability_ind, rule_effect, rule_effect_method, spacer4, hap_emis_prf_lvl, control_status, emission_data_lvl, submittal_flag, tribal_code
+nei_point_em_types: C, C, C, C, C, C, C, C, C, C, N, N, C, N, C, C, N, N, C, C, N, C, C, C, C, N, C, C, C, C, C, C, C
+nei_point_em_widths: 2, 5, 15, 6, 6, 9, 7, 6, 8, 8, 4, 4, 10, 20, 10, 2, 5, 10, 10, 10, 4, 10, 5, 2, 5, 5, 2, 3, 2, 12, 10, 4, 4
+
+# Growth and Control tables
+
+rpo_growth_names: record_type, country_code, state_fips, county_fips, tribal_code, sic, scc, state_facility_id, emission_unit_id, emission_point_id, pollutant_code, emission_process_id, gf_start_date, gf_end_date, growth_factor, growth_factor_source, primary_contact
+rpo_growth_types: C, C, C, C, C, C, C, C, C, C, C, C, N, N, N, C, C
+rpo_growth_widths: 2, 2, 2, 3, 5, 4, 10, 15, 6, 6, 9, 6, 4, 4, 6, 80, 30
+
+rpo_control_names: record_type, country_code, state_fips, county_fips, tribal_code, sic, scc, state_facility_id, emission_unit_id, emission_point_id, pollutant_code, emission_process_id, cf_start_date, cf_end_date, control_type_code, primary_control_equip, base_date_ce, base_date_re, base_date_rp, future_date_ce, future_date_re, future_date_rp, allow_emiss_cap, cost_per_ton, control_type, new_spec_profile, new_spec_rp, control_desc, primary_contact
+rpo_control_types: C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, N, N, N, N, N, N, N, N, C, C, N, C, C
+rpo_control_widths: 2, 2, 2, 3, 5, 4, 10, 15, 6, 6, 9, 6, 8, 8, 1, 10, 6, 6, 6, 6, 6, 6, 10, 10, 10, 6, 6, 80, 30
+
+# met data
+concept_met_names: run_date, hour, icell, jcell, met_par, met_par_beis2, met_total_radiation, met_temperature, met_temp10m, met_temp2m, met_WS, met_WS10m, met_wd, met_rn_conv, met_rn_nonconv, met_evaporation_rate, met_abs_humidity, met_barometric_press, met_cloud_cover, met_soil_mois, met_soil_temp, met_ustar, met_zzero
+concept_met_types: C, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N, N
+concept_met_widths: 8, 3, 5, 5, 8, 7, 7, 6, 6, 6, 5, 5, 6, 6, 6, 6, 7, 7, 6, 7, 6, 6, 6
+
+met_invariant_names: icell, jcell, longitude, latitude, ptop
+met_invariant_types: N, N, N, N, N
+met_invariant_widths: 4, 5, 10, 9, 9

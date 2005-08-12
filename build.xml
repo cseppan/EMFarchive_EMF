@@ -60,7 +60,7 @@
     </target>
 
     <target name="clean">
-        <delete includeemptydirs="true">
+        <delete includeemptydirs="true" failonerror="no">
             <fileset dir="${build.home}" includes="**/*" />
         </delete>
     </target>

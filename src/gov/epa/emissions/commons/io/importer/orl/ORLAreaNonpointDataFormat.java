@@ -1,13 +1,10 @@
 package gov.epa.emissions.commons.io.importer.orl;
 
-import gov.epa.emissions.commons.io.ColumnType;
-import gov.epa.emissions.commons.io.importer.FileImportDetails;
-
 /**
  * ORL Nonpoint Source Toxics Inventory (list-format)
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLAreaNonpointDataFormat.java,v 1.1 2005/08/05 13:14:28 rhavaldar Exp $
+ * @version $Id: ORLAreaNonpointDataFormat.java,v 1.2 2005/08/12 14:12:14 rhavaldar Exp $
  */
 public final class ORLAreaNonpointDataFormat extends ORLAreaDataFormat
 {
@@ -34,14 +31,14 @@ public final class ORLAreaNonpointDataFormat extends ORLAreaDataFormat
     //RULE_EFFECTIVENESS -> REFF
     //RULE_PENETRATION -> RPEN
 
-    public ORLAreaNonpointDataFormat(boolean extendedFormat)
+    public ORLAreaNonpointDataFormat(SqlTypeMapper sqlTypeMapper, boolean extendedFormat)
     {
-        super(extendedFormat);
+        super(sqlTypeMapper, extendedFormat);
     }
 
-    public FileImportDetails getFileImportDetails()
+    public FileColumnsMetadata getFileImportDetails()
     {
-        FileImportDetails details = new FileImportDetails("");
+        FileColumnsMetadata details = new FileColumnsMetadata("", super.sqlTypeMapper);
 
         // once per line
         addDetail(details, FIPS_NAME, FIPS_TYPE, FIPS_WIDTH);

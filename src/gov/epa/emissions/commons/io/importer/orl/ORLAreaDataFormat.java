@@ -1,10 +1,8 @@
 package gov.epa.emissions.commons.io.importer.orl;
 
-import gov.epa.emissions.commons.io.ColumnType;
-
 /**
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLAreaDataFormat.java,v 1.1 2005/08/05 13:14:28 rhavaldar Exp $
+ * @version $Id: ORLAreaDataFormat.java,v 1.2 2005/08/12 14:12:14 rhavaldar Exp $
  */
 public abstract class ORLAreaDataFormat extends ORLDataFormat
 {
@@ -21,8 +19,8 @@ public abstract class ORLAreaDataFormat extends ORLDataFormat
     protected static final int RULE_PENETRATION_WIDTH = NO_WIDTH;
     protected static final ColumnType RULE_PENETRATION_TYPE = ColumnType.REAL;
 
-    public ORLAreaDataFormat(boolean extendedFormat)
+    public ORLAreaDataFormat(SqlTypeMapper sqlTypeMapper, boolean extendedFormat)
     {
-        super(extendedFormat);
+        super(sqlTypeMapper, extendedFormat);
     }
 }
