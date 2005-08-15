@@ -351,7 +351,7 @@ public class PostgresDatasource implements Datasource {
         }
     }
 
-    public DataAcceptor getDataAcceptor() {
+    public AbstractDataAcceptor getDataAcceptor() {
         return dataAcceptor;
     }
 

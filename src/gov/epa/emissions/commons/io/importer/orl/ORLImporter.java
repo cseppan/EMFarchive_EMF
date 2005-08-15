@@ -1,6 +1,6 @@
 package gov.epa.emissions.commons.io.importer.orl;
 
-import gov.epa.emissions.commons.db.DataAcceptor;
+import gov.epa.emissions.commons.db.AbstractDataAcceptor;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.ColumnType;
@@ -29,7 +29,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.6 2005/08/15 19:52:51 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.7 2005/08/15 20:09:31 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -402,7 +402,7 @@ public class ORLImporter extends ListFormatImporter {
         return orlDataFormat.getFileImportDetails();
     }
 
-    protected void postProcess(DataAcceptor acceptor, String tableType) throws Exception {
+    protected void postProcess(AbstractDataAcceptor acceptor, String tableType) throws Exception {
         // point
         if (tableType.equals(TableTypes.ORL_POINT_TOXICS)) {
             String[] indexColumnNames = { ORLDataFormat.FIPS_NAME, ORLPointDataFormat.PLANT_ID_CODE_NAME,
@@ -424,8 +424,7 @@ public class ORLImporter extends ListFormatImporter {
         }
         // mobile/onroad
         if (tableType.equals(TableTypes.ORL_MOBILE_TOXICS)) {
-            String[] indexColumnNames = { ORLDataFormat.FIPS_NAME,
-                    ORLMobileDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
+            String[] indexColumnNames = { ORLDataFormat.FIPS_NAME, ORLMobileDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
             acceptor.addIndex("orl_mobile_key", indexColumnNames);
         }
 
@@ -451,7 +450,7 @@ public class ORLImporter extends ListFormatImporter {
         // database operations. set the database name and table name to the
         // acceptor so it knows where to put the data.
         Datasource emissionsDatasource = dbServer.getEmissionsDatasource();
-        DataAcceptor emissionsAcceptor = emissionsDatasource.getDataAcceptor();
+        AbstractDataAcceptor emissionsAcceptor = emissionsDatasource.getDataAcceptor();
         // ORL table types
         String datasetType = dataset.getDatasetType();
         String[] tableTypes = DatasetTypes.getTableTypes(datasetType);
@@ -462,7 +461,6 @@ public class ORLImporter extends ListFormatImporter {
         String tableName = (String) dataset.getDataTable(tableType);
         String qualifiedTableName = emissionsDatasource.getName() + "." + tableName;
         emissionsAcceptor.setTable(qualifiedTableName);
-        emissionsAcceptor.startAcceptingData();
 
         // artificially insert the FIPS data column, a five
         // character String concatenating the state and county codes
@@ -541,7 +539,7 @@ public class ORLImporter extends ListFormatImporter {
                 "FLOOR(" + dbServer.asciiToNumber(TableModifier.FIPS_COL, 5) + "/1000) AS state_code" };
         // select state abbreviations, country codes and state codes from
         // reference.fips table
-        DataAcceptor referenceAcceptor = referenceDatasource.getDataAcceptor();
+        AbstractDataAcceptor referenceAcceptor = referenceDatasource.getDataAcceptor();
         ResultSet results = referenceAcceptor.select(fipsSelectColumns, FIPS_TABLE_NAME);
         // use results to create double level map
         // first level -> country code to code-abbreviation map
@@ -585,9 +583,6 @@ public class ORLImporter extends ListFormatImporter {
             // update
             emissionsAcceptor.updateWhereEquals(STATE_NAME, "'" + stateAbbr + "'", whereColumns, equalsClauses);
         }// while(it.hasNext())
-
-        // finish
-        emissionsAcceptor.finishAcceptingData();
 
         // create the summary table
         String summaryTableType = DatasetTypes.getSummaryTableType(datasetType);

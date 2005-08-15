@@ -1,23 +1,20 @@
 package gov.epa.emissions.commons.db;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * An acceptor which takes in data and puts it in a database
  * 
  * @author Prashant Pai, CEP UNC
- * @version $Id: DataAcceptor.java,v 1.1 2005/08/12 15:46:42 rhavaldar Exp $
+ * @version $Id: AbstractDataAcceptor.java,v 1.1 2005/08/15 20:09:31 rhavaldar Exp $
  * @see MySqlDataAcceptor.java
  */
 
-public abstract class DataAcceptor {
+public abstract class AbstractDataAcceptor {
 
     /**
      * The database connection. need to store the connection since we would want
@@ -31,16 +28,6 @@ public abstract class DataAcceptor {
     /** The name of the table that we will be updating. */
     protected String table = null;
 
-    /** The prefix for the insert statements. */
-    protected String insertPrefix = null;
-
-    /** The prefix for the alter statements. */
-    protected String alterAddPrefix = null;
-
-    protected String alterDropPrefix = null;
-
-    protected String alterModifyPrefix = null;
-
     /** The prefix for the update statements. */
     protected String updatePrefix = null;
 
@@ -53,41 +40,19 @@ public abstract class DataAcceptor {
     /** if transactions need to be used * */
     protected boolean useTransactions = false;
 
-    public DataAcceptor(Connection connection, boolean useTransactions, boolean usePrepStatement) {
+    public AbstractDataAcceptor(Connection connection, boolean useTransactions, boolean usePrepStatement) {
         this.connection = connection;
         this.useTransactions = useTransactions;
     }
 
-    /**
-     * Open the database connection and get a Statement ready.
-     * 
-     * @throws Exception
-     *             when either the database or table has not been set
-     */
-    public void startAcceptingData() throws Exception {
-    } // startAcceptingData()
-
-    /**
-     * Set the name of the table to write data to
-     */
     public void setTable(String tableName) {
         table = tableName;
-        insertPrefix = "INSERT INTO " + table + " VALUES(";
-        alterAddPrefix = "ALTER TABLE " + table + " ADD ";
-        alterDropPrefix = "ALTER TABLE " + table + " DROP ";
-        alterModifyPrefix = "ALTER TABLE " + table + " MODIFY ";
-        updatePrefix = "UPDATE " + table + " SET ";
-    } // setTable()
+    }
 
     /**
      * gets rid of unwanted characters
-     * 
-     * @param dirtyStr
-     *            the string to be cleaned
-     * @return String the cleaned up string
      */
-    public String clean(String dirtyStr) {
-        // currently only remove " and replace by blank
+    protected String clean(String dirtyStr) {
         return dirtyStr.replace('"', ' ');
     }
 
@@ -127,22 +92,6 @@ public abstract class DataAcceptor {
 
     abstract public void deleteTable(String tableName) throws SQLException;
 
-    public void prepareForInsert(int numberOfValues) throws Exception {
-        String questionMarks = "";
-        for (int i = 0; i < numberOfValues; i++) {
-            questionMarks += ", ?";
-        }// for int i
-        questionMarks = questionMarks.substring(2);
-        String finalPrepQuery = insertPrefix + questionMarks + ")";
-        prepStatement = connection.prepareStatement(finalPrepQuery);
-    }// prepareForInsert(int)
-
-    public void insertRow(String[] data, String[] colTypes) throws Exception {
-        insertStandardRow(data, colTypes);
-    }
-
-    abstract protected void insertStandardRow(String[] data, String[] colTypes) throws Exception;
-
     /**
      * Alter the table by adding a new column of the specified type in the
      * specified location.
@@ -160,37 +109,17 @@ public abstract class DataAcceptor {
      * @throws Exception
      *             if encounter error altering table
      */
-    public void addColumn(String columnName, String columnType, String afterColumnName) throws Exception {
-        // instantiate a new string buffer in which the query would be created
-        StringBuffer sb = new StringBuffer(alterAddPrefix);
-        final String AFTER = " AFTER ";
-
-        sb.append(columnName + " " + columnType);
-        if (afterColumnName != null) {
-            sb.append(AFTER + afterColumnName);
-        }// if
-
-        Statement statement = connection.createStatement();
-        try {
-            statement.execute(sb.toString());
-        } finally {
-            statement.close();
-        }
-    }
+    abstract public void addColumn(String columnName, String columnType, String afterColumnName) throws Exception;
 
     /**
      * Alter the table by dropping the specified column name.
      * 
      * ALTER TABLE databaseName.tableName DROP columnName
-     * 
-     * @param columnName -
-     *            the name of the column to drop
-     * @throws Exception
      */
     public void dropColumn(String columnName) throws Exception {
-        String dropStatement = alterDropPrefix + columnName;
+        String dropStatement = "ALTER TABLE " + table + " DROP " + columnName;
         execute(dropStatement);
-    }// dropColumn(String)
+    }
 
     protected void execute(String query) throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -200,21 +129,6 @@ public abstract class DataAcceptor {
             statement.close();
         }
     }
-
-    /**
-     * ALTER TABLE databaseName.tableName MODIFY columnName columnType AFTER
-     * afterColumnName
-     * 
-     * @param columnName
-     * @param columnType
-     * @param afterColumnName
-     * @throws Exception
-     */
-    public void modifyColumn(String columnName, String columnType, String afterColumnName) throws Exception {
-        final String AFTER = " AFTER ";
-        String modifyStatement = alterModifyPrefix + columnName + " " + columnType + AFTER + afterColumnName;
-        execute(modifyStatement);
-    }// modifyColumn(String, String, String)
 
     /**
      * Alter the table by adding an index composed of <i>i</i> column names.
@@ -227,7 +141,7 @@ public abstract class DataAcceptor {
      */
     public void addIndex(String indexName, String[] indexColumnNames) throws Exception {
         // instantiate a new string buffer in which the query would be created
-        StringBuffer sb = new StringBuffer(alterAddPrefix);
+        StringBuffer sb = new StringBuffer("ALTER TABLE " + table + " ADD ");
         final String INDEX = "INDEX ";
 
         sb.append(INDEX + indexName + "(" + indexColumnNames[0]);
@@ -338,39 +252,6 @@ public abstract class DataAcceptor {
 
     abstract public ResultSet select(String[] columnNames, String tableName) throws Exception;
 
-    /**
-     * SELECT * FROM dbName.tableName
-     * 
-     * @param tableName -
-     *            the table containing the data
-     * 
-     * @throws Exception
-     *             if encounter error selecting table
-     */
-    public ResultSet selectAll(String tableName) throws Exception {
-        return select(new String[] { "*" }, tableName);
-    }// selectAll(String, String)
+    abstract public void insertRow(String[] data, String[] columnTypes) throws Exception;
 
-    /**
-     * Close the database connection.
-     * 
-     * @throws Exception
-     *             on closing connection to database.
-     */
-    public void finishAcceptingData() throws Exception {
-        if (useTransactions) {
-            execute("COMMIT");
-        }
-    }
-
-    public List showColumnsLike(String columnLike) throws Exception {
-        DatabaseMetaData metadata = this.connection.getMetaData();
-        ResultSet result = metadata.getColumns(connection.getCatalog(), null, table, columnLike);
-        List columns = new ArrayList();
-        while (result.next()) {
-            columns.add(result.getString("COLUMN_NAME"));
-        }
-
-        return columns;
-    }
 }

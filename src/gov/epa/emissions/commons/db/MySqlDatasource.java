@@ -22,7 +22,7 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
 
     private volatile boolean connectedToDatabase = false;
 
-    private DataAcceptor dataAcceptor;
+    private AbstractDataAcceptor dataAcceptor;
 
     private ConnectionParams params;
 
@@ -366,7 +366,7 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
         return dirtyStr.replace('-', '_');
     }
 
-    public DataAcceptor getDataAcceptor() {
+    public AbstractDataAcceptor getDataAcceptor() {
         return dataAcceptor;
     }
 

@@ -9,7 +9,7 @@ import java.sql.Statement;
  * An acceptor which takes in data and puts it in a database
  */
 
-public class MySqlDataAcceptor extends DataAcceptor {
+public class MySqlDataAcceptor extends AbstractDataAcceptor {
 
     private String datasourceName;
 
@@ -38,8 +38,8 @@ public class MySqlDataAcceptor extends DataAcceptor {
         }
     }
 
-    public void insertStandardRow(String[] data, String[] colTypes) throws Exception {
-        StringBuffer sb = new StringBuffer(insertPrefix);
+    public void insertRow(String[] data, String[] colTypes) throws Exception {
+        StringBuffer sb = new StringBuffer("INSERT INTO " + table + " VALUES(");
 
         // append data to the query.. put quotes around VARCHAR entries
         for (int i = 0; i < data.length; i++) {
@@ -88,4 +88,21 @@ public class MySqlDataAcceptor extends DataAcceptor {
         return results;
     }
 
+    public void addColumn(String columnName, String columnType, String afterColumnName) throws Exception {
+        // instantiate a new string buffer in which the query would be created
+        StringBuffer sb = new StringBuffer("ALTER TABLE " + table + " ADD ");
+        final String AFTER = " AFTER ";
+
+        sb.append(columnName + " " + columnType);
+        if (afterColumnName != null) {
+            sb.append(AFTER + afterColumnName);
+        }// if
+
+        Statement statement = connection.createStatement();
+        try {
+            statement.execute(sb.toString());
+        } finally {
+            statement.close();
+        }
+    }
 }

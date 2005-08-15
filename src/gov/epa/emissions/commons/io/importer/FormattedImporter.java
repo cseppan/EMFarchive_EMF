@@ -1,6 +1,6 @@
 package gov.epa.emissions.commons.io.importer;
 
-import gov.epa.emissions.commons.db.DataAcceptor;
+import gov.epa.emissions.commons.db.AbstractDataAcceptor;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.Dataset;
@@ -68,7 +68,7 @@ public abstract class FormattedImporter implements Importer {
         // instantiate an database acceptor.. the acceptor takes care of all
         // database operations.. set the database name and table name to the
         // acceptor so it knows where to put the data in.
-        DataAcceptor acceptor = datasource.getDataAcceptor();
+        AbstractDataAcceptor acceptor = datasource.getDataAcceptor();
         // delete table if overwrite
         if (overwrite) {
             acceptor.deleteTable(qualifiedTableName);
@@ -80,7 +80,6 @@ public abstract class FormattedImporter implements Importer {
         }
         acceptor.setTable(qualifiedTableName);
 
-        acceptor.startAcceptingData();
         acceptor.createTable(columnNames, columnTypes, null, false);
         String line = null;
         String[] data = null;
@@ -128,7 +127,6 @@ public abstract class FormattedImporter implements Importer {
         // when all the data is done ingesting..
         // close the database connections by calling acceptor.finish..
         // and close the reader & writer as well..
-        acceptor.finishAcceptingData();
         reader.close();
         if (writer != null)
             writer.close();
@@ -235,7 +233,7 @@ public abstract class FormattedImporter implements Importer {
      * processing in postImport() which is performed after ALL tables are
      * imported. Default behavior is to not perform any post processing.
      */
-    protected void postProcess(DataAcceptor acceptor, String tableType) throws Exception {
+    protected void postProcess(AbstractDataAcceptor acceptor, String tableType) throws Exception {
         /* DO NOTHING */
         return;
     }

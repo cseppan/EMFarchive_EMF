@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class PostgresDataAcceptor extends DataAcceptor {
+public class PostgresDataAcceptor extends AbstractDataAcceptor {
 
     public PostgresDataAcceptor(Connection connection, boolean useTransactions, boolean usePrepStatement) {
         super(connection, useTransactions, usePrepStatement);
@@ -21,11 +21,6 @@ public class PostgresDataAcceptor extends DataAcceptor {
 
     public void setTable(String tableName) {
         table = tableName;
-        insertPrefix = "INSERT INTO " + table + " VALUES(";
-        alterAddPrefix = "ALTER TABLE " + table + " ADD ";
-        alterDropPrefix = "ALTER TABLE " + table + " DROP ";
-        alterModifyPrefix = "ALTER TABLE " + table + " MODIFY ";
-        updatePrefix = "UPDATE " + table + " SET ";
     }
 
     public void createTable(String[] colNames, String[] colTypes, String primaryCol, boolean auto) throws Exception {
@@ -58,8 +53,8 @@ public class PostgresDataAcceptor extends DataAcceptor {
         }
     }
 
-    public void insertStandardRow(String[] data, String[] colTypes) throws Exception {
-        StringBuffer sb = new StringBuffer(insertPrefix);
+    public void insertRow(String[] data, String[] colTypes) throws Exception {
+        StringBuffer sb = new StringBuffer("INSERT INTO " + table + " VALUES(");
 
         for (int i = 0; i < data.length; i++) {
             if (colTypes[i].startsWith("VARCHAR")) {

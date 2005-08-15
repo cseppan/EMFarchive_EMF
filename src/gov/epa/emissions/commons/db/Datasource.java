@@ -25,5 +25,5 @@ public interface Datasource {
             throws SQLException;
 
     //TODO: combine datasource and dataacceptor
-    DataAcceptor getDataAcceptor();
+    AbstractDataAcceptor getDataAcceptor();
 }

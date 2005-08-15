@@ -7,8 +7,6 @@ public class DatabaseSetup {
 
     private DbServer dbServer;
 
-    private ConnectionParams analysisParams;
-
     private ConnectionParams emissionsParams;
 
     private ConnectionParams referenceParams;
@@ -29,11 +27,6 @@ public class DatabaseSetup {
     }
 
     private DbServer createMySqlDbServer(Properties pref) throws SQLException {
-        analysisParams = createConnectionParams(pref.getProperty("datasource.analysis.name"), pref
-                .getProperty("datasource.analysis.name"), pref.getProperty("database.analysis.username"), pref
-                .getProperty("database.analysis.password"), pref.getProperty("database.analysis.host"), pref
-                .getProperty("database.analysis.port"));
-
         emissionsParams = createConnectionParams(pref.getProperty("datasource.emissions.name"), pref
                 .getProperty("datasource.emissions.name"), pref.getProperty("database.emissions.username"), pref
                 .getProperty("database.emissions.password"), pref.getProperty("database.emissions.host"), pref
@@ -48,11 +41,6 @@ public class DatabaseSetup {
     }
 
     private DbServer createPostgresDbServer(Properties pref) throws SQLException {
-        analysisParams = createConnectionParams(pref.getProperty("database.analysis.name"), pref
-                .getProperty("database.analysis.name"), pref.getProperty("database.analysis.username"), pref
-                .getProperty("database.analysis.password"), pref.getProperty("database.analysis.host"), pref
-                .getProperty("database.analysis.port"));
-
         String emissionsDatasource = pref.getProperty("datasource.emissions.name");
         String referenceDatasource = pref.getProperty("datasource.reference.name");
 
