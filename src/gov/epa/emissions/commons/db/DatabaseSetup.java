@@ -1,6 +1,5 @@
 package gov.epa.emissions.commons.db;
 
-
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -17,19 +16,19 @@ public class DatabaseSetup {
     private String dbType;
 
     // TODO: export connections params to User Preferences file, after setup
-    public DatabaseSetup(Properties pref) {
+    public DatabaseSetup(Properties pref) throws SQLException {
         this.dbType = pref.getProperty("database.type");
         this.dbServer = createDbServer(dbType, pref);
     }
 
-    private DbServer createDbServer(String dbType, Properties pref) {
+    private DbServer createDbServer(String dbType, Properties pref) throws SQLException {
         if (dbType.equals("mysql"))
             return createMySqlDbServer(pref);
 
         return createPostgresDbServer(pref);
     }
 
-    private DbServer createMySqlDbServer(Properties pref) {
+    private DbServer createMySqlDbServer(Properties pref) throws SQLException {
         analysisParams = createConnectionParams(pref.getProperty("datasource.analysis.name"), pref
                 .getProperty("datasource.analysis.name"), pref.getProperty("database.analysis.username"), pref
                 .getProperty("database.analysis.password"), pref.getProperty("database.analysis.host"), pref
@@ -48,7 +47,7 @@ public class DatabaseSetup {
         return new MySqlDbServer(analysisParams, emissionsParams, referenceParams, pref);
     }
 
-    private DbServer createPostgresDbServer(Properties pref) {
+    private DbServer createPostgresDbServer(Properties pref) throws SQLException {
         analysisParams = createConnectionParams(pref.getProperty("database.analysis.name"), pref
                 .getProperty("database.analysis.name"), pref.getProperty("database.analysis.username"), pref
                 .getProperty("database.analysis.password"), pref.getProperty("database.analysis.host"), pref
@@ -72,12 +71,6 @@ public class DatabaseSetup {
     private ConnectionParams createConnectionParams(String dbName, String datasource, String username, String password,
             String host, String port) {
         return new ConnectionParams(dbName, datasource, host, port, username, password);
-    }
-
-    public void init() throws SQLException {
-        dbServer.createAnalysisDatasource();
-        dbServer.createEmissionsDatasource();
-        dbServer.createReferenceDatasource();
     }
 
     public DbServer getDbServer() {

@@ -29,7 +29,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.4 2005/08/12 16:44:09 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.5 2005/08/15 17:36:42 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -533,7 +533,7 @@ public class ORLImporter extends ListFormatImporter {
          * mins max versus dozens of minutes and even hours.
          */
         Datasource referenceDatasource = dbServer.getReferenceDatasource();
-        final String FIPS_TABLE_NAME = "fips";
+        final String FIPS_TABLE_NAME = referenceDatasource.getName() + ".fips";
         final String[] fipsSelectColumns = { "DISTINCT " + TableModifier.STATE_COL, "country_code",
                 "FLOOR(" + dbServer.asciiToNumber(TableModifier.FIPS_COL, 5) + "/1000) AS state_code" };
         // select state abbreviations, country codes and state codes from

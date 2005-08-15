@@ -1,8 +1,6 @@
 package gov.epa.emissions.commons.db;
 
 
-import java.sql.SQLException;
-
 public interface DbServer {
 
     Datasource getAnalysisDatasource();
@@ -19,9 +17,4 @@ public interface DbServer {
      */
     String asciiToNumber(String asciiColumn, int precision);
 
-    void createAnalysisDatasource() throws SQLException;
-
-    void createEmissionsDatasource() throws SQLException;
-
-    void createReferenceDatasource() throws SQLException;
 }

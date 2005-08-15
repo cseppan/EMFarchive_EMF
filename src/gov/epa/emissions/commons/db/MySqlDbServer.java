@@ -13,13 +13,7 @@ import java.util.Properties;
 
 public class MySqlDbServer implements DbServer {
 
-    private ConnectionParams analysisParams;
-
     private SqlTypeMapper typeMapper;
-
-    private ConnectionParams emissionsParams;
-
-    private ConnectionParams referenceParams;
 
     private Datasource analysisDatasource;
 
@@ -30,28 +24,28 @@ public class MySqlDbServer implements DbServer {
     private Properties appProps;
 
     public MySqlDbServer(ConnectionParams analysisParams, ConnectionParams emissionsParams,
-            ConnectionParams referenceParams, Properties appProps) {
-        this.analysisParams = analysisParams;
-        this.emissionsParams = emissionsParams;
-        this.referenceParams = referenceParams;
+            ConnectionParams referenceParams, Properties appProps) throws SQLException {
         this.appProps = appProps;
 
         this.typeMapper = new MySqlTypeMapper();
+        createAnalysisDatasource(analysisParams);
+        createEmissionsDatasource(emissionsParams);
+        createReferenceDatasource(referenceParams);
     }
 
-    public void createAnalysisDatasource() throws SQLException {
+    private void createAnalysisDatasource(ConnectionParams analysisParams) throws SQLException {
         analysisDatasource = createDatasource(analysisParams);
         if (!doesDatabaseExist(analysisParams, analysisDatasource.getConnection()))
             createDatabase(analysisParams, analysisDatasource.getConnection());
     }
 
-    public void createEmissionsDatasource() throws SQLException {
+    private void createEmissionsDatasource(ConnectionParams emissionsParams) throws SQLException {
         emissionsDatasource = createDatasource(emissionsParams);
         if (!doesDatabaseExist(emissionsParams, emissionsDatasource.getConnection()))
             createDatabase(emissionsParams, emissionsDatasource.getConnection());
     }
 
-    public void createReferenceDatasource() throws SQLException {
+    private void createReferenceDatasource(ConnectionParams referenceParams) throws SQLException {
         referenceDatasource = createDatasource(referenceParams);
         if (!doesDatabaseExist(referenceParams, referenceDatasource.getConnection())) {
             createDatabase(referenceParams, referenceDatasource.getConnection());

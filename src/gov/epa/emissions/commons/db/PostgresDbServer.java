@@ -1,6 +1,5 @@
 package gov.epa.emissions.commons.db;
 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -9,13 +8,7 @@ public class PostgresDbServer implements DbServer {
 
     private Connection sharedConnection;
 
-    private ConnectionParams analysisParams;
-
     private SqlTypeMapper typeMapper;
-
-    private ConnectionParams emissionsParams;
-
-    private ConnectionParams referenceParams;
 
     private PostgresDatasource analysisDatasource;
 
@@ -23,32 +16,25 @@ public class PostgresDbServer implements DbServer {
 
     private Datasource referenceDatasource;
 
-    public PostgresDbServer(ConnectionParams analysisParams, ConnectionParams emissionsDatasourceParams,
-            ConnectionParams referenceParams) {
-        this.analysisParams = analysisParams;
-        this.emissionsParams = emissionsDatasourceParams;
-        this.referenceParams = referenceParams;
+    public PostgresDbServer(ConnectionParams analysisParams, ConnectionParams emissionsParams,
+            ConnectionParams referenceParams) throws SQLException {
         this.typeMapper = new PostgresSqlTypeMapper();
+
+        createAnalysisDatasource(analysisParams);
+        emissionsDatasource = createDatasourceWithSharedConnection(emissionsParams);
+        referenceDatasource = createDatasourceWithSharedConnection(referenceParams);
     }
 
     // TODO: verify if schema exists. If not, create it (and create tables as
     // needed - reference datasource)
-    public void createAnalysisDatasource() throws SQLException {
+    private void createAnalysisDatasource(ConnectionParams analysisParams) throws SQLException {
         Connection connection = createConnection(analysisParams.getHost(), analysisParams.getPort(), analysisParams
                 .getDbName(), analysisParams.getUsername(), analysisParams.getPassword());
 
-       analysisDatasource = new PostgresDatasource(analysisParams, connection);
+        analysisDatasource = new PostgresDatasource(analysisParams, connection);
     }
 
-    public void createEmissionsDatasource() throws SQLException {
-        emissionsDatasource = createDatasourceWithSharedConnection(emissionsParams);
-    }
-
-    public void createReferenceDatasource() throws SQLException {
-        referenceDatasource = createDatasourceWithSharedConnection(referenceParams);
-    }
-
-    public Datasource getAnalysisDatasource() {        
+    public Datasource getAnalysisDatasource() {
         return analysisDatasource;
     }
 
@@ -56,7 +42,7 @@ public class PostgresDbServer implements DbServer {
         return emissionsDatasource;
     }
 
-    public Datasource getReferenceDatasource()  {
+    public Datasource getReferenceDatasource() {
         return referenceDatasource;
     }
 

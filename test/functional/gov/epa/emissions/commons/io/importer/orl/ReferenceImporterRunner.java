@@ -1,13 +1,15 @@
 package gov.epa.emissions.commons.io.importer.orl;
 
 import gov.epa.emissions.commons.db.DatabaseSetup;
-import gov.epa.emissions.commons.io.importer.ReferenceTables;
+import gov.epa.emissions.commons.io.importer.ReferenceImporter;
+import gov.epa.mims.analysisengine.gui.DefaultUserInteractor;
+import gov.epa.mims.analysisengine.gui.GUIUserInteractor;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-public class ReferenceTablesRunner {
+public class ReferenceImporterRunner {
 
     public static void main(String[] args) throws Exception {
         // common setup for importers
@@ -17,14 +19,15 @@ public class ReferenceTablesRunner {
         properties.put("REFERENCE_FILE_BASE_DIR", "config/refDbFiles");
 
         DatabaseSetup dbSetup = new DatabaseSetup(properties);
-        dbSetup.init();
         // end setup
 
+        DefaultUserInteractor.set(new GUIUserInteractor());
+
+        File fieldDefsFile = new File("config/field_defs.dat");
         File referenceFilesDir = new File("config/refDbFiles");
-        ReferenceTables tables = new ReferenceTables(referenceFilesDir, dbSetup.getDbServer().getTypeMapper());
-        
-        System.out.println("Started adding reference tables...");
-        tables.createAdditionRefTables(dbSetup.getDbServer().getReferenceDatasource());
-        System.out.println("Completed adding reference tables.");
+
+        System.out.println("Started Reference importer...");
+        new ReferenceImporter(dbSetup.getDbServer(), fieldDefsFile, referenceFilesDir, false).createReferenceTables();
+        System.out.println("Completed importing Reference data");
     }
 }
