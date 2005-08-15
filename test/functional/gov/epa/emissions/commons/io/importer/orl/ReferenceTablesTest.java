@@ -7,23 +7,32 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-public class ReferenceTablesRunner {
+import junit.framework.TestCase;
 
-    public static void main(String[] args) throws Exception {
-        // common setup for importers
+public class ReferenceTablesTest extends TestCase {
+
+    private DatabaseSetup dbSetup;
+
+    private File referenceFilesDir;
+
+    protected void setUp() throws Exception {
         Properties properties = new Properties();
         properties.load(new FileInputStream(new File("test/user_preferences.txt")));
         properties.put("DATASET_NIF_FIELD_DEFS", "config/field_defs.dat");
         properties.put("REFERENCE_FILE_BASE_DIR", "config/refDbFiles");
 
-        DatabaseSetup dbSetup = new DatabaseSetup(properties);
-        // end setup
+        dbSetup = new DatabaseSetup(properties);
 
-        File referenceFilesDir = new File("config/refDbFiles");
-        ReferenceTables tables = new ReferenceTables(referenceFilesDir, dbSetup.getDbServer().getTypeMapper());
+        referenceFilesDir = new File("config/refDbFiles");
+    }
 
+    public void testCreateAddtionalTables() throws Exception {
         System.out.println("Started adding reference tables...");
+
+        ReferenceTables tables = new ReferenceTables(referenceFilesDir, dbSetup.getDbServer().getTypeMapper());
         tables.createAdditionRefTables(dbSetup.getDbServer().getReferenceDatasource());
+        
         System.out.println("Completed adding reference tables.");
     }
+
 }
