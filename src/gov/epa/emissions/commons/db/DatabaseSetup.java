@@ -44,7 +44,7 @@ public class DatabaseSetup {
                 .getProperty("database.reference.password"), pref.getProperty("database.reference.host"), pref
                 .getProperty("database.reference.port"));
 
-        return new MySqlDbServer(analysisParams, emissionsParams, referenceParams, pref);
+        return new MySqlDbServer(emissionsParams, referenceParams, pref);
     }
 
     private DbServer createPostgresDbServer(Properties pref) throws SQLException {
@@ -65,7 +65,7 @@ public class DatabaseSetup {
         emissionsParams = new ConnectionParams(dbName, emissionsDatasource, host, port, username, password);
         referenceParams = new ConnectionParams(dbName, referenceDatasource, host, port, username, password);
 
-        return new PostgresDbServer(analysisParams, emissionsParams, referenceParams);
+        return new PostgresDbServer(emissionsParams, referenceParams);
     }
 
     private ConnectionParams createConnectionParams(String dbName, String datasource, String username, String password,

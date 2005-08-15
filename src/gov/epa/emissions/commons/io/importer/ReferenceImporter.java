@@ -34,7 +34,7 @@ public class ReferenceImporter extends FixedFormatImporter {
      * Take a array of Files and put them database, overwriting existing
      * corresponding tables specified in dataset based on overwrite flag.
      */
-    public void putIntoDatabase(File[] files, boolean overwrite, Dataset dataset) throws Exception {
+    public void run(File[] files, Dataset dataset, boolean overwrite) throws Exception {
         this.dataset = dataset;
 
         Datasource datasource = dbServer.getReferenceDatasource();
@@ -108,7 +108,7 @@ public class ReferenceImporter extends FixedFormatImporter {
         dataset.addDataTable(TableTypes.REF_TRIBAL_CODES, "tribal");
         dataset.setDatasetType(datasetType);
 
-        putIntoDatabase(files, true, dataset);
+        run(files, dataset, true);
     }
 
 }

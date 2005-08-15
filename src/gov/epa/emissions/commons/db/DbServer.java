@@ -1,9 +1,6 @@
 package gov.epa.emissions.commons.db;
 
-
 public interface DbServer {
-
-    Datasource getAnalysisDatasource();
 
     Datasource getEmissionsDatasource();
 

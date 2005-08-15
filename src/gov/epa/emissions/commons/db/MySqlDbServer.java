@@ -15,28 +15,19 @@ public class MySqlDbServer implements DbServer {
 
     private SqlTypeMapper typeMapper;
 
-    private Datasource analysisDatasource;
-
     private Datasource emissionsDatasource;
 
     private Datasource referenceDatasource;
 
     private Properties appProps;
 
-    public MySqlDbServer(ConnectionParams analysisParams, ConnectionParams emissionsParams,
-            ConnectionParams referenceParams, Properties appProps) throws SQLException {
+    public MySqlDbServer(ConnectionParams emissionsParams, ConnectionParams referenceParams, Properties appProps)
+            throws SQLException {
         this.appProps = appProps;
 
         this.typeMapper = new MySqlTypeMapper();
-        createAnalysisDatasource(analysisParams);
         createEmissionsDatasource(emissionsParams);
         createReferenceDatasource(referenceParams);
-    }
-
-    private void createAnalysisDatasource(ConnectionParams analysisParams) throws SQLException {
-        analysisDatasource = createDatasource(analysisParams);
-        if (!doesDatabaseExist(analysisParams, analysisDatasource.getConnection()))
-            createDatabase(analysisParams, analysisDatasource.getConnection());
     }
 
     private void createEmissionsDatasource(ConnectionParams emissionsParams) throws SQLException {
@@ -54,6 +45,7 @@ public class MySqlDbServer implements DbServer {
     }
 
     private void createReferenceTables() throws SQLException {
+        //TODO: replace by injection. Combine Reference Tables & Reference Importer
         File fieldDefsFile = new File((String) appProps.get("DATASET_NIF_FIELD_DEFS"));
         File referenceFilesDir = new File((String) appProps.get("REFERENCE_FILE_BASE_DIR"));
 
@@ -66,10 +58,6 @@ public class MySqlDbServer implements DbServer {
         } catch (Exception e) {
             throw new SQLException("could not create reference tables. Reason: " + e.getMessage());
         }
-    }
-
-    public Datasource getAnalysisDatasource() {
-        return analysisDatasource;
     }
 
     public Datasource getEmissionsDatasource() {

@@ -57,7 +57,7 @@ public class ORLImporterTest extends TestCase {
         dataset.addDataTable(summaryTableType, table + "_summary");
 
         ORLImporter importer = new ORLImporter(dbSetup.getDbServer(), false, true);
-        importer.putIntoDatabase(new File[] { new File("test/data/orl/nc", filename) }, true, dataset);
+        importer.run(new File[] { new File("test/data/orl/nc", filename) }, dataset, true);
     }
 
 }

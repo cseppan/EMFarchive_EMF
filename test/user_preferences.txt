@@ -6,18 +6,8 @@ database.type=postgres
 datasource.emissions.name=emissions
 datasource.reference.name=reference
 
-database.shared.name=EmisView
+database.shared.name=EMF.raghu
 database.shared.host=152.2.72.90
 database.shared.port=5432
 database.shared.username=emisview
 database.shared.password=emisview
-
-
-#analysis datasource
-datasource.analysis.name=analysis
-
-database.analysis.name=EmisView
-database.analysis.host=152.2.72.90
-database.analysis.port=5432
-database.analysis.username=emisview
-database.analysis.password=emisview

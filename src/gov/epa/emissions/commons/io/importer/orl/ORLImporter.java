@@ -29,7 +29,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.5 2005/08/15 17:36:42 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.6 2005/08/15 19:52:51 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -69,6 +69,9 @@ public class ORLImporter extends ListFormatImporter {
 
     private List comments = null;
 
+    /* read ahead limit ~ 100 MB */
+    public static final long READ_AHEAD_LIMIT = 105000000L;
+
     public ORLImporter(DbServer dbServer, boolean useTransactions, boolean annualNotAverageDaily) {
         super(dbServer, ListFormatImporter.WHITESPACE_REGEX, useTransactions, true);
         this.annualNotAverageDaily = annualNotAverageDaily;
@@ -80,13 +83,13 @@ public class ORLImporter extends ListFormatImporter {
      * 
      * @param files -
      *            an array of Files which are checked prior to import
-     * @param overwrite -
-     *            whether or not to overwrite corresponding tables
      * @param dataset -
      *            Dataset specifying needed properties such as datasetType and
      *            table name (table name look-up is based on file name)
+     * @param overwrite -
+     *            whether or not to overwrite corresponding tables
      */
-    public void putIntoDatabase(File[] files, boolean overwrite, Dataset dataset) throws Exception {
+    public void run(File[] files, Dataset dataset, boolean overwrite) throws Exception {
         this.dataset = dataset;
 
         Datasource datasource = dbServer.getEmissionsDatasource();
@@ -134,7 +137,7 @@ public class ORLImporter extends ListFormatImporter {
         long lastModified = file.lastModified();
         // if file is small enough, mark file read ahead limit from beginning
         // so we can come back without having to close and reopen the file
-        if (fileLength < READ_AHEAD_LIMIT) {
+        if (fileLength < ORLImporter.READ_AHEAD_LIMIT) {
             reader.mark((int) fileLength);
         }
 
@@ -144,7 +147,7 @@ public class ORLImporter extends ListFormatImporter {
         checkHeaders(file.getAbsolutePath());
 
         // if able, go back to the file beginning
-        if (fileLength < READ_AHEAD_LIMIT) {
+        if (fileLength < ORLImporter.READ_AHEAD_LIMIT) {
             reader.reset();
         }
         // else close, reopen and check for modification

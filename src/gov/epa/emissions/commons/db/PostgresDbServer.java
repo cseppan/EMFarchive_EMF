@@ -10,32 +10,15 @@ public class PostgresDbServer implements DbServer {
 
     private SqlTypeMapper typeMapper;
 
-    private PostgresDatasource analysisDatasource;
-
     private Datasource emissionsDatasource;
 
     private Datasource referenceDatasource;
 
-    public PostgresDbServer(ConnectionParams analysisParams, ConnectionParams emissionsParams,
-            ConnectionParams referenceParams) throws SQLException {
+    public PostgresDbServer(ConnectionParams emissionsParams, ConnectionParams referenceParams) throws SQLException {
         this.typeMapper = new PostgresSqlTypeMapper();
 
-        createAnalysisDatasource(analysisParams);
         emissionsDatasource = createDatasourceWithSharedConnection(emissionsParams);
         referenceDatasource = createDatasourceWithSharedConnection(referenceParams);
-    }
-
-    // TODO: verify if schema exists. If not, create it (and create tables as
-    // needed - reference datasource)
-    private void createAnalysisDatasource(ConnectionParams analysisParams) throws SQLException {
-        Connection connection = createConnection(analysisParams.getHost(), analysisParams.getPort(), analysisParams
-                .getDbName(), analysisParams.getUsername(), analysisParams.getPassword());
-
-        analysisDatasource = new PostgresDatasource(analysisParams, connection);
-    }
-
-    public Datasource getAnalysisDatasource() {
-        return analysisDatasource;
     }
 
     public Datasource getEmissionsDatasource() {

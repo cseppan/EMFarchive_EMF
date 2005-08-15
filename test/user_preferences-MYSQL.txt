@@ -18,12 +18,3 @@ database.emissions.host=localhost
 database.emissions.port=3306
 database.emissions.username=root
 database.emissions.password=root
-
-
-#analysis datasource
-datasource.analysis.name=analysis
-
-database.analysis.host=localhost
-database.analysis.port=3306
-database.analysis.username=root
-database.analysis.password=root
