@@ -72,7 +72,7 @@ public abstract class AbstractDataAcceptor {
      * @throws Exception
      *             if encounter error altering table
      */
-    abstract public void addColumn(String columnName, String columnType, String afterColumnName) throws Exception;
+    abstract public void addColumn(String table, String columnName, String columnType, String afterColumnName) throws Exception;
 
     protected void execute(String query) throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);

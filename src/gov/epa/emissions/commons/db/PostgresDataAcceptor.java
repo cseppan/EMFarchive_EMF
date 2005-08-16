@@ -73,7 +73,7 @@ public class PostgresDataAcceptor extends AbstractDataAcceptor {
         execute(sb.toString());
     }
 
-    public void addColumn(String columnName, String columnType, String afterColumnName) throws Exception {
+    public void addColumn(String table, String columnName, String columnType, String afterColumnName) throws Exception {
         String statement = "ALTER TABLE " + table + " ADD " + columnName + " " + columnType;
         execute(statement);
     }

@@ -29,7 +29,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.8 2005/08/16 18:10:38 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.9 2005/08/16 18:33:11 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -483,7 +483,7 @@ public class ORLImporter extends ListFormatImporter {
             final int COUNTY_CODE_WIDTH = 3;
 
             // alter table
-            emissionsAcceptor.addColumn(FIPS_NAME, fips.getType(FIPS_NAME), COUNTY_CODE_NAME);
+            emissionsAcceptor.addColumn(qualifiedTableName, FIPS_NAME, fips.getType(FIPS_NAME), COUNTY_CODE_NAME);
 
             // update FIPS column
             for (int stid = 0; stid < STATE_CODE_WIDTH; stid++) {
@@ -521,7 +521,7 @@ public class ORLImporter extends ListFormatImporter {
         state.setType(STATE_NAME, STATE_TYPE.getName());
 
         // STATE column
-        emissionsAcceptor.addColumn(STATE_NAME, state.getType(STATE_NAME), FIPS_NAME);
+        emissionsAcceptor.addColumn(qualifiedTableName, STATE_NAME, state.getType(STATE_NAME), FIPS_NAME);
 
         // update STATE column
         /**

@@ -46,7 +46,7 @@ public class MySqlDataAcceptor extends AbstractDataAcceptor {
         execute(sb.toString());
     }
 
-    public void addColumn(String columnName, String columnType, String afterColumnName) throws Exception {
+    public void addColumn(String table, String columnName, String columnType, String afterColumnName) throws Exception {
         // instantiate a new string buffer in which the query would be created
         StringBuffer sb = new StringBuffer("ALTER TABLE " + table + " ADD ");
         final String AFTER = " AFTER ";
