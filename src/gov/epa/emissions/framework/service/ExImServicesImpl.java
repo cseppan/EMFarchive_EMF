@@ -8,15 +8,14 @@
  */
 package gov.epa.emissions.framework.service;
 
+import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.commons.EMFConstants;
+import gov.epa.emissions.framework.commons.ExImServices;
+import gov.epa.emissions.framework.commons.StatusServices;
 
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.ExImServices;
-import gov.epa.emissions.framework.commons.StatusServices;
-import gov.epa.emissions.framework.commons.EMFConstants;
 ;
 
 /**
@@ -52,7 +51,9 @@ public class ExImServicesImpl implements ExImServices{
             
             //FIXME:  Replace with factory method to get the status service
             StatusServices statusSvc = new StatusServicesImpl();
-                    
+            
+            //FixMe: Create DbServer object and pass it into the ExImTask
+            //DbServer dbServer
             ExImTask eximTask = new ExImTask(userName,file,fileType, statusSvc);
             eximTask.run();
             eximTask = null;
