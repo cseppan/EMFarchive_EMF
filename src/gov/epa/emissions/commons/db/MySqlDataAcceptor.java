@@ -1,7 +1,6 @@
 package gov.epa.emissions.commons.db;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
@@ -10,35 +9,20 @@ import java.sql.Statement;
 
 public class MySqlDataAcceptor extends AbstractDataAcceptor {
 
-    private String datasourceName;
-
-    public MySqlDataAcceptor(String datasourceName, Connection connection, boolean useTransactions,
-            boolean usePrepStatement) {
+    public MySqlDataAcceptor(Connection connection, boolean useTransactions, boolean usePrepStatement) {
         super(connection);
-        this.datasourceName = datasourceName;
     }
 
     public String customizeCreateTableQuery(String origQueryString) {
         String queryString = origQueryString;
-        //TODO: do we need InnoDB ? If so, when ?
-//        if (useTransactions) {
-//            queryString += " type=InnoDB";
-//        }
+        // TODO: do we need InnoDB ? If so, when ?
+        // if (useTransactions) {
+        // queryString += " type=InnoDB";
+        // }
         return queryString;
     }
 
-    public boolean tableExists(String tableName) throws Exception {
-        // if SHOW TABLES query returns one or more rows, the table exists
-        Statement statement = connection.createStatement();
-        try {
-            statement.execute("SHOW TABLES FROM " + datasourceName + " LIKE '" + tableName + "'");
-            return statement.getResultSet().getRow() > 0;
-        } finally {
-            statement.close();
-        }
-    }
-
-    public void insertRow(String[] data, String[] colTypes) throws Exception {
+    public void insertRow(String table, String[] data, String[] colTypes) throws Exception {
         StringBuffer sb = new StringBuffer("INSERT INTO " + table + " VALUES(");
 
         // append data to the query.. put quotes around VARCHAR entries
@@ -61,16 +45,6 @@ public class MySqlDataAcceptor extends AbstractDataAcceptor {
 
         execute(sb.toString());
     }
-
-    public void deleteTable(String tableName) throws SQLException {
-        try {
-            execute("DROP TABLE IF EXISTS " + tableName);
-        } catch (SQLException e) {// TODO: fix the schema prefix issues in
-            // ORLImporter
-            System.err.println("Could not delete table - " + tableName + ". Ignoring..");
-        }
-    }
-
 
     public void addColumn(String columnName, String columnType, String afterColumnName) throws Exception {
         // instantiate a new string buffer in which the query would be created

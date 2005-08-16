@@ -19,7 +19,7 @@ public class PostgresDatasource implements Datasource {
     public PostgresDatasource(String name, Connection connection) {
         this.connection = connection;
         this.name = name;
-        this.dataAcceptor = new PostgresDataAcceptor(connection, false, true);
+        this.dataAcceptor = new PostgresDataAcceptor(connection);
     }
 
     public String getName() {
@@ -140,5 +140,17 @@ public class PostgresDatasource implements Datasource {
         statement.execute(sb.toString());
 
         return statement.getResultSet();
+    }
+
+    public void deleteTable(String tableName) throws SQLException {
+        try {
+            execute("DROP TABLE " + tableName);
+        } catch (SQLException e) {
+            System.err.println("Table " + tableName + " could not be dropped");
+        }
+    }
+
+    public boolean tableExists(String tableName) throws Exception {
+        return false;// TODO: use JDBC to query tables
     }
 }

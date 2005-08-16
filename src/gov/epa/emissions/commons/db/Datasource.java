@@ -22,6 +22,10 @@ public interface Datasource {
     void createTable(String tableName, String[] colNames, String[] colTypes, String[] primaryCols, boolean overwrite)
             throws SQLException;
 
+    void deleteTable(String tableName) throws SQLException;
+
+    boolean tableExists(String tableName) throws Exception;
+
     // management interface
     String getName();
 

@@ -71,10 +71,10 @@ public abstract class FormattedImporter implements Importer {
         AbstractDataAcceptor acceptor = datasource.getDataAcceptor();
         // delete table if overwrite
         if (overwrite) {
-            acceptor.deleteTable(qualifiedTableName);
+            datasource.deleteTable(qualifiedTableName);
         }
         // else make sure table does not exist
-        else if (acceptor.tableExists(qualifiedTableName)) {
+        else if (datasource.tableExists(qualifiedTableName)) {
             throw new Exception("The table \"" + qualifiedTableName
                     + "\" already exists. Please select 'overwrite tables if exist' or choose a new table name.");
         }
@@ -107,7 +107,7 @@ public abstract class FormattedImporter implements Importer {
                 data = breakUpLine(line, columnWidths);
                 if (validData(data, tableType)) {
                     // data = supplementData(data, tableType);
-                    acceptor.insertRow(data, columnTypes);
+                    acceptor.insertRow(qualifiedTableName, data, columnTypes);
                     numRows++;
                 } else {
                     // create new file writer

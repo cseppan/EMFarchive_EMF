@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @version $Id: SummaryTableCreator.java,v 1.1 2005/08/16 18:10:38 rhavaldar Exp $
+ * @version $Id: SummaryTableCreator.java,v 1.2 2005/08/16 18:28:11 rhavaldar Exp $
  */
 public class SummaryTableCreator {
     public static final String AREA_SUMMARY = "nei_area_summary";
@@ -573,7 +573,7 @@ public class SummaryTableCreator {
 
         // create the actual table
         if (overwrite)
-            this.emissionsDatasource.getDataAcceptor().deleteTable(summaryTable);
+            this.emissionsDatasource.deleteTable(summaryTable);
         else if (this.emissionsDatasource.getTableNames().contains(summaryTable))
             throw new Exception("The table \"" + summaryTable
                     + "\" already exists. Please select 'overwrite tables if exist' or choose a new table name.");
@@ -582,9 +582,9 @@ public class SummaryTableCreator {
         // drop the temp tables, if needed
         if (tempTableNames != null) {
             for (int i = 0; i < tempTableNames.length; i++) {
-                this.emissionsDatasource.getDataAcceptor().deleteTable(tempTableNames[i]);
+                this.emissionsDatasource.deleteTable(tempTableNames[i]);
             }
         }
-    }// createORLSummaryTable(String, String, String, boolean, boolean)
+    }
 
 }

@@ -26,8 +26,6 @@ public abstract class AbstractDataAcceptor {
         return dirtyStr.replace('"', ' ');
     }
 
-    // query interface
-
     // data definition interface
     public void createTable(String[] colNames, String[] colTypes, String primaryCol, boolean auto) throws Exception {
         // check to see if there are the same number of column names and column
@@ -54,11 +52,7 @@ public abstract class AbstractDataAcceptor {
     }
 
     public abstract String customizeCreateTableQuery(String origQueryString);
-
-    public abstract boolean tableExists(String tableName) throws Exception;
-
-    abstract public void deleteTable(String tableName) throws SQLException;
-
+  
     // management interface
 
     /**
@@ -204,6 +198,6 @@ public abstract class AbstractDataAcceptor {
         return concat.toString();
     }// generateConcatExpr(String[])
 
-    abstract public void insertRow(String[] data, String[] columnTypes) throws Exception;
+    abstract public void insertRow(String tableName, String[] data, String[] columnTypes) throws Exception;
 
 }

@@ -20,7 +20,7 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
     public MySqlDatasource(String name, Connection connection) {
         this.name = name;
         this.connection = connection;
-        this.dataAcceptor = new MySqlDataAcceptor(name, connection, false, false);
+        this.dataAcceptor = new MySqlDataAcceptor(connection, false, false);
     }
 
     public String getName() {
@@ -153,5 +153,25 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
         ResultSet results = statement.getResultSet();
 
         return results;
+    }
+
+    public void deleteTable(String tableName) throws SQLException {
+        try {
+            execute("DROP TABLE IF EXISTS " + tableName);
+        } catch (SQLException e) {// TODO: fix the schema prefix issues in
+            // ORLImporter
+            System.err.println("Could not delete table - " + tableName + ". Ignoring..");
+        }
+    }
+
+    public boolean tableExists(String tableName) throws Exception {
+        // if SHOW TABLES query returns one or more rows, the table exists
+        Statement statement = connection.createStatement();
+        try {
+            statement.execute("SHOW TABLES FROM " + name + " LIKE '" + tableName + "'");
+            return statement.getResultSet().getRow() > 0;
+        } finally {
+            statement.close();
+        }
     }
 }

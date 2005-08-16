@@ -1,20 +1,15 @@
 package gov.epa.emissions.commons.db;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 
 public class PostgresDataAcceptor extends AbstractDataAcceptor {
 
-    public PostgresDataAcceptor(Connection connection, boolean useTransactions, boolean usePrepStatement) {
+    public PostgresDataAcceptor(Connection connection) {
         super(connection);
     }
 
     public String customizeCreateTableQuery(String query) {
         return query;
-    }
-
-    public boolean tableExists(String tableName) throws Exception {
-        return false;// TODO: use JDBC to query tables
     }
 
     public void setTable(String tableName) {
@@ -40,15 +35,7 @@ public class PostgresDataAcceptor extends AbstractDataAcceptor {
         execute(ddlStatement);
     }
 
-    public void deleteTable(String tableName) throws SQLException {
-        try {
-            execute("DROP TABLE " + tableName);
-        } catch (SQLException e) {
-            System.err.println("Table " + tableName + " could not be dropped");
-        }
-    }
-
-    public void insertRow(String[] data, String[] colTypes) throws Exception {
+    public void insertRow(String table, String[] data, String[] colTypes) throws Exception {
         StringBuffer sb = new StringBuffer("INSERT INTO " + table + " VALUES(");
 
         for (int i = 0; i < data.length; i++) {
