@@ -8,7 +8,7 @@ import java.sql.Statement;
 public class PostgresDataAcceptor extends AbstractDataAcceptor {
 
     public PostgresDataAcceptor(Connection connection, boolean useTransactions, boolean usePrepStatement) {
-        super(connection, useTransactions, usePrepStatement);
+        super(connection);
     }
 
     public String customizeCreateTableQuery(String query) {
@@ -24,9 +24,6 @@ public class PostgresDataAcceptor extends AbstractDataAcceptor {
     }
 
     public void createTable(String[] colNames, String[] colTypes, String primaryCol, boolean auto) throws Exception {
-        this.colNames = colNames;
-        this.colTypes = colTypes;
-
         String ddlStatement = "CREATE TABLE " + table + " (";
 
         for (int i = 0; i < colNames.length; i++) {

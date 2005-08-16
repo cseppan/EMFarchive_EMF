@@ -29,18 +29,8 @@ public abstract class AbstractDataAcceptor {
     /** The name of the table that we will be updating. */
     protected String table = null;
 
-    /** the column names * */
-    protected String[] colNames;
-
-    /** the column types * */
-    protected String[] colTypes;
-
-    /** if transactions need to be used * */
-    protected boolean useTransactions = false;
-
-    public AbstractDataAcceptor(Connection connection, boolean useTransactions, boolean usePrepStatement) {
+    public AbstractDataAcceptor(Connection connection) {
         this.connection = connection;
-        this.useTransactions = useTransactions;
     }
 
     public void setTable(String tableName) {
@@ -63,9 +53,6 @@ public abstract class AbstractDataAcceptor {
         if (colNames.length != colTypes.length)
             throw new Exception("There are different numbers of column names and types");
 
-        this.colNames = colNames;
-        this.colTypes = colTypes;
-
         String ddlStatement = "CREATE TABLE " + table + " (";
 
         for (int i = 0; i < colNames.length; i++) {
@@ -82,7 +69,7 @@ public abstract class AbstractDataAcceptor {
         ddlStatement = customizeCreateTableQuery(ddlStatement);
 
         execute(ddlStatement);
-    }// createTable()
+    }
 
     public abstract String customizeCreateTableQuery(String origQueryString);
 
@@ -108,11 +95,6 @@ public abstract class AbstractDataAcceptor {
      *             if encounter error altering table
      */
     abstract public void addColumn(String columnName, String columnType, String afterColumnName) throws Exception;
-
-    public void dropColumn(String columnName) throws Exception {
-        String dropStatement = "ALTER TABLE " + table + " DROP " + columnName;
-        execute(dropStatement);
-    }
 
     protected void execute(String query) throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);

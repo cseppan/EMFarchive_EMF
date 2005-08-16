@@ -15,15 +15,16 @@ public class MySqlDataAcceptor extends AbstractDataAcceptor {
 
     public MySqlDataAcceptor(String datasourceName, Connection connection, boolean useTransactions,
             boolean usePrepStatement) {
-        super(connection, useTransactions, usePrepStatement);
+        super(connection);
         this.datasourceName = datasourceName;
     }
 
     public String customizeCreateTableQuery(String origQueryString) {
         String queryString = origQueryString;
-        if (useTransactions) {
-            queryString += " type=InnoDB";
-        }
+        //TODO: do we need InnoDB ? If so, when ?
+//        if (useTransactions) {
+//            queryString += " type=InnoDB";
+//        }
         return queryString;
     }
 
