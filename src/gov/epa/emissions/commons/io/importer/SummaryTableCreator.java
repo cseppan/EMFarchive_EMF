@@ -2,6 +2,7 @@ package gov.epa.emissions.commons.io.importer;
 
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.Query;
+import gov.epa.emissions.commons.db.TableDefinition;
 import gov.epa.emissions.commons.io.importer.orl.ORLDataFormat;
 import gov.epa.emissions.commons.io.importer.orl.ORLPointDataFormat;
 
@@ -11,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @version $Id: SummaryTableCreator.java,v 1.3 2005/08/16 19:49:33 rhavaldar Exp $
+ * @version $Id: SummaryTableCreator.java,v 1.3 2005/08/16 19:49:33 rhavaldar
+ *          Exp $
  */
 public class SummaryTableCreator {
     public static final String AREA_SUMMARY = "nei_area_summary";
@@ -231,7 +233,7 @@ public class SummaryTableCreator {
         if (overwrite)
             emissionsQuery.execute("DROP TABLE IF EXISTS " + summaryTable);// FIXME:
         // db-specific
-        else if (emissionsDatasource.getTableNames().contains(summaryTable))
+        else if (emissionsDatasource.tableDefinition().getTableNames().contains(summaryTable))
             throw new Exception("Table \"" + summaryTable
                     + "\" already exists. Must either overwrite table or choose new name.");
         emissionsQuery.execute(query);
@@ -297,7 +299,7 @@ public class SummaryTableCreator {
 
         if (overwrite)
             emissionsQuery.execute("DROP TABLE IF EXISTS " + summaryTable);
-        else if (emissionsDatasource.getTableNames().contains(summaryTable))
+        else if (emissionsDatasource.tableDefinition().getTableNames().contains(summaryTable))
             throw new Exception("Table \"" + summaryTable
                     + "\" already exists. Must either overwrite table or choose new name.");
         emissionsQuery.execute(query);
@@ -347,7 +349,7 @@ public class SummaryTableCreator {
 
         if (overwrite)
             emissionsQuery.execute("DROP TABLE IF EXISTS " + summaryTable);
-        else if (emissionsDatasource.getTableNames().contains(summaryTable))
+        else if (emissionsDatasource.tableDefinition().getTableNames().contains(summaryTable))
             throw new SQLException("Table \"" + summaryTable
                     + "\" already exists. Must either overwrite table or choose new name.");
         emissionsQuery.execute(query);
@@ -453,12 +455,13 @@ public class SummaryTableCreator {
         String summaryTableAndPart = "";
 
         // split into subgroups and use temp tables
+        TableDefinition tableDefinition = this.emissionsDatasource.tableDefinition();
         if (numOfPollutants > MAX_POLLUTANTS_JOIN) {
             tempTableNames = new String[(int) Math.ceil(numOfPollutants / (double) MAX_POLLUTANTS_JOIN)];
             tempTableQueries = new String[tempTableNames.length];
 
             // get the names of the temp tables
-            java.util.List tableNames = this.emissionsDatasource.getTableNames();
+            java.util.List tableNames = tableDefinition.getTableNames();
             for (int i = 0, nextTemp = 0; i < tempTableNames.length; i++, nextTemp++) {
                 String tempTableName = summaryTable + "_temp" + nextTemp;
                 while (tableNames.contains(tempTableName.toLowerCase())) {
@@ -578,8 +581,8 @@ public class SummaryTableCreator {
 
         // create the actual table
         if (overwrite)
-            this.emissionsDatasource.deleteTable(summaryTable);
-        else if (this.emissionsDatasource.getTableNames().contains(summaryTable))
+            tableDefinition.deleteTable(summaryTable);
+        else if (tableDefinition.getTableNames().contains(summaryTable))
             throw new Exception("The table \"" + summaryTable
                     + "\" already exists. Please select 'overwrite tables if exist' or choose a new table name.");
         emissionsQuery.execute(query);
@@ -587,7 +590,7 @@ public class SummaryTableCreator {
         // drop the temp tables, if needed
         if (tempTableNames != null) {
             for (int i = 0; i < tempTableNames.length; i++) {
-                this.emissionsDatasource.deleteTable(tempTableNames[i]);
+                tableDefinition.deleteTable(tempTableNames[i]);
             }
         }
     }

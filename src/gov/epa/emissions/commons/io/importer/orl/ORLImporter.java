@@ -3,6 +3,7 @@ package gov.epa.emissions.commons.io.importer.orl;
 import gov.epa.emissions.commons.db.DataAcceptor;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.TableDefinition;
 import gov.epa.emissions.commons.io.ColumnType;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.importer.DatasetTypes;
@@ -29,7 +30,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.13 2005/08/16 19:49:33 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.14 2005/08/16 21:32:25 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -403,29 +404,30 @@ public class ORLImporter extends ListFormatImporter {
     }
 
     protected void postProcess(Datasource datasource, String table, String tableType) throws Exception {
+        TableDefinition tableDefinition = datasource.tableDefinition();
         // point
         if (tableType.equals(TableTypes.ORL_POINT_TOXICS)) {
             String[] indexColumnNames = { ORLDataFormat.FIPS_NAME, ORLPointDataFormat.PLANT_ID_CODE_NAME,
                     ORLPointDataFormat.POINT_ID_CODE_NAME, ORLPointDataFormat.STACK_ID_CODE_NAME,
                     ORLPointDataFormat.DOE_PLANT_ID_NAME, ORLPointDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
-            datasource.addIndex(table, "orl_point_key", indexColumnNames);
+            tableDefinition.addIndex(table, "orl_point_key", indexColumnNames);
         }
         // nonpoint
         if (tableType.equals(TableTypes.ORL_AREA_NONPOINT_TOXICS)) {
             String[] indexColumnNames = { ORLDataFormat.FIPS_NAME,
                     ORLAreaNonpointDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
-            datasource.addIndex(table, "orl_nonpoint_key", indexColumnNames);
+            tableDefinition.addIndex(table, "orl_nonpoint_key", indexColumnNames);
         }
         // nonroad
         if (tableType.equals(TableTypes.ORL_AREA_NONROAD_TOXICS)) {
             String[] indexColumnNames = { ORLDataFormat.FIPS_NAME,
                     ORLAreaNonroadDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
-            datasource.addIndex(table, "orl_nonroad_key", indexColumnNames);
+            tableDefinition.addIndex(table, "orl_nonroad_key", indexColumnNames);
         }
         // mobile/onroad
         if (tableType.equals(TableTypes.ORL_MOBILE_TOXICS)) {
             String[] indexColumnNames = { ORLDataFormat.FIPS_NAME, ORLMobileDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
-            datasource.addIndex(table, "orl_mobile_key", indexColumnNames);
+            tableDefinition.addIndex(table, "orl_mobile_key", indexColumnNames);
         }
 
         // set the description, combining multiple lines into one String
@@ -482,7 +484,8 @@ public class ORLImporter extends ListFormatImporter {
             final int COUNTY_CODE_WIDTH = 3;
 
             // alter table
-            emissionsDatasource.addColumn(qualifiedTableName, FIPS_NAME, fips.getType(FIPS_NAME), COUNTY_CODE_NAME);
+            emissionsDatasource.tableDefinition().addColumn(qualifiedTableName, FIPS_NAME, fips.getType(FIPS_NAME),
+                    COUNTY_CODE_NAME);
 
             // update FIPS column
             for (int stid = 0; stid < STATE_CODE_WIDTH; stid++) {
@@ -503,7 +506,8 @@ public class ORLImporter extends ListFormatImporter {
                     String[] likeClauses = { stidLike.toString(), cyidLike.toString() };
 
                     // update
-                    emissionsAcceptor.updateWhereLike(qualifiedTableName, FIPS_NAME, concatExpr, whereColumns, likeClauses);
+                    emissionsAcceptor.updateWhereLike(qualifiedTableName, FIPS_NAME, concatExpr, whereColumns,
+                            likeClauses);
                 }
             }
         }
@@ -520,7 +524,7 @@ public class ORLImporter extends ListFormatImporter {
         state.setType(STATE_NAME, STATE_TYPE.getName());
 
         // STATE column
-        emissionsDatasource.addColumn(qualifiedTableName, STATE_NAME, state.getType(STATE_NAME), FIPS_NAME);
+        emissionsDatasource.tableDefinition().addColumn(qualifiedTableName, STATE_NAME, state.getType(STATE_NAME), FIPS_NAME);
 
         // update STATE column
         /**
@@ -538,7 +542,7 @@ public class ORLImporter extends ListFormatImporter {
                 "FLOOR(" + dbServer.asciiToNumber(SummaryTableCreator.FIPS_COL, 5) + "/1000) AS state_code" };
         // select state abbreviations, country codes and state codes from
         // reference.fips table
-       ResultSet results = referenceDatasource.query().select(fipsSelectColumns, FIPS_TABLE_NAME);
+        ResultSet results = referenceDatasource.query().select(fipsSelectColumns, FIPS_TABLE_NAME);
         // use results to create double level map
         // first level -> country code to code-abbreviation map
         Map countryToStateCodeMap = new HashMap();
@@ -579,7 +583,8 @@ public class ORLImporter extends ListFormatImporter {
             String[] equalsClauses = { stateCode };
 
             // update
-            emissionsAcceptor.updateWhereEquals(qualifiedTableName, STATE_NAME, "'" + stateAbbr + "'", whereColumns, equalsClauses);
+            emissionsAcceptor.updateWhereEquals(qualifiedTableName, STATE_NAME, "'" + stateAbbr + "'", whereColumns,
+                    equalsClauses);
         }// while(it.hasNext())
 
         // create the summary table
@@ -587,7 +592,8 @@ public class ORLImporter extends ListFormatImporter {
         String summaryTable = emissionsDatasource.getName() + "."
                 + (String) dataset.getDataTables().get(summaryTableType);
         String table = emissionsDatasource.getName() + "." + (String) dataset.getDataTables().get(tableType);
-        SummaryTableCreator modifier = new SummaryTableCreator(dbServer.getEmissionsDatasource(), dbServer.getReferenceDatasource());
+        SummaryTableCreator modifier = new SummaryTableCreator(dbServer.getEmissionsDatasource(), dbServer
+                .getReferenceDatasource());
         modifier.createORLSummaryTable(datasetType, table, summaryTable, overwrite, annualNotAverageDaily);
     }
 

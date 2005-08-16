@@ -2,6 +2,7 @@ package gov.epa.emissions.commons.io.importer;
 
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.TableDefinition;
 import gov.epa.emissions.commons.io.Dataset;
 
 import java.io.BufferedReader;
@@ -64,16 +65,17 @@ public abstract class FormattedImporter implements Importer {
             throw new Exception("The table name must be at least one character long for file name: " + fileName);
         }
 
+        TableDefinition tableDefinition = datasource.tableDefinition();
         if (overwrite) {
-            datasource.deleteTable(qualifiedTableName);
+            tableDefinition.deleteTable(qualifiedTableName);
         }
         // else make sure table does not exist
-        else if (datasource.tableExists(qualifiedTableName)) {
+        else if (tableDefinition.tableExists(qualifiedTableName)) {
             throw new Exception("The table \"" + qualifiedTableName
                     + "\" already exists. Please select 'overwrite tables if exist' or choose a new table name.");
         }
 
-        datasource.createTable(qualifiedTableName, columnNames, columnTypes, null);
+        tableDefinition.createTable(qualifiedTableName, columnNames, columnTypes, null);
         String line = null;
         String[] data = null;
         int numRows = 0;
