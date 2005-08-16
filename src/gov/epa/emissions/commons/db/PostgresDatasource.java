@@ -61,21 +61,15 @@ public class PostgresDatasource implements Datasource {
      * please ensure that primaryCols is a subset of colNames before calling
      * this method
      */
-    public void createTable(String tableName, String[] colNames, String[] colTypes, String[] primaryCols,
-            boolean overwrite) throws SQLException {
+    public void createTableWithOverwrite(String table, String[] colNames, String[] colTypes, String[] primaryCols)
+            throws SQLException {
         int length = colNames.length;
         if (length != colTypes.length)
             throw new SQLException("There are different numbers of column names and types");
 
-        if (overwrite) {
-            try {
-                execute("DROP TABLE " + tableName);
-            } catch (Exception e) {
-                // TODO: ignore (for postgress)
-            }
-        }
+        deleteTable(table);
 
-        String queryString = "CREATE TABLE " + tableName + " (";
+        String queryString = "CREATE TABLE " + table + " (";
 
         for (int i = 0; i < length - 1; i++) {
             queryString += clean(colNames[i]) + " " + colTypes[i] + ", ";
@@ -93,6 +87,27 @@ public class PostgresDatasource implements Datasource {
         queryString = queryString + primaryColumns + ")";
 
         execute(queryString);
+    }
+
+    // TODO: verify if the CREATE TABLE syntax is applicable to Postgres
+    public void createTable(String table, String[] colNames, String[] colTypes, String primaryCol) throws SQLException {
+        if (colNames.length != colTypes.length)
+            throw new SQLException("There are different numbers of column names and types");
+
+        String ddlStatement = "CREATE TABLE " + table + " (";
+
+        for (int i = 0; i < colNames.length; i++) {
+            // one of the columnnames was "dec" for december.. caused a problem
+            // there
+            if (colNames[i].equals("dec"))
+                colNames[i] = colNames[i] + "1";
+
+            ddlStatement = ddlStatement + clean(colNames[i]) + " " + colTypes[i]
+                    + (colNames[i].equals(primaryCol) ? " PRIMARY KEY " + ", " : ", ");
+        }// for i
+        ddlStatement = ddlStatement.substring(0, ddlStatement.length() - 2) + ")";
+
+        execute(ddlStatement);
     }
 
     private String clean(String data) {
@@ -158,4 +173,22 @@ public class PostgresDatasource implements Datasource {
         String statement = "ALTER TABLE " + table + " ADD " + columnName + " " + columnType;
         execute(statement);
     }
+
+    /**
+     * ALTER TABLE ADD INDEX indexName (indexColumnNames0, indexColumnNames1,
+     * ....)
+     */
+    public void addIndex(String table, String indexName, String[] indexColumnNames) throws SQLException {
+        StringBuffer query = new StringBuffer();
+        // postgres indexes must be unique across tables/database
+        String syntheticIndexName = table.replace('.', '_') + "_" + indexName;
+        query.append("CREATE INDEX " + syntheticIndexName + " ON " + table + " (" + indexColumnNames[0]);
+        for (int i = 1; i < indexColumnNames.length; i++) {
+            query.append(", " + indexColumnNames[i]);
+        }
+        query.append(")");
+        
+        execute(query.toString());
+    }
+
 }

@@ -12,13 +12,4 @@ public class MySqlDataAcceptor extends AbstractDataAcceptor {
         super(connection);
     }
 
-    public String customizeCreateTableQuery(String origQueryString) {
-        String queryString = origQueryString;
-        // TODO: do we need InnoDB ? If so, when ?
-        // if (useTransactions) {
-        // queryString += " type=InnoDB";
-        // }
-        return queryString;
-    }
-
 }

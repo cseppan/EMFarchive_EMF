@@ -29,7 +29,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.10 2005/08/16 18:51:38 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.11 2005/08/16 19:18:57 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -402,30 +402,30 @@ public class ORLImporter extends ListFormatImporter {
         return orlDataFormat.getFileImportDetails();
     }
 
-    protected void postProcess(AbstractDataAcceptor acceptor, String tableType) throws Exception {
+    protected void postProcess(Datasource datasource, String table, String tableType) throws Exception {
         // point
         if (tableType.equals(TableTypes.ORL_POINT_TOXICS)) {
             String[] indexColumnNames = { ORLDataFormat.FIPS_NAME, ORLPointDataFormat.PLANT_ID_CODE_NAME,
                     ORLPointDataFormat.POINT_ID_CODE_NAME, ORLPointDataFormat.STACK_ID_CODE_NAME,
                     ORLPointDataFormat.DOE_PLANT_ID_NAME, ORLPointDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
-            acceptor.addIndex("orl_point_key", indexColumnNames);
+            datasource.addIndex(table, "orl_point_key", indexColumnNames);
         }
         // nonpoint
         if (tableType.equals(TableTypes.ORL_AREA_NONPOINT_TOXICS)) {
             String[] indexColumnNames = { ORLDataFormat.FIPS_NAME,
                     ORLAreaNonpointDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
-            acceptor.addIndex("orl_nonpoint_key", indexColumnNames);
+            datasource.addIndex(table, "orl_nonpoint_key", indexColumnNames);
         }
         // nonroad
         if (tableType.equals(TableTypes.ORL_AREA_NONROAD_TOXICS)) {
             String[] indexColumnNames = { ORLDataFormat.FIPS_NAME,
                     ORLAreaNonroadDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
-            acceptor.addIndex("orl_nonroad_key", indexColumnNames);
+            datasource.addIndex(table, "orl_nonroad_key", indexColumnNames);
         }
         // mobile/onroad
         if (tableType.equals(TableTypes.ORL_MOBILE_TOXICS)) {
             String[] indexColumnNames = { ORLDataFormat.FIPS_NAME, ORLMobileDataFormat.SOURCE_CLASSIFICATION_CODE_NAME };
-            acceptor.addIndex("orl_mobile_key", indexColumnNames);
+            datasource.addIndex(table, "orl_mobile_key", indexColumnNames);
         }
 
         // set the description, combining multiple lines into one String

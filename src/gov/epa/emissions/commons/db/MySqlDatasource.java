@@ -60,22 +60,15 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
      * please ensure that primaryCols is a subset of colNames before calling
      * this method
      */
-    public void createTable(String tableName, String[] colNames, String[] colTypes, String[] primaryCols,
-            boolean overwrite) throws SQLException {
+    public void createTableWithOverwrite(String tableName, String[] colNames, String[] colTypes, String[] primaryCols)
+            throws SQLException {
         // check to see if there are the same number of column names and column
         // types
         int length = colNames.length;
         if (length != colTypes.length)
             throw new SQLException("There are different numbers of column names and types");
 
-        if (overwrite) {
-            try {
-                // TODO: make db pluggable
-                execute("DROP TABLE " + tableName);
-            } catch (Exception e) {
-                // TODO: ignore (for postgress)
-            }
-        }
+        deleteTable(tableName);
 
         String queryString = "CREATE TABLE " + tableName + " (";
 
@@ -95,6 +88,27 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
 
         queryString = queryString + primaryColumns + ")";
         execute(queryString);
+    }
+
+    public void createTable(String table, String[] colNames, String[] colTypes, String primaryCol)
+            throws SQLException {
+        if (colNames.length != colTypes.length)
+            throw new SQLException("There are different numbers of column names and types");
+
+        String ddlStatement = "CREATE TABLE " + table + " (";
+
+        for (int i = 0; i < colNames.length; i++) {
+            // one of the columnnames was "dec" for december.. caused a problem
+            // there
+            if (colNames[i].equals("dec"))
+                colNames[i] = colNames[i] + "1";
+
+            ddlStatement = ddlStatement + clean(colNames[i]) + " " + colTypes[i]
+                    + (colNames[i].equals(primaryCol) ? " PRIMARY KEY " + ", " : ", ");
+        }// for i
+        ddlStatement = ddlStatement.substring(0, ddlStatement.length() - 2) + ")";
+
+        execute(ddlStatement);
     }
 
     public void insertRow(String table, String[] data, String[] colTypes) throws SQLException {
@@ -158,8 +172,7 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
     public void deleteTable(String tableName) throws SQLException {
         try {
             execute("DROP TABLE IF EXISTS " + tableName);
-        } catch (SQLException e) {// TODO: fix the schema prefix issues in
-            // ORLImporter
+        } catch (SQLException e) {
             System.err.println("Could not delete table - " + tableName + ". Ignoring..");
         }
     }
@@ -192,4 +205,23 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
             statement.close();
         }
     }
+    
+    /**
+     * ALTER TABLE ADD INDEX indexName (indexColumnNames0, indexColumnNames1,
+     * ....)
+     */
+    public void addIndex(String table, String indexName, String[] indexColumnNames) throws SQLException {
+        // instantiate a new string buffer in which the query would be created
+        StringBuffer sb = new StringBuffer("ALTER TABLE " + table + " ADD ");
+        final String INDEX = "INDEX ";
+
+        sb.append(INDEX + indexName + "(" + indexColumnNames[0]);
+        for (int i = 1; i < indexColumnNames.length; i++) {
+            sb.append(", " + indexColumnNames[i]);
+        }
+        sb.append(")");
+
+        execute(sb.toString());
+    }// addIndex(String, String[])
+
 }

@@ -19,13 +19,17 @@ public interface Datasource {
     // data definition interface
     List getTableNames() throws SQLException;
 
-    void createTable(String tableName, String[] colNames, String[] colTypes, String[] primaryCols, boolean overwrite)
+    void createTableWithOverwrite(String tableName, String[] colNames, String[] colTypes, String[] primaryCols)
             throws SQLException;
 
+    void createTable(String table, String[] colNames, String[] colTypes, String primaryCol) throws SQLException;
+    
     void deleteTable(String tableName) throws SQLException;
 
     boolean tableExists(String tableName) throws Exception;
 
+    void addIndex(String table, String indexName, String[] indexColumnNames) throws SQLException;
+    
     /**
      * Alter the table by adding a new column of the specified type in the
      * specified location.

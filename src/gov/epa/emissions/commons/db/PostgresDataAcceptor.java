@@ -8,10 +8,6 @@ public class PostgresDataAcceptor extends AbstractDataAcceptor {
         super(connection);
     }
 
-    public String customizeCreateTableQuery(String query) {
-        return query;
-    }
-
     public void setTable(String tableName) {
         table = tableName;
     }
@@ -30,21 +26,7 @@ public class PostgresDataAcceptor extends AbstractDataAcceptor {
         }
         ddlStatement = ddlStatement.substring(0, ddlStatement.length() - 2) + ")";
 
-        ddlStatement = customizeCreateTableQuery(ddlStatement);
-
         execute(ddlStatement);
-    }
-
-    public void addIndex(String indexName, String[] indexColumnNames) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        // postgres indexes must be unique across tables/database
-        String syntheticIndexName = table.replace('.', '_') + "_" + indexName;
-        sb.append("CREATE INDEX " + syntheticIndexName + " ON " + table + " (" + indexColumnNames[0]);
-        for (int i = 1; i < indexColumnNames.length; i++) {
-            sb.append(", " + indexColumnNames[i]);
-        }
-        sb.append(")");
-        execute(sb.toString());
     }
 
 }

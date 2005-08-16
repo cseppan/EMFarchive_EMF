@@ -80,7 +80,7 @@ public abstract class FormattedImporter implements Importer {
         }
         acceptor.setTable(qualifiedTableName);
 
-        acceptor.createTable(columnNames, columnTypes, null, false);
+        datasource.createTable(qualifiedTableName, columnNames, columnTypes, null);
         String line = null;
         String[] data = null;
         int numRows = 0;
@@ -122,7 +122,7 @@ public abstract class FormattedImporter implements Importer {
         }// while file is not empty
 
         // perform capable table type specific processing
-        postProcess(acceptor, tableType);
+        postProcess(datasource, qualifiedTableName, tableType);
 
         // when all the data is done ingesting..
         // close the database connections by calling acceptor.finish..
@@ -232,10 +232,10 @@ public abstract class FormattedImporter implements Importer {
      * after each table is imported, as opposed to dataset type specific
      * processing in postImport() which is performed after ALL tables are
      * imported. Default behavior is to not perform any post processing.
+     * @param tableType2 
      */
-    protected void postProcess(AbstractDataAcceptor acceptor, String tableType) throws Exception {
-        /* DO NOTHING */
-        return;
+    protected void postProcess(Datasource datasource, String table, String tableType) throws Exception {
+        return;/* DO NOTHING */
     }
 
     protected abstract String[] breakUpLine(String line, int[] widths) throws Exception;

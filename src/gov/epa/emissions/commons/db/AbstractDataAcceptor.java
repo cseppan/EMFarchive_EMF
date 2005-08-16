@@ -26,36 +26,6 @@ public abstract class AbstractDataAcceptor {
         return dirtyStr.replace('"', ' ');
     }
 
-    // data definition interface
-    public void createTable(String[] colNames, String[] colTypes, String primaryCol, boolean auto) throws Exception {
-        // check to see if there are the same number of column names and column
-        // types
-        if (colNames.length != colTypes.length)
-            throw new Exception("There are different numbers of column names and types");
-
-        String ddlStatement = "CREATE TABLE " + table + " (";
-
-        for (int i = 0; i < colNames.length; i++) {
-            // one of the columnnames was "dec" for december.. caused a problem
-            // there
-            if (colNames[i].equals("dec"))
-                colNames[i] = colNames[i] + "1";
-
-            ddlStatement = ddlStatement + clean(colNames[i]) + " " + colTypes[i]
-                    + (colNames[i].equals(primaryCol) ? " PRIMARY KEY " + (auto ? " AUTO_INCREMENT, " : ", ") : ", ");
-        }// for i
-        ddlStatement = ddlStatement.substring(0, ddlStatement.length() - 2) + ")";
-
-        ddlStatement = customizeCreateTableQuery(ddlStatement);
-
-        execute(ddlStatement);
-    }
-
-    public abstract String customizeCreateTableQuery(String origQueryString);
-  
-    // management interface
-
- 
     protected void execute(String query) throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         try {
@@ -64,24 +34,6 @@ public abstract class AbstractDataAcceptor {
             statement.close();
         }
     }
-
-    /**
-     * ALTER TABLE ADD INDEX indexName (indexColumnNames0, indexColumnNames1,
-     * ....)
-     */
-    public void addIndex(String indexName, String[] indexColumnNames) throws Exception {
-        // instantiate a new string buffer in which the query would be created
-        StringBuffer sb = new StringBuffer("ALTER TABLE " + table + " ADD ");
-        final String INDEX = "INDEX ";
-
-        sb.append(INDEX + indexName + "(" + indexColumnNames[0]);
-        for (int i = 1; i < indexColumnNames.length; i++) {
-            sb.append(", " + indexColumnNames[i]);
-        }
-        sb.append(")");
-
-        execute(sb.toString());
-    }// addIndex(String, String[])
 
     /**
      * UPDATE databaseName.tableName SET columnName = setExpr WHERE
@@ -179,7 +131,5 @@ public abstract class AbstractDataAcceptor {
 
         return concat.toString();
     }// generateConcatExpr(String[])
-
-    
 
 }

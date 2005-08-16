@@ -58,7 +58,7 @@ public class ReferenceTables {
         line = bfr.readLine();
         colNames = line.split(DELIMITER);
         String[] primaryCol = { colNames[0] };
-        datasource.createTable(qualifiedTableName, colNames, colTypes, primaryCol, true);
+        datasource.createTableWithOverwrite(qualifiedTableName, colNames, colTypes, primaryCol);
         while ((line = bfr.readLine()) != null && line.trim().length() != 0) {
             line = line.trim();
             String[] pollutants = line.split(DELIMITER);
@@ -84,7 +84,7 @@ public class ReferenceTables {
         colNames = line.split(",");
         String[] primaryCol = { colNames[0] };
         String qualifiedTableName = datasource.getName() + "." + tableName;
-        datasource.createTable(qualifiedTableName, colNames, colTypes, primaryCol, true);
+        datasource.createTableWithOverwrite(qualifiedTableName, colNames, colTypes, primaryCol);
 
         while ((line = bfr.readLine()) != null && line.trim().length() != 0) {
             line = line.trim();
@@ -111,7 +111,7 @@ public class ReferenceTables {
         line = bfr.readLine();
         colNames = line.split(",");
         String[] primaryCol = { colNames[0], colNames[1] };
-        datasource.createTable(qualifiedTableName, colNames, colTypes, primaryCol, true);
+        datasource.createTableWithOverwrite(qualifiedTableName, colNames, colTypes, primaryCol);
 
         while ((line = bfr.readLine()) != null && line.trim().length() != 0) {
             line = line.trim();
@@ -137,7 +137,7 @@ public class ReferenceTables {
         line = bfr.readLine();
         colNames = line.split(",");
         String[] primaryCol = { colNames[0] };
-        datasource.createTable(qualifiedTableName, colNames, colTypes, primaryCol, true);
+        datasource.createTableWithOverwrite(qualifiedTableName, colNames, colTypes, primaryCol);
 
         while ((line = bfr.readLine()) != null && line.trim().length() != 0) {
             line = line.trim();
@@ -169,7 +169,7 @@ public class ReferenceTables {
         line = bfr.readLine();
         colNames = line.split(",");
         String qualifiedTableName = datasource.getName() + "." + tableName;
-        datasource.createTable(qualifiedTableName, colNames, colTypes, null, true);
+        datasource.createTableWithOverwrite(qualifiedTableName, colNames, colTypes, null);
         int lineNo = 1;
         while ((line = bfr.readLine()) != null && line.trim().length() != 0) {
             lineNo++;
