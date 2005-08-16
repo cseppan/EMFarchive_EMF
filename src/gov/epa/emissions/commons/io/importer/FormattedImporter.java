@@ -1,6 +1,5 @@
 package gov.epa.emissions.commons.io.importer;
 
-import gov.epa.emissions.commons.db.AbstractDataAcceptor;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.Dataset;
@@ -65,11 +64,6 @@ public abstract class FormattedImporter implements Importer {
             throw new Exception("The table name must be at least one character long for file name: " + fileName);
         }
 
-        // instantiate an database acceptor.. the acceptor takes care of all
-        // database operations.. set the database name and table name to the
-        // acceptor so it knows where to put the data in.
-        AbstractDataAcceptor acceptor = datasource.getDataAcceptor();
-        // delete table if overwrite
         if (overwrite) {
             datasource.deleteTable(qualifiedTableName);
         }
@@ -78,7 +72,6 @@ public abstract class FormattedImporter implements Importer {
             throw new Exception("The table \"" + qualifiedTableName
                     + "\" already exists. Please select 'overwrite tables if exist' or choose a new table name.");
         }
-        acceptor.setTable(qualifiedTableName);
 
         datasource.createTable(qualifiedTableName, columnNames, columnTypes, null);
         String line = null;

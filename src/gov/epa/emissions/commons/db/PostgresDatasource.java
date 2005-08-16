@@ -12,14 +12,14 @@ public class PostgresDatasource implements Datasource {
 
     private Connection connection;
 
-    private PostgresDataAcceptor dataAcceptor;
+    private DataAcceptor dataAcceptor;
 
     private String name;
 
     public PostgresDatasource(String name, Connection connection) {
         this.connection = connection;
         this.name = name;
-        this.dataAcceptor = new PostgresDataAcceptor(connection);
+        this.dataAcceptor = new DataAcceptor(connection);
     }
 
     public String getName() {
@@ -136,7 +136,7 @@ public class PostgresDatasource implements Datasource {
         execute(query.toString());
     }
 
-    public AbstractDataAcceptor getDataAcceptor() {
+    public DataAcceptor getDataAcceptor() {
         return dataAcceptor;
     }
 
@@ -187,7 +187,7 @@ public class PostgresDatasource implements Datasource {
             query.append(", " + indexColumnNames[i]);
         }
         query.append(")");
-        
+
         execute(query.toString());
     }
 

@@ -13,14 +13,14 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
 
     private Connection connection;
 
-    private AbstractDataAcceptor dataAcceptor;
+    private DataAcceptor dataAcceptor;
 
     private String name;
 
     public MySqlDatasource(String name, Connection connection) {
         this.name = name;
         this.connection = connection;
-        this.dataAcceptor = new MySqlDataAcceptor(connection, false, false);
+        this.dataAcceptor = new DataAcceptor(connection);
     }
 
     public String getName() {
@@ -148,7 +148,7 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
         return dirtyStr.replace('-', '_');
     }
 
-    public AbstractDataAcceptor getDataAcceptor() {
+    public DataAcceptor getDataAcceptor() {
         return dataAcceptor;
     }
 

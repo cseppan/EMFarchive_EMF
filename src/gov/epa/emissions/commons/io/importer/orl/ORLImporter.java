@@ -1,6 +1,6 @@
 package gov.epa.emissions.commons.io.importer.orl;
 
-import gov.epa.emissions.commons.db.AbstractDataAcceptor;
+import gov.epa.emissions.commons.db.DataAcceptor;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.ColumnType;
@@ -29,7 +29,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.11 2005/08/16 19:18:57 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.12 2005/08/16 19:31:41 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -450,7 +450,7 @@ public class ORLImporter extends ListFormatImporter {
         // database operations. set the database name and table name to the
         // acceptor so it knows where to put the data.
         Datasource emissionsDatasource = dbServer.getEmissionsDatasource();
-        AbstractDataAcceptor emissionsAcceptor = emissionsDatasource.getDataAcceptor();
+        DataAcceptor emissionsAcceptor = emissionsDatasource.getDataAcceptor();
         // ORL table types
         String datasetType = dataset.getDatasetType();
         String[] tableTypes = DatasetTypes.getTableTypes(datasetType);
@@ -460,7 +460,6 @@ public class ORLImporter extends ListFormatImporter {
         String tableType = tableTypes[0];
         String tableName = (String) dataset.getDataTable(tableType);
         String qualifiedTableName = emissionsDatasource.getName() + "." + tableName;
-        emissionsAcceptor.setTable(qualifiedTableName);
 
         // artificially insert the FIPS data column, a five
         // character String concatenating the state and county codes
@@ -504,7 +503,7 @@ public class ORLImporter extends ListFormatImporter {
                     String[] likeClauses = { stidLike.toString(), cyidLike.toString() };
 
                     // update
-                    emissionsAcceptor.updateWhereLike(FIPS_NAME, concatExpr, whereColumns, likeClauses);
+                    emissionsAcceptor.updateWhereLike(qualifiedTableName, FIPS_NAME, concatExpr, whereColumns, likeClauses);
                 }
             }
         }
@@ -580,7 +579,7 @@ public class ORLImporter extends ListFormatImporter {
             String[] equalsClauses = { stateCode };
 
             // update
-            emissionsAcceptor.updateWhereEquals(STATE_NAME, "'" + stateAbbr + "'", whereColumns, equalsClauses);
+            emissionsAcceptor.updateWhereEquals(qualifiedTableName, STATE_NAME, "'" + stateAbbr + "'", whereColumns, equalsClauses);
         }// while(it.hasNext())
 
         // create the summary table

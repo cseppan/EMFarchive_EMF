@@ -52,5 +52,5 @@ public interface Datasource {
 
     Connection getConnection();
 
-    AbstractDataAcceptor getDataAcceptor();
+    DataAcceptor getDataAcceptor();
 }

@@ -5,28 +5,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public abstract class AbstractDataAcceptor {
+public class DataAcceptor {
 
     protected Connection connection = null;
 
-    protected String table = null;
-
-    public AbstractDataAcceptor(Connection connection) {
+    public DataAcceptor(Connection connection) {
         this.connection = connection;
     }
 
-    public void setTable(String tableName) {
-        table = tableName;
-    }
-
-    /**
-     * gets rid of unwanted characters
-     */
-    protected String clean(String dirtyStr) {
-        return dirtyStr.replace('"', ' ');
-    }
-
-    protected void execute(String query) throws SQLException {
+    private void execute(String query) throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         try {
             statement.execute(query);
@@ -50,8 +37,8 @@ public abstract class AbstractDataAcceptor {
      * @throws Exception
      *             if encounter error updating table
      */
-    public void updateWhereLike(String columnName, String setExpr, String[] whereColumns, String[] likeClauses)
-            throws Exception {
+    public void updateWhereLike(String table, String columnName, String setExpr, String[] whereColumns,
+            String[] likeClauses) throws Exception {
         if (whereColumns.length != likeClauses.length) {
             throw new Exception("There are different numbers of WHERE column names and LIKE clauses");
         }
@@ -86,8 +73,8 @@ public abstract class AbstractDataAcceptor {
      * @throws Exception
      *             if encounter error updating table
      */
-    public void updateWhereEquals(String columnName, String setExpr, String[] whereColumns, String[] equalsClauses)
-            throws Exception {
+    public void updateWhereEquals(String table, String columnName, String setExpr, String[] whereColumns,
+            String[] equalsClauses) throws Exception {
         if (whereColumns.length != equalsClauses.length) {
             throw new Exception("There are different numbers of WHERE column names and = clauses");
         }
@@ -115,21 +102,17 @@ public abstract class AbstractDataAcceptor {
      *            Array of data ('literals' and column names)
      * @return the SQL concat expression
      */
+    // FIXME: does this work with Postgres ?
     public String generateConcatExpr(String[] exprs) {
-        final String CONCAT = "concat(";
-        // begin the concat expression
-        StringBuffer concat = new StringBuffer(CONCAT);
+        StringBuffer concat = new StringBuffer("concat(");
         // add the first string
         concat.append(exprs[0]);
-        // if there is more than one string to concat, add a
-        // comma separator before each of the remaining strings
         for (int i = 1; i < exprs.length; i++) {
             concat.append("," + exprs[i]);
         }
-        // close off the concat expression
         concat.append(")");
 
         return concat.toString();
-    }// generateConcatExpr(String[])
+    }
 
 }
