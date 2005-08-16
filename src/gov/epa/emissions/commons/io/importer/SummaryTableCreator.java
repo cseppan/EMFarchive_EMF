@@ -1,6 +1,7 @@
 package gov.epa.emissions.commons.io.importer;
 
 import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.Query;
 import gov.epa.emissions.commons.io.importer.orl.ORLDataFormat;
 import gov.epa.emissions.commons.io.importer.orl.ORLPointDataFormat;
 
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @version $Id: SummaryTableCreator.java,v 1.2 2005/08/16 18:28:11 rhavaldar Exp $
+ * @version $Id: SummaryTableCreator.java,v 1.3 2005/08/16 19:49:33 rhavaldar Exp $
  */
 public class SummaryTableCreator {
     public static final String AREA_SUMMARY = "nei_area_summary";
@@ -193,7 +194,8 @@ public class SummaryTableCreator {
         epTable = emissionsDatasource.getName() + "." + epTable;
         summaryTable = emissionsDatasource.getName() + "." + summaryTable;
 
-        ResultSet rs = emissionsDatasource.executeQuery("SELECT DISTINCT(pollutant_code) FROM " + emTable);
+        Query emissionsQuery = emissionsDatasource.query();
+        ResultSet rs = emissionsQuery.executeQuery("SELECT DISTINCT(pollutant_code) FROM " + emTable);
         rs.last();
         int numOfPollutants = rs.getRow();
 
@@ -227,12 +229,12 @@ public class SummaryTableCreator {
                 + "=ep." + FIPS_COL + " AND e." + SCC_COL + "=ep." + SCC_COL + ")";
 
         if (overwrite)
-            emissionsDatasource.execute("DROP TABLE IF EXISTS " + summaryTable);// FIXME:
+            emissionsQuery.execute("DROP TABLE IF EXISTS " + summaryTable);// FIXME:
         // db-specific
         else if (emissionsDatasource.getTableNames().contains(summaryTable))
             throw new Exception("Table \"" + summaryTable
                     + "\" already exists. Must either overwrite table or choose new name.");
-        emissionsDatasource.execute(query);
+        emissionsQuery.execute(query);
     }// createAreaSummaryTable(String, String, String, String)
 
     private String clean(String dirtyStr) {
@@ -246,7 +248,8 @@ public class SummaryTableCreator {
         epTable = emissionsDatasource + "." + epTable;
         summaryTable = emissionsDatasource + "." + summaryTable;
 
-        ResultSet rs = emissionsDatasource.executeQuery("SELECT DISTINCT(" + POLLUTANT_COL + ") FROM " + emTable);
+        Query emissionsQuery = emissionsDatasource.query();
+        ResultSet rs = emissionsQuery.executeQuery("SELECT DISTINCT(" + POLLUTANT_COL + ") FROM " + emTable);
         rs.last();
         int numOfPollutants = rs.getRow();
 
@@ -293,11 +296,11 @@ public class SummaryTableCreator {
                 + FACILITY_COL + " = er." + FACILITY_COL + " AND e." + POINT_COL + " = er." + POINT_COL + ")";
 
         if (overwrite)
-            emissionsDatasource.execute("DROP TABLE IF EXISTS " + summaryTable);
+            emissionsQuery.execute("DROP TABLE IF EXISTS " + summaryTable);
         else if (emissionsDatasource.getTableNames().contains(summaryTable))
             throw new Exception("Table \"" + summaryTable
                     + "\" already exists. Must either overwrite table or choose new name.");
-        emissionsDatasource.execute(query);
+        emissionsQuery.execute(query);
     }// createPointSumaryTable(String, String, String, String, String,
 
     // String)
@@ -305,7 +308,8 @@ public class SummaryTableCreator {
     public void createMobileEmissionsSummaryTable(String databaseName, String emTable, String peTable,
             String summaryTable, boolean overwrite) throws SQLException {
         // TODO keithlee - test createMobileEmissionsSummaryTable()
-        ResultSet rs = emissionsDatasource.executeQuery("SELECT DISTINCT(pollutant_code) FROM " + emTable);
+        Query emissionsQuery = emissionsDatasource.query();
+        ResultSet rs = emissionsQuery.executeQuery("SELECT DISTINCT(pollutant_code) FROM " + emTable);
         rs.last();
         int numOfPollutants = rs.getRow();
 
@@ -342,11 +346,11 @@ public class SummaryTableCreator {
                 + "=pe." + FIPS_COL + " AND e." + SCC_COL + "=pe." + SCC_COL + ")";
 
         if (overwrite)
-            emissionsDatasource.execute("DROP TABLE IF EXISTS " + summaryTable);
+            emissionsQuery.execute("DROP TABLE IF EXISTS " + summaryTable);
         else if (emissionsDatasource.getTableNames().contains(summaryTable))
             throw new SQLException("Table \"" + summaryTable
                     + "\" already exists. Must either overwrite table or choose new name.");
-        emissionsDatasource.execute(query);
+        emissionsQuery.execute(query);
     }// createMobileEmissionsSummaryTable(String, String, boolean)
 
     public void createORLSummaryTable(String datasetType, String orlTable, String summaryTable, boolean overwrite,
@@ -358,7 +362,8 @@ public class SummaryTableCreator {
 
         // connect to emissions database
         // get the pollutant CAS codes
-        ResultSet rs = emissionsDatasource.executeQuery("SELECT DISTINCT(" + CAS_COL + ") FROM " + orlTable);
+        Query emissionsQuery = emissionsDatasource.query();
+        ResultSet rs = emissionsQuery.executeQuery("SELECT DISTINCT(" + CAS_COL + ") FROM " + orlTable);
         rs.last();
         int numOfPollutants = rs.getRow();
         String[] pollutants = new String[numOfPollutants];
@@ -557,8 +562,8 @@ public class SummaryTableCreator {
         // create the temp tables first, if needed
         if (tempTableNames != null) {
             for (int i = 0; i < tempTableQueries.length; i++) {
-                this.emissionsDatasource.execute(tempTableQueries[i]);
-                this.emissionsDatasource.execute((String) tempTableIndexList.get(i));
+                emissionsQuery.execute(tempTableQueries[i]);
+                emissionsQuery.execute((String) tempTableIndexList.get(i));
             }
             // will need comma after select distinct
             summaryFromSelectDistinct += ", ";
@@ -577,7 +582,7 @@ public class SummaryTableCreator {
         else if (this.emissionsDatasource.getTableNames().contains(summaryTable))
             throw new Exception("The table \"" + summaryTable
                     + "\" already exists. Please select 'overwrite tables if exist' or choose a new table name.");
-        this.emissionsDatasource.execute(query);
+        emissionsQuery.execute(query);
 
         // drop the temp tables, if needed
         if (tempTableNames != null) {

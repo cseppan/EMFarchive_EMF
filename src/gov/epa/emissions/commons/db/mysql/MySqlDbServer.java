@@ -1,5 +1,8 @@
-package gov.epa.emissions.commons.db;
+package gov.epa.emissions.commons.db.mysql;
 
+import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.SqlTypeMapper;
 import gov.epa.emissions.commons.io.importer.ReferenceImporter;
 import gov.epa.emissions.commons.io.importer.ReferenceTables;
 

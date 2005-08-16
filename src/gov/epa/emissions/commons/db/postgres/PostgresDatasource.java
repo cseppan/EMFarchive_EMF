@@ -1,4 +1,8 @@
-package gov.epa.emissions.commons.db;
+package gov.epa.emissions.commons.db.postgres;
+
+import gov.epa.emissions.commons.db.DataAcceptor;
+import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.Query;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -41,14 +45,6 @@ public class PostgresDatasource implements Datasource {
         }
 
         return tableNames;
-    }
-
-    /**
-     * Execute an SQL query and return the result set.
-     */
-    public ResultSet executeQuery(final String query) throws SQLException {
-        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        return statement.executeQuery(query);
     }
 
     public void execute(final String query) throws SQLException {
@@ -114,47 +110,10 @@ public class PostgresDatasource implements Datasource {
         return (data).replace('-', '_');
     }
 
-    public void insertRow(String table, String[] data, String[] colTypes) throws SQLException {
-        StringBuffer query = new StringBuffer();
-        query.append("INSERT INTO " + table + " VALUES(");
-
-        for (int i = 0; i < data.length; i++) {
-            if (colTypes[i].startsWith("VARCHAR")) {
-                String cleanedCell = data[i].replace('-', '_');
-                String cellWithSinglQuotesEscaped = cleanedCell.replace('\'', ' ');
-                query.append("'" + cellWithSinglQuotesEscaped + "'");
-            } else {
-                if (data[i].trim().length() == 0)
-                    data[i] = "NULL";
-                query.append(data[i]);
-            }
-            if (i < (data.length - 1))
-                query.append(',');
-        }
-        query.append(')');// close parentheses around the query
-
-        execute(query.toString());
-    }
+    public void insertRow(String table, String[] data, String[] colTypes) throws SQLException {}
 
     public DataAcceptor getDataAcceptor() {
         return dataAcceptor;
-    }
-
-    // FIXME: duplicate methods in both datasources
-    public ResultSet select(String[] columnNames, String tableName) throws SQLException {
-        final String selectPrefix = "SELECT ";
-        StringBuffer sb = new StringBuffer(selectPrefix);
-        sb.append(columnNames[0]);
-        for (int i = 1; i < columnNames.length; i++) {
-            sb.append("," + columnNames[i]);
-        }
-        final String fromSuffix = " FROM " + tableName;
-        sb.append(fromSuffix);
-
-        Statement statement = connection.createStatement();
-        statement.execute(sb.toString());
-
-        return statement.getResultSet();
     }
 
     public void deleteTable(String tableName) throws SQLException {
@@ -189,6 +148,10 @@ public class PostgresDatasource implements Datasource {
         query.append(")");
 
         execute(query.toString());
+    }
+
+    public Query query() {
+        return new PostgresQuery(connection);
     }
 
 }

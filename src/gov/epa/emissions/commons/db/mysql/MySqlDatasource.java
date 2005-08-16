@@ -1,4 +1,8 @@
-package gov.epa.emissions.commons.db;
+package gov.epa.emissions.commons.db.mysql;
+
+import gov.epa.emissions.commons.db.DataAcceptor;
+import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.Query;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -45,11 +49,6 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
 
     }
 
-    public ResultSet executeQuery(final String query) throws SQLException {
-        Statement statement = connection.createStatement();
-        return statement.executeQuery(query);
-    }
-
     public void execute(final String query) throws SQLException {
         Statement statement = connection.createStatement();
         statement.execute(query);
@@ -90,8 +89,7 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
         execute(queryString);
     }
 
-    public void createTable(String table, String[] colNames, String[] colTypes, String primaryCol)
-            throws SQLException {
+    public void createTable(String table, String[] colNames, String[] colTypes, String primaryCol) throws SQLException {
         if (colNames.length != colTypes.length)
             throw new SQLException("There are different numbers of column names and types");
 
@@ -111,62 +109,12 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
         execute(ddlStatement);
     }
 
-    public void insertRow(String table, String[] data, String[] colTypes) throws SQLException {
-        /*
-         * for (int k = 0; k < data.length; k++) System.out.print(data[k] + "
-         * "); System.out.println();
-         */
-        String insertPrefix = "INSERT INTO " + table + " VALUES(";
-
-        // instantiate a new string buffer in which the query would be created
-        StringBuffer sb = new StringBuffer(insertPrefix);
-
-        // append data to the query.. put quotes around VARCHAR entries
-        for (int i = 0; i < data.length; i++) {
-            if (colTypes[i].startsWith("VARCHAR")) {
-                String cleanedCell = clean(data[i]);
-                String cellWithSinglQuotesEscaped = cleanedCell.replaceAll("\'", "\\'");
-                sb.append("\"" + cellWithSinglQuotesEscaped + "\"");
-            } else {
-                if (data[i].trim().length() == 0)
-                    data[i] = "NULL";
-                sb.append(data[i]);
-            }
-            sb.append(',');
-        }// for int i
-
-        // there will an extra comma at the end so delete that
-        sb.deleteCharAt(sb.length() - 1);
-
-        // close parentheses around the query
-        sb.append(')');
-
-        execute(sb.toString());
-    }
-
     private String clean(String dirtyStr) {
         return dirtyStr.replace('-', '_');
     }
 
     public DataAcceptor getDataAcceptor() {
         return dataAcceptor;
-    }
-
-    public ResultSet select(String[] columnNames, String tableName) throws SQLException {
-        final String selectPrefix = "SELECT ";
-        StringBuffer sb = new StringBuffer(selectPrefix);
-        sb.append(columnNames[0]);
-        for (int i = 1; i < columnNames.length; i++) {
-            sb.append("," + columnNames[i]);
-        }
-        final String fromSuffix = " FROM " + tableName;
-        sb.append(fromSuffix);
-
-        Statement statement = connection.createStatement();
-        statement.execute(sb.toString());
-        ResultSet results = statement.getResultSet();
-
-        return results;
     }
 
     public void deleteTable(String tableName) throws SQLException {
@@ -205,7 +153,7 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
             statement.close();
         }
     }
-    
+
     /**
      * ALTER TABLE ADD INDEX indexName (indexColumnNames0, indexColumnNames1,
      * ....)
@@ -222,6 +170,10 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
         sb.append(")");
 
         execute(sb.toString());
-    }// addIndex(String, String[])
+    }
+
+    public Query query() {
+        return new MySqlQuery(connection);
+    }
 
 }

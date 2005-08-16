@@ -1,4 +1,6 @@
-package gov.epa.emissions.commons.db;
+package gov.epa.emissions.commons.db.postgres;
+
+import gov.epa.emissions.commons.db.SqlTypeMapper;
 
 public class PostgresSqlTypeMapper implements SqlTypeMapper {
 

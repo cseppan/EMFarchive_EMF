@@ -29,7 +29,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.12 2005/08/16 19:31:41 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.13 2005/08/16 19:49:33 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -538,7 +538,7 @@ public class ORLImporter extends ListFormatImporter {
                 "FLOOR(" + dbServer.asciiToNumber(SummaryTableCreator.FIPS_COL, 5) + "/1000) AS state_code" };
         // select state abbreviations, country codes and state codes from
         // reference.fips table
-       ResultSet results = referenceDatasource.select(fipsSelectColumns, FIPS_TABLE_NAME);
+       ResultSet results = referenceDatasource.query().select(fipsSelectColumns, FIPS_TABLE_NAME);
         // use results to create double level map
         // first level -> country code to code-abbreviation map
         Map countryToStateCodeMap = new HashMap();
@@ -561,7 +561,7 @@ public class ORLImporter extends ListFormatImporter {
         String fipsVal = dbServer.asciiToNumber(ORLDataFormat.FIPS_NAME, 5);
         final String[] usedStateCodesSelectColumns = { "DISTINCT FLOOR(" + fipsVal + "/1000) AS state_code" };
 
-        results = emissionsDatasource.select(usedStateCodesSelectColumns, qualifiedTableName);
+        results = emissionsDatasource.query().select(usedStateCodesSelectColumns, qualifiedTableName);
         // we only need to issue SQL update commands for used state codes
         List usedStateCodes = new ArrayList();
         while (results.next()) {

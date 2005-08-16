@@ -100,7 +100,7 @@ public abstract class FormattedImporter implements Importer {
                 data = breakUpLine(line, columnWidths);
                 if (validData(data, tableType)) {
                     // data = supplementData(data, tableType);
-                    datasource.insertRow(qualifiedTableName, data, columnTypes);
+                    datasource.query().insertRow(qualifiedTableName, data, columnTypes);
                     numRows++;
                 } else {
                     // create new file writer

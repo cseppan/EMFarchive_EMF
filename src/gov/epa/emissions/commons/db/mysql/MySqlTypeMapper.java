@@ -1,4 +1,6 @@
-package gov.epa.emissions.commons.db;
+package gov.epa.emissions.commons.db.mysql;
+
+import gov.epa.emissions.commons.db.SqlTypeMapper;
 
 public class MySqlTypeMapper implements SqlTypeMapper {
 

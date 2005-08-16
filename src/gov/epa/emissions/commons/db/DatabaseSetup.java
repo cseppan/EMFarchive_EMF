@@ -1,5 +1,10 @@
 package gov.epa.emissions.commons.db;
 
+import gov.epa.emissions.commons.db.mysql.MySqlConnectionFactory;
+import gov.epa.emissions.commons.db.mysql.MySqlDbServer;
+import gov.epa.emissions.commons.db.postgres.PostgresConnectionFactory;
+import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
+
 import java.io.File;
 import java.sql.SQLException;
 import java.util.Properties;

@@ -1,20 +1,12 @@
 package gov.epa.emissions.commons.db;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
 public interface Datasource {
 
-    // query interface
-    ResultSet executeQuery(String query) throws SQLException;
-
-    void execute(String query) throws SQLException;
-
-    ResultSet select(String[] columnNames, String tableName) throws SQLException;
-
-    void insertRow(String tableName, String[] data, String[] colTypes) throws SQLException;
+    Query query();
     
     // data definition interface
     List getTableNames() throws SQLException;
