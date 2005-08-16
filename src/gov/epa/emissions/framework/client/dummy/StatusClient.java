@@ -214,7 +214,7 @@ public class StatusClient {
     private void callServiceForGet() {
         StatusServices emfStatusSvc = new StatusServicesTransport(endpoint2);
         try {
-            Status[] stats = emfStatusSvc.getMessages("ejones");
+            Status[] stats = emfStatusSvc.getMessages("aeyth");
             System.out.println("Total number of status messages: " + stats.length);
             
             for (int i=0; i<stats.length; i++){
