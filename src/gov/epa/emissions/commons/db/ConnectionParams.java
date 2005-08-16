@@ -2,8 +2,6 @@ package gov.epa.emissions.commons.db;
 
 public class ConnectionParams {
 
-    private String datasource;
-
     private String host;
 
     private String port;
@@ -14,9 +12,8 @@ public class ConnectionParams {
 
     private String dbName;
 
-    public ConnectionParams(String dbName, String datasource, String host, String port, String username, String password) {
+    public ConnectionParams(String dbName, String host, String port, String username, String password) {
         this.dbName = dbName;
-        this.datasource = datasource;
         this.host = host;
         this.port = port;
         this.username = username;
@@ -29,10 +26,6 @@ public class ConnectionParams {
 
     public String getPort() {
         return port;
-    }
-
-    public String getDatasource() {
-        return datasource;
     }
 
     public String getUsername() {
@@ -63,7 +56,6 @@ public class ConnectionParams {
         this.username = username;
     }
 
-    
     public void setPassword(String password) {
         this.password = password;
     }

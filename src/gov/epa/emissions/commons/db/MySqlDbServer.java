@@ -9,8 +9,12 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Properties;
 
+/**
+ * Note: Emissions & Reference are two schemas in a single database i.e. share a
+ * connection. A datasource is represented by a schema in MySql, and Database ==
+ * Schema
+ */
 public class MySqlDbServer implements DbServer {
 
     private SqlTypeMapper typeMapper;
@@ -19,38 +23,38 @@ public class MySqlDbServer implements DbServer {
 
     private Datasource referenceDatasource;
 
-    private Properties appProps;
-
-    public MySqlDbServer(ConnectionParams emissionsParams, ConnectionParams referenceParams, Properties appProps)
-            throws SQLException {
-        this.appProps = appProps;
-
+    public MySqlDbServer(ConnectionParams params, String referenceDatasourceName, String emissionsDatasourceName,
+            File fieldDefsFile, File referenceFilesDir) throws SQLException {
         this.typeMapper = new MySqlTypeMapper();
-        createEmissionsDatasource(emissionsParams);
-        createReferenceDatasource(referenceParams);
+
+        createEmissionsDatasource(params, emissionsDatasourceName);
+        createReferenceDatasource(params, referenceDatasourceName, fieldDefsFile, referenceFilesDir);
     }
 
-    private void createEmissionsDatasource(ConnectionParams emissionsParams) throws SQLException {
-        emissionsDatasource = createDatasource(emissionsParams);
-        if (!doesDatabaseExist(emissionsParams, emissionsDatasource.getConnection()))
-            createDatabase(emissionsParams, emissionsDatasource.getConnection());
+    private void createEmissionsDatasource(ConnectionParams params, String datasourceName) throws SQLException {
+        emissionsDatasource = createDatasource(params, datasourceName);
+        if (!doesSchemaExist(datasourceName, emissionsDatasource.getConnection()))
+            createSchema(datasourceName, emissionsDatasource.getConnection());
     }
 
-    private void createReferenceDatasource(ConnectionParams referenceParams) throws SQLException {
-        referenceDatasource = createDatasource(referenceParams);
-        if (!doesDatabaseExist(referenceParams, referenceDatasource.getConnection())) {
-            createDatabase(referenceParams, referenceDatasource.getConnection());
-            createReferenceTables();
+    private void createReferenceDatasource(ConnectionParams referenceParams, String datasourceName, File fieldDefsFile,
+            File referenceFilesDir) throws SQLException {
+        referenceDatasource = createDatasource(referenceParams, datasourceName);
+        if (!doesSchemaExist(datasourceName, referenceDatasource.getConnection())) {
+            createSchema(datasourceName, referenceDatasource.getConnection());
+            createReferenceTables(fieldDefsFile, referenceFilesDir);
         }
     }
 
-    private void createReferenceTables() throws SQLException {
-        //TODO: replace by injection. Combine Reference Tables & Reference Importer
-        File fieldDefsFile = new File((String) appProps.get("DATASET_NIF_FIELD_DEFS"));
-        File referenceFilesDir = new File((String) appProps.get("REFERENCE_FILE_BASE_DIR"));
+    private Datasource createDatasource(ConnectionParams params, String datasourceName) throws SQLException {
+        Connection connection = createConnection(params.getHost(), params.getPort(), params.getUsername(), params
+                .getPassword());
 
+        return new MySqlDatasource(datasourceName, connection);
+    }
+
+    private void createReferenceTables(File fieldDefsFile, File referenceFilesDir) throws SQLException {
         try {
-            // TODO: a better way to access props and create Reference Importer
             ReferenceImporter importer = new ReferenceImporter(this, fieldDefsFile, referenceFilesDir, false);
             importer.createReferenceTables();
             ReferenceTables tables = new ReferenceTables(null, getTypeMapper());
@@ -68,34 +72,25 @@ public class MySqlDbServer implements DbServer {
         return referenceDatasource;
     }
 
-    // Note: Emissions & Reference are two schemas in a single database. So,
-    // they share a connection
-    private Datasource createDatasource(ConnectionParams params) throws SQLException {
-        Connection connection = createConnection(params.getHost(), params.getPort(), params.getDatasource(), params
-                .getUsername(), params.getPassword());
-
-        return new MySqlDatasource(params.getDatasource(), connection);
-    }
-
-    private void createDatabase(ConnectionParams params, Connection connection) throws SQLException {
+    private void createSchema(String datasourceName, Connection connection) throws SQLException {
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
-            stmt.execute("CREATE DATABASE " + params.getDbName());
+            stmt.execute("CREATE DATABASE " + datasourceName);
         } finally {
             if (stmt != null)
                 stmt.close();
         }
     }
 
-    private boolean doesDatabaseExist(ConnectionParams params, Connection connection) throws SQLException {
+    private boolean doesSchemaExist(String datasourceName, Connection connection) throws SQLException {
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery("SHOW databases");
             while (rs.next()) {
-                String dbName = rs.getString(1);
-                if (dbName.equalsIgnoreCase(params.getDbName()))
+                String aDatasourceName = rs.getString(1);
+                if (aDatasourceName.equalsIgnoreCase(datasourceName))
                     return true;
             }
         } finally {
@@ -106,17 +101,16 @@ public class MySqlDbServer implements DbServer {
         return false;
     }
 
-    private Connection createConnection(String host, String port, String dbName, String user, String password)
-            throws SQLException {
+    private Connection createConnection(String host, String port, String user, String password) throws SQLException {
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException cnfx) {
             throw new SQLException("Can't load JDBC driver!");
         }
 
-        String url = "jdbc:mysql://" + host + ((port != null) ? (":" + port) : "") + "/" + dbName;
+        String url = "jdbc:mysql://" + host + ((port != null) ? (":" + port) : "");
 
-        return DriverManager.getConnection(url, user, password);
+        return DriverManager.getConnection(url + "/reference", user, password);
     }
 
     public SqlTypeMapper getTypeMapper() {

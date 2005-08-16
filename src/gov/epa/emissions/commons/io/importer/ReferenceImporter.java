@@ -12,6 +12,7 @@ import java.io.FilenameFilter;
 
 /**
  * This class represents the ReferenceImporter for the reference database.
+ * TODO: replace by injection. Combine Reference Tables & Reference Importer
  */
 public class ReferenceImporter extends FixedFormatImporter {
     private File fieldDefsFile;

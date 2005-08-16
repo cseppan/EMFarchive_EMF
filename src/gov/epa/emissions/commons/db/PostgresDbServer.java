@@ -4,9 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+//Note: Emissions & Reference are two schemas in a single database i.e. share a connection
 public class PostgresDbServer implements DbServer {
 
-    private Connection sharedConnection;
+    private Connection connection;
 
     private SqlTypeMapper typeMapper;
 
@@ -14,11 +15,15 @@ public class PostgresDbServer implements DbServer {
 
     private Datasource referenceDatasource;
 
-    public PostgresDbServer(ConnectionParams emissionsParams, ConnectionParams referenceParams) throws SQLException {
+    public PostgresDbServer(ConnectionParams params, String referenceDatasourceName, String emissionsDatasourceName)
+            throws SQLException {
         this.typeMapper = new PostgresSqlTypeMapper();
 
-        emissionsDatasource = createDatasourceWithSharedConnection(emissionsParams);
-        referenceDatasource = createDatasourceWithSharedConnection(referenceParams);
+        connection = createConnection(params.getHost(), params.getPort(), params.getDbName(), params.getUsername(),
+                params.getPassword());
+
+        referenceDatasource = createDatasource(referenceDatasourceName, connection);
+        emissionsDatasource = createDatasource(emissionsDatasourceName, connection);
     }
 
     public Datasource getEmissionsDatasource() {
@@ -29,14 +34,8 @@ public class PostgresDbServer implements DbServer {
         return referenceDatasource;
     }
 
-    // Note: Emissions & Reference are two schemas in a single database. So,
-    // they share a connection
-    private Datasource createDatasourceWithSharedConnection(ConnectionParams params) throws SQLException {
-        if (sharedConnection == null)
-            sharedConnection = createConnection(params.getHost(), params.getPort(), params.getDbName(), params
-                    .getUsername(), params.getPassword());
-
-        return new PostgresDatasource(params.getDatasource(), sharedConnection);
+    private Datasource createDatasource(String datasourceName, Connection connection) {
+        return new PostgresDatasource(datasourceName, connection);
     }
 
     private Connection createConnection(String host, String port, String dbName, String user, String password)
