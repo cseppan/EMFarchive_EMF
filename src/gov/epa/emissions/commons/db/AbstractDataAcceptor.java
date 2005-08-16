@@ -55,25 +55,7 @@ public abstract class AbstractDataAcceptor {
   
     // management interface
 
-    /**
-     * Alter the table by adding a new column of the specified type in the
-     * specified location.
-     * 
-     * ALTER TABLE databaseName.tableName ADD columnName columnType [AFTER
-     * afterColumnName]
-     * 
-     * @param columnName -
-     *            the name of the new column to add
-     * @param columnType -
-     *            the type of the new column
-     * @param afterColumnName -
-     *            the column name to add the new column after. Use null for
-     *            default function (add to end)
-     * @throws Exception
-     *             if encounter error altering table
-     */
-    abstract public void addColumn(String table, String columnName, String columnType, String afterColumnName) throws Exception;
-
+ 
     protected void execute(String query) throws SQLException {
         Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         try {
@@ -198,6 +180,6 @@ public abstract class AbstractDataAcceptor {
         return concat.toString();
     }// generateConcatExpr(String[])
 
-    abstract public void insertRow(String tableName, String[] data, String[] columnTypes) throws Exception;
+    
 
 }

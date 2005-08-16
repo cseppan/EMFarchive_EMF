@@ -174,4 +174,22 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
             statement.close();
         }
     }
+
+    public void addColumn(String table, String columnName, String columnType, String afterColumnName) throws Exception {
+        // instantiate a new string buffer in which the query would be created
+        StringBuffer sb = new StringBuffer("ALTER TABLE " + table + " ADD ");
+        final String AFTER = " AFTER ";
+
+        sb.append(columnName + " " + columnType);
+        if (afterColumnName != null) {
+            sb.append(AFTER + afterColumnName);
+        }// if
+
+        Statement statement = connection.createStatement();
+        try {
+            statement.execute(sb.toString());
+        } finally {
+            statement.close();
+        }
+    }
 }

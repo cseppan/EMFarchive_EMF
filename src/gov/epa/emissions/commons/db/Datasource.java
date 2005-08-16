@@ -15,7 +15,7 @@ public interface Datasource {
     ResultSet select(String[] columnNames, String tableName) throws SQLException;
 
     void insertRow(String tableName, String[] data, String[] colTypes) throws SQLException;
-
+    
     // data definition interface
     List getTableNames() throws SQLException;
 
@@ -25,6 +25,23 @@ public interface Datasource {
     void deleteTable(String tableName) throws SQLException;
 
     boolean tableExists(String tableName) throws Exception;
+
+    /**
+     * Alter the table by adding a new column of the specified type in the
+     * specified location.
+     * 
+     * ALTER TABLE databaseName.tableName ADD columnName columnType [AFTER
+     * afterColumnName]
+     * 
+     * @param columnName -
+     *            the name of the new column to add
+     * @param columnType -
+     *            the type of the new column
+     * @param afterColumnName -
+     *            the column name to add the new column after. Use null for
+     *            default function (add to end)
+     */
+    void addColumn(String table, String columnName, String columnType, String afterColumnName) throws Exception;
 
     // management interface
     String getName();

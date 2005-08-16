@@ -69,13 +69,13 @@ public class PostgresDatasource implements Datasource {
 
         if (overwrite) {
             try {
-                execute("DROP TABLE " + name + "." + tableName);
+                execute("DROP TABLE " + tableName);
             } catch (Exception e) {
                 // TODO: ignore (for postgress)
             }
         }
 
-        String queryString = "CREATE TABLE " + getName() + "." + tableName + " (";
+        String queryString = "CREATE TABLE " + tableName + " (";
 
         for (int i = 0; i < length - 1; i++) {
             queryString += clean(colNames[i]) + " " + colTypes[i] + ", ";
@@ -101,7 +101,7 @@ public class PostgresDatasource implements Datasource {
 
     public void insertRow(String table, String[] data, String[] colTypes) throws SQLException {
         StringBuffer query = new StringBuffer();
-        query.append("INSERT INTO " + getName() + "." + table + " VALUES(");
+        query.append("INSERT INTO " + table + " VALUES(");
 
         for (int i = 0; i < data.length; i++) {
             if (colTypes[i].startsWith("VARCHAR")) {
@@ -152,5 +152,10 @@ public class PostgresDatasource implements Datasource {
 
     public boolean tableExists(String tableName) throws Exception {
         return false;// TODO: use JDBC to query tables
+    }
+
+    public void addColumn(String table, String columnName, String columnType, String afterColumnName) throws Exception {
+        String statement = "ALTER TABLE " + table + " ADD " + columnName + " " + columnType;
+        execute(statement);
     }
 }

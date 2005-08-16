@@ -35,32 +35,6 @@ public class PostgresDataAcceptor extends AbstractDataAcceptor {
         execute(ddlStatement);
     }
 
-    public void insertRow(String table, String[] data, String[] colTypes) throws Exception {
-        StringBuffer sb = new StringBuffer("INSERT INTO " + table + " VALUES(");
-
-        for (int i = 0; i < data.length; i++) {
-            if (colTypes[i].startsWith("VARCHAR")) {
-                String cleanedCell = clean(data[i]);
-
-                // TODO: escape single quote
-                String cellStrippedOffSingleQuotes = cleanedCell.replace('\'', ' ');
-                sb.append("'" + cellStrippedOffSingleQuotes + "'");
-
-            } else {
-                if (data[i].trim().length() == 0)
-                    data[i] = "NULL";
-                sb.append(data[i]);
-            }
-            sb.append(',');
-        }// for int i
-
-        // there will an extra comma at the end so delete that
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append(')');
-
-        execute(sb.toString());
-    }
-
     public void addIndex(String indexName, String[] indexColumnNames) throws Exception {
         StringBuffer sb = new StringBuffer();
         // postgres indexes must be unique across tables/database
@@ -71,11 +45,6 @@ public class PostgresDataAcceptor extends AbstractDataAcceptor {
         }
         sb.append(")");
         execute(sb.toString());
-    }
-
-    public void addColumn(String table, String columnName, String columnType, String afterColumnName) throws Exception {
-        String statement = "ALTER TABLE " + table + " ADD " + columnName + " " + columnType;
-        execute(statement);
     }
 
 }

@@ -43,9 +43,10 @@ public class ReferenceTables {
         this.sqlTypeMapper = sqlTypeMapper;
     }
 
-    public void createPollutantsTable(Datasource db) throws Exception {
+    public void createPollutantsTable(Datasource datasource) throws Exception {
         int col_count = POLLUTANT_COL_COUNT;
-        String tableName = POLLUTANT_TABLE;
+        String qualifiedTableName = datasource.getName() + "." + POLLUTANT_TABLE;
+
         String fileName = referenceFilesDir + "/" + ADD_REF_FILES_DIR + "/pollutants.txt";
         File file = new File(fileName);
         FileReader fr = new FileReader(file);
@@ -57,18 +58,18 @@ public class ReferenceTables {
         line = bfr.readLine();
         colNames = line.split(DELIMITER);
         String[] primaryCol = { colNames[0] };
-        db.createTable(tableName, colNames, colTypes, primaryCol, true);
+        datasource.createTable(qualifiedTableName, colNames, colTypes, primaryCol, true);
         while ((line = bfr.readLine()) != null && line.trim().length() != 0) {
             line = line.trim();
             String[] pollutants = line.split(DELIMITER);
             if (pollutants.length != col_count) {
                 throw new Exception("The file is not in the expected format");
             }
-            db.insertRow(tableName, pollutants, colTypes);
+            datasource.insertRow(qualifiedTableName, pollutants, colTypes);
         }
     }
 
-    public void createCountriesTable(Datasource db) throws Exception {
+    public void createCountriesTable(Datasource datasource) throws Exception {
         int col_count = COUNTRIES_COL_COUNT;
         String tableName = COUNTRIES_TABLE;
         String fileName = referenceFilesDir + "/" + ADD_REF_FILES_DIR + "/countries.txt";
@@ -82,7 +83,8 @@ public class ReferenceTables {
         line = bfr.readLine();
         colNames = line.split(",");
         String[] primaryCol = { colNames[0] };
-        db.createTable(tableName, colNames, colTypes, primaryCol, true);
+        String qualifiedTableName = datasource.getName() + "." + tableName;
+        datasource.createTable(qualifiedTableName, colNames, colTypes, primaryCol, true);
 
         while ((line = bfr.readLine()) != null && line.trim().length() != 0) {
             line = line.trim();
@@ -90,13 +92,14 @@ public class ReferenceTables {
             if (countries.length != col_count) {
                 throw new Exception("The file is not in the expected format");
             }
-            db.insertRow(tableName, countries, colTypes);
+            datasource.insertRow(qualifiedTableName, countries, colTypes);
         }
     }
 
-    public void createStatesTable(Datasource db) throws Exception {
+    public void createStatesTable(Datasource datasource) throws Exception {
         int col_count = STATES_COL_COUNT;
-        String tableName = STATES_TABLE;
+        String qualifiedTableName = datasource.getName() + "." + STATES_TABLE;
+        
         String fileName = referenceFilesDir + "/" + ADD_REF_FILES_DIR + "/states.txt";
         File file = new File(fileName);
         FileReader fr = new FileReader(file);
@@ -108,7 +111,7 @@ public class ReferenceTables {
         line = bfr.readLine();
         colNames = line.split(",");
         String[] primaryCol = { colNames[0], colNames[1] };
-        db.createTable(tableName, colNames, colTypes, primaryCol, true);
+        datasource.createTable(qualifiedTableName, colNames, colTypes, primaryCol, true);
 
         while ((line = bfr.readLine()) != null && line.trim().length() != 0) {
             line = line.trim();
@@ -116,13 +119,13 @@ public class ReferenceTables {
             if (countries.length != col_count) {
                 throw new Exception("The file is not in the expected format");
             }
-            db.insertRow(tableName, countries, colTypes);
+            datasource.insertRow(qualifiedTableName, countries, colTypes);
         }
     }
 
-    public void createSectorsTable(Datasource db) throws Exception {
+    public void createSectorsTable(Datasource datasource) throws Exception {
         int col_count = SECTORS_COL_COUNT;
-        String tableName = SECTORS_TABLE;
+        String qualifiedTableName = datasource.getName() + "." + SECTORS_TABLE;
         String fileName = referenceFilesDir + "/" + ADD_REF_FILES_DIR + "/sectors.txt";
         File file = new File(fileName);
         FileReader fr = new FileReader(file);
@@ -134,7 +137,7 @@ public class ReferenceTables {
         line = bfr.readLine();
         colNames = line.split(",");
         String[] primaryCol = { colNames[0] };
-        db.createTable(tableName, colNames, colTypes, primaryCol, true);
+        datasource.createTable(qualifiedTableName, colNames, colTypes, primaryCol, true);
 
         while ((line = bfr.readLine()) != null && line.trim().length() != 0) {
             line = line.trim();
@@ -142,11 +145,11 @@ public class ReferenceTables {
             if (sectors.length != col_count) {
                 throw new Exception("The file is not in the expected format");
             }
-            db.insertRow(tableName, sectors, colTypes);
+            datasource.insertRow(qualifiedTableName, sectors, colTypes);
         }
     }
 
-    public void createCountyTable(Datasource db) throws Exception {
+    public void createCountyTable(Datasource datasource) throws Exception {
         int col_count = COUNTY_COL_COUNT;
         String tableName = COUNTY_TABLE;
         String fileName = referenceFilesDir + "/" + ADD_REF_FILES_DIR + "/counties.txt";
@@ -165,9 +168,8 @@ public class ReferenceTables {
         String[] colNames;
         line = bfr.readLine();
         colNames = line.split(",");
-        // String[] primaryCol =
-        // {colNames[0]};
-        db.createTable(tableName, colNames, colTypes, null, true);
+        String qualifiedTableName = datasource.getName() + "." + tableName;
+        datasource.createTable(qualifiedTableName, colNames, colTypes, null, true);
         int lineNo = 1;
         while ((line = bfr.readLine()) != null && line.trim().length() != 0) {
             lineNo++;
@@ -182,7 +184,7 @@ public class ReferenceTables {
                     data[i] = counties[i].trim();
                 }
             }
-            db.insertRow(tableName, data, colTypes);
+            datasource.insertRow(qualifiedTableName, data, colTypes);
         }
     }
 
