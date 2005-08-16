@@ -37,7 +37,7 @@ public class ORLImporterTest extends TestCase {
     }
 
     public void testNonPointUsingPostgres() throws Exception {
-        useMysql();
+        usePostgres();
         doTestNonPoint();
     }
 
@@ -46,7 +46,7 @@ public class ORLImporterTest extends TestCase {
     }
 
     public void testNonPointUsingMysql() throws Exception {
-        usePostgres();
+        useMysql();
         doTestNonPoint();
     }
 

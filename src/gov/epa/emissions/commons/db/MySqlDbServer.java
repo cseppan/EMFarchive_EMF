@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.io.importer.ReferenceTables;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -23,40 +22,36 @@ public class MySqlDbServer implements DbServer {
 
     private Datasource referenceDatasource;
 
-    public MySqlDbServer(ConnectionParams params, String referenceDatasourceName, String emissionsDatasourceName,
+    public MySqlDbServer(Connection connection, String referenceDatasourceName, String emissionsDatasourceName,
             File fieldDefsFile, File referenceFilesDir) throws SQLException {
         this.typeMapper = new MySqlTypeMapper();
 
-        createEmissionsDatasource(params, emissionsDatasourceName);
-        createReferenceDatasource(params, referenceDatasourceName, fieldDefsFile, referenceFilesDir);
+        createEmissionsDatasource(connection, emissionsDatasourceName);
+        createReferenceDatasource(connection, referenceDatasourceName, fieldDefsFile, referenceFilesDir);
     }
 
-    private void createEmissionsDatasource(ConnectionParams params, String datasourceName) throws SQLException {
-        emissionsDatasource = createDatasource(params, datasourceName);
+    private void createEmissionsDatasource(Connection connection, String datasourceName) throws SQLException {
+        emissionsDatasource = new MySqlDatasource(datasourceName, connection);
+
         if (!doesSchemaExist(datasourceName, emissionsDatasource.getConnection()))
             createSchema(datasourceName, emissionsDatasource.getConnection());
     }
 
-    private void createReferenceDatasource(ConnectionParams referenceParams, String datasourceName, File fieldDefsFile,
+    private void createReferenceDatasource(Connection connection, String datasourceName, File fieldDefsFile,
             File referenceFilesDir) throws SQLException {
-        referenceDatasource = createDatasource(referenceParams, datasourceName);
+        referenceDatasource = new MySqlDatasource(datasourceName, connection);
+
         if (!doesSchemaExist(datasourceName, referenceDatasource.getConnection())) {
             createSchema(datasourceName, referenceDatasource.getConnection());
             createReferenceTables(fieldDefsFile, referenceFilesDir);
         }
     }
 
-    private Datasource createDatasource(ConnectionParams params, String datasourceName) throws SQLException {
-        Connection connection = createConnection(params.getHost(), params.getPort(), params.getUsername(), params
-                .getPassword());
-
-        return new MySqlDatasource(datasourceName, connection);
-    }
-
     private void createReferenceTables(File fieldDefsFile, File referenceFilesDir) throws SQLException {
         try {
             ReferenceImporter importer = new ReferenceImporter(this, fieldDefsFile, referenceFilesDir, false);
             importer.createReferenceTables();
+            
             ReferenceTables tables = new ReferenceTables(null, getTypeMapper());
             tables.createAdditionRefTables(referenceDatasource);
         } catch (Exception e) {
@@ -99,18 +94,6 @@ public class MySqlDbServer implements DbServer {
         }
 
         return false;
-    }
-
-    private Connection createConnection(String host, String port, String user, String password) throws SQLException {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException cnfx) {
-            throw new SQLException("Can't load JDBC driver!");
-        }
-
-        String url = "jdbc:mysql://" + host + ((port != null) ? (":" + port) : "");
-
-        return DriverManager.getConnection(url + "/reference", user, password);
     }
 
     public SqlTypeMapper getTypeMapper() {

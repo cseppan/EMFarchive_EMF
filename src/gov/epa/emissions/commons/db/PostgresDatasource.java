@@ -15,7 +15,6 @@ public class PostgresDatasource implements Datasource {
     private PostgresDataAcceptor dataAcceptor;
 
     private String name;
-
    
     public PostgresDatasource(String name, Connection connection) {
         this.connection = connection;
