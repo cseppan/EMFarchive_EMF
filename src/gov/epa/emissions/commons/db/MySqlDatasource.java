@@ -15,16 +15,16 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
 
     private AbstractDataAcceptor dataAcceptor;
 
-    private ConnectionParams params;
+    private String name;
 
-    public MySqlDatasource(ConnectionParams params, Connection connection) {
-        this.params = params;
+    public MySqlDatasource(String name, Connection connection) {
+        this.name = name;
         this.connection = connection;
-        this.dataAcceptor = new MySqlDataAcceptor(params.getDatasource(), connection, false, false);
+        this.dataAcceptor = new MySqlDataAcceptor(name, connection, false, false);
     }
 
     public String getName() {
-        return params.getDatasource();
+        return name;
     }
 
     public Connection getConnection() {
@@ -136,10 +136,6 @@ public class MySqlDatasource implements Datasource, Cloneable, Serializable {
 
     public AbstractDataAcceptor getDataAcceptor() {
         return dataAcceptor;
-    }
-
-    public ConnectionParams getConnectionParams() {
-        return params;
     }
 
 }

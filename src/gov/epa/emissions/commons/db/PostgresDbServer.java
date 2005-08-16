@@ -36,7 +36,7 @@ public class PostgresDbServer implements DbServer {
             sharedConnection = createConnection(params.getHost(), params.getPort(), params.getDbName(), params
                     .getUsername(), params.getPassword());
 
-        return new PostgresDatasource(params, sharedConnection);
+        return new PostgresDatasource(params.getDatasource(), sharedConnection);
     }
 
     private Connection createConnection(String host, String port, String dbName, String user, String password)

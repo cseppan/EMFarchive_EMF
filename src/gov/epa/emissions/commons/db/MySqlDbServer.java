@@ -74,7 +74,7 @@ public class MySqlDbServer implements DbServer {
         Connection connection = createConnection(params.getHost(), params.getPort(), params.getDatasource(), params
                 .getUsername(), params.getPassword());
 
-        return new MySqlDatasource(params, connection);
+        return new MySqlDatasource(params.getDatasource(), connection);
     }
 
     private void createDatabase(ConnectionParams params, Connection connection) throws SQLException {

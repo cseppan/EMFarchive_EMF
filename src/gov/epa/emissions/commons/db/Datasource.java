@@ -7,8 +7,6 @@ import java.util.List;
 
 public interface Datasource {
 
-    ConnectionParams getConnectionParams();
-
     String getName();
 
     ResultSet executeQuery(String query) throws SQLException;

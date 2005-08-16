@@ -14,16 +14,17 @@ public class PostgresDatasource implements Datasource {
 
     private PostgresDataAcceptor dataAcceptor;
 
-    private ConnectionParams connectionParams;
+    private String name;
 
-    public PostgresDatasource(ConnectionParams params, Connection connection) {
+   
+    public PostgresDatasource(String name, Connection connection) {
         this.connection = connection;
-        this.connectionParams = params;
+        this.name = name;
         this.dataAcceptor = new PostgresDataAcceptor(connection, false, true);
     }
 
     public String getName() {
-        return connectionParams.getDatasource();
+        return name;
     }
 
     public Connection getConnection() {
@@ -63,16 +64,13 @@ public class PostgresDatasource implements Datasource {
      */
     public void createTable(String tableName, String[] colNames, String[] colTypes, String[] primaryCols,
             boolean overwrite) throws SQLException {
-        // check to see if there are the same number of column names and column
-        // types
         int length = colNames.length;
         if (length != colTypes.length)
             throw new SQLException("There are different numbers of column names and types");
 
         if (overwrite) {
             try {
-                // TODO: make db pluggable
-                execute("DROP TABLE " + connectionParams.getDatasource() + "." + tableName);
+                execute("DROP TABLE " + name + "." + tableName);
             } catch (Exception e) {
                 // TODO: ignore (for postgress)
             }
@@ -126,10 +124,6 @@ public class PostgresDatasource implements Datasource {
 
     public AbstractDataAcceptor getDataAcceptor() {
         return dataAcceptor;
-    }
-
-    public ConnectionParams getConnectionParams() {
-        return connectionParams;
     }
 
 }
