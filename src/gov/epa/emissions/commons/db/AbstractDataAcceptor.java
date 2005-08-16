@@ -10,7 +10,8 @@ import java.sql.Statement;
  * An acceptor which takes in data and puts it in a database
  * 
  * @author Prashant Pai, CEP UNC
- * @version $Id: AbstractDataAcceptor.java,v 1.1 2005/08/15 20:09:31 rhavaldar Exp $
+ * @version $Id: AbstractDataAcceptor.java,v 1.1 2005/08/15 20:09:31 rhavaldar
+ *          Exp $
  * @see MySqlDataAcceptor.java
  */
 
@@ -27,9 +28,6 @@ public abstract class AbstractDataAcceptor {
 
     /** The name of the table that we will be updating. */
     protected String table = null;
-
-    /** The prefix for the update statements. */
-    protected String updatePrefix = null;
 
     /** the column names * */
     protected String[] colNames;
@@ -175,7 +173,7 @@ public abstract class AbstractDataAcceptor {
         }
 
         // instantiate a new string buffer in which the query would be created
-        StringBuffer sb = new StringBuffer(updatePrefix + columnName + " = " + setExpr + " WHERE ");
+        StringBuffer sb = new StringBuffer("UPDATE " + table + " SET " + columnName + " = " + setExpr + " WHERE ");
 
         // add the first LIKE expression
         sb.append(whereColumns[0] + " LIKE '" + likeClauses[0] + "'");
@@ -211,7 +209,7 @@ public abstract class AbstractDataAcceptor {
         }
 
         // instantiate a new string buffer in which the query would be created
-        StringBuffer sb = new StringBuffer(updatePrefix + columnName + " = " + setExpr + " WHERE ");
+        StringBuffer sb = new StringBuffer("UPDATE " + table + " SET " + columnName + " = " + setExpr + " WHERE ");
 
         // add the first LIKE expression
         sb.append(whereColumns[0] + " = " + equalsClauses[0]);
