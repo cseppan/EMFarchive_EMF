@@ -14,7 +14,7 @@
     <property name="test.functional.dir" value="test/functional" />
     <property name="test.integration.dir" value="test/integration" />
 
-    <property name="build.home" value="build" />
+    <property name="build.home" value="build/sandbox" />
     <property name="web.dir" value="web" />
     <property name="build.dist.dir" value="${build.home}/dist" />
     <property name="build.web-inf.dir" value="${build.dist.dir}/WEB-INF" />
