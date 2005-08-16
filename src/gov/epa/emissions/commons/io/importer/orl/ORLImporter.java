@@ -8,7 +8,7 @@ import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.importer.DatasetTypes;
 import gov.epa.emissions.commons.io.importer.FileColumnsMetadata;
 import gov.epa.emissions.commons.io.importer.ListFormatImporter;
-import gov.epa.emissions.commons.io.importer.TableModifier;
+import gov.epa.emissions.commons.io.importer.SummaryTableCreator;
 import gov.epa.emissions.commons.io.importer.TableTypes;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
 
@@ -29,7 +29,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.7 2005/08/15 20:09:31 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.8 2005/08/16 18:10:38 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -535,12 +535,11 @@ public class ORLImporter extends ListFormatImporter {
          */
         Datasource referenceDatasource = dbServer.getReferenceDatasource();
         final String FIPS_TABLE_NAME = referenceDatasource.getName() + ".fips";
-        final String[] fipsSelectColumns = { "DISTINCT " + TableModifier.STATE_COL, "country_code",
-                "FLOOR(" + dbServer.asciiToNumber(TableModifier.FIPS_COL, 5) + "/1000) AS state_code" };
+        final String[] fipsSelectColumns = { "DISTINCT " + SummaryTableCreator.STATE_COL, "country_code",
+                "FLOOR(" + dbServer.asciiToNumber(SummaryTableCreator.FIPS_COL, 5) + "/1000) AS state_code" };
         // select state abbreviations, country codes and state codes from
         // reference.fips table
-        AbstractDataAcceptor referenceAcceptor = referenceDatasource.getDataAcceptor();
-        ResultSet results = referenceAcceptor.select(fipsSelectColumns, FIPS_TABLE_NAME);
+       ResultSet results = referenceDatasource.select(fipsSelectColumns, FIPS_TABLE_NAME);
         // use results to create double level map
         // first level -> country code to code-abbreviation map
         Map countryToStateCodeMap = new HashMap();
@@ -563,7 +562,7 @@ public class ORLImporter extends ListFormatImporter {
         String fipsVal = dbServer.asciiToNumber(ORLDataFormat.FIPS_NAME, 5);
         final String[] usedStateCodesSelectColumns = { "DISTINCT FLOOR(" + fipsVal + "/1000) AS state_code" };
 
-        results = emissionsAcceptor.select(usedStateCodesSelectColumns, qualifiedTableName);
+        results = emissionsDatasource.select(usedStateCodesSelectColumns, qualifiedTableName);
         // we only need to issue SQL update commands for used state codes
         List usedStateCodes = new ArrayList();
         while (results.next()) {
@@ -589,7 +588,7 @@ public class ORLImporter extends ListFormatImporter {
         String summaryTable = emissionsDatasource.getName() + "."
                 + (String) dataset.getDataTables().get(summaryTableType);
         String table = emissionsDatasource.getName() + "." + (String) dataset.getDataTables().get(tableType);
-        TableModifier modifier = new TableModifier(dbServer.getEmissionsDatasource(), dbServer.getReferenceDatasource());
+        SummaryTableCreator modifier = new SummaryTableCreator(dbServer.getEmissionsDatasource(), dbServer.getReferenceDatasource());
         modifier.createORLSummaryTable(datasetType, table, summaryTable, overwrite, annualNotAverageDaily);
     }
 

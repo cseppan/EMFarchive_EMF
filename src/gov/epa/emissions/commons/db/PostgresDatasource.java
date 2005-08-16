@@ -15,7 +15,7 @@ public class PostgresDatasource implements Datasource {
     private PostgresDataAcceptor dataAcceptor;
 
     private String name;
-   
+
     public PostgresDatasource(String name, Connection connection) {
         this.connection = connection;
         this.name = name;
@@ -125,4 +125,20 @@ public class PostgresDatasource implements Datasource {
         return dataAcceptor;
     }
 
+    // FIXME: duplicate methods in both datasources
+    public ResultSet select(String[] columnNames, String tableName) throws SQLException {
+        final String selectPrefix = "SELECT ";
+        StringBuffer sb = new StringBuffer(selectPrefix);
+        sb.append(columnNames[0]);
+        for (int i = 1; i < columnNames.length; i++) {
+            sb.append("," + columnNames[i]);
+        }
+        final String fromSuffix = " FROM " + tableName;
+        sb.append(fromSuffix);
+
+        Statement statement = connection.createStatement();
+        statement.execute(sb.toString());
+
+        return statement.getResultSet();
+    }
 }

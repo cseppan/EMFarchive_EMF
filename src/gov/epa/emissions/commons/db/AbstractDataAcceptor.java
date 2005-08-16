@@ -1,32 +1,14 @@
 package gov.epa.emissions.commons.db;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/**
- * An acceptor which takes in data and puts it in a database
- * 
- * @author Prashant Pai, CEP UNC
- * @version $Id: AbstractDataAcceptor.java,v 1.1 2005/08/15 20:09:31 rhavaldar
- *          Exp $
- * @see MySqlDataAcceptor.java
- */
-
 public abstract class AbstractDataAcceptor {
 
-    /**
-     * The database connection. need to store the connection since we would want
-     * to close it at the end
-     */
     protected Connection connection = null;
 
-    /** a prepared statement to use * */
-    protected PreparedStatement prepStatement = null;
-
-    /** The name of the table that we will be updating. */
     protected String table = null;
 
     public AbstractDataAcceptor(Connection connection) {
@@ -44,9 +26,9 @@ public abstract class AbstractDataAcceptor {
         return dirtyStr.replace('"', ' ');
     }
 
-    /**
-     * Create the table using the header
-     */
+    // query interface
+
+    // data definition interface
     public void createTable(String[] colNames, String[] colTypes, String primaryCol, boolean auto) throws Exception {
         // check to see if there are the same number of column names and column
         // types
@@ -76,6 +58,8 @@ public abstract class AbstractDataAcceptor {
     public abstract boolean tableExists(String tableName) throws Exception;
 
     abstract public void deleteTable(String tableName) throws SQLException;
+
+    // management interface
 
     /**
      * Alter the table by adding a new column of the specified type in the
@@ -219,8 +203,6 @@ public abstract class AbstractDataAcceptor {
 
         return concat.toString();
     }// generateConcatExpr(String[])
-
-    abstract public ResultSet select(String[] columnNames, String tableName) throws Exception;
 
     abstract public void insertRow(String[] data, String[] columnTypes) throws Exception;
 

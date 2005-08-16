@@ -1,7 +1,6 @@
 package gov.epa.emissions.commons.db;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -72,22 +71,6 @@ public class MySqlDataAcceptor extends AbstractDataAcceptor {
         }
     }
 
-    public ResultSet select(String[] columnNames, String tableName) throws Exception {
-        final String selectPrefix = "SELECT ";
-        StringBuffer sb = new StringBuffer(selectPrefix);
-        sb.append(columnNames[0]);
-        for (int i = 1; i < columnNames.length; i++) {
-            sb.append("," + columnNames[i]);
-        }
-        final String fromSuffix = " FROM " + tableName;
-        sb.append(fromSuffix);
-
-        Statement statement = connection.createStatement();
-        statement.execute(sb.toString());
-        ResultSet results = statement.getResultSet();
-
-        return results;
-    }
 
     public void addColumn(String columnName, String columnType, String afterColumnName) throws Exception {
         // instantiate a new string buffer in which the query would be created

@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @version $Id: TableModifier.java,v 1.2 2005/08/16 15:10:18 rhavaldar Exp $
+ * @version $Id: SummaryTableCreator.java,v 1.1 2005/08/16 18:10:38 rhavaldar Exp $
  */
-public class TableModifier {
+public class SummaryTableCreator {
     public static final String AREA_SUMMARY = "nei_area_summary";
 
     public static final String POINT_SUMMARY = "nei_point_summary";
@@ -182,7 +182,7 @@ public class TableModifier {
 
     private Datasource referenceDatasource;
 
-    public TableModifier(Datasource emissions, Datasource reference) {
+    public SummaryTableCreator(Datasource emissions, Datasource reference) {
         this.emissionsDatasource = emissions;
         this.referenceDatasource = reference;
     }
