@@ -10,7 +10,7 @@ public interface DbServer {
 
     /**
      * @return wraps a db-specific function around ascii column to convert it to
-     *         a number w/ specified precision
+     *         a number w/ specified precision (i.e. size)
      */
     String asciiToNumber(String asciiColumn, int precision);
 

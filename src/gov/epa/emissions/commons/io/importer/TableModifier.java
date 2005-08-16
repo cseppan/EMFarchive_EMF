@@ -1,7 +1,6 @@
 package gov.epa.emissions.commons.io.importer;
 
 import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.db.MySqlDatasource;
 import gov.epa.emissions.commons.io.importer.orl.ORLDataFormat;
 import gov.epa.emissions.commons.io.importer.orl.ORLPointDataFormat;
 
@@ -11,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @version $Id: TableModifier.java,v 1.1 2005/08/12 15:46:42 rhavaldar Exp $
+ * @version $Id: TableModifier.java,v 1.2 2005/08/16 15:10:18 rhavaldar Exp $
  */
 public class TableModifier {
     public static final String AREA_SUMMARY = "nei_area_summary";
@@ -207,7 +206,7 @@ public class TableModifier {
 
         for (int i = 0; i < numOfPollutants; i++) {
             pollutants[i] = rs.getString(POLLUTANT_COL);
-            cleanPoll = MySqlDatasource.clean(pollutants[i]);
+            cleanPoll = clean(pollutants[i]);
             selectPart = selectPart + cleanPoll + "." + EMISSION_COL + " as " + cleanPoll + ", ";
             joinPart = joinPart + "LEFT JOIN (SELECT " + FIPS_COL + ", " + SCC_COL + ", " + EMISSION_COL + " FROM "
                     + emTable + " WHERE " + POLLUTANT_COL + " = '" + pollutants[i] + "') " + cleanPoll + " ON (e."
@@ -230,11 +229,15 @@ public class TableModifier {
         if (overwrite)
             emissionsDatasource.execute("DROP TABLE IF EXISTS " + summaryTable);// FIXME:
         // db-specific
-        else if (emissionsDatasource.getTableNames(false).contains(summaryTable))
+        else if (emissionsDatasource.getTableNames().contains(summaryTable))
             throw new Exception("Table \"" + summaryTable
                     + "\" already exists. Must either overwrite table or choose new name.");
         emissionsDatasource.execute(query);
     }// createAreaSummaryTable(String, String, String, String)
+
+    private String clean(String dirtyStr) {
+        return dirtyStr.replace('-', '_');
+    }
 
     public void createPointSummaryTable(String datasourceName, String emTable, String epTable, String euTable,
             String erTable, String summaryTable, boolean overwrite) throws Exception {
@@ -256,7 +259,7 @@ public class TableModifier {
 
         for (int i = 0; i < numOfPollutants; i++) {
             pollutants[i] = rs.getString(POLLUTANT_COL);
-            cleanPoll = MySqlDatasource.clean(pollutants[i]);
+            cleanPoll = clean(pollutants[i]);
             selectPart = selectPart + cleanPoll + "." + EMISSION_COL + " as " + cleanPoll + ", ";
             joinPart = joinPart + "LEFT JOIN (SELECT " + FIPS_COL + ", " + FACILITY_COL + ", " + UNIT_COL + ", "
                     + PROCESS_COL + ", " + POINT_COL + "," + EMISSION_COL + " FROM " + emTable + " WHERE "
@@ -291,7 +294,7 @@ public class TableModifier {
 
         if (overwrite)
             emissionsDatasource.execute("DROP TABLE IF EXISTS " + summaryTable);
-        else if (emissionsDatasource.getTableNames(false).contains(summaryTable))
+        else if (emissionsDatasource.getTableNames().contains(summaryTable))
             throw new Exception("Table \"" + summaryTable
                     + "\" already exists. Must either overwrite table or choose new name.");
         emissionsDatasource.execute(query);
@@ -340,7 +343,7 @@ public class TableModifier {
 
         if (overwrite)
             emissionsDatasource.execute("DROP TABLE IF EXISTS " + summaryTable);
-        else if (emissionsDatasource.getTableNames(false).contains(summaryTable))
+        else if (emissionsDatasource.getTableNames().contains(summaryTable))
             throw new SQLException("Table \"" + summaryTable
                     + "\" already exists. Must either overwrite table or choose new name.");
         emissionsDatasource.execute(query);
@@ -450,7 +453,7 @@ public class TableModifier {
             tempTableQueries = new String[tempTableNames.length];
 
             // get the names of the temp tables
-            java.util.List tableNames = this.emissionsDatasource.getTableNames(false);
+            java.util.List tableNames = this.emissionsDatasource.getTableNames();
             for (int i = 0, nextTemp = 0; i < tempTableNames.length; i++, nextTemp++) {
                 String tempTableName = summaryTable + "_temp" + nextTemp;
                 while (tableNames.contains(tempTableName.toLowerCase())) {
@@ -524,7 +527,7 @@ public class TableModifier {
             for (int i = 0; i < numOfPollutants; i++) {
                 // when using number (CAS) as column name, enclose in slanted
                 // quotes
-                String cleanPoll = "`" + MySqlDatasource.clean(pollutants[i]) + "`";
+                String cleanPoll = "`" + clean(pollutants[i]) + "`";
                 summaryTableSelectPart += cleanPoll + "." + emissionCol + " as " + cleanPoll + ", ";
 
                 if (datasetType.equals(DatasetTypes.ORL_AREA_NONPOINT_TOXICS)
@@ -571,7 +574,7 @@ public class TableModifier {
         // create the actual table
         if (overwrite)
             this.emissionsDatasource.getDataAcceptor().deleteTable(summaryTable);
-        else if (this.emissionsDatasource.getTableNames(false).contains(summaryTable))
+        else if (this.emissionsDatasource.getTableNames().contains(summaryTable))
             throw new Exception("The table \"" + summaryTable
                     + "\" already exists. Please select 'overwrite tables if exist' or choose a new table name.");
         this.emissionsDatasource.execute(query);

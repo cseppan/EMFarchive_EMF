@@ -8,6 +8,9 @@ import gov.epa.emissions.commons.io.importer.TableTypes;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -16,35 +19,52 @@ public class ORLImporterTest extends TestCase {
 
     private DatabaseSetup dbSetup;
 
-    protected void setUp() throws Exception {
+    private void usePostgres() throws Exception {
+        init(new File("test/postgres.conf"));
+    }
+
+    private void useMysql() throws Exception {
+        init(new File("test/mysql.conf"));
+    }
+
+    private void init(File conf) throws IOException, FileNotFoundException, SQLException {
         Properties properties = new Properties();
-        properties.load(new FileInputStream(new File("test/user_preferences.txt")));
+        properties.load(new FileInputStream(conf));
         properties.put("DATASET_NIF_FIELD_DEFS", "config/field_defs.dat");
         properties.put("REFERENCE_FILE_BASE_DIR", "config/refDbFiles");
 
         dbSetup = new DatabaseSetup(properties);
     }
 
-    public void testNonPoint() throws Exception {
-        String filename = "arinv.nonpoint.nti99_NC.txt";
-        run(filename, DatasetTypes.ORL_AREA_NONPOINT_TOXICS, TableTypes.ORL_AREA_NONPOINT_TOXICS);
+    public void testNonPointUsingPostgres() throws Exception {
+        useMysql();
+        doTestNonPoint();
     }
 
-    //FIXME: change the columns from numbers to prefix alphabets
+    private void doTestNonPoint() throws Exception {
+        run("arinv.nonpoint.nti99_NC.txt", DatasetTypes.ORL_AREA_NONPOINT_TOXICS, TableTypes.ORL_AREA_NONPOINT_TOXICS);
+    }
+
+    public void testNonPointUsingMysql() throws Exception {
+        usePostgres();
+        doTestNonPoint();
+    }
+
+    // FIXME: change the columns from numbers to prefix alphabets
     public void TODO_testNonRoad() throws Exception {
         run("arinv.nonroad.nti99d_NC.new.txt", DatasetTypes.ORL_AREA_NONROAD_TOXICS, TableTypes.ORL_AREA_NONROAD_TOXICS);
     }
 
     public void TODO_testPoint() {
-        String datasetType = DatasetTypes.ORL_POINT_TOXICS;
-        String tableType = TableTypes.ORL_POINT_TOXICS;
-        String dbFile = "ptinv.nti99_NC.100.txt";
+        // String datasetType = DatasetTypes.ORL_POINT_TOXICS;
+        // String tableType = TableTypes.ORL_POINT_TOXICS;
+        // String dbFile = "ptinv.nti99_NC.100.txt";
     }
 
     public void TODO_testMobile() {
-        String datasetType = DatasetTypes.ORL_MOBILE_TOXICS;
-        String tableType = TableTypes.ORL_MOBILE_TOXICS;
-        String dbFile = "nti99.NC.onroad.SMOKE.100.txt";
+        // String datasetType = DatasetTypes.ORL_MOBILE_TOXICS;
+        // String tableType = TableTypes.ORL_MOBILE_TOXICS;
+        // String dbFile = "nti99.NC.onroad.SMOKE.100.txt";
     }
 
     private void run(final String filename, String datasetType, String tableType) throws Exception {

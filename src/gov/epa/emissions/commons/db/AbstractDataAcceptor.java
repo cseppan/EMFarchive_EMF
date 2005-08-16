@@ -109,11 +109,6 @@ public abstract class AbstractDataAcceptor {
      */
     abstract public void addColumn(String columnName, String columnType, String afterColumnName) throws Exception;
 
-    /**
-     * Alter the table by dropping the specified column name.
-     * 
-     * ALTER TABLE databaseName.tableName DROP columnName
-     */
     public void dropColumn(String columnName) throws Exception {
         String dropStatement = "ALTER TABLE " + table + " DROP " + columnName;
         execute(dropStatement);
@@ -129,13 +124,8 @@ public abstract class AbstractDataAcceptor {
     }
 
     /**
-     * Alter the table by adding an index composed of <i>i</i> column names.
-     * 
-     * ALTER TABLE ADD INDEX indexName (indexColumnNames[i])
-     * 
-     * @param indexName
-     * @param indexColumnNames
-     * @throws Exception
+     * ALTER TABLE ADD INDEX indexName (indexColumnNames0, indexColumnNames1,
+     * ....)
      */
     public void addIndex(String indexName, String[] indexColumnNames) throws Exception {
         // instantiate a new string buffer in which the query would be created

@@ -15,9 +15,17 @@ public class ReferenceTablesTest extends TestCase {
 
     private File referenceFilesDir;
 
-    protected void setUp() throws Exception {
+    private void initUsingPostgres() throws Exception {
+        init(new File("test/postgres.conf"));
+    }
+
+    private void initUsingMysql() throws Exception {
+        init(new File("test/mysql.conf"));
+    }
+
+    private void init(File conf) throws Exception {
         Properties properties = new Properties();
-        properties.load(new FileInputStream(new File("test/user_preferences.txt")));
+        properties.load(new FileInputStream(conf));
         properties.put("DATASET_NIF_FIELD_DEFS", "config/field_defs.dat");
         properties.put("REFERENCE_FILE_BASE_DIR", "config/refDbFiles");
 
@@ -26,13 +34,19 @@ public class ReferenceTablesTest extends TestCase {
         referenceFilesDir = new File("config/refDbFiles");
     }
 
-    public void testCreateAddtionalTables() throws Exception {
-        System.out.println("Started adding reference tables...");
+    public void testCreateAddtionalTablesUsingPostgres() throws Exception {
+        initUsingPostgres();
+        doTestCreateAdditionalTables();
+    }
 
+    public void testCreateAddtionalTablesUsingMysql() throws Exception {
+        initUsingMysql();
+        doTestCreateAdditionalTables();
+    }
+
+    private void doTestCreateAdditionalTables() throws Exception {
         ReferenceTables tables = new ReferenceTables(referenceFilesDir, dbSetup.getDbServer().getTypeMapper());
         tables.createAdditionRefTables(dbSetup.getDbServer().getReferenceDatasource());
-        
-        System.out.println("Completed adding reference tables.");
     }
 
 }

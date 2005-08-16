@@ -17,9 +17,18 @@ public class ReferenceImporterTest extends TestCase {
 
     private File referenceFilesDir;
 
-    protected void setUp() throws Exception {
+    private void initUsingPostgres() throws Exception {
+        init(new File("test/postgres.conf"));
+    }
+
+    private void initUsingMysql() throws Exception {
+        init(new File("test/mysql.conf"));
+    }
+
+    private void init(File file) throws Exception {
         Properties properties = new Properties();
-        properties.load(new FileInputStream(new File("test/user_preferences.txt")));
+        properties.load(new FileInputStream(file));
+
         properties.put("DATASET_NIF_FIELD_DEFS", "config/field_defs.dat");
         properties.put("REFERENCE_FILE_BASE_DIR", "config/refDbFiles");
 
@@ -28,12 +37,20 @@ public class ReferenceImporterTest extends TestCase {
         referenceFilesDir = new File("config/refDbFiles");
     }
 
-    public void testImportReference() throws Exception {
-        System.out.println("Started Reference importer...");
+    public void testImportReferenceUsingPostgres() throws Exception {
+        initUsingPostgres();
+        doTestImportReference();
+    }
+
+    public void testImportReferenceUsingMysql() throws Exception {
+        initUsingMysql();
+        doTestImportReference();
+    }
+
+    private void doTestImportReference() throws Exception {
         ReferenceImporter referenceImporter = new ReferenceImporter(dbSetup.getDbServer(), fieldDefsFile,
                 referenceFilesDir, false);
         referenceImporter.createReferenceTables();
-        System.out.println("Completed importing Reference data");
     }
 
 }

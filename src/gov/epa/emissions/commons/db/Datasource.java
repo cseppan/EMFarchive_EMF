@@ -15,7 +15,7 @@ public interface Datasource {
 
     void execute(String query) throws SQLException;
 
-    List getTableNames(boolean b);
+    List getTableNames() throws SQLException;
 
     Connection getConnection();
 
