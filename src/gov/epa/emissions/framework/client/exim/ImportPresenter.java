@@ -27,4 +27,8 @@ public class ImportPresenter {
         view.close();
     }
 
+    public void observe() {
+        view.register(this);
+    }
+
 }

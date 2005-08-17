@@ -4,10 +4,13 @@ import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
 import gov.epa.emissions.framework.client.admin.UpdateUserWindow;
 import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
 import gov.epa.emissions.framework.client.admin.UserManagerWindow;
+import gov.epa.emissions.framework.client.exim.ImportPresenter;
+import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
-import gov.epa.emissions.framework.commons.UserServices;
+import gov.epa.emissions.framework.commons.ExImServices;
 import gov.epa.emissions.framework.commons.User;
+import gov.epa.emissions.framework.commons.UserServices;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -65,7 +68,14 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
     private JMenu createFileMenu() {
         JMenu menu = new JMenu("File");
 
-        menu.add(createDisabledMenuItem("Import"));
+        JMenuItem importMenu = new JMenuItem("Import");
+        importMenu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                displayImport();
+            }
+        });
+        menu.add(importMenu);
+
         menu.add(createDisabledMenuItem("Export"));
         menu.addSeparator();
 
@@ -89,13 +99,24 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         return menu;
     }
 
+    protected void displayImport() {
+        ExImServices eximServices = null;//TODO: fetch it using ServiceLocator
+        ImportWindow view = new ImportWindow(user, eximServices);
+        ImportPresenter presenter = new ImportPresenter(user, eximServices, view);
+        presenter.observe();
+        
+        desktop.add(view);
+
+        view.display();
+    }
+
     private void logout() {
         LoginWindow view = new LoginWindow(userAdmin);
         LoginPresenter presenter = new LoginPresenter(userAdmin, view);
         presenter.observe();
 
         view.display();
-        
+
         close();
     }
 

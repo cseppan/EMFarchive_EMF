@@ -33,4 +33,13 @@ public class ImportPresenterTest extends MockObjectTestCase {
         presenter.notifyCancel();
     }
 
+    public void testShouldRegisterWithViewOnObserve() throws EmfException {
+        Mock view = mock(ImportView.class);
+
+        ImportPresenter presenter = new ImportPresenter(null, null, (ImportView) view.proxy());
+        view.expects(once()).method("register").with(eq(presenter));
+
+        presenter.observe();
+    }
+
 }
