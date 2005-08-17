@@ -23,4 +23,14 @@ public class ImportPresenterTest extends MockObjectTestCase {
 
         presenter.notifyImport(type, "filepath");
     }
+
+    public void testClosesViewOnCancelImport() throws EmfException {
+        Mock view = mock(ImportView.class);
+        view.expects(once()).method("close");
+
+        ImportPresenter presenter = new ImportPresenter(null, null, (ImportView) view.proxy());
+
+        presenter.notifyCancel();
+    }
+
 }
