@@ -1,3 +1,18 @@
+-- Table: emf.datasettypes
+
+-- DROP TABLE emf.datasettypes;
+
+CREATE TABLE emf.datasettypes
+(
+  name varchar(128) NOT NULL,
+  id int4 NOT NULL,
+  description varchar(255) NOT NULL,
+  minfiles int2 NOT NULL DEFAULT 0,
+  maxfiles int2 NOT NULL DEFAULT 0
+) 
+WITHOUT OIDS;
+ALTER TABLE emf.datasettypes OWNER TO emf;
+
 CREATE TABLE users
 (
   user_name varchar(15) NOT NULL,
