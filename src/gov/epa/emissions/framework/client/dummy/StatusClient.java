@@ -199,7 +199,7 @@ public class StatusClient {
         aStat.setMessage("import started for file XYZABC");
         aStat.setMsgType("INFOMATICA");
         aStat.setTimestamp(new Date());
-        aStat.setUserName("cdcruz");
+        aStat.setUserName("jcapowski");
       StatusServices emfStatusSvc= new StatusServicesTransport(endpoint2);
 
         System.out.println("HibClient: Before call to setStatus");
@@ -214,7 +214,7 @@ public class StatusClient {
     private void callServiceForGet() {
         StatusServices emfStatusSvc = new StatusServicesTransport(endpoint2);
         try {
-            Status[] stats = emfStatusSvc.getMessages("aeyth");
+            Status[] stats = emfStatusSvc.getMessages("jcapowski");
             System.out.println("Total number of status messages: " + stats.length);
             
             for (int i=0; i<stats.length; i++){
