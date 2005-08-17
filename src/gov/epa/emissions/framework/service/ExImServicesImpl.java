@@ -8,8 +8,8 @@
  */
 package gov.epa.emissions.framework.service;
 
-import gov.epa.emissions.framework.DatasetType;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.commons.DatasetType;
 import gov.epa.emissions.framework.commons.EMFConstants;
 import gov.epa.emissions.framework.commons.ExImServices;
 import gov.epa.emissions.framework.commons.StatusServices;
@@ -99,6 +99,14 @@ public class ExImServicesImpl implements ExImServices{
     public void startImport(User user, String fileName, DatasetType datasetType) throws EmfException {
         // TODO Auto-generated method stub
         
+    }
+
+    /* (non-Javadoc)
+     * @see gov.epa.emissions.framework.commons.ExImServices#getDatasetTypes()
+     */
+    public DatasetType[] getDatasetTypes() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }//ExImServicesImpl

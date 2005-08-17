@@ -8,7 +8,6 @@
  */
 package gov.epa.emissions.framework.commons;
 
-import gov.epa.emissions.framework.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 
 /**
@@ -19,5 +18,5 @@ public interface ExImServices extends EMFService{
 
     public void startImport(String userName, String fileName, String fileType) throws EmfException;
     public void startImport(User user, String fileName, DatasetType datasetType) throws EmfException;
-    
+    public DatasetType[] getDatasetTypes();  
 }
