@@ -95,10 +95,11 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         container.add(importButton);
 
         JButton done = new JButton("Done");
-        done.setName("cancel");
+        done.setName("done");
         done.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                close();
+                if (presenter != null)
+                    presenter.notifyDone();
             }
 
         });
