@@ -50,7 +50,7 @@ public class UserManagerWindowLauncher {
         users.add(createUser("mary", "Mary Joe", "mary@wonderful.net"));
         users.add(createUser("kevin", "Kevin Spacey", "kevin@spacey.com"));
 
-        UserServices userAdmin = new EMFUserAdminStub(users);
+        UserServices userAdmin = new UserServicesStub(users);
 
         return userAdmin;
     }

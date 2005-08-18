@@ -1,7 +1,8 @@
 package gov.epa.emissions.framework.client.login;
 
-import gov.epa.emissions.framework.client.admin.EMFUserAdminStub;
-import gov.epa.emissions.framework.client.transport.UserServicesTransport;
+import gov.epa.emissions.framework.client.admin.UserServicesStub;
+import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.UserServices;
 
 import java.awt.Component;
@@ -12,6 +13,12 @@ import java.util.Collections;
 import javax.swing.JTextField;
 
 import junit.extensions.abbot.ComponentTestFixture;
+
+import org.jmock.Mock;
+import org.jmock.core.constraint.IsEqual;
+import org.jmock.core.matcher.InvokeAtLeastOnceMatcher;
+import org.jmock.core.stub.ReturnStub;
+
 import abbot.finder.matchers.NameMatcher;
 import abbot.tester.ComponentTester;
 
@@ -20,7 +27,13 @@ public class LoginTest extends ComponentTestFixture {
     private boolean isWindowClosed = false;
 
     public void testShouldCloseOnClickCancel() throws Exception {
-        LoginWindow window = new LoginWindow(new EMFUserAdminStub(Collections.EMPTY_LIST));
+        UserServicesStub userServices = new UserServicesStub(Collections.EMPTY_LIST);
+
+        Mock serviceLocator = new Mock(ServiceLocator.class);
+        serviceLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getUserServices")).will(
+                new ReturnStub(userServices));
+
+        LoginWindow window = new LoginWindow((ServiceLocator) serviceLocator.proxy());
         showWindow(window);
 
         window.addWindowListener(new WindowAdapter() {
@@ -38,10 +51,11 @@ public class LoginTest extends ComponentTestFixture {
     }
 
     public void testShouldShowEmfConsoleOnLogin() throws Exception {
-        UserServices emfUserAdmin = new UserServicesTransport(
-                "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.UserServices");
-        
-        LoginWindow window = new LoginWindow(emfUserAdmin);
+        ServiceLocator serviceLocator = new RemoteServiceLocator("http://ben.cep.unc.edu:8080/emf/services");
+
+        UserServices userServices = serviceLocator.getUserServices();
+
+        LoginWindow window = new LoginWindow((ServiceLocator) userServices);
         showWindow(window);
 
         window.addWindowListener(new WindowAdapter() {

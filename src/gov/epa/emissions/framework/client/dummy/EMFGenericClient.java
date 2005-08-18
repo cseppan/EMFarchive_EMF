@@ -39,7 +39,7 @@ public class EMFGenericClient {
      * 
      */
     private void doEmfSvcs() throws EmfException {
-      UserServices usersSvc = svcLoc.getUsersService();
+      UserServices usersSvc = svcLoc.getUserServices();
       User user = usersSvc.getUser("cdcruz");
       System.out.println(user.getFullName());
 

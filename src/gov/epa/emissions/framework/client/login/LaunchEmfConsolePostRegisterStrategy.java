@@ -3,19 +3,19 @@ package gov.epa.emissions.framework.client.login;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
 
 public class LaunchEmfConsolePostRegisterStrategy implements PostRegisterStrategy {
 
-    private UserServices userAdmin;
+    private ServiceLocator serviceLocator;
 
-    public LaunchEmfConsolePostRegisterStrategy(UserServices admin) {
-        userAdmin = admin;
+    public LaunchEmfConsolePostRegisterStrategy(ServiceLocator serviceLocator) {
+        this.serviceLocator = serviceLocator;
     }
 
     public void execute(User user) {
-        EmfConsole console = new EmfConsole(user, userAdmin);
+        EmfConsole console = new EmfConsole(user, serviceLocator);
 
         EmfConsolePresenter presenter = new EmfConsolePresenter(console);
         presenter.observe();

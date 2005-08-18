@@ -2,21 +2,20 @@ package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
-import gov.epa.emissions.framework.client.transport.UserServicesTransport;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
 import javax.swing.JFrame;
 
 public class Launcher {
 
     public static void main(String[] args) {
-        String endpoint = "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.UserServices";
-        UserServices userAdmin = new UserServicesTransport(endpoint);
+        ServiceLocator serviceLocator = new RemoteServiceLocator("http://ben.cep.unc.edu:8080/emf/services");
 
-        LoginWindow login = new LoginWindow(userAdmin);
+        LoginWindow login = new LoginWindow(serviceLocator);
         login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        LoginPresenter presenter = new LoginPresenter(userAdmin, login);
+        LoginPresenter presenter = new LoginPresenter(serviceLocator.getUserServices(), login);
         presenter.observe();
 
         login.display();

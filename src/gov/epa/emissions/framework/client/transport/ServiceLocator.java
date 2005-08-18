@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.UserServices;
 
 public interface ServiceLocator {
-    public UserServices getUsersService();
+    public UserServices getUserServices();
 
     public StatusServices getStatusService();
 

@@ -8,8 +8,8 @@ import gov.epa.emissions.framework.client.ErrorMessagePanel;
 import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
 import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
 import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -38,12 +38,13 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
     private LoginPresenter presenter;
 
-    private UserServices userAdmin;
-
     private ErrorMessagePanel errorMessagePanel;
 
-    public LoginWindow(UserServices userAdmin) {
-        this.userAdmin = userAdmin;
+    private ServiceLocator serviceLocator;
+
+    public LoginWindow(ServiceLocator serviceLocator) {
+        this.serviceLocator = serviceLocator;
+
         JPanel layoutPanel = createLayout();
 
         this.setSize(new Dimension(350, 250));
@@ -112,7 +113,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
     }
 
     private void launchConsole(User user) {
-        EmfConsole console = new EmfConsole(user, userAdmin);
+        EmfConsole console = new EmfConsole(user, serviceLocator);
         EmfConsolePresenter presenter = new EmfConsolePresenter(console);
         presenter.observe();
 
@@ -181,9 +182,9 @@ public class LoginWindow extends EmfWindow implements LoginView {
     }
 
     private void launchCreateUser() throws Exception {
-        PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(userAdmin);
-        RegisterUserWindow window = new RegisterUserWindow(userAdmin, strategy);
-        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, window.getView());
+        PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(serviceLocator);
+        RegisterUserWindow window = new RegisterUserWindow(serviceLocator.getUserServices(), strategy);
+        RegisterUserPresenter presenter = new RegisterUserPresenter(serviceLocator.getUserServices(), window.getView());
         presenter.observe();
 
         window.display();

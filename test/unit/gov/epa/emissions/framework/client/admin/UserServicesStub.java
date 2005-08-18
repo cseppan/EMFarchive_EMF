@@ -7,11 +7,11 @@ import gov.epa.emissions.framework.services.UserServices;
 import java.util.Iterator;
 import java.util.List;
 
-public class EMFUserAdminStub implements UserServices {
+public class UserServicesStub implements UserServices {
 
     private List users;
 
-    public EMFUserAdminStub(List users) {
+    public UserServicesStub(List users) {
         this.users = users;
     }
 

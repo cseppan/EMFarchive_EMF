@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.login;
 
-
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import org.jmock.Mock;
 import org.jmock.core.constraint.IsAnything;
 import org.jmock.core.constraint.IsEqual;
+import org.jmock.core.matcher.InvokeAtLeastOnceMatcher;
 import org.jmock.core.matcher.InvokeOnceMatcher;
 import org.jmock.core.stub.ReturnStub;
 import org.jmock.core.stub.ThrowStub;
@@ -18,12 +19,16 @@ import org.jmock.core.stub.ThrowStub;
 public class LoginWindowLauncher {
 
     public static void main(String[] args) throws UserException {
-        Mock userAdmin = new Mock(UserServices.class);
-        setFailureExpectation(userAdmin);
-        setSuccessExpectation(userAdmin, "user", "user");
-        UserServices userAdminProxy = (UserServices) userAdmin.proxy();
+        Mock userServices = new Mock(UserServices.class);
+        setFailureExpectation(userServices);
+        setSuccessExpectation(userServices, "user", "user");
+        UserServices userAdminProxy = (UserServices) userServices.proxy();
 
-        LoginWindow login = new LoginWindow(userAdminProxy);
+        Mock serviceLocator = new Mock(ServiceLocator.class);
+        serviceLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getUserServices")).will(
+                new ReturnStub(userServices));
+
+        LoginWindow login = new LoginWindow((ServiceLocator) serviceLocator.proxy());
         login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         LoginPresenter presenter = new LoginPresenter(userAdminProxy, login);

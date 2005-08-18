@@ -14,7 +14,7 @@ import javax.swing.JFrame;
 public class UpdateUserWindowLauncher {
 
     public static void main(String[] args) throws Exception {
-        UserServices userAdmin = new EMFUserAdminStub(Collections.EMPTY_LIST);
+        UserServices userAdmin = new UserServicesStub(Collections.EMPTY_LIST);
         User user = new User();
         user.setUserName("joes");
         user.setFullName("Joe Schmoe");

@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
@@ -26,21 +27,21 @@ import javax.swing.JOptionPane;
 
 public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
-    private UserServices userAdmin;
-
     private JDesktopPane desktop;
 
     private User user;
 
     private EmfConsolePresenter presenter;
 
+    private ServiceLocator serviceLocator;
+
     // TODO: should we user 'ServiceLocator' instead, since other services will
     // also be needed
 
     // TODO: split the login & logout menu/actions in a separate class ??
-    public EmfConsole(User user, UserServices userAdmin) {
+    public EmfConsole(User user, ServiceLocator serviceLocator) {
         this.user = user;
-        this.userAdmin = userAdmin;
+        this.serviceLocator = serviceLocator;
 
         super.setJMenuBar(createMenuBar());
 
@@ -100,19 +101,21 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
     }
 
     protected void displayImport() {
-        ExImServices eximServices = null;//TODO: fetch it using ServiceLocator
+        ExImServices eximServices = null;// TODO: fetch it using
+                                            // ServiceLocator
         ImportWindow view = new ImportWindow(user, eximServices);
         ImportPresenter presenter = new ImportPresenter(user, eximServices, view);
         presenter.observe();
-        
+
         desktop.add(view);
 
         view.display();
     }
 
     private void logout() {
-        LoginWindow view = new LoginWindow(userAdmin);
-        LoginPresenter presenter = new LoginPresenter(userAdmin, view);
+        UserServices userServices = serviceLocator.getUserServices();
+        LoginWindow view = new LoginWindow(serviceLocator);
+        LoginPresenter presenter = new LoginPresenter(userServices, view);
         presenter.observe();
 
         view.display();
@@ -162,7 +165,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     private void displayUpdateUser() {
         UpdateUserWindow view = new UpdateUserWindow(user);
-        UpdateUserPresenter presenter = new UpdateUserPresenter(userAdmin, view);
+        UpdateUserPresenter presenter = new UpdateUserPresenter(serviceLocator.getUserServices(), view);
         presenter.observe();
 
         desktop.add(view);
@@ -172,8 +175,9 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     public void displayUserManager() {
         try {
-            UserManagerWindow console = new UserManagerWindow(userAdmin, this);
-            UserManagerPresenter presenter = new UserManagerPresenter(userAdmin, console);
+            UserServices userServices = serviceLocator.getUserServices();
+            UserManagerWindow console = new UserManagerWindow(userServices, this);
+            UserManagerPresenter presenter = new UserManagerPresenter(userServices, console);
             presenter.observe();
 
             desktop.add(console);
