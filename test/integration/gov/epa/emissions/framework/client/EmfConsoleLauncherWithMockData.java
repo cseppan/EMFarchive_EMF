@@ -23,8 +23,9 @@ public class EmfConsoleLauncherWithMockData {
         Mock serviceLocator = new Mock(ServiceLocator.class);
         serviceLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getUserServices")).will(
                 new ReturnStub(userServices));
-
-        EmfConsole console = new EmfConsole(null, (ServiceLocator) serviceLocator.proxy());
+        User user = new User();
+        
+        EmfConsole console = new EmfConsole(user, (ServiceLocator) serviceLocator.proxy());
         console.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         EmfConsolePresenter presenter = new EmfConsolePresenter(console);

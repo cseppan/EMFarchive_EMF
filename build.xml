@@ -21,7 +21,10 @@
 
     <property name="reports.unittests.dir"
               value="${build.home}/reports/unit-tests"
-    />   
+    />
+    <property name="reports.integrationtests.dir"
+              value="${build.home}/reports/integration-tests"
+    />
     <property name="app.name" value="emf" />
     <property name="app.path" value="/${app.name}" />
     <property name="war-path"
@@ -52,6 +55,7 @@
         <mkdir dir="${build.web-inf.dir}" />
         <mkdir dir="${build.classes.dir}" />
         <mkdir dir="${reports.unittests.dir}" />
+        <mkdir dir="${reports.integrationtests.dir}" />
     </target>
 
     <target name="clean">
@@ -76,6 +80,11 @@
                classpathref="classpath"
                debug="on"
         />
+        <javac srcdir="${test.integration.dir}"
+               destdir="${build.classes.dir}"
+               classpathref="classpath"
+               debug="on"
+        />
     </target>
 
     <target name="unit-tests" depends="compile">
@@ -91,8 +100,22 @@
         </junit>
     </target>
 
-    <target name="all" depends="compile, unit-tests" />
+    <target name="integration-tests" depends="compile">
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath refid="classpath" />
+            <formatter type="xml" />
 
+            <batchtest fork="yes" todir="${reports.integrationtests.dir}">
+                <fileset dir="${test.integration.dir}">
+                    <include name="**/*Test*.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="all-tests" depends="compile, unit-tests, integration-tests" />
+    <target name="all" depends="compile, unit-tests" />
+    
     <!--  =================== CVS Targets ====================================== -->
     <target name="cvs-properties-load">
         <property file=".cvs" />
@@ -192,12 +215,13 @@
         />
     </target>
 
-    <target name="simple-deploy" depends="app-dist"
+    <target name="simple-deploy"
+            depends="app-dist"
             description="Removes (if present) an existing installation and copies the new War to Tomcat webapps folder"
     >
-        <delete file="${tomcat.webapps}/${app.name}.war"/>
-        <delete dir="${tomcat.webapps}/${app.name}"/>
-        <copy todir="${tomcat.webapps}" file="${build.home}/${app.name}.war"/>
+        <delete file="${tomcat.webapps}/${app.name}.war" />
+        <delete dir="${tomcat.webapps}/${app.name}" />
+        <copy todir="${tomcat.webapps}" file="${build.home}/${app.name}.war" />
     </target>
 
     <!-- 'dynamically' removes the app from Tomcat. Restart negates this effect ?? -->

@@ -21,7 +21,7 @@ public class LoginWindowLauncher {
     public static void main(String[] args) throws UserException {
         Mock userServices = new Mock(UserServices.class);
         setFailureExpectation(userServices);
-        setSuccessExpectation(userServices, "user", "user");
+        setSuccessExpectation(userServices, "user", "user1234");
         UserServices userAdminProxy = (UserServices) userServices.proxy();
 
         Mock serviceLocator = new Mock(ServiceLocator.class);
