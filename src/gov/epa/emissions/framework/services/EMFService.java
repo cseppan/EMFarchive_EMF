@@ -6,7 +6,7 @@
  * File Name: EMFService.java
  * Author: Conrad F. D'Cruz
  */
-package gov.epa.emissions.framework.commons;
+package gov.epa.emissions.framework.services;
 
 /**
  * @author Conrad F. D'Cruz

@@ -9,8 +9,8 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.Status;
-import gov.epa.emissions.framework.commons.StatusServices;
+import gov.epa.emissions.framework.services.Status;
+import gov.epa.emissions.framework.services.StatusServices;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
@@ -80,8 +80,8 @@ public class StatusServicesTransport implements StatusServices {
             
             call.setOperationName(qname3);
             
-            Class cls1 = gov.epa.emissions.framework.commons.Status.class;
-            Class cls2 = gov.epa.emissions.framework.commons.Status[].class;
+            Class cls1 = gov.epa.emissions.framework.services.Status.class;
+            Class cls2 = gov.epa.emissions.framework.services.Status[].class;
 	          call.registerTypeMapping(cls1, qname1,
 					  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),        
 					  new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));        			  
@@ -138,7 +138,7 @@ public class StatusServicesTransport implements StatusServices {
             
             call.setOperationName(qname3);
             
-            Class cls1 = gov.epa.emissions.framework.commons.Status.class;
+            Class cls1 = gov.epa.emissions.framework.services.Status.class;
 	        call.registerTypeMapping(cls1, qname1,
 					  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),        
 					  new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));        			  

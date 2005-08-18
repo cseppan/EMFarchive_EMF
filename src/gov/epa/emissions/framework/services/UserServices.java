@@ -6,7 +6,7 @@
  * File Name: EMFUserAdmin.java
  * Author: Conrad F. D'Cruz
  */
-package gov.epa.emissions.framework.commons;
+package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.framework.EmfException;
 

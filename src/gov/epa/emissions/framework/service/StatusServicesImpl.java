@@ -10,9 +10,9 @@ package gov.epa.emissions.framework.service;
 
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.StatusServices;
-import gov.epa.emissions.framework.commons.Status;
 import gov.epa.emissions.framework.dao.StatusDAO;
+import gov.epa.emissions.framework.services.Status;
+import gov.epa.emissions.framework.services.StatusServices;
 
 import java.util.List;
 

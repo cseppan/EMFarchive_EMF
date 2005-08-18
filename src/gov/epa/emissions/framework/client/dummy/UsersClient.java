@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.dummy;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.UserServicesTransport;
-import gov.epa.emissions.framework.commons.User;
+import gov.epa.emissions.framework.services.User;
 
 /*
  * Created on Aug 4, 2005

@@ -6,7 +6,7 @@
  * File Name: EMFStatus.java
  * Author: Conrad F. D'Cruz
  */
-package gov.epa.emissions.framework.commons;
+package gov.epa.emissions.framework.services;
 
 import java.io.Serializable;
 import java.util.Date;

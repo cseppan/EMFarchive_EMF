@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.client.EmfWindow;
-import gov.epa.emissions.framework.commons.UserServices;
+import gov.epa.emissions.framework.services.UserServices;
 
 import java.awt.Point;
 

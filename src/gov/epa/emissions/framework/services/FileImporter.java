@@ -6,7 +6,7 @@
  * File Name: DummyImporter.java
  * Author: Conrad F. D'Cruz
  */
-package gov.epa.emissions.framework.commons;
+package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
@@ -28,7 +28,7 @@ import javax.sql.DataSource;
  * @author Conrad F. D'Cruz
  *
  */
-public class DummyImporter {
+public class FileImporter {
 	private DataSource ds = null;
 	private File file = null;
     private static final String INSERT_RECORD_QUERY="INSERT INTO actypes (carriername,aircrafttype,count) VALUES (?,?,?)";
@@ -41,7 +41,7 @@ public class DummyImporter {
      * @param ds
      * @param file
      */
-    public DummyImporter(DataSource ds, File file) {
+    public FileImporter(DataSource ds, File file) {
         super();
         this.ds = ds;
         this.file = file;
@@ -49,7 +49,7 @@ public class DummyImporter {
     /**
      * 
      */
-    public DummyImporter() {
+    public FileImporter() {
         super();
     }
 

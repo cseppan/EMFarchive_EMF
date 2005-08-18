@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.UserServicesTransport;
-import gov.epa.emissions.framework.commons.UserServices;
+import gov.epa.emissions.framework.services.UserServices;
 import junit.framework.TestCase;
 
 public class AuthenticateTest extends TestCase {

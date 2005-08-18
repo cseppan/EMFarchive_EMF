@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
 import gov.epa.emissions.framework.client.transport.UserServicesTransport;
-import gov.epa.emissions.framework.commons.UserServices;
+import gov.epa.emissions.framework.services.UserServices;
 
 import javax.swing.JFrame;
 

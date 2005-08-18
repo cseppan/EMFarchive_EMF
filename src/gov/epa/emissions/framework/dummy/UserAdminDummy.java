@@ -9,7 +9,7 @@
 package gov.epa.emissions.framework.dummy;
 
 import gov.epa.emissions.framework.UserException;
-import gov.epa.emissions.framework.commons.User;
+import gov.epa.emissions.framework.services.User;
 
 import java.util.Hashtable;
 

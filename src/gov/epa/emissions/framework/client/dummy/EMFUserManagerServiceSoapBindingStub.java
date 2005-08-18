@@ -58,7 +58,7 @@ public class EMFUserManagerServiceSoapBindingStub extends org.apache.axis.client
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("createUser");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "newUser"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://commons.framework.emissions.epa.gov", "User"), gov.epa.emissions.framework.commons.User.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "newUser"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://commons.framework.emissions.epa.gov", "User"), gov.epa.emissions.framework.services.User.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"));
         oper.setReturnClass(java.lang.String.class);
@@ -81,7 +81,7 @@ public class EMFUserManagerServiceSoapBindingStub extends org.apache.axis.client
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "userName"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://commons.framework.emissions.epa.gov", "User"));
-        oper.setReturnClass(gov.epa.emissions.framework.commons.User.class);
+        oper.setReturnClass(gov.epa.emissions.framework.services.User.class);
         oper.setReturnQName(new javax.xml.namespace.QName("", "getUserReturn"));
         oper.setStyle(org.apache.axis.constants.Style.RPC);
         oper.setUse(org.apache.axis.constants.Use.ENCODED);
@@ -98,7 +98,7 @@ public class EMFUserManagerServiceSoapBindingStub extends org.apache.axis.client
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("updateUser");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "newUser"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://commons.framework.emissions.epa.gov", "User"), gov.epa.emissions.framework.commons.User.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("", "newUser"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://commons.framework.emissions.epa.gov", "User"), gov.epa.emissions.framework.services.User.class, false, false);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://schemas.xmlsoap.org/soap/encoding/", "string"));
         oper.setReturnClass(java.lang.String.class);
@@ -171,7 +171,7 @@ public class EMFUserManagerServiceSoapBindingStub extends org.apache.axis.client
 
             qName = new javax.xml.namespace.QName("http://commons.framework.emissions.epa.gov", "User");
             cachedSerQNames.add(qName);
-            cls = gov.epa.emissions.framework.commons.User.class;
+            cls = gov.epa.emissions.framework.services.User.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
@@ -336,7 +336,7 @@ public class EMFUserManagerServiceSoapBindingStub extends org.apache.axis.client
 }
     }
 
-    public java.lang.String createUser(gov.epa.emissions.framework.commons.User newUser) throws java.rmi.RemoteException {
+    public java.lang.String createUser(gov.epa.emissions.framework.services.User newUser) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -398,7 +398,7 @@ public class EMFUserManagerServiceSoapBindingStub extends org.apache.axis.client
 }
     }
 
-    public gov.epa.emissions.framework.commons.User getUser(java.lang.String userName) throws java.rmi.RemoteException {
+    public gov.epa.emissions.framework.services.User getUser(java.lang.String userName) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -419,9 +419,9 @@ public class EMFUserManagerServiceSoapBindingStub extends org.apache.axis.client
         else {
             extractAttachments(_call);
             try {
-                return (gov.epa.emissions.framework.commons.User) _resp;
+                return (gov.epa.emissions.framework.services.User) _resp;
             } catch (java.lang.Exception _exception) {
-                return (gov.epa.emissions.framework.commons.User) org.apache.axis.utils.JavaUtils.convert(_resp, gov.epa.emissions.framework.commons.User.class);
+                return (gov.epa.emissions.framework.services.User) org.apache.axis.utils.JavaUtils.convert(_resp, gov.epa.emissions.framework.services.User.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
@@ -460,7 +460,7 @@ public class EMFUserManagerServiceSoapBindingStub extends org.apache.axis.client
 }
     }
 
-    public java.lang.String updateUser(gov.epa.emissions.framework.commons.User newUser) throws java.rmi.RemoteException {
+    public java.lang.String updateUser(gov.epa.emissions.framework.services.User newUser) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }

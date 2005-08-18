@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
 import gov.epa.emissions.framework.client.admin.UsersManagementView;
-import gov.epa.emissions.framework.commons.UserServices;
+import gov.epa.emissions.framework.services.UserServices;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;

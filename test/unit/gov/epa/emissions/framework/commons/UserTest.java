@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.commons;
 
 import gov.epa.emissions.framework.UserException;
+import gov.epa.emissions.framework.services.User;
 import junit.framework.TestCase;
 
 public class UserTest extends TestCase {

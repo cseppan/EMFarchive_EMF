@@ -8,9 +8,9 @@ import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
-import gov.epa.emissions.framework.commons.ExImServices;
-import gov.epa.emissions.framework.commons.User;
-import gov.epa.emissions.framework.commons.UserServices;
+import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.framework.services.UserServices;
 
 import java.awt.Dimension;
 import java.awt.Point;

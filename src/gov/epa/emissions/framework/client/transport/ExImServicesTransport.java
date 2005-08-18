@@ -10,9 +10,9 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.DatasetType;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.ExImServices;
-import gov.epa.emissions.framework.commons.Status;
-import gov.epa.emissions.framework.commons.User;
+import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.Status;
+import gov.epa.emissions.framework.services.User;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;

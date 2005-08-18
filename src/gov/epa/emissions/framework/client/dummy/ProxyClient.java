@@ -10,8 +10,8 @@ package gov.epa.emissions.framework.client.dummy;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.Proxy;
-import gov.epa.emissions.framework.commons.UserServices;
-import gov.epa.emissions.framework.commons.User;
+import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.framework.services.UserServices;
 
 /**
  * @author Conrad F. D'Cruz

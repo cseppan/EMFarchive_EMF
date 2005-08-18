@@ -3,8 +3,8 @@ package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
-import gov.epa.emissions.framework.commons.UserServices;
-import gov.epa.emissions.framework.commons.User;
+import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.framework.services.UserServices;
 
 import javax.swing.JFrame;
 

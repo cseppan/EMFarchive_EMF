@@ -10,8 +10,8 @@ package gov.epa.emissions.framework.client.dummy;
   
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.StatusServicesTransport;
-import gov.epa.emissions.framework.commons.Status;
-import gov.epa.emissions.framework.commons.StatusServices;
+import gov.epa.emissions.framework.services.Status;
+import gov.epa.emissions.framework.services.StatusServices;
 
 import java.util.Date;
 

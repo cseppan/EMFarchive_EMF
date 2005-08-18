@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.client.ErrorMessagePanel;
-import gov.epa.emissions.framework.commons.User;
+import gov.epa.emissions.framework.services.User;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

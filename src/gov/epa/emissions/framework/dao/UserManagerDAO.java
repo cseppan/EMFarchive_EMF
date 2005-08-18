@@ -10,7 +10,7 @@ package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.framework.InfrastructureException;
 import gov.epa.emissions.framework.UserException;
-import gov.epa.emissions.framework.commons.User;
+import gov.epa.emissions.framework.services.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

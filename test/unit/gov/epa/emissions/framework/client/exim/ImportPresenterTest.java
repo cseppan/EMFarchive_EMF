@@ -2,8 +2,8 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.framework.DatasetType;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.ExImServices;
-import gov.epa.emissions.framework.commons.User;
+import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.User;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;

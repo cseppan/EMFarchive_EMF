@@ -9,7 +9,7 @@
 package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.Status;
+import gov.epa.emissions.framework.services.Status;
 
 import java.util.ArrayList;
 import java.util.Iterator;

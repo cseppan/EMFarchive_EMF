@@ -9,13 +9,12 @@
 package gov.epa.emissions.framework.client.dummy;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.transport.ExImServicesTransport;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.client.transport.StatusServicesTransport;
-import gov.epa.emissions.framework.client.transport.UserServicesTransport;
-import gov.epa.emissions.framework.commons.EMFConstants;
-import gov.epa.emissions.framework.commons.Status;
-import gov.epa.emissions.framework.commons.User;
+import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
+import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.Status;
+import gov.epa.emissions.framework.services.StatusServices;
+import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.framework.services.UserServices;
 
 /**
  * @author Conrad F. D'Cruz
@@ -23,7 +22,7 @@ import gov.epa.emissions.framework.commons.User;
  */
 public class EMFGenericClient {
 
-    ServiceLocator svcLoc;
+    RemoteServiceLocator svcLoc;
     
     /**
      * @throws EmfException
@@ -31,7 +30,7 @@ public class EMFGenericClient {
      */
     public EMFGenericClient() throws EmfException {
         super();
-        svcLoc = ServiceLocator.getInstance();
+        svcLoc = new RemoteServiceLocator("http://localhost:8080/emf/services");
         doEmfSvcs();
     }
 
@@ -40,15 +39,15 @@ public class EMFGenericClient {
      * 
      */
     private void doEmfSvcs() throws EmfException {
-      UserServicesTransport usersSvc = svcLoc.getUsersService(EMFConstants.HOST_NAME_BEN_ID);
+      UserServices usersSvc = svcLoc.getUsersService();
       User user = usersSvc.getUser("cdcruz");
       System.out.println(user.getFullName());
 
-      StatusServicesTransport statusSvc = svcLoc.getStatusService(EMFConstants.HOST_NAME_BEN_ID);
+      StatusServices statusSvc = svcLoc.getStatusService();
       Status[] allStats = statusSvc.getMessages("cdcruz");
       
       System.out.println("Number of messages: " + allStats.length);
-      ExImServicesTransport eximSvc = svcLoc.getEximService(EMFConstants.HOST_NAME_BEN_ID);
+      ExImServices eximSvc = svcLoc.getEximService();
       eximSvc.startImport("cdcruz","conrad.txt","TST");
       
     }//doEmfSvcs

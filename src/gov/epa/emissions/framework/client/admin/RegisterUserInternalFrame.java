@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
-import gov.epa.emissions.framework.commons.UserServices;
+import gov.epa.emissions.framework.services.UserServices;
 
 public class RegisterUserInternalFrame extends EmfInteralFrame implements EmfWidgetContainer {
 

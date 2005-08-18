@@ -11,8 +11,8 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.framework.AuthenticationException;
 import gov.epa.emissions.framework.CommunicationFailureException;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.commons.User;
-import gov.epa.emissions.framework.commons.UserServices;
+import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.framework.services.UserServices;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
@@ -78,7 +78,7 @@ public class UserServicesTransport implements UserServices {
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             call.setOperationName(new QName("http://soapinterop.org/", "authenticate") );
             QName qname = new QName("urn:gov.epa.emf.UserServices","ns1:User");
-            Class cls = gov.epa.emissions.framework.commons.User.class;
+            Class cls = gov.epa.emissions.framework.services.User.class;
             call.registerTypeMapping(cls,qname,BeanSerializerFactory.class, BeanDeserializerFactory.class);
 
             call.addParameter("uname",
@@ -135,7 +135,7 @@ public class UserServicesTransport implements UserServices {
             QName qname1 = new QName("urn:gov.epa.emf.UserServices","ns1:User");
             QName qname2 = new QName("urn:gov.epa.emf.UserServices", "getUser");
             call.setOperationName(qname2);
-            Class cls = gov.epa.emissions.framework.commons.User.class;
+            Class cls = gov.epa.emissions.framework.services.User.class;
 	        call.registerTypeMapping(User.class, qname1,
 	    			  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls, qname1),        
 	    			  new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls, qname1));        			  
@@ -173,7 +173,7 @@ public class UserServicesTransport implements UserServices {
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             call.setOperationName(new QName("urn:gov.epa.emf.UserServices", "createUser") );
             QName qname = new QName("urn:gov.epa.emf.UserServices","ns1:User");
-            Class cls = gov.epa.emissions.framework.commons.User.class;
+            Class cls = gov.epa.emissions.framework.services.User.class;
             call.registerTypeMapping(cls, qname,
 					   new org.apache.axis.encoding.ser.BeanSerializerFactory(cls, qname),        
 					   new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls, qname)); 
@@ -209,7 +209,7 @@ public class UserServicesTransport implements UserServices {
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             call.setOperationName(new QName("urn:gov.epa.emf.UserServices", "updateUser") );
             QName qname = new QName("urn:gov.epa.emf.UserServices","ns1:User");
-            Class cls = gov.epa.emissions.framework.commons.User.class;
+            Class cls = gov.epa.emissions.framework.services.User.class;
             call.registerTypeMapping(cls, qname,
 					   new org.apache.axis.encoding.ser.BeanSerializerFactory(cls, qname),        
 					   new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls, qname)); 
@@ -288,8 +288,8 @@ public class UserServicesTransport implements UserServices {
                 
                 call.setOperationName(qname3);
                 
-                Class cls1 = gov.epa.emissions.framework.commons.User.class;
-                Class cls2 = gov.epa.emissions.framework.commons.User[].class;
+                Class cls1 = gov.epa.emissions.framework.services.User.class;
+                Class cls2 = gov.epa.emissions.framework.services.User[].class;
   	          call.registerTypeMapping(cls1, qname1,
   					  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),        
   					  new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));        			  
@@ -336,8 +336,8 @@ public class UserServicesTransport implements UserServices {
             QName qname2 = new QName("urn:gov.epa.emf.UserServices","ns1:Users");
             QName qname3 = new QName("urn:gov.epa.emf.UserServices", "updateUsers");
                         
-            Class cls1 = gov.epa.emissions.framework.commons.User.class;
-            Class cls2 = gov.epa.emissions.framework.commons.User[].class;
+            Class cls1 = gov.epa.emissions.framework.services.User.class;
+            Class cls2 = gov.epa.emissions.framework.services.User[].class;
 	        call.registerTypeMapping(cls1, qname1,
 					  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),        
 					  new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));  
