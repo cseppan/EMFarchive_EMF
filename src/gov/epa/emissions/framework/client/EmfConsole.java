@@ -101,8 +101,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
     }
 
     protected void displayImport() {
-        ExImServices eximServices = null;// TODO: fetch it using
-                                            // ServiceLocator
+        ExImServices eximServices = serviceLocator.getEximServices();
         ImportWindow view = new ImportWindow(user, eximServices);
         ImportPresenter presenter = new ImportPresenter(user, eximServices, view);
         presenter.observe();

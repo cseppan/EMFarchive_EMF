@@ -5,6 +5,8 @@ import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.admin.UserServicesStub;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.services.DatasetType;
+import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
@@ -22,11 +24,15 @@ public class ImportWindowLauncher {
 
     public static void main(String[] args) throws EmfException {
         User user = createUser("joe", "Joe Fullman", "joef@zukoswky.com");
-        UserServices userServices = createUserAdmin(user);
-        
-        Mock serviceLocator = new Mock(ServiceLocator.class);        
+        UserServices userServices = createUserServices(user);
+
+        ExImServices exImServices = createExImServices();
+
+        Mock serviceLocator = new Mock(ServiceLocator.class);
         serviceLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getUserServices")).will(
                 new ReturnStub(userServices));
+        serviceLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getEximServices")).will(
+                new ReturnStub(exImServices));
 
         EmfConsole console = new EmfConsole(user, (ServiceLocator) serviceLocator.proxy());
         console.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -37,7 +43,22 @@ public class ImportWindowLauncher {
         console.display();
     }
 
-    static private UserServices createUserAdmin(User user) throws EmfException {
+    private static ExImServices createExImServices() {
+        DatasetType nonRoad = new DatasetType("Non Road");
+        DatasetType onRoad = new DatasetType("On Road");
+        DatasetType nonPoint = new DatasetType("Non Point");
+
+        DatasetType[] datasetTypes = new DatasetType[] { nonRoad, onRoad, nonPoint };
+
+        Mock service = new Mock(ExImServices.class);
+        service.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getDatasetTypes")).will(
+                new ReturnStub(datasetTypes));
+        service.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("startImport")).withAnyArguments();
+
+        return (ExImServices) service.proxy();
+    }
+
+    static private UserServices createUserServices(User user) throws EmfException {
         List users = new ArrayList();
         users.add(user);
 

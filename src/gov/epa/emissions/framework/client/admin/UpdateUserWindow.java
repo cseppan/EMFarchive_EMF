@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
-import gov.epa.emissions.framework.client.ErrorMessagePanel;
+import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.services.User;
 
 import java.awt.BorderLayout;
@@ -29,7 +29,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
 
     private UpdateUserPresenter presenter;
 
-    private ErrorMessagePanel errorMessagePanel;
+    private MessagePanel messagePanel;
 
     private User user;
 
@@ -61,8 +61,8 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
     private JPanel createLayout() {
         JPanel layout = new JPanel();
 
-        errorMessagePanel = new ErrorMessagePanel();
-        layout.add(errorMessagePanel);
+        messagePanel = new MessagePanel();
+        layout.add(messagePanel);
         layout.add(createProfilePanel());
         layout.add(createLoginPanel());
         layout.add(createButtonsPanel());
@@ -216,7 +216,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
             presenter.notifySave(user);
             close();
         } catch (EmfException e) {
-            errorMessagePanel.setMessage(e.getMessage());
+            messagePanel.setError(e.getMessage());
         }
     }
 

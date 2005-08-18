@@ -7,8 +7,8 @@ import gov.epa.emissions.framework.services.UserServices;
 public interface ServiceLocator {
     public UserServices getUserServices();
 
-    public StatusServices getStatusService();
+    public StatusServices getStatusServices();
 
-    public ExImServices getEximService();
+    public ExImServices getEximServices();
 
 }

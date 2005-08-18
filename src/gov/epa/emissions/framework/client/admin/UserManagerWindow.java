@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
-import gov.epa.emissions.framework.client.ErrorMessagePanel;
+import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
@@ -40,7 +40,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
 
     private JPanel layout;
 
-    private ErrorMessagePanel errorMessagePanel;
+    private MessagePanel messagePanel;
 
     private JFrame parentConsole;
 
@@ -109,8 +109,8 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
         sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
 
-        errorMessagePanel = new ErrorMessagePanel();
-        layout.add(errorMessagePanel, BorderLayout.NORTH);
+        messagePanel = new MessagePanel();
+        layout.add(messagePanel, BorderLayout.NORTH);
         layout.add(scrollPane, BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
     }
@@ -199,7 +199,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
                 String username = model.getUser(selected[i]).getUserName();
                 presenter.notifyDelete(username);
             } catch (EmfException e) {
-                errorMessagePanel.setMessage(e.getMessage());
+                messagePanel.setError(e.getMessage());
                 // TODO: temp, until the HACK is addressed (then, use refresh)
                 validate();
             }

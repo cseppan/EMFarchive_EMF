@@ -43,11 +43,11 @@ public class EMFGenericClient {
       User user = usersSvc.getUser("cdcruz");
       System.out.println(user.getFullName());
 
-      StatusServices statusSvc = svcLoc.getStatusService();
+      StatusServices statusSvc = svcLoc.getStatusServices();
       Status[] allStats = statusSvc.getMessages("cdcruz");
       
       System.out.println("Number of messages: " + allStats.length);
-      ExImServices eximSvc = svcLoc.getEximService();
+      ExImServices eximSvc = svcLoc.getEximServices();
       eximSvc.startImport("cdcruz","conrad.txt","TST");
       
     }//doEmfSvcs

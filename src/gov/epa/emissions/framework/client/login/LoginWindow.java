@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.EmfWindow;
-import gov.epa.emissions.framework.client.ErrorMessagePanel;
+import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
 import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
 import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
@@ -38,7 +38,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
     private LoginPresenter presenter;
 
-    private ErrorMessagePanel errorMessagePanel;
+    private MessagePanel messagePanel;
 
     private ServiceLocator serviceLocator;
 
@@ -58,8 +58,8 @@ public class LoginWindow extends EmfWindow implements LoginView {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        errorMessagePanel = new ErrorMessagePanel();
-        panel.add(errorMessagePanel);
+        messagePanel = new MessagePanel();
+        panel.add(messagePanel);
         panel.add(createLoginPanel());
         panel.add(createButtonsPanel());
         panel.add(new JSeparator(SwingConstants.HORIZONTAL));
@@ -85,12 +85,12 @@ public class LoginWindow extends EmfWindow implements LoginView {
                     return;
                 try {
                     User user = presenter.notifyLogin(username.getText(), new String(password.getPassword()));
-                    errorMessagePanel.clear();
+                    messagePanel.clear();
                     refresh();
                     launchConsole(user);
                     close();
                 } catch (EmfException e) {
-                    errorMessagePanel.setMessage(e.getMessage());
+                    messagePanel.setError(e.getMessage());
                 }
             }
 
