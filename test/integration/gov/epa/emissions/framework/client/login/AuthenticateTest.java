@@ -9,14 +9,14 @@ public class AuthenticateTest extends TestCase {
 
     public void testShouldSucceedOnValidUsernamePassword() throws EmfException {
         UserServices emfUserAdmin = new UserServicesTransport(
-                "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.UserServices");
+                "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.services.UserServices");
 
         emfUserAdmin.authenticate("cdcruz", "conrad12345", false);
     }
 
     public void testShouldFailOnInvalidPassword() {
         UserServices emfUserAdmin = new UserServicesTransport(
-                "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.UserServices");
+                "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.services.UserServices");
         try {
             emfUserAdmin.authenticate("cdcruz", "password", false);
         } catch (EmfException ex) {
@@ -28,7 +28,7 @@ public class AuthenticateTest extends TestCase {
     
     public void testShouldFailOnUnknownUsername() {
         UserServices emfUserAdmin = new UserServicesTransport(
-                "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.UserServices");
+                "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.services.UserServices");
         try {
             emfUserAdmin.authenticate("sdfsfr45gn", "password", false);
         } catch (EmfException ex) {

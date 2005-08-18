@@ -1,0 +1,1 @@
+insert into emf.users values('admin', 'admin123', 'EMF Administrator', 'UNC', '123-9999', 'admin@emf.cep.unc.edu', TRUE, FALSE);

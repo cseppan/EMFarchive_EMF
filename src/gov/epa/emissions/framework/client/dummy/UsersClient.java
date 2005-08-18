@@ -19,7 +19,7 @@ import gov.epa.emissions.framework.services.User;
  */
 public class UsersClient {
    
-     private static String endpoint1 = "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.UserServices";
+     private static String endpoint1 = "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.services.UserServices";
 
     /**
      * @throws EmfException

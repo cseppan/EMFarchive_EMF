@@ -18,7 +18,7 @@ import gov.epa.emissions.framework.client.transport.ExImServicesTransport;
  */
 public class ExImClient {
     private static String endpoint1 = 
-        "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.ExImServices";
+        "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.services.ExImServices";
 
     /**
      * @throws EmfException

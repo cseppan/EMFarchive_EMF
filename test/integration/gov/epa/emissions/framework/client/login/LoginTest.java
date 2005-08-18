@@ -51,7 +51,7 @@ public class LoginTest extends ComponentTestFixture {
     }
 
     public void testShouldShowEmfConsoleOnLogin() throws Exception {
-        ServiceLocator serviceLocator = new RemoteServiceLocator("http://ben.cep.unc.edu:8080/emf/services");
+        ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
 
         UserServices userServices = serviceLocator.getUserServices();
 

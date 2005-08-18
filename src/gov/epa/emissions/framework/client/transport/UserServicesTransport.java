@@ -77,7 +77,7 @@ public class UserServicesTransport implements UserServices {
             call.setMaintainSession(true);
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             call.setOperationName(new QName("http://soapinterop.org/", "authenticate") );
-            QName qname = new QName("urn:gov.epa.emf.UserServices","ns1:User");
+            QName qname = new QName("urn:gov.epa.emf.services.UserServices","ns1:User");
             Class cls = gov.epa.emissions.framework.services.User.class;
             call.registerTypeMapping(cls,qname,BeanSerializerFactory.class, BeanDeserializerFactory.class);
 
@@ -132,8 +132,8 @@ public class UserServicesTransport implements UserServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             
-            QName qname1 = new QName("urn:gov.epa.emf.UserServices","ns1:User");
-            QName qname2 = new QName("urn:gov.epa.emf.UserServices", "getUser");
+            QName qname1 = new QName("urn:gov.epa.emf.services.UserServices","ns1:User");
+            QName qname2 = new QName("urn:gov.epa.emf.services.UserServices", "getUser");
             call.setOperationName(qname2);
             Class cls = gov.epa.emissions.framework.services.User.class;
 	        call.registerTypeMapping(User.class, qname1,
@@ -171,8 +171,8 @@ public class UserServicesTransport implements UserServices {
         try {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            call.setOperationName(new QName("urn:gov.epa.emf.UserServices", "createUser") );
-            QName qname = new QName("urn:gov.epa.emf.UserServices","ns1:User");
+            call.setOperationName(new QName("urn:gov.epa.emf.services.UserServices", "createUser") );
+            QName qname = new QName("urn:gov.epa.emf.services.UserServices","ns1:User");
             Class cls = gov.epa.emissions.framework.services.User.class;
             call.registerTypeMapping(cls, qname,
 					   new org.apache.axis.encoding.ser.BeanSerializerFactory(cls, qname),        
@@ -207,8 +207,8 @@ public class UserServicesTransport implements UserServices {
         try {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            call.setOperationName(new QName("urn:gov.epa.emf.UserServices", "updateUser") );
-            QName qname = new QName("urn:gov.epa.emf.UserServices","ns1:User");
+            call.setOperationName(new QName("urn:gov.epa.emf.services.UserServices", "updateUser") );
+            QName qname = new QName("urn:gov.epa.emf.services.UserServices","ns1:User");
             Class cls = gov.epa.emissions.framework.services.User.class;
             call.registerTypeMapping(cls, qname,
 					   new org.apache.axis.encoding.ser.BeanSerializerFactory(cls, qname),        
@@ -282,9 +282,9 @@ public class UserServicesTransport implements UserServices {
                 call.setTargetEndpointAddress( new java.net.URL(endpoint) );
                 
                 //call.setOperationName(new QName("urn:EMFUserManager", "getUsers") );
-                QName qname1 = new QName("urn:gov.epa.emf.UserServices","ns1:User");
-                QName qname2 = new QName("urn:gov.epa.emf.UserServices","ns1:Users");
-                QName qname3 = new QName("urn:gov.epa.emf.UserServices", "getUsers");
+                QName qname1 = new QName("urn:gov.epa.emf.services.UserServices","ns1:User");
+                QName qname2 = new QName("urn:gov.epa.emf.services.UserServices","ns1:Users");
+                QName qname3 = new QName("urn:gov.epa.emf.services.UserServices", "getUsers");
                 
                 call.setOperationName(qname3);
                 
@@ -332,9 +332,9 @@ public class UserServicesTransport implements UserServices {
             
             System.out.println("Endpoint: " + endpoint);
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            QName qname1 = new QName("urn:gov.epa.emf.UserServices","ns1:User");
-            QName qname2 = new QName("urn:gov.epa.emf.UserServices","ns1:Users");
-            QName qname3 = new QName("urn:gov.epa.emf.UserServices", "updateUsers");
+            QName qname1 = new QName("urn:gov.epa.emf.services.UserServices","ns1:User");
+            QName qname2 = new QName("urn:gov.epa.emf.services.UserServices","ns1:Users");
+            QName qname3 = new QName("urn:gov.epa.emf.services.UserServices", "updateUsers");
                         
             Class cls1 = gov.epa.emissions.framework.services.User.class;
             Class cls2 = gov.epa.emissions.framework.services.User[].class;

@@ -429,7 +429,7 @@
 	      <value>10000</value>
 	    </parameter>
 	
-	    <!-- MySQL dB username and password for dB connections  -->
+	    <!-- Postgres dB username and password for dB connections  -->
 	    <parameter>
 	     <name>username</name>
 	     <value>postgres</value>

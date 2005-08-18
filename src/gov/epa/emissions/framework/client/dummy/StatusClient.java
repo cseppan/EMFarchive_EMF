@@ -23,7 +23,7 @@ public class StatusClient {
     private static String endpoint1 = 
         "http://ben.cep.unc.edu:8080/emf/services/EMFUserManagerService";
     private static String endpoint2 = 
-    "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.StatusServices";
+    "http://ben.cep.unc.edu:8080/emf/services/gov.epa.emf.services.StatusServices";
         
     public StatusClient() throws EmfException{
         super();

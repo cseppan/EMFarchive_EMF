@@ -74,9 +74,9 @@ public class StatusServicesTransport implements StatusServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             
-            QName qname1 = new QName("urn:gov.epa.emf.StatusServices","ns1:Status");
-            QName qname2 = new QName("urn:gov.epa.emf.StatusServices","ns1:AllStatus");
-            QName qname3 = new QName("urn:gov.epa.emf.StatusServices", "getMessages");
+            QName qname1 = new QName("urn:gov.epa.emf.services.StatusServices","ns1:Status");
+            QName qname2 = new QName("urn:gov.epa.emf.services.StatusServices","ns1:AllStatus");
+            QName qname3 = new QName("urn:gov.epa.emf.services.StatusServices", "getMessages");
             
             call.setOperationName(qname3);
             
@@ -133,8 +133,8 @@ public class StatusServicesTransport implements StatusServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             
-            QName qname1 = new QName("urn:gov.epa.emf.StatusServices","ns1:Status");
-            QName qname3 = new QName("urn:gov.epa.emf.StatusServices", "setStatus");
+            QName qname1 = new QName("urn:gov.epa.emf.services.StatusServices","ns1:Status");
+            QName qname3 = new QName("urn:gov.epa.emf.services.StatusServices", "setStatus");
             
             call.setOperationName(qname3);
             

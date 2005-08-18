@@ -29,7 +29,7 @@ public class ProxyClient {
     public static void main(String[] args) {
     	    try {
                 Class[] interfaces = new Class[] {UserServices.class};
-                UserServices emfAdmin = (UserServices)(Proxy.newInstance("urn:gov.epa.emf.UserServices",interfaces));
+                UserServices emfAdmin = (UserServices)(Proxy.newInstance("urn:gov.epa.emf.services.UserServices",interfaces));
                 User user = emfAdmin.getUser("cdcruz");
                 System.out.println(user.getFullName());
             } catch (EmfException e) {

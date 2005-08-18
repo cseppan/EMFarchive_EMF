@@ -23,15 +23,15 @@ public class RemoteServiceLocator implements ServiceLocator {
 
     public UserServices getUserServices() {
 
-        return new UserServicesTransport(baseUrl + "/gov.epa.emf.UserServices");
+        return new UserServicesTransport(baseUrl + "/gov.epa.emf.services.UserServices");
     }
 
     public StatusServices getStatusService() {
-        return new StatusServicesTransport(baseUrl + "/gov.epa.emf.StatusServices");
+        return new StatusServicesTransport(baseUrl + "/gov.epa.emf.services.StatusServices");
     }
 
     public ExImServices getEximService() {
-        return new ExImServicesTransport(baseUrl + "/gov.epa.emf.ExImServices");
+        return new ExImServicesTransport(baseUrl + "/gov.epa.emf.services.ExImServices");
     }
 
 }
