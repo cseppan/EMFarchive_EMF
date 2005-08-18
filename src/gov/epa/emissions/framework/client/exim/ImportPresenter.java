@@ -23,7 +23,7 @@ public class ImportPresenter {
         model.startImport(user, filename, type);
     }
 
-    public void notifyCancel() {
+    public void notifyDone() {
         view.close();
     }
 
