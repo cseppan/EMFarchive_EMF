@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
@@ -35,25 +36,35 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     private ServiceLocator serviceLocator;
 
-    // TODO: should we user 'ServiceLocator' instead, since other services will
-    // also be needed
-
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(User user, ServiceLocator serviceLocator) {
         this.user = user;
         this.serviceLocator = serviceLocator;
 
         super.setJMenuBar(createMenuBar());
-
-        super.setSize(new Dimension(900, 700));
-        super.setLocation(new Point(300, 150));
-        super.setTitle("Emissions Modeling Framework (EMF)");
-        super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setProperties();
 
         desktop = new JDesktopPane();
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 
         this.setContentPane(desktop);
+        showStatus();
+    }
+
+    private void showStatus() {
+        StatusServices statusServices = serviceLocator.getStatusServices();
+        StatusWindow view = new StatusWindow(user, statusServices);
+
+        desktop.add(view);
+
+        view.display();
+    }
+
+    private void setProperties() {
+        super.setSize(new Dimension(900, 700));
+        super.setLocation(new Point(300, 150));
+        super.setTitle("Emissions Modeling Framework (EMF)");
+        super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     private JMenuBar createMenuBar() {

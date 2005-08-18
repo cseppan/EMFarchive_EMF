@@ -1,9 +1,7 @@
 package gov.epa.emissions.framework.client.exim;
 
-public interface ImportView {
+import gov.epa.emissions.framework.client.EmfWidgetContainer;
+
+public interface ImportView extends EmfWidgetContainer {
     void register(ImportPresenter presenter);
-
-    void close();
-
-    void display();
 }
