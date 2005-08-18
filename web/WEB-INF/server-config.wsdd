@@ -43,6 +43,7 @@
   <parameter name="allowedMethods" value="*"/>
   <parameter name="scope" value="application"/>
   <parameter name="className" value="gov.epa.emissions.framework.service.ExImServicesImpl"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.DatasetType" qname="ns1:DatasetType" xmlns:ns1="urn:gov.epa.emf.ExImServices"/>
  </service>
 
  <arrayMapping qname="ns1:Users" xmlns:ns1="urn:gov.epa.emf.UserServices"
