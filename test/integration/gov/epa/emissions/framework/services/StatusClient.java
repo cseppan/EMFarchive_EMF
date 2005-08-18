@@ -6,7 +6,7 @@
  * File Name: EMFClient.java
  * Author: Conrad F. D'Cruz
  */
-package gov.epa.emissions.framework.client.dummy;
+package gov.epa.emissions.framework.services;
   
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.StatusServicesTransport;
@@ -199,7 +199,7 @@ public class StatusClient {
         aStat.setMessage("import started for file XYZABC");
         aStat.setMsgType("INFOMATICA");
         aStat.setTimestamp(new Date());
-        aStat.setUserName("jcapowski");
+        aStat.setUserName("cdcruz");
       StatusServices emfStatusSvc= new StatusServicesTransport(endpoint2);
 
         System.out.println("HibClient: Before call to setStatus");

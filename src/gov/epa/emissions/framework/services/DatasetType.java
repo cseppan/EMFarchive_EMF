@@ -13,7 +13,20 @@ public class DatasetType implements Serializable{
     private String description;
     private int minfiles;
     private int maxfiles;
+    private String uid=null;
     
+    /**
+     * @return Returns the uid.
+     */
+    public String getUid() {
+        return uid;
+    }
+    /**
+     * @param uid The uid to set.
+     */
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
     public DatasetType(){
     	super();
     }

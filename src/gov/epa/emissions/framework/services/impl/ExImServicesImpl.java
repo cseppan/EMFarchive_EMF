@@ -9,6 +9,7 @@
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.dao.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.DatasetType;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.ExImServices;
@@ -18,6 +19,9 @@ import gov.epa.emissions.framework.services.User;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+
+import org.hibernate.Session;
 ;
 
 /**
@@ -97,16 +101,52 @@ public class ExImServicesImpl implements ExImServices{
      * @see gov.epa.emissions.framework.commons.ExImServices#startImport(gov.epa.emissions.framework.commons.User, java.lang.String, gov.epa.emissions.framework.commons.DatasetType)
      */
     public void startImport(User user, String fileName, DatasetType datasetType) throws EmfException {
-        // TODO Auto-generated method stub
+
+        System.out.println("In ExImServicesImpl:startImport");
+
+        File file = null;
+        
+        try {
+            file = checkFile(fileName);
+            
+            /*
+             * Since the ExImTask is creating the status messages in a seperate thread
+             * Send in an instance of the statusService and the username of
+             * the user that invoked this service
+             */
+            
+            //FIXME:  Replace with factory method to get the status service
+            StatusServices statusSvc = new StatusServicesImpl();
+            
+            //FixMe: Create DbServer object and pass it into the ExImTask
+            //DbServer dbServer
+            ExImTask eximTask = new ExImTask(user,file,datasetType, statusSvc);
+            eximTask.run();
+            eximTask = null;
+        } catch (EmfException e) {
+            e.printStackTrace();
+            throw new EmfException(e.getMessage());
+        }
+        System.out.println("In ExImServicesImpl:startImport");
         
     }
 
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.commons.ExImServices#getDatasetTypes()
      */
-    public DatasetType[] getDatasetTypes() {
-        // TODO Auto-generated method stub
-        return null;
+    public DatasetType[] getDatasetTypes() throws EmfException {
+        Session session = HibernateUtils.currentSession();
+        List datasettypes = DatasetTypesDAO.getDatasetTypes(session);
+        System.out.println("Total number of messages in the List= " + datasettypes.size());
+        return (DatasetType[]) datasettypes.toArray(new DatasetType[datasettypes.size()]);    
+    }
+
+    /* (non-Javadoc)
+     * @see gov.epa.emissions.framework.services.ExImServices#insertDatasetType(gov.epa.emissions.framework.services.DatasetType)
+     */
+    public void insertDatasetType(DatasetType aDst) throws EmfException {
+        Session session = HibernateUtils.currentSession();
+        DatasetTypesDAO.insertDatasetType(aDst,session);
     }
 
 }//ExImServicesImpl

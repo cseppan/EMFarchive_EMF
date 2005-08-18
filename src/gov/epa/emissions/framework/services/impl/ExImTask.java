@@ -17,9 +17,11 @@ import gov.epa.emissions.commons.io.importer.TableTypes;
 import gov.epa.emissions.commons.io.importer.orl.ORLImporter;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DataSourceFactory;
+import gov.epa.emissions.framework.services.DatasetType;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
+import gov.epa.emissions.framework.services.User;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -32,10 +34,12 @@ import java.util.Date;
  */
 public class ExImTask implements Runnable {
 
+    private User user;
     private String userName;
     private File file;
     private String fileType;
     private StatusServices statusSvc = null;
+    private DatasetType datasetType;
 
     /**
      * 
@@ -58,7 +62,20 @@ public class ExImTask implements Runnable {
        this.fileType=fileType;
        this.statusSvc=statusSvc;
        this.userName = userName;
+    }
 
+    /**
+     * @param user
+     * @param file2
+     * @param datasetType
+     * @param statusSvc2
+     */
+    public ExImTask(User user, File file2, DatasetType datasetType, StatusServices statusSvc2) {
+        super();
+        this.file = file2;
+        this.user = user;
+        this.statusSvc=statusSvc2;
+        this.datasetType = datasetType;
     }
 
     /* (non-Javadoc)
@@ -82,14 +99,14 @@ public class ExImTask implements Runnable {
 
         // Create an instance of the EmfDataset
         Dataset dataset = new EmfDataset();
-        String datasetType = DatasetTypes.ORL_AREA_NONPOINT_TOXICS;
+        //String datasetType = DatasetTypes.ORL_AREA_NONPOINT_TOXICS;
         String tableType = TableTypes.ORL_AREA_NONPOINT_TOXICS;
         String filename = file.getName();
         String table = filename.substring(0, filename.length() - 4).replace('.', '_');
         
-        dataset.setDatasetType(datasetType);
+        dataset.setDatasetType(datasetType.getName());
         dataset.addDataTable(tableType, table);
-        String summaryTableType = DatasetTypes.getSummaryTableType(datasetType);
+        String summaryTableType = DatasetTypes.getSummaryTableType(datasetType.getName());
         dataset.addDataTable(summaryTableType, table + "_summary");
 
         // Get an instance of a DbServer

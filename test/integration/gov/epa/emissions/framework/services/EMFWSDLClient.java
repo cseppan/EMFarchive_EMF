@@ -6,7 +6,7 @@
  * File Name: EMFWSDLClient.java
  * Author: Conrad F. D'Cruz
  */
-package gov.epa.emissions.framework.client.dummy;
+package gov.epa.emissions.framework.services;
 
 import java.net.MalformedURLException;
 import java.net.URL;

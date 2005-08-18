@@ -6,7 +6,7 @@
  * File Name: EMFGenericClient.java
  * Author: Conrad F. D'Cruz
  */
-package gov.epa.emissions.framework.client.dummy;
+package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;

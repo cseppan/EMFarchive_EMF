@@ -73,8 +73,13 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         GridLayout valuesLayoutManager = new GridLayout(3, 1);
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
-
-        datasetTypesModel = new DefaultComboBoxModel(eximServices.getDatasetTypes());
+//FIXME: RAGHU this was added by conrad to fix the bug
+        try {
+            datasetTypesModel = new DefaultComboBoxModel(eximServices.getDatasetTypes());
+        } catch (EmfException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         JComboBox petList = new JComboBox(datasetTypesModel);
         valuesPanel.add(petList);
 

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class name="gov.epa.emissions.framework.services.DatasetType" table="emf.datasettypes">
+ 	<id name="uid" type="string" column="uid" unsaved-value="0">
+	  <generator class="uuid"/>
+ 	</id>
+	<property column="name" length="15" name="name" not-null="true" type="java.lang.String"/>
+	<property column="description" length="255" name="description" not-null="true" type="java.lang.String"/>
+	<property column="minfiles" length="4" name="minfiles" type="integer"/>
+	<property column="maxfiles" length="4" name="maxfiles" type="integer"/>
+  </class> 
+</hibernate-mapping>

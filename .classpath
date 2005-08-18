@@ -26,7 +26,6 @@
 	<classpathentry kind="lib" path="lib/dev/saaj-api.jar"/>
 	<classpathentry kind="lib" path="lib/dev/saaj-impl.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat/mysql-connector-java-3.1.10-bin.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/catalina-ant.jar"/>
 	<classpathentry kind="lib" path="lib/analysis-engine.jar"/>
 	<classpathentry kind="lib" path="lib/antlr-2.7.5H3.jar"/>
 	<classpathentry kind="lib" path="lib/cglib-2.1.jar"/>

@@ -5,7 +5,7 @@
  * by the Apache Axis 1.2.1 Jun 14, 2005 (09:15:57 EDT) WSDL2Java emitter.
  */
 
-package gov.epa.emissions.framework.client.dummy;
+package gov.epa.emissions.framework.services;
 
 public class EMFUserManagerServiceSoapBindingStub extends org.apache.axis.client.Stub implements EMFUserManager {
     private java.util.Vector cachedSerClasses = new java.util.Vector();

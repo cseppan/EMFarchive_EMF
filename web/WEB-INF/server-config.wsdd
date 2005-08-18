@@ -55,6 +55,11 @@
              languageSpecificType="java:gov.epa.emissions.framework.services.Status[]"
 			 innerType="ns1:Status" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
+
+ <arrayMapping qname="ns1:DatasetTypes" xmlns:ns1="urn:gov.epa.emf.services.ExImServices"
+             languageSpecificType="java:gov.epa.emissions.framework.services.DatasetType[]"
+			 innerType="ns1:DatasetType" 
+             encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
  
  <transport name="http">
   <requestFlow>

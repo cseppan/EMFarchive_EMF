@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 2.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
 
 <hibernate-mapping> 
-  <class name="gov.epa.emissions.framework.commons.Status" table="statusmessages"> 
+  <class name="gov.epa.emissions.framework.services.Status" table="statusmessages"> 
  	<id name="statusid" type="string" column="id" unsaved-value="0">
 	  <generator class="uuid"/>
  	</id>

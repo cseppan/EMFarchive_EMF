@@ -18,5 +18,7 @@ public interface ExImServices extends EMFService{
 
     public void startImport(String userName, String fileName, String fileType) throws EmfException;
     public void startImport(User user, String fileName, DatasetType datasetType) throws EmfException;
-    public DatasetType[] getDatasetTypes();  
+    public DatasetType[] getDatasetTypes() throws EmfException;
+    public void insertDatasetType(DatasetType aDstn) throws EmfException;
+
 }
