@@ -131,4 +131,8 @@ public class Status implements Serializable{
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
+
+    public String toString() {
+        return "Message : " + message + " for user: " + userName;
+    }
 }

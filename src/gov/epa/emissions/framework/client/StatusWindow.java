@@ -2,10 +2,11 @@ package gov.epa.emissions.framework.client;
 
 import java.awt.Dimension;
 
+import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
 
-public class StatusWindow extends EmfInteralFrame implements EmfWidgetContainer {
+public class StatusWindow extends EmfInteralFrame implements StatusView {
 
     public StatusWindow(User user, StatusServices statusServices) {
         super("Status Messages");
@@ -22,6 +23,12 @@ public class StatusWindow extends EmfInteralFrame implements EmfWidgetContainer 
 
     public void display() {
         super.setVisible(true);
+    }
+
+    public void update(Status[] messages) {
+    }
+
+    public void notifyError(String message) {        
     }
 
 }
