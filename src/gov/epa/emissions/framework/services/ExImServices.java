@@ -8,7 +8,6 @@
  */
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.framework.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 
 /**
