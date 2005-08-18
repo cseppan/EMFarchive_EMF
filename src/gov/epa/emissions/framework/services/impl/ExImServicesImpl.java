@@ -6,7 +6,7 @@
  * File Name: EMFDataService.java
  * Author: Conrad F. D'Cruz
  */
-package gov.epa.emissions.framework.service;
+package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.framework.DatasetType;
 import gov.epa.emissions.framework.EmfException;

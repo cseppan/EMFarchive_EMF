@@ -6,7 +6,7 @@
  * File Name: HibernateUtil.java
  * Author: Conrad F. D'Cruz
  */
-package gov.epa.emissions.framework.service;
+package gov.epa.emissions.framework.services.impl;
 
 //import net.sf.ehcache.config.Configuration;
 

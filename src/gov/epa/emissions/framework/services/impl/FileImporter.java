@@ -6,7 +6,7 @@
  * File Name: DummyImporter.java
  * Author: Conrad F. D'Cruz
  */
-package gov.epa.emissions.framework.services;
+package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
@@ -169,8 +169,6 @@ public class FileImporter {
      * @return
      */
     private int getNumber(String line) {
-        int count=0;
-        
         StringTokenizer strTkn = new StringTokenizer(line, ",", false);
         
         return strTkn.countTokens();

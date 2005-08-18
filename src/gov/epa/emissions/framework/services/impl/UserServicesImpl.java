@@ -2,7 +2,7 @@
  * Created on Jun 21, 2005
  *
  */
-package gov.epa.emissions.framework.service;
+package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.framework.AuthenticationException;
 import gov.epa.emissions.framework.EmfException;

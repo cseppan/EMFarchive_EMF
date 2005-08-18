@@ -6,7 +6,7 @@
  * File Name: ImporterService.java
  * Author: Conrad F. D'Cruz
  */
-package gov.epa.emissions.framework.service;
+package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
