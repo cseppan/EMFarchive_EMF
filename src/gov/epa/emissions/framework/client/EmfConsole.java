@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client;
 
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
 import gov.epa.emissions.framework.client.admin.UpdateUserWindow;
 import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
@@ -36,19 +37,30 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     private ServiceLocator serviceLocator;
 
+    private MessagePanel messagePanel;
+
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(User user, ServiceLocator serviceLocator) {
         this.user = user;
         this.serviceLocator = serviceLocator;
-
-        super.setJMenuBar(createMenuBar());
+        
         setProperties();
+        setLayout();
+        showStatus();
+    }
+
+    private void setLayout() {
+        JMenuBar menuBar = createMenuBar();
+        super.setJMenuBar(menuBar);
+
+        messagePanel = new MessagePanel();
+        messagePanel.setMessage("here I am");
+        menuBar.add(messagePanel);
 
         desktop = new JDesktopPane();
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 
         this.setContentPane(desktop);
-        showStatus();
     }
 
     private void showStatus() {
@@ -83,7 +95,11 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         JMenuItem importMenu = new JMenuItem("Import");
         importMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                displayImport();
+                try {
+                    displayImport();
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
             }
         });
         menu.add(importMenu);
@@ -111,7 +127,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         return menu;
     }
 
-    protected void displayImport() {
+    protected void displayImport() throws EmfException {
         ExImServices eximServices = serviceLocator.getEximServices();
         ImportWindow view = new ImportWindow(user, eximServices);
         ImportPresenter presenter = new ImportPresenter(user, eximServices, view);

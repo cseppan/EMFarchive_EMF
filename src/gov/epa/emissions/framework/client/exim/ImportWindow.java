@@ -36,17 +36,17 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
 
     private ExImServices eximServices;
 
-    public ImportWindow(User user, ExImServices eximServices) {
+    public ImportWindow(User user, ExImServices eximServices) throws EmfException {
         super("Import Dataset");
         this.eximServices = eximServices;
 
         JPanel layoutPanel = createLayout();
         this.getContentPane().add(layoutPanel);
 
-        setSize(new Dimension(400, 225));
+        setSize(new Dimension(500, 225));
     }
 
-    private JPanel createLayout() {
+    private JPanel createLayout() throws EmfException {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -58,7 +58,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         return panel;
     }
 
-    private JPanel createImportPanel() {
+    private JPanel createImportPanel() throws EmfException {
         JPanel panel = new JPanel();
 
         GridLayout labelsLayoutManager = new GridLayout(3, 1);
@@ -73,20 +73,14 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         GridLayout valuesLayoutManager = new GridLayout(3, 1);
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
-//FIXME: RAGHU this was added by conrad to fix the bug
-        try {
-            datasetTypesModel = new DefaultComboBoxModel(eximServices.getDatasetTypes());
-        } catch (EmfException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        JComboBox petList = new JComboBox(datasetTypesModel);
-        valuesPanel.add(petList);
+        datasetTypesModel = new DefaultComboBoxModel(eximServices.getDatasetTypes());
+        JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
+        valuesPanel.add(datasetTypesComboBox);
 
-        name = new JTextField(10);
+        name = new JTextField(15);
         name.setName("name");
         valuesPanel.add(name);
-        filename = new JTextField(10);
+        filename = new JTextField(25);
         filename.setName("filename");
         valuesPanel.add(filename);
 
@@ -115,9 +109,10 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
                 refresh();
                 try {
                     presenter.notifyImport((DatasetType) datasetTypesModel.getSelectedItem(), filename.getText());
-                    messagePanel
-                            .setMessage("Imported " + name.getText() + " [ " + filename.getText() + " ] successfully.");
+                    messagePanel.setMessage("Imported " + name.getText() + " [ " + filename.getText()
+                            + " ] successfully.");
                 } catch (EmfException e) {
+                    e.printStackTrace();
                     messagePanel.setError(e.getMessage());
                 }
             }

@@ -1,1 +1,0 @@
-INSERT INTO users (user_name,user_pass,fullname,affiliation,workphone,emailaddr,inadmingrp,acctdisabled) VALUES ('jbond2','james123','James Bond','MI-5','363-0007', 'bond@uk.gov',true,false)

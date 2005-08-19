@@ -90,7 +90,7 @@ public class ExImServicesTransport implements ExImServices {
 		          
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
             
-            Object obj = call.invoke( new Object[] {userName, fileName, fileType} );
+            call.invoke( new Object[] {userName, fileName, fileType} );
             
         } catch (ServiceException e) {
             System.out.println("Error invoking the service");
@@ -144,7 +144,7 @@ public class ExImServicesTransport implements ExImServices {
 		          
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
             
-            Object obj = call.invoke( new Object[] {user, fileName, datasetType} );
+            call.invoke( new Object[] {user, fileName, datasetType} );
             
         } catch (ServiceException e) {
             System.out.println("Error invoking the service");
@@ -153,6 +153,7 @@ public class ExImServicesTransport implements ExImServices {
             System.out.println("Error in format of URL string");
             e.printStackTrace();
         } catch (AxisFault fault){
+            fault.printStackTrace();
             throw new EmfException(extractMessage(fault.getMessage()));           
         }catch (RemoteException e) {
             System.out.println("Error communicating with WS end point");
@@ -240,7 +241,7 @@ public class ExImServicesTransport implements ExImServices {
 		          
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
             
-            Object obj = call.invoke( new Object[] {aDstn} );
+            call.invoke( new Object[] {aDstn} );
             
         } catch (ServiceException e) {
             System.out.println("Error invoking the service");
