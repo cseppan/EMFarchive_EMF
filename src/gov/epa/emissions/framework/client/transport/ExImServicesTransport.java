@@ -118,9 +118,9 @@ public class ExImServicesTransport implements ExImServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress( new java.net.URL(endpoint) );
             
-            QName qname1 = new QName("urn:gov.epa.emf.ExImServices","ns1:User");
-            QName qname2 = new QName("urn:gov.epa.emf.ExImServices","ns1:DatasetType");
-            QName qname3 = new QName("urn:gov.epa.emf.ExImServices", "startImport");
+            QName qname1 = new QName("urn:gov.epa.emf.services.ExImServices","ns1:User");
+            QName qname2 = new QName("urn:gov.epa.emf.services.ExImServices","ns1:DatasetType");
+            QName qname3 = new QName("urn:gov.epa.emf.services.ExImServices", "startImport");
             
             call.setOperationName(qname3);
             

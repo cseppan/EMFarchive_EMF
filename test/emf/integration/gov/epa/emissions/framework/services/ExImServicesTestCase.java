@@ -8,19 +8,32 @@ public abstract class ExImServicesTestCase extends TestCase {
 
     private String baseUrl;
 
-    protected ExImServices service;
+    protected ExImServices eximService;
+
+    private UserServices userService;
 
     protected ExImServicesTestCase(String baseUrl) {
         this.baseUrl = baseUrl;
     }
 
     protected void setUp() {
-        service = new RemoteServiceLocator(baseUrl).getEximServices();
+        RemoteServiceLocator serviceLocator = new RemoteServiceLocator(baseUrl);
+        eximService = serviceLocator.getEximServices();
+        userService = serviceLocator.getUserServices();
     }
 
     public void testFetchDatasetTypesReturnsFourORLTypes() throws EmfException {
-        DatasetType[] datasetTypes = service.getDatasetTypes();
+        DatasetType[] datasetTypes = eximService.getDatasetTypes();
         assertEquals(4, datasetTypes.length);
+    }
+    
+    public void test() throws EmfException {
+        DatasetType[] datasetTypes = eximService.getDatasetTypes();
+        User user  = userService.getUser("emf"); 
+        
+        //FIXME: this should be generic, and not hard-coded. ??
+        String filename = "c:/CEP/projects/EMF/test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt";
+        eximService.startImport(user.getUserName(), filename, datasetTypes[0].getName());
     }
 
     //TODO: rename & redo this test 
@@ -29,7 +42,7 @@ public abstract class ExImServicesTestCase extends TestCase {
         // System.out.println("END IMPORT CLIENT");
         // ExImTransport emfData2 = new ExImTransport(endpoint1);
         // emfData1.startImport("cdcruz","FOOBAR_TWO","IDA");
-        DatasetType[] datasetTypes = service.getDatasetTypes();
+        DatasetType[] datasetTypes = eximService.getDatasetTypes();
         assertEquals(4, datasetTypes.length);
 
         // DatasetType dst = new DatasetType();
