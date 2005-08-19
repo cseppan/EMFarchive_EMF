@@ -54,7 +54,6 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         super.setJMenuBar(menuBar);
 
         messagePanel = new MessagePanel();
-        messagePanel.setMessage("here I am");
         menuBar.add(messagePanel);
 
         desktop = new JDesktopPane();
@@ -65,7 +64,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     private void showStatus() {
         StatusServices statusServices = serviceLocator.getStatusServices();
-        StatusWindow view = new StatusWindow(user, statusServices);
+        StatusWindow view = new StatusWindow(user, statusServices, this);
 
         desktop.add(view);
 
