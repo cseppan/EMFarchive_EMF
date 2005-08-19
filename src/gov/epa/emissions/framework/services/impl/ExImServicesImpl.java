@@ -21,14 +21,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
-;
 
 /**
  * @author Conrad F. D'Cruz
  *
  */
 public class ExImServicesImpl implements ExImServices{
+
+    private static Log log = LogFactory.getLog(ExImServicesImpl.class);
 
     /**
      * 
@@ -41,9 +44,7 @@ public class ExImServicesImpl implements ExImServices{
      * @see gov.epa.emissions.framework.commons.EMFData#startImport(java.lang.String, java.lang.String)
      */
     public void startImport(String userName, String fileName, String fileType) throws EmfException {
-
-        System.out.println("In ExImServicesImpl:startImport");
-
+        log.debug("In ExImServicesImpl:startImport begin");
         File file = null;
         
         try {
@@ -64,10 +65,10 @@ public class ExImServicesImpl implements ExImServices{
             eximTask.run();
             eximTask = null;
         } catch (EmfException e) {
-            e.printStackTrace();
+            log.error("EmfException: ", e);
             throw new EmfException(e.getMessage());
         }
-        System.out.println("In ExImServicesImpl:startImport");
+        log.debug("In ExImServicesImpl:startImport END");
     }//startImport
 
     /**
@@ -86,10 +87,10 @@ public class ExImServicesImpl implements ExImServices{
 
             if (!file.exists()) throw new Exception("foobar");
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            log.error("EmfException: ", e);
             throw new EmfException("Pathname invalid: " + uriPathName);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Exception: ", e);
             throw new EmfException("File not found: " + uriPathName + "/" + fileName);
         }
         return file;
@@ -102,7 +103,7 @@ public class ExImServicesImpl implements ExImServices{
      */
     public void startImport(User user, String fileName, DatasetType datasetType) throws EmfException {
 
-        System.out.println("In ExImServicesImpl:startImport");
+        log.debug("In ExImServicesImpl:startImport START");
 
         File file = null;
         
@@ -124,20 +125,21 @@ public class ExImServicesImpl implements ExImServices{
             eximTask.run();
             eximTask = null;
         } catch (EmfException e) {
-            e.printStackTrace();
+            log.error("EMFException", e);
             throw new EmfException(e.getMessage());
         }
-        System.out.println("In ExImServicesImpl:startImport");
-        
+        log.debug("In ExImServicesImpl:startImport END");
     }
 
     /* (non-Javadoc)
      * @see gov.epa.emissions.framework.commons.ExImServices#getDatasetTypes()
      */
     public DatasetType[] getDatasetTypes() throws EmfException {
-        Session session = HibernateUtils.currentSession();
+        log.debug("In ExImServicesImpl:getDatasetTypes START");
+
+    	Session session = HibernateUtils.currentSession();
         List datasettypes = DatasetTypesDAO.getDatasetTypes(session);
-        System.out.println("Total number of messages in the List= " + datasettypes.size());
+        log.debug("In ExImServicesImpl:getDatasetTypes END");
         return (DatasetType[]) datasettypes.toArray(new DatasetType[datasettypes.size()]);    
     }
 
@@ -145,8 +147,12 @@ public class ExImServicesImpl implements ExImServices{
      * @see gov.epa.emissions.framework.services.ExImServices#insertDatasetType(gov.epa.emissions.framework.services.DatasetType)
      */
     public void insertDatasetType(DatasetType aDst) throws EmfException {
-        Session session = HibernateUtils.currentSession();
+        log.debug("In ExImServicesImpl:insertDatasetType START");
+
+    	Session session = HibernateUtils.currentSession();
         DatasetTypesDAO.insertDatasetType(aDst,session);
+        log.debug("In ExImServicesImpl:insertDatasetType END");
+
     }
 
 }//ExImServicesImpl
