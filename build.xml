@@ -10,8 +10,18 @@
     <property name="JAVA_HOME" value="${env.JAVA_HOME}" />
     <property name="src.dir" value="src" />
     <property name="lib.dir" value="lib" />
-    <property name="test.unit.dir" value="test/unit" />
-    <property name="test.integration.dir" value="test/integration" />
+
+    <property name="test.emf.dir" value="test/emf" />
+    <property name="test.emf.unit.dir" value="${test.emf.dir}/unit" />
+    <property name="test.emf.integration.dir"
+              value="${test.emf.dir}/integration"
+    />
+
+    <property name="test.commons.dir" value="test/commons" />
+    <property name="test.commons.unit.dir" value="${test.commons.dir}/unit" />
+    <property name="test.commons.integration.dir"
+              value="${test.commons.dir}/integration"
+    />
 
     <property name="build.home" value="build/sandbox" />
     <property name="web.dir" value="web" />
@@ -20,10 +30,10 @@
     <property name="build.classes.dir" value="${build.web-inf.dir}/classes" />
 
     <property name="reports.unittests.dir"
-              value="${build.home}/reports/unit-tests"
+              value="${build.home}/reports/emf-unit-tests"
     />
     <property name="reports.integrationtests.dir"
-              value="${build.home}/reports/integration-tests"
+              value="${build.home}/reports/emf-integration-tests"
     />
     <property name="app.name" value="emf" />
     <property name="app.path" value="/${app.name}" />
@@ -64,7 +74,7 @@
         </delete>
     </target>
 
-    <target name="compile" depends="clean, init">
+    <target name="compile-src" depends="clean, init">
         <javac srcdir="${src.dir}"
                destdir="${build.classes.dir}"
                classpathref="classpath"
@@ -75,47 +85,119 @@
             <fileset dir="${src.dir}" includes="**/*.xml" />
             <fileset dir="${src.dir}" includes="**/*.dtd" />
         </copy>
-        <javac srcdir="${test.unit.dir}"
+    </target>
+
+    <target name="compile-emf-tests" depends="clean, init, compile-src">
+        <javac srcdir="${test.emf.unit.dir}"
                destdir="${build.classes.dir}"
                classpathref="classpath"
                debug="on"
         />
-        <javac srcdir="${test.integration.dir}"
+        <javac srcdir="${test.emf.integration.dir}"
                destdir="${build.classes.dir}"
                classpathref="classpath"
                debug="on"
         />
     </target>
 
-    <target name="unit-tests" depends="compile">
+
+    <target name="compile-commons-tests" depends="clean, init, compile-src">
+        <javac srcdir="${test.commons.unit.dir}"
+               destdir="${build.classes.dir}"
+               classpathref="classpath"
+               debug="on"
+        />
+        <javac srcdir="${test.commons.integration.dir}"
+               destdir="${build.classes.dir}"
+               classpathref="classpath"
+               debug="on"
+        />
+    </target>
+
+    <target name="compile"
+            depends="clean, init, compile-src, compile-emf-tests, compile-commons-tests"
+    />
+
+    <target name="emf-unit-tests" depends="compile">
         <junit printsummary="yes" haltonfailure="yes">
             <classpath refid="classpath" />
             <formatter type="xml" />
 
             <batchtest fork="yes" todir="${reports.unittests.dir}">
-                <fileset dir="${test.unit.dir}">
-                    <include name="**/*Test*.java" />
+                <fileset dir="${test.emf.unit.dir}">
+                    <include name="**/*Test.java" />
                 </fileset>
             </batchtest>
         </junit>
     </target>
 
-    <target name="integration-tests" depends="compile">
+    <target name="commons-unit-tests" depends="compile">
         <junit printsummary="yes" haltonfailure="yes">
             <classpath refid="classpath" />
             <formatter type="xml" />
 
-            <batchtest fork="yes" todir="${reports.integrationtests.dir}">
-                <fileset dir="${test.integration.dir}">
-                    <include name="**/*Test*.java" />
+            <batchtest fork="yes" todir="${reports.unittests.dir}">
+                <fileset dir="${test.commons.unit.dir}">
+                    <include name="**/*Test.java" />
                 </fileset>
             </batchtest>
         </junit>
     </target>
 
-    <target name="all-tests" depends="compile, unit-tests, integration-tests" />
-    <target name="all" depends="compile, unit-tests" />
+    <target name="emf-integration-tests"
+            depends="compile"
+            description="All Integration Tests"
+    >
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath refid="classpath" />
+            <formatter type="xml" />
+            <batchtest fork="yes" todir="${reports.integrationtests.dir}">
+                <fileset dir="${test.emf.integration.dir}">
+                    <include name="**/*Test.java" />
+                    <exclude name="**/Remote*Test.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="emf-webservices-tests"
+            depends="compile"
+            description="Integration of Client and Web Services"
+    >
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath refid="classpath" />
+            <formatter type="xml" />
+            <batchtest fork="yes" todir="${reports.integrationtests.dir}">
+                <fileset dir="${test.emf.integration.dir}">
+                    <include name="**/emissions/framework/**/*Test.java" />
+                    <exclude name="**/emissions/framework/**/Remote*Test.java"
+                    />
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="commons-integration-tests"
+             depends="compile"
+             description="All Integration Tests"
+     >
+         <junit printsummary="yes" haltonfailure="yes">
+             <classpath refid="classpath" />
+             <formatter type="xml" />
+             <batchtest fork="yes" todir="${reports.integrationtests.dir}">
+                 <fileset dir="${test.commons.integration.dir}">
+                     <include name="**/*Test.java" />
+                 </fileset>
+             </batchtest>
+         </junit>
+     </target>
     
+    <target name="all-emf-tests" depends="compile, emf-unit-tests, emf-integration-tests" />
+    <target name="all-common-tests" depends="compile, commons-unit-tests, commons-integration-tests" />
+    <target name="all-tests" depends="all-emf-tests, all-common-tests" />
+    <target name="all-unit-tests" depends="emf-unit-tests, commons-unit-tests"/>
+    <target name="all" depends="compile, all-unit-tests" description="runs all unit-tests"/>
+
     <!--  =================== CVS Targets ====================================== -->
     <target name="cvs-properties-load">
         <property file=".cvs" />
@@ -139,7 +221,7 @@
         <echo message="EMF update is complete." />
     </target>
 
-    <target name="pre-checkin" depends="cvs-update, compile, unit-tests" />
+    <target name="pre-checkin" depends="cvs-update, compile, emf-unit-tests" />
 
     <!--  =================== Tomcat Deployment Targets ====================================== -->
     <target name="app-prepare" depends="clean, init, compile">

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client;
 
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.TaskRunner;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
@@ -12,7 +13,7 @@ import org.jmock.MockObjectTestCase;
 
 public class StatusPresenterTest extends MockObjectTestCase {
 
-    public void testShouldUpdateViewTwiceOnTwoSuccessfulPolls() throws Exception {
+    public void testShouldUpdateViewOnSuccessfulPoll() throws Exception {
         User user = new User();
         user.setUserName("user");
 
@@ -31,9 +32,37 @@ public class StatusPresenterTest extends MockObjectTestCase {
             public void start(Runnable runnable) {
                 runnable.run();
             }
+
             public void stop() {
             }
         };
         presenter.start(runner);
+        presenter.stop();
+    }
+
+    public void testShouldNotifyViewOnFailedPoll() throws Exception {
+        User user = new User();
+        user.setUserName("user");
+
+        Mock service = mock(StatusServices.class);
+        service.expects(atLeastOnce()).method("getMessages").with(eq(user.getUserName())).will(
+                throwException(new EmfException("poll failure")));
+
+        Mock view = mock(StatusView.class);
+        view.expects(once()).method("notifyError").with(eq("poll failure"));
+
+        StatusPresenter presenter = new StatusPresenter(user, (StatusServices) service.proxy(), (StatusView) view
+                .proxy());
+
+        TaskRunner runner = new TaskRunner() {
+            public void start(Runnable runnable) {
+                runnable.run();
+            }
+
+            public void stop() {
+            }
+        };
+        presenter.start(runner);
+        presenter.stop();
     }
 }
