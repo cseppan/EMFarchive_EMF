@@ -18,11 +18,11 @@ public class ReferenceImporterTest extends TestCase {
     private File referenceFilesDir;
 
     private void initUsingPostgres() throws Exception {
-        init(new File("test/postgres.conf"));
+        init(new File("test/commons/postgres.conf"));
     }
 
     private void initUsingMysql() throws Exception {
-        init(new File("test/mysql.conf"));
+        init(new File("test/commons/mysql.conf"));
     }
 
     private void init(File file) throws Exception {
