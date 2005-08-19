@@ -20,11 +20,11 @@ public class ORLImporterTest extends TestCase {
     private DatabaseSetup dbSetup;
 
     private void usePostgres() throws Exception {
-        init(new File("test/postgres.conf"));
+        init(new File("test/commons/postgres.conf"));
     }
 
     private void useMysql() throws Exception {
-        init(new File("test/mysql.conf"));
+        init(new File("test/commons/mysql.conf"));
     }
 
     private void init(File conf) throws IOException, FileNotFoundException, SQLException {
