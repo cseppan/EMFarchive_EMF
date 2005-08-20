@@ -26,6 +26,9 @@ import gov.epa.emissions.framework.services.User;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.Date;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 ;
 
 /**
@@ -33,6 +36,8 @@ import java.util.Date;
  *
  */
 public class ExImTask implements Runnable {
+
+    private static Log log = LogFactory.getLog(ExImTask.class);
 
     private User user;
     private String userName;
@@ -74,6 +79,7 @@ public class ExImTask implements Runnable {
         super();
         this.file = file2;
         this.user = user;
+        this.userName=user.getUserName();
         this.statusSvc=statusSvc2;
         this.datasetType = datasetType;
     }
@@ -82,7 +88,7 @@ public class ExImTask implements Runnable {
      * @see java.lang.Runnable#run()
      */
     public void run() {
-      System.out.println("In NEW THREAD start import: " + file.getName() + " " + fileType);
+      log.debug("In NEW THREAD start import: " + file.getName() + " " + fileType);
       Status startStatus = new Status();
       startStatus.setUserName(this.userName);
       startStatus.setMsgType(EMFConstants.IMPORT_MESSAGE_TYPE);
@@ -126,17 +132,16 @@ public class ExImTask implements Runnable {
 		
 		statusSvc.setStatus(endStatus);
     } catch (EmfException e) {
-        e.printStackTrace();
+        log.error(e);
     } catch (SQLException e) {
         // TODO Auto-generated catch block
         //EMF TODO: We need to get an EMF Exception thrown from below
-        e.printStackTrace();
+        log.error(e);
     } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        log.error(e);
     }
     
-      System.out.println("In NEW THREAD end import: " + file.getName() + " " + fileType);
+    log.debug("In NEW THREAD start import: " + file.getName() + " " + fileType);
     }
 
 }

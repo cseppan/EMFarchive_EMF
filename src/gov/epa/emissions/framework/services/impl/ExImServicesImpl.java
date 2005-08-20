@@ -72,8 +72,10 @@ public class ExImServicesImpl implements ExImServices {
     private File checkFile(String fileName) throws EmfException {
         File file = new File(fileName);
 
-        if (!file.exists())
+        if (!file.exists()){
+        	log.error("file " + fileName + " not found");
             throw new EmfException("file " + fileName + " not found");
+        }
         return file;
 
     }
