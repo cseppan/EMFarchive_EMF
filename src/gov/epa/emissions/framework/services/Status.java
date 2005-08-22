@@ -110,7 +110,7 @@ public class Status implements Serializable{
     /**
      * @return Returns the msgType.
      */
-    public String getMsgType() {
+    public String getMessageType() {
         return msgType;
     }
     /**

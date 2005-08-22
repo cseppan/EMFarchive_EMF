@@ -222,7 +222,7 @@ public class StatusClient {
                 //System.out.println("" + aStat.getStatusid());
                 System.out.println("" + aStat.getUserName());
                 System.out.println("" + aStat.getTimestamp());
-                System.out.println("" + aStat.getMsgType());
+                System.out.println("" + aStat.getMessageType());
                 System.out.println("" + aStat.getMessage());
                 System.out.println("" + aStat.isMsgRead());
                 

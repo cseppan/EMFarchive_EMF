@@ -145,7 +145,7 @@ public class StatusServicesTransport implements StatusServices {
 		    call.addParameter( "status", qname1, ParameterMode.IN );
             call.setReturnType(qname3);
             
-            Object obj = call.invoke( new Object[] {status} );
+            call.invoke( new Object[] {status} );
         } catch (ServiceException e) {
             System.out.println("Error invoking the service");
             e.printStackTrace();
