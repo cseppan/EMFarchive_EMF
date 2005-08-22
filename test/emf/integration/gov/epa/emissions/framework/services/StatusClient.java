@@ -197,7 +197,7 @@ public class StatusClient {
     private void callServiceForInsert() throws EmfException {
         Status aStat = new Status();
         aStat.setMessage("import started for file XYZABC");
-        aStat.setMsgType("INFOMATICA");
+        aStat.setMessageType("INFOMATICA");
         aStat.setTimestamp(new Date());
         aStat.setUserName("cdcruz");
       StatusServices emfStatusSvc= new StatusServicesTransport(endpoint2);

@@ -98,7 +98,7 @@ public class ExImTask implements Runnable {
     private void setStatus(String message) throws EmfException {
         Status endStatus = new Status();
         endStatus.setUserName(user.getUserName());
-        endStatus.setMsgType(EMFConstants.IMPORT_MESSAGE_TYPE);
+        endStatus.setMessageType(EMFConstants.IMPORT_MESSAGE_TYPE);
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 

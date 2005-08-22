@@ -19,7 +19,7 @@ public class Status implements Serializable{
 
     private String statusid=null;
     private String userName;
-    private String msgType;
+    private String messageType;
     private String message;
     private boolean msgRead=false;
     private Date timestamp = null;
@@ -77,7 +77,7 @@ public class Status implements Serializable{
             Date timestamp) {
         super();
         this.userName = userName;
-        this.msgType = msgType;
+        this.messageType = msgType;
         this.message = message;
         this.timestamp = timestamp;
     }
@@ -111,13 +111,13 @@ public class Status implements Serializable{
      * @return Returns the msgType.
      */
     public String getMessageType() {
-        return msgType;
+        return messageType;
     }
     /**
-     * @param msgType The msgType to set.
+     * @param messageType The msgType to set.
      */
-    public void setMsgType(String msgType) {
-        this.msgType = msgType;
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
     /**
      * @return Returns the timestamp.
