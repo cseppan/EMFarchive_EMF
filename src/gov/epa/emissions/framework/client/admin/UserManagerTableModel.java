@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.gui.TableHeader;
 import gov.epa.emissions.commons.gui.RefreshableTableModel;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
@@ -13,14 +14,14 @@ import javax.swing.table.AbstractTableModel;
 
 public class UserManagerTableModel extends AbstractTableModel implements RefreshableTableModel {
 
-    private Header header;
+    private TableHeader header;
 
     private List rows;
 
     private UserServices userAdmin;
 
     public UserManagerTableModel(UserServices userAdmin) {
-        this.header = new Header(new String[] { "Username", "Name", "Email" });
+        this.header = new TableHeader(new String[] { "Username", "Name", "Email" });
         this.userAdmin = userAdmin;
 
         createRows(this.userAdmin);
@@ -75,27 +76,6 @@ public class UserManagerTableModel extends AbstractTableModel implements Refresh
 
     public boolean isCellEditable(int row, int column) {
         return (column == 1 || column == 2) ? true : false;
-    }
-
-    // inner classes
-    private class Header {
-        private String[] columnNames;
-
-        public Header(String[] columnNames) {
-            this.columnNames = columnNames;
-        }
-
-        public Class getColumnClass(int column) {
-            return String.class;
-        }
-
-        public int columnsSize() {
-            return columnNames.length;
-        }
-
-        public String columnName(int i) {
-            return columnNames[i];
-        }
     }
 
     private class Row {
