@@ -26,17 +26,17 @@ public abstract class ExImServicesTestCase extends TestCase {
         DatasetType[] datasetTypes = eximService.getDatasetTypes();
         assertEquals(4, datasetTypes.length);
     }
-    
-    public void test() throws EmfException {
+
+    public void testImportOrlNonPoint() throws EmfException {
         DatasetType[] datasetTypes = eximService.getDatasetTypes();
-        User user  = userService.getUser("emf"); 
-        
-        //FIXME: this should be generic, and not hard-coded. ??
+        User user = userService.getUser("emf");
+
+        // FIXME: this should be generic, and not hard-coded. ??
         String filename = "c:/CEP/projects/EMF/test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt";
-        eximService.startImport(user.getUserName(), filename, datasetTypes[0].getName());
+        eximService.startImport(user, filename, datasetTypes[0]);
     }
 
-    //TODO: rename & redo this test 
+    // TODO: rename & redo this test
     public void FIXME_testWHAT() throws EmfException {
         // emfData1.startImport("jcapowski","arinv.nonpoint.nti99_NC.txt","ORL");
         // System.out.println("END IMPORT CLIENT");

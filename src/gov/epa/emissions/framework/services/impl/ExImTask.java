@@ -24,124 +24,87 @@ import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-;
 
-/**
- * @author Conrad F. D'Cruz
- *
- */
 public class ExImTask implements Runnable {
 
     private static Log log = LogFactory.getLog(ExImTask.class);
 
     private User user;
-    private String userName;
+
     private File file;
-    private String fileType;
+
     private StatusServices statusSvc = null;
+
     private DatasetType datasetType;
 
-    /**
-     * 
-     */
-    public ExImTask(File file, String fileType) {
-        super();
-        this.file = file;
-        this.fileType = fileType;
-    }
-
-    /**
-     * @param fileName
-     * @param fileType
-     * @param statusSvc
-     * @param status
-     */
-    public ExImTask(String userName, File file, String fileType, StatusServices statusSvc) {
-       super();
-       this.file = file;
-       this.fileType=fileType;
-       this.statusSvc=statusSvc;
-       this.userName = userName;
-    }
-
-    /**
-     * @param user
-     * @param file2
-     * @param datasetType
-     * @param statusSvc2
-     */
-    public ExImTask(User user, File file2, DatasetType datasetType, StatusServices statusSvc2) {
-        super();
-        this.file = file2;
+    public ExImTask(User user, File file, DatasetType datasetType, StatusServices statusSvc2) {
         this.user = user;
-        this.userName=user.getUserName();
-        this.statusSvc=statusSvc2;
+        this.file = file;
+        this.statusSvc = statusSvc2;
         this.datasetType = datasetType;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Runnable#run()
-     */
     public void run() {
-      log.debug("In NEW THREAD start import: " + file.getName() + " " + fileType);
-      Status startStatus = new Status();
-      startStatus.setUserName(this.userName);
-      startStatus.setMsgType(EMFConstants.IMPORT_MESSAGE_TYPE);
-      startStatus.setMessage(EMFConstants.START_IMPORT_MESSAGE_Prefix + fileType + ":" + file.getName());
-      startStatus.setTimestamp(new Date());
-      try {
-        statusSvc.setStatus(startStatus);
-        
-        log.debug("In NEW THREAD start import: AFTER SETTING START IMPORT MESSAGE");
-          
-        // Call the importer
-//		DummyImporter imptr = new DummyImporter(DataSourceFactory.getDataSource(),file);
-//		imptr.run();
+        log.info("starting import - file: " + file.getName() + " of type: " + datasetType.getName());
 
-        // Create an instance of the EmfDataset
-        Dataset dataset = new EmfDataset();
-        //String datasetType = DatasetTypes.ORL_AREA_NONPOINT_TOXICS;
-        String tableType = TableTypes.ORL_AREA_NONPOINT_TOXICS;
-        String filename = file.getName();
-        String table = filename.substring(0, filename.length() - 4).replace('.', '_');
-        
-        dataset.setDatasetType(datasetType.getName());
-        dataset.addDataTable(tableType, table);
-        String summaryTableType = DatasetTypes.getSummaryTableType(datasetType.getName());
-        dataset.addDataTable(summaryTableType, table + "_summary");
+        try {
+            setStartStatus();
 
-        // Get an instance of a DbServer
-        DbServer dbServer = new PostgresDbServer(DataSourceFactory.getDataSource().getConnection(), "reference", "emissions");
-        
-        // Get the specific type of importer for the filetype requested by user for import
-        ORLImporter importer = new ORLImporter(dbServer, false, true);
-        
-        // Invoke the importer for the specific file
-        importer.run(new File[]{file},dataset, true);
-        
-		Status endStatus = new Status();
-		endStatus.setUserName(this.userName);
-		endStatus.setMsgType(EMFConstants.IMPORT_MESSAGE_TYPE);
-		endStatus.setMessage(EMFConstants.END_IMPORT_MESSAGE_Prefix + fileType + ":" + file.getName());
-		endStatus.setTimestamp(new Date());
-		
-		statusSvc.setStatus(endStatus);
-    } catch (EmfException e) {
-        log.error(e);
-    } catch (SQLException e) {
-        // TODO Auto-generated catch block
-        //EMF TODO: We need to get an EMF Exception thrown from below
-        log.error(e);
-    } catch (Exception e) {
-        log.error(e);
+            // Create an instance of the EmfDataset
+            Dataset dataset = new EmfDataset();
+
+            // FIXME: why hard code the table type ?
+            String tableType = TableTypes.ORL_AREA_NONPOINT_TOXICS;
+            String filename = file.getName();
+            String table = filename.substring(0, filename.length() - 4).replace('.', '_');
+
+            dataset.setDatasetType(datasetType.getName());
+            dataset.addDataTable(tableType, table);
+            String summaryTableType = DatasetTypes.getSummaryTableType(datasetType.getName());
+            dataset.addDataTable(summaryTableType, table + "_summary");
+
+            // FIXME: we should not hard-code the db server
+            
+            
+            // Get an instance of a DbServer
+            DbServer dbServer = new PostgresDbServer(DataSourceFactory.getDataSource().getConnection(), "reference",
+                    "emissions");
+
+            // Get the specific type of importer for the filetype requested by
+            // user for import
+            ORLImporter importer = new ORLImporter(dbServer, false, true);
+
+            // Invoke the importer for the specific file
+            importer.run(new File[] { file }, dataset, true);
+
+            setEndStatus();
+        } catch (Exception e) {
+            log.error("Problem on attempting to run ExIm on file : " + file, e);
+        }
+
+        log.info("importing of file: " + file.getName() + " of type: " + datasetType.getName() + " complete");
     }
-    
-    log.debug("In NEW THREAD start import: " + file.getName() + " " + fileType);
+
+    private void setStartStatus() throws EmfException {
+        setStatus(EMFConstants.START_IMPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
+    }
+
+    private void setEndStatus() throws EmfException {
+        setStatus(EMFConstants.END_IMPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
+    }
+
+    private void setStatus(String message) throws EmfException {
+        Status endStatus = new Status();
+        endStatus.setUserName(user.getUserName());
+        endStatus.setMsgType(EMFConstants.IMPORT_MESSAGE_TYPE);
+        endStatus.setMessage(message);
+        endStatus.setTimestamp(new Date());
+
+        statusSvc.setStatus(endStatus);
     }
 
 }

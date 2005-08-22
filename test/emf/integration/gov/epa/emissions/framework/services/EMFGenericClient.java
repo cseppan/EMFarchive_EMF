@@ -48,7 +48,9 @@ public class EMFGenericClient {
       
       System.out.println("Number of messages: " + allStats.length);
       ExImServices eximSvc = svcLoc.getEximServices();
-      eximSvc.startImport("cdcruz","conrad.txt","TST");
+      DatasetType[] datasetTypes = eximSvc.getDatasetTypes();
+      //TODO: lookup the 'TST' dataset type 
+      eximSvc.startImport(user,"conrad.txt", datasetTypes[0]/*"TST"*/);
       
     }//doEmfSvcs
 

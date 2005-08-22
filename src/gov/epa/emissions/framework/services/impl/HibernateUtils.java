@@ -8,8 +8,6 @@
  */
 package gov.epa.emissions.framework.services.impl;
 
-//import net.sf.ehcache.config.Configuration;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
@@ -19,47 +17,44 @@ import org.hibernate.cfg.Configuration;
 
 /**
  * @author Conrad F. D'Cruz
- *
+ * 
  */
 public class HibernateUtils {
-    
-    private static Log log = LogFactory.getLog(HibernateUtils.class);
-    private static SessionFactory sessionFactory = null;
 
+    private static Log log = LogFactory.getLog(HibernateUtils.class);
+
+    private static SessionFactory sessionFactory = null;
 
     static {
         try {
-            // Create the SessionFactory
-            sessionFactory = new Configuration().configure().buildSessionFactory();
+            Configuration configure = new Configuration().configure("hibernate.cfg.xml");
+            sessionFactory = configure.buildSessionFactory();
         } catch (Throwable ex) {
             log.error("Initial SessionFactory creation failed.", ex);
             throw new ExceptionInInitializerError(ex);
         }
     }
 
-
-    public static final ThreadLocal session = new ThreadLocal();
+    public static final ThreadLocal sessionThread = new ThreadLocal();
 
     public static Session currentSession() throws HibernateException {
-    	log.debug("get current session");
-        Session s = (Session) session.get();
+        Session session = (Session) sessionThread.get();
         // Open a new Session, if this Thread has none yet
-        if (s == null) {
-            s = sessionFactory.openSession();
-            session.set(s);
+        if (session == null) {
+            session = sessionFactory.openSession();
+            sessionThread.set(session);
         }
-    	log.debug("get current session");
-        return s;
+        return session;
     }
 
     public static void closeSession() throws HibernateException {
-    	log.debug("closing session");
-        Session s = (Session) session.get();
-        session.set(null);
-        if (s != null){
+        log.debug("closing session");
+        Session s = (Session) sessionThread.get();
+        sessionThread.set(null);
+        if (s != null) {
             s.close();
         }
-    	log.debug("closing session");
+        log.debug("closing session");
     }
-    
+
 }

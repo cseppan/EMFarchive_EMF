@@ -63,6 +63,8 @@ public class StatusServicesImpl implements StatusServices{
     	log.debug("EMFStatusService: setStatus " + status.getUserName());
         Session session = HibernateUtils.currentSession();
         log.debug("EMFStatusService: Before insertStatusMessage");
+        
+        //FIXME: replace static w/ instance methods
         StatusDAO.insertStatusMessage(status,session);
         log.debug("EMFStatusService: After insertStatusMessage");
     	log.debug("EMFStatusService: setStatus " + status.getUserName());
