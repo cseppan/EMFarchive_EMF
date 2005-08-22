@@ -232,9 +232,9 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
 
     public void refresh() {
         selectModel.refresh();
-        createLayout(parentConsole);// TODO: A HACK, until we fix row-count issues w/
-        // SortFilterSelectPanel
-        this.validate();
+        // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
+        createLayout(parentConsole);
+        super.validate();
     }
 
     public void display() {

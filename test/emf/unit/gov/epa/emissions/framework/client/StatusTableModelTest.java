@@ -24,7 +24,10 @@ public class StatusTableModelTest extends MockObjectTestCase {
         Status[] status = new Status[] { status1, status2 };
 
         model = new StatusTableModel();
+        assertEquals(0, model.getRowCount());
+        
         model.refresh(status);
+        assertEquals(2, model.getRowCount());
     }
 
     public void testShouldReturnRowsEqualingTheNumberOfStatusMessages() {

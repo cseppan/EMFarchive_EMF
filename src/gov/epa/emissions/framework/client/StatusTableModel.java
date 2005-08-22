@@ -20,6 +20,7 @@ public class StatusTableModel extends AbstractTableModel {
 
     public StatusTableModel() {
         this.header = new TableHeader(new String[] { "Username", "Message Type", "Message", "Timestamp" });
+        this.statuses = new Status[0];
     }
 
     public int getRowCount() {
@@ -27,7 +28,7 @@ public class StatusTableModel extends AbstractTableModel {
     }
 
     public int getColumnCount() {
-        return 4;
+        return header.columnsSize();
     }
 
     public String getColumnName(int i) {
