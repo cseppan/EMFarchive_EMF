@@ -41,20 +41,25 @@ public class HibernateUtils {
     public static final ThreadLocal session = new ThreadLocal();
 
     public static Session currentSession() throws HibernateException {
+    	log.debug("get current session");
         Session s = (Session) session.get();
         // Open a new Session, if this Thread has none yet
         if (s == null) {
             s = sessionFactory.openSession();
             session.set(s);
         }
+    	log.debug("get current session");
         return s;
     }
 
     public static void closeSession() throws HibernateException {
+    	log.debug("closing session");
         Session s = (Session) session.get();
         session.set(null);
-        if (s != null)
+        if (s != null){
             s.close();
+        }
+    	log.debug("closing session");
     }
     
 }

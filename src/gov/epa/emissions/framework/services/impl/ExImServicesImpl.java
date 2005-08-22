@@ -70,14 +70,15 @@ public class ExImServicesImpl implements ExImServices {
     }// startImport
 
     private File checkFile(String fileName) throws EmfException {
+    	log.debug("check if file exists " + fileName);
         File file = new File(fileName);
 
         if (!file.exists()){
         	log.error("file " + fileName + " not found");
             throw new EmfException("file " + fileName + " not found");
         }
+        log.debug("check if file exists " + fileName);
         return file;
-
     }
 
     /*

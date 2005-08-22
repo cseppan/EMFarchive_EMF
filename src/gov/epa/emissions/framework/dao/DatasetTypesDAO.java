@@ -9,11 +9,14 @@
 package gov.epa.emissions.framework.dao;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DatasetType;
+import gov.epa.emissions.framework.services.impl.ExImServicesImpl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -23,11 +26,12 @@ import org.hibernate.Transaction;
  *
  */
 public class DatasetTypesDAO {
+    private static Log log = LogFactory.getLog(DatasetTypesDAO.class);
 
     private static final String GET_DATASETTYPE_QUERY="select dst from DatasetType as dst";
     
     public static List getDatasetTypes(Session session) throws EmfException{
-        System.out.println("In getMessages");
+        log.debug("In getMessages");
         ArrayList datasetTypes = new ArrayList();
         
         Transaction tx = session.beginTransaction();
@@ -41,15 +45,17 @@ public class DatasetTypesDAO {
         }
         
         tx.commit();
-        System.out.println("End getMessages");
+        log.debug("End getMessages");
         return datasetTypes;
     }//getDatasetTypes()
     
     public static void insertDatasetType(DatasetType aDst, Session session){
+    	log.debug("inserting datatype into database");
         Transaction tx = session.beginTransaction();
         session.save(aDst);
         session.flush();
         tx.commit();
+    	log.debug("inserting datatype into database");
     }
     
 

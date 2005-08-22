@@ -15,29 +15,34 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author Conrad F. D'Cruz
  *
  */
 public class DataSourceFactory {
+    private static Log log = LogFactory.getLog(DataSourceFactory.class);
 
     public static DataSource getDataSource() throws InfrastructureException{
-        DataSource ds = null;
-        
+    	log.debug("get data source");
+        DataSource ds = null;        
         try{
             Context ctx = new InitialContext();
             if(ctx == null ) 
                 throw new Exception("No Context");
-            System.out.println("BEFORE: Is datasource null? " + (ds ==null));
+            log.debug("BEFORE: Is datasource null? " + (ds ==null));
             ds = (DataSource)ctx.lookup("java:/comp/env/jdbc/EMFDB");
-            System.out.println("AFTER: Is datasource null? " + (ds ==null));
+            log.debug("AFTER: Is datasource null? " + (ds ==null));
         }catch (NamingException ex){
-            ex.printStackTrace();
+            log.error(ex);
             throw new InfrastructureException("Server configuration error");
         }catch(Exception ex) {
-            ex.printStackTrace();
+            log.error(ex);
             throw new InfrastructureException("Server configuration error");
         }
+    	log.debug("get data source");
         return ds;  
     }
 

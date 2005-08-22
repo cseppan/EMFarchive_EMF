@@ -16,6 +16,8 @@ import gov.epa.emissions.framework.services.StatusServices;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 
 /**
@@ -23,6 +25,8 @@ import org.hibernate.Session;
  *
  */
 public class StatusServicesImpl implements StatusServices{
+
+	private static Log log = LogFactory.getLog(StatusServicesImpl.class);
 
     /**
      * 
@@ -35,9 +39,11 @@ public class StatusServicesImpl implements StatusServices{
      * @see gov.epa.emissions.framework.commons.EMFData#getMessages(java.lang.String)
      */
     public Status[] getMessages(String userName) throws EmfException {
+    	log.debug("get all status messages of for user " +userName);
         Session session = HibernateUtils.currentSession();
         List allStats = StatusDAO.getMessages(userName,session);
-        System.out.println("Total number of messages in the List= " + allStats.size());
+        log.debug("Total number of messages in the List= " + allStats.size());
+    	log.debug("get all status messages of for user " +userName);
         return (Status[]) allStats.toArray(new Status[allStats.size()]);
     }
 
@@ -45,16 +51,21 @@ public class StatusServicesImpl implements StatusServices{
      * @see gov.epa.emissions.framework.commons.EMFData#getMessages(java.lang.String, java.lang.String)
      */
     public Status[] getMessages(String userName, String type) throws EmfException {
-        // TODO Auto-generated method stub
-        return null;
+    	log.debug("get all status messages of type "+type+" for user " +userName);
+        Session session = HibernateUtils.currentSession();
+        List allStats = StatusDAO.getMessages(userName,type,session);
+        log.debug("Total number of messages in the List= " + allStats.size());
+    	log.debug("get all status messages of type "+type+" for user " +userName);
+        return (Status[]) allStats.toArray(new Status[allStats.size()]);
     }
 
     public void setStatus(Status status) throws EmfException{
-        System.out.println("EMFStatusService: setStatus " + status.getUserName());
+    	log.debug("EMFStatusService: setStatus " + status.getUserName());
         Session session = HibernateUtils.currentSession();
-        System.out.println("EMFStatusService: Before insertStatusMessage");
+        log.debug("EMFStatusService: Before insertStatusMessage");
         StatusDAO.insertStatusMessage(status,session);
-        System.out.println("EMFStatusService: After insertStatusMessage");
+        log.debug("EMFStatusService: After insertStatusMessage");
+    	log.debug("EMFStatusService: setStatus " + status.getUserName());
     }
     
 

@@ -97,7 +97,7 @@ public class ExImTask implements Runnable {
       try {
         statusSvc.setStatus(startStatus);
         
-        System.out.println("In NEW THREAD start import: AFTER SETTING START IMPORT MESSAGE");
+        log.debug("In NEW THREAD start import: AFTER SETTING START IMPORT MESSAGE");
           
         // Call the importer
 //		DummyImporter imptr = new DummyImporter(DataSourceFactory.getDataSource(),file);
