@@ -9,3 +9,4 @@ wsdl_build
 *.jpage
 build.properties
 bak
+junit*.properties

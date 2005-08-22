@@ -4,13 +4,13 @@ public class EmfException extends Exception {
 
     String details;
     
-    public EmfException(String description, String details, Throwable cause) {
-        super(description, cause);
+    public EmfException(String message, String details, Throwable cause) {
+        super(message, cause);
         this.details = details;
     }
 
-    public EmfException(String description, String details) {
-        super(description);
+    public EmfException(String message, String details) {
+        super(message);
         this.details = details;
     }
 

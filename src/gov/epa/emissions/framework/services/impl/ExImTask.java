@@ -9,14 +9,12 @@
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.importer.DatasetTypes;
 import gov.epa.emissions.commons.io.importer.TableTypes;
 import gov.epa.emissions.commons.io.importer.orl.ORLImporter;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.dao.DataSourceFactory;
 import gov.epa.emissions.framework.services.DatasetType;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.Status;
@@ -37,15 +35,19 @@ public class ExImTask implements Runnable {
 
     private File file;
 
-    private StatusServices statusSvc = null;
+    private StatusServices statusServices = null;
 
     private DatasetType datasetType;
 
-    public ExImTask(User user, File file, DatasetType datasetType, StatusServices statusSvc2) {
+    private DbServer dbServer;
+
+    public ExImTask(User user, File file, DatasetType datasetType, StatusServices statusServices, DbServer dbServer) {
         this.user = user;
         this.file = file;
-        this.statusSvc = statusSvc2;
+        this.statusServices = statusServices;
         this.datasetType = datasetType;
+
+        this.dbServer = dbServer;
     }
 
     public void run() {
@@ -54,31 +56,12 @@ public class ExImTask implements Runnable {
         try {
             setStartStatus();
 
-            // Create an instance of the EmfDataset
-            Dataset dataset = new EmfDataset();
+            Dataset dataset = createOrlDataset();
 
-            // FIXME: why hard code the table type ?
-            String tableType = TableTypes.ORL_AREA_NONPOINT_TOXICS;
-            String filename = file.getName();
-            String table = filename.substring(0, filename.length() - 4).replace('.', '_');
-
-            dataset.setDatasetType(datasetType.getName());
-            dataset.addDataTable(tableType, table);
-            String summaryTableType = DatasetTypes.getSummaryTableType(datasetType.getName());
-            dataset.addDataTable(summaryTableType, table + "_summary");
-
-            // FIXME: we should not hard-code the db server
-            
-            
-            // Get an instance of a DbServer
-            DbServer dbServer = new PostgresDbServer(DataSourceFactory.getDataSource().getConnection(), "reference",
-                    "emissions");
-
-            // Get the specific type of importer for the filetype requested by
-            // user for import
+            // FIXME: Get the specific type of importer for the filetype. Use a
+            // Factory pattern
             ORLImporter importer = new ORLImporter(dbServer, false, true);
 
-            // Invoke the importer for the specific file
             importer.run(new File[] { file }, dataset, true);
 
             setEndStatus();
@@ -87,6 +70,21 @@ public class ExImTask implements Runnable {
         }
 
         log.info("importing of file: " + file.getName() + " of type: " + datasetType.getName() + " complete");
+    }
+
+    private Dataset createOrlDataset() {
+        Dataset dataset = new EmfDataset();
+
+        // FIXME: why hard code the table type ?
+        String filename = file.getName();
+        String table = filename.substring(0, filename.length() - 4).replace('.', '_');
+
+        dataset.setDatasetType(datasetType.getName());
+        dataset.addDataTable(TableTypes.ORL_AREA_NONPOINT_TOXICS, table);
+        String summaryTableType = DatasetTypes.getSummaryTableType(datasetType.getName());
+        dataset.addDataTable(summaryTableType, table + "_summary");
+
+        return dataset;
     }
 
     private void setStartStatus() throws EmfException {
@@ -104,7 +102,7 @@ public class ExImTask implements Runnable {
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 
-        statusSvc.setStatus(endStatus);
+        statusServices.setStatus(endStatus);
     }
 
 }

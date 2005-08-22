@@ -1,7 +1,11 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.commons.io.importer.DatasetTypes;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
+
+import java.io.File;
+
 import junit.framework.TestCase;
 
 public abstract class ExImServicesTestCase extends TestCase {
@@ -28,12 +32,16 @@ public abstract class ExImServicesTestCase extends TestCase {
     }
 
     public void testImportOrlNonPoint() throws EmfException {
-        DatasetType[] datasetTypes = eximService.getDatasetTypes();
+        DatasetType datasetType = new DatasetType();
+        datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
         User user = userService.getUser("emf");
 
-        // FIXME: this should be generic, and not hard-coded. ??
-        String filename = "c:/CEP/projects/EMF/test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt";
-        eximService.startImport(user, filename, datasetTypes[0]);
+        File userDir = new File(System.getProperty("user.dir"));
+        File file = new File(userDir, "test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt");
+
+        eximService.startImport(user, file.getPath(), datasetType);
+
+        // TODO: verify status
     }
 
     // TODO: rename & redo this test

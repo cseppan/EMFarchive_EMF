@@ -8,6 +8,8 @@
  */
 package gov.epa.emissions.framework.services.impl;
 
+import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.mysql.MySqlDbServer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.DatasetType;
@@ -17,6 +19,11 @@ import gov.epa.emissions.framework.services.User;
 
 import java.io.File;
 import java.util.List;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,11 +37,15 @@ public class ExImServicesImpl implements ExImServices {
 
     private static Log log = LogFactory.getLog(ExImServicesImpl.class);
 
-    public ExImServicesImpl() {
+    private DataSource datasource;
 
+    public ExImServicesImpl() throws NamingException {
+        // TODO: should we move this into an abstract super class ?
+        Context ctx = new InitialContext();
+        datasource = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
     }
 
-    private File checkFile(String fileName) throws EmfException {
+    private File validateFile(String fileName) throws EmfException {
         log.debug("check if file exists " + fileName);
         File file = new File(fileName);
 
@@ -43,36 +54,28 @@ public class ExImServicesImpl implements ExImServices {
             throw new EmfException("file " + fileName + " not found");
         }
         log.debug("check if file exists " + fileName);
+        
         return file;
     }
 
-    public void startImport(User user, String fileName, DatasetType datasetType) throws EmfException {
-
+    public void startImport(User user, String filename, DatasetType datasetType) throws EmfException {
         log.debug("In ExImServicesImpl:startImport START");
 
-        File file = null;
-
         try {
-            file = checkFile(fileName);
-
-            /*
-             * Since the ExImTask is creating the status messages in a seperate
-             * thread Send in an instance of the statusService and the username
-             * of the user that invoked this service
-             */
-
-            // FIXME: Replace with factory method to get the status service
+            File file = validateFile(filename);
             StatusServices statusSvc = new StatusServicesImpl();
 
-            // FixMe: Create DbServer object and pass it into the ExImTask
-            // DbServer dbServer
-            ExImTask eximTask = new ExImTask(user, file, datasetType, statusSvc);
+            // FIXME: we should not hard-code the db server. Also, read the
+            // datasource names from properties
+            DbServer dbServer = new MySqlDbServer(datasource.getConnection(), "reference", "emissions", null, null);
+
+            ExImTask eximTask = new ExImTask(user, file, datasetType, statusSvc, dbServer);
             eximTask.run();
-            eximTask = null;
-        } catch (EmfException e) {
-            log.error("EMFException", e);
+        } catch (Exception e) {
+            log.error("Exception attempting to start import of file: " + filename, e);
             throw new EmfException(e.getMessage());
         }
+
         log.debug("In ExImServicesImpl:startImport END");
     }
 
@@ -82,6 +85,7 @@ public class ExImServicesImpl implements ExImServices {
         Session session = HibernateUtils.currentSession();
         List datasettypes = DatasetTypesDAO.getDatasetTypes(session);
         log.debug("In ExImServicesImpl:getDatasetTypes END");
+        
         return (DatasetType[]) datasettypes.toArray(new DatasetType[datasettypes.size()]);
     }
 
@@ -90,6 +94,7 @@ public class ExImServicesImpl implements ExImServices {
 
         Session session = HibernateUtils.currentSession();
         DatasetTypesDAO.insertDatasetType(aDst, session);
+        
         log.debug("In ExImServicesImpl:insertDatasetType END");
 
     }

@@ -8,6 +8,6 @@ public interface ExImServices extends EMFService {
 
     public DatasetType[] getDatasetTypes() throws EmfException;
 
-    public void insertDatasetType(DatasetType aDstn) throws EmfException;
+    public void insertDatasetType(DatasetType datasetType) throws EmfException;
 
 }

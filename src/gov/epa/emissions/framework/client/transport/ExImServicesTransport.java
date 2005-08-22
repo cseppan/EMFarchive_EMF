@@ -63,51 +63,6 @@ public class ExImServicesTransport implements ExImServices {
     }
 
     /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.commons.ExImServices#startImport(java.lang.String, java.lang.String, java.lang.String)
-     */
-    public void startImport(String userName, String fileName, String fileType) throws EmfException {
-        Service  service = new Service();
-        Call     call;
-
-        try {
-            call = (Call) service.createCall();
-            call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            
-            QName qname3 = new QName("urn:gov.epa.emf.ExImServices", "startImport");
-            
-            call.setOperationName(qname3);
-            
-            call.addParameter("username",
-                    org.apache.axis.Constants.XSD_STRING,
-                    javax.xml.rpc.ParameterMode.IN);
-
-            call.addParameter("filename",
-                            org.apache.axis.Constants.XSD_STRING,
-                            javax.xml.rpc.ParameterMode.IN);
-		    call.addParameter("filetype",
-                            org.apache.axis.Constants.XSD_STRING,
-                            javax.xml.rpc.ParameterMode.IN);
-		          
-            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
-            
-            call.invoke( new Object[] {userName, fileName, fileType} );
-            
-        } catch (ServiceException e) {
-            System.out.println("Error invoking the service");
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            System.out.println("Error in format of URL string");
-            e.printStackTrace();
-        } catch (AxisFault fault){
-            throw new EmfException(extractMessage(fault.getMessage()));           
-        }catch (RemoteException e) {
-            System.out.println("Error communicating with WS end point");
-            e.printStackTrace();
-        }
-        
-    }
-
-    /* (non-Javadoc)
      * @see gov.epa.emissions.framework.commons.ExImServices#startImport(gov.epa.emissions.framework.commons.User, java.lang.String, gov.epa.emissions.framework.commons.DatasetType)
      */
     public void startImport(User user, String fileName, DatasetType datasetType) throws EmfException {
