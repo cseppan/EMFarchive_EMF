@@ -20,30 +20,30 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Conrad F. D'Cruz
- *
+ * 
  */
 public class DataSourceFactory {
     private static Log log = LogFactory.getLog(DataSourceFactory.class);
 
-    public static DataSource getDataSource() throws InfrastructureException{
-    	log.debug("get data source");
-        DataSource ds = null;        
-        try{
+    public static DataSource getDataSource() throws InfrastructureException {
+        log.debug("get data source");
+        DataSource ds = null;
+        try {
             Context ctx = new InitialContext();
-            if(ctx == null ) 
+            if (ctx == null)
                 throw new Exception("No Context");
-            log.debug("BEFORE: Is datasource null? " + (ds ==null));
-            ds = (DataSource)ctx.lookup("java:/comp/env/jdbc/EMFDB");
-            log.debug("AFTER: Is datasource null? " + (ds ==null));
-        }catch (NamingException ex){
+            log.debug("BEFORE: Is datasource null? " + (ds == null));
+            ds = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
+            log.debug("AFTER: Is datasource null? " + (ds == null));
+        } catch (NamingException ex) {
             log.error(ex);
             throw new InfrastructureException("Server configuration error");
-        }catch(Exception ex) {
+        } catch (Exception ex) {
             log.error(ex);
             throw new InfrastructureException("Server configuration error");
         }
-    	log.debug("get data source");
-        return ds;  
+        log.debug("get data source");
+        return ds;
     }
 
 }

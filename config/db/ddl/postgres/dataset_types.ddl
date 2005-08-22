@@ -8,4 +8,4 @@ CREATE TABLE emf.datasettypes
   uid varchar(32)
 ) 
 WITHOUT OIDS;
-ALTER TABLE datasettypes OWNER TO emf;
+ALTER TABLE emf.datasettypes OWNER TO emf;

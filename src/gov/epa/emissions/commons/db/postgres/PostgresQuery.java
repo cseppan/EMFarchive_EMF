@@ -28,16 +28,16 @@ public class PostgresQuery implements Query {
     // FIXME: duplicate methods in both datasources
     public ResultSet select(String[] columnNames, String tableName) throws SQLException {
         final String selectPrefix = "SELECT ";
-        StringBuffer sb = new StringBuffer(selectPrefix);
-        sb.append(columnNames[0]);
+        StringBuffer query = new StringBuffer(selectPrefix);
+        query.append(columnNames[0]);
         for (int i = 1; i < columnNames.length; i++) {
-            sb.append("," + columnNames[i]);
+            query.append("," + columnNames[i]);
         }
         final String fromSuffix = " FROM " + tableName;
-        sb.append(fromSuffix);
+        query.append(fromSuffix);
 
-        Statement statement = connection.createStatement();
-        statement.execute(sb.toString());
+        Statement statement = connection.createStatement();    
+        statement.execute(query.toString());
 
         return statement.getResultSet();
     }

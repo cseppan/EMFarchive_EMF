@@ -54,7 +54,7 @@ public class ExImServicesImpl implements ExImServices {
             throw new EmfException("file " + fileName + " not found");
         }
         log.debug("check if file exists " + fileName);
-        
+
         return file;
     }
 
@@ -85,7 +85,7 @@ public class ExImServicesImpl implements ExImServices {
         Session session = HibernateUtils.currentSession();
         List datasettypes = DatasetTypesDAO.getDatasetTypes(session);
         log.debug("In ExImServicesImpl:getDatasetTypes END");
-        
+
         return (DatasetType[]) datasettypes.toArray(new DatasetType[datasettypes.size()]);
     }
 
@@ -94,7 +94,7 @@ public class ExImServicesImpl implements ExImServices {
 
         Session session = HibernateUtils.currentSession();
         DatasetTypesDAO.insertDatasetType(aDst, session);
-        
+
         log.debug("In ExImServicesImpl:insertDatasetType END");
 
     }

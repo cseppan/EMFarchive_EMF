@@ -303,6 +303,7 @@
     >
         <delete file="${tomcat.webapps}/${app.name}.war" />
         <delete dir="${tomcat.webapps}/${app.name}" />
+        <delete dir="${tomcat.home}/work/Standalone/localhost/emf" />
         <copy todir="${tomcat.webapps}" file="${build.home}/${app.name}.war" />
     </target>
 
