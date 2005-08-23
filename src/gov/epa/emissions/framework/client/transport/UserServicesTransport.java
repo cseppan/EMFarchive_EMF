@@ -56,7 +56,7 @@ public class UserServicesTransport implements UserServices {
         
     /**
      * 
-     * This utility method extracts the significat message from the Axis Fault
+     * This utility method extracts the significant message from the Axis Fault
      * @param faultReason
      * @return
      */

@@ -23,6 +23,8 @@ import javax.xml.rpc.ServiceException;
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Conrad F. D'Cruz
@@ -31,6 +33,7 @@ import org.apache.axis.client.Service;
  *
  */
 public class ExImServicesTransport implements ExImServices {
+    private static Log log = LogFactory.getLog(ExImServicesTransport.class);
 
     private static String endpoint = "";
 
@@ -54,11 +57,13 @@ public class ExImServicesTransport implements ExImServices {
      * @return
      */
     private String extractMessage(String faultReason) {
-        String message = faultReason.substring(faultReason.indexOf("Exception: ") + 11);
+    	log.debug("Extracting significant message from Axis fault");
+    	String message = faultReason.substring(faultReason.indexOf("Exception: ") + 11);
 //        if (message.equals("Connection refused: connect")){
 //            message = "Cannot communicate with EMF Server";
 //        }
         
+    	log.debug("Extracting significant message from Axis fault");
         return message;
     }
 
@@ -66,7 +71,8 @@ public class ExImServicesTransport implements ExImServices {
      * @see gov.epa.emissions.framework.commons.ExImServices#startImport(gov.epa.emissions.framework.commons.User, java.lang.String, gov.epa.emissions.framework.commons.DatasetType)
      */
     public void startImport(User user, String fileName, DatasetType datasetType) throws EmfException {
-        Service  service = new Service();
+    	log.debug("Begin import file for user:filename:datasettype:: " + user.getUserName() + " :: " + fileName + " :: " + datasetType.getName());
+    	Service  service = new Service();
         Call     call;
 
         try {
@@ -102,19 +108,18 @@ public class ExImServicesTransport implements ExImServices {
             call.invoke( new Object[] {user, fileName, datasetType} );
             
         } catch (ServiceException e) {
-            System.out.println("Error invoking the service");
-            e.printStackTrace();
+            log.error("Error invoking the service",e);
         } catch (MalformedURLException e) {
-            System.out.println("Error in format of URL string");
-            e.printStackTrace();
+            System.out.println();
+            log.error("Error in format of URL string",e);
         } catch (AxisFault fault){
-            fault.printStackTrace();
+            log.error("Axis Fault details",fault);
             throw new EmfException(extractMessage(fault.getMessage()));           
         }catch (RemoteException e) {
-            System.out.println("Error communicating with WS end point");
-            e.printStackTrace();
+            log.error("Error communicating with WS end point",e);
         }
         
+    	log.debug("Begin import file for user:filename:datasettype:: " + user.getUserName() + " :: " + fileName + " :: " + datasetType.getName());
         
     }
 
@@ -122,7 +127,8 @@ public class ExImServicesTransport implements ExImServices {
      * @see gov.epa.emissions.framework.commons.ExImServices#getDatasetTypes()
      */
     public DatasetType[] getDatasetTypes() throws EmfException {
-   
+    	log.debug("Get all dataset types");
+
     	// Call the ExImServices endpoint and acquire the array of all dataset types
     	//defined in the system
         DatasetType[] datasetTypes = null;;
@@ -157,17 +163,16 @@ public class ExImServicesTransport implements ExImServices {
             datasetTypes = (DatasetType[])obj;
             
         } catch (ServiceException e) {
-            System.out.println("Error invoking the service");
-            e.printStackTrace();
+            log.error("Error invoking the service",e);
         } catch (MalformedURLException e) {
-            System.out.println("Error in format of URL string");
-            e.printStackTrace();
+            log.error("Error in format of URL string",e);
         } catch (AxisFault fault){
+        	log.error("Axis fault details",fault);
             throw new EmfException(extractMessage(fault.getMessage()));           
         }catch (RemoteException e) {
-            System.out.println("Error communicating with WS end point");
-            e.printStackTrace();
+            log.error("Error communicating with WS end point",e);
         }
+    	log.debug("Get all dataset types");
     	return datasetTypes;
     }
 
@@ -175,7 +180,8 @@ public class ExImServicesTransport implements ExImServices {
      * @see gov.epa.emissions.framework.services.ExImServices#insertDatasetType(gov.epa.emissions.framework.services.DatasetType)
      */
     public void insertDatasetType(DatasetType aDstn) throws EmfException {
-        Service  service = new Service();
+    	log.debug("insert a new dataset type object: " + aDstn.getName());
+    	Service  service = new Service();
         Call     call;
         try {
             call = (Call) service.createCall();
@@ -199,19 +205,17 @@ public class ExImServicesTransport implements ExImServices {
             call.invoke( new Object[] {aDstn} );
             
         } catch (ServiceException e) {
-            System.out.println("Error invoking the service");
-            e.printStackTrace();
+            log.error("Error invoking the service",e);
         } catch (MalformedURLException e) {
-            System.out.println("Error in format of URL string");
-            e.printStackTrace();
+            log.error("Error in format of URL string",e);
         } catch (AxisFault fault){
-            throw new EmfException(extractMessage(fault.getMessage()));           
+        	log.error("Axis Fault details",fault);
+        	throw new EmfException(extractMessage(fault.getMessage()));           
         }catch (RemoteException e) {
-            System.out.println("Error communicating with WS end point");
-            e.printStackTrace();
+            log.error("Error communicating with WS end point",e);
         }
-        
-        
+                
+    	log.debug("insert a new dataset type object: " + aDstn.getName());
        
     }
    

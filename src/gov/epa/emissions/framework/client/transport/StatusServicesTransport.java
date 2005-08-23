@@ -22,6 +22,8 @@ import javax.xml.rpc.ServiceException;
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Conrad F. D'Cruz
@@ -30,6 +32,7 @@ import org.apache.axis.client.Service;
  *
  */
 public class StatusServicesTransport implements StatusServices {
+    private static Log log = LogFactory.getLog(StatusServicesTransport.class);
 
     private static String endpoint = "";
 
@@ -53,11 +56,13 @@ public class StatusServicesTransport implements StatusServices {
      * @return
      */
     private String extractMessage(String faultReason) {
+    	log.debug("Utility method extracting Axis fault reason");
         String message = faultReason.substring(faultReason.indexOf("Exception: ") + 11);
         if (message.equals("Connection refused: connect")){
             message = "Cannot communicate with EMF Server";
         }
         
+    	log.debug("Utility method extracting Axis fault reason");
         return message;
     }
    
@@ -65,6 +70,7 @@ public class StatusServicesTransport implements StatusServices {
      * @see gov.epa.emissions.framework.commons.EMFStatus#getMessages(java.lang.String)
      */
     public Status[] getMessages(String userName) throws EmfException {
+    	log.debug("Getting all messages for user: " + userName);
         Status[] allStats = null;;
         
         Service  service = new Service();
@@ -99,18 +105,18 @@ public class StatusServicesTransport implements StatusServices {
             allStats = (Status[])obj;
             
         } catch (ServiceException e) {
-            System.out.println("Error invoking the service");
-            e.printStackTrace();
+            log.error("Error invoking the service", e);            
         } catch (MalformedURLException e) {
-            System.out.println("Error in format of URL string");
-            e.printStackTrace();
+            log.error("Error in format of URL string", e);            
         } catch (AxisFault fault){
+            log.error("Axis fault", fault);            
             throw new EmfException(extractMessage(fault.getMessage()));           
         }catch (RemoteException e) {
-            System.out.println("Error communicating with WS end point");
-            e.printStackTrace();
+            System.out.println();
+            log.error("Error communicating with WS end point", e);            
         }
 
+    	log.debug("Getting all messages for user: " + userName);
         return allStats;
     }
 
@@ -118,7 +124,7 @@ public class StatusServicesTransport implements StatusServices {
      * @see gov.epa.emissions.framework.commons.EMFStatus#getMessages(java.lang.String, java.lang.String)
      */
     public Status[] getMessages(String userName, String type) throws EmfException {
-        // TODO Auto-generated method stub
+        // FIXME: CONRAD Complete this method
         return null;
     }
 
@@ -126,7 +132,8 @@ public class StatusServicesTransport implements StatusServices {
      * @see gov.epa.emissions.framework.commons.EMFStatus#setStatus(gov.epa.emissions.framework.commons.Status)
      */
     public void setStatus(Status status) throws EmfException {
-        Service  service = new Service();
+    	log.debug("Setting status for user:message " + status.getUserName() + " :: " + status.getMessage());
+    	Service  service = new Service();
         Call     call;
         
         try {
@@ -147,18 +154,16 @@ public class StatusServicesTransport implements StatusServices {
             
             call.invoke( new Object[] {status} );
         } catch (ServiceException e) {
-            System.out.println("Error invoking the service");
-            e.printStackTrace();
+            log.error("Error invoking the service",e);
         } catch (MalformedURLException e) {
-            System.out.println("Error in format of URL string");
-            e.printStackTrace();
+            log.error("Error in format of URL string",e);
         } catch (AxisFault fault){
-            throw new EmfException(extractMessage(fault.getMessage()));           
+        	log.error("Axis Fault",fault);
+        	throw new EmfException(extractMessage(fault.getMessage()));           
         }catch (RemoteException e) {
-            System.out.println("Error communicating with WS end point");
-            e.printStackTrace();
+            log.error("Error communicating with WS end point",e);
         }
-        
+    	log.debug("Setting status for user:message " + status.getUserName() + " :: " + status.getMessage());        
     }
 
 }
