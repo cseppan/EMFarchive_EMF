@@ -1,9 +1,9 @@
-package gov.epa.emissions.commons.io.exporter;
+package gov.epa.emissions.commons.io.exporter.orl;
 
 import gov.epa.emissions.commons.db.DatabaseSetup;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
-import gov.epa.emissions.commons.io.exporter.ORLExporter;
+import gov.epa.emissions.commons.io.exporter.orl.ORLExporter;
 import gov.epa.emissions.commons.io.importer.DatasetTypes;
 import gov.epa.emissions.commons.io.importer.TableTypes;
 
