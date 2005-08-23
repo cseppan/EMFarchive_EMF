@@ -25,6 +25,7 @@ public class StatusTableModelTest extends MockObjectTestCase {
 
         model = new StatusTableModel();
         assertEquals(0, model.getRowCount());
+        assertNull("No data on creation", model.getValueAt(0, 0));
         
         model.refresh(status);
         assertEquals(2, model.getRowCount());

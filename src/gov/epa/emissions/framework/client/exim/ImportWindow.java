@@ -108,7 +108,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
                     return;
 
                 clearMessagePanel();
-                postMessageUpdate();
+                doImport();
             }
 
         });
@@ -146,9 +146,11 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         super.validate();
     }
 
-    private void postMessageUpdate() {
+    private void doImport() {
         try {
+            System.err.println("start import..");
             presenter.notifyImport((DatasetType) datasetTypesModel.getSelectedItem(), filename.getText());
+            System.err.println("start import complete.");
             String message = "Started importing " + name.getText() + " [ " + filename.getText() + " ]...."
                     + "Please monitor the Status window to track your Import task.";
             messagePanel.setMessage(message);

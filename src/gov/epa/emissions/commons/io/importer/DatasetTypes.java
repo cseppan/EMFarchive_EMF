@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @version $Id: DatasetTypes.java,v 1.2 2005/08/12 16:44:09 rhavaldar Exp $
+ * @version $Id: DatasetTypes.java,v 1.3 2005/08/23 20:28:27 rhavaldar Exp $
  * 
  */
 public final class DatasetTypes {
@@ -28,13 +28,13 @@ public final class DatasetTypes {
 
     public static final String IDA_MOBILE_ACTIVITY = "IDA Mobile Activity Inventory";
 
-    public static final String ORL_AREA_NONPOINT_TOXICS = "ORL Nonpoint Source Toxics Inventory";
+    public static final String ORL_AREA_NONPOINT_TOXICS = "ORL Nonpoint Inventory";
 
-    public static final String ORL_AREA_NONROAD_TOXICS = "ORL Nonroad Source Toxics Inventory";
+    public static final String ORL_AREA_NONROAD_TOXICS = "ORL Nonroad Inventory";
 
-    public static final String ORL_MOBILE_TOXICS = "ORL Mobile Onroad Source Toxics Inventory";
+    public static final String ORL_MOBILE_TOXICS = "ORL Onroad Inventory";
 
-    public static final String ORL_POINT_TOXICS = "ORL Point Source Toxics Inventory";
+    public static final String ORL_POINT_TOXICS = "ORL Point Inventory";
 
     public static final String REFERENCE = "Reference";
 

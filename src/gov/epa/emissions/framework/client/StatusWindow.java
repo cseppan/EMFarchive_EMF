@@ -46,7 +46,7 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(messagePanel, BorderLayout.EAST);
         layout.add(panel, BorderLayout.NORTH);
-        
+
         layout.add(createTable(), BorderLayout.CENTER);
 
         return layout;
@@ -83,10 +83,12 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
     }
 
     public void update(Status[] statuses) {
+        System.err.println("about to update...");
         messagePanel.setMessage("Last Update : " + new Date(), Color.GRAY);
         statusTableModel.refresh(statuses);
 
-        super.validate();
+        super.revalidate();
+        System.err.println("update complete");
     }
 
     public void notifyError(String message) {

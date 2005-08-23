@@ -9,7 +9,7 @@
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.commons.db.mysql.MySqlDbServer;
+import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.DatasetType;
@@ -67,10 +67,11 @@ public class ExImServicesImpl implements ExImServices {
 
             // FIXME: we should not hard-code the db server. Also, read the
             // datasource names from properties
-            DbServer dbServer = new MySqlDbServer(datasource.getConnection(), "reference", "emissions", null, null);
+            DbServer dbServer = new PostgresDbServer(datasource.getConnection(), "reference", "emissions");
 
             ExImTask eximTask = new ExImTask(user, file, datasetType, statusSvc, dbServer);
-            eximTask.run();
+            //FIXME: use a thread pool
+            new Thread(eximTask).start();
         } catch (Exception e) {
             log.error("Exception attempting to start import of file: " + filename, e);
             throw new EmfException(e.getMessage());

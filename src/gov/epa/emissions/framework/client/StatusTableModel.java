@@ -21,6 +21,7 @@ public class StatusTableModel extends AbstractTableModel {
     public StatusTableModel() {
         this.header = new TableHeader(new String[] { "Username", "Message Type", "Message", "Timestamp" });
         this.statuses = new Status[0];
+        this.rows = new ArrayList();
     }
 
     public int getRowCount() {
@@ -36,6 +37,9 @@ public class StatusTableModel extends AbstractTableModel {
     }
 
     public Object getValueAt(int row, int column) {
+        if ((rows.size() - 1 < row) || (column > header.columnsSize() - 1))
+            return null;
+
         return ((Row) rows.get(row)).getValueAt(column);
     }
 

@@ -101,7 +101,7 @@ public class StatusDAO {
             aStatus.setMsgRead();
             allStatus.add(aStatus);  
         }
-        
+        session.flush();
         tx.commit();
         log.debug("End getMessages");
         return allStatus;
