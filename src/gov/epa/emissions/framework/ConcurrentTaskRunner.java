@@ -37,8 +37,8 @@ public class ConcurrentTaskRunner implements TaskRunner {
                 while (alive) {
                     task.run();
                     try {
-                        // TODO: what's a reasonable polling time ? configurable
-                        mutex.wait(2000);
+                        // TODO: what's a reasonable polling time ? 
+                        mutex.wait(5000);
                     } catch (InterruptedException e) {
                         alive = false;
                     }

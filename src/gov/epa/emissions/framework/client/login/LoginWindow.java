@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.EmfWindow;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
 import gov.epa.emissions.framework.client.admin.RegisterUserPresenter;
 import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
@@ -58,7 +59,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        messagePanel = new MessagePanel();
+        messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
         panel.add(createLoginPanel());
         panel.add(createButtonsPanel());

@@ -2,32 +2,20 @@ package gov.epa.emissions.framework.client;
 
 import java.awt.Color;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class MessagePanel extends JPanel {
-
-    private JLabel label;
-
-    public MessagePanel() {
-        label = new JLabel();
-        super.add(label);
-    }
+public abstract class MessagePanel extends JPanel {
 
     public void setError(String error) {
-        clear();
-        label.setForeground(Color.RED);
-        label.setText(error);
-    }
-
-    public void clear() {
-        label.setText("");
+        setMessage(error, Color.RED);
     }
 
     public void setMessage(String message) {
-        clear();
-        label.setForeground(Color.BLUE);
-        label.setText(message);
+        setMessage(message, Color.BLUE);
     }
+
+    abstract public void clear();
+
+    abstract public void setMessage(String message, Color color);
 
 }

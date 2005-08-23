@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.User;
 
 import java.awt.BorderLayout;
@@ -61,7 +62,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
     private JPanel createLayout() {
         JPanel layout = new JPanel();
 
-        messagePanel = new MessagePanel();
+        messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
         layout.add(createProfilePanel());
         layout.add(createLoginPanel());

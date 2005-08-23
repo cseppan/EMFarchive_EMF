@@ -53,7 +53,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         JMenuBar menuBar = createMenuBar();
         super.setJMenuBar(menuBar);
 
-        messagePanel = new MessagePanel();
+        messagePanel = new SingleLineMessagePanel();
         menuBar.add(messagePanel);
 
         desktop = new JDesktopPane();

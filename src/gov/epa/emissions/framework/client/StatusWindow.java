@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.util.Date;
@@ -23,7 +24,7 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
     private StatusTableModel statusTableModel;
 
     public StatusWindow(User user, StatusServices statusServices, Container parent) {
-        super("Status Messages");
+        super("Status");
 
         position(parent);
         super.setContentPane(createLayout());
@@ -41,9 +42,11 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
         JPanel layout = new JPanel();
         layout.setLayout(new BorderLayout());
 
-        messagePanel = new MessagePanel();
-        layout.add(messagePanel, BorderLayout.NORTH);
-
+        messagePanel = new SingleLineMessagePanel();
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(messagePanel, BorderLayout.EAST);
+        layout.add(panel, BorderLayout.NORTH);
+        
         layout.add(createTable(), BorderLayout.CENTER);
 
         return layout;
@@ -80,7 +83,7 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
     }
 
     public void update(Status[] statuses) {
-        messagePanel.setMessage("Last Update @ " + new Date());
+        messagePanel.setMessage("Last Update : " + new Date(), Color.GRAY);
         statusTableModel.refresh(statuses);
 
         super.validate();

@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.MultiLineMessagePanel;
 import gov.epa.emissions.framework.services.DatasetType;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
@@ -40,17 +41,18 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         super("Import Dataset");
         this.eximServices = eximServices;
 
+        Dimension size = new Dimension(500, 275);
+        setSize(size);
+
         JPanel layoutPanel = createLayout();
         this.getContentPane().add(layoutPanel);
-
-        setSize(new Dimension(500, 225));
     }
 
     private JPanel createLayout() throws EmfException {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        messagePanel = new MessagePanel();
+        messagePanel = new MultiLineMessagePanel(new Dimension(400, 100));
         panel.add(messagePanel);
         panel.add(createImportPanel());
         panel.add(createButtonsPanel());
@@ -105,16 +107,8 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
                 if (presenter == null)
                     return;
 
-                messagePanel.clear();
-                refresh();
-                try {
-                    presenter.notifyImport((DatasetType) datasetTypesModel.getSelectedItem(), filename.getText());
-                    messagePanel.setMessage("Imported " + name.getText() + " [ " + filename.getText()
-                            + " ] successfully.");
-                } catch (EmfException e) {
-                    e.printStackTrace();
-                    messagePanel.setError(e.getMessage());
-                }
+                clearMessagePanel();
+                postMessageUpdate();
             }
 
         });
@@ -150,5 +144,24 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
 
     private void refresh() {
         super.validate();
+    }
+
+    private void postMessageUpdate() {
+        try {
+            presenter.notifyImport((DatasetType) datasetTypesModel.getSelectedItem(), filename.getText());
+            String message = "Started importing " + name.getText() + " [ " + filename.getText() + " ]...."
+                    + "Please monitor the Status window to track your Import task.";
+            messagePanel.setMessage(message);
+
+            name.setText("");
+            filename.setText("");
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void clearMessagePanel() {
+        messagePanel.clear();
+        refresh();
     }
 }

@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
@@ -77,7 +78,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
     private void createLayout() {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        messagePanel = new MessagePanel();
+        messagePanel = new SingleLineMessagePanel();
         this.add(messagePanel);
         this.add(createProfilePanel());
         this.add(createLoginPanel());
