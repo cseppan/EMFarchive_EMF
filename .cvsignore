@@ -10,3 +10,4 @@ wsdl_build
 build.properties
 bak
 junit*.properties
+*.EXPORTED

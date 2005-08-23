@@ -13,4 +13,6 @@ public interface Query {
 
     void insertRow(String table, String[] data, String[] colTypes) throws SQLException;
 
+    ResultSet selectAll(String table) throws SQLException;
+
 }

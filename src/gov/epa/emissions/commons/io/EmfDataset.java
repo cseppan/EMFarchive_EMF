@@ -1,6 +1,5 @@
 package gov.epa.emissions.commons.io;
 
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +17,8 @@ public class EmfDataset implements Dataset {
     private String datasetType;
 
     private String region;
+
+    private String country;
 
     public EmfDataset() {
         dataTables = new HashMap();
@@ -80,6 +81,14 @@ public class EmfDataset implements Dataset {
     }
 
     public void setDataSources(Map dataSources) {
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 
 }

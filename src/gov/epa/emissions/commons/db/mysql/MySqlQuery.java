@@ -75,4 +75,7 @@ public class MySqlQuery implements Query {
         execute(sb.toString());
     }
 
+    public ResultSet selectAll(String table) throws SQLException {
+        return select(new String[] { "*" }, table);
+    }
 }

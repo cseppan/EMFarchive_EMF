@@ -37,4 +37,8 @@ public interface Dataset {
     void addDataTable(String tableType, String tableName);
 
     void setDataSources(Map dataSources);
+
+    String getCountry();
+
+    void setCountry(String country);
 }

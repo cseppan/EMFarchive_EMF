@@ -83,12 +83,10 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
     }
 
     public void update(Status[] statuses) {
-        System.err.println("about to update...");
         messagePanel.setMessage("Last Update : " + new Date(), Color.GRAY);
         statusTableModel.refresh(statuses);
 
-        super.revalidate();
-        System.err.println("update complete");
+        super.revalidate();//TODO: invalidate ? validate ?
     }
 
     public void notifyError(String message) {

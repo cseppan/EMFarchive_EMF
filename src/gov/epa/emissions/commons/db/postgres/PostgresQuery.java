@@ -36,7 +36,7 @@ public class PostgresQuery implements Query {
         final String fromSuffix = " FROM " + tableName;
         query.append(fromSuffix);
 
-        Statement statement = connection.createStatement();    
+        Statement statement = connection.createStatement();
         statement.execute(query.toString());
 
         return statement.getResultSet();
@@ -62,6 +62,10 @@ public class PostgresQuery implements Query {
         query.append(')');// close parentheses around the query
 
         execute(query.toString());
+    }
+
+    public ResultSet selectAll(String table) throws SQLException {
+        return select(new String[] { "*" }, table);
     }
 
 }
