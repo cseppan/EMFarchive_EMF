@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.exim;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.MultiLineMessagePanel;
-import gov.epa.emissions.framework.services.DatasetType;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
