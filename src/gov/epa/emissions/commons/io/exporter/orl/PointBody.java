@@ -150,19 +150,19 @@ public class PointBody implements ORLBody {
             if (data.getString(25) == null)
                 writer.print("-9" + Formatter.DELIMITER);
             else
-                writer.print(ORLFormats.AVD_EMIS_FORMAT.format(data.getDouble(25)) + Formatter.DELIMITER);
+                writer.print(AvdEmisFormatter.FORMAT.format(data.getDouble(25)) + Formatter.DELIMITER);
 
             // CEFF field
             if (data.getString(26) == null)
                 writer.print("-9" + Formatter.DELIMITER);
             else
-                writer.print(ORLFormats.CEFF_FORMAT.format(data.getDouble(26)) + Formatter.DELIMITER);
+                writer.print(CeffFormatter.FORMAT.format(data.getDouble(26)) + Formatter.DELIMITER);
 
             // REFF field
             if (data.getString(27) == null)
                 writer.print("-9" + Formatter.DELIMITER);
             else
-                writer.print(ORLFormats.REFF_FORMAT.format(data.getDouble(27)) + Formatter.DELIMITER);
+                writer.print(ReffFormatter.FORMAT.format(data.getDouble(27)) + Formatter.DELIMITER);
 
             // CPRI field
             if (data.getString(28) == null)

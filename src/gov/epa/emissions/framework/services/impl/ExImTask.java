@@ -64,9 +64,14 @@ public class ExImTask implements Runnable {
 
             importer.run(new File[] { file }, dataset, true);
 
-            setEndStatus();
+            setStatus(EMFConstants.END_IMPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + file, e);
+            try {
+                setStatus("Import failure. Reason: " + e.getMessage());
+            } catch (EmfException e1) {
+                log.error("Problem attempting to post 'end status' using Status Service for file : " + file, e1);
+            }
         }
 
         log.info("importing of file: " + file.getName() + " of type: " + datasetType.getName() + " complete");
@@ -89,10 +94,6 @@ public class ExImTask implements Runnable {
 
     private void setStartStatus() throws EmfException {
         setStatus(EMFConstants.START_IMPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
-    }
-
-    private void setEndStatus() throws EmfException {
-        setStatus(EMFConstants.END_IMPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
     }
 
     private void setStatus(String message) throws EmfException {

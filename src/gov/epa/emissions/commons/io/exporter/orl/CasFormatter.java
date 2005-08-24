@@ -10,7 +10,7 @@ public class CasFormatter implements Formatter {
         String value = data.getString("CAS");
         String evalValue = (value == null) ? "-9" : value;
 
-        writer.print(evalValue + DELIMITER);
+        writer.print(evalValue);
     }
 
 }

@@ -52,6 +52,8 @@ public class StatusTableModel extends AbstractTableModel {
             Row row = new Row(statuses[i]);
             rows.add(row);
         }
+        
+        super.fireTableDataChanged();
     }
 
     private class Column {

@@ -8,10 +8,9 @@ public class SccFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
         String value = data.getString("SCC");
-        if (value == null)
-            writer.print("-9" + Formatter.DELIMITER);
-        else
-            writer.print(value + DELIMITER);
+        String evalValue = (value == null) ? "-9" : value;
+
+        writer.print(evalValue);
     }
 
 }

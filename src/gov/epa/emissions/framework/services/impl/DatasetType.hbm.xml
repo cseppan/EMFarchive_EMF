@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-  <class name="gov.epa.emissions.framework.services.DatasetType" table="emf.datasettypes">
+  <class name="gov.epa.emissions.commons.io.DatasetType" table="emf.datasettypes">
  	<id name="uid" type="string" column="uid" unsaved-value="0">
 	  <generator class="uuid"/>
  	</id>

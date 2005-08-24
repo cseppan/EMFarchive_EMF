@@ -20,12 +20,12 @@ import junit.framework.TestCase;
  * @author Conrad F. D'Cruz
  * 
  */
-public class StatusServicesTest extends TestCase {
+public abstract class StatusServicesTestCase extends TestCase {
 
     private StatusServices service;
 
-    protected void setUp() {
-        ServiceLocator locator = new RemoteServiceLocator("http://localhost:8080/emf/services");
+    public StatusServicesTestCase(String baseUrl) {
+        ServiceLocator locator = new RemoteServiceLocator(baseUrl);
         service = locator.getStatusServices();
     }
 

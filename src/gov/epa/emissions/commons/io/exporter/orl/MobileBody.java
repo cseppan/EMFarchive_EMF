@@ -1,46 +1,24 @@
 package gov.epa.emissions.commons.io.exporter.orl;
 
-import java.io.PrintWriter;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MobileBody implements ORLBody {
+public class MobileBody extends AbstractORLBody {
 
-    public void write(ResultSet data, PrintWriter writer) throws SQLException {
-        while (data.next()) {
-            // FIPS field
-            if (data.getString(1) == null)
-                writer.print("-9" + Formatter.DELIMITER);
-            else
-                writer.print(FipsFormatter.FORMAT.format(data.getInt(1)) + Formatter.DELIMITER);
+    private List formatters;
 
-            // SCC field
-            if (data.getString(3) == null)
-                writer.print("-9" + Formatter.DELIMITER);
-            else
-                writer.print(data.getString(3) + Formatter.DELIMITER);
+    public MobileBody() {
+        this.formatters = new ArrayList();
 
-            // POLL field
-            if (data.getString(4) == null)
-                writer.print("-9" + Formatter.DELIMITER);
-            else
-                writer.print(data.getString(4) + Formatter.DELIMITER);
+        formatters.add(new FipsFormatter());
+        formatters.add(new SccFormatter());
+        formatters.add(new CasFormatter());
+        formatters.add(new AnnEmisFormatter());
+        formatters.add(new AvdEmisFormatter());
+    }
 
-            // ANN_EMIS field
-            if (data.getString(5) == null)
-                writer.print("-9" + Formatter.DELIMITER);
-            else
-                writer.print(AnnEmisFormatter.FORMAT.format(data.getDouble(5)) + Formatter.DELIMITER);
-
-            // AVD_EMIS field
-            if (data.getString(6) == null)
-                writer.print("-9");
-            else
-                writer.print(ORLFormats.AVD_EMIS_FORMAT.format(data.getDouble(6)));
-
-            // Close the line and count the number of rows
-            writer.println();
-        }
+    protected List getFormatters() {
+        return formatters;
     }
 
 }

@@ -145,22 +145,11 @@
     </target>
 
     <target name="emf-integration-tests"
-            depends="compile"
+            depends="compile, emf-local-webservices-tests, emf-remote-webservices-tests"
             description="All Integration Tests"
-    >
-        <junit printsummary="yes" haltonfailure="yes">
-            <classpath refid="classpath" />
-            <formatter type="xml" />
-            <batchtest fork="yes" todir="${reports.integrationtests.dir}">
-                <fileset dir="${test.emf.integration.dir}">
-                    <include name="**/*Test.java" />
-                    <exclude name="**/Remote*Test.java" />
-                </fileset>
-            </batchtest>
-        </junit>
-    </target>
+    />
 
-    <target name="emf-webservices-tests"
+    <target name="emf-local-webservices-tests"
             depends="compile"
             description="Integration of Client and Web Services"
     >
@@ -169,7 +158,7 @@
             <formatter type="xml" />
             <batchtest fork="yes" todir="${reports.integrationtests.dir}">
                 <fileset dir="${test.emf.integration.dir}">
-                    <include name="**/emissions/framework/**/*Test.java" />
+                    <include name="**/emissions/framework/**/Local*Test.java" />
                     <exclude name="**/emissions/framework/**/Remote*Test.java"
                     />
                 </fileset>
@@ -177,26 +166,52 @@
         </junit>
     </target>
 
+    <target name="emf-remote-webservices-tests"
+            depends="compile"
+            description="Integration of Client and Web Services"
+    >
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath refid="classpath" />
+            <formatter type="xml" />
+            <batchtest fork="yes" todir="${reports.integrationtests.dir}">
+                <fileset dir="${test.emf.integration.dir}">
+                    <include name="**/emissions/framework/**/Remote*Test.java"
+                    />
+                    <exclude name="**/emissions/framework/**/Local*Test.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
     <target name="commons-integration-tests"
-             depends="compile"
-             description="All Integration Tests"
-     >
-         <junit printsummary="yes" haltonfailure="yes">
-             <classpath refid="classpath" />
-             <formatter type="xml" />
-             <batchtest fork="yes" todir="${reports.integrationtests.dir}">
-                 <fileset dir="${test.commons.integration.dir}">
-                     <include name="**/*Test.java" />
-                 </fileset>
-             </batchtest>
-         </junit>
-     </target>
-    
-    <target name="all-emf-tests" depends="compile, emf-unit-tests, emf-integration-tests" />
-    <target name="all-common-tests" depends="compile, commons-unit-tests, commons-integration-tests" />
+            depends="compile"
+            description="All Integration Tests"
+    >
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath refid="classpath" />
+            <formatter type="xml" />
+            <batchtest fork="yes" todir="${reports.integrationtests.dir}">
+                <fileset dir="${test.commons.integration.dir}">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="all-emf-tests"
+            depends="compile, emf-unit-tests, emf-integration-tests"
+    />
+    <target name="all-common-tests"
+            depends="compile, commons-unit-tests, commons-integration-tests"
+    />
     <target name="all-tests" depends="all-emf-tests, all-common-tests" />
-    <target name="all-unit-tests" depends="emf-unit-tests, commons-unit-tests"/>
-    <target name="all" depends="compile, all-unit-tests" description="runs all unit-tests"/>
+    <target name="all-unit-tests"
+            depends="emf-unit-tests, commons-unit-tests"
+    />
+    <target name="all"
+            depends="compile, all-unit-tests"
+            description="runs all unit-tests"
+    />
 
     <!--  =================== CVS Targets ====================================== -->
     <target name="cvs-properties-load">

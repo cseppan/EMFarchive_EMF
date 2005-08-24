@@ -6,15 +6,15 @@ import java.sql.SQLException;
 
 import corejava.Format;
 
-public class AnnEmisFormatter implements Formatter {
+public class ReffFormatter implements Formatter {
 
-    public static final Format FORMAT = new Format("%14.7e");
+    public static final Format FORMAT = new Format("%6.2f");
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        if (data.getString("ANN_EMIS") == null)
+        if (data.getString("REFF") == null)
             writer.print("-9");
         else
-            writer.print(FORMAT.format(data.getDouble("ANN_EMIS")));
+            writer.print(FORMAT.format(data.getDouble("REFF")));
     }
 
 }

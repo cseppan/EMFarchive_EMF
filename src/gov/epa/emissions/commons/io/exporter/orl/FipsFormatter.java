@@ -12,9 +12,9 @@ class FipsFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
         if (data.getString("FIPS") == null)
-            writer.print("-9" + DELIMITER);
+            writer.print("-9");
         else
-            writer.print(FORMAT.format(data.getInt("FIPS")) + DELIMITER);
+            writer.print(FORMAT.format(data.getInt("FIPS")));
     }
 
 }

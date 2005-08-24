@@ -10,7 +10,7 @@ public class NaicsFormatter implements Formatter {
         String value = data.getString("NAICS");
         String evalValue = (value == null) ? "-9" : value;
 
-        writer.print(evalValue + DELIMITER);
+        writer.print(evalValue);
     }
 
 }
