@@ -7,8 +7,8 @@
  * Author: Conrad F. D'Cruz
  */
 package gov.epa.emissions.framework.dao;
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DatasetType;
 
 import java.util.ArrayList;
 import java.util.Iterator;

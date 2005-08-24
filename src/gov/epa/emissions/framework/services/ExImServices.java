@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 
 public interface ExImServices extends EMFService {

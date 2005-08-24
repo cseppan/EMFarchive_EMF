@@ -10,12 +10,12 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.Dataset;
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.importer.DatasetTypes;
 import gov.epa.emissions.commons.io.importer.TableTypes;
 import gov.epa.emissions.commons.io.importer.orl.ORLImporter;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DatasetType;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;

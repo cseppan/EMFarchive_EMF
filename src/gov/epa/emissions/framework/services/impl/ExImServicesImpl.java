@@ -10,9 +10,9 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetTypesDAO;
-import gov.epa.emissions.framework.services.DatasetType;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;

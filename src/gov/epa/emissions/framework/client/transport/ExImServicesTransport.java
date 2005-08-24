@@ -8,8 +8,8 @@
  */
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DatasetType;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
@@ -86,7 +86,7 @@ public class ExImServicesTransport implements ExImServices {
             call.setOperationName(qname3);
             
             Class cls1 = gov.epa.emissions.framework.services.User.class;
-            Class cls2 = gov.epa.emissions.framework.services.DatasetType.class;
+            Class cls2 = gov.epa.emissions.commons.io.DatasetType.class;
             
 	        call.registerTypeMapping(cls1, qname1,
 	    			  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),        
@@ -146,8 +146,8 @@ public class ExImServicesTransport implements ExImServices {
             
             call.setOperationName(qname3);
             
-            Class cls1 = gov.epa.emissions.framework.services.DatasetType.class;
-            Class cls2 = gov.epa.emissions.framework.services.DatasetType[].class;
+            Class cls1 = gov.epa.emissions.commons.io.DatasetType.class;
+            Class cls2 = gov.epa.emissions.commons.io.DatasetType[].class;
 	          
             call.registerTypeMapping(cls1, qname1,
 					  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),        
@@ -192,7 +192,7 @@ public class ExImServicesTransport implements ExImServices {
             
             call.setOperationName(qname3);
             
-            Class cls2 = gov.epa.emissions.framework.services.DatasetType.class;
+            Class cls2 = gov.epa.emissions.commons.io.DatasetType.class;
             
 	        call.registerTypeMapping(cls2, qname2,
 	    			  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls2, qname2),        
