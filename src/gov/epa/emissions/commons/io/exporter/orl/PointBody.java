@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class PointBody implements ORLBody {
 
-    public void write(PrintWriter writer, ResultSet data) throws SQLException {
+    public void write(ResultSet data, PrintWriter writer) throws SQLException {
         while (data.next()) {
             // FIPS field
             if (data.getString(1) == null)
@@ -144,7 +144,7 @@ public class PointBody implements ORLBody {
             if (data.getString(24) == null)
                 writer.print("-9" + Formatter.DELIMITER);
             else
-                writer.print(ORLFormats.ANN_EMIS_FORMAT.format(data.getDouble(24)) + Formatter.DELIMITER);
+                writer.print(AnnEmisFormatter.FORMAT.format(data.getDouble(24)) + Formatter.DELIMITER);
 
             // AVD_EMIS field
             if (data.getString(25) == null)

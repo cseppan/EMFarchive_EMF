@@ -54,7 +54,7 @@ public class ORLExporter extends FixedFormatExporter {
             String datasetType = dataset.getDatasetType();
 
             ORLBody body = bodyWriterFactory.getBody(datasetType);
-            body.write(writer, data);
+            body.write(data, writer);
         } finally {
             if (writer != null) {
                 writer.close();

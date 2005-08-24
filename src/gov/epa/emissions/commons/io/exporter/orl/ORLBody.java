@@ -5,5 +5,5 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public interface ORLBody {
-    void write(PrintWriter writer, ResultSet data) throws SQLException;
+    void write(ResultSet data, PrintWriter writer) throws SQLException;
 }

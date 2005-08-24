@@ -16,8 +16,6 @@ public interface ORLFormats {
 
     public static final Format POLL_FORMAT = new Format("%16s");
 
-    public static final Format ANN_EMIS_FORMAT = new Format("%14.7e");
-
     public static final Format AVD_EMIS_FORMAT = new Format("%14.7e");
 
     public static final Format CEFF_FORMAT = new Format("%6.2f");

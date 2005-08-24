@@ -3,54 +3,38 @@ package gov.epa.emissions.commons.io.exporter.orl;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class NonPointBody implements ORLBody {
 
-    public void write(PrintWriter writer, ResultSet data) throws SQLException {       
+    private List formatters;
+
+    public NonPointBody() {
+        this.formatters = new ArrayList();
+
+        formatters.add(new FipsFormatter());
+        formatters.add(new SccFormatter());
+        formatters.add(new SicFormatter());
+        formatters.add(new MactFormatter());
+        formatters.add(new SrcTypeFormatter());
+        formatters.add(new NaicsFormatter());
+        formatters.add(new CasFormatter());
+        formatters.add(new AnnEmisFormatter());
+    }
+
+    public void write(ResultSet data, PrintWriter writer) throws SQLException {
         while (data.next()) {
-            writeRecord(writer, data);
+            writeRecord(data, writer);
         }
     }
 
-    private void writeRecord(PrintWriter writer, ResultSet data) throws SQLException {
-        // FIPS field
-        new FipsFormatter().format(data, writer);
-
-        // SCC field
-        new SccFormatter().format(data, writer);
-
-        // SIC field
-        new SicFormatter().format(data, writer);
-
-        // MACT field
-        if (data.getString("MACT") == null)
-            writer.print("-9" + Formatter.DELIMITER);
-        else
-            writer.print(data.getString("MACT") + Formatter.DELIMITER);
-
-        // SRCTYPE field
-        if (data.getString("SRCTYPE") == null)
-            writer.print("-9" + Formatter.DELIMITER);
-        else
-            writer.print(data.getString("SRCTYPE") + Formatter.DELIMITER);
-
-        // NAICS field
-        if (data.getString("NAICS") == null)
-            writer.print("-9" + Formatter.DELIMITER);
-        else
-            writer.print(data.getString("NAICS") + Formatter.DELIMITER);
-
-        // POLL/CAS field
-        if (data.getString("CAS") == null)
-            writer.print("-9" + Formatter.DELIMITER);
-        else
-            writer.print(data.getString("CAS") + Formatter.DELIMITER);
-
-        // ANN_EMIS field
-        if (data.getString("ANN_EMIS") == null)
-            writer.print("-9" + Formatter.DELIMITER);
-        else
-            writer.print(ORLFormats.ANN_EMIS_FORMAT.format(data.getDouble("ANN_EMIS")) + Formatter.DELIMITER);
+    private void writeRecord(ResultSet data, PrintWriter writer) throws SQLException {
+        for (Iterator iter = formatters.iterator(); iter.hasNext();) {
+            Formatter element = (Formatter) iter.next();
+            element.format(data, writer);
+        }
 
         // AVD_EMIS field
         if (data.getString("AVD_EMIS") == null)
