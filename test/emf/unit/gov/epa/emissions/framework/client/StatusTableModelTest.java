@@ -21,13 +21,13 @@ public class StatusTableModelTest extends MockObjectTestCase {
         Date status2Timestamp = new Date(status1Timestamp.getTime() + 2000);
         status2 = new Status("user2", "type2", "message2", status2Timestamp);
 
-        Status[] status = new Status[] { status1, status2 };
+        Status[] statuses = new Status[] { status1, status2 };
 
         model = new StatusTableModel();
         assertEquals(0, model.getRowCount());
         assertNull("No data on creation", model.getValueAt(0, 0));
         
-        model.refresh(status);
+        model.refresh(statuses);
         assertEquals(2, model.getRowCount());
     }
 
@@ -58,4 +58,13 @@ public class StatusTableModelTest extends MockObjectTestCase {
         assertEquals(status2.getTimestamp(), model.getValueAt(1, 3));
     }
 
+    public void testShouldAppendStatusesOnRefresh() {
+        Status status = new Status("user2", "type2", "message2", new Date());
+        Status[] statuses = new Status[] { status };
+        
+        model.refresh(statuses);
+        
+        assertEquals(3, model.getRowCount());
+
+    }
 }

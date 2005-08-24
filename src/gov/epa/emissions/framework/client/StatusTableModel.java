@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.TableHeader;
 import gov.epa.emissions.framework.services.Status;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,7 @@ import javax.swing.table.AbstractTableModel;
 
 public class StatusTableModel extends AbstractTableModel {
 
-    private Status[] statuses;
+    private List statusList;
 
     private TableHeader header;
 
@@ -20,12 +21,13 @@ public class StatusTableModel extends AbstractTableModel {
 
     public StatusTableModel() {
         this.header = new TableHeader(new String[] { "Username", "Message Type", "Message", "Timestamp" });
-        this.statuses = new Status[0];
+        this.statusList = new ArrayList();
+
         this.rows = new ArrayList();
     }
 
     public int getRowCount() {
-        return statuses.length;
+        return rows.size();
     }
 
     public int getColumnCount() {
@@ -44,9 +46,8 @@ public class StatusTableModel extends AbstractTableModel {
     }
 
     public void refresh(Status[] statuses) {
-        this.statuses = statuses;
+        this.statusList.addAll(Arrays.asList(statuses));
 
-        this.rows = new ArrayList();
         for (int i = 0; i < statuses.length; i++) {
             Row row = new Row(statuses[i]);
             rows.add(row);
