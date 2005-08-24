@@ -10,27 +10,27 @@ public class MobileBody implements ORLBody {
         while (data.next()) {
             // FIPS field
             if (data.getString(1) == null)
-                writer.print("-9" + DELIMITER);
+                writer.print("-9" + Formatter.DELIMITER);
             else
-                writer.print(ORLFormats.FIPS_FORMAT.format(data.getInt(1)) + DELIMITER);
+                writer.print(FipsFormatter.FORMAT.format(data.getInt(1)) + Formatter.DELIMITER);
 
             // SCC field
             if (data.getString(3) == null)
-                writer.print("-9" + DELIMITER);
+                writer.print("-9" + Formatter.DELIMITER);
             else
-                writer.print(data.getString(3) + DELIMITER);
+                writer.print(data.getString(3) + Formatter.DELIMITER);
 
             // POLL field
             if (data.getString(4) == null)
-                writer.print("-9" + DELIMITER);
+                writer.print("-9" + Formatter.DELIMITER);
             else
-                writer.print(data.getString(4) + DELIMITER);
+                writer.print(data.getString(4) + Formatter.DELIMITER);
 
             // ANN_EMIS field
             if (data.getString(5) == null)
-                writer.print("-9" + DELIMITER);
+                writer.print("-9" + Formatter.DELIMITER);
             else
-                writer.print(ORLFormats.ANN_EMIS_FORMAT.format(data.getDouble(5)) + DELIMITER);
+                writer.print(ORLFormats.ANN_EMIS_FORMAT.format(data.getDouble(5)) + Formatter.DELIMITER);
 
             // AVD_EMIS field
             if (data.getString(6) == null)

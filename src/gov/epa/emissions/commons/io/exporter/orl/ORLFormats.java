@@ -4,8 +4,6 @@ import corejava.Format;
 
 public interface ORLFormats {
 
-    public static final Format FIPS_FORMAT = new Format("%5d");
-
     public static final Format SCC_FORMAT = new Format("%10s");
 
     public static final Format SIC_FORMAT = new Format("%4s");

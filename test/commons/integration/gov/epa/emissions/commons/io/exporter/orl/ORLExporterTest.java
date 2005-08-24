@@ -24,6 +24,10 @@ public class ORLExporterTest extends TestCase {
         init(new File("test/commons/postgres.conf"));
     }
 
+    private void useMysql() throws Exception {
+        init(new File("test/commons/mysql.conf"));
+    }
+
     private void init(File conf) throws IOException, FileNotFoundException, SQLException {
         Properties properties = new Properties();
         properties.load(new FileInputStream(conf));
@@ -34,15 +38,21 @@ public class ORLExporterTest extends TestCase {
     }
 
     public void testNonPointUsingPostgres() throws Exception {
+        System.err.println("POSTGRES");
         usePostgres();
-        doTestNonPoint();
+        doTestNonPoint("POSTGRES");
     }
 
-    private void doTestNonPoint() throws Exception {
+    public void testNonPointUsingMysql() throws Exception {
+        System.err.println("MYSQL");
+        useMysql();
+        doTestNonPoint("MYSQL");
+    }
+
+    private void doTestNonPoint(String fileSuffix) throws Exception {
         String datasetType = DatasetTypes.ORL_AREA_NONPOINT_TOXICS;
         String tableType = TableTypes.ORL_AREA_NONPOINT_TOXICS;
 
-        // Determine tableName and exportFileName from importFileName
         String importFilenamePrefix = "arinv.nonpoint.nti99_NC";
         String tableName = importFilenamePrefix.replace('.', '_');
 
@@ -50,7 +60,9 @@ public class ORLExporterTest extends TestCase {
 
         ORLExporter exporter = new ORLExporter(dbSetup.getDbServer());
 
-        String exportFileName = importFilenamePrefix + ".EXPORTED";
+        String tempDir = System.getProperty("java.io.tmpdir");
+        String exportFileName = tempDir + "/" + importFilenamePrefix + ".EXPORTED_" + fileSuffix;
+        
         exporter.exportTableToFile(tableType, dataset, exportFileName);
     }
 

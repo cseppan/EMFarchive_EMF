@@ -2,11 +2,18 @@ package gov.epa.emissions.commons.io.exporter.orl;
 
 import java.io.PrintWriter;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 public class NonPointBody implements ORLBody {
 
     public void write(PrintWriter writer, ResultSet data) throws SQLException {
+        ResultSetMetaData meta = data.getMetaData();
+
+        for (int i = 1; i <= meta.getColumnCount(); i++) {
+            System.err.print(meta.getColumnName(i) + "\t");
+        }
+        System.err.println("Total Columns - " + meta.getColumnCount());
         while (data.next()) {
             writeRecord(writer, data);
         }
@@ -14,79 +21,70 @@ public class NonPointBody implements ORLBody {
 
     private void writeRecord(PrintWriter writer, ResultSet data) throws SQLException {
         // FIPS field
-        if (data.getString(1) == null)
-            writer.print("-9" + DELIMITER);
-        else
-            writer.print(ORLFormats.FIPS_FORMAT.format(data.getInt(1)) + DELIMITER);
+        new FipsFormatter().format(data, writer);
 
         // SCC field
-        if (data.getString(3) == null)
-            writer.print("-9" + DELIMITER);
-        else
-            writer.print(data.getString(3) + DELIMITER);
+        new SccFormatter().format(data, writer);
 
         // SIC field
-        if (data.getString(4) == null)
-            writer.print("-9" + DELIMITER);
-        else
-            writer.print(data.getString(4) + DELIMITER);
+        new SicFormatter().format(data, writer);
 
         // MACT field
-        if (data.getString(5) == null)
-            writer.print("-9" + DELIMITER);
+        if (data.getString("MACT") == null)
+            writer.print("-9" + Formatter.DELIMITER);
         else
-            writer.print(data.getString(5) + DELIMITER);
+            writer.print(data.getString("MACT") + Formatter.DELIMITER);
 
         // SRCTYPE field
-        if (data.getString(6) == null)
-            writer.print("-9" + DELIMITER);
+        if (data.getString("SRCTYPE") == null)
+            writer.print("-9" + Formatter.DELIMITER);
         else
-            writer.print(data.getString(6) + DELIMITER);
+            writer.print(data.getString("SRCTYPE") + Formatter.DELIMITER);
 
         // NAICS field
-        if (data.getString(7) == null)
-            writer.print("-9" + DELIMITER);
+        if (data.getString("NAICS") == null)
+            writer.print("-9" + Formatter.DELIMITER);
         else
-            writer.print(data.getString(7) + DELIMITER);
+            writer.print(data.getString("NAICS") + Formatter.DELIMITER);
 
         // POLL field
         if (data.getString(8) == null)
-            writer.print("-9" + DELIMITER);
+            writer.print("-9" + Formatter.DELIMITER);
         else
-            writer.print(data.getString(8) + DELIMITER);
+            writer.print(data.getString(8) + Formatter.DELIMITER);
 
         // ANN_EMIS field
-        if (data.getString(9) == null)
-            writer.print("-9" + DELIMITER);
+        if (data.getString("ANN_EMIS") == null)
+            writer.print("-9" + Formatter.DELIMITER);
         else
-            writer.print(ORLFormats.ANN_EMIS_FORMAT.format(data.getDouble(9)) + DELIMITER);
+            writer.print(ORLFormats.ANN_EMIS_FORMAT.format(data.getDouble("ANN_EMIS")) + Formatter.DELIMITER);
 
         // AVD_EMIS field
-        if (data.getString(10) == null)
-            writer.print("-9" + DELIMITER);
+        if (data.getString("AVD_EMIS") == null)
+            writer.print("-9" + Formatter.DELIMITER);
         else
-            writer.print(ORLFormats.AVD_EMIS_FORMAT.format(data.getDouble(10)) + DELIMITER);
+            writer.print(ORLFormats.AVD_EMIS_FORMAT.format(data.getDouble("AVD_EMIS")) + Formatter.DELIMITER);
 
         // CEFF field
-        if (data.getString(11) == null)
-            writer.print("-9" + DELIMITER);
+        if (data.getString("CEFF") == null)
+            writer.print("-9" + Formatter.DELIMITER);
         else
-            writer.print(ORLFormats.CEFF_FORMAT.format(data.getDouble(11)) + DELIMITER);
+            writer.print(ORLFormats.CEFF_FORMAT.format(data.getDouble("CEFF")) + Formatter.DELIMITER);
 
         // REFF field
-        if (data.getString(12) == null)
-            writer.print("-9" + DELIMITER);
+        if (data.getString("REFF") == null)
+            writer.print("-9" + Formatter.DELIMITER);
         else
-            writer.print(ORLFormats.REFF_FORMAT.format(data.getDouble(12)) + DELIMITER);
+            writer.print(ORLFormats.REFF_FORMAT.format(data.getDouble("REFF")) + Formatter.DELIMITER);
 
         // RPEN field
-        if (data.getString(13) == null)
+        String value = data.getString("RPEN");
+        if (value == null)
             writer.print("-9");
         else
-            writer.print(ORLFormats.RPEN_FORMAT.format(data.getDouble(13)));
+            writer.print(ORLFormats.RPEN_FORMAT.format(value));
 
-        // Close the line and count the number of rows
+        // Close the line
         writer.println();
     }
-
 }
