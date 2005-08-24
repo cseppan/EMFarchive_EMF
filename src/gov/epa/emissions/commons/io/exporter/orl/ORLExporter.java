@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Query;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.exporter.FixedFormatExporter;
-import gov.epa.emissions.commons.io.importer.DatasetTypes;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -20,9 +19,12 @@ public class ORLExporter extends FixedFormatExporter {
 
     private ORLHeaderWriter headerWriter;
 
+    private ORLBodyFactory bodyWriterFactory;
+
     public ORLExporter(DbServer dbServer) {
         super(dbServer);
         this.headerWriter = new ORLHeaderWriter();
+        this.bodyWriterFactory = new ORLBodyFactory();
     }
 
     // Now start writing the output data. Here are some notes
@@ -51,7 +53,7 @@ public class ORLExporter extends FixedFormatExporter {
 
             String datasetType = dataset.getDatasetType();
 
-            ORLBody body = getBody(datasetType);
+            ORLBody body = bodyWriterFactory.getBody(datasetType);
             body.write(writer, data);
         } finally {
             if (writer != null) {
@@ -61,20 +63,4 @@ public class ORLExporter extends FixedFormatExporter {
 
     }
 
-    // TODO: convert it to factory
-    private ORLBody getBody(String datasetType) {
-        if (datasetType.equals(DatasetTypes.ORL_AREA_NONPOINT_TOXICS))
-            return new NonPointBody();
-
-        if (datasetType.equals(DatasetTypes.ORL_AREA_NONROAD_TOXICS))
-            return new NonRoadBody();
-
-        if (datasetType.equals(DatasetTypes.ORL_MOBILE_TOXICS))
-            return new MobileBody();
-
-        if (datasetType.equals(DatasetTypes.ORL_POINT_TOXICS))
-            return new PointBody();
-
-        return null;
-    }
 }
