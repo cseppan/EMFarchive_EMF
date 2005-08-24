@@ -30,7 +30,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.14 2005/08/16 21:32:25 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.15 2005/08/24 18:30:58 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -174,20 +174,16 @@ public class ORLImporter extends ListFormatImporter {
         super.importFile(file, datasource, reader, columnNames, columnTypes, columnWidths, overwrite);
 
         // set dataset variables not specified in files
-        final TemporalResolution resolution;
-        List units = new ArrayList();
         final String unitsValue = "short tons";
         final String annualUnits = unitsValue + "/year";
         final String averageDailyUnits = unitsValue + "/day";
         if (annualNotAverageDaily) {
-            units.add(annualUnits);
-            resolution = TemporalResolution.ANNUAL;
+            dataset.setUnits(annualUnits);
+            dataset.setTemporalResolution(TemporalResolution.ANNUAL.getName());
         } else {
-            units.add(averageDailyUnits);
-            resolution = TemporalResolution.DAILY;
-        }
-        dataset.setUnits(units);
-        dataset.setTemporalResolution(resolution.getName());
+            dataset.setUnits(averageDailyUnits);
+            dataset.setTemporalResolution(TemporalResolution.DAILY.getName());
+        }        
     }
 
     private void initializeHeaders() {

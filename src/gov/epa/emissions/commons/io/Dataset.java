@@ -1,44 +1,48 @@
 package gov.epa.emissions.commons.io;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 public interface Dataset {
 
+    //bean-style properties
+    void setCreator(String creator);
+    String getCreator();
+
     String getDatasetType();
-
-    void setUnits(List units);
-
-    void setTemporalResolution(String name);
-
-    void setRegion(String countryName);
-
-    void setYear(int year);
-
-    void setStartDateTime(Date time);
-
-    void setStopDateTime(Date time);
-
-    String getRegion();
-
-    int getYear();
-
-    String getDescription();
-
-    void setDescription(String description);
-
-    Object getDataTable(String tableType);
-
-    Map getDataTables();
-
     void setDatasetType(String datasetType);
 
-    void addDataTable(String tableType, String tableName);
+    void setUnits(String units);
+    String getUnits();
 
-    void setDataSources(Map dataSources);
+    void setRegion(String region);
+    String getRegion();
+
+    void setYear(int year);
+    int getYear();
 
     String getCountry();
-
     void setCountry(String country);
+
+    void setTemporalResolution(String name);
+    String getTemporalResolution();
+
+    void setStartDateTime(Date time);
+    Date getStartDateTime();
+
+    void setStopDateTime(Date time);
+    Date getStopDateTime();
+
+    String getDescription();
+    void setDescription(String description);
+   
+    Map getDataTables();
+    void setDataTables(Map datatables);
+    
+    void setDataSources(Map dataSources);
+    Map getDataSources();
+
+    // convenience methods
+    String getDataTable(String tableType);
+    void addDataTable(String tableType, String table);
 }
