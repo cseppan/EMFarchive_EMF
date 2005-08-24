@@ -14,6 +14,7 @@ import java.util.Date;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.TableColumnModel;
 
 public class StatusWindow extends EmfInteralFrame implements StatusView {
 
@@ -55,11 +56,17 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
     private JScrollPane createTable() {
         statusTableModel = new StatusTableModel();
         JTable table = new JTable(statusTableModel);
-
+        setColumnWidths(table.getColumnModel());
+        
         JScrollPane scrollPane = new JScrollPane(table);
         table.setPreferredScrollableViewportSize(this.getSize());
 
         return scrollPane;
+    }
+
+    private void setColumnWidths(TableColumnModel model) {
+        int width = getWidth();
+        
     }
 
     private void position(Container parent) {

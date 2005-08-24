@@ -36,26 +36,23 @@ public class StatusTableModelTest extends MockObjectTestCase {
     }
 
     public void testShouldHaveFourColumns() {
-        assertEquals(4, model.getColumnCount());
+        assertEquals(3, model.getColumnCount());
     }
 
     public void testShouldReturnExpectedColumnsNames() {
-        assertEquals("Username", model.getColumnName(0));
-        assertEquals("Message Type", model.getColumnName(1));
-        assertEquals("Message", model.getColumnName(2));
-        assertEquals("Timestamp", model.getColumnName(3));
+        assertEquals("Message Type", model.getColumnName(0));
+        assertEquals("Message", model.getColumnName(1));
+        assertEquals("Timestamp", model.getColumnName(2));
     }
 
     public void testShouldReturnUserAttributesAtSpecifiedIndex() {
-        assertEquals(status1.getUserName(), model.getValueAt(0, 0));
-        assertEquals(status1.getMessageType(), model.getValueAt(0, 1));
-        assertEquals(status1.getMessage(), model.getValueAt(0, 2));
-        assertEquals(status1.getTimestamp(), model.getValueAt(0, 3));
+        assertEquals(status1.getMessageType(), model.getValueAt(0, 0));
+        assertEquals(status1.getMessage(), model.getValueAt(0, 1));
+        assertEquals(status1.getTimestamp(), model.getValueAt(0, 2));
 
-        assertEquals(status2.getUserName(), model.getValueAt(1, 0));
-        assertEquals(status2.getMessageType(), model.getValueAt(1, 1));
-        assertEquals(status2.getMessage(), model.getValueAt(1, 2));
-        assertEquals(status2.getTimestamp(), model.getValueAt(1, 3));
+        assertEquals(status2.getMessageType(), model.getValueAt(1, 0));
+        assertEquals(status2.getMessage(), model.getValueAt(1, 1));
+        assertEquals(status2.getTimestamp(), model.getValueAt(1, 2));
     }
 
     public void testShouldAppendStatusesOnRefresh() {
