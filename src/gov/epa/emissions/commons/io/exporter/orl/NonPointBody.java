@@ -2,18 +2,11 @@ package gov.epa.emissions.commons.io.exporter.orl;
 
 import java.io.PrintWriter;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 public class NonPointBody implements ORLBody {
 
-    public void write(PrintWriter writer, ResultSet data) throws SQLException {
-        ResultSetMetaData meta = data.getMetaData();
-
-        for (int i = 1; i <= meta.getColumnCount(); i++) {
-            System.err.print(meta.getColumnName(i) + "\t");
-        }
-        System.err.println("Total Columns - " + meta.getColumnCount());
+    public void write(PrintWriter writer, ResultSet data) throws SQLException {       
         while (data.next()) {
             writeRecord(writer, data);
         }
@@ -47,11 +40,11 @@ public class NonPointBody implements ORLBody {
         else
             writer.print(data.getString("NAICS") + Formatter.DELIMITER);
 
-        // POLL field
-        if (data.getString(8) == null)
+        // POLL/CAS field
+        if (data.getString("CAS") == null)
             writer.print("-9" + Formatter.DELIMITER);
         else
-            writer.print(data.getString(8) + Formatter.DELIMITER);
+            writer.print(data.getString("CAS") + Formatter.DELIMITER);
 
         // ANN_EMIS field
         if (data.getString("ANN_EMIS") == null)

@@ -38,13 +38,11 @@ public class ORLExporterTest extends TestCase {
     }
 
     public void testNonPointUsingPostgres() throws Exception {
-        System.err.println("POSTGRES");
         usePostgres();
         doTestNonPoint("POSTGRES");
     }
 
     public void testNonPointUsingMysql() throws Exception {
-        System.err.println("MYSQL");
         useMysql();
         doTestNonPoint("MYSQL");
     }
@@ -62,7 +60,7 @@ public class ORLExporterTest extends TestCase {
 
         String tempDir = System.getProperty("java.io.tmpdir");
         String exportFileName = tempDir + "/" + importFilenamePrefix + ".EXPORTED_" + fileSuffix;
-        
+
         exporter.exportTableToFile(tableType, dataset, exportFileName);
     }
 
