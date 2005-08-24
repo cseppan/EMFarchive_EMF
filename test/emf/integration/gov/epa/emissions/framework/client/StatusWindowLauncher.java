@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -42,15 +43,15 @@ public class StatusWindowLauncher {
     }
 
     private static StatusServices createStatusServices(User user) {
-        Status nonRoad = new Status();
-        Status onRoad = new Status();
-        Status nonPoint = new Status();
+        Status nonRoad = new Status("user1", "type1", "message1", new Date());
+        Status onRoad = new Status("user2", "type2", "message2", new Date());
+        Status nonPoint = new Status("user3", "type3", "message3", new Date());
 
-        Status[] status = new Status[] { nonRoad, onRoad, nonPoint };
+        Status[] statuses = new Status[] { nonRoad, onRoad, nonPoint };
 
         Mock service = new Mock(StatusServices.class);
         service.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getMessages")).with(
-                new IsEqual(user.getUserName())).will(new ReturnStub(status));
+                new IsEqual(user.getUserName())).will(new ReturnStub(statuses));
 
         return (StatusServices) service.proxy();
     }

@@ -39,6 +39,8 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     private MessagePanel messagePanel;
 
+    private StatusWindow status;
+
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(User user, ServiceLocator serviceLocator) {
         this.user = user;
@@ -64,11 +66,11 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     private void showStatus() {
         StatusServices statusServices = serviceLocator.getStatusServices();
-        StatusWindow view = new StatusWindow(user, statusServices, this);
+        status = new StatusWindow(user, statusServices, this);
 
-        desktop.add(view);
+        desktop.add(status);
 
-        view.display();
+        status.display();
     }
 
     private void setProperties() {
@@ -149,6 +151,8 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
     }
 
     private void close() {
+        //TODO: auto logout of a session
+        status.close();
         super.dispose();
     }
 

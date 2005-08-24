@@ -49,7 +49,7 @@ public class ExImServicesImpl implements ExImServices {
         log.debug("check if file exists " + fileName);
         File file = new File(fileName);
 
-        if (!file.exists()) {
+        if (!file.exists() || !file.isFile()) {
             log.error("file " + fileName + " not found");
             throw new EmfException("file " + fileName + " not found");
         }

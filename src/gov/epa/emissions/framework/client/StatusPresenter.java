@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.TaskRunner;
+import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
 
@@ -37,7 +38,8 @@ public class StatusPresenter {
     public class StatusMonitor implements Runnable {
         public void run() {
             try {
-                view.update(model.getMessages(user.getUserName()));
+                Status[] statuses = model.getMessages(user.getUserName());
+                view.update(statuses);
             } catch (EmfException e) {
                 view.notifyError(e.getMessage());
             }

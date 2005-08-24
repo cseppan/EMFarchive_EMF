@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.ConcurrentTaskRunner;
+import gov.epa.emissions.framework.TaskRunner;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
@@ -14,6 +15,7 @@ import java.util.Date;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 public class StatusWindow extends EmfInteralFrame implements StatusView {
@@ -23,6 +25,8 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
     private MessagePanel messagePanel;
 
     private StatusTableModel statusTableModel;
+
+    private TaskRunner taskRunner;
 
     public StatusWindow(User user, StatusServices statusServices, Container parent) {
         super("Status");
@@ -36,7 +40,8 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
         super.setResizable(false);
 
         this.presenter = new StatusPresenter(user, statusServices, this);
-        this.presenter.start(new ConcurrentTaskRunner());
+        taskRunner = new ConcurrentTaskRunner();
+        this.presenter.start(taskRunner);
     }
 
     private JPanel createLayout() {
@@ -57,7 +62,7 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
         statusTableModel = new StatusTableModel();
         JTable table = new JTable(statusTableModel);
         setColumnWidths(table.getColumnModel());
-        
+
         JScrollPane scrollPane = new JScrollPane(table);
         table.setPreferredScrollableViewportSize(this.getSize());
 
@@ -65,8 +70,8 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
     }
 
     private void setColumnWidths(TableColumnModel model) {
-        int width = getWidth();
-        
+        TableColumn message = model.getColumn(1);
+        message.setPreferredWidth((int) (getWidth() * 0.75));
     }
 
     private void position(Container parent) {
@@ -82,6 +87,7 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
     }
 
     public void close() {
+        taskRunner.stop();
         super.dispose();
     }
 
@@ -93,7 +99,7 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
         messagePanel.setMessage("Last Update : " + new Date(), Color.GRAY);
         statusTableModel.refresh(statuses);
 
-        super.revalidate();//TODO: invalidate ? validate ?
+        super.revalidate();
     }
 
     public void notifyError(String message) {
