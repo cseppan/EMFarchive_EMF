@@ -26,7 +26,7 @@ public class EMFGenericClient {
      */
     public EMFGenericClient() throws EmfException {
         super();
-        svcLoc = new RemoteServiceLocator("http://localhost:8080/emf/services");
+        svcLoc = new RemoteServiceLocator("http://ben.cep.unc.edu:8080/emf/services");
         doEmfSvcs();
     }
 
@@ -43,11 +43,11 @@ public class EMFGenericClient {
       Status[] allStats = statusSvc.getMessages("cdcruz");
       
       System.out.println("Number of messages: " + allStats.length);
-      ExImServices eximSvc = svcLoc.getEximServices();
-      DatasetType[] datasetTypes = eximSvc.getDatasetTypes();
-      //TODO: lookup the 'TST' dataset type 
-      eximSvc.startImport(user,"conrad.txt", datasetTypes[0]/*"TST"*/);
-      
+//      ExImServices eximSvc = svcLoc.getEximServices();
+//      DatasetType[] datasetTypes = eximSvc.getDatasetTypes();
+//      //TODO: lookup the 'TST' dataset type 
+//      eximSvc.startImport(user,"conrad.txt", datasetTypes[0]/*"TST"*/);
+//      
     }//doEmfSvcs
 
     public static void main(String[] args) throws EmfException {
