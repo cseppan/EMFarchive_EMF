@@ -13,15 +13,12 @@ public class ORLImporterTest extends EmissionsDataSetupTestCase {
         run("arinv.nonpoint.nti99_NC.txt", DatasetTypes.ORL_AREA_NONPOINT_TOXICS, TableTypes.ORL_AREA_NONPOINT_TOXICS);
     }
 
-    // FIXME: change the columns from numbers to prefix alphabets
     public void testNonRoad() throws Exception {
         run("arinv.nonroad.nti99d_NC.new.txt", DatasetTypes.ORL_AREA_NONROAD_TOXICS, TableTypes.ORL_AREA_NONROAD_TOXICS);
     }
 
-    public void TODO_testPoint() {
-        // String datasetType = DatasetTypes.ORL_POINT_TOXICS;
-        // String tableType = TableTypes.ORL_POINT_TOXICS;
-        // String dbFile = "ptinv.nti99_NC.100.txt";
+    public void testPoint() throws Exception {
+        run("ptinv.nti99_NC.txt", DatasetTypes.ORL_POINT_TOXICS, TableTypes.ORL_POINT_TOXICS);
     }
 
     public void testOnRoadMobile() throws Exception {
