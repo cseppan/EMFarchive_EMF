@@ -198,6 +198,31 @@
         </junit>
     </target>
 
+    <target name="setup-emissions-data"
+            depends="compile"
+            description="Sets up Emissions and Reference schema"
+    >
+        <echo message="Setting up Emissions and Reference schema..." />
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath refid="classpath" />
+            <formatter type="xml" />
+
+            <test name="gov.epa.emissions.commons.io.importer.orl.ReferenceImporterTest"
+                  fork="yes"
+                  todir="${reports.integrationtests.dir}"
+            />
+            <test name="gov.epa.emissions.commons.io.importer.orl.ReferenceTablesTest"
+                  fork="yes"
+                  todir="${reports.integrationtests.dir}"
+            />
+            <test name="gov.epa.emissions.commons.io.importer.orl.ORLImporterTest"
+                  fork="yes"
+                  todir="${reports.integrationtests.dir}"
+            />
+        </junit>
+        <echo message="Emissions and Reference schema setup complete." />
+    </target>
+
     <target name="all-emf-tests"
             depends="compile, emf-unit-tests, emf-integration-tests"
     />
