@@ -16,6 +16,8 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
+// TODO: the table is the same for Non Point, Non Road and On Road until Importer can import all those types. 
+// Currently, it only imports the Non Point
 public class ORLExporterTest extends TestCase {
 
     private DatabaseSetup dbSetup;
@@ -56,7 +58,17 @@ public class ORLExporterTest extends TestCase {
         useMysql();
         doTestOnRoad("MySQL");
     }
-    
+
+    public void testNonRoadUsingPostgres() throws Exception {
+        usePostgres();
+        doTestNonRoad("POSTGRES");
+    }
+
+    public void testNonRoadUsingMysql() throws Exception {
+        useMysql();
+        doTestNonRoad("POSTGRES");
+    }
+
     private void doTestNonPoint(String fileSuffix) throws Exception {
         doExport(fileSuffix, DatasetTypes.ORL_AREA_NONPOINT_TOXICS, TableTypes.ORL_AREA_NONPOINT_TOXICS,
                 "arinv_nonpoint_nti99_NC");
@@ -64,6 +76,11 @@ public class ORLExporterTest extends TestCase {
 
     private void doTestOnRoad(String fileSuffix) throws Exception {
         doExport(fileSuffix, DatasetTypes.ORL_ON_ROAD_TOXICS, TableTypes.ORL_MOBILE_TOXICS, "arinv_nonpoint_nti99_NC");
+    }
+
+    private void doTestNonRoad(String fileSuffix) throws Exception {
+        doExport(fileSuffix, DatasetTypes.ORL_AREA_NONROAD_TOXICS, TableTypes.ORL_AREA_NONROAD_TOXICS,
+                "arinv_nonpoint_nti99_NC");
     }
 
     private void doExport(String fileSuffix, String datasetType, String tableType, String tableName) throws Exception {
