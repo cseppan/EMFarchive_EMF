@@ -3,11 +3,11 @@ package gov.epa.emissions.commons.io.exporter.orl;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PointBody extends AbstractORLBody {
+public class PointFormatterSequence implements FormatterSequence {
 
     private List formatters;
 
-    public PointBody() {
+    public PointFormatterSequence() {
         this.formatters = new ArrayList();
 
         formatters.add(new FipsFormatter());
@@ -41,7 +41,7 @@ public class PointBody extends AbstractORLBody {
         formatters.add(new CsecFormatter());
     }
 
-    protected List getFormatters() {
+    public List sequence() {
         return formatters;
     }
 

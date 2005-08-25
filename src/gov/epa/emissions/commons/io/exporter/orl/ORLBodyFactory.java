@@ -12,10 +12,10 @@ public class ORLBodyFactory {
     ORLBodyFactory() {
         bodyMap = new HashMap();
 
-        bodyMap.put(DatasetTypes.ORL_AREA_NONPOINT_TOXICS, new NonPointBody());
-        bodyMap.put(DatasetTypes.ORL_AREA_NONROAD_TOXICS, new NonRoadBody());
-        bodyMap.put(DatasetTypes.ORL_ON_ROAD_TOXICS, new MobileBody());
-        bodyMap.put(DatasetTypes.ORL_POINT_TOXICS, new PointBody());
+        bodyMap.put(DatasetTypes.ORL_AREA_NONPOINT_TOXICS, new ORLBody(new NonPointFormatterSequence()));
+        bodyMap.put(DatasetTypes.ORL_AREA_NONROAD_TOXICS, new ORLBody(new NonRoadFormatterSequence()));
+        bodyMap.put(DatasetTypes.ORL_ON_ROAD_TOXICS, new ORLBody(new OnRoadMobileFormatterSequence()));
+        bodyMap.put(DatasetTypes.ORL_POINT_TOXICS, new ORLBody(new PointFormatterSequence()));
     }
 
     ORLBody getBody(String datasetType) {

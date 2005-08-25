@@ -3,11 +3,11 @@ package gov.epa.emissions.commons.io.exporter.orl;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MobileBody extends AbstractORLBody {
+public class NonRoadFormatterSequence implements FormatterSequence {
 
     private List formatters;
 
-    public MobileBody() {
+    public NonRoadFormatterSequence() {
         this.formatters = new ArrayList();
 
         formatters.add(new FipsFormatter());
@@ -15,9 +15,12 @@ public class MobileBody extends AbstractORLBody {
         formatters.add(new PollFormatter());
         formatters.add(new AnnEmisFormatter());
         formatters.add(new AvdEmisFormatter());
+        formatters.add(new CeffFormatter());
+        formatters.add(new ReffFormatter());
+        formatters.add(new RpenFormatter());
     }
 
-    protected List getFormatters() {
+    public List sequence() {
         return formatters;
     }
 
