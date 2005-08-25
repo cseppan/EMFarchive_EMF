@@ -14,9 +14,12 @@ import gov.epa.emissions.framework.EmfException;
  * @author Conrad F. D'Cruz
  *
  */
-public interface StatusServices extends EMFService{
+public interface StatusServices extends EMFServices{
 
+	
     public void setStatus(Status status) throws EmfException;
+	
+    //FIXME: Use User object instead of userName
     public Status[] getMessages(String userName) throws EmfException;
     public Status[] getMessages(String userName, String type) throws EmfException;
 }
