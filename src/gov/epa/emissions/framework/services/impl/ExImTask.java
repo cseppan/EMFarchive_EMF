@@ -102,7 +102,7 @@ public class ExImTask implements Runnable {
         endStatus.setMessageType(EMFConstants.IMPORT_MESSAGE_TYPE);
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
-
+ 
         statusServices.setStatus(endStatus);
     }
 

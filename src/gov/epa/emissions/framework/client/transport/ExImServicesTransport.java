@@ -8,6 +8,7 @@
  */
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.ExImServices;
@@ -218,6 +219,11 @@ public class ExImServicesTransport implements ExImServices {
     	log.debug("insert a new dataset type object: " + aDstn.getName());
        
     }
+
+	public void startExport(User user, Dataset dataset, String fileName) throws EmfException {
+		// TODO Auto-generated method stub
+		
+	}
    
 
 }//EMFDataTransport
