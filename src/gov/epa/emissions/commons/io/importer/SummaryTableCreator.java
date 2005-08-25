@@ -113,8 +113,8 @@ public class SummaryTableCreator {
     public static final String ER_KEY_INDEX = "er_key";
 
     // ORL columns
-    private static final String CAS_COL = ORLDataFormat.CAS_NAME;
 
+    private static final String CAS_COL = ORLDataFormat.CAS_NAME;
     private static final String ANNUAL_EMISSION_COL = ORLDataFormat.ANNUAL_EMISSIONS_NAME;
 
     private static final String AVERAGE_DAY_EMISSION_COL = ORLDataFormat.AVERAGE_DAY_EMISSIONS_NAME;
@@ -365,7 +365,8 @@ public class SummaryTableCreator {
         // connect to emissions database
         // get the pollutant CAS codes
         Query emissionsQuery = emissionsDatasource.query();
-        ResultSet rs = emissionsQuery.executeQuery("SELECT DISTINCT(" + CAS_COL + ") FROM " + orlTable);
+        String casQuery = "SELECT DISTINCT(" + CAS_COL + ") FROM " + orlTable;
+        ResultSet rs = emissionsQuery.executeQuery(casQuery);
         rs.last();
         int numOfPollutants = rs.getRow();
         String[] pollutants = new String[numOfPollutants];
@@ -412,7 +413,7 @@ public class SummaryTableCreator {
                 summarySelectDistinct = " SELECT DISTINCT f." + STATE_COL + " as " + STATE + ", " + "e." + FIPS_COL_ORL
                         + " as " + FIPS + ", e." + SCC_COL_ORL + " as " + SCC + ", ";
                 summaryFromSelectDistinct += "(SELECT DISTINCT " + FIPS_COL_ORL + ", " + SCC_COL_ORL + " FROM "
-                        + orlTable + " ) e ";
+                        + orlTable + " ) e ";                
             }
         } else if (datasetType.equals(DatasetTypes.ORL_POINT_TOXICS)) {
             // String createIndex = " (INDEX orl_key (" + FIPS + ", " + PLANTID
@@ -478,8 +479,7 @@ public class SummaryTableCreator {
             java.util.Arrays.fill(tempTableSelectParts, "");
             java.util.Arrays.fill(tempTableJoinParts, "");
             for (int index = 0, i = 0; index < pollutants.length; index++, i = (int) (index / MAX_POLLUTANTS_JOIN)) {
-                // when using number (CAS) as column name, enclose in slanted
-                // quotes
+                // when using number (CAS) as column name, suffix w/ underscore '_'
                 String cleanPoll = "_" + pollutants[index].replace('-', '_');
                 tempTableSelectParts[i] += cleanPoll + "." + emissionCol + " as " + cleanPoll + ", ";
                 summaryTableSelectPart += "t" + i + "." + cleanPoll + " as " + cleanPoll + ", ";
@@ -535,7 +535,7 @@ public class SummaryTableCreator {
             for (int i = 0; i < numOfPollutants; i++) {
                 // when using number (CAS) as column name, enclose in slanted
                 // quotes
-                String cleanPoll = "`" + clean(pollutants[i]) + "`";
+                String cleanPoll = "_" + clean(pollutants[i]);                
                 summaryTableSelectPart += cleanPoll + "." + emissionCol + " as " + cleanPoll + ", ";
 
                 if (datasetType.equals(DatasetTypes.ORL_AREA_NONPOINT_TOXICS)

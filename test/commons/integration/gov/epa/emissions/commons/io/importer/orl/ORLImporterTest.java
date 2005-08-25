@@ -14,7 +14,7 @@ public class ORLImporterTest extends EmissionsDataSetupTestCase {
     }
 
     // FIXME: change the columns from numbers to prefix alphabets
-    public void TODO_testNonRoad() throws Exception {
+    public void testNonRoad() throws Exception {
         run("arinv.nonroad.nti99d_NC.new.txt", DatasetTypes.ORL_AREA_NONROAD_TOXICS, TableTypes.ORL_AREA_NONROAD_TOXICS);
     }
 
