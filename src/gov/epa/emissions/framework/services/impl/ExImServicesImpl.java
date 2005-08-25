@@ -12,6 +12,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetTypesDAO;
 import gov.epa.emissions.framework.services.ExImServices;
@@ -19,6 +20,7 @@ import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.naming.Context;
@@ -36,74 +38,85 @@ import org.hibernate.Session;
  */
 public class ExImServicesImpl implements ExImServices {
 
-    private static Log log = LogFactory.getLog(ExImServicesImpl.class);
+	private static Log log = LogFactory.getLog(ExImServicesImpl.class);
 
-    private DataSource datasource;
+	private ImporterFactory importerFactory;
 
-    public ExImServicesImpl() throws NamingException {
-        // TODO: should we move this into an abstract super class ?
-        Context ctx = new InitialContext();
-        datasource = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
-    }
+	public ExImServicesImpl() throws NamingException, SQLException {
+		// TODO: should we move this into an abstract super class ?
+		Context ctx = new InitialContext();
+		DataSource datasource = (DataSource) ctx
+				.lookup("java:/comp/env/jdbc/EMFDB");
 
-    private File validateFile(String fileName) throws EmfException {
-        log.debug("check if file exists " + fileName);
-        File file = new File(fileName);
+		// FIXME: we should not hard-code the db server. Also, read the
+		// datasource names from properties
+		DbServer dbServer = new PostgresDbServer(datasource.getConnection(),
+				"reference", "emissions");
 
-        if (!file.exists() || !file.isFile()) {
-            log.error("file " + fileName + " not found");
-            throw new EmfException("file " + fileName + " not found");
-        }
-        log.debug("check if file exists " + fileName);
+		importerFactory = new ImporterFactory(dbServer);
+	}
 
-        return file;
-    }
+	private File validateFile(String fileName) throws EmfException {
+		log.debug("check if file exists " + fileName);
+		File file = new File(fileName);
 
-    public void startImport(User user, String filename, DatasetType datasetType) throws EmfException {
-        log.debug("In ExImServicesImpl:startImport START");
+		if (!file.exists() || !file.isFile()) {
+			log.error("file " + fileName + " not found");
+			throw new EmfException("file " + fileName + " not found");
+		}
+		log.debug("check if file exists " + fileName);
 
-        try {
-            File file = validateFile(filename);
-            StatusServices statusSvc = new StatusServicesImpl();
+		return file;
+	}
 
-            // FIXME: we should not hard-code the db server. Also, read the
-            // datasource names from properties
-            DbServer dbServer = new PostgresDbServer(datasource.getConnection(), "reference", "emissions");
+	public void startImport(User user, String filename, DatasetType datasetType)
+			throws EmfException {
+		log.debug("In ExImServicesImpl:startImport START");
 
-            ExImTask eximTask = new ExImTask(user, file, datasetType, statusSvc, dbServer);
-            //FIXME: use a thread pool
-            new Thread(eximTask).start();
-        } catch (Exception e) {
-            log.error("Exception attempting to start import of file: " + filename, e);
-            throw new EmfException(e.getMessage());
-        }
+		try {
+			File file = validateFile(filename);
+			StatusServices statusSvc = new StatusServicesImpl();
 
-        log.debug("In ExImServicesImpl:startImport END");
-    }
+			Importer importer = importerFactory.create(datasetType);
+			ImportTask eximTask = new ImportTask(user, file, datasetType,
+					statusSvc, importer);
 
-    public DatasetType[] getDatasetTypes() throws EmfException {
-        log.debug("In ExImServicesImpl:getDatasetTypes START");
+			// FIXME: use a thread pool
+			new Thread(eximTask).start();
+		} catch (Exception e) {
+			log.error("Exception attempting to start import of file: "
+					+ filename, e);
+			throw new EmfException(e.getMessage());
+		}
 
-        Session session = HibernateUtils.currentSession();
-        List datasettypes = DatasetTypesDAO.getDatasetTypes(session);
-        log.debug("In ExImServicesImpl:getDatasetTypes END");
+		log.debug("In ExImServicesImpl:startImport END");
+	}
 
-        return (DatasetType[]) datasettypes.toArray(new DatasetType[datasettypes.size()]);
-    }
+	public DatasetType[] getDatasetTypes() throws EmfException {
+		log.debug("In ExImServicesImpl:getDatasetTypes START");
 
-    public void insertDatasetType(DatasetType aDst) throws EmfException {
-        log.debug("In ExImServicesImpl:insertDatasetType START");
+		Session session = HibernateUtils.currentSession();
+		List datasettypes = DatasetTypesDAO.getDatasetTypes(session);
+		log.debug("In ExImServicesImpl:getDatasetTypes END");
 
-        Session session = HibernateUtils.currentSession();
-        DatasetTypesDAO.insertDatasetType(aDst, session);
+		return (DatasetType[]) datasettypes
+				.toArray(new DatasetType[datasettypes.size()]);
+	}
 
-        log.debug("In ExImServicesImpl:insertDatasetType END");
+	public void insertDatasetType(DatasetType aDst) throws EmfException {
+		log.debug("In ExImServicesImpl:insertDatasetType START");
 
-    }
+		Session session = HibernateUtils.currentSession();
+		DatasetTypesDAO.insertDatasetType(aDst, session);
 
-	public void startExport(User user, Dataset dataset, String fileName) throws EmfException {
+		log.debug("In ExImServicesImpl:insertDatasetType END");
+
+	}
+
+	public void startExport(User user, Dataset dataset, String fileName)
+			throws EmfException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
