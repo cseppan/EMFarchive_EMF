@@ -1,4 +1,4 @@
-package gov.epa.emissions.commons.io.importer.orl;
+package gov.epa.emissions.commons.io.importer;
 
 import gov.epa.emissions.commons.db.DatabaseSetup;
 
@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
-public abstract class EmissionsDataSetupTestCase extends TestCase {
+public abstract class CommonsTestCase extends TestCase {
 
     protected DatabaseSetup dbSetup;
 

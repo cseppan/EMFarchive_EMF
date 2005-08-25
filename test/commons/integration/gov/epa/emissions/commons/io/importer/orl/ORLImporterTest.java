@@ -3,13 +3,14 @@ package gov.epa.emissions.commons.io.importer.orl;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.importer.DatasetTypes;
+import gov.epa.emissions.commons.io.importer.CommonsTestCase;
 import gov.epa.emissions.commons.io.importer.TableTypes;
 
 import java.io.File;
 
-public class ORLImporterTest extends EmissionsDataSetupTestCase {
+public class ORLImporterTest extends CommonsTestCase {
 
-    public void testNonPointUsingPostgres() throws Exception {
+    public void testNonPoint() throws Exception {
         run("arinv.nonpoint.nti99_NC.txt", DatasetTypes.ORL_AREA_NONPOINT_TOXICS, TableTypes.ORL_AREA_NONPOINT_TOXICS);
     }
 
