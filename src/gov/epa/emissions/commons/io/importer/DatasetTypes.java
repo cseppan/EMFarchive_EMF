@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @version $Id: DatasetTypes.java,v 1.4 2005/08/25 14:42:46 rhavaldar Exp $
+ * @version $Id: DatasetTypes.java,v 1.5 2005/08/25 21:00:09 rhavaldar Exp $
  * 
  */
 public final class DatasetTypes {
@@ -32,7 +32,7 @@ public final class DatasetTypes {
 
     public static final String ORL_AREA_NONROAD_TOXICS = "ORL Nonroad Inventory";
 
-    public static final String ORL_ON_ROAD_TOXICS = "ORL Onroad Inventory";
+    public static final String ORL_ON_ROAD_MOBILE_TOXICS = "ORL Onroad Inventory";
 
     public static final String ORL_POINT_TOXICS = "ORL Point Inventory";
 
@@ -73,7 +73,7 @@ public final class DatasetTypes {
         // NAMES.add(REFERENCE);
         NAMES.add(ORL_AREA_NONPOINT_TOXICS);
         NAMES.add(ORL_AREA_NONROAD_TOXICS);
-        NAMES.add(ORL_ON_ROAD_TOXICS);
+        NAMES.add(ORL_ON_ROAD_MOBILE_TOXICS);
         NAMES.add(ORL_POINT_TOXICS);
 
         SUMMARY_TABLE_TYPE = new HashMap();
@@ -86,7 +86,7 @@ public final class DatasetTypes {
         SUMMARY_TABLE_TYPE.put(IDA_MOBILE_ACTIVITY, TableTypes.IDA_MOBILE_ACTIVITY);
         SUMMARY_TABLE_TYPE.put(ORL_AREA_NONPOINT_TOXICS, TableTypes.ORL_AREA_NONPOINT_TOXICS_SUMMARY);
         SUMMARY_TABLE_TYPE.put(ORL_AREA_NONROAD_TOXICS, TableTypes.ORL_AREA_NONROAD_TOXICS_SUMMARY);
-        SUMMARY_TABLE_TYPE.put(ORL_ON_ROAD_TOXICS, TableTypes.ORL_MOBILE_TOXICS_SUMMARY);
+        SUMMARY_TABLE_TYPE.put(ORL_ON_ROAD_MOBILE_TOXICS, TableTypes.ORL_MOBILE_TOXICS_SUMMARY);
         SUMMARY_TABLE_TYPE.put(ORL_POINT_TOXICS, TableTypes.ORL_POINT_TOXICS_SUMMARY);
 
         TABLE_NAMES = new HashMap();
@@ -100,7 +100,7 @@ public final class DatasetTypes {
         TABLE_NAMES.put(REFERENCE, TableTypes.getNamesArray(REFERENCE));
         TABLE_NAMES.put(ORL_AREA_NONPOINT_TOXICS, TableTypes.getNamesArray(ORL_AREA_NONPOINT_TOXICS));
         TABLE_NAMES.put(ORL_AREA_NONROAD_TOXICS, TableTypes.getNamesArray(ORL_AREA_NONROAD_TOXICS));
-        TABLE_NAMES.put(ORL_ON_ROAD_TOXICS, TableTypes.getNamesArray(ORL_ON_ROAD_TOXICS));
+        TABLE_NAMES.put(ORL_ON_ROAD_MOBILE_TOXICS, TableTypes.getNamesArray(ORL_ON_ROAD_MOBILE_TOXICS));
         TABLE_NAMES.put(ORL_POINT_TOXICS, TableTypes.getNamesArray(ORL_POINT_TOXICS));
 
         DESCRIPTIVE_COLUMN_NAMES = new HashMap();
@@ -112,7 +112,7 @@ public final class DatasetTypes {
     public static boolean isORLDataset(String datasetType) {
         if (datasetType != null)
             return (datasetType.equals(ORL_AREA_NONPOINT_TOXICS) || datasetType.equals(ORL_AREA_NONROAD_TOXICS)
-                    || datasetType.equals(ORL_ON_ROAD_TOXICS) || datasetType.equals(ORL_POINT_TOXICS));
+                    || datasetType.equals(ORL_ON_ROAD_MOBILE_TOXICS) || datasetType.equals(ORL_POINT_TOXICS));
         return false;
     }
 

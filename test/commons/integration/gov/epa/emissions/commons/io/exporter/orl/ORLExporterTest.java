@@ -75,7 +75,7 @@ public class ORLExporterTest extends TestCase {
     }
 
     private void doTestOnRoad(String fileSuffix) throws Exception {
-        doExport(fileSuffix, DatasetTypes.ORL_ON_ROAD_TOXICS, TableTypes.ORL_MOBILE_TOXICS, "arinv_nonpoint_nti99_NC");
+        doExport(fileSuffix, DatasetTypes.ORL_ON_ROAD_MOBILE_TOXICS, TableTypes.ORL_MOBILE_TOXICS, "arinv_nonpoint_nti99_NC");
     }
 
     private void doTestNonRoad(String fileSuffix) throws Exception {

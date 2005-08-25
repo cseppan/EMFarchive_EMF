@@ -24,10 +24,8 @@ public class ORLImporterTest extends EmissionsDataSetupTestCase {
         // String dbFile = "ptinv.nti99_NC.100.txt";
     }
 
-    public void TODO_testMobile() {
-        // String datasetType = DatasetTypes.ORL_MOBILE_TOXICS;
-        // String tableType = TableTypes.ORL_MOBILE_TOXICS;
-        // String dbFile = "nti99.NC.onroad.SMOKE.100.txt";
+    public void testOnRoadMobile() throws Exception {
+        run("nti99.NC.onroad.SMOKE.txt", DatasetTypes.ORL_ON_ROAD_MOBILE_TOXICS, TableTypes.ORL_MOBILE_TOXICS);
     }
 
     private void run(final String filename, String datasetType, String tableType) throws Exception {
