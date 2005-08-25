@@ -7,7 +7,7 @@ import java.util.Map;
  * Table type String constants
  * 
  * @author Craig Mattocks, Keith Lee
- * @version $Id: TableTypes.java,v 1.2 2005/08/12 16:44:09 rhavaldar Exp $
+ * @version $Id: TableTypes.java,v 1.3 2005/08/25 14:42:46 rhavaldar Exp $
  */
 public final class TableTypes {
     public static final String IDA_AREA = "IDA Area Source Emissions";
@@ -130,7 +130,7 @@ public final class TableTypes {
                 ORL_AREA_NONPOINT_TOXICS, ORL_AREA_NONPOINT_TOXICS_SUMMARY });
         DATASET_TYPE_TO_NAMES_ARRAY_MAP.put(DatasetTypes.ORL_AREA_NONROAD_TOXICS, new String[] {
                 ORL_AREA_NONROAD_TOXICS, ORL_AREA_NONROAD_TOXICS_SUMMARY });
-        DATASET_TYPE_TO_NAMES_ARRAY_MAP.put(DatasetTypes.ORL_MOBILE_TOXICS, new String[] { ORL_MOBILE_TOXICS,
+        DATASET_TYPE_TO_NAMES_ARRAY_MAP.put(DatasetTypes.ORL_ON_ROAD_TOXICS, new String[] { ORL_MOBILE_TOXICS,
                 ORL_MOBILE_TOXICS_SUMMARY });
         DATASET_TYPE_TO_NAMES_ARRAY_MAP.put(DatasetTypes.ORL_POINT_TOXICS, new String[] { ORL_POINT_TOXICS,
                 ORL_POINT_TOXICS_SUMMARY });

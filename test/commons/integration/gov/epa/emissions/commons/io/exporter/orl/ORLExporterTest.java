@@ -47,19 +47,32 @@ public class ORLExporterTest extends TestCase {
         doTestNonPoint("MYSQL");
     }
 
+    public void testOnRoadUsingPostgres() throws Exception {
+        usePostgres();
+        doTestOnRoad("POSTGRES");
+    }
+
+    public void testOnRoadUsingMysql() throws Exception {
+        useMysql();
+        doTestOnRoad("MySQL");
+    }
+    
     private void doTestNonPoint(String fileSuffix) throws Exception {
-        String datasetType = DatasetTypes.ORL_AREA_NONPOINT_TOXICS;
-        String tableType = TableTypes.ORL_AREA_NONPOINT_TOXICS;
+        doExport(fileSuffix, DatasetTypes.ORL_AREA_NONPOINT_TOXICS, TableTypes.ORL_AREA_NONPOINT_TOXICS,
+                "arinv_nonpoint_nti99_NC");
+    }
 
-        String importFilenamePrefix = "arinv.nonpoint.nti99_NC";
-        String tableName = importFilenamePrefix.replace('.', '_');
+    private void doTestOnRoad(String fileSuffix) throws Exception {
+        doExport(fileSuffix, DatasetTypes.ORL_ON_ROAD_TOXICS, TableTypes.ORL_MOBILE_TOXICS, "arinv_nonpoint_nti99_NC");
+    }
 
+    private void doExport(String fileSuffix, String datasetType, String tableType, String tableName) throws Exception {
         Dataset dataset = createDataset(datasetType, tableType, tableName);
 
         ORLExporter exporter = new ORLExporter(dbSetup.getDbServer());
 
         String tempDir = System.getProperty("java.io.tmpdir");
-        String exportFileName = tempDir + "/" + importFilenamePrefix + ".EXPORTED_" + fileSuffix;
+        String exportFileName = tempDir + "/" + datasetType + "." + tableName + ".EXPORTED_" + fileSuffix;
 
         exporter.exportTableToFile(tableType, dataset, exportFileName);
     }

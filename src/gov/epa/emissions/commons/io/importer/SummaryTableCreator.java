@@ -392,7 +392,7 @@ public class SummaryTableCreator {
         String tempFromSelectDistinct = null;
         if (datasetType.equals(DatasetTypes.ORL_AREA_NONPOINT_TOXICS)
                 || datasetType.equals(DatasetTypes.ORL_AREA_NONROAD_TOXICS)
-                || datasetType.equals(DatasetTypes.ORL_MOBILE_TOXICS)) {
+                || datasetType.equals(DatasetTypes.ORL_ON_ROAD_TOXICS)) {
             // String createIndex = " (INDEX orl_key (" + FIPS + ", " + SCC +
             // "))";
             tempSelectDistinct = " SELECT DISTINCT e." + FIPS_COL_ORL + " as " + FIPS + ", e." + SCC_COL_ORL + " as "
@@ -487,7 +487,7 @@ public class SummaryTableCreator {
                 // get FIPS, SCC and CAS for pollutant
                 if (datasetType.equals(DatasetTypes.ORL_AREA_NONPOINT_TOXICS)
                         || datasetType.equals(DatasetTypes.ORL_AREA_NONROAD_TOXICS)
-                        || datasetType.equals(DatasetTypes.ORL_MOBILE_TOXICS)) {
+                        || datasetType.equals(DatasetTypes.ORL_ON_ROAD_TOXICS)) {
                     tempTableJoinParts[i] += "LEFT JOIN (SELECT " + FIPS_COL_ORL + ", " + SCC_COL_ORL + ", "
                             + emissionCol + " FROM " + orlTable + " WHERE " + CAS_COL + " = '" + pollutants[index]
                             + "') " + cleanPoll + " ON (e." + FIPS_COL_ORL + " = " + cleanPoll + "." + FIPS_COL_ORL
@@ -540,7 +540,7 @@ public class SummaryTableCreator {
 
                 if (datasetType.equals(DatasetTypes.ORL_AREA_NONPOINT_TOXICS)
                         || datasetType.equals(DatasetTypes.ORL_AREA_NONROAD_TOXICS)
-                        || datasetType.equals(DatasetTypes.ORL_MOBILE_TOXICS)) {
+                        || datasetType.equals(DatasetTypes.ORL_ON_ROAD_TOXICS)) {
                     // get FIPS, SCC and CAS for pollutant
                     summaryTableJoinPart += "LEFT JOIN (SELECT " + FIPS_COL_ORL + ", " + SCC_COL_ORL + ", "
                             + emissionCol + " FROM " + orlTable + " WHERE " + CAS_COL + " = '" + pollutants[i] + "') "

@@ -30,7 +30,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.15 2005/08/24 18:30:58 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.16 2005/08/25 14:42:46 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -106,7 +106,7 @@ public class ORLImporter extends ListFormatImporter {
         }
 
         if (!type.equals(DatasetTypes.ORL_AREA_NONPOINT_TOXICS) && !type.equals(DatasetTypes.ORL_AREA_NONROAD_TOXICS)
-                && !type.equals(DatasetTypes.ORL_MOBILE_TOXICS) && !type.equals(DatasetTypes.ORL_POINT_TOXICS)) {
+                && !type.equals(DatasetTypes.ORL_ON_ROAD_TOXICS) && !type.equals(DatasetTypes.ORL_POINT_TOXICS)) {
             throw new Exception("Unknown/unhandled ORL type: " + type);
         }
 
@@ -362,7 +362,7 @@ public class ORLImporter extends ListFormatImporter {
                 && (fileTypeLowerCase.indexOf("nonpoint") == -1) && fileTypeLowerCase.indexOf("non-point") == -1) {
             // must check for "Nonpoint" before check for "Point"
             keyword = "Nonpoint";
-        } else if (datasetType.equals(DatasetTypes.ORL_MOBILE_TOXICS) && fileTypeLowerCase.indexOf("mobile") == -1) {
+        } else if (datasetType.equals(DatasetTypes.ORL_ON_ROAD_TOXICS) && fileTypeLowerCase.indexOf("mobile") == -1) {
             keyword = "Mobile";
         } else if (datasetType.equals(DatasetTypes.ORL_POINT_TOXICS) && fileTypeLowerCase.indexOf("point") == -1) {
             // must check for "Nonpoint" before check for "Point"
@@ -387,7 +387,7 @@ public class ORLImporter extends ListFormatImporter {
             orlDataFormat = new ORLAreaNonpointDataFormat(dbServer.getTypeMapper(), extendedFormat);
         } else if (datasetType.equals(DatasetTypes.ORL_AREA_NONROAD_TOXICS)) {
             orlDataFormat = new ORLAreaNonroadDataFormat(dbServer.getTypeMapper(), extendedFormat);
-        } else if (datasetType.equals(DatasetTypes.ORL_MOBILE_TOXICS)) {
+        } else if (datasetType.equals(DatasetTypes.ORL_ON_ROAD_TOXICS)) {
             orlDataFormat = new ORLMobileDataFormat(dbServer.getTypeMapper(), extendedFormat);
         } else if (datasetType.equals(DatasetTypes.ORL_POINT_TOXICS)) {
             orlDataFormat = new ORLPointDataFormat(dbServer.getTypeMapper(), extendedFormat);

@@ -14,7 +14,7 @@ public class ORLBodyFactory {
 
         bodyMap.put(DatasetTypes.ORL_AREA_NONPOINT_TOXICS, new NonPointBody());
         bodyMap.put(DatasetTypes.ORL_AREA_NONROAD_TOXICS, new NonRoadBody());
-        bodyMap.put(DatasetTypes.ORL_MOBILE_TOXICS, new MobileBody());
+        bodyMap.put(DatasetTypes.ORL_ON_ROAD_TOXICS, new MobileBody());
         bodyMap.put(DatasetTypes.ORL_POINT_TOXICS, new PointBody());
     }
 

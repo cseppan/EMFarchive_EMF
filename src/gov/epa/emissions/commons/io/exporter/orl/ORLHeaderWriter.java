@@ -29,7 +29,7 @@ public class ORLHeaderWriter {
         typeHackMap = new HashMap();
         typeHackMap.put(DatasetTypes.ORL_AREA_NONPOINT_TOXICS, "Non-point Source Inventory");
         typeHackMap.put(DatasetTypes.ORL_AREA_NONROAD_TOXICS, "Non-road Vehicle Emission Inventory");
-        typeHackMap.put(DatasetTypes.ORL_MOBILE_TOXICS, "On-road Vehicle Emission Inventory");
+        typeHackMap.put(DatasetTypes.ORL_ON_ROAD_TOXICS, "On-road Vehicle Emission Inventory");
         typeHackMap.put(DatasetTypes.ORL_POINT_TOXICS, "Point Source Inventory");
     }
 
