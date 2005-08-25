@@ -10,7 +10,7 @@
 	<property column="msg_type" length="255" name="messageType" not-null="true" type="java.lang.String"/>
 	<property column="message" length="255" name="message" type="java.lang.String"/>
 	<property column="date" length="10" name="timestamp" type="java.util.Date"/>
-    <property column="msg_read" name="msgRead" type="yes_no"/>
+    <property column="msg_read" name="msgRead" type="boolean"/>
   </class> 
 </hibernate-mapping>  
 

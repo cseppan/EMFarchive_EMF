@@ -35,15 +35,15 @@ public class UserManagerDAO {
 
     DataSource ds = null;
 
-    private static final String GET_USER_QUERY = "select * from users where user_name=?";
+    private static final String GET_USER_QUERY = "select * from emf.users where user_name=?";
 
-    private static final String GET_USERS_QUERY = "select * from users order by user_name";
+    private static final String GET_USERS_QUERY = "select * from emf.users order by user_name";
 
-    private static final String INSERT_USER_QUERY = "INSERT INTO users (user_name,user_pass,fullname,affiliation,workphone,emailaddr,inadmingrp,acctdisabled) VALUES (?,?,?,?,?,?,?,?)";
+    private static final String INSERT_USER_QUERY = "INSERT INTO emf.users (user_name,user_pass,fullname,affiliation,workphone,emailaddr,inadmingrp,acctdisabled) VALUES (?,?,?,?,?,?,?,?)";
 
-    private static final String UPDATE_USER_QUERY = "UPDATE users SET user_name=?,user_pass=?,fullname=?,affiliation=?,workphone=?,emailaddr=?,inadmingrp=?,acctdisabled=? WHERE user_name=?";
+    private static final String UPDATE_USER_QUERY = "UPDATE emf.users SET user_name=?,user_pass=?,fullname=?,affiliation=?,workphone=?,emailaddr=?,inadmingrp=?,acctdisabled=? WHERE user_name=?";
 
-    private static final String DELETE_USER_QUERY = "DELETE FROM users where user_name=?";
+    private static final String DELETE_USER_QUERY = "DELETE FROM emf.users where user_name=?";
 
     public UserManagerDAO() throws InfrastructureException {
         try {

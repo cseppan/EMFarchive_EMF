@@ -13,7 +13,6 @@ import gov.epa.emissions.framework.CommunicationFailureException;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
-import gov.epa.emissions.framework.services.impl.ExImServicesImpl;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
