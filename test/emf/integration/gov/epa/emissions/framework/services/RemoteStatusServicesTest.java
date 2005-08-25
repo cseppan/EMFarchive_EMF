@@ -8,7 +8,7 @@
  */
 package gov.epa.emissions.framework.services;
 
-import junit.framework.TestCase;
+import org.apache.commons.configuration.ConfigurationException;
 
 /**
  * @author Conrad F. D'Cruz
@@ -16,8 +16,8 @@ import junit.framework.TestCase;
  */
 public class RemoteStatusServicesTest extends StatusServicesTestCase {
 
-    public RemoteStatusServicesTest() {
-        super("http://ben.cep.unc.edu:8080/emf/services");
+    public RemoteStatusServicesTest() throws ConfigurationException {
+        super("emf.services.url.remote");
     }
 
 }

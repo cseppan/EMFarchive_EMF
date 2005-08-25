@@ -14,18 +14,20 @@ import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
 import java.util.Date;
 
-import junit.framework.TestCase;
+import org.apache.commons.configuration.ConfigurationException;
 
 /**
  * @author Conrad F. D'Cruz
  * 
  */
-public abstract class StatusServicesTestCase extends TestCase {
+public abstract class StatusServicesTestCase extends ServicesTestCase {
 
     private StatusServices service;
 
-    public StatusServicesTestCase(String baseUrl) {
-        ServiceLocator locator = new RemoteServiceLocator(baseUrl);
+    public StatusServicesTestCase(String baseUrlProperty) throws ConfigurationException {
+        super(baseUrlProperty);
+
+        ServiceLocator locator = new RemoteServiceLocator(super.baseUrl);
         service = locator.getStatusServices();
     }
 

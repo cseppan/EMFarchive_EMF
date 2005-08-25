@@ -8,6 +8,7 @@
  */
 package gov.epa.emissions.framework.services;
 
+import org.apache.commons.configuration.ConfigurationException;
 
 /**
  * @author Conrad F. D'Cruz
@@ -15,8 +16,8 @@ package gov.epa.emissions.framework.services;
  */
 public class LocalStatusServicesTest extends StatusServicesTestCase {
 
-    public LocalStatusServicesTest() {
-        super("http://localhost:8080/emf/services");
+    public LocalStatusServicesTest() throws ConfigurationException {
+        super("emf.services.url.local");
     }
 
 }

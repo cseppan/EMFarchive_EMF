@@ -1,9 +1,11 @@
 package gov.epa.emissions.framework.services;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 public class LocalExImServicesTest extends ExImServicesTestCase {
 
-    public LocalExImServicesTest() {
-        super("http://localhost:8080/emf/services");
+    public LocalExImServicesTest() throws ConfigurationException {
+        super("emf.services.url.local");
     }
 
 }

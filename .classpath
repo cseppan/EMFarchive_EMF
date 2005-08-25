@@ -31,7 +31,6 @@
 	<classpathentry kind="lib" path="lib/analysis-engine.jar"/>
 	<classpathentry kind="lib" path="lib/antlr-2.7.5H3.jar"/>
 	<classpathentry kind="lib" path="lib/cglib-2.1.jar"/>
-	<classpathentry kind="lib" path="lib/commons-collections-2.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/dom4j-1.6.jar"/>
 	<classpathentry kind="lib" path="lib/ehcache-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate3.jar"/>
@@ -53,5 +52,8 @@
 	<classpathentry kind="lib" path="lib/swarmcache-1.0rc2.jar"/>
 	<classpathentry kind="lib" path="lib/versioncheck.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat/postgresql-8.0-311.jdbc3.jar"/>
+	<classpathentry kind="lib" path="lib/dev/commons-configuration-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/dev/commons-lang-2.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.1.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

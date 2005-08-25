@@ -209,8 +209,8 @@
             depends="emf-unit-tests, commons-unit-tests"
     />
     <target name="all"
-            depends="compile, all-unit-tests"
-            description="runs all unit-tests"
+            depends="compile, all-emf-tests, commons-unit-tests"
+            description="runs [all emf tests] + [commons unittests]"
     />
 
     <!--  =================== CVS Targets ====================================== -->

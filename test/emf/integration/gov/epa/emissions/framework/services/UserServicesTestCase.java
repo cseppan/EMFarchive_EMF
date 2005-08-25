@@ -3,21 +3,21 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import junit.framework.TestCase;
 
-public abstract class UserServicesTestCase extends TestCase {
+import org.apache.commons.configuration.ConfigurationException;
+
+public abstract class UserServicesTestCase extends ServicesTestCase {
     private UserServices service;
-    private String baseUrl;
-    
-    protected UserServicesTestCase(String baseUrl) {
-        this.baseUrl = baseUrl;
+
+    protected UserServicesTestCase(String baseUrlProperty) throws ConfigurationException {
+        super(baseUrlProperty);
     }
-    
+
     protected void setUp() {
         ServiceLocator serviceLocator = new RemoteServiceLocator(baseUrl);
         service = serviceLocator.getUserServices();
     }
-    
+
     public void testGetUserSucceedsForEMFAdministrator() throws EmfException {
         User user = service.getUser("admin");
         assertEquals("EMF Administrator", user.getFullName());
