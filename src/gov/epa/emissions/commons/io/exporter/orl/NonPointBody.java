@@ -16,7 +16,7 @@ public class NonPointBody extends AbstractORLBody {
         formatters.add(new MactFormatter());
         formatters.add(new SrcTypeFormatter());
         formatters.add(new NaicsFormatter());
-        formatters.add(new CasFormatter());
+        formatters.add(new PollFormatter());
         formatters.add(new AnnEmisFormatter());
         formatters.add(new AvdEmisFormatter());
         formatters.add(new CeffFormatter());

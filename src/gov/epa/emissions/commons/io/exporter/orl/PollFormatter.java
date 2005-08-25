@@ -5,12 +5,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * North American Industrial Classification System Code
+ * Pollutant name or number. Also called, CAS
  */
-public class NaicsFormatter implements Formatter {
+public class PollFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        String value = data.getString("NAICS");
+        String value = data.getString("CAS");
         String evalValue = (value == null) ? "-9" : value;
 
         writer.print(evalValue);

@@ -6,6 +6,9 @@ import java.sql.SQLException;
 
 import corejava.Format;
 
+/**
+ * Average-day Emissions (AVD_EMIS)
+ */
 public class AvdEmisFormatter implements Formatter {
 
     public static final Format FORMAT = new Format("%14.7e");

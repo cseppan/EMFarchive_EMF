@@ -12,7 +12,7 @@ public class MobileBody extends AbstractORLBody {
 
         formatters.add(new FipsFormatter());
         formatters.add(new SccFormatter());
-        formatters.add(new CasFormatter());
+        formatters.add(new PollFormatter());
         formatters.add(new AnnEmisFormatter());
         formatters.add(new AvdEmisFormatter());
     }

@@ -7,17 +7,18 @@ import java.sql.SQLException;
 import corejava.Format;
 
 /**
- * Annual Emissions (ANN_EMIS)
+ * Stack Height (STKHGT)
  */
-public class AnnEmisFormatter implements Formatter {
+public class StkHgtFormatter implements Formatter {
 
-    public static final Format FORMAT = new Format("%14.7e");
+    public static final Format FORMAT = new Format("%9.4f");
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        if (data.getString("ANN_EMIS") == null)
+        // FIXME: the column that STKHGT field corresponds to ?
+        if (data.getString(11) == null)
             writer.print("-9");
         else
-            writer.print(FORMAT.format(data.getDouble("ANN_EMIS")));
+            writer.print(FORMAT.format(data.getDouble(11)));
     }
 
 }

@@ -4,20 +4,17 @@ import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import corejava.Format;
-
 /**
- * Five digit FIPS code for state and county
+ * Secondary Control Equipment Code (CSEC)
  */
-class FipsFormatter implements Formatter {
-
-    public static final Format FORMAT = new Format("%5d");
+public class CsecFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        if (data.getString("FIPS") == null)
+        // FIXME: the column that CSEC field corresponds to ?
+        if (data.getString(29) == null)
             writer.print("-9");
         else
-            writer.print(FORMAT.format(data.getInt("FIPS")));
+            writer.print(ORLFormats.CSEC_FORMAT.format(data.getInt(29)));
     }
 
 }

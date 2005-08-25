@@ -4,6 +4,9 @@ import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Source Classification Code
+ */
 public class SccFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {

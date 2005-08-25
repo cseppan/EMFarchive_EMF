@@ -6,6 +6,9 @@ import java.sql.SQLException;
 
 import corejava.Format;
 
+/**
+ * Control Efficiency percentage (CEFF)
+ */
 public class CeffFormatter implements Formatter {
 
     public static final Format FORMAT = new Format("%6.2f");

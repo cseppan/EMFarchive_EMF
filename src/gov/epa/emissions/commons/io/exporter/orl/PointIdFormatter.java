@@ -5,12 +5,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * North American Industrial Classification System Code
+ * Point Identification Code
  */
-public class NaicsFormatter implements Formatter {
+public class PointIdFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        String value = data.getString("NAICS");
+        // FIXME: the column that POINTID field corresponds to ?
+        String value = data.getString(4);
         String evalValue = (value == null) ? "-9" : value;
 
         writer.print(evalValue);

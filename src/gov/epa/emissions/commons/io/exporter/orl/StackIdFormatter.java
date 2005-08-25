@@ -4,13 +4,11 @@ import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * North American Industrial Classification System Code
- */
-public class NaicsFormatter implements Formatter {
+public class StackIdFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        String value = data.getString("NAICS");
+        // FIXME: the column that STACKID field corresponds to ?
+        String value = data.getString(5);
         String evalValue = (value == null) ? "-9" : value;
 
         writer.print(evalValue);

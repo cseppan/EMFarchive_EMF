@@ -1,0 +1,17 @@
+package gov.epa.emissions.commons.io.exporter.orl;
+
+import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class UTMZoneFormatter implements Formatter {
+
+    public void format(ResultSet data, PrintWriter writer) throws SQLException {
+        // FIXME: the column that UTMZ field corresponds to ?
+        if (data.getString(22) == null)
+            writer.print("-9");
+        else
+            writer.print(ORLFormats.UTMZ_FORMAT.format(data.getInt(22)));
+    }
+
+}

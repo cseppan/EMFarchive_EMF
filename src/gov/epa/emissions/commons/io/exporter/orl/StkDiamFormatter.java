@@ -4,20 +4,18 @@ import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import corejava.Format;
-
 /**
- * Five digit FIPS code for state and county
+ * Stack Diameter (STKDIAM)
  */
-class FipsFormatter implements Formatter {
-
-    public static final Format FORMAT = new Format("%5d");
+public class StkDiamFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        if (data.getString("FIPS") == null)
+        // FIXME: the column that STKDIAM field corresponds to ?
+        if (data.getString(12) == null)
             writer.print("-9");
         else
-            writer.print(FORMAT.format(data.getInt("FIPS")));
+            writer.print(ORLFormats.STKDIAM_FORMAT.format(data.getDouble(12)));
+
     }
 
 }

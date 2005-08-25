@@ -26,17 +26,9 @@ public interface ORLFormats {
 
     public static final Format PLANT_FORMAT = new Format("%40s");
 
-    public static final Format ERPTYPE_FORMAT = new Format("%2s");
-
-    public static final Format STKHGT_FORMAT = new Format("%9.4f");
-
     public static final Format STKDIAM_FORMAT = new Format("%7.4f");
 
-    public static final Format STKTEMP_FORMAT = new Format("%7.4f");
-
     public static final Format STKFLOW_FORMAT = new Format("%9.4f");
-
-    public static final Format STKVEL_FORMAT = new Format("%9.4f");
 
     public static final Format CTYPE_FORMAT = new Format("%1s");
 
