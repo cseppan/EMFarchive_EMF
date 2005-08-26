@@ -238,6 +238,11 @@
             description="runs [all emf tests] + [commons unittests]"
     />
 
+    <target name="ci-build"
+            depends="compile, all-unit-tests"
+            description="Continuous Integration build"
+    />
+
     <!--  =================== CVS Targets ====================================== -->
     <target name="cvs-properties-load">
         <property file=".cvs" />
