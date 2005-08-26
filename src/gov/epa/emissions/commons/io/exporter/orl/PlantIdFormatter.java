@@ -10,8 +10,7 @@ import java.sql.SQLException;
 public class PlantIdFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        // FIXME: the column name for PLANTID field
-        String value = data.getString(3);
+        String value = data.getString("plantid");
         String evalValue = (value == null) ? "-9" : value;
 
         writer.print(evalValue);

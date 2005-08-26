@@ -10,11 +10,10 @@ import java.sql.SQLException;
 public class StkFlowFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        // FIXME: the column that STKFLOW field corresponds to ?
-        if (data.getString(14) == null)
+        if (data.getString("stkflow") == null)
             writer.print("-9");
         else
-            writer.print(ORLFormats.STKFLOW_FORMAT.format(data.getDouble(14)));
+            writer.print(ORLFormats.STKFLOW_FORMAT.format(data.getDouble("stkflow")));
     }
 
 }

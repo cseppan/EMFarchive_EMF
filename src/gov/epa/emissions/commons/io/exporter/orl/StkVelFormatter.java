@@ -14,11 +14,10 @@ public class StkVelFormatter implements Formatter {
     public static final Format FORMAT = new Format("%9.4f");
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        // FIXME: the column that STKVEL field corresponds to ?
-        if (data.getString(15) == null)
+        if (data.getString("stkvel") == null)
             writer.print("-9");
         else
-            writer.print(FORMAT.format(data.getDouble(15)));
+            writer.print(FORMAT.format(data.getDouble("stkvel")));
     }
 
 }

@@ -7,11 +7,10 @@ import java.sql.SQLException;
 public class UTMZoneFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        // FIXME: the column that UTMZ field corresponds to ?
-        if (data.getString(22) == null)
+        if (data.getString("umtz") == null)
             writer.print("-9");
         else
-            writer.print(ORLFormats.UTMZ_FORMAT.format(data.getInt(22)));
+            writer.print(ORLFormats.UTMZ_FORMAT.format(data.getInt("umtz")));
     }
 
 }

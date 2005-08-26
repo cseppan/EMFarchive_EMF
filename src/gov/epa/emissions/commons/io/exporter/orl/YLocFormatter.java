@@ -7,11 +7,10 @@ import java.sql.SQLException;
 public class YLocFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        // FIXME: the column that YLOC field corresponds to ?
-        if (data.getString(21) == null)
+        if (data.getString("yloc") == null)
             writer.print("-9");
         else
-            writer.print(ORLFormats.YLOC_FORMAT.format(data.getDouble(21)));
+            writer.print(ORLFormats.YLOC_FORMAT.format(data.getDouble("yloc")));
     }
 
 }

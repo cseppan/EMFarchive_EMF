@@ -12,13 +12,14 @@ import gov.epa.emissions.commons.io.importer.orl.ORLImporter;
 // FIXME: first import, before exporting.
 public class ORLExporterTest extends CommonsTestCase {
 
-    public void xtestPoint() throws Exception {
+    public void testPoint() throws Exception {
         doImport("ptinv.nti99_NC.txt", DatasetTypes.ORL_POINT_TOXICS, TableTypes.ORL_POINT_TOXICS);
         doExport(DatasetTypes.ORL_POINT_TOXICS, TableTypes.ORL_POINT_TOXICS, "ptinv_nti99_NC");
     }
-    
+
     public void testNonPoint() throws Exception {
-        doImport("arinv.nonpoint.nti99_NC.txt", DatasetTypes.ORL_AREA_NONPOINT_TOXICS, TableTypes.ORL_AREA_NONPOINT_TOXICS);
+        doImport("arinv.nonpoint.nti99_NC.txt", DatasetTypes.ORL_AREA_NONPOINT_TOXICS,
+                TableTypes.ORL_AREA_NONPOINT_TOXICS);
         doExport(DatasetTypes.ORL_AREA_NONPOINT_TOXICS, TableTypes.ORL_AREA_NONPOINT_TOXICS, "arinv_nonpoint_nti99_NC");
     }
 
@@ -28,8 +29,10 @@ public class ORLExporterTest extends CommonsTestCase {
     }
 
     public void testNonRoad() throws Exception {
-        doImport("arinv.nonroad.nti99d_NC.new.txt", DatasetTypes.ORL_AREA_NONROAD_TOXICS, TableTypes.ORL_AREA_NONROAD_TOXICS);
-        doExport(DatasetTypes.ORL_AREA_NONROAD_TOXICS, TableTypes.ORL_AREA_NONROAD_TOXICS, "arinv_nonroad_nti99d_NC_new");
+        doImport("arinv.nonroad.nti99d_NC.new.txt", DatasetTypes.ORL_AREA_NONROAD_TOXICS,
+                TableTypes.ORL_AREA_NONROAD_TOXICS);
+        doExport(DatasetTypes.ORL_AREA_NONROAD_TOXICS, TableTypes.ORL_AREA_NONROAD_TOXICS,
+                "arinv_nonroad_nti99d_NC_new");
     }
 
     private void doExport(String datasetType, String tableType, String tableName) throws Exception {
@@ -51,7 +54,7 @@ public class ORLExporterTest extends CommonsTestCase {
         dataset.setCountry("US");
         dataset.setYear(1234);
         dataset.setDescription("This is the first line of an artificial description\nThis is the second line");
-        
+
         return dataset;
     }
 

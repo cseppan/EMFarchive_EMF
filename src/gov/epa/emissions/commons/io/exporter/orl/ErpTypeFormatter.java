@@ -14,8 +14,7 @@ public class ErpTypeFormatter implements Formatter {
     public static final Format ERPTYPE_FORMAT = new Format("%2s");
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        // FIXME: the column that ERPTYPE field corresponds to ?
-        String value = data.getString(9);
+        String value = data.getString("erptype");
         String evalValue = (value == null) ? "-9" : ERPTYPE_FORMAT.format(value);
         
         writer.print(evalValue);

@@ -10,11 +10,10 @@ import java.sql.SQLException;
 public class StkDiamFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        // FIXME: the column that STKDIAM field corresponds to ?
-        if (data.getString(12) == null)
+        if (data.getString("stkdiam") == null)
             writer.print("-9");
         else
-            writer.print(ORLFormats.STKDIAM_FORMAT.format(data.getDouble(12)));
+            writer.print(ORLFormats.STKDIAM_FORMAT.format(data.getDouble("stkdiam")));
 
     }
 

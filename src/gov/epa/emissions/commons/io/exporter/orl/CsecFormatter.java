@@ -10,11 +10,10 @@ import java.sql.SQLException;
 public class CsecFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        // FIXME: the column that CSEC field corresponds to ?
-        if (data.getString(29) == null)
+        if (data.getString("csec") == null)
             writer.print("-9");
         else
-            writer.print(ORLFormats.CSEC_FORMAT.format(data.getInt(29)));
+            writer.print(ORLFormats.CSEC_FORMAT.format(data.getInt("csec")));
     }
 
 }

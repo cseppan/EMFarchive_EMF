@@ -10,8 +10,7 @@ import java.sql.SQLException;
 public class SegmentFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        // FIXME: the column that SEGMENT field corresponds to ?
-        String value = data.getString(6);
+        String value = data.getString("segment");
         String evalValue = (value == null) ? "-9" : value;
 
         writer.print(evalValue);

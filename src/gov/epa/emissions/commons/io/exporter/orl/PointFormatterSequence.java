@@ -19,7 +19,6 @@ public class PointFormatterSequence implements FormatterSequence {
         formatters.add(new SccFormatter());
         formatters.add(new ErpTypeFormatter());
         formatters.add(new SrcTypeFormatter());
-        formatters.add(new ErpTypeFormatter());
         formatters.add(new StkHgtFormatter());
         formatters.add(new StkDiamFormatter());
         formatters.add(new StkTempFormatter());

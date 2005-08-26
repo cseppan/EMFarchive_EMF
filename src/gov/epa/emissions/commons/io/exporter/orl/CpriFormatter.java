@@ -10,11 +10,10 @@ import java.sql.SQLException;
 public class CpriFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        // FIXME: the column that CPRI field corresponds to ?
-        if (data.getString(28) == null)
+        if (data.getString("cpri") == null)
             writer.print("-9");
         else
-            writer.print(ORLFormats.CPRI_FORMAT.format(data.getInt(28)));
+            writer.print(ORLFormats.CPRI_FORMAT.format(data.getInt("cpri")));
     }
 
 }

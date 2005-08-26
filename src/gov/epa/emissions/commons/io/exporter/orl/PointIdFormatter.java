@@ -10,8 +10,7 @@ import java.sql.SQLException;
 public class PointIdFormatter implements Formatter {
 
     public void format(ResultSet data, PrintWriter writer) throws SQLException {
-        // FIXME: the column that POINTID field corresponds to ?
-        String value = data.getString(4);
+        String value = data.getString("pointid");
         String evalValue = (value == null) ? "-9" : value;
 
         writer.print(evalValue);
