@@ -37,11 +37,30 @@
     />
     <property name="app.name" value="emf" />
     <property name="app.path" value="/${app.name}" />
+
+    <!-- Tomcat properties-->
     <property name="tomcat.webapps" value="${tomcat.home}/webapps" />
     <property name="war-path"
               value="file:///${tomcat.webapps}/${app.name}.war"
     />
+    <!--
+tomcat.manager.url=http://${tomcat.server}:8080/manager
 
+tomcat.start.prefix=-jar -Duser.dir="${tomcat.home}" -Djava.endorsed.dirs="${tomcat.home}/common/endorsed" "${tomcat.home}/bin/bootstrap.jar"
+tomcat.start=${tomcat.start.prefix} start
+tomcat.stop.prefix=-jar -Duser.dir="${tomcat.home}" "${tomcat.home}/bin/bootstrap.jar"
+tomcat.stop=${tomcat.stop.prefix} stop
+
+-->
+    <property name="tomcat.manager.url" value="http://${tomcat.server}:8080/manager" />
+    <property name="tomcat.start.prefix" value="-jar -Duser.dir=${tomcat.home} -Djava.endorsed.dirs=${tomcat.home}/common/endorsed ${tomcat.home}/bin/bootstrap.jar" />
+    <property name="tomcat.start" value="${tomcat.start.prefix} start" />
+    
+    <property name="tomcat.stop.prefix" value="-jar -Duser.dir=${tomcat.home} ${tomcat.home}/bin/bootstrap.jar" />
+    <property name="tomcat.stop" value="${tomcat.stop.prefix} stop" />
+
+    <property name="" value="" />
+    <!-- end Tomcat properties -->
 
     <path id="classpath">
         <pathelement location="${build.classes.dir}" />
@@ -227,10 +246,10 @@
     <target name="all-emf-tests"
             depends="compile, emf-unit-tests, emf-integration-tests"
     />
-    <target name="all-common-tests"
+    <target name="all-commons-tests"
             depends="compile, commons-unit-tests, commons-integration-tests"
     />
-    <target name="all-tests" depends="all-emf-tests, all-common-tests" />
+    <target name="all-tests" depends="all-emf-tests, all-commons-tests" />
     <target name="all-unit-tests"
             depends="emf-unit-tests, commons-unit-tests"
     />
@@ -366,6 +385,43 @@
         <delete dir="${tomcat.webapps}/${app.name}" />
         <delete dir="${tomcat.home}/work/Standalone/localhost/emf" />
         <copy todir="${tomcat.webapps}" file="${build.home}/${app.name}.war" />
+    </target>
+
+    <target name="tomcat-start">
+        <exec executable="${jdk.home}/bin/java.exe"
+              dir="${build.home}"
+              output="${build.home}/tomcat-start.txt"
+              error="${build.home}/tomcat-start-error.txt"
+              failonerror="yes"
+        >
+            <arg line="${tomcat.start}" />
+        </exec>
+    </target>
+    <target name="tomcat-stop">
+        <exec executable="${jdk.home}/bin/java.exe"
+              dir="${build.home}"
+              output="${build.home}/tomcat-stop.txt"
+              error="${build.home}/tomcat-stop-error.txt"
+              failonerror="false"
+        >
+            <arg line="${tomcat.stop}" />
+        </exec>
+        <echo message="Tomcat stopped." />
+    </target>
+
+    <target name="nirvana" depends="tomcat-stop, simple-deploy">
+        <!-- start tomcat & (all tests + stop tomcat) in parallel -->
+        <parallel>
+            <ant target="tomcat-start" />
+            <sequential>
+                <sleep seconds="5" />
+                <echo message="starting tests.." />
+                <ant target="all-emf-tests" />
+                <ant target="all-commons-tests" />
+                <ant target="tomcat-stop" />
+            </sequential>
+        </parallel>
+
     </target>
 
 </project>

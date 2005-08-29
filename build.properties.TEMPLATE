@@ -2,20 +2,17 @@
 # Please copy it as build.properties (in the same folder as this file), 
 # and change the properties as needed
 
-
-
-# Properties for Deployment to Tomcat
+# Properties for Deployment to Tomcat (compatible w/ version 4.1.31)
 
 # app
 app.name=emf
 app.version=0.1
   
-# basic settings
+# basic settings - use '/' as a separator
+jdk.home=<full path to JDK home - use '/' as a separator>
 tomcat.home=<full path to Tomcat home i.e. installation directory >
-
 
 # Tomcat Manager
 tomcat.server=localhost
 tomcat.manager.username=admin
 tomcat.manager.password=admin
-tomcat.manager.url=http://${tomcat.server}:8080/manager
