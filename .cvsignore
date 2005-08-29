@@ -11,3 +11,4 @@ build.properties
 bak
 junit*.properties
 *.EXPORTED
+build-tomcat.xml

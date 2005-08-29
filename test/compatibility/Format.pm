@@ -175,11 +175,14 @@ sub compareNum {
     if ($num1 != $num2) {
         if ($num1 == 0) {
             warn "Values $num1 and $num2 do not match";
+            return 0;
         } else {
             my $percent = ($num1 - $num2) / $num1;
-            warn "Values $num1 and $num2 differ by" . sprintf(" %.3f%%", $percent);
+            if (abs($percent) > 0.001) {
+                warn "Values $num1 and $num2 differ by" . sprintf(" %.3f%%", $percent);
+                return 0;
+            }
         }
-        return 0;
     }
     return 1;
 }

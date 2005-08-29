@@ -41,6 +41,8 @@ open (my $file2, $filename) or confess "Could not open file $filename";
 my $maxDiff = defined($ARGV[3]) ? $ARGV[3] / 100 : 0.001;
 
 
+my $status = 0;
+
 # variables for reading files
 my %filehash;
 my $key;
@@ -54,7 +56,10 @@ while (<$file1>) {
     next unless scalar(@fields);
     
     # check format of all fields
-    next unless $format1->checkFields(\@fields);
+    unless ($format1->checkFields(\@fields)) {
+        $status = 1;
+        next;
+    }
 
     # create unique key for entry
     $key = $format1->makeKey(\@fields);
@@ -63,6 +68,7 @@ while (<$file1>) {
     if (exists $filehash{$key}) {
         warn "Source/pollutant $key in 1st file at line " . $format1->lineNumber() .
              " already encountered at line " . $filehash{$key}{'line'};
+        $status = 1;
         next;
     }
     
@@ -79,7 +85,10 @@ while (<$file2>) {
     my @fields = $format2->splitLine($_);
     next unless scalar(@fields);
     
-    next unless $format2->checkFields(\@fields);
+    unless ($format2->checkFields(\@fields)) {
+        $status = 1;
+        next;
+    }
     
     $key = $format2->makeKey(\@fields);
 
@@ -87,6 +96,7 @@ while (<$file2>) {
     unless (exists $filehash{$key}) {
         warn "Source/pollutant $key only in 2nd file at line " . 
              $format2->lineNumber();
+        $status = 1;
         next;
     }
     
@@ -94,6 +104,7 @@ while (<$file2>) {
     if ($filehash{$key}{'found'}) {
         warn "Source/pollutant $key in 2nd file at line " . $format2->lineNumber() .
              " already encountered at line " . $filehash{$key}{'found'};
+        $status = 1;
         next;
     }
     
@@ -104,6 +115,7 @@ while (<$file2>) {
         warn "Files differ: 1st file, line " . $filehash{$key}{'line'} .
              "; 2nd file, line " . $format2->lineNumber() . 
              " (see earlier errors)";
+        $status = 1;
     }
 
 }
@@ -113,10 +125,17 @@ foreach $key (keys %filehash) {
     unless ($filehash{$key}{'found'}) {
         warn "Source/pollutant $key only in 1st file at line " .
              $filehash{$key}{'line'};
+        $status = 1;
     }
 }
 
 close $file1;
 close $file2;
 
-exit;
+if ($status) {
+    print "Status: failure\n";
+} else {
+    print "Status: success\n";
+}
+
+exit($status);

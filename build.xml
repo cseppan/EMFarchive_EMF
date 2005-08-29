@@ -52,11 +52,17 @@ tomcat.stop.prefix=-jar -Duser.dir="${tomcat.home}" "${tomcat.home}/bin/bootstra
 tomcat.stop=${tomcat.stop.prefix} stop
 
 -->
-    <property name="tomcat.manager.url" value="http://${tomcat.server}:8080/manager" />
-    <property name="tomcat.start.prefix" value="-jar -Duser.dir=${tomcat.home} -Djava.endorsed.dirs=${tomcat.home}/common/endorsed ${tomcat.home}/bin/bootstrap.jar" />
+    <property name="tomcat.manager.url"
+              value="http://${tomcat.server}:8080/manager"
+    />
+    <property name="tomcat.start.prefix"
+              value="-jar -Duser.dir=${tomcat.home} -Djava.endorsed.dirs=${tomcat.home}/common/endorsed ${tomcat.home}/bin/bootstrap.jar"
+    />
     <property name="tomcat.start" value="${tomcat.start.prefix} start" />
-    
-    <property name="tomcat.stop.prefix" value="-jar -Duser.dir=${tomcat.home} ${tomcat.home}/bin/bootstrap.jar" />
+
+    <property name="tomcat.stop.prefix"
+              value="-jar -Duser.dir=${tomcat.home} ${tomcat.home}/bin/bootstrap.jar"
+    />
     <property name="tomcat.stop" value="${tomcat.stop.prefix} stop" />
 
     <property name="" value="" />
@@ -309,71 +315,11 @@ tomcat.stop=${tomcat.stop.prefix} stop
              basedir="${build.dist.dir}"
         />
     </target>
-
-
-    <!-- 'dynamically' installs the app in Tomcat. Will need to reinstall, 
-        if Tomcat restarts. Use the 'reload' target, if you only update 
-        Java classes/web.xml. Logical opposite of the 'remove' target
     
-        You must run this target from the same server as Tomcat
-    -->
-    <target name="app-install"
-            description="Install application to servlet container"
-    >
-        <install url="${tomcat.manager.url}"
-                 username="${tomcat.manager.username}"
-                 password="${tomcat.manager.password}"
-                 path="${app.path}"
-                 war="${war-path}"
-        />
-    </target>
-    <target name="app-remove"
-            description="Remove application on servlet container"
-    >
-        <remove url="${tomcat.manager.url}"
-                username="${tomcat.manager.username}"
-                password="${tomcat.manager.password}"
-                path="${app.path}"
-        />
-    </target>
-
     <target name="apps-list" description="List installed applications ">
         <list url="${tomcat.manager.url}"
               username="${tomcat.manager.username}"
               password="${tomcat.manager.password}"
-        />
-    </target>
-
-    <target name="app-deploy"
-            description="Deploy application on servlet container"
-    >
-        <copy todir="${tomcat.webapps}" file="${build.home}/${app.name}.war" />
-        <deploy url="${tomcat.manager.url}"
-                username="${tomcat.manager.username}"
-                password="${tomcat.manager.password}"
-                path="${app.path}"
-                war="${war-path}"
-        />
-    </target>
-
-    <target name="app-reload"
-            depends="app-stop, app-start"
-            description="Reload application on servlet container"
-    />
-
-    <target name="app-start" description="Start Tomcat application">
-        <start url="${tomcat.manager.url}"
-               username="${tomcat.username}"
-               password="${tomcat.password}"
-               path="${app.path}"
-        />
-    </target>
-
-    <target name="app-stop" description="Stop Tomcat application">
-        <stop url="${tomcat.manager.url}"
-              username="${tomcat.username}"
-              password="${tomcat.password}"
-              path="${app.path}"
         />
     </target>
 
@@ -414,7 +360,6 @@ tomcat.stop=${tomcat.stop.prefix} stop
         <parallel>
             <ant target="tomcat-start" />
             <sequential>
-                <sleep seconds="5" />
                 <echo message="starting tests.." />
                 <ant target="all-emf-tests" />
                 <ant target="all-commons-tests" />
