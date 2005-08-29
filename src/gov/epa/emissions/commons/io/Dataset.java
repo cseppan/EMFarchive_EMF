@@ -1,10 +1,26 @@
+/*
+ * Creation on Aug 29, 2005
+ * Eclipse Project Name: EMF
+ * File Name: Dataset.java
+ * Author: Conrad F. D'Cruz
+ */
+/**
+ * 
+ */
+
 package gov.epa.emissions.commons.io;
 
 import java.util.Date;
 import java.util.Map;
 
 public interface Dataset {
+	//unique id needed for hibernate persistence
+	public long getDatasetid();
+	public void setDatasetid(long datasetid);
 
+	public String getName();
+	public void setName(String name);
+	
     //bean-style properties
     void setCreator(String creator);
     String getCreator();

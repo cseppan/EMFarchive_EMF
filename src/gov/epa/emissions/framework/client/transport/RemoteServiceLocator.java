@@ -8,6 +8,7 @@
  */
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.UserServices;
@@ -32,6 +33,10 @@ public class RemoteServiceLocator implements ServiceLocator {
 
     public ExImServices getEximServices() {
         return new ExImServicesTransport(baseUrl + "/gov.epa.emf.services.ExImServices");
+    }
+
+    public DataServices getDataServices() {
+        return new DataServicesTransport(baseUrl + "/gov.epa.emf.services.DataServices");
     }
 
 }

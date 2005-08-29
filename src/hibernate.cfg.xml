@@ -17,6 +17,7 @@
         </property>
         <mapping resource="gov/epa/emissions/framework/services/impl/Status.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/impl/DatasetType.hbm.xml"/>
+    	<mapping resource="gov/epa/emissions/framework/services/impl/Dataset.hbm.xml"/>
     </session-factory>
     
 </hibernate-configuration>

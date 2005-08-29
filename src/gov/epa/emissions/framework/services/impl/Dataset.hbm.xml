@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping schema="emf">
+  <class name="gov.epa.emissions.commons.io.EmfDataset" table="datasets">
+ 	<id name="datasetid" type="long" column="dataset_id">
+      <generator class="identity"/>
+ 	</id>
+	<property column="name" length="128" name="name" not-null="true" type="java.lang.String"/>
+	<property column="creator" length="128" name="creator" not-null="true" type="java.lang.String"/>
+	<property column="datasettype" length="255" name="datasetType" not-null="true" type="java.lang.String"/>
+	<property column="units" length="128" name="units" not-null="true" type="java.lang.String"/>
+	<property column="region" length="255" name="region" not-null="true" type="java.lang.String"/>
+	<property column="year" length="128" name="year" not-null="true" type="integer"/>
+	<property column="country" length="255" name="country" not-null="true" type="java.lang.String"/>
+	<property column="temporal_resolution" length="255" name="temporalResolution" not-null="true" type="java.lang.String"/>
+	<property column="start_date_time" length="4" name="startDateTime" type="java.util.Date"/>
+	<property column="stop_date_time" length="4" name="stopDateTime" type="java.util.Date"/>
+	<property column="description" length="255" name="description" not-null="true" type="java.lang.String"/>
+  </class> 
+</hibernate-mapping>
