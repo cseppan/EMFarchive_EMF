@@ -16,7 +16,6 @@ import org.jmock.core.stub.ReturnStub;
 public class RegisterUserWindowLauncher {
 
     public static void main(String[] args) throws Exception {
-
         UserServices userServices = new UserServicesStub(Collections.EMPTY_LIST);
         Mock serviceLocator = new Mock(ServiceLocator.class);
         serviceLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getUserServices")).will(
