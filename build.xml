@@ -308,43 +308,20 @@
                  war="${war-path}"
         />
     </target>
-
-    <target name="apps-list" description="List installed applications ">
-        <list url="${tomcat.manager.url}"
-              username="${tomcat.manager.username}"
-              password="${tomcat.manager.password}"
-        />
-    </target>
-
-
-    <!-- Signals Tomcat to reload the app. Could be used when application context is 
-        not reloadable, and the classes/property/lib files are updated.
-
-        NOTE: If web.xml has changed, use stop & start.
-    -->
-    <target name="app-reload"
-            description="Reload application on servlet container"
+    <target name="app-remove"
+            description="Remove application on servlet container"
     >
-        <reload url="${tomcat.manager.url}"
+        <remove url="${tomcat.manager.url}"
                 username="${tomcat.manager.username}"
                 password="${tomcat.manager.password}"
                 path="${app.path}"
         />
     </target>
 
-    <target name="app.start" description="Start Tomcat application">
-        <start url="${tomcat.manager.url}"
-               username="${tomcat.username}"
-               password="${tomcat.password}"
-               path="${app.path}"
-        />
-    </target>
-
-    <target name="app.stop" description="Stop Tomcat application">
-        <stop url="${tomcat.manager.url}"
-              username="${tomcat.username}"
-              password="${tomcat.password}"
-              path="${app.path}"
+    <target name="apps-list" description="List installed applications ">
+        <list url="${tomcat.manager.url}"
+              username="${tomcat.manager.username}"
+              password="${tomcat.manager.password}"
         />
     </target>
 
@@ -360,6 +337,27 @@
         />
     </target>
 
+    <target name="app-reload"
+            depends="app-stop, app-start"
+            description="Reload application on servlet container"
+    />
+
+    <target name="app-start" description="Start Tomcat application">
+        <start url="${tomcat.manager.url}"
+               username="${tomcat.username}"
+               password="${tomcat.password}"
+               path="${app.path}"
+        />
+    </target>
+
+    <target name="app-stop" description="Stop Tomcat application">
+        <stop url="${tomcat.manager.url}"
+              username="${tomcat.username}"
+              password="${tomcat.password}"
+              path="${app.path}"
+        />
+    </target>
+
     <target name="simple-deploy"
             depends="app-dist"
             description="Removes (if present) an existing installation and copies the new War to Tomcat webapps folder"
@@ -370,15 +368,5 @@
         <copy todir="${tomcat.webapps}" file="${build.home}/${app.name}.war" />
     </target>
 
-    <!-- 'dynamically' removes the app from Tomcat. Restart negates this effect ?? -->
-    <target name="app-remove"
-            description="Remove application on servlet container"
-    >
-        <remove url="${tomcat.manager.url}"
-                username="${tomcat.manager.username}"
-                password="${tomcat.manager.password}"
-                path="${app.path}"
-        />
-    </target>
 </project>
 
