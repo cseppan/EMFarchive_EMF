@@ -15,6 +15,7 @@ tomcat.home=<full path to Tomcat home i.e. installation directory >
 
 
 # Tomcat Manager
+tomcat.server=localhost
 tomcat.manager.username=admin
 tomcat.manager.password=admin
-tomcat.manager.url=http://localhost:8080/manager
+tomcat.manager.url=http://${tomcat.server}:8080/manager

@@ -37,10 +37,11 @@
     />
     <property name="app.name" value="emf" />
     <property name="app.path" value="/${app.name}" />
-    <property name="war-path"
-              value="file:///${basedir}/${build.home}/${app.name}"
-    />
     <property name="tomcat.webapps" value="${tomcat.home}/webapps" />
+    <property name="war-path"
+              value="file:///${tomcat.webapps}/${app.name}.war"
+    />
+
 
     <path id="classpath">
         <pathelement location="${build.classes.dir}" />
@@ -331,9 +332,26 @@
         />
     </target>
 
+    <target name="app.start" description="Start Tomcat application">
+        <start url="${tomcat.manager.url}"
+               username="${tomcat.username}"
+               password="${tomcat.password}"
+               path="${app.path}"
+        />
+    </target>
+
+    <target name="app.stop" description="Stop Tomcat application">
+        <stop url="${tomcat.manager.url}"
+              username="${tomcat.username}"
+              password="${tomcat.password}"
+              path="${app.path}"
+        />
+    </target>
+
     <target name="app-deploy"
-            description="Reload application on servlet container"
+            description="Deploy application on servlet container"
     >
+        <copy todir="${tomcat.webapps}" file="${build.home}/${app.name}.war" />
         <deploy url="${tomcat.manager.url}"
                 username="${tomcat.manager.username}"
                 password="${tomcat.manager.password}"

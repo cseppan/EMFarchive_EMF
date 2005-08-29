@@ -435,7 +435,7 @@
 	         -->
 	    <parameter>
 	      <name>url</name>
-	      <value>jdbc:postgresql://localhost:5432/EMF.raghu?autoReconnect=true</value>
+	      <value>jdbc:postgresql://ben.cep.unc.edu:5432/EMF.raghu?autoReconnect=true</value>
 	    </parameter>
 	  </ResourceParams>
 	</Context>
