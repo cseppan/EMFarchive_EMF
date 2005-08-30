@@ -54,9 +54,7 @@ public class ReferenceImporter extends FixedFormatImporter {
 
         // import each file (--> database table) one by one..
         for (int i = 0; i < files.length; i++) {
-            System.out.println("importing file - " + files[i]);
             importFile(files[i], datasource, getDetails(files[i]), overwrite);
-            System.out.println("successfully imported file - " + files[i]);
         }
     }
 
