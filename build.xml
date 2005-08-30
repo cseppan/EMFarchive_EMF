@@ -184,7 +184,7 @@ tomcat.stop=${tomcat.stop.prefix} stop
             <formatter type="xml" />
             <batchtest fork="yes" todir="${reports.integrationtests.dir}">
                 <fileset dir="${test.emf.integration.dir}">
-                    <include name="**/emissions/framework/**/Local*Test.java" />
+                    <include name="**/emissions/framework/**/*Test.java" />
                     <exclude name="**/emissions/framework/**/Remote*Test.java"
                     />
                 </fileset>

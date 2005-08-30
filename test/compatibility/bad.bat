@@ -1,0 +1,1 @@
+perl compare_invs.pl ORLNonpoint data\imported-non-point.txt data\BAD-exported-non-point.txt > bad.results
