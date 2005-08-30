@@ -45,7 +45,7 @@ public class DataServicesTransport implements DataServices {
 
     public DataServicesTransport(String endpt) {
         endpoint=endpt;
-        System.out.println("ENDPOINT: " + endpoint);
+        log.info("ENDPOINT: " + endpoint);
     }
 
 	/* (non-Javadoc)

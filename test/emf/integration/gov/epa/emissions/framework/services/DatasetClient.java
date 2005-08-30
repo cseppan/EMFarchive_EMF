@@ -6,9 +6,11 @@ import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.services.impl.DataServicesImpl;
 
 import java.util.Date;
+import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.mapping.Map;
 
 /*
  * Created on Aug 1, 2005
@@ -39,13 +41,13 @@ public class DatasetClient {
      */
     public DatasetClient() throws Exception {
         super();
-        log.info("IN CONSTRUCTOR");
+        log.debug("IN CONSTRUCTOR");
         svcLoc = new RemoteServiceLocator("http://localhost:8080/emf/services");
         dataSvc = svcLoc.getDataServices();
         
         insertDataset();
         getDatasets();
-        log.info("END CONSTRUCTOR");
+        log.debug("END CONSTRUCTOR");
 
     }
 
@@ -55,14 +57,13 @@ public class DatasetClient {
         try {
             Dataset[] dataSets = dataSvc.getDatasets();
             if (dataSets == null){
-            	System.out.println("NULL DATASETS");
+            	log.info("NULL DATASETS");
             }else{
-                System.out.println("Total number of datasettypes: " + dataSets.length);            	
+                log.info("Total number of datasettypes: " + dataSets.length);            	
             }
 
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log.error("Error getting datasets",e);
         }
         
 	}
@@ -82,8 +83,14 @@ public class DatasetClient {
     	aDset.setTemporalResolution("FooBar");
     	aDset.setUnits("Unity");
     	aDset.setYear(43);
+    	//Map of datatables
+    	HashMap dataTables = new HashMap();
+    	dataTables.put("A","B");
+    	dataTables.put("C","D");
+    	
+    	//Insert the dataset into the schema
     	dataSvc.insertDataset(aDset);
-      System.out.println("HibClient: After call to insert Dataset");
+      log.debug("HibClient: After call to insert Dataset");
 	}
 
 

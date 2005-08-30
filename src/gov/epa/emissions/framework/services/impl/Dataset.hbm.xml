@@ -19,5 +19,11 @@
 	<property column="start_date_time" length="4" name="startDateTime" type="java.util.Date"/>
 	<property column="stop_date_time" length="4" name="stopDateTime" type="java.util.Date"/>
 	<property column="description" length="255" name="description" not-null="true" type="java.lang.String"/>
+
+    <map name="dataTables" table="DATASETTABLES" lazy="false">
+        <key column="DATASET_ID"/>
+        <index column="TABLE_TYPE" type="string"/>
+        <element column="TABLE_NAME" type="string"/>
+    </map>
   </class> 
 </hibernate-mapping>
