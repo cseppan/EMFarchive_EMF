@@ -146,15 +146,6 @@ public abstract class FormattedImporter implements Importer {
         return dataset;
     }
 
-    protected String[] removeSummaryTable(String datasetType, String[] tableTypes) {
-        String summaryTable = DatasetTypes.getSummaryTableType(datasetType);
-        // must send returned array to concrete List constructor in order to use
-        // remove method
-        List tableTypeList = new ArrayList(Arrays.asList(tableTypes));
-        tableTypeList.remove(summaryTable);
-        return (String[]) tableTypeList.toArray(new String[0]);
-    }
-
     protected void checkForIndexOutOfBounds(int index, String[] stringlets, String line) throws Exception {
         // check for index out of bounds
         if (index >= stringlets.length) {

@@ -67,8 +67,7 @@ public class ORLExporterTest extends CommonsTestCase {
         dataset.setDatasetType(datasetType);
         // only one base type
         dataset.addTable(new Table(tableType.baseTypes()[0], tableName));
-        String summaryTableType = DatasetTypes.getSummaryTableType(datasetType);
-        dataset.addTable(new Table(summaryTableType, tableName + "_summary"));
+        dataset.addTable(new Table(tableType.summaryType(), tableName + "_summary"));
 
         ORLImporter importer = new ORLImporter(dbSetup.getDbServer(), false, true);
         importer.run(new File[] { new File("test/commons/data/orl/nc", filename) }, dataset, true);

@@ -24,7 +24,8 @@ public final class DatasetTypes {
 
         DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.put(ORL_AREA_NONROAD_TOXICS, ORLTableType.ORL_AREA_NONROAD_TOXICS
                 .summaryType());
-        DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.put(ORL_ON_ROAD_MOBILE_TOXICS, ORLTableType.ORL_ONROAD_MOBILE_TOXICS.summaryType());
+        DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.put(ORL_ON_ROAD_MOBILE_TOXICS, ORLTableType.ORL_ONROAD_MOBILE_TOXICS
+                .summaryType());
         DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.put(ORL_POINT_TOXICS, ORLTableType.ORL_POINT_TOXICS.summaryType());
     }
 
@@ -33,11 +34,6 @@ public final class DatasetTypes {
             return (datasetType.equals(ORL_AREA_NONPOINT_TOXICS) || datasetType.equals(ORL_AREA_NONROAD_TOXICS)
                     || datasetType.equals(ORL_ON_ROAD_MOBILE_TOXICS) || datasetType.equals(ORL_POINT_TOXICS));
         return false;
-    }
-
-    //FIXME: get rid and use TableType
-    public static String getSummaryTableType(final String datasetType) {
-        return (String) DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.get(datasetType);
     }
 
 }

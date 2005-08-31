@@ -31,7 +31,7 @@ import java.util.Map;
  * The importer for ORL (One Record per Line) format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.18 2005/08/31 19:47:14 rhavaldar Exp $
+ * @version $Id: ORLImporter.java,v 1.19 2005/08/31 20:02:27 rhavaldar Exp $
  */
 public class ORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
@@ -666,9 +666,8 @@ public class ORLImporter extends ListFormatImporter {
         }// while(it.hasNext())
 
         // create the summary table
-        String summaryTableType = DatasetTypes.getSummaryTableType(datasetType);
         String summaryTable = emissionsDatasource.getName() + "."
-                + (String) dataset.getTablesMap().get(summaryTableType);
+                + (String) dataset.getTablesMap().get(tableType.summaryType());
         SummaryTableCreator modifier = new SummaryTableCreator(dbServer.getEmissionsDatasource(), dbServer
                 .getReferenceDatasource());
         modifier.createORLSummaryTable(datasetType, qualifiedTableName, summaryTable, overwrite, annualNotAverageDaily);

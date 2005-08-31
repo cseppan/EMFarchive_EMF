@@ -12,7 +12,6 @@ import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.Table;
-import gov.epa.emissions.commons.io.importer.DatasetTypes;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ORLTableType;
 import gov.epa.emissions.framework.EmfException;
@@ -81,9 +80,9 @@ public class ImportTask implements Runnable {
         String tablename = filename.substring(0, filename.length() - 4).replace('.', '_');
 
         dataset.setDatasetType(datasetType.getName());
-        dataset.addTable(new Table(ORLTableType.ORL_AREA_NONPOINT_TOXICS.baseTypes()[0], tablename));
-        String summaryTableType = DatasetTypes.getSummaryTableType(datasetType.getName());
-        dataset.addTable(new Table(summaryTableType, tablename + "_summary"));
+        ORLTableType tableType = ORLTableType.ORL_AREA_NONPOINT_TOXICS;
+        dataset.addTable(new Table(tableType.baseTypes()[0], tablename));
+        dataset.addTable(new Table(tableType.summaryType(), tablename + "_summary"));
 
         return dataset;
     }
