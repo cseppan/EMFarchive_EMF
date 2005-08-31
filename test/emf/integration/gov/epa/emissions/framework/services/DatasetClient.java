@@ -3,28 +3,13 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
-import gov.epa.emissions.framework.services.impl.DataServicesImpl;
 
 import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.mapping.Map;
 
-/*
- * Created on Aug 1, 2005
- *
- * Eclipse Project Name: Hib
- * Package: 
- * File Name: HibClient.java
- * Author: Conrad F. D'Cruz
- */
-
-/**
- * @author Conrad F. D'Cruz
- *
- */
 /**
  * @author Conrad F. D'Cruz
  *

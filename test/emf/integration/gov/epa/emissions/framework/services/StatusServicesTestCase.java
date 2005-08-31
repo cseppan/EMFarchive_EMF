@@ -44,7 +44,6 @@ public abstract class StatusServicesTestCase extends ServicesTestCase {
     public void testGet() throws EmfException {
         Status[] stats = service.getMessages("emf");
         // FIXME: insert first, before assertion
-        System.out.println("Total number of status messages: " + stats.length);
 
         for (int i = 0; i < stats.length; i++) {
             Status aStat = stats[i];

@@ -1,7 +1,4 @@
 -- Sequence: emf.datasets_dataset_id_seq
-
-DROP SEQUENCE emf.datasets_dataset_id_seq;
-
 CREATE SEQUENCE emf.datasets_dataset_id_seq
   INCREMENT 1
   MINVALUE 1

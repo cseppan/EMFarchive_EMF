@@ -17,13 +17,15 @@ public final class DatasetTypes {
 
     private static final Map DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP;
 
-    static {
+    static {// FIXME: analyze usage and refactor ?
         DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP = new HashMap();
-        DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.put(ORL_AREA_NONPOINT_TOXICS,
-                TableTypes.ORL_AREA_NONPOINT_TOXICS_SUMMARY);
-        DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.put(ORL_AREA_NONROAD_TOXICS, TableTypes.ORL_AREA_NONROAD_TOXICS_SUMMARY);
-        DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.put(ORL_ON_ROAD_MOBILE_TOXICS, TableTypes.ORL_MOBILE_TOXICS_SUMMARY);
-        DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.put(ORL_POINT_TOXICS, TableTypes.ORL_POINT_TOXICS_SUMMARY);
+        DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.put(ORL_AREA_NONPOINT_TOXICS, ORLTableType.ORL_AREA_NONPOINT_TOXICS
+                .summaryType());
+
+        DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.put(ORL_AREA_NONROAD_TOXICS, ORLTableType.ORL_AREA_NONROAD_TOXICS
+                .summaryType());
+        DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.put(ORL_ON_ROAD_MOBILE_TOXICS, ORLTableType.ORL_ONROAD_MOBILE_TOXICS.summaryType());
+        DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.put(ORL_POINT_TOXICS, ORLTableType.ORL_POINT_TOXICS.summaryType());
     }
 
     public static boolean isORLDataset(String datasetType) {
@@ -33,10 +35,7 @@ public final class DatasetTypes {
         return false;
     }
 
-    public static String[] getTableTypes(final String datasetType) {
-        return TableTypes.getTableTypes(datasetType);
-    }
-
+    //FIXME: get rid and use TableType
     public static String getSummaryTableType(final String datasetType) {
         return (String) DATASET_TYPE_TO_SUMMARY_TABLE_TYPE_MAP.get(datasetType);
     }

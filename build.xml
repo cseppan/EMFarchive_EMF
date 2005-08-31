@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="EMF" default="all" basedir=".">
+<project name="EMF" default="nirvana" basedir=".">
 
     <!--  =================== Properties ====================================== -->
     <property file="build.properties" />
@@ -210,7 +210,7 @@ tomcat.stop=${tomcat.stop.prefix} stop
     </target>
 
     <target name="commons-integration-tests"
-            depends="compile"
+            depends="compile, setup-emissions-data"
             description="All Integration Tests"
     >
         <junit printsummary="yes" haltonfailure="yes">
@@ -219,6 +219,9 @@ tomcat.stop=${tomcat.stop.prefix} stop
             <batchtest fork="yes" todir="${reports.integrationtests.dir}">
                 <fileset dir="${test.commons.integration.dir}">
                     <include name="**/*Test.java" />
+                    <exclude name="**/ReferenceImporterTest.java" />
+                    <exclude name="**/ReferenceTablesCreatorTest.java" />
+                    <exclude name="**/ORLImporterTest.java" />
                 </fileset>
             </batchtest>
         </junit>
@@ -237,7 +240,7 @@ tomcat.stop=${tomcat.stop.prefix} stop
                   fork="yes"
                   todir="${reports.integrationtests.dir}"
             />
-            <test name="gov.epa.emissions.commons.io.importer.orl.ReferenceTablesTest"
+            <test name="gov.epa.emissions.commons.io.importer.orl.ReferenceTablesCreatorTest"
                   fork="yes"
                   todir="${reports.integrationtests.dir}"
             />
@@ -259,11 +262,7 @@ tomcat.stop=${tomcat.stop.prefix} stop
     <target name="all-unit-tests"
             depends="emf-unit-tests, commons-unit-tests"
     />
-    <target name="all"
-            depends="compile, all-emf-tests, commons-unit-tests"
-            description="runs [all emf tests] + [commons unittests]"
-    />
-
+   
     <target name="ci-build"
             depends="compile, all-unit-tests, app-dist"
             description="Continuous Integration build"
@@ -315,7 +314,7 @@ tomcat.stop=${tomcat.stop.prefix} stop
              basedir="${build.dist.dir}"
         />
     </target>
-    
+
     <target name="apps-list" description="List installed applications ">
         <list url="${tomcat.manager.url}"
               username="${tomcat.manager.username}"

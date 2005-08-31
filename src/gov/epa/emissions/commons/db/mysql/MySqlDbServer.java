@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlTypeMapper;
 import gov.epa.emissions.commons.io.importer.ReferenceImporter;
-import gov.epa.emissions.commons.io.importer.ReferenceTables;
+import gov.epa.emissions.commons.io.importer.ReferenceTablesCreator;
 
 import java.io.File;
 import java.sql.Connection;
@@ -55,7 +55,7 @@ public class MySqlDbServer implements DbServer {
             ReferenceImporter importer = new ReferenceImporter(this, fieldDefsFile, referenceFilesDir, false);
             importer.createReferenceTables();
             
-            ReferenceTables tables = new ReferenceTables(null, getTypeMapper());
+            ReferenceTablesCreator tables = new ReferenceTablesCreator(null, getTypeMapper());
             tables.createAdditionRefTables(referenceDatasource);
         } catch (Exception e) {
             throw new SQLException("could not create reference tables. Reason: " + e.getMessage());

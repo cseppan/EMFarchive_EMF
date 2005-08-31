@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Arrays;
 
-public class ReferenceTables {
+public class ReferenceTablesCreator {
 
     public static final String DELIMITER = ",";
 
@@ -39,7 +39,7 @@ public class ReferenceTables {
 
     private SqlTypeMapper sqlTypeMapper;
 
-    public ReferenceTables(File referenceFilesDir, SqlTypeMapper sqlTypeMapper) {
+    public ReferenceTablesCreator(File referenceFilesDir, SqlTypeMapper sqlTypeMapper) {
         this.referenceFilesDir = referenceFilesDir;
         this.sqlTypeMapper = sqlTypeMapper;
     }

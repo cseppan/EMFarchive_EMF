@@ -1,5 +1,4 @@
 --- Table: emf.datasets
-DROP TABLE "emf"."datasets";
 CREATE TABLE "emf"."datasets"
 (
   dataset_id serial not null unique,

@@ -1,5 +1,3 @@
-DROP TABLE datasettables;
-
 CREATE TABLE datasettables
 (
   dataset_id int4 NOT NULL,
@@ -8,4 +6,3 @@ CREATE TABLE datasettables
 ) 
 WITHOUT OIDS;
 ALTER TABLE datasettables OWNER TO emf;
-

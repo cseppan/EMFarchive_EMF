@@ -10,170 +10,190 @@
 
 package gov.epa.emissions.commons.io;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Conrad F. D'Cruz
- *
+ * 
  */
 public class EmfDataset implements Dataset {
-//	TODO: how are these unused variables accessed ?
+    // TODO: how are these unused variables accessed ?
 
-	//unique id needed for hibernate persistence
-	private long datasetid;
+    // unique id needed for hibernate persistence
+    private long datasetid;
 
-	private String name;
+    private String name;
 
-	private int year;
+    private int year;
 
-	private String description;
+    private String description;
 
-	private Map dataTables;
+    private String datasetType;
 
-	private String datasetType;
+    private String region;
 
-	private String region;
+    private String country;
 
-	private String country;
+    private String units;
 
-	private String units;
+    private String creator;
 
-	private String creator;
+    private String temporalResolution;
 
-	private String temporalResolution;
+    private Date startDateTime;
 
-	private Date startDateTime;
+    private Date endDateTime;
 
-	private Date endDateTime;
+    private Map datasources;
 
-	private Map datasources;
+    private List tables;
 
+    public EmfDataset() {
+        tables = new ArrayList();
+    }
 
-	public EmfDataset() {
-		dataTables = new HashMap();
-	}
+    public String getDatasetType() {
+        return datasetType;
+    }
 
-	public String getDatasetType() {
-		return datasetType;
-	}
+    public void setUnits(String units) {
+        this.units = units;
+    }
 
-	public void setUnits(String units) {
-		this.units = units;
-	}
+    public void setTemporalResolution(String temporalResolution) {
+        this.temporalResolution = temporalResolution;
+    }
 
-	public void setTemporalResolution(String temporalResolution) {
-		this.temporalResolution = temporalResolution;
-	}
+    public void setRegion(String region) {
+        this.region = region;
+    }
 
-	public void setRegion(String region) {
-		this.region = region;
-	}
+    public void setYear(int year) {
+        this.year = year;
+    }
 
-	public void setYear(int year) {
-		this.year = year;
-	}
+    public void setStartDateTime(Date time) {
+        this.startDateTime = time;
+    }
 
-	public void setStartDateTime(Date time) {
-		this.startDateTime = time;
-	}
+    public void setStopDateTime(Date time) {
+        this.endDateTime = time;
+    }
 
-	public void setStopDateTime(Date time) {
-		this.endDateTime = time;
-	}
+    public String getRegion() {
+        return region;
+    }
 
-	public String getRegion() {
-		return region;
-	}
+    public int getYear() {
+        return year;
+    }
 
-	public int getYear() {
-		return year;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public Table getTable(String tableType) {
+        for (Iterator iter = tables.iterator(); iter.hasNext();) {
+            Table element = (Table) iter.next();
+            if (element.tableType().equals(tableType))
+                return element;
+        }
 
-	public String getDataTable(String tableType) {
-		return (String) ((dataTables != null) ? dataTables.get(tableType)
-				: null);
-	}
+        return null;
+    }
 
-	public Map getDataTables() {
-		return dataTables;
-	}
+    // TODO: return a list. Also, change the Hibernate mapping
+    public Map getTablesMap() {
+        Map tablesMap = new HashMap();
 
-	public void setDatasetType(String datasetType) {
-		this.datasetType = datasetType;
-	}
+        for (Iterator iter = tables.iterator(); iter.hasNext();) {
+            Table element = (Table) iter.next();
+            tablesMap.put(element.tableType(), element.tableName());
+        }
 
-	public void addDataTable(String tableType, String tableName) {
-		dataTables.put(tableType, tableName);
-	}
+        return tablesMap;
+    }
 
-	public void setDataSources(Map dataSources) {
-		this.datasources = dataSources;// table type -> filepath mapping
-	}
+    public void setDatasetType(String datasetType) {
+        this.datasetType = datasetType;
+    }
 
-	public String getCountry() {
-		return country;
-	}
+    public void addTable(Table table) {
+        tables.add(table);
+    }
 
-	public void setCountry(String country) {
-		this.country = country;
-	}
+    public void setDataSources(Map dataSources) {
+        this.datasources = dataSources;// table type -> filepath mapping
+    }
 
-	public String getUnits() {
-		return units;
-	}
+    public String getCountry() {
+        return country;
+    }
 
-	public void setDataTables(Map datatablesMap) {
-		this.dataTables = datatablesMap;
-	}
+    public void setCountry(String country) {
+        this.country = country;
+    }
 
-	public void setCreator(String creator) {
-		this.creator = creator;
-	}
+    public String getUnits() {
+        return units;
+    }
 
-	public String getCreator() {
-		return creator;
-	}
+    public void setTablesMap(Map tablesMap) {
+        tables.clear();
 
-	public String getTemporalResolution() {
-		return temporalResolution;
-	}
+        for (Iterator iter = tablesMap.keySet().iterator(); iter.hasNext();) {
+            String tableType = (String) iter.next();
+            tables.add(new Table(tableType, (String) tablesMap.get(tableType)));
+        }
+    }
 
-	public Date getStartDateTime() {
-		return startDateTime;
-	}
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
 
-	public Date getStopDateTime() {
-		return endDateTime;
-	}
+    public String getCreator() {
+        return creator;
+    }
 
-	public Map getDataSources() {
-		return datasources;
-	}
+    public String getTemporalResolution() {
+        return temporalResolution;
+    }
 
-	public long getDatasetid() {
-		return datasetid;
-	}
+    public Date getStartDateTime() {
+        return startDateTime;
+    }
 
-	public void setDatasetid(long datasetid) {
-		this.datasetid = datasetid;
-	}
+    public Date getStopDateTime() {
+        return endDateTime;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public Map getDataSources() {
+        return datasources;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public long getDatasetid() {
+        return datasetid;
+    }
+
+    public void setDatasetid(long datasetid) {
+        this.datasetid = datasetid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }
