@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.services.impl;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.importer.Importer;
-import gov.epa.emissions.commons.io.importer.orl.ORLImporter;
+import gov.epa.emissions.commons.io.importer.orl.BaseORLImporter;
 
 public class ImporterFactory {
 
@@ -16,7 +16,7 @@ public class ImporterFactory {
 	public Importer create(DatasetType datasetType) {
 		// FIXME: Get the specific type of importer for the filetype. Use a
 		// Factory pattern
-		return new ORLImporter(dbServer, false, true);
+		return new BaseORLImporter(dbServer, false, true);
 	}
 
 }

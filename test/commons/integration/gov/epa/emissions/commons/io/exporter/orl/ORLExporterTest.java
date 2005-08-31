@@ -5,9 +5,10 @@ import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.commons.io.importer.CommonsTestCase;
 import gov.epa.emissions.commons.io.importer.DatasetTypes;
+import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ORLTableTypes;
 import gov.epa.emissions.commons.io.importer.TableType;
-import gov.epa.emissions.commons.io.importer.orl.ORLImporter;
+import gov.epa.emissions.commons.io.importer.orl.BaseORLImporter;
 
 import java.io.File;
 
@@ -73,7 +74,7 @@ public class ORLExporterTest extends CommonsTestCase {
         dataset.addTable(new Table(tableType.baseTypes()[0], tableName));
         dataset.addTable(new Table(tableType.summaryType(), tableName + "_summary"));
 
-        ORLImporter importer = new ORLImporter(dbSetup.getDbServer(), false, true);
+        Importer importer = new BaseORLImporter(dbSetup.getDbServer(), false, true);
         importer.run(new File[] { new File("test/commons/data/orl/nc", filename) }, dataset, true);
     }
 }

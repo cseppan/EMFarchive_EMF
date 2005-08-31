@@ -221,7 +221,7 @@ tomcat.stop=${tomcat.stop.prefix} stop
                     <include name="**/*Test.java" />
                     <exclude name="**/ReferenceImporterTest.java" />
                     <exclude name="**/ReferenceTablesCreatorTest.java" />
-                    <exclude name="**/ORLImporterTest.java" />
+                    <exclude name="**/*ORLImporterTest.java" />
                 </fileset>
             </batchtest>
         </junit>
@@ -244,7 +244,12 @@ tomcat.stop=${tomcat.stop.prefix} stop
                   fork="yes"
                   todir="${reports.integrationtests.dir}"
             />
-            <test name="gov.epa.emissions.commons.io.importer.orl.ORLImporterTest"
+            <!-- Run Complete ORL before Base ORL as only Base is needed by rest of EMF -->
+            <test name="gov.epa.emissions.commons.io.importer.orl.CompleteORLImporterTest"
+                  fork="yes"
+                  todir="${reports.integrationtests.dir}"
+            />
+            <test name="gov.epa.emissions.commons.io.importer.orl.BaseORLImporterTest"
                   fork="yes"
                   todir="${reports.integrationtests.dir}"
             />
@@ -262,7 +267,7 @@ tomcat.stop=${tomcat.stop.prefix} stop
     <target name="all-unit-tests"
             depends="emf-unit-tests, commons-unit-tests"
     />
-   
+
     <target name="ci-build"
             depends="compile, all-unit-tests, app-dist"
             description="Continuous Integration build"
@@ -341,7 +346,7 @@ tomcat.stop=${tomcat.stop.prefix} stop
         >
             <arg line="${tomcat.start}" />
         </exec>
-        <echo message="Tomcat started.."/>
+        <echo message="Tomcat started.." />
     </target>
     <target name="tomcat-stop">
         <exec executable="${jdk.home}/bin/java.exe"

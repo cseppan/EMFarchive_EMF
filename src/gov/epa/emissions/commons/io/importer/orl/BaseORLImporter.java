@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,11 +31,8 @@ import java.util.Map;
 
 /**
  * The importer for ORL (One Record per Line) format text files.
- * 
- * @author Keith Lee, CEP UNC
- * @version $Id: ORLImporter.java,v 1.20 2005/08/31 21:04:27 rhavaldar Exp $
  */
-public class ORLImporter extends ListFormatImporter {
+public class BaseORLImporter extends ListFormatImporter {
     /* ORL header record command fields */
     private static final String COMMAND = "#";
 
@@ -53,7 +51,7 @@ public class ORLImporter extends ListFormatImporter {
     private static final String DESCRIPTION_COMMAND = COMMAND + "DESC";
 
     /** primary column: annual emissions or average daily emissions */
-    private boolean annualNotAverageDaily = true;
+    protected boolean annualNotAverageDaily = true;
 
     /** the ORL data format * */
     private ORLDataFormat orlDataFormat = null;
@@ -75,7 +73,7 @@ public class ORLImporter extends ListFormatImporter {
     /* read ahead limit ~ 100 MB */
     public static final long READ_AHEAD_LIMIT = 105000000L;
 
-    public ORLImporter(DbServer dbServer, boolean useTransactions, boolean annualNotAverageDaily) {
+    public BaseORLImporter(DbServer dbServer, boolean useTransactions, boolean annualNotAverageDaily) {
         super(new ORLTableTypes(), dbServer, ListFormatImporter.WHITESPACE_REGEX, useTransactions, true);
         this.annualNotAverageDaily = annualNotAverageDaily;
     }
@@ -140,7 +138,7 @@ public class ORLImporter extends ListFormatImporter {
         long lastModified = file.lastModified();
         // if file is small enough, mark file read ahead limit from beginning
         // so we can come back without having to close and reopen the file
-        if (fileLength < ORLImporter.READ_AHEAD_LIMIT) {
+        if (fileLength < BaseORLImporter.READ_AHEAD_LIMIT) {
             reader.mark((int) fileLength);
         }
 
@@ -150,7 +148,7 @@ public class ORLImporter extends ListFormatImporter {
         checkHeaders(file.getAbsolutePath());
 
         // if able, go back to the file beginning
-        if (fileLength < ORLImporter.READ_AHEAD_LIMIT) {
+        if (fileLength < BaseORLImporter.READ_AHEAD_LIMIT) {
             reader.reset();
         }
         // else close, reopen and check for modification
@@ -528,9 +526,6 @@ public class ORLImporter extends ListFormatImporter {
      * the database.
      */
     private void postImport(boolean overwrite) throws Exception {
-        // instantiate a database acceptor. the acceptor takes care of all
-        // database operations. set the database name and table name to the
-        // acceptor so it knows where to put the data.
         Datasource emissionsDatasource = dbServer.getEmissionsDatasource();
         DataAcceptor emissionsAcceptor = emissionsDatasource.getDataAcceptor();
         // ORL table types
@@ -541,55 +536,12 @@ public class ORLImporter extends ListFormatImporter {
         Table table = (Table) dataset.getTable(tableType.baseTypes()[0]);
         String qualifiedTableName = emissionsDatasource.getName() + "." + table.tableName();
 
-        // artificially insert the FIPS data column, a five
-        // character String concatenating the state and county codes
-        final String FIPS_NAME = ORLDataFormat.FIPS_NAME;
-        // FIPS column
-        if (!extendedFormat
-                && (tableType.equals(ORLTableTypes.ORL_AREA_NONROAD_TOXICS) || tableType
-                        .equals(ORLTableTypes.ORL_ONROAD_MOBILE_TOXICS))) {
-            final int FIPS_WIDTH = 5;
-            final ColumnType FIPS_TYPE = ColumnType.CHAR;
-            FileColumnsMetadata fips = new FileColumnsMetadata(FIPS_NAME, dbServer.getTypeMapper());
-            fips.addColumnName(FIPS_NAME);
+        final String FIPS_NAME = modifyFipsColumn(emissionsDatasource, emissionsAcceptor, tableType, qualifiedTableName);
+        modifyStateColumn(emissionsDatasource, emissionsAcceptor, qualifiedTableName, FIPS_NAME);
+    }
 
-            fips.setWidth(FIPS_NAME, String.valueOf(FIPS_WIDTH));
-            fips.setType(FIPS_NAME, FIPS_TYPE.getName());
-
-            final String STATE_CODE_NAME = "STATE";
-            final int STATE_CODE_WIDTH = 2;
-            final String COUNTY_CODE_NAME = "COUNTY";
-            final int COUNTY_CODE_WIDTH = 3;
-
-            // alter table
-            emissionsDatasource.tableDefinition().addColumn(qualifiedTableName, FIPS_NAME, fips.getType(FIPS_NAME),
-                    COUNTY_CODE_NAME);
-
-            // update FIPS column
-            for (int stid = 0; stid < STATE_CODE_WIDTH; stid++) {
-                // set-up parameters for SQL update
-                StringBuffer stidLike = new StringBuffer("__");
-                StringBuffer stidConcat = new StringBuffer("0");
-                stidLike.delete(1, stidLike.length() - stid);
-                stidConcat.delete(0, stid);
-                for (int cyid = 0; cyid < COUNTY_CODE_WIDTH; cyid++) {
-                    StringBuffer cyidLike = new StringBuffer("___");
-                    StringBuffer cyidConcat = new StringBuffer("00");
-                    cyidLike.delete(1, cyidLike.length() - cyid);
-                    cyidConcat.delete(0, cyid);
-                    String[] concatExprs = { "'" + stidConcat + "'", STATE_CODE_NAME, "'" + cyidConcat + "'",
-                            COUNTY_CODE_NAME };
-                    String concatExpr = emissionsAcceptor.generateConcatExpr(concatExprs);
-                    String[] whereColumns = { STATE_CODE_NAME, COUNTY_CODE_NAME };
-                    String[] likeClauses = { stidLike.toString(), cyidLike.toString() };
-
-                    // update
-                    emissionsAcceptor.updateWhereLike(qualifiedTableName, FIPS_NAME, concatExpr, whereColumns,
-                            likeClauses);
-                }
-            }
-        }
-
+    private void modifyStateColumn(Datasource emissionsDatasource, DataAcceptor emissionsAcceptor,
+            String qualifiedTableName, final String FIPS_NAME) throws Exception, SQLException {
         // artificially insert the STATE data column, a four
         // character String from the reference.fips table
         final String STATE_NAME = "state_abbr";
@@ -639,7 +591,7 @@ public class ORLImporter extends ListFormatImporter {
                 throw new Exception("Duplicate state code '" + state_code + "' in country '" + country_code
                         + "' for table " + FIPS_TABLE_NAME);
             }
-        }// while(results.next())
+        }
 
         String fipsVal = dbServer.asciiToNumber(ORLDataFormat.FIPS_NAME, 5);
         final String[] usedStateCodesSelectColumns = { "DISTINCT FLOOR(" + fipsVal + "/1000) AS state_code" };
@@ -664,14 +616,60 @@ public class ORLImporter extends ListFormatImporter {
             // update
             emissionsAcceptor.updateWhereEquals(qualifiedTableName, STATE_NAME, "'" + stateAbbr + "'", whereColumns,
                     equalsClauses);
-        }// while(it.hasNext())
+        }
+    }
 
-        // create the summary table
-        String summaryTable = emissionsDatasource.getName() + "."
-                + (String) dataset.getTablesMap().get(tableType.summaryType());
-        SummaryTableCreator modifier = new SummaryTableCreator(dbServer.getEmissionsDatasource(), dbServer
-                .getReferenceDatasource());
-        modifier.createORLSummaryTable(datasetType, qualifiedTableName, summaryTable, overwrite, annualNotAverageDaily);
+    private String modifyFipsColumn(Datasource emissionsDatasource, DataAcceptor emissionsAcceptor,
+            TableType tableType, String qualifiedTableName) throws Exception {
+        // artificially insert the FIPS data column, a five
+        // character String concatenating the state and county codes
+        final String FIPS_NAME = ORLDataFormat.FIPS_NAME;
+        // FIPS column
+        if (!extendedFormat
+                && (tableType.equals(ORLTableTypes.ORL_AREA_NONROAD_TOXICS) || tableType
+                        .equals(ORLTableTypes.ORL_ONROAD_MOBILE_TOXICS))) {
+            final int FIPS_WIDTH = 5;
+            final ColumnType FIPS_TYPE = ColumnType.CHAR;
+            FileColumnsMetadata fips = new FileColumnsMetadata(FIPS_NAME, dbServer.getTypeMapper());
+            fips.addColumnName(FIPS_NAME);
+
+            fips.setWidth(FIPS_NAME, String.valueOf(FIPS_WIDTH));
+            fips.setType(FIPS_NAME, FIPS_TYPE.getName());
+
+            final String STATE_CODE_NAME = "STATE";
+            final int STATE_CODE_WIDTH = 2;
+            final String COUNTY_CODE_NAME = "COUNTY";
+            final int COUNTY_CODE_WIDTH = 3;
+
+            // alter table
+            emissionsDatasource.tableDefinition().addColumn(qualifiedTableName, FIPS_NAME, fips.getType(FIPS_NAME),
+                    COUNTY_CODE_NAME);
+
+            // update FIPS column
+            for (int stid = 0; stid < STATE_CODE_WIDTH; stid++) {
+                // set-up parameters for SQL update
+                StringBuffer stidLike = new StringBuffer("__");
+                StringBuffer stidConcat = new StringBuffer("0");
+                stidLike.delete(1, stidLike.length() - stid);
+                stidConcat.delete(0, stid);
+                for (int cyid = 0; cyid < COUNTY_CODE_WIDTH; cyid++) {
+                    StringBuffer cyidLike = new StringBuffer("___");
+                    StringBuffer cyidConcat = new StringBuffer("00");
+                    cyidLike.delete(1, cyidLike.length() - cyid);
+                    cyidConcat.delete(0, cyid);
+                    String[] concatExprs = { "'" + stidConcat + "'", STATE_CODE_NAME, "'" + cyidConcat + "'",
+                            COUNTY_CODE_NAME };
+                    String concatExpr = emissionsAcceptor.generateConcatExpr(concatExprs);
+                    String[] whereColumns = { STATE_CODE_NAME, COUNTY_CODE_NAME };
+                    String[] likeClauses = { stidLike.toString(), cyidLike.toString() };
+
+                    // update
+                    emissionsAcceptor.updateWhereLike(qualifiedTableName, FIPS_NAME, concatExpr, whereColumns,
+                            likeClauses);
+                }
+            }
+        }
+        return FIPS_NAME;
     }
 
     public List getComments() {
