@@ -358,7 +358,7 @@ public class SummaryTableCreator {
     public void createORLSummaryTable(String datasetType, String orlTable, String summaryTable, boolean overwrite,
             boolean annualNotAverageDaily) throws Exception {
         // check the dataset type
-        if (!DatasetTypes.isORLDataset(datasetType)) {
+        if (!DatasetTypes.isORL(datasetType)) {
             throw new Exception("Cannot create an ORL summary table for the dataset type \"" + datasetType + "\"");
         }
 

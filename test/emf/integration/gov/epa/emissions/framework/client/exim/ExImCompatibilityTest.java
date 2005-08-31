@@ -69,6 +69,7 @@ public class ExImCompatibilityTest extends TestCase {
         reader.close();
     }
 
+    //FIXME: read the 'exit status' directly from the error/input streams
     private void verify(File file, String expectedMessage) throws IOException {
         List lines = new ArrayList();
         BufferedReader reader = null;

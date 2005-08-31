@@ -28,7 +28,7 @@ public class ReferenceImporter extends FixedFormatImporter {
     private static final String REF_DIR_NAME = "refFiles";
 
     public ReferenceImporter(DbServer dbServer, File fieldDefsFileName, File referenceFilesDir, boolean useTransactions) {
-        super(dbServer);
+        super(new ReferenceTableTypes(), dbServer);
         this.fieldDefsFile = fieldDefsFileName;
         this.referenceFilesDir = referenceFilesDir;
         this.useTransactions = useTransactions;

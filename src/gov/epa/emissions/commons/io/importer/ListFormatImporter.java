@@ -38,8 +38,8 @@ public abstract class ListFormatImporter extends FormattedImporter {
 
     // private boolean firstLineHeader;
 
-    public ListFormatImporter(DbServer dbServer, String splitRegex, boolean useTransactions, boolean multipleOccurances) {
-        super(dbServer);
+    public ListFormatImporter(TableTypes tableTypes, DbServer dbServer, String splitRegex, boolean useTransactions, boolean multipleOccurances) {
+        super(tableTypes, dbServer);
         splitRegularExpression = splitRegex;
         this.useTransactions = useTransactions;
         // add quantifier to find regular expression one or more times

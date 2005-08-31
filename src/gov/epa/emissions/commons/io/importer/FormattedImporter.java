@@ -24,7 +24,10 @@ public abstract class FormattedImporter implements Importer {
 
     protected DbServer dbServer;
 
-    protected FormattedImporter(DbServer dbServer) {
+    protected TableTypes tableTypes;
+
+    protected FormattedImporter(TableTypes tableTypes, DbServer dbServer) {
+        this.tableTypes = tableTypes;
         this.dbServer = dbServer;
     }
 
@@ -33,8 +36,8 @@ public abstract class FormattedImporter implements Importer {
     }
 
     protected final File[] checkFiles(String datasetType, File[] files) throws Exception {
-        //FIXME: why is ORL referenced in this base class ?
-        ORLTableType tableType = ORLTableType.type(datasetType);
+        // FIXME: why is ORL referenced in this base class ?
+        TableType tableType = tableTypes.type(datasetType);
 
         // flags for when we find a file for the table type
         String[] baseTableTypes = tableType.baseTypes();
@@ -113,7 +116,7 @@ public abstract class FormattedImporter implements Importer {
     protected final void setDataSources(File[] files) {
         String datasetType = dataset.getDatasetType();
         // get all the table types for the dataset type
-        ORLTableType tableType = ORLTableType.type(datasetType);
+        TableType tableType = tableTypes.type(datasetType);
         Map dataSources = new HashMap();/* <TableType, String> */
         String[] tableTypes = tableType.baseTypes();
         String[] absolutePaths = new String[tableTypes.length];

@@ -7,8 +7,8 @@ import gov.epa.emissions.commons.db.DbServer;
  * format.
  */
 public abstract class FixedFormatImporter extends FormattedImporter {
-    protected FixedFormatImporter(DbServer dbServer) {
-        super(dbServer);
+    protected FixedFormatImporter(TableTypes tableTypes, DbServer dbServer) {
+        super(tableTypes, dbServer);
     }
 
     /**
