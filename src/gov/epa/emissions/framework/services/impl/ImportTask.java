@@ -15,6 +15,7 @@ import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ORLTableType;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
@@ -35,20 +36,22 @@ public class ImportTask implements Runnable {
     private File file;
 
     private StatusServices statusServices = null;
+    private DataServices dataServices = null;
 
     private DatasetType datasetType;
 
     private Importer importer;
 
-    public ImportTask(User user, File file, DatasetType datasetType, StatusServices statusServices, Importer importer) {
-        this.user = user;
-        this.file = file;
-        this.statusServices = statusServices;
-        this.datasetType = datasetType;
+	public ImportTask(User user, File file, DatasetType datasetType,
+			DataServices dataServices, StatusServices statusServices, Importer importer) {
+		this.user = user;
+		this.file = file;
+		this.dataServices = dataServices;
+		this.statusServices = statusServices;
+		this.datasetType = datasetType;
 
-        this.importer = importer;
-    }
-
+		this.importer = importer;
+	}
     public void run() {
         log.info("starting import - file: " + file.getName() + " of type: " + datasetType.getName());
 
@@ -58,6 +61,9 @@ public class ImportTask implements Runnable {
             Dataset dataset = createOrlDataset();
 
             importer.run(new File[] { file }, dataset, true);
+
+            //if no errors then insert the dataset into the database
+			dataServices.insertDataset((EmfDataset)dataset);
 
             setStatus(EMFConstants.END_IMPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
         } catch (Exception e) {

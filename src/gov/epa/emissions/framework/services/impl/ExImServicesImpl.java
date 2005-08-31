@@ -15,6 +15,7 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetTypesDAO;
+import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
@@ -76,10 +77,11 @@ public class ExImServicesImpl implements ExImServices {
 		try {
 			File file = validateFile(filename);
 			StatusServices statusSvc = new StatusServicesImpl();
-
+			DataServices dataSvc = new DataServicesImpl();
+			
 			Importer importer = importerFactory.create(datasetType);
 			ImportTask eximTask = new ImportTask(user, file, datasetType,
-					statusSvc, importer);
+					dataSvc,statusSvc, importer);
 
 			// FIXME: use a thread pool
 			new Thread(eximTask).start();
