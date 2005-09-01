@@ -35,8 +35,6 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
 
     private UserManagerTableModel model;
 
-    private SortFilterSelectionPanel sortFilterSelectPanel;
-
     private UserServices userAdmin;
 
     private JPanel layout;
@@ -55,19 +53,19 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         layout = new JPanel();
         this.getContentPane().add(layout);
 
-        // TODO: OverallTableModel has a bug w/ respect to row-count &
+        // FIXME: OverallTableModel has a bug w/ respect to row-count &
         // cannot refresh itself. So, we will regen the layout on every
         // refresh - it's a HACK. Will need to be addressed
         createLayout(parentConsole);
-
-        this.setSize(new Dimension(500, 300));
     }
 
     private void createLayout(JFrame parentConsole) {
         layout.removeAll();
-        sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
+        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         createLayout(layout, sortFilterSelectPanel);
         listenForUpdateSelection(sortFilterSelectPanel.getTable());
+        
+        this.setSize(new Dimension(500, 300));
     }
 
     private void listenForUpdateSelection(JTable table) {

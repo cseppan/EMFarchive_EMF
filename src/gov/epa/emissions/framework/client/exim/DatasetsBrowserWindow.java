@@ -1,0 +1,91 @@
+package gov.epa.emissions.framework.client.exim;
+
+import gov.epa.emissions.commons.gui.SortFilterSelectModel;
+import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.io.Dataset;
+import gov.epa.emissions.framework.client.EmfInteralFrame;
+import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
+public class DatasetsBrowserWindow extends EmfInteralFrame {
+
+    private DatasetsBrowserTableModel model;
+
+    private SortFilterSelectModel selectModel;
+
+    private JPanel layout;
+
+    private SingleLineMessagePanel messagePanel;
+
+    // FIXME: this is very similar to UserManagerWindow. Can we refactory &
+    // reuse ?
+    public DatasetsBrowserWindow(Dataset[] datasets, JFrame parentConsole) {
+        super("Datasets Browser");
+
+        model = new DatasetsBrowserTableModel(datasets);
+        selectModel = new SortFilterSelectModel(model);
+
+        layout = new JPanel();
+        this.getContentPane().add(layout);
+
+        // FIXME: OverallTableModel has a bug w/ respect to row-count &
+        // cannot refresh itself. So, we will regen the layout on every
+        // refresh - it's a HACK. Will need to be addressed
+        createLayout(parentConsole);
+    }
+
+    private void createLayout(JFrame parentConsole) {
+        layout.removeAll();
+        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
+        createLayout(layout, sortFilterSelectPanel);
+
+        int parentWidth = (int) parentConsole.getSize().getWidth();
+        System.err.println(parentConsole.getSize());
+        this.setSize(new Dimension(parentWidth, 300));
+    }
+
+    private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
+        layout.setLayout(new BorderLayout());
+
+        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
+        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
+
+        messagePanel = new SingleLineMessagePanel();
+        layout.add(messagePanel, BorderLayout.NORTH);
+        layout.add(scrollPane, BorderLayout.CENTER);
+        layout.add(createControlPanel(), BorderLayout.SOUTH);
+    }
+
+    private JPanel createControlPanel() {
+        JPanel closePanel = new JPanel();
+
+        JButton exportButton = new JButton("Export");
+        exportButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+            }
+        });
+        closePanel.add(exportButton);
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+            }
+        });
+        closePanel.add(closeButton);
+
+        JPanel controlPanel = new JPanel();
+        controlPanel.setLayout(new BorderLayout());
+        controlPanel.add(closePanel, BorderLayout.EAST);
+
+        return controlPanel;
+    }
+}
