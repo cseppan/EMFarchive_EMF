@@ -21,9 +21,10 @@ public class RegisterUserWindowLauncher {
         serviceLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getUserServices")).will(
                 new ReturnStub(userServices));
 
-        PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy((ServiceLocator) serviceLocator
-                .proxy());
-        RegisterUserWindow window = new RegisterUserWindow(userServices, strategy);
+        ServiceLocator serviceLocatorProxy = (ServiceLocator) serviceLocator.proxy();
+        PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(serviceLocatorProxy);
+
+        RegisterUserWindow window = new RegisterUserWindow(serviceLocatorProxy, strategy);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         RegisterUserPresenter presenter = new RegisterUserPresenter(userServices, window.getView());

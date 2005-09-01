@@ -53,7 +53,7 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
         createLayout(layout, sortFilterSelectPanel);
 
         int parentWidth = (int) parentConsole.getSize().getWidth();
-        this.setSize(new Dimension(parentWidth, 300));
+        this.setSize(new Dimension(parentWidth - 10, 300));
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
@@ -74,6 +74,7 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
         JButton exportButton = new JButton("Export");
         exportButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
+                exportSelectedDatasets();
             }
         });
         closePanel.add(exportButton);
@@ -95,7 +96,30 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
         return controlPanel;
     }
 
-    public void setObserver(DatasetsBrowserPresenter presenter) {
+    protected void exportSelectedDatasets() {
+        if (presenter == null)
+            return;
+        int[] selected = selectModel.getSelectedIndexes();
+        if (selected.length == 0)
+            return;
+
+        for (int i = 0; i < selected.length; i++) {
+            try {
+                EmfDataset dataset = model.getDataset(selected[i]);
+                presenter.notifyExport(dataset);
+            } catch (EmfException e) {
+                messagePanel.setError(e.getMessage());
+                refresh();
+                break;// TODO: should continue ?
+            }
+        }
+    }
+
+    private void refresh() {
+        super.validate();
+    }
+
+    public void observe(DatasetsBrowserPresenter presenter) {
         this.presenter = presenter;
     }
 
@@ -111,6 +135,7 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
         ExportWindow exportView = new ExportWindow(dataset);
         exportPresenter.observe(exportView);
 
+        getDesktopPane().add(exportView);
         exportView.display();
     }
 }

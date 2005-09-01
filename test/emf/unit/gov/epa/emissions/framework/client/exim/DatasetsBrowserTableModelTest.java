@@ -76,4 +76,9 @@ public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
         assertFalse("All column should be uneditable", model.isCellEditable(0, 3));
         assertFalse("All column should be uneditable", model.isCellEditable(0, 4));
     }
+
+    public void testShouldReturnDatasetBasedOnIndex() {
+        assertEquals(dataset1, model.getDataset(0));
+        assertEquals(dataset2, model.getDataset(1));
+    }
 }

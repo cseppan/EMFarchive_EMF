@@ -11,9 +11,9 @@ public class RegisterUserPanelWithAdminOption extends RegisterUserPanel {
 
     private JCheckBox isAdmin;
 
-    public RegisterUserPanelWithAdminOption(UserServices userAdmin, PostRegisterStrategy postRegisterStrategy,
-            EmfWidgetContainer parent) {
-        super(postRegisterStrategy, parent);
+    public RegisterUserPanelWithAdminOption(UserServices userServices, PostRegisterStrategy postRegisterStrategy,
+            RegisterCancelStrategy cancelStrategy, EmfWidgetContainer parent) {
+        super(postRegisterStrategy, cancelStrategy, parent);
 
         this.isAdmin = new JCheckBox("Administrator");
         super.profileValuesPanel.add(isAdmin);

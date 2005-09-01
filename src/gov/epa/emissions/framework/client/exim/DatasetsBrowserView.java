@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.EmfException;
 
 public interface DatasetsBrowserView {
 
-    void setObserver(DatasetsBrowserPresenter presenter);
+    void observe(DatasetsBrowserPresenter presenter);
 
     void showExport(EmfDataset dataset, ExportPresenter exportPresenter) throws EmfException;
 

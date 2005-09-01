@@ -64,7 +64,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         createLayout(layout, sortFilterSelectPanel);
         listenForUpdateSelection(sortFilterSelectPanel.getTable());
-        
+
         this.setSize(new Dimension(500, 300));
     }
 
@@ -201,6 +201,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
                 messagePanel.setError(e.getMessage());
                 // TODO: temp, until the HACK is addressed (then, use refresh)
                 validate();
+                break;// TODO: should continue ?
             }
         }
     }

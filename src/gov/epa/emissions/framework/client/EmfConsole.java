@@ -208,7 +208,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     protected void displayDatasets() throws EmfException {
         DatasetsBrowserWindow view = new DatasetsBrowserWindow(serviceLocator.getDataServices(), this);
-        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(serviceLocator);
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(user, serviceLocator);
         presenter.observe(view);
 
         desktop.add(view);

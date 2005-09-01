@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.commons.gui.RefreshableTableModel;
 import gov.epa.emissions.commons.gui.TableHeader;
 import gov.epa.emissions.commons.io.Dataset;
+import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataServices;
 
@@ -64,7 +65,11 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
     private class Row {
         private Map columns;
 
+        private Dataset dataset;
+
         public Row(Dataset dataset) {
+            this.dataset = dataset;
+
             columns = new HashMap();
             columns.put(new Integer(0), new Column(dataset.getName()));
 
@@ -86,6 +91,13 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
 
     public boolean isCellEditable(int row, int col) {
         return false;
+    }
+
+    public EmfDataset getDataset(int index) {
+        Row row = (Row) rows.get(index);
+
+        return (EmfDataset) row.dataset;// FIXME: merge EmfDataset and Dataset
+                                        // into one
     }
 
 }

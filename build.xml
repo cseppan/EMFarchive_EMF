@@ -337,6 +337,10 @@ tomcat.stop=${tomcat.stop.prefix} stop
         <copy todir="${tomcat.webapps}" file="${build.home}/${app.name}.war" />
     </target>
 
+    <target name="redeploy"
+            depends="tomcat-stop, simple-deploy, tomcat-start"
+    />
+
     <target name="tomcat-start">
         <exec executable="${jdk.home}/bin/java.exe"
               dir="${build.home}"

@@ -50,8 +50,12 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     protected JPanel profileValuesPanel;
 
-    public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, EmfWidgetContainer parent) {
+    private RegisterCancelStrategy cancelStrategy;
+
+    public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, RegisterCancelStrategy cancelStrategy,
+            EmfWidgetContainer parent) {
         this.postRegisterStrategy = postRegisterStrategy;
+        this.cancelStrategy = cancelStrategy;
         this.parent = parent;
 
         createLayout();
@@ -81,9 +85,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         JButton cancel = new JButton("Cancel");
         cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (presenter != null) {
-                    presenter.notifyCancel();
-                }
+                cancelStrategy.execute(presenter);
             }
         });
 

@@ -46,6 +46,7 @@
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.DatasetType" qname="ns1:DatasetType" xmlns:ns1="urn:gov.epa.emf.services.ExImServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.emf.services.ExImServices"/>  
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.emf.services.ExImServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Table" qname="ns1:Table" xmlns:ns1="urn:gov.epa.emf.services.ExImServices"/>  
  </service>
 
  <service name="gov.epa.emf.services.DataServices" provider="java:RPC" style="RPC" use="encoded">

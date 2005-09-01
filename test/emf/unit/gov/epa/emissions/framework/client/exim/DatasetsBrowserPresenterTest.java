@@ -20,9 +20,9 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
     public void testShouldCloseViewOnClickOfCloseButton() {
         Mock view = mock(DatasetsBrowserView.class);
 
-        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(null);
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(null, null);
 
-        view.expects(once()).method("setObserver").with(eq(presenter));
+        view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("close").withNoArguments();
 
         presenter.observe((DatasetsBrowserView) view.proxy());
@@ -35,8 +35,8 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         dataset.setName("name");
         dataset.setCreator("creator");
 
-        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter((ServiceLocator) serviceLocator.proxy());
-        view.expects(once()).method("setObserver").with(eq(presenter));
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(null, (ServiceLocator) serviceLocator.proxy());
+        view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("showExport").with(eq(dataset), new IsInstanceOf(ExportPresenter.class));
 
         presenter.observe((DatasetsBrowserView) view.proxy());
