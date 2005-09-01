@@ -19,13 +19,13 @@ public final class EMFConstants {
 
     public static final String EXPORT_MESSAGE_TYPE = "Export";
 
-    public static final String START_IMPORT_MESSAGE_Prefix = "Started import for (FileType:Filename) ";
+    public static final String START_IMPORT_MESSAGE_Prefix = "Started import for ";
 
-    public static final String END_IMPORT_MESSAGE_Prefix = "Completed import for (FileType:Filename) ";
+    public static final String END_IMPORT_MESSAGE_Prefix = "Completed import for ";
 
-    public static final String START_EXPORT_MESSAGE_Prefix = "Started export for (FileType:Filename) ";
+    public static final String START_EXPORT_MESSAGE_Prefix = "Started export for ";
 
-    public static final String END_EXPORT_MESSAGE_Prefix = "Completed export for (FileType:Filename) ";
+    public static final String END_EXPORT_MESSAGE_Prefix = "Completed export for ";
 
     public static final String URI_FILENAME_PREFIX = "file:///";
 

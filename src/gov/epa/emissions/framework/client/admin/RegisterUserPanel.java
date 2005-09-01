@@ -43,7 +43,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     private JTextField email;
 
-    private JCheckBox isAdmin;
+    private JCheckBox isAdmin = new JCheckBox();
 
     private PostRegisterStrategy postRegisterStrategy;
 
