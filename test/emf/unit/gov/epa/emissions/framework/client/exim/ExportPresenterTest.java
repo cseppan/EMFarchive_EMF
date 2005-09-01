@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.exim;
 
+import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.ExImServices;
@@ -14,18 +15,17 @@ public class ExportPresenterTest extends MockObjectTestCase {
         User user = new User();
         user.setUserName("user");
         user.setFullName("full name");
-        
+
         EmfDataset dataset = new EmfDataset();
         dataset.setCreator(user.getFullName());
         dataset.setName("dataset test");
-        
+
         String filename = "filename.txt";
 
-        Mock view = mock(ExportView.class);
         Mock model = mock(ExImServices.class);
         model.expects(once()).method("startExport").with(eq(user), eq(dataset), eq(filename));
 
-        ExportPresenter presenter = new ExportPresenter(user, (ExImServices) model.proxy(), (ExportView) view.proxy());
+        ExportPresenter presenter = new ExportPresenter(user, (ExImServices) model.proxy());
 
         presenter.notifyExport(dataset, filename);
     }
@@ -34,18 +34,22 @@ public class ExportPresenterTest extends MockObjectTestCase {
         Mock view = mock(ExportView.class);
         view.expects(once()).method("close");
 
-        ExportPresenter presenter = new ExportPresenter(null, null, (ExportView) view.proxy());
-
+        ExportView viewProxy = (ExportView) view.proxy();
+        ExportPresenter presenter = new ExportPresenter(null, null);
+        view.expects(once()).method("register").with(eq(presenter));        
+        presenter.observe(viewProxy);
+        
         presenter.notifyDone();
     }
 
     public void testShouldRegisterWithViewOnObserve() throws EmfException {
         Mock view = mock(ExportView.class);
 
-        ExportPresenter presenter = new ExportPresenter(null, null, (ExportView) view.proxy());
+        ExportView viewProxy = (ExportView) view.proxy();
+        ExportPresenter presenter = new ExportPresenter(null, null);
         view.expects(once()).method("register").with(eq(presenter));
 
-        presenter.observe();
+        presenter.observe(viewProxy);
     }
 
 }

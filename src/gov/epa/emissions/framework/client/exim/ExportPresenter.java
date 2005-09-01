@@ -13,10 +13,9 @@ public class ExportPresenter {
 
     private ExportView view;
 
-    public ExportPresenter(User user, ExImServices services, ExportView view) {
+    public ExportPresenter(User user, ExImServices services) {
         this.user = user;
         this.model = services;
-        this.view = view;
     }
 
     public void notifyExport(EmfDataset dataset, String filename) throws EmfException {
@@ -24,10 +23,12 @@ public class ExportPresenter {
     }
 
     public void notifyDone() {
-        view.close();
+        if (view != null)
+            view.close();
     }
 
-    public void observe() {
+    public void observe(ExportView view) {
+        this.view = view;
         view.register(this);
     }
 

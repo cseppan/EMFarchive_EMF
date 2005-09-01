@@ -27,8 +27,8 @@ public class ExportWindowLauncher {
         dataset.setDescription("ORL Non Road");
 
         ExportWindow view = new ExportWindow(dataset);
-        ExportPresenter presenter = new ExportPresenter(user, (ExImServices) exim.proxy(), view);
-        presenter.observe();
+        ExportPresenter presenter = new ExportPresenter(user, (ExImServices) exim.proxy());
+        presenter.observe(view);
 
         view.display();
 

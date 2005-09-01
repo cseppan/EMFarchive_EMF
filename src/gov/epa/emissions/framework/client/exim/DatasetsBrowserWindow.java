@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
@@ -104,5 +105,12 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
 
     public void display() {
         this.setVisible(true);
+    }
+
+    public void showExport(EmfDataset dataset, ExportPresenter exportPresenter) throws EmfException {
+        ExportWindow exportView = new ExportWindow(dataset);
+        exportPresenter.observe(exportView);
+
+        exportView.display();
     }
 }
