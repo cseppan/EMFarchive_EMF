@@ -45,7 +45,7 @@ public class DataServicesImpl implements DataServices {
 
     public void insertDataset(EmfDataset aDataset) throws EmfException {
         Session session = HibernateUtils.currentSession();
-        DatasetDAO.insertDatasetType(aDataset, session);
+        DatasetDAO.insertDataset(aDataset, session);
 
     }
 

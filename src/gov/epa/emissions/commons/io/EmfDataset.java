@@ -200,4 +200,13 @@ public class EmfDataset implements Dataset {
         return (Table[]) tables.toArray(new Table[0]);
     }
 
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof Dataset)) {
+            return false;
+        }
+
+        Dataset otherDataset = (Dataset) other;
+
+        return (name.equals(otherDataset.getName())) && (creator.equals(otherDataset.getCreator()));
+    }
 }

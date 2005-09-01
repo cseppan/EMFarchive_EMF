@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.importer.DatasetTypes;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
@@ -38,7 +39,11 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
         File userDir = new File(System.getProperty("user.dir"));
         File file = new File(userDir, "test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt");
 
-        eximService.startImport(user, file.getPath(), datasetType);
+        EmfDataset dataset = new EmfDataset();
+        dataset.setCreator(user.getFullName());
+        dataset.setName("ORL NonPoint - Test");
+        
+        eximService.startImport(user, file.getPath(), dataset, datasetType);
 
         // TODO: verify status
     }

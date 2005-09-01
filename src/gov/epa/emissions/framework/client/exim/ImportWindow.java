@@ -147,7 +147,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
 
     private void doImport() {
         try {
-            presenter.notifyImport((DatasetType) datasetTypesModel.getSelectedItem(), filename.getText());
+            presenter.notifyImport(filename.getText(), name.getText(), (DatasetType) datasetTypesModel.getSelectedItem());
             String message = "Started importing " + name.getText() + " [ " + filename.getText() + " ]...."
                     + "Please monitor the Status window to track your Import request.";
             messagePanel.setMessage(message);

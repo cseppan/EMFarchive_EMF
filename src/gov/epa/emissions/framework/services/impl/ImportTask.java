@@ -8,7 +8,6 @@
  */
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.Table;
@@ -37,34 +36,39 @@ public class ImportTask implements Runnable {
     private File file;
 
     private StatusServices statusServices = null;
+
     private DataServices dataServices = null;
 
     private DatasetType datasetType;
 
     private Importer importer;
 
-	public ImportTask(User user, File file, DatasetType datasetType,
-			DataServices dataServices, StatusServices statusServices, Importer importer) {
-		this.user = user;
-		this.file = file;
-		this.dataServices = dataServices;
-		this.statusServices = statusServices;
-		this.datasetType = datasetType;
+    private EmfDataset dataset;
 
-		this.importer = importer;
-	}
+    public ImportTask(User user, File file, EmfDataset dataset, DatasetType datasetType, DataServices dataServices,
+            StatusServices statusServices, Importer importer) {
+        this.user = user;
+        this.file = file;
+        this.dataset = dataset;
+        this.dataServices = dataServices;
+        this.statusServices = statusServices;
+        this.datasetType = datasetType;
+
+        this.importer = importer;
+    }
+
     public void run() {
         log.info("starting import - file: " + file.getName() + " of type: " + datasetType.getName());
 
         try {
             setStartStatus();
 
-            Dataset dataset = createOrlDataset();
+            updateOrlDataset(dataset);
 
             importer.run(new File[] { file }, dataset, true);
 
-            //if no errors then insert the dataset into the database
-			dataServices.insertDataset((EmfDataset)dataset);
+            // if no errors then insert the dataset into the database
+            dataServices.insertDataset((EmfDataset) dataset);
 
             setStatus(EMFConstants.END_IMPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
         } catch (Exception e) {
@@ -79,9 +83,7 @@ public class ImportTask implements Runnable {
         log.info("importing of file: " + file.getName() + " of type: " + datasetType.getName() + " complete");
     }
 
-    private Dataset createOrlDataset() {
-        Dataset dataset = new EmfDataset();
-
+    private void updateOrlDataset(EmfDataset dataset) {
         // FIXME: why hard code the table type ?
         String filename = file.getName();
         String tablename = filename.substring(0, filename.length() - 4).replace('.', '_');
@@ -90,8 +92,6 @@ public class ImportTask implements Runnable {
         TableType tableType = ORLTableTypes.ORL_AREA_NONPOINT_TOXICS;
         dataset.addTable(new Table(tableType.baseTypes()[0], tablename));
         dataset.addTable(new Table(tableType.summaryType(), tablename + "_summary"));
-
-        return dataset;
     }
 
     private void setStartStatus() throws EmfException {

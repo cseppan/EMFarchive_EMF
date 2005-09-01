@@ -12,6 +12,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetTypesDAO;
@@ -70,7 +71,7 @@ public class ExImServicesImpl implements ExImServices {
 		return file;
 	}
 
-	public void startImport(User user, String filename, DatasetType datasetType)
+	public void startImport(User user, String filename, EmfDataset dataset, DatasetType datasetType)
 			throws EmfException {
 		log.debug("In ExImServicesImpl:startImport START");
 
@@ -80,7 +81,7 @@ public class ExImServicesImpl implements ExImServices {
 			DataServices dataSvc = new DataServicesImpl();
 			
 			Importer importer = importerFactory.create(datasetType);
-			ImportTask eximTask = new ImportTask(user, file, datasetType,
+			ImportTask eximTask = new ImportTask(user, file, dataset, datasetType,
 					dataSvc,statusSvc, importer);
 
 			// FIXME: use a thread pool

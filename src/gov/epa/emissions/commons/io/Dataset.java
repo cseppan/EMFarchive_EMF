@@ -25,7 +25,7 @@ public interface Dataset extends Serializable {
     public void setName(String name);
 
     // bean-style properties
-    void setCreator(String creator);
+    void setCreator(String creator);//TODO: use User instead
 
     String getCreator();
 

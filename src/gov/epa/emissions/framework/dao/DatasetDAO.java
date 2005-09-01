@@ -48,7 +48,7 @@ private static final String GET_DATASET_QUERY="select aDset from EmfDataset as a
       return datasets;
   }//getDatasetTypes()
   
-  public static void insertDatasetType(Dataset aDset, Session session){
+  public static void insertDataset(Dataset aDset, Session session){
       Transaction tx = session.beginTransaction();
       session.save(aDset);
       session.flush();
