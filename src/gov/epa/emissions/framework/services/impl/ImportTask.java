@@ -89,7 +89,9 @@ public class ImportTask implements Runnable {
         String tablename = filename.substring(0, filename.length() - 4).replace('.', '_');
 
         dataset.setDatasetType(datasetType.getName());
-        TableType tableType = ORLTableTypes.ORL_AREA_NONPOINT_TOXICS;
+        
+        ORLTableTypes tableTypes = new ORLTableTypes();
+        TableType tableType = tableTypes.type(dataset.getDatasetType());
         dataset.addTable(new Table(tableType.baseTypes()[0], tablename));
         dataset.addTable(new Table(tableType.summaryType(), tablename + "_summary"));
     }
