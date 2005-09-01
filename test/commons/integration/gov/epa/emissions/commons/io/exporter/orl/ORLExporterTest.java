@@ -41,7 +41,7 @@ public class ORLExporterTest extends CommonsTestCase {
     }
 
     private void doExport(String datasetType, TableType tableType, String tableName) throws Exception {
-        Dataset dataset = createDataset(datasetType, tableType, tableName);
+        EmfDataset dataset = createDataset(datasetType, tableType, tableName);
 
         ORLExporter exporter = new ORLExporter(dbSetup.getDbServer());
 
@@ -49,11 +49,11 @@ public class ORLExporterTest extends CommonsTestCase {
         String exportFileName = tempDir + "/" + datasetType + "." + tableName + ".EXPORTED_";
 
         // ORL has only one base table type
-        exporter.exportTableToFile(dataset, exportFileName);
+        exporter.run(new File(exportFileName), dataset);
     }
 
-    private Dataset createDataset(String datasetType, TableType tableType, String tableName) {
-        Dataset dataset = new EmfDataset();
+    private EmfDataset createDataset(String datasetType, TableType tableType, String tableName) {
+        EmfDataset dataset = new EmfDataset();
         dataset.setDatasetType(datasetType);
         // only one base type
         dataset.addTable(new Table(tableType.baseTypes()[0], tableName));

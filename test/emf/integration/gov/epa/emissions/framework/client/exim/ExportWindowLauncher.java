@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.ExImServices;
@@ -24,7 +23,7 @@ public class ExportWindowLauncher {
         exim.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("startExport")).withAnyArguments();
 
         User user = new User();
-        Dataset dataset = new EmfDataset();
+        EmfDataset dataset = new EmfDataset();
         dataset.setDescription("ORL Non Road");
 
         ExportWindow view = new ExportWindow(dataset);

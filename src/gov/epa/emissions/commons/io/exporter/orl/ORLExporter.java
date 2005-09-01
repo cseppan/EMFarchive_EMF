@@ -4,10 +4,12 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Query;
 import gov.epa.emissions.commons.io.Dataset;
+import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.commons.io.exporter.FixedFormatExporter;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
@@ -39,7 +41,7 @@ public class ORLExporter extends FixedFormatExporter {
     // format as these data values can be very small
 
     // FIXME: lookup Table Type from Dataset
-    public void exportTableToFile(Dataset dataset, String fileName) throws Exception {
+    private void exportTableToFile(Dataset dataset, String fileName) throws Exception {
         PrintWriter writer = null;
 
         try {
@@ -67,5 +69,10 @@ public class ORLExporter extends FixedFormatExporter {
         }
 
     }
+
+	public void run(File file, EmfDataset dataset) throws Exception {
+		exportTableToFile(dataset,file.getName());
+	}
+
 
 }

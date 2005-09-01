@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.ExImServices;
@@ -16,7 +15,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
         user.setUserName("user");
         user.setFullName("full name");
         
-        Dataset dataset = new EmfDataset();
+        EmfDataset dataset = new EmfDataset();
         dataset.setCreator(user.getFullName());
         dataset.setName("dataset test");
         

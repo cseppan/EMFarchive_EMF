@@ -10,9 +10,9 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
-import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.EmfDataset;
+import gov.epa.emissions.commons.io.exporter.Exporter;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetTypesDAO;
@@ -43,6 +43,7 @@ public class ExImServicesImpl implements ExImServices {
 	private static Log log = LogFactory.getLog(ExImServicesImpl.class);
 
 	private ImporterFactory importerFactory;
+	private ExporterFactory exporterFactory;
 
 	public ExImServicesImpl() throws NamingException, SQLException {
 		// TODO: should we move this into an abstract super class ?
@@ -71,12 +72,16 @@ public class ExImServicesImpl implements ExImServices {
 		return file;
 	}
 
-	public void startImport(User user, String filename, EmfDataset dataset, DatasetType datasetType)
+	/*
+	 *  (non-Javadoc)
+	 * @see gov.epa.emissions.framework.services.ExImServices#startImport(gov.epa.emissions.framework.services.User, java.lang.String, gov.epa.emissions.commons.io.EmfDataset, gov.epa.emissions.commons.io.DatasetType)
+	 */
+	public void startImport(User user, String fileName, EmfDataset dataset, DatasetType datasetType)
 			throws EmfException {
 		log.debug("In ExImServicesImpl:startImport START");
 
 		try {
-			File file = validateFile(filename);
+			File file = validateFile(fileName);
 			StatusServices statusSvc = new StatusServicesImpl();
 			DataServices dataSvc = new DataServicesImpl();
 			
@@ -88,13 +93,44 @@ public class ExImServicesImpl implements ExImServices {
 			new Thread(eximTask).start();
 		} catch (Exception e) {
 			log.error("Exception attempting to start import of file: "
-					+ filename, e);
+					+ fileName, e);
 			throw new EmfException(e.getMessage());
 		}
 
 		log.debug("In ExImServicesImpl:startImport END");
 	}
 
+	/*
+	 *  (non-Javadoc)
+	 * @see gov.epa.emissions.framework.services.ExImServices#startExport(gov.epa.emissions.framework.services.User, gov.epa.emissions.commons.io.Dataset, java.lang.String)
+	 */
+	public void startExport(User user, EmfDataset dataset, String fileName)
+			throws EmfException {
+		log.debug("In ExImServicesImpl:startExport START");
+
+		try {
+			File file = validateFile(fileName);
+			StatusServices statusSvc = new StatusServicesImpl();
+			DataServices dataSvc = new DataServicesImpl();
+			Exporter exporter = exporterFactory.create(dataset.getDatasetType());
+			ExportTask eximTask = new ExportTask(user,file,dataset,dataSvc,statusSvc,exporter);
+
+			// FIXME: use a thread pool
+			new Thread(eximTask).start();
+		} catch (Exception e) {
+			log.error("Exception attempting to start export of file: "
+					+ fileName, e);
+			throw new EmfException(e.getMessage());
+		}
+
+		log.debug("In ExImServicesImpl:startExport END");
+
+	}
+
+	/*
+	 *  (non-Javadoc)
+	 * @see gov.epa.emissions.framework.services.ExImServices#getDatasetTypes()
+	 */
 	public DatasetType[] getDatasetTypes() throws EmfException {
 		log.debug("In ExImServicesImpl:getDatasetTypes START");
 
@@ -116,10 +152,5 @@ public class ExImServicesImpl implements ExImServices {
 
 	}
 
-	public void startExport(User user, Dataset dataset, String fileName)
-			throws EmfException {
-		// TODO Auto-generated method stub
-
-	}
 
 }

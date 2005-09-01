@@ -8,7 +8,6 @@
  */
 package gov.epa.emissions.framework.client.transport;
 
-import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
@@ -231,9 +230,48 @@ public class ExImServicesTransport implements ExImServices {
 
     }
 
-    public void startExport(User user, Dataset dataset, String fileName) throws EmfException {
-        // TODO Auto-generated method stub
+	public void startExport(User user, EmfDataset dataset, String fileName) throws EmfException {
+        log.debug("Begin export file for user:filename:datasettype:: " + user.getUserName() + " :: " + fileName
+                + " :: " + dataset.getDatasetType());
+        Service service = new Service();
+        Call call;
 
-    }
+        try {
+            call = (Call) service.createCall();
+            call.setTargetEndpointAddress(new java.net.URL(endpoint));
+
+            QName userQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:User");
+            QName datasetQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:EmfDataset");
+            QName operationQName = new QName("urn:gov.epa.emf.services.ExImServices", "startExport");
+
+            call.setOperationName(operationQName);
+
+            registerMapping(call, userQName, User.class);
+            registerMapping(call, datasetQName, EmfDataset.class);
+
+            call.addParameter("user", userQName, ParameterMode.IN);
+            call.addParameter("filename", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("dataset", datasetQName, ParameterMode.IN);
+
+            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+
+            call.invoke(new Object[] { user, dataset,fileName});
+
+        } catch (ServiceException e) {
+            log.error("Error invoking the service", e);
+        } catch (MalformedURLException e) {
+            System.out.println();
+            log.error("Error in format of URL string", e);
+        } catch (AxisFault fault) {
+            log.error("Axis Fault details", fault);
+            throw new EmfException(extractMessage(fault.getMessage()));
+        } catch (RemoteException e) {
+            log.error("Error communicating with WS end point", e);
+        }
+
+        log.debug("End export file for user:filename:datasettype:: " + user.getUserName() + " :: " + fileName
+                + " :: " + dataset.getDatasetType());
+		
+	}
 
 }// EMFDataTransport
