@@ -41,7 +41,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         super("Import Dataset");
         this.eximServices = eximServices;
 
-        setSize(new Dimension(500, 275));
+        setSize(new Dimension(600, 275));
 
         JPanel layoutPanel = createLayout();
         this.getContentPane().add(layoutPanel);

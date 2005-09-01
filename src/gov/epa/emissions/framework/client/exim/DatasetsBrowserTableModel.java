@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.commons.gui.RefreshableTableModel;
 import gov.epa.emissions.commons.gui.TableHeader;
 import gov.epa.emissions.commons.io.Dataset;
+import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.DataServices;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,14 +19,10 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
 
     private List rows;
 
-    public void setValueAt(Object value, int row, int col) {
-        super.setValueAt(value, row, col);
-        System.err.println("setting value - " + value + " @ (" + row + ", " + col + " )");
-    }
-
-    public DatasetsBrowserTableModel(Dataset[] datasets) {
+    public DatasetsBrowserTableModel(DataServices services) throws EmfException {
         this.header = new TableHeader(new String[] { "Name", "Start Date", "End Date", "Region", "Creator" });
-        createRows(datasets);
+
+        createRows(services);
     }
 
     public int getRowCount() {
@@ -43,9 +41,10 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
         return ((Row) rows.get(row)).getValueAt(column);
     }
 
-    private void createRows(Dataset[] datasets) {
+    private void createRows(DataServices services) throws EmfException {
         this.rows = new ArrayList();
 
+        Dataset[] datasets = services.getDatasets();
         for (int i = 0; i < datasets.length; i++) {
             Row row = new Row(datasets[i]);
             rows.add(row);
@@ -65,11 +64,7 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
     private class Row {
         private Map columns;
 
-        private Dataset dataset;
-
         public Row(Dataset dataset) {
-            this.dataset = dataset;
-
             columns = new HashMap();
             columns.put(new Integer(0), new Column(dataset.getName()));
 

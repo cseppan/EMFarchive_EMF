@@ -5,6 +5,8 @@ import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
 import gov.epa.emissions.framework.client.admin.UpdateUserWindow;
 import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
 import gov.epa.emissions.framework.client.admin.UserManagerWindow;
+import gov.epa.emissions.framework.client.exim.DatasetsBrowserPresenter;
+import gov.epa.emissions.framework.client.exim.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
@@ -45,7 +47,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
     public EmfConsole(User user, ServiceLocator serviceLocator) {
         this.user = user;
         this.serviceLocator = serviceLocator;
-        
+
         setProperties();
         setLayout();
         showStatus();
@@ -151,7 +153,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
     }
 
     private void close() {
-        //TODO: auto logout of a session
+        // TODO: auto logout of a session
         status.close();
         super.dispose();
     }
@@ -165,6 +167,18 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     private JMenu createManageMenu() {
         JMenu menu = new JMenu("Manage");
+
+        JMenuItem datasets = new JMenuItem("Datasets");
+        datasets.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    displayDatasets();
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+        });
+        menu.add(datasets);
 
         menu.add(createDisabledMenuItem("Dataset Types"));
         menu.add(createDisabledMenuItem("Sectors"));
@@ -190,6 +204,16 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         menu.add(myProfile);
 
         return menu;
+    }
+
+    protected void displayDatasets() throws EmfException {
+        DatasetsBrowserWindow view = new DatasetsBrowserWindow(serviceLocator.getDataServices(), this);
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(serviceLocator.getDataServices(), view);
+        presenter.observe();
+
+        desktop.add(view);
+
+        view.display();
     }
 
     private void displayUpdateUser() {

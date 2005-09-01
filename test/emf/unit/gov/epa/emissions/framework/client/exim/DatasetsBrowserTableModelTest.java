@@ -3,21 +3,25 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.DataServices;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
 public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
 
     private DatasetsBrowserTableModel model;
+
     private EmfDataset dataset1;
+
     private EmfDataset dataset2;
 
     protected void setUp() throws EmfException {
-        List datasets = new ArrayList();
+        List datasetList = new ArrayList();
 
         dataset1 = new EmfDataset();
         dataset1.setName("name1");
@@ -25,7 +29,7 @@ public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
         dataset1.setRegion("region1");
         dataset1.setStartDateTime(new Date());
         dataset1.setStopDateTime(new Date());
-        datasets.add(dataset1);
+        datasetList.add(dataset1);
 
         dataset2 = new EmfDataset();
         dataset2.setName("name2");
@@ -33,9 +37,14 @@ public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
         dataset2.setRegion("region2");
         dataset2.setStartDateTime(new Date());
         dataset2.setStopDateTime(new Date());
-        datasets.add(dataset2);
-        
-        model = new DatasetsBrowserTableModel((Dataset[]) datasets.toArray(new Dataset[0]));
+        datasetList.add(dataset2);
+
+        Dataset[] datasets = (Dataset[]) datasetList.toArray(new Dataset[0]);
+
+        Mock services = mock(DataServices.class);
+        services.expects(atLeastOnce()).method("getDatasets").withNoArguments().will(returnValue(datasets));
+
+        model = new DatasetsBrowserTableModel((DataServices) services.proxy());
     }
 
     public void testShouldReturnColumnsNames() {
@@ -48,7 +57,7 @@ public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
         assertEquals("Creator", model.getColumnName(4));
     }
 
-    public void testShouldReturnRowsEqualingNumberOfDatasets() throws EmfException{       
+    public void testShouldReturnRowsEqualingNumberOfDatasets() throws EmfException {
         assertEquals(2, model.getRowCount());
     }
 
@@ -59,7 +68,7 @@ public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
         assertEquals(dataset1.getRegion(), model.getValueAt(0, 3));
         assertEquals(dataset1.getCreator(), model.getValueAt(0, 4));
     }
-    
+
     public void testShouldMarkEmailColumnAsEditable() {
         assertFalse("All column should be uneditable", model.isCellEditable(0, 0));
         assertFalse("All column should be uneditable", model.isCellEditable(0, 1));

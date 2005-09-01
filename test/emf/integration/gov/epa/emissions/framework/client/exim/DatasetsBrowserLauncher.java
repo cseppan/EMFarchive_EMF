@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
+import gov.epa.emissions.framework.services.DataServices;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -12,6 +13,11 @@ import java.util.List;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+
+import org.jmock.Mock;
+import org.jmock.core.constraint.IsEqual;
+import org.jmock.core.matcher.InvokeAtLeastOnceMatcher;
+import org.jmock.core.stub.ReturnStub;
 
 public class DatasetsBrowserLauncher {
 
@@ -23,9 +29,13 @@ public class DatasetsBrowserLauncher {
         frame.setLocation(new Point(400, 200));
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        
-        DatasetsBrowserWindow console = new DatasetsBrowserWindow(launcher.createDatasets(), frame);
+
+        Dataset[] datasets = launcher.createDatasets();
+        Mock services = new Mock(DataServices.class);
+        services.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getDatasets")).will(
+                new ReturnStub(datasets));
+
+        DatasetsBrowserWindow console = new DatasetsBrowserWindow((DataServices) services.proxy(), frame);
         console.setVisible(true);
 
         launcher.addAsInternalFrame(console, frame);

@@ -2,9 +2,10 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
-import gov.epa.emissions.commons.io.Dataset;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.services.DataServices;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -16,7 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class DatasetsBrowserWindow extends EmfInteralFrame {
+public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBrowserView {
 
     private DatasetsBrowserTableModel model;
 
@@ -26,12 +27,14 @@ public class DatasetsBrowserWindow extends EmfInteralFrame {
 
     private SingleLineMessagePanel messagePanel;
 
+    private DatasetsBrowserPresenter presenter;
+
     // FIXME: this is very similar to UserManagerWindow. Can we refactory &
     // reuse ?
-    public DatasetsBrowserWindow(Dataset[] datasets, JFrame parentConsole) {
+    public DatasetsBrowserWindow(DataServices services, JFrame parentConsole) throws EmfException {
         super("Datasets Browser");
 
-        model = new DatasetsBrowserTableModel(datasets);
+        model = new DatasetsBrowserTableModel(services);
         selectModel = new SortFilterSelectModel(model);
 
         layout = new JPanel();
@@ -77,6 +80,9 @@ public class DatasetsBrowserWindow extends EmfInteralFrame {
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
+                if (presenter != null) {
+                    presenter.notifyCloseView();
+                }
             }
         });
         closePanel.add(closeButton);
@@ -86,5 +92,17 @@ public class DatasetsBrowserWindow extends EmfInteralFrame {
         controlPanel.add(closePanel, BorderLayout.EAST);
 
         return controlPanel;
+    }
+
+    public void setObserver(DatasetsBrowserPresenter presenter) {
+        this.presenter = presenter;
+    }
+
+    public void close() {
+        super.dispose();
+    }
+
+    public void display() {
+        this.setVisible(true);
     }
 }
