@@ -77,7 +77,7 @@ public class ReferenceImporter extends FixedFormatImporter {
         
         // use the table type to get the table name
         Table table = (Table) dataset.getTable(tableType);
-        String tableName = table.tableName().trim();
+        String tableName = table.getTableName().trim();
         String qualifiedTableName = datasource.getName() + "." + tableName;
         
         if (tableName == null) {

@@ -10,12 +10,23 @@ public class Table {
         this.tableType = tableType;
     }
 
-    public String tableName() {
+    public Table() {
+    }
+
+    public String getTableName() {
         return tableName;
     }
 
-    public String tableType() {
+    public String getTableType() {
         return tableType;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public void setTableType(String tableType) {
+        this.tableType = tableType;
     }
 
 }

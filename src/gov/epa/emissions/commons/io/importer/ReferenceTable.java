@@ -79,8 +79,8 @@ final class ReferenceTable extends Table {
 
         for (Iterator iter = list().iterator(); iter.hasNext();) {
             ReferenceTable table = (ReferenceTable) iter.next();
-            if (filename.indexOf(table.tableName()) != -1) //i.e. contains
-                return table.tableType();
+            if (filename.indexOf(table.getTableName()) != -1) //i.e. contains
+                return table.getTableType();
         }
 
         return null;
@@ -91,7 +91,7 @@ final class ReferenceTable extends Table {
 
         for (Iterator iter = list().iterator(); iter.hasNext();) {
             ReferenceTable element = (ReferenceTable) iter.next();
-            types.add(element.tableType());
+            types.add(element.getTableType());
         }
 
         return (String[]) types.toArray(new String[0]);

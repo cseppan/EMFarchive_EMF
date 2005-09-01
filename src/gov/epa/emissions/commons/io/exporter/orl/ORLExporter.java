@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Query;
 import gov.epa.emissions.commons.io.Dataset;
+import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.commons.io.exporter.FixedFormatExporter;
 
 import java.io.BufferedWriter;
@@ -36,10 +37,9 @@ public class ORLExporter extends FixedFormatExporter {
     // -9
     // For Annual Emisions and Average Day Emissions, use an exponential
     // format as these data values can be very small
-    
-    
-    //FIXME: lookup Table Type from Dataset
-    public void exportTableToFile(String tableType, Dataset dataset, String fileName) throws Exception {
+
+    // FIXME: lookup Table Type from Dataset
+    public void exportTableToFile(Dataset dataset, String fileName) throws Exception {
         PrintWriter writer = null;
 
         try {
@@ -48,8 +48,10 @@ public class ORLExporter extends FixedFormatExporter {
             headerWriter.writeHeader(dataset, writer);
 
             Datasource datasource = dbServer.getEmissionsDatasource();
-            String tableName = (String) dataset.getTablesMap().get(tableType);
-            String qualifiedTableName = datasource.getName() + "." + tableName;
+            // TODO: we know ORL only has a single base table, but cleaner
+            // interface needed
+            Table baseTable = dataset.getTables()[0];
+            String qualifiedTableName = datasource.getName() + "." + baseTable.getTableName();
 
             Query query = datasource.query();
             ResultSet data = query.selectAll(qualifiedTableName);

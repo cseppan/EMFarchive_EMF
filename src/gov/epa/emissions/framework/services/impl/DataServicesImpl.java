@@ -21,36 +21,32 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-
 /**
  * @author Conrad F. D'Cruz
- *
+ * 
  */
 public class DataServicesImpl implements DataServices {
 
-	/**
-	 * 
-	 */
-	public DataServicesImpl() {
-		super();
-	}
+    public DataServicesImpl() {
+        super();
+    }
 
-	public Dataset[] getDatasets() throws EmfException {
+    public Dataset[] getDatasets() throws EmfException {
         Session session = HibernateUtils.currentSession();
         List datasets = DatasetDAO.getDatasets(session);
         System.out.println("Total number of datasets in the List= " + datasets.size());
-        return (Dataset[]) datasets.toArray(new EmfDataset[datasets.size()]);    
-	}
+        return (Dataset[]) datasets.toArray(new Dataset[datasets.size()]);
+    }
 
-	public Dataset[] getDatasets(User user) throws EmfException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public Dataset[] getDatasets(User user) throws EmfException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	public void insertDataset(EmfDataset aDataset) throws EmfException {
+    public void insertDataset(EmfDataset aDataset) throws EmfException {
         Session session = HibernateUtils.currentSession();
-        DatasetDAO.insertDatasetType(aDataset,session);
-		
-	}
+        DatasetDAO.insertDatasetType(aDataset, session);
+
+    }
 
 }

@@ -346,7 +346,6 @@ tomcat.stop=${tomcat.stop.prefix} stop
         >
             <arg line="${tomcat.start}" />
         </exec>
-        <echo message="Tomcat started.." />
     </target>
     <target name="tomcat-stop">
         <exec executable="${jdk.home}/bin/java.exe"

@@ -198,7 +198,7 @@ public class BaseORLImporter extends ListFormatImporter {
         // use the table type to get the table name
         String baseTableType = tableType.baseTypes()[0];
         Table table = (Table) dataset.getTable(baseTableType);
-        String tableName = table.tableName().trim();
+        String tableName = table.getTableName().trim();
         String qualifiedTableName = datasource.getName() + "." + tableName;
 
         if (tableName == null) {
@@ -534,7 +534,7 @@ public class BaseORLImporter extends ListFormatImporter {
         // only one base type.
         // FIXME: why not have a ORLTableType that only has one base table ?
         Table table = (Table) dataset.getTable(tableType.baseTypes()[0]);
-        String qualifiedTableName = emissionsDatasource.getName() + "." + table.tableName();
+        String qualifiedTableName = emissionsDatasource.getName() + "." + table.getTableName();
 
         final String FIPS_NAME = modifyFipsColumn(emissionsDatasource, emissionsAcceptor, tableType, qualifiedTableName);
         modifyStateColumn(emissionsDatasource, emissionsAcceptor, qualifiedTableName, FIPS_NAME);

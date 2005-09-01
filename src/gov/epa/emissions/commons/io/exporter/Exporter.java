@@ -8,5 +8,5 @@ import gov.epa.emissions.commons.io.Dataset;
 public interface Exporter {
     
     //FIXME: change to an IOException
-    void exportTableToFile(String tableType, Dataset dataset, String fileName) throws Exception;
+    void exportTableToFile(Dataset dataset, String fileName) throws Exception;
 }

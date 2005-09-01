@@ -47,13 +47,14 @@
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.emf.services.ExImServices"/>  
  </service>
 
-  <service name="gov.epa.emf.services.DataServices" provider="java:RPC" style="RPC" use="encoded">
+ <service name="gov.epa.emf.services.DataServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
   <parameter name="scope" value="application"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.DataServicesImpl"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.emf.services.DataServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Dataset" qname="ns1:Dataset" xmlns:ns1="urn:gov.epa.emf.services.DataServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.emf.services.DataServices"/>  
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Table" qname="ns1:Table" xmlns:ns1="urn:gov.epa.emf.services.DataServices"/>  
  </service>
 
  <arrayMapping qname="ns1:Users" xmlns:ns1="urn:gov.epa.emf.services.UserServices"
@@ -71,16 +72,16 @@
 			 innerType="ns1:DatasetType" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
 
- <arrayMapping qname="ns1:Datasets" xmlns:ns1="urn:gov.epa.emf.services.DataServices"
+  <arrayMapping qname="ns1:Datasets" xmlns:ns1="urn:gov.epa.emf.services.DataServices"
              languageSpecificType="java:gov.epa.emissions.commons.io.Dataset[]"
 			 innerType="ns1:Dataset" 
-             encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
+             encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>               
 
  <arrayMapping qname="ns1:EmfDatasets" xmlns:ns1="urn:gov.epa.emf.services.DataServices"
              languageSpecificType="java:gov.epa.emissions.commons.io.EmfDataset[]"
 			 innerType="ns1:EmfDataset" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
- 
+             
  <transport name="http">
   <requestFlow>
    <handler type="URLMapper"/>

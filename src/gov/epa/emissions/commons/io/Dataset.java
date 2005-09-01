@@ -77,4 +77,6 @@ public interface Dataset extends Serializable {
     Table getTable(String tableType);
 
     void addTable(Table importedTable);
+
+    public Table[] getTables();
 }
