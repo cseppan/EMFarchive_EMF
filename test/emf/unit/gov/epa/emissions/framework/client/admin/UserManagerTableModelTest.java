@@ -10,7 +10,7 @@ import java.util.List;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
-public class UsersManagementTableModelTest extends MockObjectTestCase {
+public class UserManagerTableModelTest extends MockObjectTestCase {
 
     private List users;
 
