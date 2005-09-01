@@ -2,7 +2,7 @@
 CREATE TABLE "emf"."datasets"
 (
   dataset_id serial not null unique,
-  name varchar(128) NOT NULL,
+  name varchar(128) NOT NULL unique,
   creator varchar(128) NOT NULL,
   datasettype varchar(255) NOT NULL,
   units varchar(255),
