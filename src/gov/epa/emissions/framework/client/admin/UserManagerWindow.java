@@ -221,7 +221,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         container.display();
     }
 
-    public void setViewObserver(UserManagerPresenter presenter) {
+    public void setObserver(UserManagerPresenter presenter) {
         this.presenter = presenter;
     }
 

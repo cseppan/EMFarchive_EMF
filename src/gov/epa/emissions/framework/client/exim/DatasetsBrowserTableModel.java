@@ -17,6 +17,11 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
 
     private List rows;
 
+    public void setValueAt(Object value, int row, int col) {
+        super.setValueAt(value, row, col);
+        System.err.println("setting value - " + value + " @ (" + row + ", " + col + " )");
+    }
+
     public DatasetsBrowserTableModel(Dataset[] datasets) {
         this.header = new TableHeader(new String[] { "Name", "Start Date", "End Date", "Region", "Creator" });
         createRows(datasets);
@@ -82,6 +87,10 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
 
     public void refresh() {
         // TODO: what to do ?
+    }
+
+    public boolean isCellEditable(int row, int col) {
+        return false;
     }
 
 }

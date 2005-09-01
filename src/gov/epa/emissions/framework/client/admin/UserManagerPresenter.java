@@ -19,7 +19,7 @@ public class UserManagerPresenter implements EmfPresenter{
     }
 
     public void observe() {
-        view.setViewObserver(this);
+        view.setObserver(this);
     }
 
     public void notifyDelete(String username) throws EmfException {

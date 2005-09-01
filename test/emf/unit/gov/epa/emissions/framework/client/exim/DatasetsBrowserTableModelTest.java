@@ -59,4 +59,12 @@ public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
         assertEquals(dataset1.getRegion(), model.getValueAt(0, 3));
         assertEquals(dataset1.getCreator(), model.getValueAt(0, 4));
     }
+    
+    public void testShouldMarkEmailColumnAsEditable() {
+        assertFalse("All column should be uneditable", model.isCellEditable(0, 0));
+        assertFalse("All column should be uneditable", model.isCellEditable(0, 1));
+        assertFalse("All column should be uneditable", model.isCellEditable(0, 2));
+        assertFalse("All column should be uneditable", model.isCellEditable(0, 3));
+        assertFalse("All column should be uneditable", model.isCellEditable(0, 4));
+    }
 }

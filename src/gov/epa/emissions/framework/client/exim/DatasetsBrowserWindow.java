@@ -49,7 +49,6 @@ public class DatasetsBrowserWindow extends EmfInteralFrame {
         createLayout(layout, sortFilterSelectPanel);
 
         int parentWidth = (int) parentConsole.getSize().getWidth();
-        System.err.println(parentConsole.getSize());
         this.setSize(new Dimension(parentWidth, 300));
     }
 

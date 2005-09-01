@@ -8,14 +8,14 @@ import gov.epa.emissions.framework.services.UserServices;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
-public class UsersManagementPresenterTest extends MockObjectTestCase {
+public class UserManagerPresenterTest extends MockObjectTestCase {
 
     public void testShouldCloseViewOnClickOfCloseButton() {
         Mock view = mock(UsersManagementView.class);
 
         UserManagerPresenter presenter = new UserManagerPresenter(null, (UsersManagementView) view.proxy());
 
-        view.expects(once()).method("setViewObserver").with(eq(presenter));
+        view.expects(once()).method("setObserver").with(eq(presenter));
         view.expects(once()).method("close").withNoArguments();
 
         presenter.observe();
