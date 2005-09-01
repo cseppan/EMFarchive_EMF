@@ -4,5 +4,5 @@ public interface RegisterUserView {
 
     void close();
 
-    void setObserver(RegisterUserPresenter presenter);
+    void observe(RegisterUserPresenter presenter);
 }

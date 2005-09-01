@@ -29,7 +29,7 @@ public class RegisterUserPresenter implements EmfPresenter {
     }
 
     public void observe() {
-        this.view.setObserver(this);
+        this.view.observe(this);
     }
 
 }

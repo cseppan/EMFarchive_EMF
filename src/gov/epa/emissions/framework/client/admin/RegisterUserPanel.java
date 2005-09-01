@@ -1,11 +1,11 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -17,7 +17,6 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -43,36 +42,21 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     private JTextField email;
 
-    private JCheckBox isAdmin = new JCheckBox();
-
     private PostRegisterStrategy postRegisterStrategy;
 
     private EmfWidgetContainer parent;
 
     private MessagePanel messagePanel;
 
-    private JPanel profileValuesPanel;
+    protected JPanel profileValuesPanel;
 
-    public RegisterUserPanel(UserServices userAdmin, PostRegisterStrategy postRegisterStrategy,
-            EmfWidgetContainer parent) {
+    public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, EmfWidgetContainer parent) {
         this.postRegisterStrategy = postRegisterStrategy;
         this.parent = parent;
 
         createLayout();
 
         this.setSize(new Dimension(350, 425));
-    }
-
-    //TODO: a simple, clear way ?
-    public static RegisterUserPanel createWithAdminOption(UserServices userAdmin,
-            PostRegisterStrategy postRegisterStrategy, EmfWidgetContainer parent) {
-        RegisterUserPanel panel = new RegisterUserPanel(userAdmin, postRegisterStrategy, parent);
-        
-        panel.isAdmin = new JCheckBox("Administrator");
-        panel.profileValuesPanel.add(panel.isAdmin);
-        panel.refresh();
-        
-        return panel;
     }
 
     private void createLayout() {
@@ -124,14 +108,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
         try {
             User user = new User();
-            user.setUserName(username.getText());
-            user.setPassword(new String(password.getPassword()));
-            user.confirmPassword(new String(confirmPassword.getPassword()));
-            user.setFullName(name.getText());
-            user.setAffiliation(affiliation.getText());
-            user.setEmailAddr(email.getText());
-            user.setWorkPhone(phone.getText());
-            user.setInAdminGroup(isAdmin.isSelected());
+            populateUser(user);
 
             presenter.notifyRegister(user);
             postRegisterStrategy.execute(user);
@@ -140,6 +117,16 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
             messagePanel.setError(e.getMessage());
             refresh();
         }
+    }
+
+    protected void populateUser(User user) throws UserException {
+        user.setUserName(username.getText());
+        user.setPassword(new String(password.getPassword()));
+        user.confirmPassword(new String(confirmPassword.getPassword()));
+        user.setFullName(name.getText());
+        user.setAffiliation(affiliation.getText());
+        user.setEmailAddr(email.getText());
+        user.setWorkPhone(phone.getText());
     }
 
     public void refresh() {
@@ -186,7 +173,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         GridLayout labelsLayoutManager = new GridLayout(5, 1);
         labelsLayoutManager.setVgap(15);
         JPanel profileLabelsPanel = new JPanel(labelsLayoutManager);
-        
+
         profileLabelsPanel.setLayout(labelsLayoutManager);
         profileLabelsPanel.add(new JLabel("Name"));
         profileLabelsPanel.add(new JLabel("Affiliation"));
@@ -198,7 +185,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         GridLayout valuesLayoutManager = new GridLayout(5, 1);
         valuesLayoutManager.setVgap(10);
         profileValuesPanel = new JPanel(valuesLayoutManager);
-        
+
         name = new JTextField(10);
         profileValuesPanel.add(name);
         affiliation = new JTextField(10);
@@ -226,7 +213,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         parent.close();
     }
 
-    public void setObserver(RegisterUserPresenter presenter) {
+    public void observe(RegisterUserPresenter presenter) {
         this.presenter = presenter;
     }
 
