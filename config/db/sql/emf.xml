@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <users user_name="admin" user_pass="admin123" fullname="EMF Administrator" affiliation="UNC" workphone="123-9999" emailaddr="admin@emf.cep.unc.edu" inadmingrp="true" acctdisabled="false"/>
+  <users user_name="emf" user_pass="emf12345" fullname="EMF User" affiliation="UNC" workphone="123-9999" emailaddr="emf@emf.cep.unc.edu" inadmingrp="false" acctdisabled="false"/>
+  <datasettypes name="ORL Nonpoint Inventory" id="0" description="ORL Nonpoint Inventory" minfiles="1" maxfiles="1" uid="1882552005caf5c00105caf5c29f0001"/>
+  <datasettypes name="ORL Nonroad Inventory" id="0" description="ORL Nonroad Inventory" minfiles="1" maxfiles="1" uid="1882552005caf5c00105caf5c2c70002"/>
+  <datasettypes name="ORL Onroad Inventory" id="0" description="ORL Onroad Inventory" minfiles="1" maxfiles="1" uid="1882552005caf78b0105caf78db80001"/>
+  <datasettypes name="ORL Point Inventory" id="0" description="ORL Point Inventory" minfiles="1" maxfiles="1" uid="1882552005caf78b0105caf78e120002"/>
+</dataset>

@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <users user_name="admin" user_pass="admin123" fullname="EMF Administrator" affiliation="UNC" workphone="123-9999" emailaddr="admin@emf.cep.unc.edu" inadmingrp="true" acctdisabled="false"/>
+  <users user_name="emf" user_pass="emf12345" fullname="EMF User" affiliation="UNC" workphone="123-9999" emailaddr="emf@emf.cep.unc.edu" inadmingrp="false" acctdisabled="false"/>
+</dataset>
