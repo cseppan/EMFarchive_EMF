@@ -67,7 +67,7 @@ public class ExportTask implements Runnable {
         try {
             setStartStatus();
 
-            exporter.run( file, dataset);
+            exporter.run( dataset, file);
 
             setStatus(EMFConstants.END_EXPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
         } catch (Exception e) {

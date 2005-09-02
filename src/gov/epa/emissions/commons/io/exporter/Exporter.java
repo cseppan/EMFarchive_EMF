@@ -12,5 +12,5 @@ public interface Exporter {
     //FIXME: change to an IOException
     //void exportTableToFile(Dataset dataset, String fileName) throws Exception;
 
-	public void run(File file, EmfDataset dataset) throws Exception;
+	public void run(EmfDataset dataset, File file) throws Exception;
 }

@@ -3,7 +3,6 @@ package gov.epa.emissions.commons.io.exporter.orl;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Query;
-import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.commons.io.exporter.FixedFormatExporter;
@@ -40,12 +39,11 @@ public class ORLExporter extends FixedFormatExporter {
     // For Annual Emisions and Average Day Emissions, use an exponential
     // format as these data values can be very small
 
-    // FIXME: lookup Table Type from Dataset
-    private void exportTableToFile(Dataset dataset, String fileName) throws Exception {
+    public void run(EmfDataset dataset, File file) throws Exception {
         PrintWriter writer = null;
 
         try {
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName)));
+            writer = new PrintWriter(new BufferedWriter(new FileWriter(file.getCanonicalPath())));
 
             headerWriter.writeHeader(dataset, writer);
 
@@ -67,12 +65,6 @@ public class ORLExporter extends FixedFormatExporter {
                 writer.close();
             }
         }
-
     }
-
-	public void run(File file, EmfDataset dataset) throws Exception {
-		exportTableToFile(dataset,file.getName());
-	}
-
 
 }

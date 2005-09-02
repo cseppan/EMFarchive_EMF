@@ -48,8 +48,7 @@ public class ORLExporterTest extends CommonsTestCase {
         String tempDir = System.getProperty("java.io.tmpdir");
         String exportFileName = tempDir + "/" + datasetType + "." + tableName + ".EXPORTED_";
 
-        // ORL has only one base table type
-        exporter.run(new File(exportFileName), dataset);
+        exporter.run(dataset, new File(exportFileName));
     }
 
     private EmfDataset createDataset(String datasetType, TableType tableType, String tableName) {
