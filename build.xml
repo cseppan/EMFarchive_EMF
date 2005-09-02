@@ -29,11 +29,12 @@
     <property name="build.web-inf.dir" value="${build.dist.dir}/WEB-INF" />
     <property name="build.classes.dir" value="${build.web-inf.dir}/classes" />
 
+    <property name="reports.dir" value="${build.home}/reports" />
     <property name="reports.unittests.dir"
-              value="${build.home}/reports/emf-unit-tests"
+              value="${reports.dir}/emf-unit-tests"
     />
     <property name="reports.integrationtests.dir"
-              value="${build.home}/reports/emf-integration-tests"
+              value="${reports.dir}/emf-integration-tests"
     />
     <property name="app.name" value="emf" />
     <property name="app.path" value="/${app.name}" />
@@ -43,15 +44,7 @@
     <property name="war-path"
               value="file:///${tomcat.webapps}/${app.name}.war"
     />
-    <!--
-tomcat.manager.url=http://${tomcat.server}:8080/manager
 
-tomcat.start.prefix=-jar -Duser.dir="${tomcat.home}" -Djava.endorsed.dirs="${tomcat.home}/common/endorsed" "${tomcat.home}/bin/bootstrap.jar"
-tomcat.start=${tomcat.start.prefix} start
-tomcat.stop.prefix=-jar -Duser.dir="${tomcat.home}" "${tomcat.home}/bin/bootstrap.jar"
-tomcat.stop=${tomcat.stop.prefix} stop
-
--->
     <property name="tomcat.manager.url"
               value="http://${tomcat.server}:8080/manager"
     />
@@ -85,7 +78,7 @@ tomcat.stop=${tomcat.stop.prefix} stop
 
     <taskdef file="tomcatTasks.properties" />
 
-    <!--  =================== Basic (Java) Targets ====================================== -->
+    <!--  ===================START Basic Targets ====================================== -->
     <target name="init">
         <mkdir dir="${build.home}" />
         <mkdir dir="${build.web-inf.dir}" />
@@ -143,7 +136,10 @@ tomcat.stop=${tomcat.stop.prefix} stop
     <target name="compile"
             depends="clean, init, compile-src, compile-emf-tests, compile-commons-tests"
     />
+    <!--  ===============END  Basic ====================================== -->
 
+
+    <!--  ===============START  Tests ====================================== -->
     <target name="emf-unit-tests" depends="compile">
         <junit printsummary="yes" haltonfailure="yes">
             <classpath refid="classpath" />
@@ -273,7 +269,23 @@ tomcat.stop=${tomcat.stop.prefix} stop
             description="Continuous Integration build"
     />
 
-    <!--  =================== CVS Targets ====================================== -->
+    <target name="nirvana" depends="tomcat-stop, simple-deploy">
+        <!-- start tomcat & (all tests + stop tomcat) in parallel -->
+        <parallel>
+            <ant target="tomcat-start" />
+            <sequential>
+                <echo message="starting tests.." />
+                <ant target="all-emf-tests" />
+                <ant target="all-commons-tests" />
+                <ant target="tomcat-stop" />
+            </sequential>
+        </parallel>
+    </target>
+    <!--  ===============END  Tests ====================================== -->
+
+
+
+    <!--  ===============START CVS Targets ====================================== -->
     <target name="cvs-properties-load">
         <property file=".cvs" />
     </target>
@@ -297,8 +309,11 @@ tomcat.stop=${tomcat.stop.prefix} stop
     </target>
 
     <target name="pre-checkin" depends="cvs-update, compile, emf-unit-tests" />
+    <!--  ===============END CVS Targets ====================================== -->
 
-    <!--  =================== Tomcat Deployment Targets ====================================== -->
+
+
+    <!--  =============START Tomcat Deployment Targets ====================================== -->
     <target name="app-prepare" depends="clean, init, compile">
         <copy todir="${build.dist.dir}">
             <fileset dir="${web.dir}" />
@@ -363,19 +378,92 @@ tomcat.stop=${tomcat.stop.prefix} stop
         <echo message="Tomcat stopped." />
     </target>
 
-    <target name="nirvana" depends="tomcat-stop, simple-deploy">
-        <!-- start tomcat & (all tests + stop tomcat) in parallel -->
-        <parallel>
-            <ant target="tomcat-start" />
-            <sequential>
-                <echo message="starting tests.." />
-                <ant target="all-emf-tests" />
-                <ant target="all-commons-tests" />
-                <ant target="tomcat-stop" />
-            </sequential>
-        </parallel>
+    <!--  ===============END  Tomcat Deployment Targets ====================================== -->
 
+
+
+    <!--  ===============START  Coverage Targets =============================== -->
+    <path id="cobertura.classpath">
+        <fileset dir="${lib.dir}/dev/cobertura">
+            <include name="**/*.jar" />
+        </fileset>
+        <path refid="classpath"/>
+    </path>
+
+    <taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
+    <property name="coverage.dir" value="${reports.dir}/coverage" />
+    <property name="instrumented.dir" value="${coverage.dir}/instrumented" />
+    <property name="reports.xml.dir" value="${coverage.dir}/tests/xml" />
+    <property name="reports.html.dir" value="${coverage.dir}/tests/html" />
+    <property name="coverage.xml.dir" value="${coverage.dir}/coverage/xml" />
+    <property name="coverage.html.dir" value="${coverage.dir}/coverage/html" />
+
+    <target name="coverage-init">
+        <mkdir dir="${build.classes.dir}" />
+        <mkdir dir="${instrumented.dir}" />
+        <mkdir dir="${reports.xml.dir}" />
+        <mkdir dir="${reports.html.dir}" />
+        <mkdir dir="${coverage.xml.dir}" />
+        <mkdir dir="${coverage.html.dir}" />
     </target>
+
+    <target name="instrument" depends="coverage-init">
+        <delete file="cobertura.ser" />
+
+        <cobertura-instrument todir="${instrumented.dir}">
+            <ignore regex="org.apache.log4j.*" />
+            <fileset dir="${build.classes.dir}">
+                <include name="**/*.class" />
+                <exclude name="**/*Test.class" />
+            </fileset>
+        </cobertura-instrument>
+    </target>
+
+    <target name="run-instrumented-tests" depends="compile, instrument">
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath location="${instrumented.dir}" />
+            <classpath refid="classpath" />
+            <formatter type="xml" />
+
+            <batchtest fork="yes" todir="${reports.xml.dir}">
+                <fileset dir="${test.emf.unit.dir}">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <junitreport todir="${reports.xml.dir}">
+            <fileset dir="${reports.xml.dir}">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report format="frames" todir="${reports.html.dir}" />
+        </junitreport>
+    </target>
+
+    <target name="coverage-check">
+        <cobertura-check branchrate="34" totallinerate="100" />
+    </target>
+
+    <target name="xml-coverage-report">
+        <cobertura-report srcdir="${src.dir}}"
+                          destdir="${coverage.xml.dir}"
+                          format="xml"
+        />
+    </target>
+
+    <target name="html-coverage-report">
+        <cobertura-report destdir="${coverage.html.dir}">
+            <fileset dir="${src.dir}">
+                <include name="**/*.java" />
+            </fileset>
+        </cobertura-report>
+    </target>
+
+    <target name="coverage"
+            depends="compile,instrument,run-instrumented-tests,xml-coverage-report,html-coverage-report"
+            description="Compile, instrument ourself, run the tests and generate JUnit and coverage reports."
+    />
+    <!--  ===============END Coverage Targets =============================== -->
 
 </project>
 
