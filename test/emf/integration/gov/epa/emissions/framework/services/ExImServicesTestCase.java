@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
 
@@ -48,6 +49,24 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
         // TODO: verify status
     }
 
+    public void testExportOrlNonPoint() throws EmfException, IOException{
+        DatasetType datasetType = new DatasetType();
+        datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
+        User user = userService.getUser("emf");
+
+        File userDir = new File(System.getProperty("user.dir"));
+        File file = new File(userDir, "test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt");
+
+        EmfDataset dataset = new EmfDataset();
+        dataset.setCreator(user.getFullName());
+        dataset.setName("ORL NonPoint - Test");
+        
+        eximService.startImport(user, file.getPath(), dataset, datasetType);
+        File fileOut = new File(System.getProperty("tmp.dir"),"orlnonpoint.txt");
+        
+        eximService.startExport(user,dataset,fileOut.getCanonicalPath());
+        
+    }
     // TODO: rename & redo this test
     public void FIXME_testWHAT() throws EmfException {
         // emfData1.startImport("jcapowski","arinv.nonpoint.nti99_NC.txt","ORL");

@@ -52,7 +52,6 @@ public class DatasetTypesDAO {
     	log.debug("inserting datatype into database");
         Transaction tx = session.beginTransaction();
         session.save(aDst);
-        session.flush();
         tx.commit();
     	log.debug("inserting datatype into database");
     }

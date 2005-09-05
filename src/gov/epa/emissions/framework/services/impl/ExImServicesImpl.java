@@ -57,6 +57,7 @@ public class ExImServicesImpl implements ExImServices {
 				"reference", "emissions");
 
 		importerFactory = new ImporterFactory(dbServer);
+		exporterFactory = new ExporterFactory(dbServer);
 	}
 
 	private File validateFile(String fileName) throws EmfException {
@@ -109,10 +110,12 @@ public class ExImServicesImpl implements ExImServices {
 		log.debug("In ExImServicesImpl:startExport START");
 
 		try {
-			File file = validateFile(fileName);
+			File file = new File(fileName);
 			StatusServices statusSvc = new StatusServicesImpl();
 			DataServices dataSvc = new DataServicesImpl();
 			Exporter exporter = exporterFactory.create(dataset.getDatasetType());
+			System.out.println("Is exporter null? " + (exporter == null));
+//		System.out.println(exporter.);
 			ExportTask eximTask = new ExportTask(user,file,dataset,dataSvc,statusSvc,exporter);
 
 			// FIXME: use a thread pool
@@ -134,10 +137,12 @@ public class ExImServicesImpl implements ExImServices {
 	public DatasetType[] getDatasetTypes() throws EmfException {
 		log.debug("In ExImServicesImpl:getDatasetTypes START");
 
-		Session session = HibernateUtils.currentSession();
+//      Session session = HibernateUtils.currentSession();
+    	Session session = EMFHibernateUtil.getSession();
 		List datasettypes = DatasetTypesDAO.getDatasetTypes(session);
 		log.debug("In ExImServicesImpl:getDatasetTypes END");
-
+        session.flush();
+        session.close();
 		return (DatasetType[]) datasettypes
 				.toArray(new DatasetType[datasettypes.size()]);
 	}
@@ -145,9 +150,11 @@ public class ExImServicesImpl implements ExImServices {
 	public void insertDatasetType(DatasetType aDst) throws EmfException {
 		log.debug("In ExImServicesImpl:insertDatasetType START");
 
-		Session session = HibernateUtils.currentSession();
+//      Session session = HibernateUtils.currentSession();
+    	Session session = EMFHibernateUtil.getSession();
 		DatasetTypesDAO.insertDatasetType(aDst, session);
-
+        session.flush();
+        session.close();
 		log.debug("In ExImServicesImpl:insertDatasetType END");
 
 	}

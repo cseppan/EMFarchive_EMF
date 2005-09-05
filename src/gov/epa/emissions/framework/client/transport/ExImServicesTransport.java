@@ -90,16 +90,18 @@ public class ExImServicesTransport implements ExImServices {
             QName datasetTypeQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:DatasetType");
             QName datasetQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:EmfDataset");
             QName operationQName = new QName("urn:gov.epa.emf.services.ExImServices", "startImport");
+            QName tableQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:Table");
 
             call.setOperationName(operationQName);
 
             registerMapping(call, userQName, User.class);
             registerMapping(call, datasetTypeQName, DatasetType.class);
             registerMapping(call, datasetQName, EmfDataset.class);
+            registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
 
             call.addParameter("user", userQName, ParameterMode.IN);
 
-            call.addParameter("filename", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("filename", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
             call.addParameter("dataset", datasetQName, ParameterMode.IN);
             call.addParameter("datasettype", datasetTypeQName, ParameterMode.IN);
 
@@ -122,12 +124,6 @@ public class ExImServicesTransport implements ExImServices {
         log.debug("Begin import file for user:filename:datasettype:: " + user.getUserName() + " :: " + fileName
                 + " :: " + datasetType.getName());
 
-    }
-
-    private void registerMapping(Call call, QName datasetQName, Class emfDatasetClass) {
-        call.registerTypeMapping(emfDatasetClass, datasetQName, new org.apache.axis.encoding.ser.BeanSerializerFactory(
-                emfDatasetClass, datasetQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(
-                emfDatasetClass, datasetQName));
     }
 
     /*
@@ -245,16 +241,18 @@ public class ExImServicesTransport implements ExImServices {
             QName userQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:User");
             QName datasetQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:EmfDataset");
             QName operationQName = new QName("urn:gov.epa.emf.services.ExImServices", "startExport");
+            QName tableQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:Table");
 
             call.setOperationName(operationQName);
 
-            registerMapping(call, userQName, User.class);
+            registerMapping(call, userQName, gov.epa.emissions.framework.services.User.class);
             registerMapping(call, datasetQName, EmfDataset.class);
-            registerMappingForTable(call);
+            //registerMappingForTable(call);
+            registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
             
             call.addParameter("user", userQName, ParameterMode.IN);
             call.addParameter("dataset", datasetQName, ParameterMode.IN);
-            call.addParameter("filename", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);            
+            call.addParameter("filename", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);            
 
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
             
@@ -275,6 +273,12 @@ public class ExImServicesTransport implements ExImServices {
         log.debug("End export file for user:filename:datasettype:: " + user.getUserName() + " :: " + fileName + " :: "
                 + dataset.getDatasetType());
 
+    }
+
+    private void registerMapping(Call call, QName emfQName, Class emfClass) {
+        call.registerTypeMapping(emfClass, emfQName, new org.apache.axis.encoding.ser.BeanSerializerFactory(
+                emfClass, emfQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(
+                emfClass, emfQName));
     }
 
     private void registerMappingForTable(Call call) {

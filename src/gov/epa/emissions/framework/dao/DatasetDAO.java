@@ -51,7 +51,6 @@ private static final String GET_DATASET_QUERY="select aDset from EmfDataset as a
   public static void insertDataset(Dataset aDset, Session session){
       Transaction tx = session.beginTransaction();
       session.save(aDset);
-      session.flush();
       tx.commit();
   }
   

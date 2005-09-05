@@ -40,8 +40,11 @@ public class StatusServicesImpl implements StatusServices{
      */
     public Status[] getMessages(String userName) throws EmfException {
     	log.debug("get all status messages of for user " +userName);
-        Session session = HibernateUtils.currentSession();
+//      Session session = HibernateUtils.currentSession();
+    	Session session = EMFHibernateUtil.getSession();
         List allStats = StatusDAO.getMessages(userName,session);
+        session.flush();
+        session.close();
         log.debug("Total number of messages in the List= " + allStats.size());
     	log.debug("get all status messages of for user " +userName);
         return (Status[]) allStats.toArray(new Status[allStats.size()]);
@@ -52,8 +55,11 @@ public class StatusServicesImpl implements StatusServices{
      */
     public Status[] getMessages(String userName, String type) throws EmfException {
     	log.debug("get all status messages of type "+type+" for user " +userName);
-        Session session = HibernateUtils.currentSession();
+//      Session session = HibernateUtils.currentSession();
+    	Session session = EMFHibernateUtil.getSession();
         List allStats = StatusDAO.getMessages(userName,type,session);
+        session.flush();
+        session.close();
         log.debug("Total number of messages in the List= " + allStats.size());
     	log.debug("get all status messages of type "+type+" for user " +userName);
         return (Status[]) allStats.toArray(new Status[allStats.size()]);
@@ -61,11 +67,14 @@ public class StatusServicesImpl implements StatusServices{
 
     public void setStatus(Status status) throws EmfException{
     	log.debug("EMFStatusService: setStatus " + status.getUserName());
-        Session session = HibernateUtils.currentSession();
+//      Session session = HibernateUtils.currentSession();
+    	Session session = EMFHibernateUtil.getSession();
         log.debug("EMFStatusService: Before insertStatusMessage");
         
         //FIXME: replace static w/ instance methods
         StatusDAO.insertStatusMessage(status,session);
+        session.flush();
+        session.close();
         log.debug("EMFStatusService: After insertStatusMessage");
     	log.debug("EMFStatusService: setStatus " + status.getUserName());
     }

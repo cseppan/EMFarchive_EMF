@@ -61,9 +61,8 @@ public class StatusDAO {
         Transaction tx = session.beginTransaction();
         log.debug("StatusDAO: insertStatusMessage before session.save");
         session.save(status);
-        session.flush();
-        log.debug("StatusDAO: insertStatusMessage after session.save");
         tx.commit();
+        log.debug("StatusDAO: insertStatusMessage after session.save");
     }
     
     //FIXME: Verify if exception needs to be thrown/caught here
@@ -72,13 +71,14 @@ public class StatusDAO {
               
         Query query = session.createQuery(GET_READ_STATUS_QUERY);
         query.setParameter("username", userName, Hibernate.STRING);
+        Transaction tx = session.beginTransaction();
 
         Iterator iter = query.iterate();
         while (iter.hasNext()){
             Status aStatus = (Status)iter.next();
             session.delete(aStatus);
         }
-        session.flush();
+        tx.commit();
         log.debug("End deleteMessages");
         
     }//deleteMessages
@@ -101,7 +101,6 @@ public class StatusDAO {
             aStatus.setMsgRead();
             allStatus.add(aStatus);  
         }
-        session.flush();
         tx.commit();
         log.debug("End getMessages");
         return allStatus;

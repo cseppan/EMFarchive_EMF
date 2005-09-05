@@ -32,9 +32,12 @@ public class DataServicesImpl implements DataServices {
     }
 
     public Dataset[] getDatasets() throws EmfException {
-        Session session = HibernateUtils.currentSession();
+//        Session session = HibernateUtils.currentSession();
+    	Session session = EMFHibernateUtil.getSession();
         List datasets = DatasetDAO.getDatasets(session);
         System.out.println("Total number of datasets in the List= " + datasets.size());
+        session.flush();
+        session.close();
         return (Dataset[]) datasets.toArray(new Dataset[datasets.size()]);
     }
 
@@ -44,9 +47,11 @@ public class DataServicesImpl implements DataServices {
     }
 
     public void insertDataset(EmfDataset aDataset) throws EmfException {
-        Session session = HibernateUtils.currentSession();
+//      Session session = HibernateUtils.currentSession();
+    	Session session = EMFHibernateUtil.getSession();
         DatasetDAO.insertDataset(aDataset, session);
-
+        session.flush();
+        session.close();
     }
 
 }

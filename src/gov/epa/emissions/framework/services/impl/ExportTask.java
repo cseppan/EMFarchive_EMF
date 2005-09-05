@@ -36,7 +36,6 @@ public class ExportTask implements Runnable {
     private User user;
     private File file;
     private StatusServices statusServices = null;
-    private DatasetType datasetType;
     private EmfDataset dataset;
 	private Exporter exporter;
 
@@ -63,13 +62,13 @@ public class ExportTask implements Runnable {
 	 */
     public void run() {
         log.info("starting export - file: " + file.getName() + " of type: " + dataset.getDatasetType());
-
+System.out.println("STARTING EXPORT");
         try {
             setStartStatus();
 
             exporter.run( dataset, file);
 
-            setStatus(EMFConstants.END_EXPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
+            setStatus(EMFConstants.END_EXPORT_MESSAGE_Prefix + dataset.getName() + ":" + file.getName());
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + file, e);
             try {
@@ -79,11 +78,11 @@ public class ExportTask implements Runnable {
             }
         }
 
-        log.info("exporting of file: " + file.getName() + " of type: " + datasetType.getName() + " complete");
+        log.info("exporting of file: " + file.getName() + " of type: " + dataset.getName() + " complete");
     }
 
     private void setStartStatus() throws EmfException {
-        setStatus(EMFConstants.START_EXPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
+        setStatus(EMFConstants.START_EXPORT_MESSAGE_Prefix + dataset.getName() + ":" + file.getName());
     }
 
     private void setStatus(String message) throws EmfException {

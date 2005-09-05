@@ -1,6 +1,8 @@
 package gov.epa.emissions.commons.io;
 
-public class Table {
+import java.io.Serializable;
+
+public class Table implements Serializable {
     private String tableName;
 
     private String tableType;
