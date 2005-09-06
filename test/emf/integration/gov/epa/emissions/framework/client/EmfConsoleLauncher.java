@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 public class EmfConsoleLauncher {
 
     public static void main(String[] args) throws EmfException {
-        ServiceLocator serviceLocator = new RemoteServiceLocator("http://ben.cep.unc.edu:8080/emf/services/");
+        ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services/");
 
         UserServices userAdmin = serviceLocator.getUserServices();
         User user = userAdmin.getUser("admin");

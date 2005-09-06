@@ -230,11 +230,6 @@ public class UserTest extends TestCase {
         fail("should fail when affiliation is less than 3 characters in lengh");
     }
 
-    public void testShouldFailIfPhoneIsInInvalidFormat() {
-        assertInvalidPhoneFormat("1x");
-        assertInvalidPhoneFormat("ab");
-    }
-
     public void testShouldFailIfPhoneIsUnspecified() {
         User user = new User();
 
@@ -246,30 +241,6 @@ public class UserTest extends TestCase {
         }
 
         fail("should fail when Phone is unspecified");
-    }
-
-    public void testShouldFailIfPhoneIsInvalidOnConstruction() {
-        try {
-            new User("sdf", "abc", "12d", null, "abcd", "abcd1234", false, false);
-        } catch (UserException ex) {
-            assertEquals("Phone should have format xxx-yyy-zzzz or xxxx or x-yyyy", ex.getMessage());
-            return;
-        }
-
-        fail("should fail when Phone has invalid format");
-    }
-
-    private void assertInvalidPhoneFormat(String phone) {
-        User user = new User();
-
-        try {
-            user.setWorkPhone(phone);
-        } catch (UserException ex) {
-            assertEquals("Phone should have format xxx-yyy-zzzz or xxxx or x-yyyy", ex.getMessage());
-            return;
-        }
-
-        fail("should fail when Phone has invalid format");
     }
 
     public void testShouldFailIfEmailHasInvalidFormat() {

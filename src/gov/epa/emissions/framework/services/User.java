@@ -41,9 +41,6 @@ public class User implements Serializable {
 
     private boolean acctDisabled = false;
 
-    // dirty flag to indicate some value in the bean has changed
-    private boolean dirty = false;
-
     public boolean equals(Object other) {
         if (!(other instanceof User))
             return false;
@@ -72,7 +69,6 @@ public class User implements Serializable {
 
         this.inAdminGroup = beAdmin;
         this.acctDisabled = disabled;
-        this.dirty = true;
     }
 
     /**
@@ -84,7 +80,6 @@ public class User implements Serializable {
 
     public void setAcctDisabled(boolean acctDisabled) {
         this.acctDisabled = acctDisabled;
-        this.dirty = true;
     }
 
     public String getAffiliation() {
@@ -100,7 +95,6 @@ public class User implements Serializable {
         }
 
         this.affiliation = affiliation;
-        this.dirty = true;
     }
 
     public String getEmailAddr() {
@@ -115,7 +109,6 @@ public class User implements Serializable {
             throw new UserException("Email should have the format xx@yy.zz");
 
         this.email = email;
-        this.dirty = true;
     }
 
     public String getFullName() {
@@ -126,7 +119,6 @@ public class User implements Serializable {
         if (name == null)
             throw new UserException("Name should be specified");
         this.name = name;
-        this.dirty = true;
     }
 
     public boolean isInAdminGroup() {
@@ -135,7 +127,6 @@ public class User implements Serializable {
 
     public void setInAdminGroup(boolean inAdminGroup) {
         this.inAdminGroup = inAdminGroup;
-        this.dirty = true;
     }
 
     public String getPassword() {
@@ -161,7 +152,6 @@ public class User implements Serializable {
         }
 
         this.password = password;
-        this.dirty = true;
     }
 
     public String getUserName() {
@@ -181,7 +171,6 @@ public class User implements Serializable {
         }
 
         this.userName = username;
-        this.dirty = true;
     }
 
     public String getWorkPhone() {
@@ -192,21 +181,7 @@ public class User implements Serializable {
         if (phone == null)
             throw new UserException("Phone should be specified");
 
-        if (!Pattern.matches("(\\d)+(-\\d+)*", phone)) {
-            throw new UserException("Phone should have format xxx-yyy-zzzz or xxxx or x-yyyy");
-        }
-
         this.phone = phone;
-        this.dirty = true;
-
-    }
-
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
     }
 
     public void confirmPassword(String confirmPassword) throws UserException {

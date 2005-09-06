@@ -123,7 +123,6 @@ public class UserManagerDAO {
                         emfUser.setPassword(rst.getString("user_pass"));
                         emfUser.setUserName(rst.getString("user_name"));
                         emfUser.setWorkPhone(rst.getString("workphone"));
-                        emfUser.setDirty(false);
                     }// while
 
                     // Close the result set, statement and the connection
@@ -188,7 +187,6 @@ public class UserManagerDAO {
                         emfUser.setPassword(rst.getString("user_pass"));
                         emfUser.setUserName(rst.getString("user_name"));
                         emfUser.setWorkPhone(rst.getString("workphone"));
-                        emfUser.setDirty(false);
 
                         users.add(emfUser);
                         log.debug(emfUser.getUserName());
