@@ -14,6 +14,9 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -141,6 +144,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         JButton newButton = new JButton("New");
         newButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
+                // FIXME: should be notifying the Presenter
                 displayRegisterUser();
             }
         });
@@ -171,12 +175,24 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
     private void updateUsers() {
         if (presenter == null)
             return;
+        List users = getSelectedUsers();
+        for (Iterator iter = users.iterator(); iter.hasNext();) {
+            User user = (User) iter.next();
+            updateUser(user);
+        }
+    }
+
+    private List getSelectedUsers() {
+        List users = new ArrayList();
+
         int[] selected = selectModel.getSelectedIndexes();
         if (selected.length == 0)
-            return;
+            return users;
         for (int i = 0; i < selected.length; i++) {
-            updateUser(model.getUser(selected[i]));
+            users.add(model.getUser(selected[i]));
         }
+
+        return users;
     }
 
     private void deleteUser() {
@@ -192,10 +208,11 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
             return;
         }
 
-        for (int i = 0; i < selected.length; i++) {
+        List users = getSelectedUsers();
+        for (Iterator iter = users.iterator(); iter.hasNext();) {
+            User user = (User) iter.next();
             try {
-                String username = model.getUser(selected[i]).getUserName();
-                presenter.notifyDelete(username);
+                presenter.notifyDelete(user.getUserName());
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
                 // TODO: temp, until the HACK is addressed (then, use refresh)
@@ -241,6 +258,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
     }
 
     private void doSimpleRefresh() {
+        model.refresh();
         selectModel.refresh();
         super.validate();
     }
