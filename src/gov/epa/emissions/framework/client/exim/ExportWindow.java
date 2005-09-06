@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
-import gov.epa.emissions.framework.client.MultiLineMessagePanel;
+import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -22,7 +22,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
 
     private EmfDataset dataset;
 
-    private MultiLineMessagePanel messagePanel;
+    private SingleLineMessagePanel messagePanel;
 
     private JTextField filename;
 
@@ -32,7 +32,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         super("Export a dataset");
         this.dataset = dataset;
 
-        super.setSize(new Dimension(500, 225));
+        super.setSize(new Dimension(600, 175));
 
         JPanel layoutPanel = createLayout();
         this.getContentPane().add(layoutPanel);
@@ -54,7 +54,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        messagePanel = new MultiLineMessagePanel(new Dimension(400, 100));
+        messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
         panel.add(createExportPanel());
         panel.add(createButtonsPanel());
@@ -77,7 +77,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
 
-        valuesPanel.add(new JLabel(dataset.getDescription()));
+        valuesPanel.add(new JLabel(dataset.getName()));
         filename = new JTextField(35);
         filename.setName("filename");
         valuesPanel.add(filename);
@@ -133,9 +133,8 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
     private void doExport() {
         try {
             presenter.notifyExport(dataset, filename.getText());
-            String message = "Started exporting [ " + filename.getText() + " ]."
-                    + "Please monitor the Status window to track your Export request.";
-            messagePanel.setMessage(message);
+            messagePanel.setMessage("Started export. Please monitor the Status window "
+                    + "to track your Export request.");
 
             filename.setText("");
         } catch (EmfException e) {

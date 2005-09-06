@@ -275,8 +275,7 @@
             <ant target="tomcat-start" />
             <sequential>
                 <echo message="starting tests.." />
-                <ant target="all-emf-tests" />
-                <ant target="all-commons-tests" />
+                <ant target="all-tests" />
                 <ant target="tomcat-stop" />
             </sequential>
         </parallel>

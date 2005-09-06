@@ -14,6 +14,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -25,141 +26,149 @@ import javax.swing.JTextField;
 
 public class ImportWindow extends EmfInteralFrame implements ImportView {
 
-	private ImportPresenter presenter;
+    private ImportPresenter presenter;
 
-	private MessagePanel messagePanel;
+    private MessagePanel messagePanel;
 
-	private JTextField name;
+    private JTextField name;
 
-	private JTextField filename;
+    private JTextField filename;
 
-	private DefaultComboBoxModel datasetTypesModel;
+    private DefaultComboBoxModel datasetTypesModel;
 
-	private ExImServices eximServices;
+    private ExImServices eximServices;
 
-	public ImportWindow(User user, ExImServices eximServices)
-			throws EmfException {
-		super("Import Dataset");
-		this.eximServices = eximServices;
+    private JTextField folder;
 
-		setSize(new Dimension(600, 275));
+    public ImportWindow(User user, ExImServices eximServices) throws EmfException {
+        super("Import Dataset");
+        this.eximServices = eximServices;
 
-		JPanel layoutPanel = createLayout();
-		this.getContentPane().add(layoutPanel);
-	}
+        setSize(new Dimension(600, 275));
 
-	private JPanel createLayout() throws EmfException {
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JPanel layoutPanel = createLayout();
+        this.getContentPane().add(layoutPanel);
+    }
 
-		messagePanel = new SingleLineMessagePanel();
-		panel.add(messagePanel);
-		panel.add(createImportPanel());
-		panel.add(createButtonsPanel());
+    private JPanel createLayout() throws EmfException {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-		return panel;
-	}
+        messagePanel = new SingleLineMessagePanel();
+        panel.add(messagePanel);
+        panel.add(createImportPanel());
+        panel.add(createButtonsPanel());
 
-	private JPanel createImportPanel() throws EmfException {
-		JPanel panel = new JPanel();
+        return panel;
+    }
 
-		GridLayout labelsLayoutManager = new GridLayout(3, 1);
-		labelsLayoutManager.setVgap(15);
-		JPanel labelsPanel = new JPanel(labelsLayoutManager);
-		labelsPanel.add(new JLabel("Dataset Type"));
-		labelsPanel.add(new JLabel("Name"));
-		labelsPanel.add(new JLabel("Filename"));
+    private JPanel createImportPanel() throws EmfException {
+        JPanel panel = new JPanel();
 
-		panel.add(labelsPanel);
+        GridLayout labelsLayoutManager = new GridLayout(4, 1);
+        labelsLayoutManager.setVgap(15);
+        JPanel labelsPanel = new JPanel(labelsLayoutManager);
+        labelsPanel.add(new JLabel("Dataset Type"));
+        labelsPanel.add(new JLabel("Name"));
+        labelsPanel.add(new JLabel("Folder"));
+        labelsPanel.add(new JLabel("Filename"));
 
-		GridLayout valuesLayoutManager = new GridLayout(3, 1);
-		valuesLayoutManager.setVgap(10);
-		JPanel valuesPanel = new JPanel(valuesLayoutManager);
-		datasetTypesModel = new DefaultComboBoxModel(eximServices
-				.getDatasetTypes());
-		JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
-		valuesPanel.add(datasetTypesComboBox);
+        panel.add(labelsPanel);
 
-		name = new JTextField(15);
-		name.setName("name");
-		valuesPanel.add(name);
-		filename = new JTextField(35);
-		filename.setName("filename");
-		valuesPanel.add(filename);
+        GridLayout valuesLayoutManager = new GridLayout(4, 1);
+        valuesLayoutManager.setVgap(10);
+        JPanel valuesPanel = new JPanel(valuesLayoutManager);
+        datasetTypesModel = new DefaultComboBoxModel(eximServices.getDatasetTypes());
+        JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
+        valuesPanel.add(datasetTypesComboBox);
 
-		panel.add(valuesPanel);
+        name = new JTextField(15);
+        name.setName("name");
+        valuesPanel.add(name);
+        
+        folder = new JTextField(35);
+        folder.setName("Folder");
+        valuesPanel.add(folder);
+        
+        filename = new JTextField(35);
+        filename.setName("filename");
+        valuesPanel.add(filename);
 
-		return panel;
-	}
+        panel.add(valuesPanel);
 
-	private JPanel createButtonsPanel() {
-		JPanel panel = new JPanel(new BorderLayout());
+        return panel;
+    }
 
-		JPanel container = new JPanel();
-		FlowLayout layout = new FlowLayout();
-		layout.setHgap(20);
-		layout.setVgap(25);
-		container.setLayout(layout);
+    private JPanel createButtonsPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
 
-		JButton importButton = new JButton("Import");
-		importButton.setName("import");
-		importButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				if (presenter == null)
-					return;
+        JPanel container = new JPanel();
+        FlowLayout layout = new FlowLayout();
+        layout.setHgap(20);
+        layout.setVgap(25);
+        container.setLayout(layout);
 
-				clearMessagePanel();
-				doImport();
-			}
+        JButton importButton = new JButton("Import");
+        importButton.setName("import");
+        importButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                if (presenter == null)
+                    return;
 
-		});
-		container.add(importButton);
+                clearMessagePanel();
+                doImport();
+            }
 
-		JButton done = new JButton("Done");
-		done.setName("done");
-		done.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				if (presenter != null)
-					presenter.notifyDone();
-			}
+        });
+        container.add(importButton);
 
-		});
-		container.add(done);
+        JButton done = new JButton("Done");
+        done.setName("done");
+        done.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                if (presenter != null)
+                    presenter.notifyDone();
+            }
 
-		panel.add(container, BorderLayout.EAST);
+        });
+        container.add(done);
 
-		return panel;
-	}
+        panel.add(container, BorderLayout.EAST);
 
-	public void register(ImportPresenter presenter) {
-		this.presenter = presenter;
-	}
+        return panel;
+    }
 
-	public void close() {
-		super.dispose();
-	}
+    public void register(ImportPresenter presenter) {
+        this.presenter = presenter;
+    }
 
-	public void display() {
-		super.setVisible(true);
-	}
+    public void close() {
+        super.dispose();
+    }
 
-	private void refresh() {
-		super.validate();
-	}
+    public void display() {
+        super.setVisible(true);
+    }
 
-	private void doImport() {
-		try {
-			presenter.notifyImport(filename.getText(), name.getText(),
-					(DatasetType) datasetTypesModel.getSelectedItem());
-			String message = "Started import. Please monitor the Status window to track your Import request.";
-			messagePanel.setMessage(message);
-		} catch (EmfException e) {
-			messagePanel.setError(e.getMessage());
-		}
-	}
+    private void refresh() {
+        super.validate();
+    }
 
-	private void clearMessagePanel() {
-		messagePanel.clear();
-		refresh();
-	}
+    private void doImport() {
+        try {
+            //TODO: assumption that filepath is UNIX-sensitive
+            String filepath = folder.getText() + File.separator + filename.getText();
+            presenter.notifyImport(filepath, name.getText(), (DatasetType) datasetTypesModel
+                    .getSelectedItem());
+            String message = "Started import. Please monitor the Status window to track your Import request.";
+            messagePanel.setMessage(message);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void clearMessagePanel() {
+        messagePanel.clear();
+        refresh();
+    }
 }
