@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Random;
 
 import org.apache.commons.configuration.ConfigurationException;
 
@@ -33,7 +34,8 @@ public abstract class DataServicesTestCase extends ServicesTestCase {
 
         // insert the new record
         EmfDataset aDset = new EmfDataset();
-        aDset.setName("NewDataset");
+        Random rand = new Random();
+        aDset.setName("NewDataset" + rand.nextInt());
         aDset.setCountry("USA");
         aDset.setCreator("cdcruz");
         aDset.setDatasetType("ORL Waypoint Test");

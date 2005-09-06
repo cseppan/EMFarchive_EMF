@@ -19,9 +19,12 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -29,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 public class LoginWindow extends EmfWindow implements LoginView {
@@ -80,19 +84,10 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
         JButton signIn = new JButton("Sign In");
         signIn.setName("signIn");
+        addKeyBinding(signIn);
         signIn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (presenter == null)
-                    return;
-                try {
-                    User user = presenter.notifyLogin(username.getText(), new String(password.getPassword()));
-                    messagePanel.clear();
-                    refresh();
-                    launchConsole(user);
-                    close();
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
-                }
+                doSignIn();
             }
 
         });
@@ -111,6 +106,30 @@ public class LoginWindow extends EmfWindow implements LoginView {
         panel.add(container, BorderLayout.EAST);
 
         return panel;
+    }
+
+    private void doSignIn() {
+        if (presenter == null)
+            return;
+        try {
+            User user = presenter.notifyLogin(username.getText(), new String(password.getPassword()));
+            messagePanel.clear();
+            refresh();
+            launchConsole(user);
+            close();
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void addKeyBinding(JButton signIn) {
+        Action doSignIn = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doSignIn();
+            }
+        };
+        signIn.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), "SignIn");
+        signIn.getActionMap().put("SignIn", doSignIn);
     }
 
     private void launchConsole(User user) {

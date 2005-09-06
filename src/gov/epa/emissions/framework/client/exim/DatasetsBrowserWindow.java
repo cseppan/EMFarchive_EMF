@@ -52,8 +52,7 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
         SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         createLayout(layout, sortFilterSelectPanel);
 
-        int parentWidth = (int) parentConsole.getSize().getWidth();
-        this.setSize(new Dimension(parentWidth - 10, 300));
+        this.setSize(new Dimension(725, 300));
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
