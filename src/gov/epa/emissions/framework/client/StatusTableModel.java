@@ -45,15 +45,26 @@ public class StatusTableModel extends AbstractTableModel {
         return ((Row) rows.get(row)).getValueAt(column);
     }
 
-    public void refresh(Status[] statuses) {
+    public void clear() {
+        this.statusList.clear();
+        this.rows.clear();
+
+        notifyTableUpdated();
+    }
+
+    private void notifyTableUpdated() {
+        super.fireTableDataChanged();
+    }
+    
+    public void refresh(Status[] statuses) {        
         this.statusList.addAll(Arrays.asList(statuses));
 
         for (int i = 0; i < statuses.length; i++) {
             Row row = new Row(statuses[i]);
             rows.add(row);
         }
-        
-        super.fireTableDataChanged();
+
+        notifyTableUpdated();
     }
 
     private class Column {
@@ -85,5 +96,7 @@ public class StatusTableModel extends AbstractTableModel {
             return columnHolder.value;
         }
     }
+
+ 
 
 }

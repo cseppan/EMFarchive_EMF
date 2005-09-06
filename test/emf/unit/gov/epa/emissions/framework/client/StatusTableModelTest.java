@@ -26,7 +26,7 @@ public class StatusTableModelTest extends MockObjectTestCase {
         model = new StatusTableModel();
         assertEquals(0, model.getRowCount());
         assertNull("No data on creation", model.getValueAt(0, 0));
-        
+
         model.refresh(statuses);
         assertEquals(2, model.getRowCount());
     }
@@ -58,10 +58,20 @@ public class StatusTableModelTest extends MockObjectTestCase {
     public void testShouldAppendStatusesOnRefresh() {
         Status status = new Status("user2", "type2", "message2", new Date());
         Status[] statuses = new Status[] { status };
-        
-        model.refresh(statuses);
-        
-        assertEquals(3, model.getRowCount());
 
+        model.refresh(statuses);
+
+        assertEquals(3, model.getRowCount());
+    }
+
+    public void testShouldClearStatusesOnClear() {
+        Status status = new Status("user2", "type2", "message2", new Date());
+        Status[] statuses = new Status[] { status };
+
+        model.refresh(statuses);
+
+        model.clear();
+
+        assertEquals(0, model.getRowCount());
     }
 }

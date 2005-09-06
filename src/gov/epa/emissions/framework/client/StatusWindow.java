@@ -10,8 +10,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Date;
 
+import javax.swing.AbstractButton;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -37,7 +43,7 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
         super.setClosable(false);
         super.setIconifiable(true);
         super.setMaximizable(false);
-        super.setResizable(false);
+        super.setResizable(true);
 
         this.presenter = new StatusPresenter(user, statusServices, this);
         taskRunner = new ConcurrentTaskRunner();
@@ -51,11 +57,31 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
         messagePanel = new SingleLineMessagePanel();
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(messagePanel, BorderLayout.EAST);
+        panel.add(createClearButton(), BorderLayout.EAST);
         layout.add(panel, BorderLayout.NORTH);
 
         layout.add(createTable(), BorderLayout.CENTER);
 
         return layout;
+    }
+
+    private JButton createClearButton() {
+        Icon icon = new ImageIcon("images/clear.ico");
+        
+        JButton button = new JButton("Clear", icon);
+        button.setToolTipText("Clears the Status messages");
+        button.setVerticalTextPosition(AbstractButton.BOTTOM);
+        button.setHorizontalTextPosition(AbstractButton.CENTER);
+
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                // FIXME: notify presenter about 'clear', and let the presenter
+                // communicate the action to the 'table-model'
+                statusTableModel.clear();
+            }
+        });
+
+        return button;
     }
 
     private JScrollPane createTable() {

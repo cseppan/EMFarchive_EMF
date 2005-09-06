@@ -10,6 +10,7 @@
     <property name="JAVA_HOME" value="${env.JAVA_HOME}" />
     <property name="src.dir" value="src" />
     <property name="lib.dir" value="lib" />
+    <property name="res.dir" value="res" />        
 
     <property name="test.emf.dir" value="test/emf" />
     <property name="test.emf.unit.dir" value="${test.emf.dir}/unit" />
@@ -103,6 +104,9 @@
             <fileset dir="${src.dir}" includes="**/*.properties" />
             <fileset dir="${src.dir}" includes="**/*.xml" />
             <fileset dir="${src.dir}" includes="**/*.dtd" />
+        </copy>
+        <copy todir="${build.classes.dir}">
+            <fileset dir="${res.dir}" includes="**/*" />
         </copy>
     </target>
 
@@ -259,7 +263,7 @@
     <target name="all-commons-tests"
             depends="compile, commons-unit-tests, commons-integration-tests"
     />
-    <target name="all-tests" depends="all-emf-tests, all-commons-tests" />
+    <target name="all-tests" depends="all-commons-tests, all-emf-tests" />
     <target name="all-unit-tests"
             depends="emf-unit-tests, commons-unit-tests"
     />
