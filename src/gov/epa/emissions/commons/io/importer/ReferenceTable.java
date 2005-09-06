@@ -73,7 +73,6 @@ final class ReferenceTable extends Table {
     // from TableType ?
     public static final String getTableType(String datasetType, String filename) {
         // FIXME: dataset type ??
-        System.err.println(datasetType);
         if (!DatasetTypes.REFERENCE.equals(datasetType))
             return null;
 

@@ -95,7 +95,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosed(InternalFrameEvent event) {
-                refresh();
+                doSimpleRefresh();
             }
         });
 
@@ -174,9 +174,8 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         int[] selected = selectModel.getSelectedIndexes();
         if (selected.length == 0)
             return;
-
         for (int i = 0; i < selected.length; i++) {
-            updateUser(model.getUser(i));
+            updateUser(model.getUser(selected[i]));
         }
     }
 
@@ -239,6 +238,11 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
 
     public void display() {
         super.setVisible(true);
+    }
+
+    private void doSimpleRefresh() {
+        selectModel.refresh();
+        super.validate();
     }
 
 }

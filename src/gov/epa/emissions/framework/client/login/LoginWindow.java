@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.login;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfConsolePresenter;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.EmfWindow;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
@@ -133,7 +134,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
     }
 
     private void launchConsole(User user) {
-        EmfConsole console = new EmfConsole(user, serviceLocator);
+        EmfConsole console = new EmfConsole(new EmfSession(user, serviceLocator));
         EmfConsolePresenter presenter = new EmfConsolePresenter(console);
         presenter.observe();
 

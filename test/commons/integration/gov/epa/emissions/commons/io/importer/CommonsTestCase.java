@@ -23,7 +23,6 @@ public abstract class CommonsTestCase extends TestCase {
         if (!conf.exists() || !conf.isFile()) {
             String error = "File: " + conf + " does not exist. Please copy either of the two TEMPLATE files "
                     + "(from " + folder + "), name it commons.conf, configure " + "it as needed, and rerun.";
-            System.err.println(error);
             throw new RuntimeException(error);
         }
 

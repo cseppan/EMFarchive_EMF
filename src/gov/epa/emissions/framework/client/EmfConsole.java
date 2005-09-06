@@ -45,9 +45,9 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
     private StatusWindow status;
 
     // TODO: split the login & logout menu/actions in a separate class ??
-    public EmfConsole(User user, ServiceLocator serviceLocator) {
-        this.user = user;
-        this.serviceLocator = serviceLocator;
+    public EmfConsole(EmfSession session) {
+        this.user = session.getUser();
+        this.serviceLocator = session.getServiceLocator();
 
         setProperties();
         setLayout();

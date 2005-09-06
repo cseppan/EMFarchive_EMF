@@ -24,70 +24,73 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ExportClient {
-//http://localhost:8080/emf/services/gov.epa.emf.services.DataServices
-	
+    // http://localhost:8080/emf/services/gov.epa.emf.services.DataServices
+
     private static Log log = LogFactory.getLog(ExportClient.class);
+
     private RemoteServiceLocator svcLoc = null;
+
     private ExImServices eximSvc = null;
+
     private UserServices userSvc = null;
 
-	public ExportClient() {
-		super();
+    public ExportClient() {
+        super();
         log.debug("IN CONSTRUCTOR");
         try {
-			svcLoc = new RemoteServiceLocator("http://localhost:8080/emf/services");
-			eximSvc = svcLoc.getEximServices();
-			userSvc = svcLoc.getUserServices();
-//			User user = userSvc.getUser("admin");
-//			System.out.println(user.getUserName());
-//			doStuff();
-			exportDataset();
-		} catch (EmfException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            svcLoc = new RemoteServiceLocator("http://localhost:8080/emf/services");
+            eximSvc = svcLoc.getEximServices();
+            userSvc = svcLoc.getUserServices();
+            // User user = userSvc.getUser("admin");
+            // System.out.println(user.getUserName());
+            // doStuff();
+            exportDataset();
+        } catch (EmfException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         log.debug("END CONSTRUCTOR");
-	}
+    }
 
-	private void doStuff() throws Exception {
-        for (int i=0; i<10;i++){synchronized (this) {wait(1);}}
-		
-	}
-
-	private void exportDataset() throws EmfException, IOException, InterruptedException {
+    private void exportDataset() throws EmfException, IOException, InterruptedException {
         DatasetType datasetType = new DatasetType();
         datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
         User user = userSvc.getUser("emf");
 
         System.out.println("$$$$$$$$$$$$$$$$ User object " + user.getUserName());
-        
+
         File userDir = new File(System.getProperty("user.dir"));
         File file = new File(userDir, "test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt");
 
-//        EmfDataset dataset = new EmfDataset();
-        EmfDataset dataset = createDataset(DatasetTypes.ORL_AREA_NONPOINT_TOXICS, ORLTableTypes.ORL_AREA_NONPOINT_TOXICS, "arinv_nonpoint_nti99_NC");
+        // EmfDataset dataset = new EmfDataset();
+        EmfDataset dataset = createDataset(DatasetTypes.ORL_AREA_NONPOINT_TOXICS,
+                ORLTableTypes.ORL_AREA_NONPOINT_TOXICS, "arinv_nonpoint_nti99_NC");
 
         dataset.setCreator(user.getFullName());
         dataset.setName("ORL NonPoint Conrad");
         dataset.setDatasetType(datasetType.getName());
-        
-		eximSvc.startImport(user, file.getPath(), dataset, datasetType);
+
+        eximSvc.startImport(user, file.getPath(), dataset, datasetType);
         System.out.println(new Date());
-        for (int i=0; i<10000;i++){synchronized (this) {wait(1);}}
+        for (int i = 0; i < 10000; i++) {
+            synchronized (this) {
+                wait(1);
+            }
+        }
         System.out.println(new Date());
-        File fileOut = new File(System.getProperty("user.dir"),"/test/commons/data/orl/nc/output/orlnonpoint.txt");
-        eximSvc.startExport(user,dataset,fileOut.getPath());	
+        File fileOut = new File(System.getProperty("user.dir"), "/test/commons/data/orl/nc/output/orlnonpoint.txt");
+        eximSvc.startExport(user, dataset, fileOut.getPath());
         System.out.println("Export ended: " + fileOut.getPath());
-	}
+    }
 
     private EmfDataset createDataset(String datasetType, TableType tableType, String tableName) {
         EmfDataset dataset = new EmfDataset();
@@ -102,8 +105,8 @@ public class ExportClient {
         return dataset;
     }
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         new ExportClient();
     }
-	
+
 }

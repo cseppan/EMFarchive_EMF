@@ -10,7 +10,6 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.EmfDataset;
-import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
@@ -247,15 +246,15 @@ public class ExImServicesTransport implements ExImServices {
 
             registerMapping(call, userQName, gov.epa.emissions.framework.services.User.class);
             registerMapping(call, datasetQName, EmfDataset.class);
-            //registerMappingForTable(call);
+            // registerMappingForTable(call);
             registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
-            
+
             call.addParameter("user", userQName, ParameterMode.IN);
             call.addParameter("dataset", datasetQName, ParameterMode.IN);
-            call.addParameter("filename", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);            
+            call.addParameter("filename", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
 
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
-            
+
             call.invoke(new Object[] { user, dataset, fileName });
 
         } catch (ServiceException e) {
@@ -276,15 +275,8 @@ public class ExImServicesTransport implements ExImServices {
     }
 
     private void registerMapping(Call call, QName emfQName, Class emfClass) {
-        call.registerTypeMapping(emfClass, emfQName, new org.apache.axis.encoding.ser.BeanSerializerFactory(
-                emfClass, emfQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(
-                emfClass, emfQName));
+        call.registerTypeMapping(emfClass, emfQName, new org.apache.axis.encoding.ser.BeanSerializerFactory(emfClass,
+                emfQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(emfClass, emfQName));
     }
 
-    private void registerMappingForTable(Call call) {
-        QName tableQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:Table");
-        call.registerTypeMapping(Table.class, tableQName, new org.apache.axis.encoding.ser.BeanSerializerFactory(
-                Table.class, tableQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(Table.class,
-                tableQName));
-    }
 }// EMFDataTransport

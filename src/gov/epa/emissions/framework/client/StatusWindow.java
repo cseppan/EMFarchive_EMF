@@ -10,8 +10,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.AbstractButton;
@@ -54,20 +57,28 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
         JPanel layout = new JPanel();
         layout.setLayout(new BorderLayout());
 
-        messagePanel = new SingleLineMessagePanel();
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(messagePanel, BorderLayout.EAST);
-        panel.add(createClearButton(), BorderLayout.EAST);
-        layout.add(panel, BorderLayout.NORTH);
-
+        layout.add(createTopPanel(), BorderLayout.NORTH);
         layout.add(createTable(), BorderLayout.CENTER);
 
         return layout;
     }
 
+    private JPanel createTopPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
+        JPanel container = new JPanel(new FlowLayout());
+        messagePanel = new SingleLineMessagePanel();
+        container.add(messagePanel);
+        container.add(createClearButton());
+
+        panel.add(container, BorderLayout.EAST);
+        return panel;
+    }
+
     private JButton createClearButton() {
         Icon icon = new ImageIcon("images/green.gif");
-        
+
         JButton button = new JButton("Clear", icon);
         button.setToolTipText("Clears the Status messages");
         button.setVerticalTextPosition(AbstractButton.BOTTOM);
@@ -122,7 +133,8 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
     }
 
     public void update(Status[] statuses) {
-        messagePanel.setMessage("Last Update : " + new Date(), Color.GRAY);
+        DateFormat format = new SimpleDateFormat("hh:mm:ss MM/dd/yyyy");
+        messagePanel.setMessage("Last Update : " + format.format(new Date()), Color.GRAY);
         statusTableModel.refresh(statuses);
 
         super.revalidate();

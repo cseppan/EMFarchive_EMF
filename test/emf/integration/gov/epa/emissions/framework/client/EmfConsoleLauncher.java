@@ -16,7 +16,7 @@ public class EmfConsoleLauncher {
         UserServices userAdmin = serviceLocator.getUserServices();
         User user = userAdmin.getUser("admin");
 
-        EmfConsole console = new EmfConsole(user, serviceLocator);
+        EmfConsole console = new EmfConsole(new EmfSession(user, serviceLocator));
         console.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         EmfConsolePresenter presenter = new EmfConsolePresenter(console);
