@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.exim;
 
+import java.io.File;
+
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.EmfDataset;
@@ -23,14 +25,43 @@ public class ImportPresenterTest extends MockObjectTestCase {
         dataset.setName("dataset name");
         dataset.setCreator(user.getFullName());
 
+        String dir = "dir";
         String filename = "filename";
+        String filepath = dir + File.separator + filename;
 
         Mock model = mock(ExImServices.class);
-        model.expects(once()).method("startImport").with(eq(user), eq(filename), eq(dataset), eq(type));
+
+        model.expects(once()).method("startImport").with(eq(user), eq(filepath), eq(dataset), eq(type));
 
         ImportPresenter presenter = new ImportPresenter(user, (ExImServices) model.proxy(), null);
 
-        presenter.notifyImport(filename, dataset.getName(), type);
+        presenter.notifyImport(dir, filename, dataset.getName(), type);
+    }
+
+    public void testDuringImportRaisesExceptionOnBlankFilename() throws EmfException {
+        ImportPresenter presenter = new ImportPresenter(null, null, null);
+
+        try {
+            presenter.notifyImport("dir", "", "dataset name", new DatasetType("ORL NonRoad"));
+        } catch (EmfException e) {
+            assertEquals("Filename must be specified", e.getMessage());
+            return;
+        }
+
+        fail("should have raised an exception if a blank filename is provided");
+    }
+
+    public void testDuringImportRaisesExceptionOnBlankDirectory() throws EmfException {
+        ImportPresenter presenter = new ImportPresenter(null, null, null);
+
+        try {
+            presenter.notifyImport("", "file.txt", "dataset name", new DatasetType("ORL NonRoad"));
+        } catch (EmfException e) {
+            assertEquals("Directory must be specified", e.getMessage());
+            return;
+        }
+
+        fail("should have raised an exception if a blank filename is provided");
     }
 
     public void testClosesViewOnDoneImport() throws EmfException {

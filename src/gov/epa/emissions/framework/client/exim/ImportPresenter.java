@@ -1,8 +1,11 @@
 package gov.epa.emissions.framework.client.exim;
 
+import java.io.File;
+
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
@@ -20,12 +23,20 @@ public class ImportPresenter {
         this.view = view;
     }
 
-    public void notifyImport(String filename, String datasetName, DatasetType type) throws EmfException {
+    public void notifyImport(String directory, String filename, String datasetName, DatasetType type)
+            throws EmfException {
+        if (directory.length() == 0)
+            throw new UserException("Directory must be specified");
+
+        if (filename.length() == 0)
+            throw new UserException("Filename must be specified");
+
         EmfDataset dataset = new EmfDataset();
         dataset.setCreator(user.getFullName());
         dataset.setName(datasetName);
-        
-        model.startImport(user, filename, dataset, type);
+
+        String filepath = directory + File.separator + filename;
+        model.startImport(user, filepath , dataset, type);
     }
 
     public void notifyDone() {

@@ -14,7 +14,6 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -38,7 +37,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
 
     private ExImServices eximServices;
 
-    private JTextField folder;
+    private JTextField directory;
 
     public ImportWindow(User user, ExImServices eximServices) throws EmfException {
         super("Import Dataset");
@@ -86,9 +85,9 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         name.setName("name");
         valuesPanel.add(name);
         
-        folder = new JTextField(35);
-        folder.setName("Folder");
-        valuesPanel.add(folder);
+        directory = new JTextField(35);
+        directory.setName("Directory");
+        valuesPanel.add(directory);
         
         filename = new JTextField(35);
         filename.setName("filename");
@@ -156,9 +155,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
 
     private void doImport() {
         try {
-            //TODO: assumption that filepath is UNIX-sensitive
-            String filepath = folder.getText() + File.separator + filename.getText();
-            presenter.notifyImport(filepath, name.getText(), (DatasetType) datasetTypesModel
+            presenter.notifyImport(directory.getText(), filename.getText(), name.getText(), (DatasetType) datasetTypesModel
                     .getSelectedItem());
             String message = "Started import. Please monitor the Status window to track your Import request.";
             messagePanel.setMessage(message);
