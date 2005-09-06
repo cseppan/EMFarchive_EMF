@@ -108,7 +108,6 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         });
         menu.add(importMenu);
 
-        menu.add(createDisabledMenuItem("Export"));
         menu.addSeparator();
 
         JMenuItem logout = new JMenuItem("Logout");
