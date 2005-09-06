@@ -60,7 +60,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
         createLayout();
 
-        this.setSize(new Dimension(350, 425));
+        this.setSize(new Dimension(375, 425));
     }
 
     private void createLayout() {
@@ -172,7 +172,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         Border titledBorder = createBorder("Profile");
         profilePanel.setBorder(titledBorder);
 
-        GridLayout labelsLayoutManager = new GridLayout(5, 1);
+        GridLayout labelsLayoutManager = new GridLayout(4, 1);
         labelsLayoutManager.setVgap(15);
         JPanel profileLabelsPanel = new JPanel(labelsLayoutManager);
 
@@ -184,7 +184,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
         profilePanel.add(profileLabelsPanel);
 
-        GridLayout valuesLayoutManager = new GridLayout(5, 1);
+        GridLayout valuesLayoutManager = new GridLayout(4, 1);
         valuesLayoutManager.setVgap(10);
         profileValuesPanel = new JPanel(valuesLayoutManager);
 
@@ -217,6 +217,10 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     public void observe(RegisterUserPresenter presenter) {
         this.presenter = presenter;
+    }
+
+    public RegisterUserPresenter getPresenter() {
+        return presenter;
     }
 
 }

@@ -9,10 +9,10 @@ public class SingleLineMessagePanel extends MessagePanel {
     private JLabel label;
 
     public SingleLineMessagePanel() {
-        label = new JLabel();
+        label = new JLabel(" ");
         super.add(label);
 
-        super.setVisible(false);
+        super.setVisible(true);
     }
 
     public void clear() {

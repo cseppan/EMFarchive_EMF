@@ -52,7 +52,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
 
         JPanel layoutPanel = createLayout();
 
-        this.setSize(new Dimension(350, 250));
+        this.setSize(new Dimension(350, 225));
         this.setLocation(new Point(400, 200));
         this.setTitle("Login");
 
@@ -79,7 +79,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
         JPanel container = new JPanel();
         FlowLayout layout = new FlowLayout();
         layout.setHgap(20);
-        layout.setVgap(25);
+        layout.setVgap(15);
         container.setLayout(layout);
 
         JButton signIn = new JButton("Sign In");
@@ -103,7 +103,7 @@ public class LoginWindow extends EmfWindow implements LoginView {
         });
         container.add(cancel);
 
-        panel.add(container, BorderLayout.EAST);
+        panel.add(container, BorderLayout.CENTER);
 
         return panel;
     }
@@ -171,37 +171,36 @@ public class LoginWindow extends EmfWindow implements LoginView {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        JLabel forgotPassword = new JLabel("<html><a href=''>Forgot your Password ?</a></html>");
-        forgotPassword.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent event) {// TODO: deferred
-            }
-        });
+        JLabel forgotPassword = new JLabel("    Forgot your Password ?");
+        forgotPassword.setEnabled(false);
+        forgotPassword.setToolTipText("To be implemented");
         JPanel forgotPasswordPanel = new JPanel(new BorderLayout());
         forgotPasswordPanel.add(forgotPassword);
 
-        panel.add(forgotPasswordPanel, BorderLayout.EAST);
+        panel.add(forgotPasswordPanel);
 
-        JLabel register = new JLabel("<html><a href=''>Not yet registered ?</a></html>");
+        JLabel register = new JLabel("<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Not yet registered ?</a></html>");
         register.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent arg0) {
                 try {
-                    launchCreateUser();
+                    launchRegisterUser();
                 } catch (Exception e) {
-                    // TODO: launch failure ??
+                    messagePanel.setError(e.getMessage());
                 }
                 close();
             }
         });
+        register.setToolTipText("Register as a new user");
 
         JPanel registerPanel = new JPanel(new BorderLayout());
         registerPanel.add(register);
 
-        panel.add(registerPanel, BorderLayout.EAST);
+        panel.add(registerPanel);
 
         return panel;
     }
 
-    private void launchCreateUser() throws Exception {
+    private void launchRegisterUser() throws Exception {
         PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(serviceLocator);
         RegisterUserWindow window = new RegisterUserWindow(serviceLocator, strategy);
         RegisterUserPresenter presenter = new RegisterUserPresenter(serviceLocator.getUserServices(), window.getView());

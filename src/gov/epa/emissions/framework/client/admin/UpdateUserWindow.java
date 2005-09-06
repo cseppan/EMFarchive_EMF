@@ -17,6 +17,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -48,27 +49,29 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
 
     private String windowTitle;
 
-    // TODO: refactor the duplication b/w register & update user widgets
+    // FIXME: refactor the duplication b/w register & update user widgets
     public UpdateUserWindow(User user) {
         super("Update User - " + user.getUserName());
         this.windowTitle = "Update User - " + user.getUserName();
 
         this.user = user;
 
-        super.setSize(new Dimension(350, 400));
+        super.setSize(new Dimension(375, 425));
         super.getContentPane().add(createLayout());
+        super.setResizable(false);
     }
 
     private JPanel createLayout() {
-        JPanel layout = new JPanel();
-
+        JPanel base = new JPanel();
+        base.setLayout(new BoxLayout(base, BoxLayout.Y_AXIS));
+        
         messagePanel = new SingleLineMessagePanel();
-        layout.add(messagePanel);
-        layout.add(createProfilePanel());
-        layout.add(createLoginPanel());
-        layout.add(createButtonsPanel());
+        base.add(messagePanel);
+        base.add(createProfilePanel());
+        base.add(createLoginPanel());
+        base.add(createButtonsPanel());
 
-        return layout;
+        return base;
     }
 
     private JPanel createProfilePanel() {

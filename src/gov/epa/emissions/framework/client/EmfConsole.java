@@ -29,6 +29,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+//FIXME: split this class up into smaller ones...getting too big
 public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     private JDesktopPane desktop;
