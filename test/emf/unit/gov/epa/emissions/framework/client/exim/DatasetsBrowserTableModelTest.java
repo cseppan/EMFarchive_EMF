@@ -1,15 +1,12 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataServices;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
 public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
@@ -39,12 +36,9 @@ public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
         dataset2.setStopDateTime(new Date());
         datasetList.add(dataset2);
 
-        Dataset[] datasets = (Dataset[]) datasetList.toArray(new Dataset[0]);
+        EmfDataset[] datasets = (EmfDataset[]) datasetList.toArray(new EmfDataset[0]);
 
-        Mock services = mock(DataServices.class);
-        services.expects(atLeastOnce()).method("getDatasets").withNoArguments().will(returnValue(datasets));
-
-        model = new DatasetsBrowserTableModel((DataServices) services.proxy());
+        model = new DatasetsBrowserTableModel(datasets);
     }
 
     public void testShouldReturnColumnsNames() {

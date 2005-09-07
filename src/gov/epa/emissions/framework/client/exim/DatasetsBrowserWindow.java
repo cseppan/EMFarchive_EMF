@@ -31,41 +31,68 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
 
     private DatasetsBrowserPresenter presenter;
 
+    private JFrame parentConsole;
+
+    private JScrollPane sortFilterPane;
+
     // FIXME: this is very similar to UserManagerWindow. Can we refactory &
     // reuse ?
     public DatasetsBrowserWindow(DataServices services, JFrame parentConsole) throws EmfException {
         super("Datasets Browser");
 
-        model = new DatasetsBrowserTableModel(services);
+        //FIXME: change the type from Dataset to EmfDataset
+        model = new DatasetsBrowserTableModel((EmfDataset[])services.getDatasets());
         selectModel = new SortFilterSelectModel(model);
+        this.parentConsole = parentConsole;
 
         layout = new JPanel();
         this.getContentPane().add(layout);
+        this.setSize(new Dimension(750, 300));
 
         // FIXME: OverallTableModel has a bug w/ respect to row-count &
         // cannot refresh itself. So, we will regen the layout on every
         // refresh - it's a HACK. Will need to be addressed
-        createLayout(parentConsole);
+        createLayout(layout, parentConsole);
     }
 
-    private void createLayout(JFrame parentConsole) {
+    private void createLayout(JPanel layout, JFrame parentConsole) {
         layout.removeAll();
-        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        createLayout(layout, sortFilterSelectPanel);
-
-        this.setSize(new Dimension(725, 300));
-    }
-
-    private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
+        
         layout.setLayout(new BorderLayout());
 
-        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
-        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
+        layout.add(createTopPanel(layout), BorderLayout.NORTH);
+        sortFilterPane = createSortFilterPane(parentConsole);
+        layout.add(sortFilterPane, BorderLayout.CENTER);
+        layout.add(createControlPanel(), BorderLayout.SOUTH);
+    }
+
+    private JScrollPane createSortFilterPane(JFrame parentConsole) {
+        SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
+
+        JScrollPane scrollPane = new JScrollPane(sortFilterSelectionPanel);
+        sortFilterSelectionPanel.setPreferredSize(new Dimension(450, 120));
+        
+        return scrollPane;
+    }
+
+    private JPanel createTopPanel(JPanel layout) {
+        JPanel panel = new JPanel(new BorderLayout());
 
         messagePanel = new SingleLineMessagePanel();
-        layout.add(messagePanel, BorderLayout.NORTH);
-        layout.add(scrollPane, BorderLayout.CENTER);
-        layout.add(createControlPanel(), BorderLayout.SOUTH);
+        panel.add(messagePanel, BorderLayout.CENTER);
+
+        JButton refresh = new DefaultButton("Refresh", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    presenter.notifyRefresh();
+                } catch (EmfException e) {
+                    showError(e.getMessage());
+                }
+            }
+        });
+        panel.add(refresh, BorderLayout.EAST);
+
+        return panel;
     }
 
     private JPanel createControlPanel() {
@@ -81,7 +108,7 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
         JButton closeButton = new DefaultButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 if (presenter != null) {
-                    presenter.notifyCloseView();
+                    presenter.notifyClose();
                 }
             }
         });
@@ -106,14 +133,18 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
                 EmfDataset dataset = model.getDataset(selected[i]);
                 presenter.notifyExport(dataset);
             } catch (EmfException e) {
-                messagePanel.setError(e.getMessage());
-                refresh();
+                showError(e.getMessage());
                 break;// TODO: should continue ?
             }
         }
     }
 
-    private void refresh() {
+    private void showError(String message) {
+        messagePanel.setError(message);
+        refreshLayout();
+    }
+
+    public void refreshLayout() {
         super.validate();
     }
 
@@ -135,5 +166,15 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
 
         getDesktopPane().add(exportView);
         exportView.display();
+    }
+
+    public void refresh(EmfDataset[] datasets) {
+        model.populate(datasets);
+        selectModel.refresh();
+        
+//      TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
+        createLayout(layout, parentConsole);
+        
+        this.refreshLayout();
     }
 }

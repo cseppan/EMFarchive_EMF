@@ -9,5 +9,7 @@ public interface DatasetsBrowserView {
 
     void showExport(EmfDataset dataset, ExportPresenter exportPresenter) throws EmfException;
 
+    void refresh(EmfDataset[] datasets);
+
     void close();
 }

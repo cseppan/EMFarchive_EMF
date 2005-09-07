@@ -4,8 +4,6 @@ import gov.epa.emissions.commons.gui.RefreshableTableModel;
 import gov.epa.emissions.commons.gui.TableHeader;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataServices;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,10 +18,10 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
 
     private List rows;
 
-    public DatasetsBrowserTableModel(DataServices services) throws EmfException {
+    public DatasetsBrowserTableModel(EmfDataset[] datasets) {
         this.header = new TableHeader(new String[] { "Name", "Start Date", "End Date", "Region", "Creator" });
 
-        createRows(services);
+        populate(datasets);
     }
 
     public int getRowCount() {
@@ -40,16 +38,6 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
 
     public Object getValueAt(int row, int column) {
         return ((Row) rows.get(row)).getValueAt(column);
-    }
-
-    private void createRows(DataServices services) throws EmfException {
-        this.rows = new ArrayList();
-
-        Dataset[] datasets = services.getDatasets();
-        for (int i = 0; i < datasets.length; i++) {
-            Row row = new Row(datasets[i]);
-            rows.add(row);
-        }
     }
 
     private class Column {
@@ -97,7 +85,16 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
         Row row = (Row) rows.get(index);
 
         return (EmfDataset) row.dataset;// FIXME: merge EmfDataset and Dataset
-                                        // into one
+        // into one
+    }
+
+    public void populate(EmfDataset[] datasets) {
+        this.rows = new ArrayList();
+
+        for (int i = 0; i < datasets.length; i++) {
+            Row row = new Row(datasets[i]);
+            rows.add(row);
+        }
     }
 
 }

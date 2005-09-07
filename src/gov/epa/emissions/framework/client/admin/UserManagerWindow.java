@@ -250,6 +250,10 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         selectModel.refresh();
         // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
         createLayout(parentConsole);
+        refreshLayout();
+    }
+
+    private void refreshLayout() {
         super.validate();
     }
 
@@ -260,7 +264,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
     private void doSimpleRefresh() {
         model.refresh();
         selectModel.refresh();
-        super.validate();
+        refreshLayout();
     }
 
 }
