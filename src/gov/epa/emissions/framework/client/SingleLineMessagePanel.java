@@ -16,7 +16,7 @@ public class SingleLineMessagePanel extends MessagePanel {
     }
 
     public void clear() {
-        label.setText("");
+        label.setText(" ");
     }
 
     public void setMessage(String message, Color color) {

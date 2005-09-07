@@ -25,6 +25,8 @@ public class ImportPresenter {
 
     public void notifyImport(String directory, String filename, String datasetName, DatasetType type)
             throws EmfException {
+        if (datasetName.length() == 0)
+            throw new UserException("Dataset Name must be specified");
         if (directory.length() == 0)
             throw new UserException("Directory must be specified");
 
@@ -36,7 +38,7 @@ public class ImportPresenter {
         dataset.setName(datasetName);
 
         String filepath = directory + File.separator + filename;
-        model.startImport(user, filepath , dataset, type);
+        model.startImport(user, filepath, dataset, type);
     }
 
     public void notifyDone() {
@@ -45,6 +47,10 @@ public class ImportPresenter {
 
     public void observe() {
         view.register(this);
+    }
+
+    public void notifyBeginInput() {
+        view.clearMessagePanel();
     }
 
 }

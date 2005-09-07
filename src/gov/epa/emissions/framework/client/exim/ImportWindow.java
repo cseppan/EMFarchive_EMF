@@ -22,6 +22,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class ImportWindow extends EmfInteralFrame implements ImportView {
 
@@ -84,18 +86,43 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         name = new JTextField(15);
         name.setName("name");
         valuesPanel.add(name);
-        
+
         directory = new JTextField(35);
         directory.setName("Directory");
         valuesPanel.add(directory);
-        
+
         filename = new JTextField(35);
         filename.setName("filename");
         valuesPanel.add(filename);
 
+        registerForEditEvents(name, directory, filename);
+
         panel.add(valuesPanel);
 
         return panel;
+    }
+
+    private void registerForEditEvents(JTextField name, JTextField directory, JTextField filename) {
+        name.getDocument().addDocumentListener(notifyBeginInput());
+        directory.getDocument().addDocumentListener(notifyBeginInput());
+        filename.getDocument().addDocumentListener(notifyBeginInput());
+    }
+
+    private DocumentListener notifyBeginInput() {
+        return new DocumentListener() {
+            public void insertUpdate(DocumentEvent event) {
+                if (presenter != null)
+                    presenter.notifyBeginInput();
+            }
+
+            public void removeUpdate(DocumentEvent event) {
+                if (presenter != null)
+                    presenter.notifyBeginInput();
+            }
+
+            public void changedUpdate(DocumentEvent event) {
+            }
+        };
     }
 
     private JPanel createButtonsPanel() {
@@ -155,8 +182,8 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
 
     private void doImport() {
         try {
-            presenter.notifyImport(directory.getText(), filename.getText(), name.getText(), (DatasetType) datasetTypesModel
-                    .getSelectedItem());
+            presenter.notifyImport(directory.getText(), filename.getText(), name.getText(),
+                    (DatasetType) datasetTypesModel.getSelectedItem());
             String message = "Started import. Please monitor the Status window to track your Import request.";
             messagePanel.setMessage(message);
         } catch (EmfException e) {
@@ -164,7 +191,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         }
     }
 
-    private void clearMessagePanel() {
+    public void clearMessagePanel() {
         messagePanel.clear();
         refresh();
     }

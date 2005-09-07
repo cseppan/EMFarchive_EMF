@@ -51,6 +51,19 @@ public class ImportPresenterTest extends MockObjectTestCase {
         fail("should have raised an exception if a blank filename is provided");
     }
 
+    public void testDuringImportRaisesExceptionOnBlankDatasetName() throws EmfException {
+        ImportPresenter presenter = new ImportPresenter(null, null, null);
+
+        try {
+            presenter.notifyImport("dir", "filename", "", new DatasetType("ORL NonRoad"));
+        } catch (EmfException e) {
+            assertEquals("Dataset Name must be specified", e.getMessage());
+            return;
+        }
+
+        fail("should have raised an exception if a blank filename is provided");
+    }
+    
     public void testDuringImportRaisesExceptionOnBlankDirectory() throws EmfException {
         ImportPresenter presenter = new ImportPresenter(null, null, null);
 
@@ -82,4 +95,15 @@ public class ImportPresenterTest extends MockObjectTestCase {
         presenter.observe();
     }
 
+    public void testShouldClearMessagePanelOnEdit() throws EmfException {
+        Mock view = mock(ImportView.class);
+
+        ImportPresenter presenter = new ImportPresenter(null, null, (ImportView) view.proxy());
+        view.expects(once()).method("register").with(eq(presenter));
+        view.expects(once()).method("clearMessagePanel").withNoArguments();
+        
+        presenter.observe();
+        
+        presenter.notifyBeginInput();
+    }
 }
