@@ -14,6 +14,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,8 +29,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 public class UserManagerWindow extends EmfInteralFrame implements UsersManagementView {
 
@@ -71,18 +71,13 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         this.setSize(new Dimension(550, 300));
     }
 
-    private void listenForUpdateSelection(JTable table) {
+    private void listenForUpdateSelection(final JTable table) {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        ListSelectionModel selectionModel = table.getSelectionModel();
-        selectionModel.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent event) {
-                if (event.getValueIsAdjusting())
-                    return;// Ignore extra messages.
-
-                ListSelectionModel selectionModel = (ListSelectionModel) event.getSource();
-                if (!selectionModel.isSelectionEmpty()) {
-                    User user = model.getUser(selectionModel.getMinSelectionIndex());
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent event) {
+                if (event.getClickCount() == 2) {
+                    User user = model.getUser(table.getSelectedRow());
                     updateUser(user);
                 }
             }
