@@ -93,7 +93,7 @@ public class ExportClient {
         }
         System.out.println(new Date());
         File fileOut = new File(System.getProperty("user.dir"), "/test/commons/data/orl/nc/output/orlnonpoint.txt");
-        eximSvc.startExport(user, dataset, fileOut.getPath());
+        eximSvc.startExport(user, new EmfDataset[]{dataset}, fileOut.getPath());
         System.out.println("Export ended: " + fileOut.getPath());
     }
 

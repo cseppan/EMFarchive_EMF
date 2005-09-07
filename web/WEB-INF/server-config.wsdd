@@ -74,12 +74,12 @@
 			 innerType="ns1:DatasetType" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
 
-  <arrayMapping qname="ns1:Datasets" xmlns:ns1="urn:gov.epa.emf.services.DataServices"
+ <arrayMapping qname="ns1:Datasets" xmlns:ns1="urn:gov.epa.emf.services.DataServices"
              languageSpecificType="java:gov.epa.emissions.commons.io.Dataset[]"
 			 innerType="ns1:Dataset" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>               
 
- <arrayMapping qname="ns1:EmfDatasets" xmlns:ns1="urn:gov.epa.emf.services.DataServices"
+ <arrayMapping qname="ns1:EmfDatasets" xmlns:ns1="urn:gov.epa.services.EmfServices"
              languageSpecificType="java:gov.epa.emissions.commons.io.EmfDataset[]"
 			 innerType="ns1:EmfDataset" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          

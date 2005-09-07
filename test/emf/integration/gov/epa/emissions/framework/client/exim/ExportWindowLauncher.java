@@ -28,8 +28,14 @@ public class ExportWindowLauncher {
         dataset1.setName("ORL Non Road");
         EmfDataset dataset2 = new EmfDataset();
         dataset2.setName("ORL Non Point");
+        EmfDataset dataset3 = new EmfDataset();
+        dataset3.setName("ORL Non Point");
+        EmfDataset dataset4 = new EmfDataset();
+        dataset4.setName("ORL Non Point");
+        EmfDataset dataset5 = new EmfDataset();
+        dataset5.setName("ORL Non Point");
 
-        EmfDataset[] datasets = new EmfDataset[] { dataset1, dataset2 };
+        EmfDataset[] datasets = new EmfDataset[] { dataset1, dataset2, dataset3, dataset4, dataset5 };
         
         ExportWindow view = new ExportWindow(datasets);
         ExportPresenter presenter = new ExportPresenter(user, (ExImServices) exim.proxy());

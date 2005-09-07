@@ -227,6 +227,54 @@ public class ExImServicesTransport implements ExImServices {
 
     }
 
+	public void startExport(User user, EmfDataset[] datasets, String folderName) throws EmfException {
+        log.debug("Begin export of files for user: Total files: " + datasets.length);
+        Service service = new Service();
+        Call call;
+
+        try {
+            call = (Call) service.createCall();
+            call.setTargetEndpointAddress(new java.net.URL(endpoint));
+
+            QName userQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:User");
+            QName datasetQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:EmfDataset");
+            QName datasetsQName = new QName("urn:gov.epa.services.EmfServices", "ns1:EmfDatasets");
+            QName operationQName = new QName("urn:gov.epa.emf.services.ExImServices", "startExport");
+            QName tableQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:Table");
+
+            call.setOperationName(operationQName);
+            registerMapping(call, userQName, gov.epa.emissions.framework.services.User.class);
+            registerMapping(call, datasetQName, EmfDataset.class);
+            
+		    call.registerTypeMapping(EmfDataset[].class, datasetsQName,
+					  new org.apache.axis.encoding.ser.ArraySerializerFactory(EmfDataset[].class, datasetsQName),        
+					  new org.apache.axis.encoding.ser.ArrayDeserializerFactory(datasetsQName));        			  
+
+            registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
+
+            call.addParameter("user", userQName, ParameterMode.IN);
+            call.addParameter("datasets", datasetsQName, ParameterMode.IN);
+            call.addParameter("foldername", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
+
+            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+
+            call.invoke(new Object[] { user, datasets, folderName });
+
+        } catch (ServiceException e) {
+            log.error("Error invoking the service", e);
+        } catch (MalformedURLException e) {
+            System.out.println();
+            log.error("Error in format of URL string", e);
+        } catch (AxisFault fault) {
+            log.error("Axis Fault details", fault);
+            throw new EmfException(extractMessage(fault.getMessage()));
+        } catch (RemoteException e) {
+            log.error("Error communicating with WS end point", e);
+        }
+
+        log.debug("Begin export of files for user");
+	}
+
     public void startExport(User user, EmfDataset dataset, String fileName) throws EmfException {
         log.debug("Begin export file for user:filename:datasettype:: " + user.getUserName() + " :: " + fileName
                 + " :: " + dataset.getDatasetType());
@@ -278,10 +326,5 @@ public class ExImServicesTransport implements ExImServices {
         call.registerTypeMapping(emfClass, emfQName, new org.apache.axis.encoding.ser.BeanSerializerFactory(emfClass,
                 emfQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(emfClass, emfQName));
     }
-
-	public void startExport(User user, EmfDataset[] datasets, String dirName) throws EmfException {
-		// TODO Auto-generated method stub
-		
-	}
 
 }// EMFDataTransport

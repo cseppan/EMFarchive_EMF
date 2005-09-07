@@ -68,10 +68,11 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
         Random random = new Random();//FIXME: drop test data during setup
         dataset.setName("ORL NonPoint - Test" + random.nextInt());
 
+        File outputFile = new File(repository, "output");
+        if (!outputFile.exists()) outputFile.mkdir();
+        
         eximService.startImport(user, repository.getAbsolutePath(), filename, dataset, datasetType);
-        File fileOut = new File(System.getProperty("tmp.dir"), "orlnonpoint.txt");
-
-        eximService.startExport(user, dataset, fileOut.getCanonicalPath());
+        eximService.startExport(user, new EmfDataset[]{dataset}, outputFile.getAbsolutePath());
 
     }
 
