@@ -37,8 +37,9 @@ public class ImportPresenter {
         dataset.setCreator(user.getFullName());
         dataset.setName(datasetName);
 
-        String filepath = directory + File.separator + filename;
-        model.startImport(user, filepath, dataset, type);
+
+//      String filepath = directory + File.separator + filename;
+      model.startImport(user, directory, filename , dataset, type);
     }
 
     public void notifyDone() {

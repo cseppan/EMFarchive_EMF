@@ -4,8 +4,6 @@
 #YEAR    1999
 #DESC Created from file 99OR-MOD.TXT provided by M. Strum in November 2002.
 #DESC North Carolina data extracted from original file using UNIX grep command.
-#DESC Units conversion from lbs to tons performed by M. Houyoux in MS Access.
-#DESC Original file format in EMSHAP format. Reformatted using UNIX cut and
 #DESC    paste commands. 
 37001 2201001150 100414 1.06262 -9 ! EPA-derived
 37001 2201001150 100425 0.20263 -9 ! EPA-derived

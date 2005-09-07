@@ -37,14 +37,20 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
         datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
         User user = userService.getUser("emf");
 
+//        File userDir = new File(System.getProperty("user.dir"));
+//        File file = new File(userDir, "test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt");
+
         File userDir = new File(System.getProperty("user.dir"));
-        File file = new File(userDir, "test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt");
+        String pathToFile="test/commons/data/orl/nc/";
+        File repository = new File(userDir,pathToFile);
+        File file = new File(repository, "arinv.nonpoint.nti99_NC.txt");
 
         EmfDataset dataset = new EmfDataset();
         dataset.setCreator(user.getFullName());
         dataset.setName("ORL NonPoint - Test");
         
-        eximService.startImport(user, file.getPath(), dataset, datasetType);
+//        eximService.startImport(user, file.getPath(), dataset, datasetType);
+        eximService.startImport(user, repository.getAbsolutePath(), file.getPath(), dataset, datasetType);
 
         // TODO: verify status
     }
@@ -55,13 +61,15 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
         User user = userService.getUser("emf");
 
         File userDir = new File(System.getProperty("user.dir"));
-        File file = new File(userDir, "test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt");
+        String pathToFile="test/commons/data/orl/nc/";
+        File repository = new File(userDir,pathToFile);
+        File file = new File(repository, "arinv.nonpoint.nti99_NC.txt");
 
         EmfDataset dataset = new EmfDataset();
         dataset.setCreator(user.getFullName());
         dataset.setName("ORL NonPoint - Test");
         
-        eximService.startImport(user, file.getPath(), dataset, datasetType);
+        eximService.startImport(user, repository.getAbsolutePath(), file.getPath(), dataset, datasetType);
         File fileOut = new File(System.getProperty("tmp.dir"),"orlnonpoint.txt");
         
         eximService.startExport(user,dataset,fileOut.getCanonicalPath());

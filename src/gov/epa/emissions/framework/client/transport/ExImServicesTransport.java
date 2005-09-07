@@ -74,7 +74,7 @@ public class ExImServicesTransport implements ExImServices {
      * @see gov.epa.emissions.framework.commons.ExImServices#startImport(gov.epa.emissions.framework.commons.User,
      *      java.lang.String, gov.epa.emissions.framework.commons.DatasetType)
      */
-    public void startImport(User user, String fileName, EmfDataset dataset, DatasetType datasetType)
+    public void startImport(User user, String folderPath, String fileName, EmfDataset dataset, DatasetType datasetType)
             throws EmfException {
         log.debug("Begin import file for user:filename:datasettype:: " + user.getUserName() + " :: " + fileName
                 + " :: " + datasetType.getName());
@@ -99,14 +99,14 @@ public class ExImServicesTransport implements ExImServices {
             registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
 
             call.addParameter("user", userQName, ParameterMode.IN);
-
+            call.addParameter("folderpath", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
             call.addParameter("filename", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
             call.addParameter("dataset", datasetQName, ParameterMode.IN);
             call.addParameter("datasettype", datasetTypeQName, ParameterMode.IN);
 
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
 
-            call.invoke(new Object[] { user, fileName, dataset, datasetType });
+            call.invoke(new Object[] { user, folderPath, fileName, dataset, datasetType });
 
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);

@@ -68,8 +68,12 @@ public class ExportClient {
 
         System.out.println("$$$$$$$$$$$$$$$$ User object " + user.getUserName());
 
+//        File userDir = new File(System.getProperty("user.dir"));
+//        File file = new File(userDir, "test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt");
         File userDir = new File(System.getProperty("user.dir"));
-        File file = new File(userDir, "test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt");
+        String pathToFile="test\\commons\\data\\orl\\nc";
+        File repository = new File(userDir,pathToFile);
+        File file = new File(repository, "arinv.nonpoint.nti99_NC.txt");
 
         // EmfDataset dataset = new EmfDataset();
         EmfDataset dataset = createDataset(DatasetTypes.ORL_AREA_NONPOINT_TOXICS,
@@ -79,7 +83,9 @@ public class ExportClient {
         dataset.setName("ORL NonPoint Conrad");
         dataset.setDatasetType(datasetType.getName());
 
-        eximSvc.startImport(user, file.getPath(), dataset, datasetType);
+//        eximSvc.startImport(user, file.getPath(), dataset, datasetType);
+        eximSvc.startImport(user, repository.getAbsolutePath(), "arinv.nonpoint.nti99_NC.txt", dataset, datasetType);
+
         System.out.println(new Date());
         for (int i = 0; i < 10000; i++) {
             synchronized (this) {

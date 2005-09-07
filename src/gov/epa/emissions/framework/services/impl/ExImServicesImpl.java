@@ -16,6 +16,7 @@ import gov.epa.emissions.commons.io.exporter.Exporter;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetTypesDAO;
+import gov.epa.emissions.framework.dao.DatasetDAO;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.StatusServices;
@@ -60,29 +61,57 @@ public class ExImServicesImpl implements ExImServices {
 		exporterFactory = new ExporterFactory(dbServer);
 	}
 
-	private File validateFile(String fileName) throws EmfException {
+	private File validateFile(File folder, String fileName) throws EmfException {
 		log.debug("check if file exists " + fileName);
-		File file = new File(fileName);
+		File file = new File(folder, fileName);
 
 		if (!file.exists() || !file.isFile()) {
-			log.error("file " + fileName + " not found");
-			throw new EmfException("file " + fileName + " not found");
+			log.error("file " + file.getAbsolutePath() + " not found");
+			throw new EmfException("file not found");
 		}
 		log.debug("check if file exists " + fileName);
 
 		return file;
 	}
 
+	private File validatePath(String folderPath) throws EmfException {
+		log.debug("check if folder exists " + folderPath);
+		File file = new File(folderPath);
+
+		if (!file.exists() || !file.isDirectory()) {
+			log.error("folder " + folderPath + " does not exist");
+			throw new EmfException("folder does not exist");
+		}
+		log.debug("check if folder exists " + folderPath);
+		return file;
+	}
+
+	private void validateDatasetName(EmfDataset dataset) throws EmfException {
+		log.debug("check if dataset name exists in table: " + dataset.getName());
+    	Session session = EMFHibernateUtil.getSession();
+		boolean dsNameUsed = DatasetDAO.isDatasetNameUsed(dataset.getName(),session);
+        session.flush();
+        session.close();
+        if (dsNameUsed){
+        	log.error("Dataset name " + dataset.getName() + " is already used");
+        	throw new EmfException("Dataset name " + dataset.getName() + " is already used");
+        }
+		log.debug("check if dataset name exists in table: " + dataset.getName());
+	}
+
+
 	/*
 	 *  (non-Javadoc)
 	 * @see gov.epa.emissions.framework.services.ExImServices#startImport(gov.epa.emissions.framework.services.User, java.lang.String, gov.epa.emissions.commons.io.EmfDataset, gov.epa.emissions.commons.io.DatasetType)
 	 */
-	public void startImport(User user, String fileName, EmfDataset dataset, DatasetType datasetType)
+	public void startImport(User user, String folderPath, String fileName, EmfDataset dataset, DatasetType datasetType)
 			throws EmfException {
 		log.debug("In ExImServicesImpl:startImport START");
 
 		try {
-			File file = validateFile(fileName);
+			File path = validatePath(folderPath);
+			File file = validateFile(path,fileName);			
+			validateDatasetName(dataset);
 			StatusServices statusSvc = new StatusServicesImpl();
 			DataServices dataSvc = new DataServicesImpl();
 			
@@ -101,6 +130,7 @@ public class ExImServicesImpl implements ExImServices {
 		log.debug("In ExImServicesImpl:startImport END");
 	}
 
+	
 	/*
 	 *  (non-Javadoc)
 	 * @see gov.epa.emissions.framework.services.ExImServices#startExport(gov.epa.emissions.framework.services.User, gov.epa.emissions.commons.io.Dataset, java.lang.String)
