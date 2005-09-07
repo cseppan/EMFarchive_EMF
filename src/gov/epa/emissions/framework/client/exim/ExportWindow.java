@@ -21,7 +21,7 @@ import javax.swing.JTextField;
 
 public class ExportWindow extends EmfInteralFrame implements ExportView {
 
-    private EmfDataset dataset;
+    private EmfDataset[] datasets;
 
     private SingleLineMessagePanel messagePanel;
 
@@ -29,9 +29,9 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
 
     private ExportPresenter presenter;
 
-    public ExportWindow(EmfDataset dataset) throws EmfException {
+    public ExportWindow(EmfDataset[] datasets) throws EmfException {
         super("Export a dataset");
-        this.dataset = dataset;
+        this.datasets = datasets;
 
         super.setSize(new Dimension(600, 175));
 
@@ -69,7 +69,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         GridLayout labelsLayoutManager = new GridLayout(2, 1);
         labelsLayoutManager.setVgap(15);
         JPanel labelsPanel = new JPanel(labelsLayoutManager);
-        labelsPanel.add(new JLabel("Dataset"));
+        labelsPanel.add(new JLabel("Datasets"));
         labelsPanel.add(new JLabel("Filename"));
 
         panel.add(labelsPanel);
@@ -78,7 +78,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
 
-        valuesPanel.add(new JLabel(dataset.getName()));
+        valuesPanel.add(new JLabel(getDatasetsLabel(datasets)));
         filename = new JTextField(35);
         filename.setName("filename");
         valuesPanel.add(filename);
@@ -86,6 +86,16 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         panel.add(valuesPanel);
 
         return panel;
+    }
+
+    private String getDatasetsLabel(EmfDataset[] datasets) {
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < datasets.length; i++) {
+            buf.append(datasets[i].getName());
+            if (i + 1 < datasets.length)
+                buf.append(", ");
+        }
+        return buf.toString();
     }
 
     private JPanel createButtonsPanel() {
@@ -127,7 +137,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
 
     private void doExport() {
         try {
-            presenter.notifyExport(dataset, filename.getText());
+            presenter.notifyExport(datasets, filename.getText());
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
 

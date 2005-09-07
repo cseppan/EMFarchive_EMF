@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 import org.apache.commons.configuration.ConfigurationException;
 
@@ -37,59 +38,41 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
         datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
         User user = userService.getUser("emf");
 
-//        File userDir = new File(System.getProperty("user.dir"));
-//        File file = new File(userDir, "test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt");
-
         File userDir = new File(System.getProperty("user.dir"));
-        String pathToFile="test/commons/data/orl/nc/";
-        File repository = new File(userDir,pathToFile);
-        File file = new File(repository, "arinv.nonpoint.nti99_NC.txt");
+        String pathToFile = "test/commons/data/orl/nc/";
+        File repository = new File(userDir, pathToFile);
+        String filename = "arinv.nonpoint.nti99_NC.txt";
 
         EmfDataset dataset = new EmfDataset();
         dataset.setCreator(user.getFullName());
-        dataset.setName("ORL NonPoint - Test");
-        
-//        eximService.startImport(user, file.getPath(), dataset, datasetType);
-        eximService.startImport(user, repository.getAbsolutePath(), file.getPath(), dataset, datasetType);
+        Random random = new Random();//FIXME: drop test data during setup
+        dataset.setName("ORL NonPoint - Test" + random.nextInt());
+
+        eximService.startImport(user, repository.getAbsolutePath(), filename, dataset, datasetType);
 
         // TODO: verify status
     }
 
-    public void testExportOrlNonPoint() throws EmfException, IOException{
+    public void testExportOrlNonPoint() throws EmfException, IOException {
         DatasetType datasetType = new DatasetType();
         datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
         User user = userService.getUser("emf");
 
         File userDir = new File(System.getProperty("user.dir"));
-        String pathToFile="test/commons/data/orl/nc/";
-        File repository = new File(userDir,pathToFile);
-        File file = new File(repository, "arinv.nonpoint.nti99_NC.txt");
+        String pathToFile = "test/commons/data/orl/nc/";
+        File repository = new File(userDir, pathToFile);
+        String filename = "arinv.nonpoint.nti99_NC.txt";
 
         EmfDataset dataset = new EmfDataset();
         dataset.setCreator(user.getFullName());
-        dataset.setName("ORL NonPoint - Test");
-        
-        eximService.startImport(user, repository.getAbsolutePath(), file.getPath(), dataset, datasetType);
-        File fileOut = new File(System.getProperty("tmp.dir"),"orlnonpoint.txt");
-        
-        eximService.startExport(user,dataset,fileOut.getCanonicalPath());
-        
-    }
-    // TODO: rename & redo this test
-    public void FIXME_testWHAT() throws EmfException {
-        // emfData1.startImport("jcapowski","arinv.nonpoint.nti99_NC.txt","ORL");
-        // System.out.println("END IMPORT CLIENT");
-        // ExImTransport emfData2 = new ExImTransport(endpoint1);
-        // emfData1.startImport("cdcruz","FOOBAR_TWO","IDA");
-        DatasetType[] datasetTypes = eximService.getDatasetTypes();
-        assertEquals(4, datasetTypes.length);
+        Random random = new Random();//FIXME: drop test data during setup
+        dataset.setName("ORL NonPoint - Test" + random.nextInt());
 
-        // DatasetType dst = new DatasetType();
-        // dst.setDescription("Hello ORL");
-        // dst.setName("Hello ORL");
-        // dst.setMaxfiles(99);
-        // dst.setMinfiles(99);
-        // emfData1.insertDatasetType(dst);
+        eximService.startImport(user, repository.getAbsolutePath(), filename, dataset, datasetType);
+        File fileOut = new File(System.getProperty("tmp.dir"), "orlnonpoint.txt");
+
+        eximService.startExport(user, dataset, fileOut.getCanonicalPath());
+
     }
 
 }

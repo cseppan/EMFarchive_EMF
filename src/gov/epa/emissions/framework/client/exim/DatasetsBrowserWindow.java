@@ -12,6 +12,8 @@ import gov.epa.emissions.framework.services.DataServices;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -40,8 +42,8 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
     public DatasetsBrowserWindow(DataServices services, JFrame parentConsole) throws EmfException {
         super("Datasets Browser");
 
-        //FIXME: change the type from Dataset to EmfDataset
-        model = new DatasetsBrowserTableModel((EmfDataset[])services.getDatasets());
+        // FIXME: change the type from Dataset to EmfDataset
+        model = new DatasetsBrowserTableModel((EmfDataset[]) services.getDatasets());
         selectModel = new SortFilterSelectModel(model);
         this.parentConsole = parentConsole;
 
@@ -57,7 +59,7 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
 
     private void createLayout(JPanel layout, JFrame parentConsole) {
         layout.removeAll();
-        
+
         layout.setLayout(new BorderLayout());
 
         layout.add(createTopPanel(layout), BorderLayout.NORTH);
@@ -71,7 +73,7 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
 
         JScrollPane scrollPane = new JScrollPane(sortFilterSelectionPanel);
         sortFilterSelectionPanel.setPreferredSize(new Dimension(450, 120));
-        
+
         return scrollPane;
     }
 
@@ -122,20 +124,20 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
     }
 
     protected void exportSelectedDatasets() {
-        if (presenter == null)
-            return;
         int[] selected = selectModel.getSelectedIndexes();
         if (selected.length == 0)
             return;
 
+        List datasets = new ArrayList();
         for (int i = 0; i < selected.length; i++) {
-            try {
-                EmfDataset dataset = model.getDataset(selected[i]);
-                presenter.notifyExport(dataset);
-            } catch (EmfException e) {
-                showError(e.getMessage());
-                break;// TODO: should continue ?
-            }
+            EmfDataset dataset = model.getDataset(selected[i]);
+            datasets.add(dataset);
+        }
+
+        try {
+            presenter.notifyExport((EmfDataset[]) datasets.toArray(new EmfDataset[0]));
+        } catch (EmfException e) {
+            showError(e.getMessage());
         }
     }
 
@@ -160,8 +162,8 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
         this.setVisible(true);
     }
 
-    public void showExport(EmfDataset dataset, ExportPresenter exportPresenter) throws EmfException {
-        ExportWindow exportView = new ExportWindow(dataset);
+    public void showExport(EmfDataset[] datasets, ExportPresenter exportPresenter) throws EmfException {
+        ExportWindow exportView = new ExportWindow(datasets);
         exportPresenter.observe(exportView);
 
         getDesktopPane().add(exportView);
@@ -171,10 +173,10 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
     public void refresh(EmfDataset[] datasets) {
         model.populate(datasets);
         selectModel.refresh();
-        
-//      TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
+
+        // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
         createLayout(layout, parentConsole);
-        
+
         this.refreshLayout();
     }
 }

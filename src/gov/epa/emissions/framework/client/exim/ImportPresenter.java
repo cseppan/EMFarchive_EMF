@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.exim;
 
-import java.io.File;
-
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;

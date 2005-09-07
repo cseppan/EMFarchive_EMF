@@ -23,10 +23,15 @@ public class ExportWindowLauncher {
         exim.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("startExport")).withAnyArguments();
 
         User user = new User();
-        EmfDataset dataset = new EmfDataset();
-        dataset.setDescription("ORL Non Road");
 
-        ExportWindow view = new ExportWindow(dataset);
+        EmfDataset dataset1 = new EmfDataset();
+        dataset1.setName("ORL Non Road");
+        EmfDataset dataset2 = new EmfDataset();
+        dataset2.setName("ORL Non Point");
+
+        EmfDataset[] datasets = new EmfDataset[] { dataset1, dataset2 };
+        
+        ExportWindow view = new ExportWindow(datasets);
         ExportPresenter presenter = new ExportPresenter(user, (ExImServices) exim.proxy());
         presenter.observe(view);
 

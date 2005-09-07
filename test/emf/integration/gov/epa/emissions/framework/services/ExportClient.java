@@ -73,7 +73,6 @@ public class ExportClient {
         File userDir = new File(System.getProperty("user.dir"));
         String pathToFile="test\\commons\\data\\orl\\nc";
         File repository = new File(userDir,pathToFile);
-        File file = new File(repository, "arinv.nonpoint.nti99_NC.txt");
 
         // EmfDataset dataset = new EmfDataset();
         EmfDataset dataset = createDataset(DatasetTypes.ORL_AREA_NONPOINT_TOXICS,

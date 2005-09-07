@@ -28,9 +28,9 @@ public class DatasetsBrowserPresenter {
         view.close();
     }
 
-    public void notifyExport(EmfDataset dataset) throws EmfException {
+    public void notifyExport(EmfDataset[] datasets) throws EmfException {
         ExportPresenter presenter = new ExportPresenter(user, serviceLocator.getEximServices());
-        view.showExport(dataset, presenter);
+        view.showExport(datasets, presenter);
     }
 
     public void notifyRefresh() throws EmfException {

@@ -18,10 +18,6 @@ public class ExportPresenter {
         this.model = services;
     }
 
-    public void notifyExport(EmfDataset dataset, String filename) throws EmfException {
-        model.startExport(user, dataset, filename);
-    }
-
     public void notifyDone() {
         if (view != null)
             view.close();
@@ -30,6 +26,10 @@ public class ExportPresenter {
     public void observe(ExportView view) {
         this.view = view;
         view.register(this);
+    }
+
+    public void notifyExport(EmfDataset[] datasets, String directory) throws EmfException {
+        model.startExport(user, datasets, directory);
     }
 
 }

@@ -19,14 +19,15 @@ public class ExportPresenterTest extends MockObjectTestCase {
         dataset.setCreator(user.getFullName());
         dataset.setName("dataset test");
 
-        String filename = "filename.txt";
+        EmfDataset[] datasets = new EmfDataset[]{dataset};
+        String directory = "/directory";
 
         Mock model = mock(ExImServices.class);
-        model.expects(once()).method("startExport").with(eq(user), eq(dataset), eq(filename));
+        model.expects(once()).method("startExport").with(eq(user), eq(datasets), eq(directory));
 
         ExportPresenter presenter = new ExportPresenter(user, (ExImServices) model.proxy());
 
-        presenter.notifyExport(dataset, filename);
+        presenter.notifyExport(datasets, directory);
     }
 
     public void testClosesViewOnDoneExport() throws EmfException {

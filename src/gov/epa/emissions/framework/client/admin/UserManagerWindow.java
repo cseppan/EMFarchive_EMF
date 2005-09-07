@@ -68,7 +68,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UsersManagemen
         createLayout(layout, sortFilterSelectPanel);
         listenForUpdateSelection(sortFilterSelectPanel.getTable());
 
-        this.setSize(new Dimension(500, 300));
+        this.setSize(new Dimension(550, 300));
     }
 
     private void listenForUpdateSelection(JTable table) {

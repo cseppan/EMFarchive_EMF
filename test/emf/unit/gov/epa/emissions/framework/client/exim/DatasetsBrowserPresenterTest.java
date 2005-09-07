@@ -42,24 +42,31 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(null, (ServiceLocator) serviceLocator.proxy());
         view.expects(once()).method("observe").with(eq(presenter));
-        
+
         presenter.observe((DatasetsBrowserView) view.proxy());
-        
+
         presenter.notifyRefresh();
     }
 
     public void testShouldNotifyBrowserViewToDisplayExportViewOnClickOfExportButton() throws EmfException {
         Mock view = mock(DatasetsBrowserView.class);
-        EmfDataset dataset = new EmfDataset();
-        dataset.setName("name");
-        dataset.setCreator("creator");
+
+        EmfDataset dataset1 = new EmfDataset();
+        dataset1.setName("name 1");
+        dataset1.setCreator("creator 1");
+
+        EmfDataset dataset2 = new EmfDataset();
+        dataset2.setName("name 2");
+        dataset2.setCreator("creator 2");
+
+        EmfDataset[] datasets = new EmfDataset[] { dataset1, dataset2 };
 
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(null, (ServiceLocator) serviceLocator.proxy());
         view.expects(once()).method("observe").with(eq(presenter));
-        view.expects(once()).method("showExport").with(eq(dataset), new IsInstanceOf(ExportPresenter.class));
+        view.expects(once()).method("showExport").with(eq(datasets), new IsInstanceOf(ExportPresenter.class));
 
         presenter.observe((DatasetsBrowserView) view.proxy());
-        presenter.notifyExport(dataset);
+        presenter.notifyExport(datasets);
     }
 
 }
