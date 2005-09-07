@@ -26,12 +26,12 @@ public class ImportPresenter {
     public void notifyImport(String directory, String filename, String datasetName, DatasetType type)
             throws EmfException {
         if (datasetName.length() == 0)
-            throw new UserException("Dataset Name must be specified");
+            throw new UserException("Dataset Name should be specified");
         if (directory.length() == 0)
-            throw new UserException("Directory must be specified");
+            throw new UserException("Directory should be specified");
 
         if (filename.length() == 0)
-            throw new UserException("Filename must be specified");
+            throw new UserException("Filename should be specified");
 
         EmfDataset dataset = new EmfDataset();
         dataset.setCreator(user.getFullName());

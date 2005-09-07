@@ -44,7 +44,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         try {
             presenter.notifyImport("dir", "", "dataset name", new DatasetType("ORL NonRoad"));
         } catch (EmfException e) {
-            assertEquals("Filename must be specified", e.getMessage());
+            assertEquals("Filename should be specified", e.getMessage());
             return;
         }
 
@@ -57,7 +57,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         try {
             presenter.notifyImport("dir", "filename", "", new DatasetType("ORL NonRoad"));
         } catch (EmfException e) {
-            assertEquals("Dataset Name must be specified", e.getMessage());
+            assertEquals("Dataset Name should be specified", e.getMessage());
             return;
         }
 
@@ -70,7 +70,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         try {
             presenter.notifyImport("", "file.txt", "dataset name", new DatasetType("ORL NonRoad"));
         } catch (EmfException e) {
-            assertEquals("Directory must be specified", e.getMessage());
+            assertEquals("Directory should be specified", e.getMessage());
             return;
         }
 
