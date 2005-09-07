@@ -105,7 +105,7 @@ public class User implements Serializable {
         if (email == null)
             throw new UserException("Email should be specified");
 
-        if (!Pattern.matches("^([a-zA-Z]+)(\\w)*@(\\w)+.(\\w)+(.\\w+)*", email))
+        if (!Pattern.matches("^(_?+\\w+(.\\w+)*)(\\w)*@(\\w)+.(\\w)+(.\\w+)*", email))
             throw new UserException("Email should have the format xx@yy.zz");
 
         this.email = email;

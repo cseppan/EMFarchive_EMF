@@ -256,6 +256,20 @@ public class UserTest extends TestCase {
         assertInvalidEmail("@s.sdr");
     }
 
+    public void testShouldPassIfEmailHasValidFormat() throws UserException {
+        User user = new User();
+        
+        user.setEmailAddr("user@user.edu");
+        user.setEmailAddr("user@user.unc.edu");
+        user.setEmailAddr("first.last@user.unc.edu");
+        user.setEmailAddr("first234.last2q34@user.unc.edu");
+        user.setEmailAddr("first_last@user.unc.edu");
+        user.setEmailAddr("_first_last@user.unc.edu");
+        user.setEmailAddr("first_234@user.unc.edu");
+        user.setEmailAddr("234first_234@user.unc.edu");
+        user.setEmailAddr("firs234t_234@user.unc.edu");
+    }
+
     public void testShouldFailOnConstructionIfEmailIsInvalid() {
         try {
             new User("fghas", "abc", "12", "ab@", "abcd", "abcd1234", false, false);
