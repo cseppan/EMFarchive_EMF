@@ -28,8 +28,8 @@ public class ExportPresenter {
         view.register(this);
     }
 
-    public void notifyExport(EmfDataset[] datasets, String directory) throws EmfException {
-        model.startExport(user, datasets, directory);
+    public void notifyExport(EmfDataset[] datasets, String folder) throws EmfException {
+        model.startExport(user, datasets, folder);
     }
 
 }

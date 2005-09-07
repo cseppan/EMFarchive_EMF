@@ -30,7 +30,7 @@ public class DatasetsBrowserLauncher {
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Dataset[] datasets = launcher.createDatasets();
+        EmfDataset[] datasets = launcher.createDatasets();
         Mock services = new Mock(DataServices.class);
         services.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getDatasets")).will(
                 new ReturnStub(datasets));
@@ -41,7 +41,7 @@ public class DatasetsBrowserLauncher {
         launcher.addAsInternalFrame(console, frame);
     }
 
-    private Dataset[] createDatasets() {
+    private EmfDataset[] createDatasets() {
         List datasets = new ArrayList();
 
         Dataset dataset1 = new EmfDataset();
@@ -60,7 +60,7 @@ public class DatasetsBrowserLauncher {
         dataset2.setStopDateTime(new Date());
         datasets.add(dataset2);
 
-        return (Dataset[]) datasets.toArray(new Dataset[0]);
+        return (EmfDataset[]) datasets.toArray(new EmfDataset[0]);
     }
 
     private void addAsInternalFrame(EmfInteralFrame console, JFrame frame) {

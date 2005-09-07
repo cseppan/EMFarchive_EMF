@@ -25,7 +25,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
 
     private SingleLineMessagePanel messagePanel;
 
-    private JTextField filename;
+    private JTextField folder;
 
     private ExportPresenter presenter;
 
@@ -70,7 +70,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         labelsLayoutManager.setVgap(15);
         JPanel labelsPanel = new JPanel(labelsLayoutManager);
         labelsPanel.add(new JLabel("Datasets"));
-        labelsPanel.add(new JLabel("Filename"));
+        labelsPanel.add(new JLabel("Folder"));
 
         panel.add(labelsPanel);
 
@@ -79,9 +79,9 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
 
         valuesPanel.add(new JLabel(getDatasetsLabel(datasets)));
-        filename = new JTextField(35);
-        filename.setName("filename");
-        valuesPanel.add(filename);
+        folder = new JTextField(35);
+        folder.setName("folder");
+        valuesPanel.add(folder);
 
         panel.add(valuesPanel);
 
@@ -137,11 +137,11 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
 
     private void doExport() {
         try {
-            presenter.notifyExport(datasets, filename.getText());
+            presenter.notifyExport(datasets, folder.getText());
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
 
-            filename.setText("");
+            folder.setText("");
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
