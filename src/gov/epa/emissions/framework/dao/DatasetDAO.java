@@ -28,7 +28,7 @@ import org.hibernate.Transaction;
  *
  */
 public class DatasetDAO {
-    private static Log log = LogFactory.getLog(StatusDAO.class);
+    private static Log log = LogFactory.getLog(DatasetDAO.class);
 
 	private static final String GET_DATASET_QUERY="select aDset from EmfDataset as aDset";
 	private static final String GET_DATASET_FOR_DATASETNAME_QUERY="select aDset from EmfDataset as aDset where aDset.name=:datasetname";

@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.io.importer.ORLTableTypes;
 import gov.epa.emissions.commons.io.importer.SummaryTableCreator;
 import gov.epa.emissions.commons.io.importer.TableType;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
+import gov.epa.emissions.framework.dao.DatasetTypesDAO;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,10 +30,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * The importer for ORL (One Record per Line) format text files.
  */
 public class BaseORLImporter extends ListFormatImporter {
+    private static Log log = LogFactory.getLog(BaseORLImporter.class);
+
     /* ORL header record command fields */
     private static final String COMMAND = "#";
 
@@ -213,6 +219,8 @@ public class BaseORLImporter extends ListFormatImporter {
         }
         // else make sure table does not exist
         else if (tableDefinition.tableExists(qualifiedTableName)) {
+        	log.error("The table \"" + qualifiedTableName
+                    + "\" already exists. Please select 'overwrite tables if exist' or choose a new table name.");
             throw new Exception("The table \"" + qualifiedTableName
                     + "\" already exists. Please select 'overwrite tables if exist' or choose a new table name.");
         }
