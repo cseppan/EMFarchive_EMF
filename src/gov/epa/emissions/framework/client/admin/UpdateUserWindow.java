@@ -17,6 +17,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -64,7 +65,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
     private JPanel createLayout() {
         JPanel base = new JPanel();
         base.setLayout(new BoxLayout(base, BoxLayout.Y_AXIS));
-        
+
         messagePanel = new SingleLineMessagePanel();
         base.add(messagePanel);
         base.add(createProfilePanel());
@@ -80,26 +81,34 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
         Border titledBorder = createBorder("Profile");
         panel.setBorder(titledBorder);
 
-        GridLayout labelsLayoutManager = new GridLayout(4, 1);
-        labelsLayoutManager.setVgap(15);
-        JPanel labelsPanel = new JPanel(labelsLayoutManager);
+        JPanel labelsPanel = new JPanel();
+        labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
+
         labelsPanel.add(new JLabel("Name"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
         labelsPanel.add(new JLabel("Affiliation"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
         labelsPanel.add(new JLabel("Phone"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
         labelsPanel.add(new JLabel("Email"));
 
         panel.add(labelsPanel);
 
-        GridLayout valuesLayoutManager = new GridLayout(4, 1);
-        valuesLayoutManager.setVgap(10);
-        JPanel valuesPanel = new JPanel(valuesLayoutManager);
+        JPanel valuesPanel = new JPanel();
+        valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
 
         name = createEditAwareTextField(user.getFullName());
         valuesPanel.add(name);
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        
         affiliation = createEditAwareTextField(user.getAffiliation());
         valuesPanel.add(affiliation);
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        
         phone = createEditAwareTextField(user.getWorkPhone());
         valuesPanel.add(phone);
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        
         email = createEditAwareTextField(user.getEmailAddr());
         valuesPanel.add(email);
 
@@ -111,7 +120,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
     }
 
     private JTextField createEditAwareTextField(String value) {
-        JTextField field = new JTextField(value, 10);
+        JTextField field = new JTextField(value, 15);
 
         field.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent event) {
@@ -245,8 +254,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
 
     public void closeOnConfirmLosingChanges() {
         int option = JOptionPane.showConfirmDialog(null,
-                "You will lose changes if you Close without Save. \nContinue ?",
-                "Close", JOptionPane.YES_NO_OPTION);
+                "You will lose changes if you Close without Save. \nContinue ?", "Close", JOptionPane.YES_NO_OPTION);
         if (option == 0)
             close();
     }

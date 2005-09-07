@@ -15,10 +15,13 @@ public class RegisterUserPanelWithAdminOption extends RegisterUserPanel {
             RegisterCancelStrategy cancelStrategy, EmfWidgetContainer parent) {
         super(postRegisterStrategy, cancelStrategy, parent);
 
-        this.isAdmin = new JCheckBox("Administrator");
-        super.profileValuesPanel.add(isAdmin);
-
+        addSelection();
         super.refresh();
+    }
+
+    private void addSelection() {
+        this.isAdmin = new JCheckBox("Is Admin ?");
+        super.addToProfilePanel(isAdmin);
     }
 
     protected void populateUser(User user) throws UserException {

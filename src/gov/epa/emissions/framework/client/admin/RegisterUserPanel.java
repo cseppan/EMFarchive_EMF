@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.gui.DefaultButton;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
@@ -12,11 +13,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -52,6 +55,8 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     private RegisterCancelStrategy cancelStrategy;
 
+    private JPanel profileLabelsPanel;
+
     public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, RegisterCancelStrategy cancelStrategy,
             EmfWidgetContainer parent) {
         this.postRegisterStrategy = postRegisterStrategy;
@@ -82,15 +87,13 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        JButton cancel = new JButton("Cancel");
-        cancel.addActionListener(new ActionListener() {
+        JButton cancel = new DefaultButton("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 cancelStrategy.execute(presenter);
             }
         });
 
-        JButton ok = new JButton("Ok");
-        ok.addActionListener(new ActionListener() {
+        JButton ok = new DefaultButton("Ok", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 registerUser();
             }
@@ -172,29 +175,32 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         Border titledBorder = createBorder("Profile");
         profilePanel.setBorder(titledBorder);
 
-        GridLayout labelsLayoutManager = new GridLayout(4, 1);
-        labelsLayoutManager.setVgap(15);
-        JPanel profileLabelsPanel = new JPanel(labelsLayoutManager);
+        profileLabelsPanel = new JPanel();
+        profileLabelsPanel.setLayout(new BoxLayout(profileLabelsPanel, BoxLayout.Y_AXIS));
 
-        profileLabelsPanel.setLayout(labelsLayoutManager);
         profileLabelsPanel.add(new JLabel("Name"));
+        profileLabelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
         profileLabelsPanel.add(new JLabel("Affiliation"));
+        profileLabelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
         profileLabelsPanel.add(new JLabel("Phone"));
+        profileLabelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
         profileLabelsPanel.add(new JLabel("Email"));
 
         profilePanel.add(profileLabelsPanel);
 
-        GridLayout valuesLayoutManager = new GridLayout(4, 1);
-        valuesLayoutManager.setVgap(10);
-        profileValuesPanel = new JPanel(valuesLayoutManager);
+        profileValuesPanel = new JPanel();
+        profileValuesPanel.setLayout(new BoxLayout(profileValuesPanel, BoxLayout.Y_AXIS));
 
-        name = new JTextField(10);
+        name = new JTextField(15);
         profileValuesPanel.add(name);
-        affiliation = new JTextField(10);
+        profileValuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        affiliation = new JTextField(15);
         profileValuesPanel.add(affiliation);
-        phone = new JTextField(10);
+        profileValuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        phone = new JTextField(15);
         profileValuesPanel.add(phone);
-        email = new JTextField(10);
+        profileValuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        email = new JTextField(15);
         profileValuesPanel.add(email);
 
         profilePanel.add(profileValuesPanel);
@@ -221,6 +227,14 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     public RegisterUserPresenter getPresenter() {
         return presenter;
+    }
+
+    // FIXME: a cleaner, refactored version needed
+    public void addToProfilePanel(JComponent component) {
+        profileLabelsPanel.add(Box.createRigidArea(new Dimension(1, 40)));
+
+        profileValuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        profileValuesPanel.add(component);
     }
 
 }
