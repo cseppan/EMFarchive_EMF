@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.exim;
 
+import gov.epa.emissions.commons.gui.DefaultButton;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
@@ -10,8 +11,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -96,9 +97,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        JButton exportButton = new JButton("Export");
-        exportButton.setName("export");
-        exportButton.addActionListener(new ActionListener() {
+        JButton exportButton = new DefaultButton("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 if (presenter == null)
                     return;
@@ -106,18 +105,14 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
                 clearMessagePanel();
                 doExport();
             }
-
         });
         container.add(exportButton);
 
-        JButton done = new JButton("Done");
-        done.setName("done");
-        done.addActionListener(new ActionListener() {
+        JButton done = new DefaultButton("Done", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 if (presenter != null)
                     presenter.notifyDone();
             }
-
         });
         container.add(done);
 

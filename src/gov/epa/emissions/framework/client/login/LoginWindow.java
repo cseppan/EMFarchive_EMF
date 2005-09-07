@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.login;
 
+import gov.epa.emissions.commons.gui.DefaultButton;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfConsolePresenter;
@@ -19,13 +20,10 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -33,7 +31,6 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 public class LoginWindow extends EmfWindow implements LoginView {
@@ -83,24 +80,17 @@ public class LoginWindow extends EmfWindow implements LoginView {
         layout.setVgap(15);
         container.setLayout(layout);
 
-        JButton signIn = new JButton("Sign In");
-        signIn.setName("signIn");
-        addKeyBinding(signIn);
-        signIn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+        JButton signIn = new DefaultButton("Sign In", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
                 doSignIn();
             }
-
         });
         container.add(signIn);
 
-        JButton cancel = new JButton("Cancel");
-        cancel.setName("cancel");
-        cancel.addActionListener(new ActionListener() {
+        JButton cancel = new DefaultButton("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 close();
             }
-
         });
         container.add(cancel);
 
@@ -121,16 +111,6 @@ public class LoginWindow extends EmfWindow implements LoginView {
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
-    }
-
-    private void addKeyBinding(JButton signIn) {
-        Action doSignIn = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                doSignIn();
-            }
-        };
-        signIn.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false), "SignIn");
-        signIn.getActionMap().put("SignIn", doSignIn);
     }
 
     private void launchConsole(User user) {

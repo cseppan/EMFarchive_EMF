@@ -41,7 +41,7 @@ public class LoginTest extends ComponentTestFixture {
             }
         });
 
-        Component cancel = getFinder().find(window, new NameMatcher("cancel"));
+        Component cancel = getFinder().find(window, new NameMatcher("Cancel"));
 
         ComponentTester tester = new ComponentTester();
         tester.actionClick(cancel);
@@ -61,7 +61,7 @@ public class LoginTest extends ComponentTestFixture {
             }
         });
 
-        Component signIn = getFinder().find(window, new NameMatcher("signIn"));
+        Component signIn = getFinder().find(window, new NameMatcher("Sign In"));
         JTextField username = (JTextField) getFinder().find(window, new NameMatcher("username"));
         username.setText("admin");
         JTextField password = (JTextField) getFinder().find(window, new NameMatcher("password"));

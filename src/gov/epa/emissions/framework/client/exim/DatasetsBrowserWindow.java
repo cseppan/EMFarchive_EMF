@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.exim;
 
+import gov.epa.emissions.commons.gui.DefaultButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.io.EmfDataset;
@@ -11,8 +12,8 @@ import gov.epa.emissions.framework.services.DataServices;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -70,16 +71,14 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
     private JPanel createControlPanel() {
         JPanel closePanel = new JPanel();
 
-        JButton exportButton = new JButton("Export");
-        exportButton.addActionListener(new ActionListener() {
+        JButton exportButton = new DefaultButton("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 exportSelectedDatasets();
             }
         });
         closePanel.add(exportButton);
 
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(new ActionListener() {
+        JButton closeButton = new DefaultButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 if (presenter != null) {
                     presenter.notifyCloseView();
