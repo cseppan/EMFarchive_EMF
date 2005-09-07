@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.exim;
 
-import java.io.File;
-
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.EmfDataset;
@@ -11,6 +9,7 @@ import gov.epa.emissions.framework.services.User;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
+import org.jmock.core.Constraint;
 
 public class ImportPresenterTest extends MockObjectTestCase {
 
@@ -27,11 +26,11 @@ public class ImportPresenterTest extends MockObjectTestCase {
 
         String dir = "dir";
         String filename = "filename";
-        String filepath = dir + File.separator + filename;
 
         Mock model = mock(ExImServices.class);
 
-        model.expects(once()).method("startImport").with(eq(user), eq(filepath), eq(dataset), eq(type));
+        Constraint[] constraints = new Constraint[] { eq(user), eq(dir), eq(filename), eq(dataset), eq(type) };
+        model.expects(once()).method("startImport").with(constraints);
 
         ImportPresenter presenter = new ImportPresenter(user, (ExImServices) model.proxy(), null);
 
@@ -63,7 +62,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
 
         fail("should have raised an exception if a blank filename is provided");
     }
-    
+
     public void testDuringImportRaisesExceptionOnBlankDirectory() throws EmfException {
         ImportPresenter presenter = new ImportPresenter(null, null, null);
 
@@ -101,9 +100,9 @@ public class ImportPresenterTest extends MockObjectTestCase {
         ImportPresenter presenter = new ImportPresenter(null, null, (ImportView) view.proxy());
         view.expects(once()).method("register").with(eq(presenter));
         view.expects(once()).method("clearMessagePanel").withNoArguments();
-        
+
         presenter.observe();
-        
+
         presenter.notifyBeginInput();
     }
 }

@@ -50,6 +50,7 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
 
     }
 
+    // TODO: refactor this row-column pattern into the commons package
     private class Row {
         private Map columns;
 

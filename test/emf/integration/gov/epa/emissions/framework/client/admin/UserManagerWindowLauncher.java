@@ -46,21 +46,22 @@ public class UserManagerWindowLauncher {
     private UserServices createUserAdmin() throws EmfException {
         List users = new ArrayList();
 
-        users.add(createUser("joe", "Joe Fullman", "joef@zukoswky.com"));
-        users.add(createUser("mary", "Mary Joe", "mary@wonderful.net"));
-        users.add(createUser("kevin", "Kevin Spacey", "kevin@spacey.com"));
+        users.add(createUser("joe", "Joe Fullman", "joef@zukoswky.com", false));
+        users.add(createUser("mary", "Mary Joe", "mary@wonderful.net", true));
+        users.add(createUser("kevin", "Kevin Spacey", "kevin@spacey.com", false));
 
         UserServices userAdmin = new UserServicesStub(users);
 
         return userAdmin;
     }
 
-    private User createUser(String username, String name, String email) throws EmfException {
+    private User createUser(String username, String name, String email, boolean isAdmin) throws EmfException {
         User user = new User();
         user.setUserName(username);
         user.setFullName(name);
         user.setEmailAddr(email);
-
+        user.setInAdminGroup(isAdmin);
+        
         return user;
     }
 }
