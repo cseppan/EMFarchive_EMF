@@ -279,4 +279,9 @@ public class ExImServicesTransport implements ExImServices {
                 emfQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(emfClass, emfQName));
     }
 
+	public void startExport(User user, EmfDataset[] datasets, String dirName) throws EmfException {
+		// TODO Auto-generated method stub
+		
+	}
+
 }// EMFDataTransport

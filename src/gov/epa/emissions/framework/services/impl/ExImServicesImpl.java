@@ -189,5 +189,10 @@ public class ExImServicesImpl implements ExImServices {
 
 	}
 
+	public void startExport(User user, EmfDataset[] datasets, String dirName) throws EmfException {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }
