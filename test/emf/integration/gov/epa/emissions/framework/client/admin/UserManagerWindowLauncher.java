@@ -21,7 +21,7 @@ public class UserManagerWindowLauncher {
         JFrame frame = new JFrame();
 
         UserManagerWindow console = new UserManagerWindow(userAdmin, frame);
-        UserManagerPresenter presenter = new UserManagerPresenter(userAdmin, console);
+        UserManagerPresenter presenter = new UserManagerPresenter(null, userAdmin, console);
         presenter.observe();
 
         console.setVisible(true);

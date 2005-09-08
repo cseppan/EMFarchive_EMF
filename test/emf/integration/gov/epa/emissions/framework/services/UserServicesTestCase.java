@@ -23,9 +23,4 @@ public abstract class UserServicesTestCase extends ServicesTestCase {
         assertEquals("EMF Administrator", user.getFullName());
     }
 
-    public void testSystemHasTwoUsersOnInstallation() throws EmfException {
-        User[] users = service.getUsers();
-        assertEquals(2, users.length);
-    }
-
 }

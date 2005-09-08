@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
-public interface UsersManagementView {
+public interface UserManagerView {
 
     void setObserver(UserManagerPresenter presenter);
 

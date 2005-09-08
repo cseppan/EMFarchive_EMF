@@ -125,13 +125,14 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
     }
 
     protected void populateUser(User user) throws UserException {
+        user.setFullName(name.getText());
+        user.setAffiliation(affiliation.getText());
+        user.setWorkPhone(phone.getText());
+        user.setEmailAddr(email.getText());
+
         user.setUserName(username.getText());
         user.setPassword(new String(password.getPassword()));
         user.confirmPassword(new String(confirmPassword.getPassword()));
-        user.setFullName(name.getText());
-        user.setAffiliation(affiliation.getText());
-        user.setEmailAddr(email.getText());
-        user.setWorkPhone(phone.getText());
     }
 
     public void refresh() {

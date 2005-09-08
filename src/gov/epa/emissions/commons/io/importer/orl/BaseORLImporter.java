@@ -14,7 +14,6 @@ import gov.epa.emissions.commons.io.importer.ORLTableTypes;
 import gov.epa.emissions.commons.io.importer.SummaryTableCreator;
 import gov.epa.emissions.commons.io.importer.TableType;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
-import gov.epa.emissions.framework.dao.DatasetTypesDAO;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -1,15 +1,19 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.client.EmfPresenter;
+import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
 public class UserManagerPresenter implements EmfPresenter{
 
-    private UsersManagementView view;
+    private UserManagerView view;
     private UserServices model;
+    private User user;
 
-    public UserManagerPresenter(UserServices model, UsersManagementView view) {
+    public UserManagerPresenter(User user, UserServices model, UserManagerView view) {
+        this.user = user;
         this.model = model;
         this.view = view;
     }
@@ -23,6 +27,12 @@ public class UserManagerPresenter implements EmfPresenter{
     }
 
     public void notifyDelete(String username) throws EmfException {
+        if(username.equals("admin"))//NOTE: super user name is fixed
+            throw new UserException("Cannot delete EMF super user - '" + username + "'");
+        
+        if(user.getUserName().equals(username))
+            throw new UserException("Cannot delete yourself - '" + username + "'");
+        
         model.deleteUser(username);
         view.refresh();
     }

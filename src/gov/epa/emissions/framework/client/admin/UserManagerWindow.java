@@ -30,7 +30,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-public class UserManagerWindow extends EmfInteralFrame implements UsersManagementView {
+public class UserManagerWindow extends EmfInteralFrame implements UserManagerView {
 
     private UserManagerPresenter presenter;
 

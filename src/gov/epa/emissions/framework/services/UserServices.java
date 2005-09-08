@@ -28,6 +28,7 @@ public interface UserServices extends EMFServices{
 
     public void updateUsers(User[] users) throws EmfException;
 
+    //FIXME: should use a User object instead
     public void deleteUser(String userName) throws EmfException;
 
     // UNUSED methods
