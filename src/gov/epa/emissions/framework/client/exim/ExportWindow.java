@@ -15,6 +15,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -32,7 +33,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
 	private ExportPresenter presenter;
 
 	public ExportWindow(EmfDataset[] datasets) throws EmfException {
-		super("Export a dataset");
+		super("Export Dataset(s)");
 		this.datasets = datasets;
 
 		super.setSize(new Dimension(600, 225));
@@ -70,21 +71,21 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
 
 		JPanel labelsPanel = new JPanel();
 		labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
-		labelsPanel.add(new JLabel("Datasets"));
-		labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
+		
+        labelsPanel.add(new JLabel("Datasets"));
+		labelsPanel.add(Box.createRigidArea(new Dimension(1, 45)));
 		labelsPanel.add(new JLabel("Folder"));
-
 		panel.add(labelsPanel);
-
+        
 		JPanel valuesPanel = new JPanel();
 		valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
-
-		JTextArea datasetNames = new JTextArea(2, 15);
+		
+        JTextArea datasetNames = new JTextArea(2, 15);
 		datasetNames.setLineWrap(false);
 		datasetNames.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(datasetNames,
-				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 		datasetNames.setText(getDatasetsLabel(datasets));
 		valuesPanel.add(scrollPane);
@@ -92,9 +93,20 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
 		folder = new JTextField(35);
 		folder.setName("folder");
 		valuesPanel.add(folder);
-
+        
 		panel.add(valuesPanel);
 
+        //TODO: needs to be implemented
+        JPanel overwritePanel = new JPanel();
+        overwritePanel.setLayout(new BoxLayout(overwritePanel, BoxLayout.Y_AXIS));
+        JCheckBox overwrite = new JCheckBox("Overwrite ?", true);
+        overwrite.setEnabled(false);
+        overwrite.setToolTipText("To be implemented");
+        overwritePanel.add(Box.createRigidArea(new Dimension(1, 65)));
+        overwritePanel.add(overwrite);
+        
+        panel.add(overwritePanel);
+        
 		return panel;
 	}
 
@@ -152,8 +164,6 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
 			messagePanel
 					.setMessage("Started export. Please monitor the Status window "
 							+ "to track your Export request.");
-
-			folder.setText("");
 		} catch (EmfException e) {
 			messagePanel.setError(e.getMessage());
 		}
