@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
@@ -13,9 +14,9 @@ public class ExportPresenter {
 
     private ExportView view;
 
-    public ExportPresenter(User user, ExImServices services) {
-        this.user = user;
-        this.model = services;
+    public ExportPresenter(EmfSession session) {
+        this.user = session.getUser();
+        this.model = session.getExImServices();
     }
 
     public void notifyDone() {

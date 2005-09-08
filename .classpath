@@ -17,7 +17,6 @@
 	<classpathentry kind="lib" path="lib/wsdl4j-1.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/soap.jar"/>
 	<classpathentry kind="lib" path="lib/dev/junit.jar"/>
-	<classpathentry kind="lib" path="lib/dev/jmock-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/colt.jar"/>
 	<classpathentry kind="lib" path="lib/cosu.jar"/>
 	<classpathentry kind="lib" path="lib/java_cup.jar"/>
@@ -57,5 +56,7 @@
 	<classpathentry kind="lib" path="lib/dev/commons-lang-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-collections-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/dev/dbunit-2.1.jar"/>
+	<classpathentry kind="lib" path="lib/dev/jmock/jmock-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/dev/jmock/jmock-cglib-1.0.1.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

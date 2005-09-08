@@ -1,9 +1,11 @@
 package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
-public final class EmfSession {
+public class EmfSession {
 
     private User user;
 
@@ -20,5 +22,13 @@ public final class EmfSession {
 
     public User getUser() {
         return user;
+    }
+
+    public ExImServices getExImServices() {
+        return serviceLocator.getExImServices();
+    }
+
+    public DataServices getDataServices() {
+        return serviceLocator.getDataServices();
     }
 }

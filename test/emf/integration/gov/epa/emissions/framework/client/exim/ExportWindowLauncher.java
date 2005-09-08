@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
@@ -15,6 +17,7 @@ import javax.swing.JFrame;
 import org.jmock.Mock;
 import org.jmock.core.constraint.IsEqual;
 import org.jmock.core.matcher.InvokeAtLeastOnceMatcher;
+import org.jmock.core.stub.ReturnStub;
 
 public class ExportWindowLauncher {
 
@@ -36,9 +39,14 @@ public class ExportWindowLauncher {
         dataset5.setName("ORL Non Point");
 
         EmfDataset[] datasets = new EmfDataset[] { dataset1, dataset2, dataset3, dataset4, dataset5 };
-        
+
+        Mock servicesLocator = new Mock(ServiceLocator.class);
+        exim.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getExImServices")).withAnyArguments().will(
+                new ReturnStub((ExImServices) exim.proxy()));
+
+        ExportPresenter presenter = new ExportPresenter(new EmfSession(user, (ServiceLocator) servicesLocator.proxy()));
+
         ExportWindow view = new ExportWindow(datasets);
-        ExportPresenter presenter = new ExportPresenter(user, (ExImServices) exim.proxy());
         presenter.observe(view);
 
         view.display();

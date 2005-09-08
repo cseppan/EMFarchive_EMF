@@ -39,7 +39,7 @@ public class ExportClient {
         log.debug("IN CONSTRUCTOR");
         try {
             svcLoc = new RemoteServiceLocator("http://localhost:8080/emf/services");
-            eximSvc = svcLoc.getEximServices();
+            eximSvc = svcLoc.getExImServices();
             userSvc = svcLoc.getUserServices();
             // User user = userSvc.getUser("admin");
             // System.out.println(user.getUserName());

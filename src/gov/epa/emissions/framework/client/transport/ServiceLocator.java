@@ -10,7 +10,7 @@ public interface ServiceLocator {
 
     StatusServices getStatusServices();
 
-    ExImServices getEximServices();
+    ExImServices getExImServices();
 
     DataServices getDataServices();
 }

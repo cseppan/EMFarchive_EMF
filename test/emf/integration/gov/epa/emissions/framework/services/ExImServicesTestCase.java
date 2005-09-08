@@ -24,7 +24,7 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
 
     protected void setUp() {
         RemoteServiceLocator serviceLocator = new RemoteServiceLocator(baseUrl);
-        eximService = serviceLocator.getEximServices();
+        eximService = serviceLocator.getExImServices();
         userService = serviceLocator.getUserServices();
     }
 

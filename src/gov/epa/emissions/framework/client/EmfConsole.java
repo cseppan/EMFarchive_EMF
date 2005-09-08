@@ -18,7 +18,6 @@ import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -44,8 +43,11 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     private StatusWindow status;
 
+    private EmfSession session;
+
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(EmfSession session) {
+        this.session = session;
         this.user = session.getUser();
         this.serviceLocator = session.getServiceLocator();
 
@@ -130,7 +132,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
     }
 
     protected void displayImport() throws EmfException {
-        ExImServices eximServices = serviceLocator.getEximServices();
+        ExImServices eximServices = serviceLocator.getExImServices();
         ImportWindow view = new ImportWindow(user, eximServices);
         ImportPresenter presenter = new ImportPresenter(user, eximServices, view);
         presenter.observe();
@@ -205,9 +207,9 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         return menu;
     }
 
-    protected void displayDatasets() throws EmfException {
+    private void displayDatasets() throws EmfException {
         DatasetsBrowserWindow view = new DatasetsBrowserWindow(serviceLocator.getDataServices(), this);
-        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(user, serviceLocator);
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session);
         presenter.observe(view);
 
         desktop.add(view);
