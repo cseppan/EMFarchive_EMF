@@ -116,7 +116,7 @@ public class User implements Serializable {
     }
 
     public void setFullName(String name) throws UserException {
-        if (name == null)
+        if (name == null || name.length() == 0)
             throw new UserException("Name should be specified");
         this.name = name;
     }
@@ -178,7 +178,7 @@ public class User implements Serializable {
     }
 
     public void setWorkPhone(String phone) throws UserException {
-        if (phone == null)
+        if (phone == null || phone.length() == 0)
             throw new UserException("Phone should be specified");
 
         this.phone = phone;

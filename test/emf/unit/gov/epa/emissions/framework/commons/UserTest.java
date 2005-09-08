@@ -18,6 +18,18 @@ public class UserTest extends TestCase {
         fail("should fail if Name is unspecified");
     }
 
+    public void testShouldFailIfNameIsBlank() {
+        User user = new User();
+        try {
+            user.setFullName("");
+        } catch (UserException ex) {
+            assertEquals("Name should be specified", ex.getMessage());
+            return;
+        }
+
+        fail("should fail if Name is unspecified");
+    }
+
     public void testShouldFailIfUsernameIsLessThanThreeCharacters() throws UserException {
         assertInvalidUsername("a");
         assertInvalidUsername("ab");
@@ -243,6 +255,19 @@ public class UserTest extends TestCase {
         fail("should fail when Phone is unspecified");
     }
 
+    public void testShouldFailIfPhoneIsBlank() {
+        User user = new User();
+
+        try {
+            user.setWorkPhone("");
+        } catch (UserException ex) {
+            assertEquals("Phone should be specified", ex.getMessage());
+            return;
+        }
+
+        fail("should fail when Phone is unspecified");
+    }
+
     public void testShouldFailIfEmailHasInvalidFormat() {
         assertInvalidEmail("a");
         assertInvalidEmail("1");
@@ -258,7 +283,7 @@ public class UserTest extends TestCase {
 
     public void testShouldPassIfEmailHasValidFormat() throws UserException {
         User user = new User();
-        
+
         user.setEmailAddr("user@user.edu");
         user.setEmailAddr("user@user.unc.edu");
         user.setEmailAddr("first.last@user.unc.edu");
