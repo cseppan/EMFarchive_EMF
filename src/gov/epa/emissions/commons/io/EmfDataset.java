@@ -37,7 +37,7 @@ public class EmfDataset implements Dataset {
 
     private String region;
 
-    private String country;
+    private String country="US";
 
     private String units;
 

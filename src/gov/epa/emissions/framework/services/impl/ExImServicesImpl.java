@@ -68,8 +68,8 @@ public class ExImServicesImpl implements ExImServices {
 		File file = new File(folder, fileName);
 
 		if (!file.exists() || !file.isFile()) {
-			log.error("file " + file.getAbsolutePath() + " not found");
-			throw new EmfException("file not found");
+			log.error("File " + file.getAbsolutePath() + " not found");
+			throw new EmfException("File not found");
 		}
 		log.debug("check if file exists " + fileName);
 
@@ -81,8 +81,8 @@ public class ExImServicesImpl implements ExImServices {
 		File file = new File(folderPath);
 
 		if (!file.exists() || !file.isDirectory()) {
-			log.error("folder " + folderPath + " does not exist");
-			throw new EmfException("folder does not exist");
+			log.error("Folder " + folderPath + " does not exist");
+			throw new EmfException("Folder does not exist");
 		}
 		log.debug("check if folder exists " + folderPath);
 		return file;
@@ -96,7 +96,7 @@ public class ExImServicesImpl implements ExImServices {
         session.close();
         if (dsNameUsed){
         	log.error("Dataset name " + dataset.getName() + " is already used");
-        	throw new EmfException("Dataset name " + dataset.getName() + " is already used");
+        	throw new EmfException("Dataset name is already used");
         }
 		log.debug("check if dataset name exists in table: " + dataset.getName());
 	}
@@ -166,16 +166,14 @@ public class ExImServicesImpl implements ExImServices {
 		String cleanName = null;		
 		StringBuffer sbuf = new StringBuffer();
 		
-		StringTokenizer stok = new StringTokenizer(name);
+		StringTokenizer stok = new StringTokenizer(name," ", true);
 		
 		while (stok.hasMoreTokens()){
 			String tok = stok.nextToken();
 			if (tok.equals(" ")){
 				tok = "_";
-			}else if (tok.equals("-")){
-				tok = "_";
 			}
-			
+						
 			sbuf.append(tok);
 
 		}

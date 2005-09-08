@@ -34,8 +34,12 @@ public class ORLHeaderWriter {
     }
 
     void writeHeader(Dataset dataset, PrintWriter writer) {
-        writer.println(ORL_COMMAND);
-
+    	
+    	String OUT_COMMAND = ORL_COMMAND;
+    	if (dataset.getDatasetType().equals("ORL Nonpoint Inventory")){
+    		OUT_COMMAND = ORL_COMMAND + " NONPOINT";
+    	}
+        writer.println(OUT_COMMAND);
         String regionMessage = (dataset.getRegion() != null) ? dataset.getRegion() : " Region not found in database";
         writer.println(REGION_COMMAND + regionMessage);
 
