@@ -78,7 +78,6 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
 
     private void setProperties() {
         super.setSize(new Dimension(900, 700));
-        super.setLocation(new Point(300, 150));
         super.setTitle("Emissions Modeling Framework (EMF)");
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -230,7 +229,7 @@ public class EmfConsole extends EmfWindow implements EmfConsoleView {
         try {
             UserServices userServices = serviceLocator.getUserServices();
             UserManagerWindow console = new UserManagerWindow(userServices, this);
-            UserManagerPresenter presenter = new UserManagerPresenter(userServices, console);
+            UserManagerPresenter presenter = new UserManagerPresenter(user, userServices, console);
             presenter.observe();
 
             desktop.add(console);
