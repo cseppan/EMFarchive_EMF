@@ -50,4 +50,15 @@ public class EmfSessionTest extends MockObjectTestCase {
 
         assertEquals(servicesProxy, session.getDataServices());
     }
+    
+    public void testCacheMostRecentExportFolder() {
+        EmfSession session = new EmfSession(null, null);
+        
+        session.setMostRecentExportFolder("folder/blah");        
+        assertEquals("folder/blah", session.getMostRecentExportFolder());
+        
+        session.setMostRecentExportFolder("folder/foo");        
+        assertEquals("folder/foo", session.getMostRecentExportFolder());
+    }
+    
 }

@@ -4,33 +4,32 @@ import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.ExImServices;
-import gov.epa.emissions.framework.services.User;
 
 public class ExportPresenter {
 
-    private User user;
-
-    private ExImServices model;
-
     private ExportView view;
 
+    private EmfSession session;
+
     public ExportPresenter(EmfSession session) {
-        this.user = session.getUser();
-        this.model = session.getExImServices();
+        this.session = session;
     }
 
     public void notifyDone() {
-        if (view != null)
-            view.close();
+        view.close();
     }
 
     public void observe(ExportView view) {
         this.view = view;
         view.register(this);
+        view.setMostRecentUsedFolder(session.getMostRecentExportFolder());
     }
 
     public void notifyExport(EmfDataset[] datasets, String folder) throws EmfException {
-        model.startExport(user, datasets, folder);
+        session.setMostRecentExportFolder(folder);
+
+        ExImServices services = session.getExImServices();
+        services.startExport(session.getUser(), datasets, folder);
     }
 
 }

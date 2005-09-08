@@ -12,6 +12,20 @@ import org.jmock.cglib.MockObjectTestCase;
 
 public class ExportPresenterTest extends MockObjectTestCase {
 
+    private Mock session;
+
+    private String folder;
+
+    protected void setUp() {
+        session = mock(EmfSessionStub.class);
+
+        session.stubs().method("getUser").withNoArguments().will(returnValue(null));
+        session.stubs().method("getExImServices").withNoArguments().will(returnValue(null));
+
+        folder = "foo/blah";
+        session.stubs().method("getMostRecentExportFolder").withNoArguments().will(returnValue(folder));
+    }
+
     public void testSendsExportRequestToEximServiceOnExport() throws EmfException {
         User user = new User();
         user.setUserName("user");
@@ -22,32 +36,29 @@ public class ExportPresenterTest extends MockObjectTestCase {
         dataset.setName("dataset test");
 
         EmfDataset[] datasets = new EmfDataset[] { dataset };
-        String directory = "/directory";
 
         Mock model = mock(ExImServices.class);
-        model.expects(once()).method("startExport").with(eq(user), eq(datasets), eq(directory));
+        model.expects(once()).method("startExport").with(eq(user), eq(datasets), eq(folder));
 
-        Mock session = mock(EmfSessionStub.class);
         session.stubs().method("getUser").withNoArguments().will(returnValue(user));
         session.stubs().method("getExImServices").withNoArguments().will(returnValue(model.proxy()));
+        session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
 
         ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
 
-        presenter.notifyExport(datasets, directory);
+        presenter.notifyExport(datasets, folder);
     }
 
     public void testClosesViewOnDoneExport() throws EmfException {
         Mock view = mock(ExportView.class);
         view.expects(once()).method("close");
 
-        Mock session = mock(EmfSessionStub.class);
-        session.stubs().method("getUser").withNoArguments().will(returnValue(null));
-        session.stubs().method("getExImServices").withNoArguments().will(returnValue(null));
-
         ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
 
         ExportView viewProxy = (ExportView) view.proxy();
         view.expects(once()).method("register").with(eq(presenter));
+        view.expects(once()).method("setMostRecentUsedFolder").with(eq(folder));
+
         presenter.observe(viewProxy);
 
         presenter.notifyDone();
@@ -56,15 +67,15 @@ public class ExportPresenterTest extends MockObjectTestCase {
     public void testShouldRegisterWithViewOnObserve() throws EmfException {
         Mock view = mock(ExportView.class);
 
-        Mock session = mock(EmfSessionStub.class);
         session.stubs().method("getUser").withNoArguments().will(returnValue(null));
         session.stubs().method("getExImServices").withNoArguments().will(returnValue(null));
 
         ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
-        
+
         ExportView viewProxy = (ExportView) view.proxy();
         view.expects(once()).method("register").with(eq(presenter));
-
+        view.expects(once()).method("setMostRecentUsedFolder").with(eq(folder));
+        
         presenter.observe(viewProxy);
     }
 

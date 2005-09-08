@@ -27,18 +27,11 @@ public class ExportWindowLauncher {
 
         User user = new User();
 
-        EmfDataset dataset1 = new EmfDataset();
-        dataset1.setName("ORL Non Road");
-        EmfDataset dataset2 = new EmfDataset();
-        dataset2.setName("ORL Non Point");
-        EmfDataset dataset3 = new EmfDataset();
-        dataset3.setName("ORL Non Point");
-        EmfDataset dataset4 = new EmfDataset();
-        dataset4.setName("ORL Non Point");
-        EmfDataset dataset5 = new EmfDataset();
-        dataset5.setName("ORL Non Point");
-
-        EmfDataset[] datasets = new EmfDataset[] { dataset1, dataset2, dataset3, dataset4, dataset5 };
+        new EmfDataset().setName("ORL Non Road");
+        EmfDataset[] datasets = new EmfDataset[] { createDataset("ORL Non Point"), createDataset("ORL Non Point"),
+                createDataset("ORL Non Point"), createDataset("ORL Non Point"), createDataset("ORL Non Point"),
+                createDataset("ORL Non Point"), createDataset("ORL Non Point"), createDataset("ORL Non Point"),
+                createDataset("ORL Non Point") };
 
         Mock servicesLocator = new Mock(ServiceLocator.class);
         exim.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getExImServices")).withAnyArguments().will(
@@ -59,6 +52,13 @@ public class ExportWindowLauncher {
         frame.setLocation(new Point(400, 200));
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    private static EmfDataset createDataset(String name) {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName(name);
+
+        return dataset;
     }
 
     private static void addAsInternalFrame(Container window, JFrame frame) {

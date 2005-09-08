@@ -11,6 +11,8 @@ public class EmfSession {
 
     private ServiceLocator serviceLocator;
 
+    private String mostRecentExportFolder;
+
     public EmfSession(User user, ServiceLocator locator) {
         serviceLocator = locator;
         this.user = user;
@@ -30,5 +32,13 @@ public class EmfSession {
 
     public DataServices getDataServices() {
         return serviceLocator.getDataServices();
+    }
+
+    public String getMostRecentExportFolder() {
+        return mostRecentExportFolder;
+    }
+
+    public void setMostRecentExportFolder(String mostRecentExportFolder) {
+        this.mostRecentExportFolder = mostRecentExportFolder;
     }
 }
