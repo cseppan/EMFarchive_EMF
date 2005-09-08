@@ -93,7 +93,6 @@ public class ImportTask implements Runnable {
         ORLTableTypes tableTypes = new ORLTableTypes();
         TableType tableType = tableTypes.type(dataset.getDatasetType());
         dataset.addTable(new Table(tableType.baseTypes()[0], tablename));
-        dataset.addTable(new Table(tableType.summaryType(), tablename + "_summary"));
     }
 
     private void setStartStatus() throws EmfException {

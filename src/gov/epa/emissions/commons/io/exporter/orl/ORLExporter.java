@@ -52,7 +52,7 @@ public class ORLExporter extends FixedFormatExporter {
             // interface needed
 
             // FIXME BELOW: Bootleg hack for demo need permanent fix
-            Table baseTable = getBaseTable(dataset);
+            Table baseTable = dataset.getTables()[0];
 
             // FIXME ABOVE: Bootleg hack for above need permanent fix
 
@@ -70,22 +70,6 @@ public class ORLExporter extends FixedFormatExporter {
                 writer.close();
             }
         }
-    }
-
-    private Table getBaseTable(EmfDataset dataset) {        
-        Table[] tables = dataset.getTables();
-        if(tables.length == 1)
-            return tables[0];
-        
-        Table tempTable0 = tables[0];
-        Table tempTable1 = tables[1];
-
-        String tableTypeName0 = tempTable0.getTableType();
-
-        if (tableTypeName0.indexOf("Summary") > 0) {
-            return tempTable1;
-        }
-        return tempTable0;
     }
 
 }
