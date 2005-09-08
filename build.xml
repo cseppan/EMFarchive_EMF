@@ -10,7 +10,7 @@
     <property name="JAVA_HOME" value="${env.JAVA_HOME}" />
     <property name="src.dir" value="src" />
     <property name="lib.dir" value="lib" />
-    <property name="res.dir" value="res" />        
+    <property name="res.dir" value="res" />
 
     <property name="test.emf.dir" value="test/emf" />
     <property name="test.emf.unit.dir" value="${test.emf.dir}/unit" />
@@ -390,7 +390,7 @@
         <fileset dir="${lib.dir}/dev/cobertura">
             <include name="**/*.jar" />
         </fileset>
-        <path refid="classpath"/>
+        <path refid="classpath" />
     </path>
 
     <taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
@@ -467,6 +467,16 @@
             description="Compile, instrument ourself, run the tests and generate JUnit and coverage reports."
     />
     <!--  ===============END Coverage Targets =============================== -->
+
+    <!--  ===============START Launch EMF ============================== -->
+    <target name="launch-EMF">
+        <java classname="gov.epa.emissions.framework.client.Launcher"
+              classpathref="classpath"
+              fork="true"
+              failonerror="true"
+        />
+    </target>
+    <!--  ===============END Launch EMF ============================== -->
 
 </project>
 
