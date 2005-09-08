@@ -50,28 +50,12 @@ public class ORLExporter extends FixedFormatExporter {
             Datasource datasource = dbServer.getEmissionsDatasource();
             // TODO: we know ORL only has a single base table, but cleaner
             // interface needed
-            
-            
-            //FIXME BELOW:  Bootleg hack for demo need permanent fix
-            Table baseTable = null;
-            Table tempTable0 = null;
-            Table tempTable1 = null;
-            
-            tempTable0 = dataset.getTables()[0];
-            tempTable1 = dataset.getTables()[1];
-            
-            String tableTypeName0 = tempTable0.getTableType();
-            String tableTypeName1 = tempTable1.getTableType();
 
-            if (tableTypeName0.indexOf("Summary") >0) {
-            	baseTable = tempTable1;
-            }
-            if (tableTypeName1.indexOf("Summary") >0) {
-            	baseTable = tempTable0;
-            }
-            
-            //FIXME ABOVE:  Bootleg hack for above need permanent fix
-            
+            // FIXME BELOW: Bootleg hack for demo need permanent fix
+            Table baseTable = getBaseTable(dataset);
+
+            // FIXME ABOVE: Bootleg hack for above need permanent fix
+
             String qualifiedTableName = datasource.getName() + "." + baseTable.getTableName();
 
             Query query = datasource.query();
@@ -86,6 +70,22 @@ public class ORLExporter extends FixedFormatExporter {
                 writer.close();
             }
         }
+    }
+
+    private Table getBaseTable(EmfDataset dataset) {        
+        Table[] tables = dataset.getTables();
+        if(tables.length == 1)
+            return tables[0];
+        
+        Table tempTable0 = tables[0];
+        Table tempTable1 = tables[1];
+
+        String tableTypeName0 = tempTable0.getTableType();
+
+        if (tableTypeName0.indexOf("Summary") > 0) {
+            return tempTable1;
+        }
+        return tempTable0;
     }
 
 }
