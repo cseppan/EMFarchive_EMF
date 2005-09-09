@@ -7,15 +7,20 @@ import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.StatusWindow;
 import gov.epa.emissions.framework.services.DataServices;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -83,7 +88,20 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.CENTER);
 
-        JButton refresh = new DefaultButton("Refresh", new AbstractAction() {
+        panel.add(createRefreshButton(), BorderLayout.EAST);
+
+        return panel;
+    }
+
+    private JButton createRefreshButton() {
+        ResourceBundle bundle = ResourceBundle.getBundle("images");
+        URL url = StatusWindow.class.getResource(bundle.getString("refresh"));
+        ImageIcon icon = new ImageIcon(url, "Refresh Datasets");
+
+        JButton button = new JButton(icon);
+        button.setToolTipText("Refresh Datasets");
+        button.setBorderPainted(false);
+        button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     presenter.notifyRefresh();
@@ -92,9 +110,8 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
                 }
             }
         });
-        panel.add(refresh, BorderLayout.EAST);
 
-        return panel;
+        return button;
     }
 
     private JPanel createControlPanel() {

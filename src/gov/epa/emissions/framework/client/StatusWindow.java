@@ -13,12 +13,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.ResourceBundle;
 
 import javax.swing.AbstractButton;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -64,8 +65,7 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
     }
 
     private JPanel createTopPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        JPanel panel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel(new FlowLayout());
         messagePanel = new SingleLineMessagePanel();
@@ -73,13 +73,17 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
         container.add(createClearButton());
 
         panel.add(container, BorderLayout.EAST);
+
         return panel;
     }
 
     private JButton createClearButton() {
-        Icon icon = new ImageIcon("images/green.gif");
+        ResourceBundle bundle = ResourceBundle.getBundle("images");
+        URL url = StatusWindow.class.getResource(bundle.getString("trash"));
+        ImageIcon icon = new ImageIcon(url, "Clear Messages");
 
-        JButton button = new JButton("Clear", icon);
+        JButton button = new JButton(icon);
+        button.setBorderPainted(false);
         button.setToolTipText("Clears the Status messages");
         button.setVerticalTextPosition(AbstractButton.BOTTOM);
         button.setHorizontalTextPosition(AbstractButton.CENTER);
