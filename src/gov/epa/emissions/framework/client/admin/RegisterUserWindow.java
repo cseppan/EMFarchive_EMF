@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
-import gov.epa.emissions.framework.client.EmfWindow;
+import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.login.LaunchLoginOnCancelStrategy;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
@@ -9,7 +9,7 @@ import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class RegisterUserWindow extends EmfWindow implements EmfWidgetContainer {
+public class RegisterUserWindow extends EmfFrame implements EmfWidgetContainer {
 
     private RegisterUserPanel view;
 

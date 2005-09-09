@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.client.status;
 
 import gov.epa.emissions.commons.gui.TableHeader;
 import gov.epa.emissions.framework.services.Status;

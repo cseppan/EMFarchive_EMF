@@ -1,7 +1,9 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.client.status;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.TaskRunner;
+import gov.epa.emissions.framework.client.status.StatusPresenter;
+import gov.epa.emissions.framework.client.status.StatusView;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;

@@ -1,5 +1,6 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.client.status;
 
+import gov.epa.emissions.framework.client.status.StatusTableModel;
 import gov.epa.emissions.framework.services.Status;
 
 import java.util.Date;

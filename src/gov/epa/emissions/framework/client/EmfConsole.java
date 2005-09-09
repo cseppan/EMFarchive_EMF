@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
+import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.StatusServices;
@@ -29,7 +30,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 //FIXME: split this class up into smaller ones...getting too big
-public class EmfConsole extends EmfWindow implements EmfConsoleView {
+public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private JDesktopPane desktop;
 

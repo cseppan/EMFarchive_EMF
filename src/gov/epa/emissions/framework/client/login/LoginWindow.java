@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.EmfWindow;
+import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.admin.PostRegisterStrategy;
@@ -33,7 +33,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
-public class LoginWindow extends EmfWindow implements LoginView {
+public class LoginWindow extends EmfFrame implements LoginView {
 
     private JTextField username;
 
