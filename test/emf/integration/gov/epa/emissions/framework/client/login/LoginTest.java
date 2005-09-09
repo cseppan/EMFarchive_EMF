@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
@@ -45,6 +46,7 @@ public class LoginTest extends ComponentTestFixture {
     public void testShouldShowEmfConsoleOnLogin() throws Exception {
         LoginWindow window = createLoginWindow();
         showWindow(window);
+        
 
         window.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent arg0) {
@@ -52,8 +54,8 @@ public class LoginTest extends ComponentTestFixture {
             }
         });
 
-        setUsername(window, "admin");
-        setPassword(window, "admin123");
+        setUsername(window, "emf");
+        setPassword(window, "emf12345");
 
         clickButton(window, "Sign In");
 
@@ -61,6 +63,28 @@ public class LoginTest extends ComponentTestFixture {
 
         EmfConsole console = (EmfConsole) getFinder().find(new WindowMatcher("EMF Console"));
         assertNotNull(console);
+        assertTrue(console.isVisible());
+    }
+
+    public void testShouldShowRegisterUserOnSelectionOfRegisterNewUserOption() throws Exception {
+        LoginWindow window = createLoginWindow();
+        showWindow(window);
+
+        window.addWindowListener(new WindowAdapter() {
+            public void windowClosed(WindowEvent arg0) {
+                isWindowClosed = true;
+            }
+        });
+
+        Component register = getFinder().find(window, new NameMatcher("RegisterUser"));
+        ComponentTester tester = new ComponentTester();
+        tester.actionClick(register);
+
+        assertTrue(isWindowClosed);
+
+        RegisterUserWindow registerUser = (RegisterUserWindow) getFinder().find(new WindowMatcher("RegisterUser"));
+        assertNotNull(registerUser);
+        assertTrue(registerUser.isVisible());
     }
 
     private void setPassword(LoginWindow window, String password) throws Exception {
@@ -91,7 +115,7 @@ public class LoginTest extends ComponentTestFixture {
         LoginWindow window = createLoginWindow();
         showWindow(window);
 
-        setUsername(window, "admin");
+        setUsername(window, "emf");
         setPassword(window, "invalid password");
 
         Component signIn = getFinder().find(window, new NameMatcher("Sign In"));
@@ -110,6 +134,9 @@ public class LoginTest extends ComponentTestFixture {
 
         LoginPresenter presenter = new LoginPresenter(serviceLocator.getUserServices(), window);
         presenter.observe();
+        
+        assertEquals("Login to EMF", window.getTitle());
+        
         return window;
     }
 

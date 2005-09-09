@@ -53,7 +53,6 @@ public class LoginWindow extends EmfFrame implements LoginView {
 
         this.setSize(new Dimension(350, 225));
         this.setLocation(new Point(400, 200));
-        this.setTitle("Login");
 
         this.getContentPane().add(layoutPanel);
     }
@@ -162,6 +161,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
         panel.add(forgotPasswordPanel);
 
         JLabel register = new JLabel("<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Not yet registered ?</a></html>");
+        register.setName("RegisterUser");
         register.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent arg0) {
                 try {
