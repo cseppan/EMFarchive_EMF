@@ -19,6 +19,19 @@ public class ORLExporterTest extends CommonsTestCase {
         doExport(DatasetTypes.ORL_POINT_TOXICS, ORLTableTypes.ORL_POINT_TOXICS, "ptinv_nti99_NC");
     }
 
+    public void testExportPointFailsWhenOverwriteIsDisabledAndOutputFileExists() throws Exception {
+        doImport("ptinv.nti99_NC.txt", DatasetTypes.ORL_POINT_TOXICS, ORLTableTypes.ORL_POINT_TOXICS);
+        doExport(DatasetTypes.ORL_POINT_TOXICS, ORLTableTypes.ORL_POINT_TOXICS, "ptinv_nti99_NC");
+
+        try {
+            doExportWithoutOverwrite(DatasetTypes.ORL_POINT_TOXICS, ORLTableTypes.ORL_POINT_TOXICS, "ptinv_nti99_NC");
+        } catch (Exception e) {
+            return;
+        }
+
+        fail("should have failed to export since file has already been exported and exists");
+    }
+
     public void testNonPoint() throws Exception {
         doImport("arinv.nonpoint.nti99_NC.txt", DatasetTypes.ORL_AREA_NONPOINT_TOXICS,
                 ORLTableTypes.ORL_AREA_NONPOINT_TOXICS);
@@ -40,10 +53,21 @@ public class ORLExporterTest extends CommonsTestCase {
                 "arinv_nonroad_nti99d_NC_new");
     }
 
-    private void doExport(String datasetType, TableType tableType, String tableName) throws Exception {
-        EmfDataset dataset = createDataset(datasetType, tableType, tableName);
+    private void doExportWithoutOverwrite(String datasetType, TableType tableType, String tableName) throws Exception {
+        ORLExporter exporter = ORLExporter.createWithoutOverwrite(dbSetup.getDbServer());
 
-        ORLExporter exporter = new ORLExporter(dbSetup.getDbServer());
+        runExport(datasetType, tableType, tableName, exporter);
+    }
+
+    private void doExport(String datasetType, TableType tableType, String tableName) throws Exception {
+        ORLExporter exporter = ORLExporter.create(dbSetup.getDbServer());
+
+        runExport(datasetType, tableType, tableName, exporter);
+    }
+
+    private void runExport(String datasetType, TableType tableType, String tableName, ORLExporter exporter)
+            throws Exception {
+        EmfDataset dataset = createDataset(datasetType, tableType, tableName);
 
         String tempDir = System.getProperty("java.io.tmpdir");
         String exportFileName = tempDir + "/" + datasetType + "." + tableName + ".EXPORTED_";

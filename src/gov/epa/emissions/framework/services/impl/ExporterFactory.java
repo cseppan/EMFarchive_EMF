@@ -29,6 +29,6 @@ public class ExporterFactory {
 	public Exporter create(String datasetType) {
 		// FIXME: Get the specific type of importer for the filetype. Use a
 		// Factory pattern
-		return new ORLExporter(dbServer);
+		return ORLExporter.create(dbServer);
 	}
 }

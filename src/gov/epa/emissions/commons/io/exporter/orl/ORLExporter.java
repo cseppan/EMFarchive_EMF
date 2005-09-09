@@ -12,23 +12,38 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * This exporter writes out data in the "One Pollutant Record Per Line" format.
- * It handles four dataset types: Nonpoint, Nonroad, Onroad, and Point.
+ * It handles four dataset types: Nonpoint, Nonroad, Onroad, and Point. <p/>
+ * 
+ * By default, it overwrites an existing file.
  */
 public class ORLExporter extends FixedFormatExporter {
 
     private ORLHeaderWriter headerWriter;
 
-    private ORLBodyFactory bodyWriterFactory;
+    private ORLBodyFactory bodyFactory;
 
-    public ORLExporter(DbServer dbServer) {
+    private OverwriteStrategy overwriteStrategy;
+
+    private ORLExporter(DbServer dbServer, OverwriteStrategy strategy) {
         super(dbServer);
+        this.overwriteStrategy = strategy;
         this.headerWriter = new ORLHeaderWriter();
-        this.bodyWriterFactory = new ORLBodyFactory();
+        this.bodyFactory = new ORLBodyFactory();
     }
 
+    static public ORLExporter create(DbServer dbServer) {
+        return new ORLExporter(dbServer, new ForceOverwriteStrategy());
+    }
+
+    public static ORLExporter createWithoutOverwrite(DbServer dbServer) {
+        return new ORLExporter(dbServer, new NoOverwriteStrategy());
+    }
+
+    // FIXME: what's this gibberish ?
     // Now start writing the output data. Here are some notes
     // The database field of column 2 is the state abbreviation code.
     // Ignore it.
@@ -40,31 +55,14 @@ public class ORLExporter extends FixedFormatExporter {
     // format as these data values can be very small
 
     public void run(EmfDataset dataset, File file) throws Exception {
+        overwriteStrategy.verifyWritable(file);
+
         PrintWriter writer = null;
 
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(file.getCanonicalPath())));
-
-            headerWriter.writeHeader(dataset, writer);
-
-            Datasource datasource = dbServer.getEmissionsDatasource();
-            // TODO: we know ORL only has a single base table, but cleaner
-            // interface needed
-
-            // FIXME BELOW: Bootleg hack for demo need permanent fix
-            Table baseTable = dataset.getTables()[0];
-
-            // FIXME ABOVE: Bootleg hack for above need permanent fix
-
-            String qualifiedTableName = datasource.getName() + "." + baseTable.getTableName();
-
-            Query query = datasource.query();
-            ResultSet data = query.selectAll(qualifiedTableName);
-
-            String datasetType = dataset.getDatasetType();
-
-            ORLBody body = bodyWriterFactory.getBody(datasetType);
-            body.write(data, writer);
+            writeHeader(dataset, writer);
+            writeBody(dataset, writer);
         } finally {
             if (writer != null) {
                 writer.close();
@@ -72,4 +70,24 @@ public class ORLExporter extends FixedFormatExporter {
         }
     }
 
+    private void writeBody(EmfDataset dataset, PrintWriter writer) throws SQLException {
+        Datasource datasource = dbServer.getEmissionsDatasource();
+
+        // TODO: we know ORL only has a single base table, but cleaner
+        // interface needed
+        Table baseTable = dataset.getTables()[0];
+        String qualifiedTableName = datasource.getName() + "." + baseTable.getTableName();
+
+        Query query = datasource.query();
+        ResultSet data = query.selectAll(qualifiedTableName);
+
+        String datasetType = dataset.getDatasetType();
+
+        ORLBody body = bodyFactory.getBody(datasetType);
+        body.write(data, writer);
+    }
+
+    private void writeHeader(EmfDataset dataset, PrintWriter writer) {
+        headerWriter.writeHeader(dataset, writer);
+    }
 }
