@@ -19,7 +19,7 @@ public class ORLExporterTest extends CommonsTestCase {
 
         String datasetType = DatasetTypes.ORL_POINT_TOXICS;
         String tableName = "ptinv_nti99_NC";
-        File file = createFile(datasetType, tableName);
+        File file = createFile(datasetType, tableName);        
 
         doExport(datasetType, ORLTableTypes.ORL_POINT_TOXICS, tableName, file);
     }
@@ -116,7 +116,10 @@ public class ORLExporterTest extends CommonsTestCase {
         String tempDir = System.getProperty("java.io.tmpdir");
         String exportFileName = tempDir + "/" + datasetType + "." + tableName + ".EXPORTED_";
 
-        return new File(exportFileName);
+        File file = new File(exportFileName);
+        file.deleteOnExit();
+        
+        return file;
     }
 
     private EmfDataset createDataset(String datasetType, TableType tableType, String tableName) {
