@@ -1,18 +1,10 @@
 package gov.epa.emissions.commons.io.exporter.orl;
 
-import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.commons.db.Query;
 import gov.epa.emissions.commons.io.EmfDataset;
-import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.commons.io.exporter.FixedFormatExporter;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * This exporter writes out data in the "One Pollutant Record Per Line" format.
@@ -22,25 +14,19 @@ import java.sql.SQLException;
  */
 public class ORLExporter extends FixedFormatExporter {
 
-    private ORLHeaderWriter headerWriter;
+    private WriteStrategy writeStrategy;
 
-    private ORLBodyFactory bodyFactory;
-
-    private OverwriteStrategy overwriteStrategy;
-
-    private ORLExporter(DbServer dbServer, OverwriteStrategy strategy) {
+    private ORLExporter(DbServer dbServer, WriteStrategy strategy) {
         super(dbServer);
-        this.overwriteStrategy = strategy;
-        this.headerWriter = new ORLHeaderWriter();
-        this.bodyFactory = new ORLBodyFactory();
+        this.writeStrategy = strategy;
     }
 
-    static public ORLExporter create(DbServer dbServer) {
-        return new ORLExporter(dbServer, new ForceOverwriteStrategy());
+    public static ORLExporter create(DbServer dbServer) {
+        return new ORLExporter(dbServer, new OverwriteStrategy(dbServer));
     }
 
     public static ORLExporter createWithoutOverwrite(DbServer dbServer) {
-        return new ORLExporter(dbServer, new NoOverwriteStrategy());
+        return new ORLExporter(dbServer, new NoOverwriteStrategy(dbServer));
     }
 
     // FIXME: what's this gibberish ?
@@ -55,39 +41,6 @@ public class ORLExporter extends FixedFormatExporter {
     // format as these data values can be very small
 
     public void run(EmfDataset dataset, File file) throws Exception {
-        overwriteStrategy.verifyWritable(file);
-
-        PrintWriter writer = null;
-
-        try {
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(file.getCanonicalPath())));
-            writeHeader(dataset, writer);
-            writeBody(dataset, writer);
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
-        }
-    }
-
-    private void writeBody(EmfDataset dataset, PrintWriter writer) throws SQLException {
-        Datasource datasource = dbServer.getEmissionsDatasource();
-
-        // TODO: we know ORL only has a single base table, but cleaner
-        // interface needed
-        Table baseTable = dataset.getTables()[0];
-        String qualifiedTableName = datasource.getName() + "." + baseTable.getTableName();
-
-        Query query = datasource.query();
-        ResultSet data = query.selectAll(qualifiedTableName);
-
-        String datasetType = dataset.getDatasetType();
-
-        ORLBody body = bodyFactory.getBody(datasetType);
-        body.write(data, writer);
-    }
-
-    private void writeHeader(EmfDataset dataset, PrintWriter writer) {
-        headerWriter.writeHeader(dataset, writer);
+        writeStrategy.write(dataset, file);
     }
 }
