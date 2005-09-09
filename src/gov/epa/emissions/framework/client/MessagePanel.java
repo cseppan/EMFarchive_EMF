@@ -18,4 +18,6 @@ public abstract class MessagePanel extends JPanel {
 
     abstract public void setMessage(String message, Color color);
 
+    abstract public String getMessage();
+
 }

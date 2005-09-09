@@ -1,24 +1,20 @@
 package gov.epa.emissions.framework.client.login;
 
-import gov.epa.emissions.framework.client.admin.UserServicesStub;
+import gov.epa.emissions.framework.client.EmfConsole;
+import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Collections;
 
+import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import junit.extensions.abbot.ComponentTestFixture;
-
-import org.jmock.Mock;
-import org.jmock.core.constraint.IsEqual;
-import org.jmock.core.matcher.InvokeAtLeastOnceMatcher;
-import org.jmock.core.stub.ReturnStub;
-
 import abbot.finder.matchers.NameMatcher;
+import abbot.finder.matchers.WindowMatcher;
 import abbot.tester.ComponentTester;
 
 public class LoginTest extends ComponentTestFixture {
@@ -26,13 +22,7 @@ public class LoginTest extends ComponentTestFixture {
     private boolean isWindowClosed = false;
 
     public void testShouldCloseOnClickCancel() throws Exception {
-        UserServicesStub userServices = new UserServicesStub(Collections.EMPTY_LIST);
-
-        Mock serviceLocator = new Mock(ServiceLocator.class);
-        serviceLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getUserServices")).will(
-                new ReturnStub(userServices));
-
-        LoginWindow window = new LoginWindow((ServiceLocator) serviceLocator.proxy());
+        LoginWindow window = createLoginWindow();
         showWindow(window);
 
         window.addWindowListener(new WindowAdapter() {
@@ -41,18 +31,19 @@ public class LoginTest extends ComponentTestFixture {
             }
         });
 
-        Component cancel = getFinder().find(window, new NameMatcher("Cancel"));
-
-        ComponentTester tester = new ComponentTester();
-        tester.actionClick(cancel);
+        clickButton(window, "Cancel");
 
         assertTrue(isWindowClosed);
     }
 
-    public void testShouldShowEmfConsoleOnLogin() throws Exception {
-        ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
+    private void clickButton(LoginWindow window, String button) throws Exception {
+        Component cancel = getFinder().find(window, new NameMatcher(button));
+        ComponentTester tester = new ComponentTester();
+        tester.actionClick(cancel);
+    }
 
-        LoginWindow window = new LoginWindow(serviceLocator);
+    public void testShouldShowEmfConsoleOnLogin() throws Exception {
+        LoginWindow window = createLoginWindow();
         showWindow(window);
 
         window.addWindowListener(new WindowAdapter() {
@@ -61,17 +52,65 @@ public class LoginTest extends ComponentTestFixture {
             }
         });
 
-        Component signIn = getFinder().find(window, new NameMatcher("Sign In"));
-        JTextField username = (JTextField) getFinder().find(window, new NameMatcher("username"));
-        username.setText("admin");
-        JTextField password = (JTextField) getFinder().find(window, new NameMatcher("password"));
-        password.setText("admin123");
+        setUsername(window, "admin");
+        setPassword(window, "admin123");
 
+        clickButton(window, "Sign In");
+
+        assertTrue(isWindowClosed);
+
+        EmfConsole console = (EmfConsole) getFinder().find(new WindowMatcher("EMF Console"));
+        assertNotNull(console);
+    }
+
+    private void setPassword(LoginWindow window, String password) throws Exception {
+        JTextField field = (JTextField) getFinder().find(window, new NameMatcher("password"));
+        field.setText(password);
+    }
+
+    private void setUsername(LoginWindow window, String username) throws Exception {
+        JTextField field = (JTextField) getFinder().find(window, new NameMatcher("username"));
+        field.setText(username);
+    }
+
+    public void testShouldShowErrorMessageOnInvalidUsername() throws Exception {
+        LoginWindow window = createLoginWindow();
+        showWindow(window);
+
+        setUsername(window, "invalid username");
+
+        Component signIn = getFinder().find(window, new NameMatcher("Sign In"));
         ComponentTester tester = new ComponentTester();
         tester.actionClick(signIn);
 
-        //FIXME: why is it failing ?
-        //assertTrue(isWindowClosed);
+        MessagePanel messagePanel = (MessagePanel) getFinder().find(window, new NameMatcher("MessagePanel"));
+        assertEquals("Invalid username", messagePanel.getMessage());
+    }
+
+    public void testShouldShowErrorMessageOnInvalidPassword() throws Exception {
+        LoginWindow window = createLoginWindow();
+        showWindow(window);
+
+        setUsername(window, "admin");
+        setPassword(window, "invalid password");
+
+        Component signIn = getFinder().find(window, new NameMatcher("Sign In"));
+        ComponentTester tester = new ComponentTester();
+        tester.actionClick(signIn);
+
+        MessagePanel messagePanel = (MessagePanel) getFinder().find(window, new NameMatcher("MessagePanel"));
+        assertEquals("Incorrect Password", messagePanel.getMessage());
+    }
+
+    private LoginWindow createLoginWindow() {
+        ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
+
+        LoginWindow window = new LoginWindow(serviceLocator);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        LoginPresenter presenter = new LoginPresenter(serviceLocator.getUserServices(), window);
+        presenter.observe();
+        return window;
     }
 
 }

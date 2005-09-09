@@ -10,6 +10,8 @@ public class MultiLineMessagePanel extends MessagePanel {
 
     private JTextArea textArea;
 
+    private String message;
+
     public MultiLineMessagePanel(Dimension size) {
         textArea = new JTextArea();
         textArea.setRows(2);
@@ -26,7 +28,8 @@ public class MultiLineMessagePanel extends MessagePanel {
 
     public void setMessage(String message, Color color) {
         clear();
-
+        
+        this.message = message;
         textArea.setForeground(color);
         textArea.setText(message);
         textArea.setCaretPosition(0);
@@ -36,7 +39,12 @@ public class MultiLineMessagePanel extends MessagePanel {
     }
 
     public void clear() {
+        message = "";
         textArea.setText("");
+    }
+
+    public String getMessage() {
+        return message;
     }
 
 }

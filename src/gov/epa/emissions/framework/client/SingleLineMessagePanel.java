@@ -8,7 +8,10 @@ public class SingleLineMessagePanel extends MessagePanel {
 
     private JLabel label;
 
+    private String message;
+
     public SingleLineMessagePanel() {
+        super.setName("MessagePanel");
         label = new JLabel(" ");
         super.add(label);
 
@@ -16,16 +19,22 @@ public class SingleLineMessagePanel extends MessagePanel {
     }
 
     public void clear() {
+        message = "";
         label.setText(" ");
     }
 
-    public void setMessage(String message, Color color) {
+    public void setMessage(String message, Color color) {       
         clear();
 
+        this.message = message;
         label.setForeground(color);
         label.setText(message);
 
         super.setVisible(true);
+    }
+
+    public String getMessage() {
+        return message;
     }
 
 }
