@@ -1,15 +1,11 @@
 package gov.epa.emissions.framework.client.login;
 
-import gov.epa.emissions.framework.client.EmfConsole;
-import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
 
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
-import javax.swing.JTextField;
 
 import abbot.finder.matchers.NameMatcher;
 import abbot.finder.matchers.WindowMatcher;
@@ -29,7 +25,7 @@ public class LoginTest extends UserAcceptanceTestCase {
             }
         });
 
-        click(window, "Cancel");
+        click(window, "cancel");
 
         assertTrue(isWindowClosed);
     }
@@ -47,13 +43,10 @@ public class LoginTest extends UserAcceptanceTestCase {
         setUsername(window, "emf");
         setPassword(window, "emf12345");
 
-        click(window, "Sign In");
+        click(window, "signIn");
 
         assertTrue(isWindowClosed);
-
-        EmfConsole console = (EmfConsole) getFinder().find(new WindowMatcher("EMF Console"));
-        assertNotNull(console);
-        assertTrue(console.isVisible());
+        assertEmfConsoleShown();
     }
 
     public void testShouldShowRegisterUserOnSelectionOfRegisterNewUserOption() throws Exception {
@@ -66,9 +59,7 @@ public class LoginTest extends UserAcceptanceTestCase {
             }
         });
 
-        Component register = getFinder().find(window, new NameMatcher("RegisterUser"));
-        ComponentTester tester = new ComponentTester();
-        tester.actionClick(register);
+        click(window, "registerUser");
 
         assertTrue(isWindowClosed);
 
@@ -78,13 +69,11 @@ public class LoginTest extends UserAcceptanceTestCase {
     }
 
     private void setPassword(LoginWindow window, String password) throws Exception {
-        JTextField field = (JTextField) getFinder().find(window, new NameMatcher("password"));
-        field.setText(password);
+        setTextfield(window, "password", password);
     }
 
     private void setUsername(LoginWindow window, String username) throws Exception {
-        JTextField field = (JTextField) getFinder().find(window, new NameMatcher("username"));
-        field.setText(username);
+        setTextfield(window, "username", username);
     }
 
     public void testShouldShowErrorMessageOnInvalidUsername() throws Exception {
@@ -93,12 +82,9 @@ public class LoginTest extends UserAcceptanceTestCase {
 
         setUsername(window, "invalid username");
 
-        Component signIn = getFinder().find(window, new NameMatcher("Sign In"));
-        ComponentTester tester = new ComponentTester();
-        tester.actionClick(signIn);
+        click(window, "signIn");
 
-        MessagePanel messagePanel = (MessagePanel) getFinder().find(window, new NameMatcher("MessagePanel"));
-        assertEquals("Invalid username", messagePanel.getMessage());
+        assertErrorMessage(window, "Invalid username");
     }
 
     public void testShouldShowErrorMessageOnInvalidPassword() throws Exception {
@@ -108,12 +94,11 @@ public class LoginTest extends UserAcceptanceTestCase {
         setUsername(window, "emf");
         setPassword(window, "invalid password");
 
-        Component signIn = getFinder().find(window, new NameMatcher("Sign In"));
+        Component signIn = getFinder().find(window, new NameMatcher("signIn"));
         ComponentTester tester = new ComponentTester();
         tester.actionClick(signIn);
 
-        MessagePanel messagePanel = (MessagePanel) getFinder().find(window, new NameMatcher("MessagePanel"));
-        assertEquals("Incorrect Password", messagePanel.getMessage());
+        assertErrorMessage(window, "Incorrect Password");
     }
 
 }

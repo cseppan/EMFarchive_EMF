@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.commons.gui.DefaultButton;
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
@@ -128,7 +128,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        JButton exportButton = new DefaultButton("Export", new AbstractAction() {
+        JButton exportButton = new Button("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 if (presenter == null)
                     return;
@@ -139,7 +139,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         });
         container.add(exportButton);
 
-        JButton done = new DefaultButton("Done", new AbstractAction() {
+        JButton done = new Button("Done", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 if (presenter != null)
                     presenter.notifyDone();

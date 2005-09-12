@@ -10,17 +10,18 @@ import java.awt.Component;
 import java.awt.Container;
 
 import javax.swing.JFrame;
+import javax.swing.JTextField;
 
+import junit.extensions.abbot.ComponentTestFixture;
 import abbot.finder.ComponentNotFoundException;
 import abbot.finder.MultipleComponentsFoundException;
 import abbot.finder.matchers.NameMatcher;
 import abbot.finder.matchers.WindowMatcher;
 import abbot.tester.ComponentTester;
-import junit.extensions.abbot.ComponentTestFixture;
 
-public class UserAcceptanceTestCase extends ComponentTestFixture {
+public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
 
-    protected void assertLoginIsShown() throws ComponentNotFoundException, MultipleComponentsFoundException {
+    protected void assertLoginIsShown() throws Exception {
         LoginWindow login = (LoginWindow) getFinder().find(new WindowMatcher("Login"));
         assertNotNull(login);
         assertTrue(login.isVisible());
@@ -30,7 +31,7 @@ public class UserAcceptanceTestCase extends ComponentTestFixture {
         LoginWindow window = createLoginWindow();
         showWindow(window);
 
-        click(window, "RegisterUser");
+        click(window, "registerUser");
 
         return (RegisterUserWindow) getFinder().find(new WindowMatcher("RegisterUser"));
     }
@@ -54,6 +55,22 @@ public class UserAcceptanceTestCase extends ComponentTestFixture {
         assertEquals("Login to EMF", window.getTitle());
 
         return window;
+    }
+
+    protected void setTextfield(Container window, String name, String value) throws Exception {
+        JTextField field = (JTextField) getFinder().find(window, new NameMatcher(name));
+        field.setText(value);
+    }
+
+    protected void assertErrorMessage(Container window, String errorMessage) throws Exception {
+        MessagePanel messagePanel = (MessagePanel) getFinder().find(window, new NameMatcher("messagePanel"));
+        assertEquals(errorMessage, messagePanel.getMessage());
+    }
+
+    protected void assertEmfConsoleShown() throws ComponentNotFoundException, MultipleComponentsFoundException {
+        EmfConsole console = (EmfConsole) getFinder().find(new WindowMatcher("EMF Console"));
+        assertNotNull(console);
+        assertTrue(console.isVisible());
     }
 
 }

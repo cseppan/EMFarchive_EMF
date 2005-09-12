@@ -282,10 +282,10 @@
 
     <!-- All tests -->
     <target name="all-emf-tests"
-            depends="compile, emf-unit-tests, emf-integration-tests, emf-uat-tests"
+            depends="emf-unit-tests, emf-integration-tests, emf-uat-tests"
     />
     <target name="all-commons-tests"
-            depends="compile, commons-unit-tests, commons-integration-tests"
+            depends="commons-unit-tests, commons-integration-tests"
     />
     <target name="all-tests" depends="all-commons-tests, all-emf-tests" />
     <target name="all-unit-tests"

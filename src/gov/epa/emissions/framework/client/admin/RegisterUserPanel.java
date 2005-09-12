@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.commons.gui.DefaultButton;
+import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.PasswordField;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
@@ -87,13 +89,13 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        JButton cancel = new DefaultButton("Cancel", new AbstractAction() {
+        JButton cancel = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 cancelStrategy.execute(presenter);
             }
         });
 
-        JButton ok = new DefaultButton("Ok", new AbstractAction() {
+        JButton ok = new Button("Ok", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 registerUser();
             }
@@ -156,11 +158,11 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
 
-        username = new JTextField(10);
+        username = new TextField("username", 10);
         valuesPanel.add(username);
-        password = new JPasswordField(10);
+        password = new PasswordField("password", 10);
         valuesPanel.add(password);
-        confirmPassword = new JPasswordField(10);
+        confirmPassword = new PasswordField("confirmPassword", 10);
         valuesPanel.add(confirmPassword);
 
         panel.add(valuesPanel);
@@ -192,16 +194,16 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         profileValuesPanel = new JPanel();
         profileValuesPanel.setLayout(new BoxLayout(profileValuesPanel, BoxLayout.Y_AXIS));
 
-        name = new JTextField(15);
+        name = new TextField("name", 15);
         profileValuesPanel.add(name);
         profileValuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        affiliation = new JTextField(15);
+        affiliation = new TextField("affiliation", 15);
         profileValuesPanel.add(affiliation);
         profileValuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        phone = new JTextField(15);
+        phone = new TextField("phone", 15);
         profileValuesPanel.add(phone);
         profileValuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        email = new JTextField(15);
+        email = new TextField("email", 15);
         profileValuesPanel.add(email);
 
         profilePanel.add(profileValuesPanel);

@@ -28,7 +28,7 @@ public class MultiLineMessagePanel extends MessagePanel {
 
     public void setMessage(String message, Color color) {
         clear();
-        
+
         this.message = message;
         textArea.setForeground(color);
         textArea.setText(message);

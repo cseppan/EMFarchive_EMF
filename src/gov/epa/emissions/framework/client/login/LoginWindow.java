@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.login;
 
-import gov.epa.emissions.commons.gui.DefaultButton;
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfConsolePresenter;
@@ -80,14 +80,14 @@ public class LoginWindow extends EmfFrame implements LoginView {
         layout.setVgap(15);
         container.setLayout(layout);
 
-        JButton signIn = new DefaultButton("Sign In", new AbstractAction() {
+        JButton signIn = new Button("Sign In", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doSignIn();
             }
         });
         container.add(signIn);
 
-        JButton cancel = new DefaultButton("Cancel", new AbstractAction() {
+        JButton cancel = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 close();
             }
@@ -161,7 +161,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
         panel.add(forgotPasswordPanel);
 
         JLabel register = new JLabel("<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Not yet registered ?</a></html>");
-        register.setName("RegisterUser");
+        register.setName("registerUser");
         register.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent arg0) {
                 try {

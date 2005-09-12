@@ -11,7 +11,6 @@ public class SingleLineMessagePanel extends MessagePanel {
     private String message;
 
     public SingleLineMessagePanel() {
-        super.setName("MessagePanel");
         label = new JLabel(" ");
         super.add(label);
 

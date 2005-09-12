@@ -50,7 +50,7 @@ public class UserTest extends TestCase {
             user.setPassword("password123");
             user.confirmPassword("password12345");
         } catch (UserException ex) {
-            assertEquals("Confirm Password does not match Password", ex.getMessage());
+            assertEquals("Confirm Password should match Password", ex.getMessage());
             return;
         }
 

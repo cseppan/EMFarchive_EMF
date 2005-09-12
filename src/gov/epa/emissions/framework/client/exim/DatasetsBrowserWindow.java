@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.commons.gui.DefaultButton;
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.io.EmfDataset;
@@ -117,14 +117,14 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
     private JPanel createControlPanel() {
         JPanel closePanel = new JPanel();
 
-        JButton exportButton = new DefaultButton("Export", new AbstractAction() {
+        JButton exportButton = new Button("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 exportSelectedDatasets();
             }
         });
         closePanel.add(exportButton);
 
-        JButton closeButton = new DefaultButton("Close", new AbstractAction() {
+        JButton closeButton = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 if (presenter != null) {
                     presenter.notifyClose();

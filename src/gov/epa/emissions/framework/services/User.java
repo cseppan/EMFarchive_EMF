@@ -186,7 +186,7 @@ public class User implements Serializable {
 
     public void confirmPassword(String confirmPassword) throws UserException {
         if (!password.equals(confirmPassword)) {
-            throw new UserException("Confirm Password does not match Password");
+            throw new UserException("Confirm Password should match Password");
         }
 
     }
