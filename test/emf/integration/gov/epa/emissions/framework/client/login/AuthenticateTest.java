@@ -22,7 +22,7 @@ public class AuthenticateTest extends TestCase {
 
     public void testShouldFailOnInvalidPassword() {
         try {
-            emfUserAdmin.authenticate("cdcruz", "password", false);
+            emfUserAdmin.authenticate("emf", "password", false);
         } catch (EmfException ex) {
             return;
         }

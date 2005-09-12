@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
+import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
@@ -127,6 +128,10 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
         JComboBox comboBox = findComboBox(window, comboBoxName);
         JComboBoxTester tester = new JComboBoxTester();
         tester.actionSelectItem(comboBox, value);
+    }
+
+    protected StatusWindow getStatusWindow(EmfConsole window) throws Exception {
+        return (StatusWindow) findInternalFrame(window, "status");
     }
 
 }

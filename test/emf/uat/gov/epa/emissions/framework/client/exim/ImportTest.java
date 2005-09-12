@@ -89,8 +89,8 @@ public class ImportTest extends UserAcceptanceTestCase {
         setTextfield(importWindow, "filename", filename);
 
         clickImport();
-
-        // TODO: assert ? use status messages ? direct db access ?
+        
+        //TODO: assert status messages
     }
 
     public void testShouldShowErrorMessageIfNameIsUnspecified() throws Exception {

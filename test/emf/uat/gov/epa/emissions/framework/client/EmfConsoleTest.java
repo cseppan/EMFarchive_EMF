@@ -47,7 +47,7 @@ public class EmfConsoleTest extends UserAcceptanceTestCase {
     }
 
     public void testShouldShowStatusOnLogin() throws Exception {
-        StatusWindow status = (StatusWindow) findInternalFrame(window, "status");
+        StatusWindow status = getStatusWindow(window);
         assertNotNull(status);
 
         JButton refreshButton = (JButton) findByName(status, "clear");

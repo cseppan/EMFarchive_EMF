@@ -109,6 +109,7 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
     private JScrollPane createTable() {
         statusTableModel = new StatusTableModel();
         JTable table = new JTable(statusTableModel);
+        table.setName("statusMessages");
         setColumnWidths(table.getColumnModel());
 
         JScrollPane scrollPane = new JScrollPane(table);
