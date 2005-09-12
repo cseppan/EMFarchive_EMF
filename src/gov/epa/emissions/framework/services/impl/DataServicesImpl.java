@@ -12,7 +12,6 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.EmfDataset;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDAO;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.User;
@@ -31,9 +30,9 @@ public class DataServicesImpl implements DataServices {
         super();
     }
 
-    public Dataset[] getDatasets() throws EmfException {
-//        Session session = HibernateUtils.currentSession();
-    	Session session = EMFHibernateUtil.getSession();
+    public Dataset[] getDatasets() {
+        // Session session = HibernateUtils.currentSession();
+        Session session = EMFHibernateUtil.getSession();
         List datasets = DatasetDAO.getDatasets(session);
         System.out.println("Total number of datasets in the List= " + datasets.size());
         session.flush();
@@ -41,14 +40,14 @@ public class DataServicesImpl implements DataServices {
         return (Dataset[]) datasets.toArray(new Dataset[datasets.size()]);
     }
 
-    public Dataset[] getDatasets(User user) throws EmfException {
+    public Dataset[] getDatasets(User user) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public void insertDataset(EmfDataset aDataset) throws EmfException {
-//      Session session = HibernateUtils.currentSession();
-    	Session session = EMFHibernateUtil.getSession();
+    public void insertDataset(EmfDataset aDataset) {
+        // Session session = HibernateUtils.currentSession();
+        Session session = EMFHibernateUtil.getSession();
         DatasetDAO.insertDataset(aDataset, session);
         session.flush();
         session.close();

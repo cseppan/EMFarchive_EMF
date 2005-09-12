@@ -7,7 +7,6 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Random;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -53,7 +52,7 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
         // TODO: verify status
     }
 
-    public void testExportOrlNonPoint() throws EmfException, IOException {
+    public void testExportOrlNonPoint() throws EmfException {
         DatasetType datasetType = new DatasetType();
         datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
         User user = userService.getUser("emf");

@@ -32,7 +32,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
 
     private ExportPresenter presenter;
 
-    public ExportWindow(EmfDataset[] datasets) throws EmfException {
+    public ExportWindow(EmfDataset[] datasets) {
         super("Export Dataset(s)");
         this.datasets = datasets;
 
@@ -54,7 +54,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         this.dispose();
     }
 
-    private JPanel createLayout() throws EmfException {
+    private JPanel createLayout() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -66,7 +66,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         return panel;
     }
 
-    private JPanel createExportPanel() throws EmfException {
+    private JPanel createExportPanel() {
         JPanel panel = new JPanel();
 
         JPanel labelsPanel = new JPanel();

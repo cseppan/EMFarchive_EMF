@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
@@ -16,6 +15,7 @@ public class UserServicesStub implements UserServices {
     }
 
     public void authenticate(String userName, String pwd, boolean wantAdminStatus) {
+        // TODO
     }
 
     public boolean resetPassword() {
@@ -35,30 +35,22 @@ public class UserServicesStub implements UserServices {
     }
 
     public void updateUser(User newUser) {
-    }
-
-    public String updateUsers(List users) {
-        return null;
+        // TODO
     }
 
     public void deleteUser(String userName) {
         for (Iterator iter = users.iterator(); iter.hasNext();) {
             User user = (User) iter.next();
-            if(user.getUserName().equals(userName)) {
+            if (user.getUserName().equals(userName)) {
                 users.remove(user);
                 break;
             }
-            
+
         }
     }
 
-
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.commons.EMFUserAdmin#updateUsers(gov.epa.emissions.framework.commons.User[])
-     */
-    public void updateUsers(User[] users) throws EmfException {
+    public void updateUsers(User[] users) {
         // TODO Auto-generated method stub
-        
     }
 
 }

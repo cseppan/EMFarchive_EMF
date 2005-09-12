@@ -30,7 +30,7 @@ public class UserTest extends TestCase {
         fail("should fail if Name is unspecified");
     }
 
-    public void testShouldFailIfUsernameIsLessThanThreeCharacters() throws UserException {
+    public void testShouldFailIfUsernameIsLessThanThreeCharacters() {
         assertInvalidUsername("a");
         assertInvalidUsername("ab");
         assertInvalidUsername("");
@@ -78,7 +78,7 @@ public class UserTest extends TestCase {
         fail("should fail if username is less than 3 characters");
     }
 
-    public void testShouldFailIfPasswordSizeIsLessThanEightCharacters() throws UserException {
+    public void testShouldFailIfPasswordSizeIsLessThanEightCharacters() {
         assertInvalidPasswordDueToSize("");
         assertInvalidPasswordDueToSize("a");
         assertInvalidPasswordDueToSize("1234567");
@@ -101,7 +101,7 @@ public class UserTest extends TestCase {
         user.setPassword("as12345678");
     }
 
-    public void testShouldFailIfPasswordDoesNotHaveAtleastOneNonAlphabeticCharacter() throws UserException {
+    public void testShouldFailIfPasswordDoesNotHaveAtleastOneNonAlphabeticCharacter() {
         assertPasswordInvalidOnContentRulesFailure("abcdefgh");
         assertPasswordInvalidOnContentRulesFailure("12asd454564");
     }
@@ -120,7 +120,7 @@ public class UserTest extends TestCase {
         fail("should fail if password matches username");
     }
 
-    public void testShouldFailIfUsernameIsUnspecified() throws UserException {
+    public void testShouldFailIfUsernameIsUnspecified() {
         User user = new User();
 
         try {
@@ -147,7 +147,7 @@ public class UserTest extends TestCase {
         fail("should fail if password matches username");
     }
 
-    public void testShouldFailIfUsernameMatchesPasswordOnConstruction() throws UserException {
+    public void testShouldFailIfUsernameMatchesPasswordOnConstruction() {
         try {
             new User("SdfsdfSD", "abd", "123", "a@a.org", "abcd1234", "abcd1234", false, false);
         } catch (UserException ex) {

@@ -27,9 +27,9 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Conrad F. D'Cruz
- *
- *	This class implements the methods specified in the StatusServices interface
- *
+ * 
+ * This class implements the methods specified in the StatusServices interface
+ * 
  */
 public class StatusServicesTransport implements StatusServices {
     private static Log log = LogFactory.getLog(StatusServicesTransport.class);
@@ -45,125 +45,130 @@ public class StatusServicesTransport implements StatusServices {
 
     public StatusServicesTransport(String endpt) {
         super();
-        endpoint=endpt;
+        endpoint = endpt;
     }
-    
-    
+
     /**
      * 
      * This utility method extracts the significat message from the Axis Fault
+     * 
      * @param faultReason
      * @return
      */
     private String extractMessage(String faultReason) {
-    	log.debug("Utility method extracting Axis fault reason");
+        log.debug("Utility method extracting Axis fault reason");
         String message = faultReason.substring(faultReason.indexOf("Exception: ") + 11);
-        if (message.equals("Connection refused: connect")){
+        if (message.equals("Connection refused: connect")) {
             message = "Cannot communicate with EMF Server";
         }
-        
-    	log.debug("Utility method extracting Axis fault reason");
+
+        log.debug("Utility method extracting Axis fault reason");
         return message;
     }
-   
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see gov.epa.emissions.framework.commons.EMFStatus#getMessages(java.lang.String)
      */
     public Status[] getMessages(String userName) throws EmfException {
-    	log.debug("Getting all messages for user: " + userName);
-        Status[] allStats = null;;
-        
-        Service  service = new Service();
-        Call     call;
+        log.debug("Getting all messages for user: " + userName);
+        Status[] allStats = null;
+
+        Service service = new Service();
+        Call call;
 
         try {
             call = (Call) service.createCall();
-            call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            
-            QName qname1 = new QName("urn:gov.epa.emf.services.StatusServices","ns1:Status");
-            QName qname2 = new QName("urn:gov.epa.emf.services.StatusServices","ns1:AllStatus");
+            call.setTargetEndpointAddress(new java.net.URL(endpoint));
+
+            QName qname1 = new QName("urn:gov.epa.emf.services.StatusServices", "ns1:Status");
+            QName qname2 = new QName("urn:gov.epa.emf.services.StatusServices", "ns1:AllStatus");
             QName qname3 = new QName("urn:gov.epa.emf.services.StatusServices", "getMessages");
-            
+
             call.setOperationName(qname3);
-            
+
             Class cls1 = gov.epa.emissions.framework.services.Status.class;
             Class cls2 = gov.epa.emissions.framework.services.Status[].class;
-	          call.registerTypeMapping(cls1, qname1,
-					  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),        
-					  new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));        			  
-		          call.registerTypeMapping(cls2, qname2,
-						  new org.apache.axis.encoding.ser.ArraySerializerFactory(cls2, qname2),        
-						  new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname2));        			  
-		            call.addParameter("uname",
-                            org.apache.axis.Constants.XSD_STRING,
-                            javax.xml.rpc.ParameterMode.IN);
-		          
+            call.registerTypeMapping(cls1, qname1,
+                    new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),
+                    new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));
+            call.registerTypeMapping(cls2, qname2,
+                    new org.apache.axis.encoding.ser.ArraySerializerFactory(cls2, qname2),
+                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname2));
+            call.addParameter("uname", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+
             call.setReturnType(qname2);
-            
-            Object obj = call.invoke( new Object[] {userName} );
-                            
-            allStats = (Status[])obj;
-            
+
+            Object obj = call.invoke(new Object[] { userName });
+
+            allStats = (Status[]) obj;
+
         } catch (ServiceException e) {
-            log.error("Error invoking the service", e);            
+            log.error("Error invoking the service", e);
         } catch (MalformedURLException e) {
-            log.error("Error in format of URL string", e);            
-        } catch (AxisFault fault){
-            log.error("Axis fault", fault);            
-            throw new EmfException(extractMessage(fault.getMessage()));           
-        }catch (RemoteException e) {
+            log.error("Error in format of URL string", e);
+        } catch (AxisFault fault) {
+            log.error("Axis fault", fault);
+            throw new EmfException(extractMessage(fault.getMessage()));
+        } catch (RemoteException e) {
             System.out.println();
-            log.error("Error communicating with WS end point", e);            
+            log.error("Error communicating with WS end point", e);
         }
 
-    	log.debug("Getting all messages for user: " + userName);
+        log.debug("Getting all messages for user: " + userName);
         return allStats;
     }
 
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.commons.EMFStatus#getMessages(java.lang.String, java.lang.String)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see gov.epa.emissions.framework.commons.EMFStatus#getMessages(java.lang.String,
+     *      java.lang.String)
      */
-    public Status[] getMessages(String userName, String type) throws EmfException {
+    public Status[] getMessages(String userName, String type) {
         // FIXME: CONRAD Complete this method
         return null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see gov.epa.emissions.framework.commons.EMFStatus#setStatus(gov.epa.emissions.framework.commons.Status)
      */
     public void setStatus(Status status) throws EmfException {
-    	log.debug("Setting status for user:message " + status.getUserName() + " :: " + status.getMessage());
-    	Service  service = new Service();
-        Call     call;
-        
+        log.debug("Setting status for user:message " + status.getUserName() + " :: " + status.getMessage());
+        Service service = new Service();
+        Call call;
+
         try {
             call = (Call) service.createCall();
-            call.setTargetEndpointAddress( new java.net.URL(endpoint) );
-            
-            QName qname1 = new QName("urn:gov.epa.emf.services.StatusServices","ns1:Status");
+            call.setTargetEndpointAddress(new java.net.URL(endpoint));
+
+            QName qname1 = new QName("urn:gov.epa.emf.services.StatusServices", "ns1:Status");
             QName qname3 = new QName("urn:gov.epa.emf.services.StatusServices", "setStatus");
-            
+
             call.setOperationName(qname3);
-            
+
             Class cls1 = gov.epa.emissions.framework.services.Status.class;
-	        call.registerTypeMapping(cls1, qname1,
-					  new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),        
-					  new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));        			  
-		    call.addParameter( "status", qname1, ParameterMode.IN );
+            call.registerTypeMapping(cls1, qname1,
+                    new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),
+                    new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));
+            call.addParameter("status", qname1, ParameterMode.IN);
             call.setReturnType(qname3);
-            
-            call.invoke( new Object[] {status} );
+
+            call.invoke(new Object[] { status });
         } catch (ServiceException e) {
-            log.error("Error invoking the service",e);
+            log.error("Error invoking the service", e);
         } catch (MalformedURLException e) {
-            log.error("Error in format of URL string",e);
-        } catch (AxisFault fault){
-        	log.error("Axis Fault",fault);
-        	throw new EmfException(extractMessage(fault.getMessage()));           
-        }catch (RemoteException e) {
-            log.error("Error communicating with WS end point",e);
+            log.error("Error in format of URL string", e);
+        } catch (AxisFault fault) {
+            log.error("Axis Fault", fault);
+            throw new EmfException(extractMessage(fault.getMessage()));
+        } catch (RemoteException e) {
+            log.error("Error communicating with WS end point", e);
         }
-    	log.debug("Setting status for user:message " + status.getUserName() + " :: " + status.getMessage());        
+        log.debug("Setting status for user:message " + status.getUserName() + " :: " + status.getMessage());
     }
 
 }

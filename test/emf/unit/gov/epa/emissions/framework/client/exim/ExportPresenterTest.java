@@ -49,7 +49,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
         presenter.notifyExport(datasets, folder);
     }
 
-    public void testClosesViewOnDoneExport() throws EmfException {
+    public void testClosesViewOnDoneExport() {
         Mock view = mock(ExportView.class);
         view.expects(once()).method("close");
 
@@ -64,7 +64,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
         presenter.notifyDone();
     }
 
-    public void testShouldRegisterWithViewOnObserve() throws EmfException {
+    public void testShouldRegisterWithViewOnObserve() {
         Mock view = mock(ExportView.class);
 
         session.stubs().method("getUser").withNoArguments().will(returnValue(null));
@@ -75,7 +75,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
         ExportView viewProxy = (ExportView) view.proxy();
         view.expects(once()).method("register").with(eq(presenter));
         view.expects(once()).method("setMostRecentUsedFolder").with(eq(folder));
-        
+
         presenter.observe(viewProxy);
     }
 

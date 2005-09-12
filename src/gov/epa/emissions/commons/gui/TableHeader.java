@@ -8,7 +8,7 @@ public class TableHeader {
         this.columnNames = columnNames;
     }
 
-    public Class getColumnClass(int column) {
+    public Class getColumnClass(int column) {//All columns assumed to be of type - String
         return String.class;
     }
 

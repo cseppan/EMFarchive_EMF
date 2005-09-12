@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.EmfDataset;
-import gov.epa.emissions.framework.EmfException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,7 +16,7 @@ public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
 
     private EmfDataset dataset2;
 
-    protected void setUp() throws EmfException {
+    protected void setUp() {
         List datasetList = new ArrayList();
 
         dataset1 = new EmfDataset();
@@ -51,7 +50,7 @@ public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
         assertEquals("Creator", model.getColumnName(4));
     }
 
-    public void testShouldReturnRowsEqualingNumberOfDatasets() throws EmfException {
+    public void testShouldReturnRowsEqualingNumberOfDatasets() {
         assertEquals(2, model.getRowCount());
     }
 

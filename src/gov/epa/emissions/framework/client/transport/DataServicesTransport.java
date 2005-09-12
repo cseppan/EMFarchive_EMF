@@ -60,7 +60,6 @@ public class DataServicesTransport implements DataServices {
         // types
         // defined in the system
         Dataset[] datasets = null;
-        ;
 
         Service service = new Service();
         Call call;
@@ -86,7 +85,7 @@ public class DataServicesTransport implements DataServices {
                     new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname2));
 
             registerMappingForTable(call);
-            
+
             call.setReturnType(qname2);
 
             Object obj = call.invoke(new Object[] {});
@@ -112,7 +111,7 @@ public class DataServicesTransport implements DataServices {
      * 
      * @see gov.epa.emissions.framework.services.DataServices#getDatasets(gov.epa.emissions.framework.services.User)
      */
-    public Dataset[] getDatasets(User user) throws EmfException {
+    public Dataset[] getDatasets(User user) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -146,9 +145,7 @@ public class DataServicesTransport implements DataServices {
             call.addParameter("dataset", qname2, ParameterMode.IN);
 
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
-            EmfDataset anEmfDataset = (EmfDataset) aDataset;
-
-            call.invoke(new Object[] { anEmfDataset });
+            call.invoke(new Object[] { aDataset });
 
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);

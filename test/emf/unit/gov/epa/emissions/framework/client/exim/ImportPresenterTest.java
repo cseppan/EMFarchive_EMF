@@ -37,7 +37,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         presenter.notifyImport(dir, filename, dataset.getName(), type);
     }
 
-    public void testDuringImportRaisesExceptionOnBlankFilename() throws EmfException {
+    public void testDuringImportRaisesExceptionOnBlankFilename() {
         ImportPresenter presenter = new ImportPresenter(null, null, null);
 
         try {
@@ -50,7 +50,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         fail("should have raised an exception if a blank filename is provided");
     }
 
-    public void testDuringImportRaisesExceptionOnBlankDatasetName() throws EmfException {
+    public void testDuringImportRaisesExceptionOnBlankDatasetName() {
         ImportPresenter presenter = new ImportPresenter(null, null, null);
 
         try {
@@ -63,7 +63,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         fail("should have raised an exception if a blank filename is provided");
     }
 
-    public void testDuringImportRaisesExceptionOnBlankDirectory() throws EmfException {
+    public void testDuringImportRaisesExceptionOnBlankDirectory() {
         ImportPresenter presenter = new ImportPresenter(null, null, null);
 
         try {
@@ -76,7 +76,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         fail("should have raised an exception if a blank filename is provided");
     }
 
-    public void testClosesViewOnDoneImport() throws EmfException {
+    public void testClosesViewOnDoneImport() {
         Mock view = mock(ImportView.class);
         view.expects(once()).method("close");
 
@@ -85,7 +85,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         presenter.notifyDone();
     }
 
-    public void testShouldRegisterWithViewOnObserve() throws EmfException {
+    public void testShouldRegisterWithViewOnObserve() {
         Mock view = mock(ImportView.class);
 
         ImportPresenter presenter = new ImportPresenter(null, null, (ImportView) view.proxy());
@@ -94,7 +94,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         presenter.observe();
     }
 
-    public void testShouldClearMessagePanelOnEdit() throws EmfException {
+    public void testShouldClearMessagePanelOnEdit() {
         Mock view = mock(ImportView.class);
 
         ImportPresenter presenter = new ImportPresenter(null, null, (ImportView) view.proxy());

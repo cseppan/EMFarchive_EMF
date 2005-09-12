@@ -13,7 +13,6 @@ package gov.epa.emissions.framework.services.impl;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.exporter.Exporter;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
@@ -44,11 +43,10 @@ public class ExportTask implements Runnable {
      * @param user
      * @param file
      * @param dataset
-     * @param dataSvc
      * @param statusSvc
      * @param exporter
      */
-	public ExportTask(User user, File file, EmfDataset dataset, DataServices dataSvc, StatusServices statusSvc, Exporter exporter) {
+	protected ExportTask(User user, File file, EmfDataset dataset, StatusServices statusSvc, Exporter exporter) {
 		this.user=user;
 		this.file=file;
 		this.dataset=dataset;

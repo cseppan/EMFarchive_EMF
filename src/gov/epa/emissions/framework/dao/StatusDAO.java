@@ -8,7 +8,6 @@
  */
 package gov.epa.emissions.framework.dao;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Status;
 
 import java.util.ArrayList;
@@ -24,86 +23,87 @@ import org.hibernate.Transaction;
 
 /**
  * @author Conrad F. D'Cruz
- *
+ * 
  */
 public class StatusDAO {
     private static Log log = LogFactory.getLog(StatusDAO.class);
 
-    private static final String GET_STATUS_QUERY="select stat from Status as stat where stat.userName=:username";
-    private static final String GET_READ_STATUS_QUERY="select stat from Status as stat where stat.msgRead=true and stat.userName=:username";
+    private static final String GET_STATUS_QUERY = "select stat from Status as stat where stat.userName=:username";
 
-    //FIXME: Verify if exception needs to be thrown/caught here
-    public static List getMessages(String userName, Session session) throws EmfException{
+    private static final String GET_READ_STATUS_QUERY = "select stat from Status as stat where stat.msgRead=true and stat.userName=:username";
+
+    // FIXME: Verify if exception needs to be thrown/caught here
+    public static List getMessages(String userName, Session session) {
         log.debug("In getMessages");
         deleteMessages(userName, session);
         ArrayList allStatus = new ArrayList();
-        
+
         Transaction tx = session.beginTransaction();
-        
+
         Query query = session.createQuery(GET_STATUS_QUERY);
         query.setParameter("username", userName, Hibernate.STRING);
 
         Iterator iter = query.iterate();
-        while (iter.hasNext()){
-            Status aStatus = (Status)iter.next();
+        while (iter.hasNext()) {
+            Status aStatus = (Status) iter.next();
             aStatus.setMsgRead();
-            allStatus.add(aStatus);  
+            allStatus.add(aStatus);
         }
-        
+
         tx.commit();
         log.debug("End getMessages");
         return allStatus;
-    }//getMessages(uname)
-    
-    //FIXME: Verify if exception needs to be thrown/caught here
-    public static void insertStatusMessage(Status status, Session session){
-    	log.debug("StatusDAO: insertStatusMessage: " + status.getUserName()+ "\n" + session.toString());
+    }// getMessages(uname)
+
+    // FIXME: Verify if exception needs to be thrown/caught here
+    public static void insertStatusMessage(Status status, Session session) {
+        log.debug("StatusDAO: insertStatusMessage: " + status.getUserName() + "\n" + session.toString());
         Transaction tx = session.beginTransaction();
         log.debug("StatusDAO: insertStatusMessage before session.save");
         session.save(status);
         tx.commit();
         log.debug("StatusDAO: insertStatusMessage after session.save");
     }
-    
-    //FIXME: Verify if exception needs to be thrown/caught here
-    private static void deleteMessages(String userName, Session session){
-    	log.debug("In deleteMessages");
-              
+
+    // FIXME: Verify if exception needs to be thrown/caught here
+    private static void deleteMessages(String userName, Session session) {
+        log.debug("In deleteMessages");
+
         Query query = session.createQuery(GET_READ_STATUS_QUERY);
         query.setParameter("username", userName, Hibernate.STRING);
         Transaction tx = session.beginTransaction();
 
         Iterator iter = query.iterate();
-        while (iter.hasNext()){
-            Status aStatus = (Status)iter.next();
+        while (iter.hasNext()) {
+            Status aStatus = (Status) iter.next();
             session.delete(aStatus);
         }
         tx.commit();
         log.debug("End deleteMessages");
-        
-    }//deleteMessages
 
-    //FIXME: Verify if exception needs to be thrown/caught here
-    //FIXME: CORRECT HIBERNATE QUERY FOR TYPE
-	public static List getMessages(String userName, String type, Session session) {
+    }// deleteMessages
+
+    // FIXME: Verify if exception needs to be thrown/caught here
+    // FIXME: CORRECT HIBERNATE QUERY FOR TYPE
+    public static List getMessages(String userName, String type, Session session) {
         log.debug("In getMessages");
         deleteMessages(userName, session);
         ArrayList allStatus = new ArrayList();
-        
+
         Transaction tx = session.beginTransaction();
-        
+
         Query query = session.createQuery(GET_STATUS_QUERY);
         query.setParameter("username", userName, Hibernate.STRING);
 
         Iterator iter = query.iterate();
-        while (iter.hasNext()){
-            Status aStatus = (Status)iter.next();
+        while (iter.hasNext()) {
+            Status aStatus = (Status) iter.next();
             aStatus.setMsgRead();
-            allStatus.add(aStatus);  
+            allStatus.add(aStatus);
         }
         tx.commit();
         log.debug("End getMessages");
         return allStatus;
-	}
+    }
 
-}//StatusDAO
+}// StatusDAO

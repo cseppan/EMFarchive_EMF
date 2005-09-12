@@ -7,10 +7,6 @@
 
 package gov.epa.emissions.framework.services;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
-
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.Table;
@@ -19,7 +15,10 @@ import gov.epa.emissions.commons.io.importer.ORLTableTypes;
 import gov.epa.emissions.commons.io.importer.TableType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
-import gov.epa.emissions.framework.services.ExImServices;
+
+import java.io.File;
+import java.util.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,9 +47,6 @@ public class ExportClient {
         } catch (EmfException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -61,18 +57,19 @@ public class ExportClient {
         log.debug("END CONSTRUCTOR");
     }
 
-    private void exportDataset() throws EmfException, IOException, InterruptedException {
+    private void exportDataset() throws EmfException, InterruptedException {
         DatasetType datasetType = new DatasetType();
         datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
         User user = userSvc.getUser("emf");
 
         System.out.println("$$$$$$$$$$$$$$$$ User object " + user.getUserName());
 
-//        File userDir = new File(System.getProperty("user.dir"));
-//        File file = new File(userDir, "test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt");
+        // File userDir = new File(System.getProperty("user.dir"));
+        // File file = new File(userDir,
+        // "test/commons/data/orl/nc/arinv.nonpoint.nti99_NC.txt");
         File userDir = new File(System.getProperty("user.dir"));
-        String pathToFile="test\\commons\\data\\orl\\nc";
-        File repository = new File(userDir,pathToFile);
+        String pathToFile = "test\\commons\\data\\orl\\nc";
+        File repository = new File(userDir, pathToFile);
 
         // EmfDataset dataset = new EmfDataset();
         EmfDataset dataset = createDataset(DatasetTypes.ORL_AREA_NONPOINT_TOXICS,
@@ -82,7 +79,7 @@ public class ExportClient {
         dataset.setName("ORL NonPoint Conrad");
         dataset.setDatasetType(datasetType.getName());
 
-//        eximSvc.startImport(user, file.getPath(), dataset, datasetType);
+        // eximSvc.startImport(user, file.getPath(), dataset, datasetType);
         eximSvc.startImport(user, repository.getAbsolutePath(), "arinv.nonpoint.nti99_NC.txt", dataset, datasetType);
 
         System.out.println(new Date());
@@ -93,7 +90,7 @@ public class ExportClient {
         }
         System.out.println(new Date());
         File fileOut = new File(System.getProperty("user.dir"), "/test/commons/data/orl/nc/output/orlnonpoint.txt");
-        eximSvc.startExport(user, new EmfDataset[]{dataset}, fileOut.getPath());
+        eximSvc.startExport(user, new EmfDataset[] { dataset }, fileOut.getPath());
         System.out.println("Export ended: " + fileOut.getPath());
     }
 

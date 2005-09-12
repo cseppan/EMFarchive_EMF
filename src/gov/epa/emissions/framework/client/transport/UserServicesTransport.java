@@ -278,7 +278,6 @@ public class UserServicesTransport implements UserServices {
     public User[] getUsers() {
         log.debug("Get users");
         User[] users = null;
-        ;
 
         Service service = new Service();
         Call call;

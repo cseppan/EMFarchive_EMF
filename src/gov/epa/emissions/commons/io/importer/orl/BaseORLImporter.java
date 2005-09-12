@@ -122,7 +122,7 @@ public class BaseORLImporter extends ListFormatImporter {
         importFile(files[0], datasource, type, overwrite);
 
         // perform post import changes
-        postImport(overwrite);
+        postImport();
     }
 
     /**
@@ -149,7 +149,7 @@ public class BaseORLImporter extends ListFormatImporter {
 
         // read the header commands
         initializeHeaders();
-        readHeader(file, reader);
+        readHeader(reader);
         checkHeaders(file.getAbsolutePath());
 
         // if able, go back to the file beginning
@@ -202,7 +202,7 @@ public class BaseORLImporter extends ListFormatImporter {
 
         // use the table type to get the table name
         String baseTableType = tableType.baseTypes()[0];
-        Table table = (Table) dataset.getTable(baseTableType);
+        Table table = dataset.getTable(baseTableType);
         String tableName = table.getTableName().trim();
         String qualifiedTableName = datasource.getName() + "." + tableName;
 
@@ -218,7 +218,7 @@ public class BaseORLImporter extends ListFormatImporter {
         }
         // else make sure table does not exist
         else if (tableDefinition.tableExists(qualifiedTableName)) {
-        	log.error("The table \"" + qualifiedTableName
+            log.error("The table \"" + qualifiedTableName
                     + "\" already exists. Please select 'overwrite tables if exist' or choose a new table name.");
             throw new Exception("The table \"" + qualifiedTableName
                     + "\" already exists. Please select 'overwrite tables if exist' or choose a new table name.");
@@ -297,7 +297,7 @@ public class BaseORLImporter extends ListFormatImporter {
         }
     }
 
-    private void readHeader(File file, BufferedReader reader) throws Exception {
+    private void readHeader(BufferedReader reader) throws Exception {
         String line = null;
 
         // read lines in one at a time and put the data into the database.
@@ -407,36 +407,6 @@ public class BaseORLImporter extends ListFormatImporter {
         }
     }// readHeaderLine(String, FileImportDetails)
 
-    protected void writeKickOutHeaders(PrintWriter writer) {
-        // #ORL
-        // #ORL NONPOINT
-        // #TOXICS
-        // #TOXICS NONPOINT
-        if (extendedFormat) {
-            writer.print(ORL_COMMAND);
-        } else {
-            writer.print(TOXICS_COMMAND);
-        }
-        if (dataset.getDatasetType().equals(DatasetTypes.ORL_AREA_NONPOINT_TOXICS)) {
-            writer.print(" " + TOXICS_NONPOINT);
-        }
-        writer.println();
-        // #TYPE fileType
-        writer.println(TYPE_COMMAND + " " + fileType);
-        // COUNTRY countryName
-        writer.println(COUNTRY_COMMAND + " " + dataset.getRegion());
-        // #YEAR dataYear
-        writer.println(YEAR_COMMAND + " " + dataset.getYear());
-        // #DESC description
-        String description = dataset.getDescription();
-        if (description != null && description.length() != 0) {
-            String[] descriptions = description.split("\\n");
-            for (int i = 0; i < descriptions.length; i++) {
-                writer.println(DESCRIPTION_COMMAND + " " + descriptions[i]);
-            }
-        }
-    }
-
     private void checkDatasetType(String datasetType, String fileType) throws Exception {
         String keyword = null;
         String fileTypeLowerCase = fileType.toLowerCase();
@@ -532,7 +502,7 @@ public class BaseORLImporter extends ListFormatImporter {
      * Perform post import operations on the data set most recently added into
      * the database.
      */
-    private void postImport(boolean overwrite) throws Exception {
+    private void postImport() throws Exception {
         Datasource emissionsDatasource = dbServer.getEmissionsDatasource();
         DataAcceptor emissionsAcceptor = emissionsDatasource.getDataAcceptor();
         // ORL table types
@@ -540,7 +510,7 @@ public class BaseORLImporter extends ListFormatImporter {
         TableType tableType = tableTypes.type(datasetType);
         // only one base type.
         // FIXME: why not have a ORLTableType that only has one base table ?
-        Table table = (Table) dataset.getTable(tableType.baseTypes()[0]);
+        Table table = dataset.getTable(tableType.baseTypes()[0]);
         String qualifiedTableName = emissionsDatasource.getName() + "." + table.getTableName();
 
         final String FIPS_NAME = modifyFipsColumn(emissionsDatasource, emissionsAcceptor, tableType, qualifiedTableName);

@@ -67,7 +67,7 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
 
         layout.setLayout(new BorderLayout());
 
-        layout.add(createTopPanel(layout), BorderLayout.NORTH);
+        layout.add(createTopPanel(), BorderLayout.NORTH);
         sortFilterPane = createSortFilterPane(parentConsole);
         layout.add(sortFilterPane, BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
@@ -82,7 +82,7 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
         return scrollPane;
     }
 
-    private JPanel createTopPanel(JPanel layout) {
+    private JPanel createTopPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
         messagePanel = new SingleLineMessagePanel();
@@ -179,7 +179,7 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
         this.setVisible(true);
     }
 
-    public void showExport(EmfDataset[] datasets, ExportPresenter exportPresenter) throws EmfException {
+    public void showExport(EmfDataset[] datasets, ExportPresenter exportPresenter) {
         ExportWindow exportView = new ExportWindow(datasets);
         exportPresenter.observe(exportView);
 

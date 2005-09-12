@@ -17,65 +17,65 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
-
 /**
  * @author adm$wkstn
- *
+ * 
  */
-public class UserServicesImpl implements UserServices{
-	private static Log log = LogFactory.getLog(UserServicesImpl.class);
+public class UserServicesImpl implements UserServices {
+    private static Log log = LogFactory.getLog(UserServicesImpl.class);
 
-	/**
-	 * 
-	 */
-	public UserServicesImpl() {
-		super();
-	}
+    /**
+     * 
+     */
+    public UserServicesImpl() {
+        super();
+    }
 
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#authenticate(java.lang.String, java.lang.String, boolean)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#authenticate(java.lang.String,
+     *      java.lang.String, boolean)
      */
     public void authenticate(String userName, String pwd, boolean wantAdminStatus) throws EmfException {
 
         log.debug("Called authenticate for username= " + userName + " want admin status? " + wantAdminStatus);
-       
+
         UserManagerDAO umDAO;
         try {
             umDAO = new UserManagerDAO();
             User emfUser = umDAO.getUser(userName);
-            if (emfUser == null){
+            if (emfUser == null) {
                 log.error("In the manager.  emfUser was NULL");
                 throw new AuthenticationException("Invalid username");
-            }//emfUser is null
-            else{
-             if (emfUser.isAcctDisabled()){
-            	 log.error("User data error: account disabled: " + userName);
-                 throw new AuthenticationException("Account Disabled");
-             }else{
-                 if (!emfUser.getPassword().equals(pwd)){
-                   log.debug("User data error: incorrect password " + userName);	 
-                   throw new AuthenticationException("Incorrect Password");
-                 }else{
-                     if (wantAdminStatus){
-                         if (!emfUser.isInAdminGroup()){
-                        	 log.debug("User data error: User not authorized to be admin " + userName);
-                             throw new AuthenticationException("Not authorized to log in as Administrator");
-                         }//user not in Admin group   
-                     }//want admin status
-                 }//pwd correct                
-             }//Acct not disabled
-            }//emfUser is not null
+            }// emfUser is null
+
+            if (emfUser.isAcctDisabled()) {
+                log.error("User data error: account disabled: " + userName);
+                throw new AuthenticationException("Account Disabled");
+            }
+            if (!emfUser.getPassword().equals(pwd)) {
+                log.debug("User data error: incorrect password " + userName);
+                throw new AuthenticationException("Incorrect Password");
+            }
+            if (wantAdminStatus) {
+                if (!emfUser.isInAdminGroup()) {
+                    log.debug("User data error: User not authorized to be admin " + userName);
+                    throw new AuthenticationException("Not authorized to log in as Administrator");
+                }// user not in Admin group
+            }// want admin status
         } catch (InfrastructureException ex) {
             log.error(ex);
             throw new EmfException(ex.getMessage());
-        } 
+        }
 
         log.debug("Called authenticate for username= " + userName + " want admin status? " + wantAdminStatus);
- 
-    }//authenticate
 
-    /* (non-Javadoc)
+    }// authenticate
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#resetPassword()
      */
     public boolean resetPassword() {
@@ -83,11 +83,13 @@ public class UserServicesImpl implements UserServices{
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#getUser(java.lang.String)
      */
     public User getUser(String userName) throws EmfException {
-    	log.debug("In get user " + userName);
+        log.debug("In get user " + userName);
         UserManagerDAO umDAO;
         User user = null;
         try {
@@ -96,33 +98,37 @@ public class UserServicesImpl implements UserServices{
         } catch (InfrastructureException ex) {
             log.error(ex);
             throw new EmfException(ex.getMessage());
-        } 
-    	log.debug("In get user " + userName);
+        }
+        log.debug("In get user " + userName);
         return user;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#createUser(gov.epa.emissions.framework.commons.User)
      */
     public void createUser(User newUser) throws EmfException {
-    	log.debug("In create new user: " + newUser.getUserName());
+        log.debug("In create new user: " + newUser.getUserName());
         UserManagerDAO umDAO;
         try {
             umDAO = new UserManagerDAO();
-            if (umDAO.isNewUser(newUser.getUserName())){
-                umDAO.insertUser(newUser);                
-            }else{
-            	log.error("User data error: Duplicate username: " + newUser.getUserName());
+            if (umDAO.isNewUser(newUser.getUserName())) {
+                umDAO.insertUser(newUser);
+            } else {
+                log.error("User data error: Duplicate username: " + newUser.getUserName());
                 throw new UserException("Duplicate username");
             }
         } catch (InfrastructureException ex) {
             log.error(ex);
             throw new EmfException(ex.getMessage());
-        } 
-        
+        }
+
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#updateUser(gov.epa.emissions.framework.commons.User)
      */
     public void updateUser(User newUser) throws EmfException {
@@ -135,10 +141,12 @@ public class UserServicesImpl implements UserServices{
             log.error(ex);
             throw new EmfException(ex.getMessage());
         }
-        log.debug("updating user info: " + newUser.getUserName());               
+        log.debug("updating user info: " + newUser.getUserName());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#deleteUser(java.lang.String)
      */
     public void deleteUser(String userName) throws EmfException {
@@ -148,34 +156,38 @@ public class UserServicesImpl implements UserServices{
             umDAO = new UserManagerDAO();
             umDAO.deleteUser(userName);
         } catch (InfrastructureException ex) {
-	        ex.printStackTrace();
-	        throw new EmfException(ex.getMessage());
+            ex.printStackTrace();
+            throw new EmfException(ex.getMessage());
         }
-        log.debug("Delete user "+ userName);          
+        log.debug("Delete user " + userName);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#getUsers()
      */
-    
+
     public User[] getUsers() throws EmfException {
-    	log.debug("get all users");
+        log.debug("get all users");
         User[] users = null;
-        
+
         UserManagerDAO umDAO;
         try {
             umDAO = new UserManagerDAO();
-            List allUsers = umDAO.getUsers();  
-            users = (User[]) allUsers.toArray(new User[allUsers.size()]); 	
+            List allUsers = umDAO.getUsers();
+            users = (User[]) allUsers.toArray(new User[allUsers.size()]);
         } catch (InfrastructureException ex) {
-	        log.error(ex);
-	        throw new EmfException(ex.getMessage());
+            log.error(ex);
+            throw new EmfException(ex.getMessage());
         }
         log.debug("get all users");
-        return users;        
+        return users;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see gov.epa.emissions.framework.commons.EMFUserAdmin#updateUsers(gov.epa.emissions.framework.commons.User[])
      */
     public void updateUsers(User[] users) throws EmfException {
@@ -183,15 +195,13 @@ public class UserServicesImpl implements UserServices{
         UserManagerDAO umDAO;
         try {
             umDAO = new UserManagerDAO();
-            umDAO.updateUsers(users);               	
+            umDAO.updateUsers(users);
         } catch (InfrastructureException ex) {
-	        log.error(ex);
-	        throw new EmfException(ex.getMessage());
+            log.error(ex);
+            throw new EmfException(ex.getMessage());
         }
         log.debug("End Update Users");
-       
-    }
-    
 
+    }
 
 }

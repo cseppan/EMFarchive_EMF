@@ -7,7 +7,6 @@ import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.ExImServices;
-import gov.epa.emissions.framework.services.User;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -42,7 +41,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
 
     private JTextField directory;
 
-    public ImportWindow(User user, ExImServices eximServices) throws EmfException {
+    public ImportWindow(ExImServices eximServices) throws EmfException {
         super("Import Dataset");
         this.eximServices = eximServices;
 
@@ -121,7 +120,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
                     presenter.notifyBeginInput();
             }
 
-            public void changedUpdate(DocumentEvent event) {
+            public void changedUpdate(DocumentEvent event) {// ignore
             }
         };
     }

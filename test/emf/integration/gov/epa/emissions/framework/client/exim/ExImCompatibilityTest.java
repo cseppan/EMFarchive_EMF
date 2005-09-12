@@ -13,27 +13,25 @@ public class ExImCompatibilityTest extends TestCase {
 
     public void testExportShouldMatchImportForValidFiles() throws Exception {
         String expectedMessage = "Status: success";
-        String outputFile = "good.results";
         String type = "ORLNonpoint";
         String importFile = "data\\imported-non-point.txt";
         String exportFile = "data\\exported-non-point.txt";
 
-        run(expectedMessage, outputFile, type, importFile, exportFile);
+        run(expectedMessage, type, importFile, exportFile);
     }
 
     public void FIXME_testExportShouldFailToMatchImportForUnmatchedData() throws Exception {
         String expectedMessage = "Status: failure";
-        String outputFile = "bad.results";
 
         String type = "ORLNonpoint";
         String importFile = "data\\imported-non-point.txt";
         String exportFile = "data\\BAD-exported-non-point.txt";
 
-        run(expectedMessage, outputFile, type, importFile, exportFile);
+        run(expectedMessage, type, importFile, exportFile);
     }
 
-    private void run(String expectedMessage, String outputFile, String type, String importFile, String exportFile)
-            throws IOException, InterruptedException {
+    private void run(String expectedMessage, String type, String importFile, String exportFile) throws IOException,
+            InterruptedException {
         String osName = System.getProperty("os.name");
         assertTrue("ExIm Compatibility Tests only run on Windows", osName.startsWith("Win"));
 

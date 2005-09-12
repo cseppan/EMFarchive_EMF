@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.services.User;
 
 public class NoOpPostRegisterStrategy implements PostRegisterStrategy {
 
-    public void execute(User user) {
+    public void execute(User user) {// No Op
     }
 
 }

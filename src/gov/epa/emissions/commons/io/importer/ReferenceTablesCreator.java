@@ -101,7 +101,7 @@ public class ReferenceTablesCreator {
     public void createStatesTable(Datasource datasource) throws Exception {
         int col_count = STATES_COL_COUNT;
         String qualifiedTableName = datasource.getName() + "." + STATES_TABLE;
-        
+
         String fileName = referenceFilesDir + "/" + ADD_REF_FILES_DIR + "/states.txt";
         File file = new File(fileName);
         FileReader fr = new FileReader(file);
@@ -181,10 +181,10 @@ public class ReferenceTablesCreator {
             String[] counties = line.split(",");
             if (counties.length > col_count) {
                 throw new Exception("The file is not in the expected format, line no=" + lineNo);
-            } else {
-                for (int i = 0; i < counties.length; i++) {
-                    data[i] = counties[i].trim();
-                }
+            }
+           
+            for (int i = 0; i < counties.length; i++) {
+                data[i] = counties[i].trim();
             }
             datasource.query().insertRow(qualifiedTableName, data, colTypes);
         }

@@ -115,6 +115,7 @@ public class SummaryTableCreator {
     // ORL columns
 
     private static final String CAS_COL = ORLDataFormat.CAS_NAME;
+
     private static final String ANNUAL_EMISSION_COL = ORLDataFormat.ANNUAL_EMISSIONS_NAME;
 
     private static final String AVERAGE_DAY_EMISSION_COL = ORLDataFormat.AVERAGE_DAY_EMISSIONS_NAME;
@@ -243,8 +244,8 @@ public class SummaryTableCreator {
         return dirtyStr.replace('-', '_');
     }
 
-    public void createPointSummaryTable(String datasourceName, String emTable, String epTable, String euTable,
-            String erTable, String summaryTable, boolean overwrite) throws Exception {
+    public void createPointSummaryTable(String emTable, String epTable, String euTable, String erTable,
+            String summaryTable, boolean overwrite) throws Exception {
         // TODO: prefix before invocation
         emTable = emissionsDatasource.getName() + "." + emTable;
         epTable = emissionsDatasource + "." + epTable;
@@ -307,8 +308,8 @@ public class SummaryTableCreator {
 
     // String)
 
-    public void createMobileEmissionsSummaryTable(String databaseName, String emTable, String peTable,
-            String summaryTable, boolean overwrite) throws SQLException {
+    public void createMobileEmissionsSummaryTable(String emTable, String peTable, String summaryTable,
+            boolean overwrite) throws SQLException {
         // TODO keithlee - test createMobileEmissionsSummaryTable()
         Query emissionsQuery = emissionsDatasource.query();
         ResultSet rs = emissionsQuery.executeQuery("SELECT DISTINCT(pollutant_code) FROM " + emTable);
@@ -413,7 +414,7 @@ public class SummaryTableCreator {
                 summarySelectDistinct = " SELECT DISTINCT f." + STATE_COL + " as " + STATE + ", " + "e." + FIPS_COL_ORL
                         + " as " + FIPS + ", e." + SCC_COL_ORL + " as " + SCC + ", ";
                 summaryFromSelectDistinct += "(SELECT DISTINCT " + FIPS_COL_ORL + ", " + SCC_COL_ORL + " FROM "
-                        + orlTable + " ) e ";                
+                        + orlTable + " ) e ";
             }
         } else if (datasetType.equals(DatasetTypes.ORL_POINT_TOXICS)) {
             // String createIndex = " (INDEX orl_key (" + FIPS + ", " + PLANTID
@@ -478,8 +479,9 @@ public class SummaryTableCreator {
             String[] tempTableJoinParts = new String[tempTableNames.length];
             java.util.Arrays.fill(tempTableSelectParts, "");
             java.util.Arrays.fill(tempTableJoinParts, "");
-            for (int index = 0, i = 0; index < pollutants.length; index++, i = (int) (index / MAX_POLLUTANTS_JOIN)) {
-                // when using number (CAS) as column name, suffix w/ underscore '_'
+            for (int index = 0, i = 0; index < pollutants.length; index++, i = (index / MAX_POLLUTANTS_JOIN)) {
+                // when using number (CAS) as column name, suffix w/ underscore
+                // '_'
                 String cleanPoll = "_" + pollutants[index].replace('-', '_');
                 tempTableSelectParts[i] += cleanPoll + "." + emissionCol + " as " + cleanPoll + ", ";
                 summaryTableSelectPart += "t" + i + "." + cleanPoll + " as " + cleanPoll + ", ";
@@ -535,7 +537,7 @@ public class SummaryTableCreator {
             for (int i = 0; i < numOfPollutants; i++) {
                 // when using number (CAS) as column name, enclose in slanted
                 // quotes
-                String cleanPoll = "_" + clean(pollutants[i]);                
+                String cleanPoll = "_" + clean(pollutants[i]);
                 summaryTableSelectPart += cleanPoll + "." + emissionCol + " as " + cleanPoll + ", ";
 
                 if (datasetType.equals(DatasetTypes.ORL_AREA_NONPOINT_TOXICS)

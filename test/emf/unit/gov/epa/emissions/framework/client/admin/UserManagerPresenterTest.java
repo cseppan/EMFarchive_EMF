@@ -52,7 +52,7 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         fail("should not have allowed deletion of currently logged in user");
     }
 
-    public void testShouldNotDeleteAdminOnNotifyDelete() throws EmfException {
+    public void testShouldNotDeleteAdminOnNotifyDelete() {
         UserManagerPresenter presenter = new UserManagerPresenter(null, null, null);
 
         try {

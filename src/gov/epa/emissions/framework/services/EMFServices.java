@@ -10,10 +10,10 @@ package gov.epa.emissions.framework.services;
 
 /**
  * @author Conrad F. D'Cruz
- *
+ * 
  * A tagging interface to define all EMF Transport services
- *
+ * 
  */
-public interface EMFServices {
+public interface EMFServices {// i.e. a tagging interface
 
-}//EMFService
+}

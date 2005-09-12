@@ -56,7 +56,7 @@ public class StatusWindowLauncher {
         return (StatusServices) service.proxy();
     }
 
-    static private UserServices createUserServices(User user) throws EmfException {
+    static private UserServices createUserServices(User user) {
         List users = new ArrayList();
         users.add(user);
 

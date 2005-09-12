@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlTypeMapper;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 
 //Note: Emissions & Reference are two schemas in a single database i.e. share a connection
 public class PostgresDbServer implements DbServer {
@@ -16,8 +15,7 @@ public class PostgresDbServer implements DbServer {
 
     private Datasource referenceDatasource;
 
-    public PostgresDbServer(Connection connection, String referenceDatasourceName, String emissionsDatasourceName)
-            throws SQLException {
+    public PostgresDbServer(Connection connection, String referenceDatasourceName, String emissionsDatasourceName) {
         this.typeMapper = new PostgresSqlTypeMapper();
 
         referenceDatasource = createDatasource(referenceDatasourceName, connection);

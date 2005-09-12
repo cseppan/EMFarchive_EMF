@@ -44,7 +44,7 @@ public class SortFilterSelectionPanel extends SortFilterTablePanel {
      * gov.epa.emissions.emisview.gui.SortFilterSelectionPanel So if you want to
      * use this constructor from some other class please refactor the
      * createPopupMenuAndToolBar()
-     *  
+     * 
      */
     public SortFilterSelectionPanel(Component parent, MultiRowHeaderTableModel model, boolean popupMenu, boolean sort,
             boolean filter, boolean format, boolean showHide, boolean reset) {
@@ -135,7 +135,7 @@ public class SortFilterSelectionPanel extends SortFilterTablePanel {
      */
     public Object[] getSelectedObjects(String colName) {
         int col = overallModel.findColumn(colName);
-        if (col < 1) //avoiding col =0 for the first col
+        if (col < 1) // avoiding col =0 for the first col
         {
             throw new IllegalArgumentException("The column name '" + colName + "' does not exist");
         }
@@ -147,12 +147,12 @@ public class SortFilterSelectionPanel extends SortFilterTablePanel {
             if (selected.booleanValue()) {
                 selList.add(overallModel.getValueAt(i, col));
             }
-        }//for(i)
+        }// for(i)
         if (selList.size() > 0) {
             return selList.toArray();
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -160,7 +160,7 @@ public class SortFilterSelectionPanel extends SortFilterTablePanel {
      */
     public String[] getSelectedStringObjects(String colName) {
         int col = overallModel.findColumn(colName);
-        if (col < 1) //avoiding col =0 for the first col
+        if (col < 1) // avoiding col =0 for the first col
         {
             throw new IllegalArgumentException("The column name '" + colName + "' does not exist");
         }
@@ -176,9 +176,9 @@ public class SortFilterSelectionPanel extends SortFilterTablePanel {
         if (selList.size() > 0) {
             String[] stringObjs = new String[selList.size()];
             return (String[]) selList.toArray(stringObjs);
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public void addSelectionListener(MouseListener m) {
@@ -191,15 +191,15 @@ public class SortFilterSelectionPanel extends SortFilterTablePanel {
      * An action to select all checkboxes in the checkbox col
      */
     protected class SelectAllAction extends AbstractAction {
-        SortFilterSelectionPanel parent = null;
+        SortFilterSelectionPanel parentRef = null;
 
         public SelectAllAction(SortFilterSelectionPanel parent) {
             super("All", selAllIcon);
-            this.parent = parent;
+            this.parentRef = parent;
         }
 
         public void actionPerformed(ActionEvent e) {
-            parent.selectAll(true);
+            parentRef.selectAll(true);
         }
     }
 
@@ -207,15 +207,15 @@ public class SortFilterSelectionPanel extends SortFilterTablePanel {
      * An action to clear all checkboxes in the checkbox col
      */
     protected class ClearAllAction extends AbstractAction {
-        SortFilterSelectionPanel parent = null;
+        SortFilterSelectionPanel parentRef = null;
 
         public ClearAllAction(SortFilterSelectionPanel parent) {
             super("Clear", clearAllIcon);
-            this.parent = parent;
+            this.parentRef = parent;
         }
 
         public void actionPerformed(ActionEvent e) {
-            parent.selectAll(false);
+            parentRef.selectAll(false);
         }
     }
 

@@ -85,7 +85,7 @@ public class MySqlTableDefinition implements TableDefinition {
         execute(ddlStatement);
     }
 
-    public void deleteTable(String tableName) throws SQLException {
+    public void deleteTable(String tableName) {
         try {
             execute("DROP TABLE IF EXISTS " + tableName);
         } catch (SQLException e) {

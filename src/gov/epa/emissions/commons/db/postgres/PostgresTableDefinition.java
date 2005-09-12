@@ -85,7 +85,7 @@ public class PostgresTableDefinition implements TableDefinition {
         execute(ddlStatement);
     }
 
-    public void deleteTable(String table) throws SQLException {
+    public void deleteTable(String table) {
         try {
             execute("DROP TABLE " + table);
         } catch (SQLException e) {

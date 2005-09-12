@@ -12,7 +12,7 @@ public class Table implements Serializable {
         this.tableType = tableType;
     }
 
-    public Table() {
+    public Table() {// Needed for Axis serialization i.e. transport-over-wire
     }
 
     public String getTableName() {

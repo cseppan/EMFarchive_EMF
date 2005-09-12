@@ -7,8 +7,8 @@
  * Author: Conrad F. D'Cruz
  */
 package gov.epa.emissions.framework.dao;
+
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.framework.EmfException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -22,39 +22,38 @@ import org.hibernate.Transaction;
 
 /**
  * @author Conrad F. D'Cruz
- *
+ * 
  */
 public class DatasetTypesDAO {
     private static Log log = LogFactory.getLog(DatasetTypesDAO.class);
 
-    private static final String GET_DATASETTYPE_QUERY="select dst from DatasetType as dst";
-    
-    public static List getDatasetTypes(Session session) throws EmfException{
+    private static final String GET_DATASETTYPE_QUERY = "select dst from DatasetType as dst";
+
+    public static List getDatasetTypes(Session session) {
         log.debug("In getMessages");
         ArrayList datasetTypes = new ArrayList();
-        
+
         Transaction tx = session.beginTransaction();
-        
+
         Query query = session.createQuery(GET_DATASETTYPE_QUERY);
 
         Iterator iter = query.iterate();
-        while (iter.hasNext()){
-            DatasetType aDst = (DatasetType)iter.next();
-            datasetTypes.add(aDst);  
+        while (iter.hasNext()) {
+            DatasetType aDst = (DatasetType) iter.next();
+            datasetTypes.add(aDst);
         }
-        
+
         tx.commit();
         log.debug("End getMessages");
         return datasetTypes;
-    }//getDatasetTypes()
-    
-    public static void insertDatasetType(DatasetType aDst, Session session){
-    	log.debug("inserting datatype into database");
+    }// getDatasetTypes()
+
+    public static void insertDatasetType(DatasetType aDst, Session session) {
+        log.debug("inserting datatype into database");
         Transaction tx = session.beginTransaction();
         session.save(aDst);
         tx.commit();
-    	log.debug("inserting datatype into database");
+        log.debug("inserting datatype into database");
     }
-    
 
 }

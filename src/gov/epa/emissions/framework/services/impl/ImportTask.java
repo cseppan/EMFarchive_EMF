@@ -68,7 +68,7 @@ public class ImportTask implements Runnable {
             importer.run(new File[] { file }, dataset, true);
 
             // if no errors then insert the dataset into the database
-            dataServices.insertDataset((EmfDataset) dataset);
+            dataServices.insertDataset(dataset);
 
             setStatus(EMFConstants.END_IMPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
         } catch (Exception e) {
@@ -89,7 +89,7 @@ public class ImportTask implements Runnable {
         String tablename = filename.substring(0, filename.length() - 4).replace('.', '_');
 
         dataset.setDatasetType(datasetType.getName());
-        
+
         ORLTableTypes tableTypes = new ORLTableTypes();
         TableType tableType = tableTypes.type(dataset.getDatasetType());
         dataset.addTable(new Table(tableType.baseTypes()[0], tablename));

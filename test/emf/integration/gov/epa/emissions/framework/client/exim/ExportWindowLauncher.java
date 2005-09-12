@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.EmfDataset;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.ExImServices;
@@ -21,7 +20,7 @@ import org.jmock.core.stub.ReturnStub;
 
 public class ExportWindowLauncher {
 
-    public static void main(String[] args) throws EmfException {
+    public static void main(String[] args) {
         Mock exim = new Mock(ExImServices.class);
         exim.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("startExport")).withAnyArguments();
 
@@ -35,7 +34,7 @@ public class ExportWindowLauncher {
 
         Mock servicesLocator = new Mock(ServiceLocator.class);
         exim.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getExImServices")).withAnyArguments().will(
-                new ReturnStub((ExImServices) exim.proxy()));
+                new ReturnStub(exim.proxy()));
 
         ExportPresenter presenter = new ExportPresenter(new EmfSession(user, (ServiceLocator) servicesLocator.proxy()));
 

@@ -137,7 +137,6 @@ public class ExImServicesTransport implements ExImServices {
         // types
         // defined in the system
         DatasetType[] datasetTypes = null;
-        ;
 
         Service service = new Service();
         Call call;

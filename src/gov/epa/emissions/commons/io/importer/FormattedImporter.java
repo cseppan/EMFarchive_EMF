@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.Dataset;
 
 import java.io.File;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,10 +28,6 @@ public abstract class FormattedImporter implements Importer {
     protected FormattedImporter(TableTypes tableTypes, DbServer dbServer) {
         this.tableTypes = tableTypes;
         this.dbServer = dbServer;
-    }
-
-    protected void writeKickOutHeaders(PrintWriter writer) {
-        /* DO NOTHING */
     }
 
     protected final File[] checkFiles(String datasetType, File[] files) throws Exception {

@@ -35,7 +35,7 @@ public class StatusPresenterTest extends MockObjectTestCase {
                 runnable.run();
             }
 
-            public void stop() {
+            public void stop() {// No Op
             }
         };
         presenter.start(runner);
@@ -61,7 +61,7 @@ public class StatusPresenterTest extends MockObjectTestCase {
                 runnable.run();
             }
 
-            public void stop() {
+            public void stop() {// No Op
             }
         };
         presenter.start(runner);

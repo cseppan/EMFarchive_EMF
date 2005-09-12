@@ -37,8 +37,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         EmfDataset[] datasets = new EmfDataset[0];
         Mock dataservices = mock(DataServices.class);
         dataservices.stubs().method("getDatasets").withNoArguments().will(returnValue(datasets));
-        serviceLocator.stubs().method("getDataServices").withNoArguments().will(
-                returnValue((DataServices) dataservices.proxy()));
+        serviceLocator.stubs().method("getDataServices").withNoArguments().will(returnValue(dataservices.proxy()));
         view.expects(once()).method("refresh").with(eq(datasets));
 
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(new EmfSession(null,

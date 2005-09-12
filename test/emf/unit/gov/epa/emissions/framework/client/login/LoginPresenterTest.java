@@ -15,15 +15,16 @@ public class LoginPresenterTest extends MockObjectTestCase {
         user.setPassword("joeymoey12");
 
         Mock userAdmin = mock(UserServices.class);
-        userAdmin.expects(once()).method("authenticate").with(eq(user.getUserName()), eq(user.getPassword()), eq(false));
+        userAdmin.expects(once()).method("authenticate")
+                .with(eq(user.getUserName()), eq(user.getPassword()), eq(false));
         userAdmin.expects(once()).method("getUser").with(eq(user.getUserName())).will(returnValue(user));
-        
+
         LoginPresenter presenter = new LoginPresenter((UserServices) userAdmin.proxy(), null);
 
         assertSame(user, presenter.notifyLogin("joey", "joeymoey12"));
     }
 
-    public void testShouldFailIfAuthenticateFailsOnNotifyLogin() throws EmfException {
+    public void testShouldFailIfAuthenticateFailsOnNotifyLogin() {
         Mock userAdmin = mock(UserServices.class);
         Throwable exception = new EmfException("authentication failure");
         userAdmin.expects(once()).method("authenticate").with(eq("username"), eq("password"), eq(false)).will(
@@ -41,7 +42,7 @@ public class LoginPresenterTest extends MockObjectTestCase {
         fail("should have raised an exception on authentication failure");
     }
 
-    public void testShouldCloseViewOnNotifyCancel() throws EmfException {
+    public void testShouldCloseViewOnNotifyCancel() {
         Mock view = mock(LoginView.class);
         view.expects(once()).method("close").withNoArguments();
 
@@ -56,7 +57,7 @@ public class LoginPresenterTest extends MockObjectTestCase {
         LoginPresenter presenter = new LoginPresenter(null, (LoginView) view.proxy());
         view.expects(once()).method("setObserver").with(eq(presenter));
 
-        presenter.observe();        
+        presenter.observe();
     }
 
 }

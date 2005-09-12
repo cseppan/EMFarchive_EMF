@@ -218,7 +218,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
     }
 
     private void displayRegisterUser() {
-        RegisterUserInternalFrame container = new RegisterUserInternalFrame(userAdmin, new NoOpPostRegisterStrategy());
+        RegisterUserInternalFrame container = new RegisterUserInternalFrame(new NoOpPostRegisterStrategy());
         RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, container.getView());
         presenter.observe();
 
