@@ -26,7 +26,7 @@ public class ImportPresenter {
         if (datasetName.length() == 0)
             throw new UserException("Dataset Name should be specified");
         if (directory.length() == 0)
-            throw new UserException("Directory should be specified");
+            throw new UserException("Folder should be specified");
 
         if (filename.length() == 0)
             throw new UserException("Filename should be specified");

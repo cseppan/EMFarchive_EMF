@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
+import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
@@ -9,6 +10,7 @@ import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import java.awt.Component;
 import java.awt.Container;
 
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JTextField;
@@ -18,7 +20,9 @@ import abbot.finder.Matcher;
 import abbot.finder.matchers.NameMatcher;
 import abbot.finder.matchers.WindowMatcher;
 import abbot.tester.ComponentTester;
+import abbot.tester.JComboBoxTester;
 
+//TODO: reorganize EMF-specific vs Abbot-specific methods
 public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
 
     protected RegisterUserWindow gotoRegisterNewUserScreen() throws Exception {
@@ -105,6 +109,24 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
                 return name.equals(internalFrame.getName());
             }
         });
+    }
+
+    protected JComboBox findComboBox(Container container, final String name) throws Exception {
+        return (JComboBox) getFinder().find(container, new Matcher() {
+            public boolean matches(Component component) {
+                if (!(component instanceof JComboBox))
+                    return false;
+    
+                JComboBox comboBox = (JComboBox) component;
+                return name.equals(comboBox.getName());
+            }
+        });
+    }
+
+    protected void selectComboBoxItem(ImportWindow window, String comboBoxName, String value) throws Exception {
+        JComboBox comboBox = findComboBox(window, comboBoxName);
+        JComboBoxTester tester = new JComboBoxTester();
+        tester.actionSelectItem(comboBox, value);
     }
 
 }

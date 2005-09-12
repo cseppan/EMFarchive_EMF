@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
@@ -39,11 +40,11 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
 
     private ExImServices eximServices;
 
-    private JTextField directory;
+    private JTextField folder;
 
     public ImportWindow(ExImServices eximServices) throws EmfException {
         super("Import Dataset");
-        super.setName("import");
+        super.setName("importWindow");
         this.eximServices = eximServices;
 
         setSize(new Dimension(600, 275));
@@ -85,19 +86,16 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         datasetTypesComboBox.setName("datasetTypes");
         valuesPanel.add(datasetTypesComboBox);
 
-        name = new JTextField(15);
-        name.setName("name");
+        name = new TextField("name", 15);
         valuesPanel.add(name);
 
-        directory = new JTextField(35);
-        directory.setName("Directory");
-        valuesPanel.add(directory);
+        folder = new TextField("folder", 35);
+        valuesPanel.add(folder);
 
-        filename = new JTextField(35);
-        filename.setName("filename");
+        filename = new TextField("filename", 35);
         valuesPanel.add(filename);
 
-        registerForEditEvents(name, directory, filename);
+        registerForEditEvents(name, folder, filename);
 
         panel.add(valuesPanel);
 
@@ -146,6 +144,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
             }
         });
         container.add(importButton);
+        getRootPane().setDefaultButton(importButton);
 
         JButton done = new Button("Done", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -178,7 +177,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
 
     private void doImport() {
         try {
-            presenter.notifyImport(directory.getText(), filename.getText(), name.getText(),
+            presenter.notifyImport(folder.getText(), filename.getText(), name.getText(),
                     (DatasetType) datasetTypesModel.getSelectedItem());
             String message = "Started import. Please monitor the Status window to track your Import request.";
             messagePanel.setMessage(message);

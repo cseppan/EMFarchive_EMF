@@ -74,7 +74,9 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
         JPanel container = new JPanel(new FlowLayout());
         messagePanel = new SingleLineMessagePanel();
         container.add(messagePanel);
-        container.add(createClearButton());
+        JButton clearButton = createClearButton();
+        getRootPane().setDefaultButton(clearButton);
+        container.add(clearButton);
 
         panel.add(container, BorderLayout.EAST);
 

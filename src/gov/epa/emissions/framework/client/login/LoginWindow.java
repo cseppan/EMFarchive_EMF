@@ -86,6 +86,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
             }
         });
         container.add(signIn);
+        getRootPane().setDefaultButton(signIn);
 
         JButton cancel = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {

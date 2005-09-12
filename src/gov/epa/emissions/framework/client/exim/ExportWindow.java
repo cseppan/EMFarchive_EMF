@@ -138,6 +138,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
             }
         });
         container.add(exportButton);
+        getRootPane().setDefaultButton(exportButton);
 
         JButton done = new Button("Done", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {

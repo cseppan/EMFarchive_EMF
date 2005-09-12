@@ -63,13 +63,13 @@ public class ImportPresenterTest extends MockObjectTestCase {
         fail("should have raised an exception if a blank filename is provided");
     }
 
-    public void testDuringImportRaisesExceptionOnBlankDirectory() {
+    public void testDuringImportRaisesExceptionOnBlankFolder() {
         ImportPresenter presenter = new ImportPresenter(null, null, null);
 
         try {
             presenter.notifyImport("", "file.txt", "dataset name", new DatasetType("ORL NonRoad"));
         } catch (EmfException e) {
-            assertEquals("Directory should be specified", e.getMessage());
+            assertEquals("Folder should be specified", e.getMessage());
             return;
         }
 
