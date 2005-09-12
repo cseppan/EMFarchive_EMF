@@ -1,6 +1,6 @@
 CREATE TABLE emf.users
 (
-  user_name varchar(15) NOT NULL,
+  user_name varchar(255) NOT NULL,
   user_pass varchar(15) NOT NULL,
   fullname varchar(255) NOT NULL,
   affiliation varchar(255) NOT NULL,
