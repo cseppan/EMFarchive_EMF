@@ -2,23 +2,20 @@ package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
-import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.JFrame;
 import javax.swing.JTextField;
 
-import junit.extensions.abbot.ComponentTestFixture;
 import abbot.finder.matchers.NameMatcher;
 import abbot.finder.matchers.WindowMatcher;
 import abbot.tester.ComponentTester;
 
-public class LoginTest extends ComponentTestFixture {
+public class LoginTest extends UserAcceptanceTestCase {
 
     private boolean isWindowClosed = false;
 
@@ -32,21 +29,14 @@ public class LoginTest extends ComponentTestFixture {
             }
         });
 
-        clickButton(window, "Cancel");
+        click(window, "Cancel");
 
         assertTrue(isWindowClosed);
-    }
-
-    private void clickButton(LoginWindow window, String button) throws Exception {
-        Component cancel = getFinder().find(window, new NameMatcher(button));
-        ComponentTester tester = new ComponentTester();
-        tester.actionClick(cancel);
     }
 
     public void testShouldShowEmfConsoleOnLogin() throws Exception {
         LoginWindow window = createLoginWindow();
         showWindow(window);
-        
 
         window.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent arg0) {
@@ -57,7 +47,7 @@ public class LoginTest extends ComponentTestFixture {
         setUsername(window, "emf");
         setPassword(window, "emf12345");
 
-        clickButton(window, "Sign In");
+        click(window, "Sign In");
 
         assertTrue(isWindowClosed);
 
@@ -124,20 +114,6 @@ public class LoginTest extends ComponentTestFixture {
 
         MessagePanel messagePanel = (MessagePanel) getFinder().find(window, new NameMatcher("MessagePanel"));
         assertEquals("Incorrect Password", messagePanel.getMessage());
-    }
-
-    private LoginWindow createLoginWindow() {
-        ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
-
-        LoginWindow window = new LoginWindow(serviceLocator);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        LoginPresenter presenter = new LoginPresenter(serviceLocator.getUserServices(), window);
-        presenter.observe();
-        
-        assertEquals("Login to EMF", window.getTitle());
-        
-        return window;
     }
 
 }
