@@ -10,11 +10,11 @@ import javax.swing.KeyStroke;
 
 public class Button extends JButton {
 
-    public Button(String name, final Action action) {
-        super(name);
-        super.setName(toCanonicalName(name));
+    public Button(String label, final Action action) {
+        super(label);
+        super.setName(toCanonicalName(label));
 
-        addActionForEnterKeyPress(name, action);
+        addActionForEnterKeyPress(label, action);
         super.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 action.actionPerformed(event);

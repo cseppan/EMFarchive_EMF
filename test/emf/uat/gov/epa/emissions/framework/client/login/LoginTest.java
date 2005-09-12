@@ -3,13 +3,8 @@ package gov.epa.emissions.framework.client.login;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
 
-import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
-import abbot.finder.matchers.NameMatcher;
-import abbot.finder.matchers.WindowMatcher;
-import abbot.tester.ComponentTester;
 
 public class LoginTest extends UserAcceptanceTestCase {
 
@@ -63,7 +58,7 @@ public class LoginTest extends UserAcceptanceTestCase {
 
         assertTrue(isWindowClosed);
 
-        RegisterUserWindow registerUser = (RegisterUserWindow) getFinder().find(new WindowMatcher("RegisterUser"));
+        RegisterUserWindow registerUser = (RegisterUserWindow) findWindow("RegisterUser");
         assertNotNull(registerUser);
         assertTrue(registerUser.isVisible());
     }
@@ -94,9 +89,7 @@ public class LoginTest extends UserAcceptanceTestCase {
         setUsername(window, "emf");
         setPassword(window, "invalid password");
 
-        Component signIn = getFinder().find(window, new NameMatcher("signIn"));
-        ComponentTester tester = new ComponentTester();
-        tester.actionClick(signIn);
+        click(window, "signIn");
 
         assertErrorMessage(window, "Incorrect Password");
     }

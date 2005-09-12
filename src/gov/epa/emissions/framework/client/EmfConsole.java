@@ -97,8 +97,10 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private JMenu createFileMenu() {
         JMenu menu = new JMenu("File");
+        menu.setName("file");
 
         JMenuItem importMenu = new JMenuItem("Import");
+        importMenu.setName("import");
         importMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {
@@ -113,6 +115,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         menu.addSeparator();
 
         JMenuItem logout = new JMenuItem("Logout");
+        logout.setName("logout");
         logout.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 logout();
@@ -121,6 +124,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         menu.add(logout);
 
         JMenuItem exit = new JMenuItem("Exit");
+        exit.setName("exit");
         exit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 // TODO: logout before exiting. Should prompt the user ?

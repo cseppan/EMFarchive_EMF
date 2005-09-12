@@ -43,6 +43,7 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
 
     public StatusWindow(User user, StatusServices statusServices, Container parent) {
         super("Status");
+        super.setName("status");
 
         position(parent);
         super.setContentPane(createLayout());
@@ -86,6 +87,7 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
         ImageIcon icon = new ImageIcon(url, "Clear Messages");
 
         JButton button = new JButton(icon);
+        button.setName("clear");
         button.setBorderPainted(false);
         button.setToolTipText("Clears the Status messages");
         button.setVerticalTextPosition(AbstractButton.BOTTOM);

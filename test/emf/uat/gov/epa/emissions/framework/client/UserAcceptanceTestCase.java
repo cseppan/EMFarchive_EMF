@@ -10,37 +10,31 @@ import java.awt.Component;
 import java.awt.Container;
 
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JTextField;
 
 import junit.extensions.abbot.ComponentTestFixture;
-import abbot.finder.ComponentNotFoundException;
-import abbot.finder.MultipleComponentsFoundException;
+import abbot.finder.Matcher;
 import abbot.finder.matchers.NameMatcher;
 import abbot.finder.matchers.WindowMatcher;
 import abbot.tester.ComponentTester;
 
 public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
 
-    protected void assertLoginIsShown() throws Exception {
-        LoginWindow login = (LoginWindow) getFinder().find(new WindowMatcher("Login"));
-        assertNotNull(login);
-        assertTrue(login.isVisible());
-    }
-
-    protected RegisterUserWindow gotoStart() throws Exception {
+    protected RegisterUserWindow gotoRegisterNewUserScreen() throws Exception {
         LoginWindow window = createLoginWindow();
         showWindow(window);
 
         click(window, "registerUser");
 
-        return (RegisterUserWindow) getFinder().find(new WindowMatcher("RegisterUser"));
+        return (RegisterUserWindow) findWindow("RegisterUser");
     }
 
     protected void click(Container window, String componentName) throws Exception {
-        Component registerLabel = getFinder().find(window, new NameMatcher(componentName));
+        Component component = findByName(window, componentName);
         ComponentTester tester = new ComponentTester();
 
-        tester.actionClick(registerLabel);
+        tester.actionClick(component);
     }
 
     protected LoginWindow createLoginWindow() {
@@ -58,19 +52,59 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
     }
 
     protected void setTextfield(Container window, String name, String value) throws Exception {
-        JTextField field = (JTextField) getFinder().find(window, new NameMatcher(name));
+        JTextField field = (JTextField) findByName(window, name);
         field.setText(value);
     }
 
     protected void assertErrorMessage(Container window, String errorMessage) throws Exception {
-        MessagePanel messagePanel = (MessagePanel) getFinder().find(window, new NameMatcher("messagePanel"));
+        MessagePanel messagePanel = (MessagePanel) findByName(window, "messagePanel");
         assertEquals(errorMessage, messagePanel.getMessage());
     }
 
-    protected void assertEmfConsoleShown() throws ComponentNotFoundException, MultipleComponentsFoundException {
-        EmfConsole console = (EmfConsole) getFinder().find(new WindowMatcher("EMF Console"));
+    protected Component findByName(Container window, String componentName) throws Exception {
+        return getFinder().find(window, new NameMatcher(componentName));
+    }
+
+    protected void assertEmfConsoleShown() throws Exception {
+        EmfConsole console = (EmfConsole) findWindow("EMF Console");
         assertNotNull(console);
         assertTrue(console.isVisible());
+    }
+
+    protected EmfConsole gotoConsole() throws Exception {
+        LoginWindow window = createLoginWindow();
+        showWindow(window);
+
+        setUsername(window, "emf");
+        setPassword(window, "emf12345");
+
+        click(window, "signIn");
+
+        return (EmfConsole) findWindow("EMF Console");
+    }
+
+    private void setPassword(LoginWindow window, String password) throws Exception {
+        setTextfield(window, "password", password);
+    }
+
+    private void setUsername(LoginWindow window, String username) throws Exception {
+        setTextfield(window, "username", username);
+    }
+
+    protected Component findWindow(String title) throws Exception {
+        return getFinder().find(new WindowMatcher(title));
+    }
+
+    protected JInternalFrame findInternalFrame(JFrame frame, final String name) throws Exception {
+        return (JInternalFrame) getFinder().find(frame, new Matcher() {
+            public boolean matches(Component component) {
+                if (!(component instanceof JInternalFrame))
+                    return false;
+
+                JInternalFrame internalFrame = (JInternalFrame) component;
+                return name.equals(internalFrame.getName());
+            }
+        });
     }
 
 }

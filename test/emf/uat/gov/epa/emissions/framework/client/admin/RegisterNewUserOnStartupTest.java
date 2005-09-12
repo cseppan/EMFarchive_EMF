@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
+import gov.epa.emissions.framework.client.login.LoginWindow;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -11,7 +12,7 @@ import abbot.tester.ComponentTester;
 public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
 
     public void testShouldShowRegisterUserOnSelectionOfRegisterNewUserOption() throws Exception {
-        RegisterUserWindow window = gotoStart();
+        RegisterUserWindow window = gotoRegisterNewUserScreen();
 
         assertNotNull(window);
         assertTrue(window.isVisible());
@@ -21,7 +22,7 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     private boolean isWindowClosed = false;
 
     public void testShouldShowLoginOnCancel() throws Exception {
-        RegisterUserWindow window = gotoStart();
+        RegisterUserWindow window = gotoRegisterNewUserScreen();
 
         window.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent arg0) {
@@ -36,8 +37,15 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
         assertLoginIsShown();
     }
 
+    protected void assertLoginIsShown() throws Exception {
+        LoginWindow login = (LoginWindow) findWindow("Login");
+        
+        assertNotNull(login);
+        assertTrue(login.isVisible());
+    }
+
     public void testShouldShowErrorsOnMissingName() throws Exception {
-        RegisterUserWindow window = gotoStart();
+        RegisterUserWindow window = gotoRegisterNewUserScreen();
 
         click(window, "ok");
 
@@ -45,7 +53,7 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     }
 
     public void testShouldShowErrorsOnMissingAffiliation() throws Exception {
-        RegisterUserWindow window = gotoStart();
+        RegisterUserWindow window = gotoRegisterNewUserScreen();
 
         setTextfield(window, "name", "A User");
 
@@ -55,7 +63,7 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     }
 
     public void testShouldShowErrorsOnMissingPhone() throws Exception {
-        RegisterUserWindow window = gotoStart();
+        RegisterUserWindow window = gotoRegisterNewUserScreen();
 
         setTextfield(window, "name", "A User");
         setTextfield(window, "affiliation", "User's affiliation");
@@ -66,7 +74,7 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     }
 
     public void testShouldShowErrorsOnMissingEmail() throws Exception {
-        RegisterUserWindow window = gotoStart();
+        RegisterUserWindow window = gotoRegisterNewUserScreen();
 
         setTextfield(window, "name", "A User");
         setTextfield(window, "affiliation", "User's affiliation");
@@ -78,7 +86,7 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     }
 
     public void testShouldShowErrorsOnMissingUsername() throws Exception {
-        RegisterUserWindow window = gotoStart();
+        RegisterUserWindow window = gotoRegisterNewUserScreen();
 
         setTextfield(window, "name", "A User");
         setTextfield(window, "affiliation", "User's affiliation");
@@ -91,7 +99,7 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     }
 
     public void testShouldShowErrorsOnInvalidUsername() throws Exception {
-        RegisterUserWindow window = gotoStart();
+        RegisterUserWindow window = gotoRegisterNewUserScreen();
 
         setTextfield(window, "name", "A User");
         setTextfield(window, "affiliation", "User's affiliation");
@@ -105,7 +113,7 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     }
 
     public void testShouldShowErrorsOnMissingPassword() throws Exception {
-        RegisterUserWindow window = gotoStart();
+        RegisterUserWindow window = gotoRegisterNewUserScreen();
 
         setTextfield(window, "name", "A User");
         setTextfield(window, "affiliation", "User's affiliation");
@@ -119,7 +127,7 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     }
 
     public void testShouldShowErrorsOnPasswordNotMatchingConfirmPassword() throws Exception {
-        RegisterUserWindow window = gotoStart();
+        RegisterUserWindow window = gotoRegisterNewUserScreen();
 
         setTextfield(window, "name", "A User");
         setTextfield(window, "affiliation", "User's affiliation");
@@ -134,7 +142,7 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     }
 
     public void testShouldShowEmfConsoleOnSuccessfulRegistration() throws Exception {
-        RegisterUserWindow window = gotoStart();
+        RegisterUserWindow window = gotoRegisterNewUserScreen();
 
         setTextfield(window, "name", "A User");
         setTextfield(window, "affiliation", "User's affiliation");
@@ -157,7 +165,7 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     }
 
     public void TODO_testShouldShowLoginOnWindowClose() throws Exception {
-        RegisterUserWindow window = gotoStart();
+        RegisterUserWindow window = gotoRegisterNewUserScreen();
 
         window.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent arg0) {

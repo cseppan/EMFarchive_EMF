@@ -43,6 +43,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
 
     public ImportWindow(ExImServices eximServices) throws EmfException {
         super("Import Dataset");
+        super.setName("import");
         this.eximServices = eximServices;
 
         setSize(new Dimension(600, 275));
@@ -81,6 +82,7 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
         datasetTypesModel = new DefaultComboBoxModel(eximServices.getDatasetTypes());
         JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
+        datasetTypesComboBox.setName("datasetTypes");
         valuesPanel.add(datasetTypesComboBox);
 
         name = new JTextField(15);
