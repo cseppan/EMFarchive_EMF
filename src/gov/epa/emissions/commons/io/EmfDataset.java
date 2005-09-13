@@ -207,6 +207,6 @@ public class EmfDataset implements Dataset {
 
         Dataset otherDataset = (Dataset) other;
 
-        return (name.equals(otherDataset.getName())) && (creator.equals(otherDataset.getCreator()));
+        return (name.equals(otherDataset.getName()));
     }
 }

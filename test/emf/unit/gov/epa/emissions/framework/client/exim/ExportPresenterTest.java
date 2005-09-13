@@ -32,7 +32,6 @@ public class ExportPresenterTest extends MockObjectTestCase {
         user.setFullName("full name");
 
         EmfDataset dataset = new EmfDataset();
-        dataset.setCreator(user.getFullName());
         dataset.setName("dataset test");
 
         EmfDataset[] datasets = new EmfDataset[] { dataset };

@@ -43,7 +43,6 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
         String filename = "arinv.nonpoint.nti99_NC.txt";
 
         EmfDataset dataset = new EmfDataset();
-        dataset.setCreator(user.getFullName());
         Random random = new Random();//FIXME: drop test data during setup
         dataset.setName("ORL NonPoint - Test" + random.nextInt());
 
@@ -63,7 +62,6 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
         String filename = "arinv.nonpoint.nti99_NC.txt";
 
         EmfDataset dataset = new EmfDataset();
-        dataset.setCreator(user.getFullName());
         Random random = new Random();//FIXME: drop test data during setup
         dataset.setName("ORL NonPoint - Test" + random.nextInt());
 

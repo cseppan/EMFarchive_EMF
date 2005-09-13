@@ -54,11 +54,9 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         EmfDataset dataset1 = new EmfDataset();
         dataset1.setName("name 1");
-        dataset1.setCreator("creator 1");
 
         EmfDataset dataset2 = new EmfDataset();
         dataset2.setName("name 2");
-        dataset2.setCreator("creator 2");
 
         EmfDataset[] datasets = new EmfDataset[] { dataset1, dataset2 };
 

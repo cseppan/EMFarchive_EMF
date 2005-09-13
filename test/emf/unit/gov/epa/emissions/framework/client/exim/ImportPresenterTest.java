@@ -22,7 +22,6 @@ public class ImportPresenterTest extends MockObjectTestCase {
 
         Dataset dataset = new EmfDataset();
         dataset.setName("dataset name");
-        dataset.setCreator(user.getFullName());
 
         String dir = "dir";
         String filename = "filename";
