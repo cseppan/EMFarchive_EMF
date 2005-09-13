@@ -2,26 +2,22 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.EmfDataset;
 
-public class SummaryTabPresenter {
+public class MetadataPresenter {
 
     private EmfDataset dataset;
 
-    private SummaryView view;
+    private MetadataView view;
 
-    public SummaryTabPresenter(EmfDataset dataset) {
+    public MetadataPresenter(EmfDataset dataset) {
         this.dataset = dataset;
-    }
-
-    public void observe(SummaryView view) {
-        this.view = view;
     }
 
     public void notifyDisplay() {
         view.display(dataset);
     }
 
-    public void notifyClose() {
-        view.close();
+    public void observe(MetadataView view) {
+        this.view = view;
     }
 
 }
