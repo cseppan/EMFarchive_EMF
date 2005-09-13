@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.io.EmfDataset;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.util.Date;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -17,6 +18,8 @@ public class MetadataWindowLauncher {
         dataset.setCreator("Jim Bowman");
         dataset.setDatasetType("ORL Non Point");
         dataset.setDescription("ORL data type...blah...blah...blah");
+        dataset.setStartDateTime(new Date());
+        dataset.setStopDateTime(new Date());
         
         MetadataWindow view = new MetadataWindow();
         MetadataPresenter presenter = new MetadataPresenter(dataset);
