@@ -12,12 +12,12 @@
     <property name="lib.dir" value="lib" />
     <property name="res.dir" value="res" />
 
-    <property name="test.emf.dir" value="test/emf" />
-    <property name="test.emf.unit.dir" value="${test.emf.dir}/unit" />
-    <property name="test.emf.integration.dir"
-              value="${test.emf.dir}/integration"
+    <property name="test.dir" value="test" />
+    <property name="test.unit.dir" value="${test.dir}/unit" />
+    <property name="test.integration.dir"
+              value="${test.dir}/integration"
     />
-    <property name="test.emf.uat.dir" value="${test.emf.dir}/uat" />
+    <property name="test.uat.dir" value="${test.dir}/uat" />
 
     <property name="build.home" value="build/sandbox" />
     <property name="web.dir" value="web" />
@@ -27,12 +27,12 @@
 
     <property name="reports.dir" value="${build.home}/reports" />
     <property name="reports.unittests.dir"
-              value="${reports.dir}/emf-unit-tests"
+              value="${reports.dir}/unit-tests"
     />
     <property name="reports.integrationtests.dir"
-              value="${reports.dir}/emf-integration-tests"
+              value="${reports.dir}/integration-tests"
     />
-    <property name="reports.uat.dir" value="${reports.dir}/emf-uat-tests" />
+    <property name="reports.uat.dir" value="${reports.dir}/uat-tests" />
 
     <property name="app.name" value="emf" />
     <property name="app.path" value="/${app.name}" />
@@ -109,18 +109,18 @@
         </copy>
     </target>
 
-    <target name="compile-emf-tests" depends="clean, init, compile-src">
-        <javac srcdir="${test.emf.unit.dir}"
+    <target name="compile-tests" depends="clean, init, compile-src">
+        <javac srcdir="${test.unit.dir}"
                destdir="${build.classes.dir}"
                classpathref="classpath"
                debug="on"
         />
-        <javac srcdir="${test.emf.integration.dir}"
+        <javac srcdir="${test.integration.dir}"
                destdir="${build.classes.dir}"
                classpathref="classpath"
                debug="on"
         />
-        <javac srcdir="${test.emf.uat.dir}"
+        <javac srcdir="${test.uat.dir}"
                destdir="${build.classes.dir}"
                classpathref="classpath"
                debug="on"
@@ -128,31 +128,31 @@
     </target>
 
     <target name="compile"
-            depends="clean, init, compile-src, compile-emf-tests"
+            depends="clean, init, compile-src, compile-tests"
     />
     <!--  ===============END  Basic ====================================== -->
 
 
     <!--  ===============START  Tests ====================================== -->
-    <target name="emf-unit-tests" depends="compile">
+    <target name="unit-tests" depends="compile">
         <junit printsummary="yes" haltonfailure="yes">
             <classpath refid="classpath" />
             <formatter type="xml" />
 
             <batchtest fork="yes" todir="${reports.unittests.dir}">
-                <fileset dir="${test.emf.unit.dir}">
+                <fileset dir="${test.unit.dir}">
                     <include name="**/*Test.java" />
                 </fileset>
             </batchtest>
         </junit>
     </target>
 
-    <target name="emf-integration-tests"
-            depends="compile, emf-local-webservices-tests, emf-remote-webservices-tests"
+    <target name="integration-tests"
+            depends="compile, local-webservices-tests, remote-webservices-tests"
             description="All Integration Tests"
     />
 
-    <target name="emf-local-webservices-tests"
+    <target name="local-webservices-tests"
             depends="compile"
             description="Integration of Client and Web Services"
     >
@@ -160,7 +160,7 @@
             <classpath refid="classpath" />
             <formatter type="xml" />
             <batchtest fork="yes" todir="${reports.integrationtests.dir}">
-                <fileset dir="${test.emf.integration.dir}">
+                <fileset dir="${test.integration.dir}">
                     <include name="**/emissions/framework/**/*Test.java" />
                     <exclude name="**/emissions/framework/**/Remote*Test.java"
                     />
@@ -169,7 +169,7 @@
         </junit>
     </target>
 
-    <target name="emf-remote-webservices-tests"
+    <target name="remote-webservices-tests"
             depends="compile"
             description="Integration of Client and Web Services"
     >
@@ -177,7 +177,7 @@
             <classpath refid="classpath" />
             <formatter type="xml" />
             <batchtest fork="yes" todir="${reports.integrationtests.dir}">
-                <fileset dir="${test.emf.integration.dir}">
+                <fileset dir="${test.integration.dir}">
                     <include name="**/emissions/framework/**/Remote*Test.java"
                     />
                     <exclude name="**/emissions/framework/**/Local*Test.java" />
@@ -186,13 +186,13 @@
         </junit>
     </target>
 
-    <target name="emf-uat-tests" depends="compile">
+    <target name="uat-tests" depends="compile">
         <junit printsummary="yes" haltonfailure="yes">
             <classpath refid="classpath" />
             <formatter type="xml" />
 
             <batchtest fork="yes" todir="${reports.uat.dir}">
-                <fileset dir="${test.emf.uat.dir}">
+                <fileset dir="${test.uat.dir}">
                     <include name="**/*Test.java" />
                 </fileset>
             </batchtest>
@@ -231,20 +231,20 @@
     </target>
 
     <!-- All tests -->
-    <target name="all-emf-tests"
-            depends="emf-unit-tests, emf-integration-tests, emf-uat-tests"
+    <target name="all-tests"
+            depends="unit-tests, integration-tests, uat-tests"
     />
     <target name="run-uat"
             description="Deploys application to Tomcat, runs all UAT tests, and stops Tomcat"
     >
         <antcall target="run-integration-tests">
-            <param name="tests-target" value="emf-uat-tests" />
+            <param name="tests-target" value="uat-tests" />
         </antcall>
     </target>
 
     <!-- Continuous Integration target -->
     <target name="ci-build"
-            depends="compile, all-emf-tests, app-dist"
+            depends="compile, all-tests, app-dist"
             description="Continuous Integration build"
     />
 
@@ -298,7 +298,7 @@
         <echo message="EMF update is complete." />
     </target>
 
-    <target name="pre-checkin" depends="cvs-update, compile, emf-unit-tests" />
+    <target name="pre-checkin" depends="cvs-update, compile, unit-tests" />
     <!--  ===============END CVS Targets ====================================== -->
 
 
@@ -416,7 +416,7 @@
             <formatter type="xml" />
 
             <batchtest fork="yes" todir="${reports.xml.dir}">
-                <fileset dir="${test.emf.unit.dir}">
+                <fileset dir="${test.unit.dir}">
                     <include name="**/*Test.java" />
                 </fileset>
             </batchtest>
