@@ -40,13 +40,13 @@ public class ImportTest extends UserAcceptanceTestCase {
         fail("should have closed the Import window on clicking Done");
     }
 
-    public void testShouldShowFourORLDatasetTypesAsOptions() throws Exception {
+    public void testShouldShowAtleastFourORLDatasetTypesAsOptions() throws Exception {
         JComboBox comboBox = findComboBox(importWindow, "datasetTypes");
 
         assertNotNull(comboBox);
 
         ListModel model = findComboBoxList(comboBox);
-        assertEquals(4, model.getSize());
+        assertTrue("Should have atleast 4 ORL types", model.getSize() >= 4);
     }
 
     public void testShouldImportORLNonRoad() throws Exception {

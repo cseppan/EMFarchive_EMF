@@ -15,6 +15,7 @@ import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.User;
 
 import java.net.MalformedURLException;
@@ -36,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DataServicesTransport implements DataServices {
     private static Log log = LogFactory.getLog(DataServicesTransport.class);
+    private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
     private String endpoint = "";
 
@@ -68,9 +70,9 @@ public class DataServicesTransport implements DataServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
-            QName qname1 = new QName("urn:gov.epa.emf.services.DataServices", "ns1:Dataset");
-            QName qname2 = new QName("urn:gov.epa.emf.services.DataServices", "ns1:Datasets");
-            QName qname3 = new QName("urn:gov.epa.emf.services.DataServices", "getDatasets");
+            QName qname1 = new QName(emfSvcsNamespace, "ns1:Dataset");
+            QName qname2 = new QName(emfSvcsNamespace, "ns1:Datasets");
+            QName qname3 = new QName(emfSvcsNamespace, "getDatasets");
 
             call.setOperationName(qname3);
 
@@ -129,8 +131,8 @@ public class DataServicesTransport implements DataServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
-            QName qname2 = new QName("urn:gov.epa.emf.services.DataServices", "ns1:EmfDataset");
-            QName qname3 = new QName("urn:gov.epa.emf.services.DataServices", "insertDataset");
+            QName qname2 = new QName(emfSvcsNamespace, "ns1:EmfDataset");
+            QName qname3 = new QName(emfSvcsNamespace, "insertDataset");
 
             call.setOperationName(qname3);
 
@@ -163,7 +165,7 @@ public class DataServicesTransport implements DataServices {
     }
 
     private void registerMappingForTable(Call call) {
-        QName tableQName = new QName("urn:gov.epa.emf.services.DataServices", "ns1:Table");
+        QName tableQName = new QName(emfSvcsNamespace, "ns1:Table");
         call.registerTypeMapping(Table.class, tableQName, new org.apache.axis.encoding.ser.BeanSerializerFactory(
                 Table.class, tableQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(Table.class,
                 tableQName));

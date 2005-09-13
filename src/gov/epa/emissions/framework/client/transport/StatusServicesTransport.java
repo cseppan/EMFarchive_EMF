@@ -9,6 +9,7 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
 
@@ -33,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class StatusServicesTransport implements StatusServices {
     private static Log log = LogFactory.getLog(StatusServicesTransport.class);
+    private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
     private static String endpoint = "";
 
@@ -82,9 +84,9 @@ public class StatusServicesTransport implements StatusServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
-            QName qname1 = new QName("urn:gov.epa.emf.services.StatusServices", "ns1:Status");
-            QName qname2 = new QName("urn:gov.epa.emf.services.StatusServices", "ns1:AllStatus");
-            QName qname3 = new QName("urn:gov.epa.emf.services.StatusServices", "getMessages");
+            QName qname1 = new QName(emfSvcsNamespace, "ns1:Status");
+            QName qname2 = new QName(emfSvcsNamespace, "ns1:AllStatus");
+            QName qname3 = new QName(emfSvcsNamespace, "getMessages");
 
             call.setOperationName(qname3);
 
@@ -145,8 +147,8 @@ public class StatusServicesTransport implements StatusServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
-            QName qname1 = new QName("urn:gov.epa.emf.services.StatusServices", "ns1:Status");
-            QName qname3 = new QName("urn:gov.epa.emf.services.StatusServices", "setStatus");
+            QName qname1 = new QName(emfSvcsNamespace, "ns1:Status");
+            QName qname3 = new QName(emfSvcsNamespace, "setStatus");
 
             call.setOperationName(qname3);
 

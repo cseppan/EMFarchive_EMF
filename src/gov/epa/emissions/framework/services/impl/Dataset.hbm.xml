@@ -4,27 +4,26 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping schema="emf">
-    <class name="gov.epa.emissions.commons.io.EmfDataset" table="datasets">
-        <id name="datasetid" type="long" column="dataset_id">
-            <generator class="identity"/>
-        </id>
-        <property column="name" length="128" name="name" not-null="true" type="java.lang.String"/>
-        <property column="creator" length="128" name="creator" not-null="true" type="java.lang.String"/>
-        <property column="datasettype" length="255" name="datasetType" not-null="true" type="java.lang.String"/>
-        <property column="units" length="128" name="units" not-null="false" type="java.lang.String"/>
-        <property column="region" length="255" name="region" not-null="false" type="java.lang.String"/>
-        <property column="year" length="128" name="year" not-null="false" type="integer"/>
-        <property column="country" length="255" name="country" not-null="false" type="java.lang.String"/>
-        <property column="temporal_resolution" length="255" name="temporalResolution" not-null="false"
-            type="java.lang.String"/>
-        <property column="start_date_time" length="4" name="startDateTime" not-null="false" type="java.util.Date"/>
-        <property column="stop_date_time" length="4" name="stopDateTime" not-null="false" type="java.util.Date"/>
-        <property column="description" length="255" name="description" not-null="false" type="java.lang.String"/>
+ <class name="gov.epa.emissions.commons.io.EmfDataset" table="datasets">
+  <id name="datasetid" type="long" column="dataset_id">
+   <generator class="identity"/>
+  </id>
+  <property name="name"					column="name"					type="java.lang.String"		not-null="true"/>
+  <property name="creator"				column="creator"				type="java.lang.String"		not-null="true"/>
+  <property name="datasetType"			column="datasettype"			type="java.lang.String"		not-null="true"/>
+  <property name="units"				column="units"					type="java.lang.String"		not-null="false"/>
+  <property name="region"				column="region"					type="java.lang.String"		not-null="false"/>
+  <property name="year"					column="year"					type="integer"				not-null="false"/>
+  <property name="country"				column="country"				type="java.lang.String"		not-null="false"/>
+  <property name="temporalResolution"	column="temporal_resolution"	type="java.lang.String"		not-null="false"/>
+  <property name="startDateTime"		column="start_date_time"   		type="java.util.Date"		not-null="false"	length="4"/>
+  <property name="stopDateTime"			column="stop_date_time" 		type="java.util.Date"		not-null="false"	length="4"/>
+  <property name="description"			column="description"			type="java.lang.String"		not-null="false"/>
         
-        <map name="tablesMap" table="DATASETTABLES" lazy="false">
-            <key column="DATASET_ID"/>
-            <index column="TABLE_TYPE" type="string"/>
-            <element column="TABLE_NAME" type="string"/>
-        </map>
-    </class>
+  <map name="tablesMap" table="DATASETTABLES" lazy="false">
+    <key column="DATASET_ID"/>
+    <index column="TABLE_TYPE" type="string"/>
+    <element column="TABLE_NAME" type="string"/>
+  </map>
+</class>
 </hibernate-mapping>

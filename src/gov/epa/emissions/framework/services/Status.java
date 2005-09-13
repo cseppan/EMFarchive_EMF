@@ -17,26 +17,14 @@ import java.util.Date;
  */
 public class Status implements Serializable{
 
-    private String statusid=null;
+    private long statusid;
     private String userName;
     private String messageType;
     private String message;
     private boolean msgRead=false;
     private Date timestamp = null;
 
-    /**
-     * @return Returns the statusid.
-     */
-    public String getStatusid() {
-        return statusid;
-    }
-    /**
-     * @param statusid The statusid to set.
-     */
-    public void setStatusid(String statusid) {
-        this.statusid = statusid;
-    }
-
+    
     /**
      * @return Returns the msgRead.
      */
@@ -135,4 +123,12 @@ public class Status implements Serializable{
     public String toString() {
         return "Message : " + message + " for user: " + userName;
     }
+
+	public long getStatusid() {
+		return statusid;
+	}
+
+	public void setStatusid(long statusid) {
+		this.statusid = statusid;
+	}
 }

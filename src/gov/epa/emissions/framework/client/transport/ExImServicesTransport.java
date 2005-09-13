@@ -11,6 +11,7 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
@@ -35,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ExImServicesTransport implements ExImServices {
     private static Log log = LogFactory.getLog(ExImServicesTransport.class);
+    private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
     private static String endpoint = "";
 
@@ -85,11 +87,11 @@ public class ExImServicesTransport implements ExImServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
-            QName userQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:User");
-            QName datasetTypeQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:DatasetType");
-            QName datasetQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:EmfDataset");
-            QName operationQName = new QName("urn:gov.epa.emf.services.ExImServices", "startImport");
-            QName tableQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:Table");
+            QName userQName = new QName(emfSvcsNamespace, "ns1:User");
+            QName datasetTypeQName = new QName(emfSvcsNamespace, "ns1:DatasetType");
+            QName datasetQName = new QName(emfSvcsNamespace, "ns1:EmfDataset");
+            QName operationQName = new QName(emfSvcsNamespace, "startImport");
+            QName tableQName = new QName(emfSvcsNamespace, "ns1:Table");
 
             call.setOperationName(operationQName);
 
@@ -145,9 +147,9 @@ public class ExImServicesTransport implements ExImServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
-            QName qname1 = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:DatasetType");
-            QName qname2 = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:DatasetTypes");
-            QName qname3 = new QName("urn:gov.epa.emf.services.ExImServices", "getDatasetTypes");
+            QName qname1 = new QName(emfSvcsNamespace, "ns1:DatasetType");
+            QName qname2 = new QName(emfSvcsNamespace, "ns1:DatasetTypes");
+            QName qname3 = new QName(emfSvcsNamespace, "getDatasetTypes");
 
             call.setOperationName(qname3);
 
@@ -194,8 +196,8 @@ public class ExImServicesTransport implements ExImServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
-            QName qname2 = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:DatasetType");
-            QName qname3 = new QName("urn:gov.epa.emf.services.ExImServices", "insertDatasetType");
+            QName qname2 = new QName(emfSvcsNamespace, "ns1:DatasetType");
+            QName qname3 = new QName(emfSvcsNamespace, "insertDatasetType");
 
             call.setOperationName(qname3);
 
@@ -235,11 +237,11 @@ public class ExImServicesTransport implements ExImServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
-            QName userQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:User");
-            QName datasetQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:EmfDataset");
-            QName datasetsQName = new QName("urn:gov.epa.services.EmfServices", "ns1:EmfDatasets");
-            QName operationQName = new QName("urn:gov.epa.emf.services.ExImServices", "startExport");
-            QName tableQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:Table");
+            QName userQName = new QName(emfSvcsNamespace, "ns1:User");
+            QName datasetQName = new QName(emfSvcsNamespace, "ns1:EmfDataset");
+            QName datasetsQName = new QName(emfSvcsNamespace, "ns1:EmfDatasets");
+            QName operationQName = new QName(emfSvcsNamespace, "startExport");
+            QName tableQName = new QName(emfSvcsNamespace, "ns1:Table");
 
             call.setOperationName(operationQName);
             registerMapping(call, userQName, gov.epa.emissions.framework.services.User.class);
@@ -284,10 +286,10 @@ public class ExImServicesTransport implements ExImServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
-            QName userQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:User");
-            QName datasetQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:EmfDataset");
-            QName operationQName = new QName("urn:gov.epa.emf.services.ExImServices", "startExport");
-            QName tableQName = new QName("urn:gov.epa.emf.services.ExImServices", "ns1:Table");
+            QName userQName = new QName(emfSvcsNamespace, "ns1:User");
+            QName datasetQName = new QName(emfSvcsNamespace, "ns1:EmfDataset");
+            QName operationQName = new QName(emfSvcsNamespace, "startExport");
+            QName tableQName = new QName(emfSvcsNamespace, "ns1:Table");
 
             call.setOperationName(operationQName);
 

@@ -8,7 +8,7 @@ public class DatasetType implements Serializable{
 	 * Generated serialVersionUID
 	 */
 	private static final long serialVersionUID = 4694789007596096797L;
-	private long id;
+	private long datasettypeid;
     private String name;
     private String description;
     private int minfiles;
@@ -47,14 +47,6 @@ public class DatasetType implements Serializable{
 		this.description = description;
 	}
 
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
 	public int getMaxfiles() {
 		return maxfiles;
 	}
@@ -78,4 +70,10 @@ public class DatasetType implements Serializable{
     public String toString() {
         return getName();
     }
+	public long getDatasettypeid() {
+		return datasettypeid;
+	}
+	public void setDatasettypeid(long datasettypeid) {
+		this.datasettypeid = datasettypeid;
+	}
 }

@@ -29,7 +29,7 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
 
     public void testFetchDatasetTypesReturnsFourORLTypes() throws EmfException {
         DatasetType[] datasetTypes = eximService.getDatasetTypes();
-        assertEquals(4, datasetTypes.length);
+        assertTrue("Should have atleast 4 ORL types", datasetTypes.length >= 4);
     }
 
     public void testImportOrlNonPoint() throws EmfException {

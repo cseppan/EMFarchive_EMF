@@ -30,51 +30,51 @@
   <parameter name="allowedMethods" value="*"/>
   <parameter name="scope" value="application"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.UserServicesImpl"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.emf.services.UserServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
  </service>
   <service name="gov.epa.emf.services.StatusServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
   <parameter name="scope" value="application"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.StatusServicesImpl"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.Status" qname="ns1:Status" xmlns:ns1="urn:gov.epa.emf.services.StatusServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.Status" qname="ns1:Status" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
  </service>
 
  <service name="gov.epa.emf.services.ExImServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
   <parameter name="scope" value="application"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.ExImServicesImpl"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.DatasetType" qname="ns1:DatasetType" xmlns:ns1="urn:gov.epa.emf.services.ExImServices"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.emf.services.ExImServices"/>  
-  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.emf.services.ExImServices"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Table" qname="ns1:Table" xmlns:ns1="urn:gov.epa.emf.services.ExImServices"/>  
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.DatasetType" qname="ns1:DatasetType" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Table" qname="ns1:Table" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
  </service>
 
  <service name="gov.epa.emf.services.DataServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
   <parameter name="scope" value="application"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.DataServicesImpl"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.emf.services.DataServices"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Dataset" qname="ns1:Dataset" xmlns:ns1="urn:gov.epa.emf.services.DataServices"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.emf.services.DataServices"/>  
-  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Table" qname="ns1:Table" xmlns:ns1="urn:gov.epa.emf.services.DataServices"/>  
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Dataset" qname="ns1:Dataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Table" qname="ns1:Table" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
  </service>
 
- <arrayMapping qname="ns1:Users" xmlns:ns1="urn:gov.epa.emf.services.UserServices"
+ <arrayMapping qname="ns1:Users" xmlns:ns1="urn:gov.epa.services.EmfServices"
              languageSpecificType="java:gov.epa.emissions.framework.services.User[]"
 			 innerType="ns1:User" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
 
- <arrayMapping qname="ns1:AllStatus" xmlns:ns1="urn:gov.epa.emf.services.StatusServices"
+ <arrayMapping qname="ns1:AllStatus" xmlns:ns1="urn:gov.epa.services.EmfServices"
              languageSpecificType="java:gov.epa.emissions.framework.services.Status[]"
 			 innerType="ns1:Status" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
 
- <arrayMapping qname="ns1:DatasetTypes" xmlns:ns1="urn:gov.epa.emf.services.ExImServices"
+ <arrayMapping qname="ns1:DatasetTypes" xmlns:ns1="urn:gov.epa.services.EmfServices"
              languageSpecificType="java:gov.epa.emissions.commons.io.DatasetType[]"
 			 innerType="ns1:DatasetType" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
 
- <arrayMapping qname="ns1:Datasets" xmlns:ns1="urn:gov.epa.emf.services.DataServices"
+ <arrayMapping qname="ns1:Datasets" xmlns:ns1="urn:gov.epa.services.EmfServices"
              languageSpecificType="java:gov.epa.emissions.commons.io.Dataset[]"
 			 innerType="ns1:Dataset" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>               
