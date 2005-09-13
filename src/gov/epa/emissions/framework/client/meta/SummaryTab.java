@@ -37,10 +37,10 @@ public class SummaryTab extends JPanel {
     }
 
     private void setLayout() {
-        super.add(createOverview());
+        super.add(createOverviewSection());
 
-        JPanel timespacePanel = createTimeSpacePanel();
-        JPanel statusPanel = createStatusPanel();
+        JPanel timespacePanel = createTimeSpaceSection();
+        JPanel statusPanel = createStatusSection();
 
         JPanel lowerPanel = new JPanel();
         lowerPanel.add(timespacePanel);
@@ -49,11 +49,44 @@ public class SummaryTab extends JPanel {
         super.add(lowerPanel);
     }
 
-    private JPanel createStatusPanel() {
-        return new JPanel();
+    private JPanel createStatusSection() {
+        JPanel panel = new JPanel();
+        panel.setBorder(createBorder());
+
+        // labels
+        JPanel labelsPanel = new JPanel();
+        labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
+
+        labelsPanel.add(new JLabel("Status"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
+        labelsPanel.add(new JLabel("Last Modified Date"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
+        labelsPanel.add(new JLabel("Last Accessed Date"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+
+        panel.add(labelsPanel);
+
+        // values
+        JPanel valuesPanel = new JPanel();
+        valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
+
+        JLabel status = new JLabel();
+        valuesPanel.add(status);
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+
+        JLabel lastModifiedDate = new JLabel();
+        valuesPanel.add(lastModifiedDate);
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+
+        JLabel lastAccessedDate = new JLabel();
+        valuesPanel.add(lastAccessedDate);
+
+        panel.add(valuesPanel);
+
+        return panel;
     }
 
-    private JPanel createTimeSpacePanel() {
+    private JPanel createTimeSpaceSection() {
         JPanel panel = new JPanel();
         panel.setBorder(createBorder());
 
@@ -77,13 +110,14 @@ public class SummaryTab extends JPanel {
         JPanel valuesPanel = new JPanel();
         valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
 
-        JLabel startDateTime = new JLabel("Start: "  + format(dataset.getStartDateTime()));
+        JLabel startDateTime = new JLabel("Start: " + format(dataset.getStartDateTime()));
         valuesPanel.add(startDateTime);
         JLabel endDateTime = new JLabel("End:   " + format(dataset.getStopDateTime()));
         valuesPanel.add(endDateTime);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
 
-        DefaultComboBoxModel temporalResolutionsModel = new DefaultComboBoxModel(new String[] {dataset.getTemporalResolution()});
+        DefaultComboBoxModel temporalResolutionsModel = new DefaultComboBoxModel(new String[] { dataset
+                .getTemporalResolution() });
         JComboBox temporalResolutions = new JComboBox(temporalResolutionsModel);
         temporalResolutions.setName("temporalResolutions");
         temporalResolutions.setPreferredSize(new Dimension(100, 20));
@@ -127,7 +161,7 @@ public class SummaryTab extends JPanel {
         return DATE_FORMATTER.format(date);
     }
 
-    private JPanel createOverview() {
+    private JPanel createOverviewSection() {
         JPanel panel = new JPanel();
         panel.setBorder(createBorder());
 
