@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.io.ColumnType;
 
 /**
  * @author Keith Lee, CEP UNC
- * @version $Id: ORLAreaDataFormat.java,v 1.3 2005/08/12 15:46:42 rhavaldar Exp $
+ * @version $Id: ORLAreaDataFormat.java,v 1.1 2005/09/13 21:18:58 rhavaldar Exp $
  */
 public abstract class ORLAreaDataFormat extends ORLDataFormat
 {

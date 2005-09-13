@@ -19,12 +19,6 @@
     />
     <property name="test.emf.uat.dir" value="${test.emf.dir}/uat" />
 
-    <property name="test.commons.dir" value="test/commons" />
-    <property name="test.commons.unit.dir" value="${test.commons.dir}/unit" />
-    <property name="test.commons.integration.dir"
-              value="${test.commons.dir}/integration"
-    />
-
     <property name="build.home" value="build/sandbox" />
     <property name="web.dir" value="web" />
     <property name="build.dist.dir" value="${build.home}/dist" />
@@ -133,22 +127,8 @@
         />
     </target>
 
-
-    <target name="compile-commons-tests" depends="clean, init, compile-src">
-        <javac srcdir="${test.commons.unit.dir}"
-               destdir="${build.classes.dir}"
-               classpathref="classpath"
-               debug="on"
-        />
-        <javac srcdir="${test.commons.integration.dir}"
-               destdir="${build.classes.dir}"
-               classpathref="classpath"
-               debug="on"
-        />
-    </target>
-
     <target name="compile"
-            depends="clean, init, compile-src, compile-emf-tests, compile-commons-tests"
+            depends="clean, init, compile-src, compile-emf-tests"
     />
     <!--  ===============END  Basic ====================================== -->
 
@@ -161,19 +141,6 @@
 
             <batchtest fork="yes" todir="${reports.unittests.dir}">
                 <fileset dir="${test.emf.unit.dir}">
-                    <include name="**/*Test.java" />
-                </fileset>
-            </batchtest>
-        </junit>
-    </target>
-
-    <target name="commons-unit-tests" depends="compile">
-        <junit printsummary="yes" haltonfailure="yes">
-            <classpath refid="classpath" />
-            <formatter type="xml" />
-
-            <batchtest fork="yes" todir="${reports.unittests.dir}">
-                <fileset dir="${test.commons.unit.dir}">
                     <include name="**/*Test.java" />
                 </fileset>
             </batchtest>
@@ -232,24 +199,7 @@
         </junit>
     </target>
 
-    <target name="commons-integration-tests"
-            depends="compile, setup-emissions-data"
-            description="All Integration Tests"
-    >
-        <junit printsummary="yes" haltonfailure="yes">
-            <classpath refid="classpath" />
-            <formatter type="xml" />
-            <batchtest fork="yes" todir="${reports.integrationtests.dir}">
-                <fileset dir="${test.commons.integration.dir}">
-                    <include name="**/*Test.java" />
-                    <exclude name="**/ReferenceImporterTest.java" />
-                    <exclude name="**/ReferenceTablesCreatorTest.java" />
-                    <exclude name="**/*ORLImporterTest.java" />
-                </fileset>
-            </batchtest>
-        </junit>
-    </target>
-
+    <!-- FIXME: anytime we have an update from Commons, we gotta run this target -->
     <target name="setup-emissions-data"
             depends="compile"
             description="Sets up Emissions and Reference schema"
@@ -284,13 +234,6 @@
     <target name="all-emf-tests"
             depends="emf-unit-tests, emf-integration-tests, emf-uat-tests"
     />
-    <target name="all-commons-tests"
-            depends="commons-unit-tests, commons-integration-tests"
-    />
-    <target name="all-tests" depends="all-commons-tests, all-emf-tests" />
-    <target name="all-unit-tests"
-            depends="emf-unit-tests, commons-unit-tests"
-    />
     <target name="run-uat"
             description="Deploys application to Tomcat, runs all UAT tests, and stops Tomcat"
     >
@@ -301,7 +244,7 @@
 
     <!-- Continuous Integration target -->
     <target name="ci-build"
-            depends="compile, all-unit-tests, app-dist"
+            depends="compile, all-emf-tests, app-dist"
             description="Continuous Integration build"
     />
 

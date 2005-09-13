@@ -6,7 +6,7 @@ import gov.epa.emissions.commons.db.DbServer;
  * This class contain elements to exporting common to all fixed format text files.
  * 
  * @author Keith Lee, CEP UNC
- * @version $Id: FixedFormatExporter.java,v 1.1 2005/08/23 20:28:27 rhavaldar Exp $
+ * @version $Id: FixedFormatExporter.java,v 1.1 2005/09/13 21:18:58 rhavaldar Exp $
  */
 public abstract class FixedFormatExporter implements Exporter
 {

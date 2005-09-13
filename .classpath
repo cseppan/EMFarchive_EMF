@@ -59,5 +59,6 @@
 	<classpathentry kind="lib" path="lib/dev/dbunit-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/dev/jmock/jmock-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/dev/jmock/jmock-cglib-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/emissions-commons-0.1.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

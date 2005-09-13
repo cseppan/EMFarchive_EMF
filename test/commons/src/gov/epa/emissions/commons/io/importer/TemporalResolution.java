@@ -4,7 +4,7 @@ package gov.epa.emissions.commons.io.importer;
  * Type-safe enums for fields (columns) of subsets
  * 
  * @author Craig Mattocks
- * @version $Id: TemporalResolution.java,v 1.2 2005/08/12 16:44:09 rhavaldar Exp $
+ * @version $Id: TemporalResolution.java,v 1.1 2005/09/13 21:18:58 rhavaldar Exp $
  */
 public final class TemporalResolution extends Enum {
     /**
