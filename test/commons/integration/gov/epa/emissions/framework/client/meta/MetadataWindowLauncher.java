@@ -9,12 +9,15 @@ import java.awt.Point;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 
-public class MetadataEditorLauncher {
+public class MetadataWindowLauncher {
 
     public static void main(String[] args) throws Exception {
         EmfDataset dataset = new EmfDataset();
         dataset.setName("Test Dataset");
-
+        dataset.setCreator("Jim Bowman");
+        dataset.setDatasetType("ORL Non Point");
+        dataset.setDescription("ORL data type...blah...blah...blah");
+        
         MetadataWindow view = new MetadataWindow();
         MetadataPresenter presenter = new MetadataPresenter(dataset);
         presenter.observe(view);
