@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.EmfDataset;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -38,31 +40,32 @@ public class SummaryTab extends JPanel {
 
     private void setLayout() {
         super.add(createOverviewSection());
+        super.add(createLowerSection());
+    }
 
-        JPanel timespacePanel = createTimeSpaceSection();
-        JPanel statusPanel = createStatusSection();
+    private JPanel createLowerSection() {
+        JPanel lowerPanel = new JPanel(new BorderLayout());
 
-        JPanel lowerPanel = new JPanel();
-        lowerPanel.add(timespacePanel);
-        lowerPanel.add(statusPanel);
+        lowerPanel.add(createTimeSpaceSection(), BorderLayout.LINE_START);
+        lowerPanel.add(createStatusSection(), BorderLayout.CENTER);
 
-        super.add(lowerPanel);
+        return lowerPanel;
     }
 
     private JPanel createStatusSection() {
         JPanel panel = new JPanel();
-        panel.setBorder(createBorder());
+        panel.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.GRAY));
 
         // labels
         JPanel labelsPanel = new JPanel();
         labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
 
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
         labelsPanel.add(new JLabel("Status"));
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
         labelsPanel.add(new JLabel("Last Modified Date"));
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
         labelsPanel.add(new JLabel("Last Accessed Date"));
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 10)));
 
         panel.add(labelsPanel);
 
@@ -70,25 +73,27 @@ public class SummaryTab extends JPanel {
         JPanel valuesPanel = new JPanel();
         valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
 
-        JLabel status = new JLabel();
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 15)));
+        JLabel status = new JLabel("<TBD>");
         valuesPanel.add(status);
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 13)));
 
-        JLabel lastModifiedDate = new JLabel();
+        JLabel lastModifiedDate = new JLabel("<TBD>");
         valuesPanel.add(lastModifiedDate);
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 17)));
 
-        JLabel lastAccessedDate = new JLabel();
+        JLabel lastAccessedDate = new JLabel("<TBD>");
         valuesPanel.add(lastAccessedDate);
 
         panel.add(valuesPanel);
+
+        // panel.add(createSubscriptionPanel());
 
         return panel;
     }
 
     private JPanel createTimeSpaceSection() {
         JPanel panel = new JPanel();
-        panel.setBorder(createBorder());
 
         // labels
         JPanel labelsPanel = new JPanel();

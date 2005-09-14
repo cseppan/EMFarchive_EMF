@@ -7,6 +7,8 @@ import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.meta.MetadataPresenter;
+import gov.epa.emissions.framework.client.meta.MetadataWindow;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.services.DataServices;
 
@@ -16,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -115,35 +118,64 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
     }
 
     private JPanel createControlPanel() {
-        JPanel closePanel = new JPanel();
+        JPanel controlPanel = new JPanel();
+        controlPanel.setLayout(new BorderLayout());
+        controlPanel.add(createRightControlPanel(), BorderLayout.LINE_END);
+        controlPanel.add(createLeftControlPanel(), BorderLayout.LINE_START);
+
+        return controlPanel;
+    }
+
+    private JPanel createLeftControlPanel() {
+        JPanel panel = new JPanel();
+
+        JButton metadata = new Button("Metadata", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                displayMetadata();
+            }
+        });
+        panel.add(metadata);
+
+        return panel;
+    }
+
+    private JPanel createRightControlPanel() {
+        JPanel panel = new JPanel();
 
         JButton exportButton = new Button("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 exportSelectedDatasets();
             }
         });
-        closePanel.add(exportButton);
+        panel.add(exportButton);
 
         JButton closeButton = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                if (presenter != null) {
-                    presenter.notifyClose();
-                }
+                presenter.notifyClose();
             }
         });
-        closePanel.add(closeButton);
+        panel.add(closeButton);
 
-        JPanel controlPanel = new JPanel();
-        controlPanel.setLayout(new BorderLayout());
-        controlPanel.add(closePanel, BorderLayout.EAST);
-
-        return controlPanel;
+        return panel;
     }
 
     protected void exportSelectedDatasets() {
+
+        // FIXME: notify the Presenter. Let it handle a no-select
+        // if (selected.length == 0)
+        // return;
+
+        List datasets = getSelectedDatasets();
+
+        try {
+            presenter.notifyExport((EmfDataset[]) datasets.toArray(new EmfDataset[0]));
+        } catch (EmfException e) {
+            showError(e.getMessage());
+        }
+    }
+
+    private List getSelectedDatasets() {
         int[] selected = selectModel.getSelectedIndexes();
-        if (selected.length == 0)
-            return;
 
         List datasets = new ArrayList();
         for (int i = 0; i < selected.length; i++) {
@@ -151,10 +183,21 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
             datasets.add(dataset);
         }
 
-        try {
-            presenter.notifyExport((EmfDataset[]) datasets.toArray(new EmfDataset[0]));
-        } catch (EmfException e) {
-            showError(e.getMessage());
+        return datasets;
+    }
+
+    protected void displayMetadata() {// FIXME: notify Presenter
+        List datasets = getSelectedDatasets();
+
+        for (Iterator iter = datasets.iterator(); iter.hasNext();) {
+            EmfDataset dataset = (EmfDataset) iter.next();
+
+            MetadataWindow view = new MetadataWindow();
+            MetadataPresenter presenter = new MetadataPresenter(dataset);
+            presenter.observe(view);
+
+            getDesktopPane().add(view);
+            presenter.notifyDisplay();
         }
     }
 
