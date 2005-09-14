@@ -7,16 +7,33 @@ import org.jmock.MockObjectTestCase;
 
 public class MetadataPresenterTest extends MockObjectTestCase {
 
-    public void testShouldDisplayViewOnNotifyDisplay() {
-        EmfDataset dataset = new EmfDataset();
+    private Mock view;
+
+    private MetadataPresenter presenter;
+
+    private EmfDataset dataset;
+
+    protected void setUp() {
+        dataset = new EmfDataset();
         dataset.setName("test");
 
-        Mock view = mock(MetadataView.class);
+        view = mock(MetadataView.class);
+        
+        presenter = new MetadataPresenter(dataset);
+        view.expects(once()).method("register").with(eq(presenter));
+        
+        presenter.observe((MetadataView) view.proxy());
+    }
+
+    public void testShouldDisplayViewOnNotifyDisplay() {
         view.expects(once()).method("display").with(eq(dataset));
 
-        MetadataPresenter presenter = new MetadataPresenter(dataset);
-        presenter.observe((MetadataView) view.proxy());
-
         presenter.notifyDisplay();
+    }
+
+    public void testShouldCloseViewOnNotifyClose() {
+        view.expects(once()).method("close");
+
+        presenter.notifyClose();
     }
 }

@@ -1,16 +1,21 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 
-import java.awt.Component;
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 public class MetadataWindow extends EmfInteralFrame implements MetadataView {
+
+    private MetadataPresenter presenter;
 
     public MetadataWindow() {
         super("Metadata Editor");
@@ -18,7 +23,7 @@ public class MetadataWindow extends EmfInteralFrame implements MetadataView {
         super.setSize(new Dimension(700, 425));
     }
 
-    private Component createLayout(EmfDataset dataset) {
+    private JTabbedPane createTabbedPane(EmfDataset dataset) {
         JTabbedPane tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Summary", new SummaryTab(dataset));
@@ -32,6 +37,7 @@ public class MetadataWindow extends EmfInteralFrame implements MetadataView {
         return tabbedPane;
     }
 
+    // TODO: other tabs
     private JPanel createTab() {
         JPanel panel = new JPanel(false);
 
@@ -42,9 +48,42 @@ public class MetadataWindow extends EmfInteralFrame implements MetadataView {
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 
-        contentPane.add(createLayout(dataset));
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(createTabbedPane(dataset), BorderLayout.CENTER);
+        panel.add(createBottomPanel(), BorderLayout.PAGE_END);
+
+        contentPane.add(panel);
 
         this.setVisible(true);
+    }
+
+    private JPanel createBottomPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(createButtonsPanel(), BorderLayout.LINE_END);
+
+        return panel;
+    }
+
+    private JPanel createButtonsPanel() {
+        Button close = new Button("close", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                presenter.notifyClose();
+            }
+        });
+        getRootPane().setDefaultButton(close);
+        
+        JPanel closePanel = new JPanel();
+        closePanel.add(close);
+        
+        return closePanel;
+    }
+
+    public void close() {
+        super.dispose();
+    }
+
+    public void register(MetadataPresenter presenter) {
+        this.presenter = presenter;
     }
 
 }

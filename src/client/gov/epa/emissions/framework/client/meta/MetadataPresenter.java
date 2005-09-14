@@ -18,6 +18,11 @@ public class MetadataPresenter {
 
     public void observe(MetadataView view) {
         this.view = view;
+        view.register(this);
+    }
+
+    public void notifyClose() {
+        view.close();
     }
 
 }
