@@ -9,14 +9,15 @@
     <property name="J2EE_HOME" value="${env.J2EE_HOME}" />
     <property name="JAVA_HOME" value="${env.JAVA_HOME}" />
     <property name="src.dir" value="src" />
+    <property name="src.client.dir" value="${src.dir}/client" />
+    <property name="src.contract.dir" value="${src.dir}/contract" />
+    <property name="src.services.dir" value="${src.dir}/services" />
     <property name="lib.dir" value="lib" />
     <property name="res.dir" value="res" />
 
     <property name="test.dir" value="test" />
     <property name="test.unit.dir" value="${test.dir}/unit" />
-    <property name="test.integration.dir"
-              value="${test.dir}/integration"
-    />
+    <property name="test.integration.dir" value="${test.dir}/integration" />
     <property name="test.uat.dir" value="${test.dir}/uat" />
 
     <property name="build.home" value="build/sandbox" />
@@ -26,9 +27,7 @@
     <property name="build.classes.dir" value="${build.web-inf.dir}/classes" />
 
     <property name="reports.dir" value="${build.home}/reports" />
-    <property name="reports.unittests.dir"
-              value="${reports.dir}/unit-tests"
-    />
+    <property name="reports.unittests.dir" value="${reports.dir}/unit-tests" />
     <property name="reports.integrationtests.dir"
               value="${reports.dir}/integration-tests"
     />
@@ -94,18 +93,36 @@
     </target>
 
     <target name="compile-src" depends="clean, init">
-        <javac srcdir="${src.dir}"
+        <antcall target="do-compile">
+            <param name="compile.src" value="${src.contract.dir}" />
+        </antcall>
+        <antcall target="do-compile">
+            <param name="compile.src" value="${src.client.dir}" />
+        </antcall>
+        <antcall target="do-compile">
+            <param name="compile.src" value="${src.services.dir}" />
+        </antcall>
+        <antcall target="copy-resources">
+            <param name="resources.root" value="${src.services.dir}" />
+        </antcall>
+        <copy todir="${build.classes.dir}">
+            <fileset dir="${res.dir}" includes="**/*" />
+        </copy>
+    </target>
+
+    <target name="do-compile">
+        <javac srcdir="${compile.src}"
                destdir="${build.classes.dir}"
                classpathref="classpath"
                debug="on"
         />
+    </target>
+
+    <target name="copy-resources">
         <copy todir="${build.classes.dir}">
-            <fileset dir="${src.dir}" includes="**/*.properties" />
-            <fileset dir="${src.dir}" includes="**/*.xml" />
-            <fileset dir="${src.dir}" includes="**/*.dtd" />
-        </copy>
-        <copy todir="${build.classes.dir}">
-            <fileset dir="${res.dir}" includes="**/*" />
+            <fileset dir="${resources.root}" includes="**/*.properties" />
+            <fileset dir="${resources.root}" includes="**/*.xml" />
+            <fileset dir="${resources.root}" includes="**/*.dtd" />
         </copy>
     </target>
 
@@ -127,9 +144,7 @@
         />
     </target>
 
-    <target name="compile"
-            depends="clean, init, compile-src, compile-tests"
-    />
+    <target name="compile" depends="clean, init, compile-src, compile-tests" />
     <!--  ===============END  Basic ====================================== -->
 
 
@@ -435,7 +450,15 @@
     </target>
 
     <target name="xml-coverage-report">
-        <cobertura-report srcdir="${src.dir}}"
+        <cobertura-report srcdir="${src.client.dir}}"
+                          destdir="${coverage.xml.dir}"
+                          format="xml"
+        />
+        <cobertura-report srcdir="${src.contract.dir}}"
+                          destdir="${coverage.xml.dir}"
+                          format="xml"
+        />
+        <cobertura-report srcdir="${src.services.dir}}"
                           destdir="${coverage.xml.dir}"
                           format="xml"
         />
@@ -443,7 +466,13 @@
 
     <target name="html-coverage-report">
         <cobertura-report destdir="${coverage.html.dir}">
-            <fileset dir="${src.dir}">
+            <fileset dir="${src.client.dir}">
+                <include name="**/*.java" />
+            </fileset>
+            <fileset dir="${src.contract.dir}">
+                <include name="**/*.java" />
+            </fileset>
+            <fileset dir="${src.services.dir}">
                 <include name="**/*.java" />
             </fileset>
         </cobertura-report>
