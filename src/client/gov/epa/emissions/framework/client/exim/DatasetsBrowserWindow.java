@@ -3,14 +3,13 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
-import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.client.meta.MetadataPresenter;
 import gov.epa.emissions.framework.client.meta.MetadataWindow;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -131,7 +130,7 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
 
         JButton metadata = new Button("Metadata", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                displayMetadata();
+                doShowMetadata();
             }
         });
         panel.add(metadata);
@@ -186,18 +185,14 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
         return datasets;
     }
 
-    protected void displayMetadata() {// FIXME: notify Presenter
+    protected void doShowMetadata() {
         List datasets = getSelectedDatasets();
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
-            EmfDataset dataset = (EmfDataset) iter.next();
-
             MetadataWindow view = new MetadataWindow();
-            MetadataPresenter presenter = new MetadataPresenter(dataset);
-            presenter.observe(view);
-
             getDesktopPane().add(view);
-            presenter.notifyDisplay();
+
+            presenter.notifyShowMetadata(view, (EmfDataset) iter.next());
         }
     }
 
@@ -239,4 +234,5 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
 
         this.refreshLayout();
     }
+
 }

@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.commons.io.EmfDataset;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.util.ArrayList;
 import java.util.Date;

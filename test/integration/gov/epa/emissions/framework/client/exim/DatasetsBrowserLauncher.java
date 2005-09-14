@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.Dataset;
-import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.Dimension;
 import java.awt.Point;

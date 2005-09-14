@@ -9,7 +9,6 @@
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ORLTableTypes;
@@ -17,6 +16,7 @@ import gov.epa.emissions.commons.io.importer.TableType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EMFConstants;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;

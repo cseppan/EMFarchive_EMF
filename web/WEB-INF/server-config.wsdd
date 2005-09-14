@@ -45,7 +45,7 @@
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.ExImServicesImpl"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.DatasetType" qname="ns1:DatasetType" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
-  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Table" qname="ns1:Table" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
  </service>
 
@@ -53,7 +53,7 @@
   <parameter name="allowedMethods" value="*"/>
   <parameter name="scope" value="application"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.DataServicesImpl"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Dataset" qname="ns1:Dataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Table" qname="ns1:Table" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
@@ -80,7 +80,7 @@
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>               
 
  <arrayMapping qname="ns1:EmfDatasets" xmlns:ns1="urn:gov.epa.services.EmfServices"
-             languageSpecificType="java:gov.epa.emissions.commons.io.EmfDataset[]"
+             languageSpecificType="java:gov.epa.emissions.framework.services.EmfDataset[]"
 			 innerType="ns1:EmfDataset" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
              

@@ -8,7 +8,6 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.commons.io.importer.DatasetTypes;
 import gov.epa.emissions.commons.io.importer.ORLTableTypes;

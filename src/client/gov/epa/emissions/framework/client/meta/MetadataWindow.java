@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -20,7 +20,7 @@ public class MetadataWindow extends EmfInteralFrame implements MetadataView {
     public MetadataWindow() {
         super("Metadata Editor");
 
-        super.setSize(new Dimension(700, 425));
+        super.setSize(new Dimension(700, 475));
     }
 
     private JTabbedPane createTabbedPane(EmfDataset dataset) {

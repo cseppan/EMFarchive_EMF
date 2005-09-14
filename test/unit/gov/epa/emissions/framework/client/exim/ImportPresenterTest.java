@@ -2,8 +2,8 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 

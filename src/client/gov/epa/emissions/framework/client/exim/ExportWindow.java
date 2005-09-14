@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

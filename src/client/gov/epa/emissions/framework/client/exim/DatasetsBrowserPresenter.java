@@ -1,9 +1,11 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.meta.MetadataPresenter;
+import gov.epa.emissions.framework.client.meta.MetadataView;
 import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 public class DatasetsBrowserPresenter {
 
@@ -33,6 +35,14 @@ public class DatasetsBrowserPresenter {
         DataServices dataServices = session.getDataServices();
         // FIXME: fix the type casting
         view.refresh((EmfDataset[]) dataServices.getDatasets());
+    }
+
+    // FIXME: change other presenters to follow this design
+    public void notifyShowMetadata(MetadataView metadataView, EmfDataset dataset) {
+        MetadataPresenter presenter = new MetadataPresenter(dataset);
+        presenter.observe(metadataView);
+
+        presenter.notifyDisplay();
     }
 
 }

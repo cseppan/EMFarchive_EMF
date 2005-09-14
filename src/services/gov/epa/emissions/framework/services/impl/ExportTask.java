@@ -10,10 +10,10 @@
 
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.exporter.Exporter;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EMFConstants;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;

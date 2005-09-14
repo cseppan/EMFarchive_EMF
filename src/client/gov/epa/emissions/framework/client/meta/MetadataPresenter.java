@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.commons.io.EmfDataset;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 public class MetadataPresenter {
 

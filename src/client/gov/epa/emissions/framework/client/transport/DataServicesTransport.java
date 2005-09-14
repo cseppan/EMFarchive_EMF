@@ -11,11 +11,11 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.io.Dataset;
-import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EMFConstants;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.User;
 
 import java.net.MalformedURLException;
@@ -37,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DataServicesTransport implements DataServices {
     private static Log log = LogFactory.getLog(DataServicesTransport.class);
+
     private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
     private String endpoint = "";
@@ -76,8 +77,8 @@ public class DataServicesTransport implements DataServices {
 
             call.setOperationName(qname3);
 
-            Class cls1 = gov.epa.emissions.commons.io.EmfDataset.class;
-            Class cls2 = gov.epa.emissions.commons.io.EmfDataset[].class;
+            Class cls1 = EmfDataset.class;
+            Class cls2 = EmfDataset[].class;
 
             call.registerTypeMapping(cls1, qname1,
                     new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),
@@ -136,11 +137,9 @@ public class DataServicesTransport implements DataServices {
 
             call.setOperationName(qname3);
 
-            Class cls2 = gov.epa.emissions.commons.io.EmfDataset.class;
-
-            call.registerTypeMapping(cls2, qname2,
-                    new org.apache.axis.encoding.ser.BeanSerializerFactory(cls2, qname2),
-                    new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls2, qname2));
+            call.registerTypeMapping(EmfDataset.class, qname2, new org.apache.axis.encoding.ser.BeanSerializerFactory(
+                    EmfDataset.class, qname2), new org.apache.axis.encoding.ser.BeanDeserializerFactory(
+                    EmfDataset.class, qname2));
 
             registerMappingForTable(call);
 

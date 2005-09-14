@@ -1,10 +1,12 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
-import gov.epa.emissions.commons.io.EmfDataset;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
@@ -61,11 +64,11 @@ public class SummaryTab extends JPanel {
         labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
 
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        labelsPanel.add(new JLabel("Status"));
+        labelsPanel.add(createRightAlignedLabel("Status"));
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        labelsPanel.add(new JLabel("Last Modified Date"));
+        labelsPanel.add(createRightAlignedLabel("Last Modified Date"));
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        labelsPanel.add(new JLabel("Last Accessed Date"));
+        labelsPanel.add(createRightAlignedLabel("Last Accessed Date"));
 
         panel.add(labelsPanel);
 
@@ -74,16 +77,13 @@ public class SummaryTab extends JPanel {
         valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
 
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        JLabel status = new JLabel("<TBD>");
-        valuesPanel.add(status);
+        valuesPanel.add(createRightAlignedLabel("<TBD>"));
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 13)));
 
-        JLabel lastModifiedDate = new JLabel("<TBD>");
-        valuesPanel.add(lastModifiedDate);
+        valuesPanel.add(createRightAlignedLabel("<TBD>"));
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 17)));
 
-        JLabel lastAccessedDate = new JLabel("<TBD>");
-        valuesPanel.add(lastAccessedDate);
+        valuesPanel.add(createRightAlignedLabel("<TBD>"));
 
         panel.add(valuesPanel);
 
@@ -99,15 +99,16 @@ public class SummaryTab extends JPanel {
         JPanel labelsPanel = new JPanel();
         labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
 
-        labelsPanel.add(new JLabel("Time Period"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        labelsPanel.add(createRightAlignedLabel("Time Period"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 30)));
+        labelsPanel.add(createRightAlignedLabel("Temporal Resolution"));
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 20)));
-        labelsPanel.add(new JLabel("Temporal Resolution"));
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        labelsPanel.add(new JLabel("Sectors"));
+        labelsPanel.add(createRightAlignedLabel("Sectors"));
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        labelsPanel.add(new JLabel("Region"));
+        labelsPanel.add(createRightAlignedLabel("Region"));
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        labelsPanel.add(new JLabel("Country"));
+        labelsPanel.add(createRightAlignedLabel("Country"));
 
         panel.add(labelsPanel);
 
@@ -115,11 +116,21 @@ public class SummaryTab extends JPanel {
         JPanel valuesPanel = new JPanel();
         valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
 
-        JLabel startDateTime = new JLabel("Start: " + format(dataset.getStartDateTime()));
-        valuesPanel.add(startDateTime);
-        JLabel endDateTime = new JLabel("End:   " + format(dataset.getStopDateTime()));
-        valuesPanel.add(endDateTime);
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        JPanel startDatePanel = new JPanel();
+        startDatePanel.add(new JLabel("Start: "));
+        TextField startDateTime = new TextField("startDateTime", 12);
+        startDateTime.setText(format(dataset.getStartDateTime()));
+        startDatePanel.add(startDateTime);
+        valuesPanel.add(startDatePanel);
+
+        JPanel endDatePanel = new JPanel();
+        endDatePanel.add(new JLabel("End:   "));
+        TextField endDateTime = new TextField("startDateTime", 12);
+        endDateTime.setText(format(dataset.getStopDateTime()));
+        endDatePanel.add(endDateTime);
+        valuesPanel.add(endDatePanel);
+
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 5)));
 
         DefaultComboBoxModel temporalResolutionsModel = new DefaultComboBoxModel(new String[] { dataset
                 .getTemporalResolution() });
@@ -174,15 +185,15 @@ public class SummaryTab extends JPanel {
         JPanel labelsPanel = new JPanel();
         labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
 
-        labelsPanel.add(new JLabel("Name"));
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        labelsPanel.add(new JLabel("Description"));
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        labelsPanel.add(new JLabel("Project"));
+        labelsPanel.add(createRightAlignedLabel("Name"));
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        labelsPanel.add(new JLabel("Creator"));
+        labelsPanel.add(createRightAlignedLabel("Description"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 20)));
+        labelsPanel.add(createRightAlignedLabel("Project"));
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        labelsPanel.add(new JLabel("Dataset Type"));
+        labelsPanel.add(createRightAlignedLabel("Creator"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        labelsPanel.add(createRightAlignedLabel("Dataset Type"));
 
         panel.add(labelsPanel);
 
@@ -194,28 +205,48 @@ public class SummaryTab extends JPanel {
         name.setText(dataset.getName());
         name.setMaximumSize(new Dimension(300, 15));
         valuesPanel.add(name);
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 5)));
 
-        TextField description = new TextField("description", 40);
-        description.setText(dataset.getDescription());
-        valuesPanel.add(description);
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        JScrollPane scrollPane = createScrollableTextArea("description", dataset.getDescription());
+        valuesPanel.add(scrollPane);
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 5)));
 
         TextField project = new TextField("project", 15);
         project.setMaximumSize(new Dimension(300, 15));
         valuesPanel.add(project);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 8)));
 
-        JLabel creator = new JLabel(dataset.getCreator());
+        JLabel creator = createLeftAlignedLabel(dataset.getCreator());
         valuesPanel.add(creator);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
 
-        JLabel datasetType = new JLabel(dataset.getDatasetType());
+        JLabel datasetType = createLeftAlignedLabel(dataset.getDatasetType());
         valuesPanel.add(datasetType);
 
         panel.add(valuesPanel);
 
         return panel;
+    }
+
+    private JLabel createRightAlignedLabel(String name) {
+        JLabel datasetTypeLabel = new JLabel(name);
+        datasetTypeLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        
+        return datasetTypeLabel;
+    }
+
+    private JLabel createLeftAlignedLabel(String name) {
+        JLabel datasetTypeLabel = new JLabel(name);
+        datasetTypeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        return datasetTypeLabel;
+    }
+    
+    private JScrollPane createScrollableTextArea(String name, String value) {
+        JTextArea description = new TextArea(name, value);
+
+        return new JScrollPane(description, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     }
 
     private Border createBorder() {

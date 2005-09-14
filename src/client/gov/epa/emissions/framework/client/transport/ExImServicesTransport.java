@@ -9,9 +9,9 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EMFConstants;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 

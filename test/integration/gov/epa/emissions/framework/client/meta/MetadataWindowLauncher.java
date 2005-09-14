@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.commons.io.EmfDataset;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -17,10 +17,12 @@ public class MetadataWindowLauncher {
         dataset.setName("Test Dataset");
         dataset.setCreator("Jim Bowman");
         dataset.setDatasetType("ORL Non Point");
-        dataset.setDescription("ORL data type...blah...blah...blah");
+        dataset.setDescription("ORL data type...blah...blah...blah.  "
+                + "The New Orleans downtown district has been reopened for business "
+                + "owners to take a look at their properties.");
         dataset.setStartDateTime(new Date());
         dataset.setStopDateTime(new Date());
-        
+
         MetadataWindow view = new MetadataWindow();
         MetadataPresenter presenter = new MetadataPresenter(dataset);
         presenter.observe(view);

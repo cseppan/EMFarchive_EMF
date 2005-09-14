@@ -7,7 +7,6 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.Dataset;
-import gov.epa.emissions.commons.io.EmfDataset;
 import gov.epa.emissions.framework.EmfException;
 
 /**
