@@ -98,7 +98,7 @@ public class ExportWindow extends EmfInteralFrame implements ExportView {
         // TODO: needs to be implemented
         JPanel overwritePanel = new JPanel();
         overwritePanel.setLayout(new BoxLayout(overwritePanel, BoxLayout.Y_AXIS));
-        JCheckBox overwrite = new JCheckBox("Overwrite ?", true);
+        JCheckBox overwrite = new JCheckBox("Overwrite?", true);
         overwrite.setEnabled(false);
         overwrite.setToolTipText("To be implemented");
         overwritePanel.add(Box.createRigidArea(new Dimension(1, 65)));

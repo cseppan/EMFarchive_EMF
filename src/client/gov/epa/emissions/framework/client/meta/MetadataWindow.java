@@ -20,7 +20,7 @@ public class MetadataWindow extends EmfInteralFrame implements MetadataView {
     public MetadataWindow() {
         super("Metadata Editor");
 
-        super.setSize(new Dimension(700, 475));
+        super.setSize(new Dimension(700, 450));
     }
 
     private JTabbedPane createTabbedPane(EmfDataset dataset) {

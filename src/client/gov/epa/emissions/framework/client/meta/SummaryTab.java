@@ -17,6 +17,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -57,7 +58,34 @@ public class SummaryTab extends JPanel {
 
     private JPanel createStatusSection() {
         JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.GRAY));
+
+        panel.add(createStatusDatesPanel(), BorderLayout.PAGE_START);
+        panel.add(createSubscriptionPanel(), BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JPanel createSubscriptionPanel() {
+        JPanel panel = new JPanel();
+
+        JCheckBox subscribed = new JCheckBox("Subscribed?", true);
+        subscribed.setToolTipText("TBD");
+        panel.add(subscribed);
+
+        panel.add(createRightAlignedLabel("Subscribed Users"));
+        DefaultComboBoxModel subscribedUsersModel = new DefaultComboBoxModel(new String[0]);
+        JComboBox subscribedUsers = new JComboBox(subscribedUsersModel);
+        subscribedUsers.setName("subscribedUser");
+        subscribedUsers.setPreferredSize(new Dimension(100, 20));
+        panel.add(subscribedUsers);
+
+        return panel;
+    }
+
+    private JPanel createStatusDatesPanel() {
+        JPanel panel = new JPanel();
 
         // labels
         JPanel labelsPanel = new JPanel();
@@ -86,8 +114,6 @@ public class SummaryTab extends JPanel {
         valuesPanel.add(createRightAlignedLabel("<TBD>"));
 
         panel.add(valuesPanel);
-
-        // panel.add(createSubscriptionPanel());
 
         return panel;
     }
@@ -214,7 +240,7 @@ public class SummaryTab extends JPanel {
         TextField project = new TextField("project", 15);
         project.setMaximumSize(new Dimension(300, 15));
         valuesPanel.add(project);
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 8)));
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 4)));
 
         JLabel creator = createLeftAlignedLabel(dataset.getCreator());
         valuesPanel.add(creator);
@@ -231,17 +257,17 @@ public class SummaryTab extends JPanel {
     private JLabel createRightAlignedLabel(String name) {
         JLabel datasetTypeLabel = new JLabel(name);
         datasetTypeLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        
+
         return datasetTypeLabel;
     }
 
     private JLabel createLeftAlignedLabel(String name) {
         JLabel datasetTypeLabel = new JLabel(name);
         datasetTypeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
+
         return datasetTypeLabel;
     }
-    
+
     private JScrollPane createScrollableTextArea(String name, String value) {
         JTextArea description = new TextArea(name, value);
 
