@@ -4,6 +4,7 @@ CREATE TABLE datasets
   dataset_id serial NOT NULL,
   name varchar(255) NOT NULL,
   creator varchar(255) NOT NULL,
+  status varchar(255) NOT NULL,
   datasettype varchar(255) NOT NULL,
   units varchar(255),
   region varchar(255),
@@ -18,4 +19,5 @@ CREATE TABLE datasets
 ) 
 WITHOUT OIDS;
 ALTER TABLE datasets OWNER TO emf;
+
 

@@ -120,7 +120,7 @@ public class UserManagerDAO {
                         emfUser.setEmail(rst.getString("emailaddr"));
                         emfUser.setFullName(rst.getString("fullname"));
                         emfUser.setInAdminGroup(rst.getBoolean("inadmingrp"));
-                        emfUser.setPassword(rst.getString("user_pass"));
+                        emfUser.setEncryptedPassword(rst.getString("user_pass"));
                         emfUser.setUsername(rst.getString("user_name"));
                         emfUser.setPhone(rst.getString("workphone"));
                     }// while
@@ -184,7 +184,7 @@ public class UserManagerDAO {
                         emfUser.setEmail(rst.getString("emailaddr"));
                         emfUser.setFullName(rst.getString("fullname"));
                         emfUser.setInAdminGroup(rst.getBoolean("inadmingrp"));
-                        emfUser.setPassword(rst.getString("user_pass"));
+                        emfUser.setEncryptedPassword(rst.getString("user_pass"));
                         emfUser.setUsername(rst.getString("user_name"));
                         emfUser.setPhone(rst.getString("workphone"));
 
@@ -248,7 +248,7 @@ public class UserManagerDAO {
                     log.debug("The query string " + UPDATE_USER_QUERY);
 
                     updateStmt.setString(1, user.getUsername());
-                    updateStmt.setString(2, user.getPassword());
+                    updateStmt.setString(2, user.getEncryptedPassword());
                     updateStmt.setString(3, user.getFullName());
                     updateStmt.setString(4, user.getAffiliation());
                     updateStmt.setString(5, user.getPhone());
@@ -284,7 +284,7 @@ public class UserManagerDAO {
                     log.debug("The query string " + INSERT_USER_QUERY);
 
                     insertStmt.setString(1, user.getUsername());
-                    insertStmt.setString(2, user.getPassword());
+                    insertStmt.setString(2, user.getEncryptedPassword());
                     insertStmt.setString(3, user.getFullName());
                     insertStmt.setString(4, user.getAffiliation());
                     insertStmt.setString(5, user.getPhone());

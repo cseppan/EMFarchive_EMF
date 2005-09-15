@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfPresenter;
+import gov.epa.emissions.framework.services.PasswordService;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
@@ -17,7 +18,9 @@ public class LoginPresenter implements EmfPresenter {
     }
 
     public User notifyLogin(String username, String password) throws EmfException {
-        userAdmin.authenticate(username, password);
+    	//encrypt the password provided by the user in the login screen
+    	
+    	userAdmin.authenticate(username, PasswordService.encrypt(password));
         return userAdmin.getUser(username);
     }
 

@@ -54,8 +54,10 @@ public class UserServicesImpl implements UserServices {
                 log.error("User data error: account disabled: " + userName);
                 throw new AuthenticationException("Account Disabled");
             }
-            if (!emfUser.getPassword().equals(pwd)) {
+            if (!emfUser.getEncryptedPassword().equals(pwd)) {
                 log.debug("User data error: incorrect password " + userName);
+                log.debug("Pwd in User: " + emfUser.getEncryptedPassword());
+                log.debug("pwd from login: " + pwd);
                 throw new AuthenticationException("Incorrect Password");
             }
         } catch (InfrastructureException ex) {

@@ -47,12 +47,22 @@ public class ExImServicesImpl implements ExImServices {
     private ImporterFactory importerFactory;
 
     private ExporterFactory exporterFactory;
+    
+    private String baseImportFolder=null;
+    private String baseExportFolder=null;
 
     public ExImServicesImpl() throws NamingException, SQLException {
         // TODO: should we move this into an abstract super class ?
         Context ctx = new InitialContext();
         DataSource datasource = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
 
+        //FIXME: Get base directory
+        File baseFile=new File(System.getProperty("user.dir"));
+        File baseImportFile=new File(baseFile,"import");
+        File baseExportFile=new File(baseFile,"export");
+        baseImportFolder=baseImportFile.getAbsolutePath();
+        baseExportFolder=baseExportFile.getAbsolutePath();
+        
         // FIXME: we should not hard-code the db server. Also, read the
         // datasource names from properties
         DbServer dbServer = new PostgresDbServer(datasource.getConnection(), "reference", "emissions");
@@ -234,5 +244,26 @@ public class ExImServicesImpl implements ExImServices {
         log.debug("In ExImServicesImpl:insertDatasetType END");
 
     }
+
+	public String getImportBaseFolder() throws EmfException {
+		
+		//FIXME:
+		boolean broke=false;
+		if (broke) throw new EmfException("TEMP");
+		
+		
+		
+		return baseImportFolder;
+	}
+
+	public String getExportBaseFolder() throws EmfException {
+
+		//FIXME:
+		boolean broke=false;
+		if (broke) throw new EmfException("TEMP");
+		
+		
+		return baseExportFolder;
+	}
 
 }

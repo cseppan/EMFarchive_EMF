@@ -35,6 +35,7 @@ public class EmfDataset implements Dataset {
     private int year;
 
     private String description;
+    private String status="imported";
 
     private String datasetType;
 
@@ -212,4 +213,12 @@ public class EmfDataset implements Dataset {
 
         return (name.equals(otherDataset.getName()));
     }
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 }

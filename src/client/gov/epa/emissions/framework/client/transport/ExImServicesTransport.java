@@ -328,4 +328,71 @@ public class ExImServicesTransport implements ExImServices {
                 emfQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(emfClass, emfQName));
     }
 
+	public String getImportBaseFolder() throws EmfException {
+        String importFolder=null;
+
+        Service service = new Service();
+        Call call;
+
+        try {
+            call = (Call) service.createCall();
+            call.setTargetEndpointAddress(new java.net.URL(endpoint));
+
+            QName operationQName = new QName(emfSvcsNamespace, "getImportBaseFolder");
+
+            call.setOperationName(operationQName);
+
+            call.setReturnType(org.apache.axis.Constants.XSD_STRING);
+
+            importFolder = (String)call.invoke(new Object[] {});
+
+        } catch (ServiceException e) {
+            log.error("Error invoking the service", e);
+        } catch (MalformedURLException e) {
+            System.out.println();
+            log.error("Error in format of URL string", e);
+        } catch (AxisFault fault) {
+            log.error("Axis Fault details", fault);
+            throw new EmfException(extractMessage(fault.getMessage()));
+        } catch (RemoteException e) {
+            log.error("Error communicating with WS end point", e);
+        }
+
+		return importFolder;
+	}
+
+	public String getExportBaseFolder() throws EmfException {
+        String exportFolder=null;
+
+        Service service = new Service();
+        Call call;
+
+        try {
+            call = (Call) service.createCall();
+            call.setTargetEndpointAddress(new java.net.URL(endpoint));
+
+            QName operationQName = new QName(emfSvcsNamespace, "getExportBaseFolder");
+
+            call.setOperationName(operationQName);
+
+            call.setReturnType(org.apache.axis.Constants.XSD_STRING);
+
+            exportFolder = (String)call.invoke(new Object[] {});
+
+        } catch (ServiceException e) {
+            log.error("Error invoking the service", e);
+        } catch (MalformedURLException e) {
+            System.out.println();
+            log.error("Error in format of URL string", e);
+        } catch (AxisFault fault) {
+            log.error("Axis Fault details", fault);
+            throw new EmfException(extractMessage(fault.getMessage()));
+        } catch (RemoteException e) {
+            log.error("Error communicating with WS end point", e);
+        }
+
+		return exportFolder;
+
+	}
+
 }// EMFDataTransport

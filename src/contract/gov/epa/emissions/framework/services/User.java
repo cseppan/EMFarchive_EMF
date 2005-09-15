@@ -9,6 +9,7 @@
  */
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
 
 import java.io.Serializable;
@@ -24,170 +25,215 @@ import java.util.regex.Pattern;
  */
 public class User implements Serializable {
 
-    // State variables for the User bean
-    private String name;
+	// State variables for the User bean
+	private String name;
 
-    private String affiliation;
+	private String affiliation;
 
-    private String phone;
+	private String phone;
 
-    private String email;
+	private String email;
 
-    private String userName;
+	private String userName;
 
-    private String password;
+	private String encryptedPassword;
 
-    private boolean inAdminGroup = false;
+	private boolean inAdminGroup = false;
 
-    private boolean acctDisabled = false;
+	private boolean acctDisabled = false;
 
-    public boolean equals(Object other) {
-        if (!(other instanceof User))
-            return false;
+	public boolean equals(Object other) {
+		if (!(other instanceof User))
+			return false;
 
-        User otherUser = (User) other;
-        return this.userName.equals(otherUser.userName);
-    }
+		User otherUser = (User) other;
+		return this.userName.equals(otherUser.userName);
+	}
 
-    public int hashCode() {
-        return userName.hashCode();
-    }
+	public int hashCode() {
+		return userName.hashCode();
+	}
 
-    public User() {
-        super();
-    }
+	public User() {
+		super();
+	}
 
-    public User(String name, String affiliation, String phone, String email, String username, String password,
-            boolean beAdmin, boolean disabled) throws UserException {
+	public User(String name, String affiliation, String phone, String email,
+			String username, String password, boolean beAdmin, boolean disabled)
+			throws UserException {
 
-        setFullName(name);
-        setAffiliation(affiliation);
-        setPhone(phone);
-        setEmail(email);
-        setUsername(username);
-        setPassword(password);
+		setFullName(name);
+		setAffiliation(affiliation);
+		setPhone(phone);
+		setEmail(email);
+		setUsername(username);
+		setPassword(password);
 
-        this.inAdminGroup = beAdmin;
-        this.acctDisabled = disabled;
-    }
+		this.inAdminGroup = beAdmin;
+		this.acctDisabled = disabled;
+	}
 
-    /**
-     * @return Returns the acctDisabled.
-     */
-    public boolean isAcctDisabled() {
-        return acctDisabled;
-    }
+	/**
+	 * @return Returns the acctDisabled.
+	 */
+	public boolean isAcctDisabled() {
+		return acctDisabled;
+	}
 
-    public void setAcctDisabled(boolean acctDisabled) {
-        this.acctDisabled = acctDisabled;
-    }
+	public void setAcctDisabled(boolean acctDisabled) {
+		this.acctDisabled = acctDisabled;
+	}
 
-    public String getAffiliation() {
-        return affiliation;
-    }
+	public String getAffiliation() {
+		return affiliation;
+	}
 
-    public void setAffiliation(String affiliation) throws UserException {
-        if (affiliation == null)
-            throw new UserException("Affiliation should be specified");
+	public void setAffiliation(String affiliation) throws UserException {
+		if (affiliation == null)
+			throw new UserException("Affiliation should be specified");
 
-        if (affiliation.length() < 3) {
-            throw new UserException("Affiliation should have 2 or more characters");
-        }
+		if (affiliation.length() < 3) {
+			throw new UserException(
+					"Affiliation should have 2 or more characters");
+		}
 
-        this.affiliation = affiliation;
-    }
+		this.affiliation = affiliation;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public void setEmail(String email) throws UserException {
-        if (email == null)
-            throw new UserException("Email should be specified");
+	public void setEmail(String email) throws UserException {
+		if (email == null)
+			throw new UserException("Email should be specified");
 
-        if (!Pattern.matches("^(_?+\\w+(.\\w+)*)(\\w)*@(\\w)+.(\\w)+(.\\w+)*", email))
-            throw new UserException("Email should have the format xx@yy.zz");
+		if (!Pattern.matches("^(_?+\\w+(.\\w+)*)(\\w)*@(\\w)+.(\\w)+(.\\w+)*",
+				email))
+			throw new UserException("Email should have the format xx@yy.zz");
 
-        this.email = email;
-    }
+		this.email = email;
+	}
 
-    public String getFullName() {
-        return name;
-    }
+	public String getFullName() {
+		return name;
+	}
 
-    public void setFullName(String name) throws UserException {
-        if (name == null || name.length() == 0)
-            throw new UserException("Name should be specified");
-        this.name = name;
-    }
+	public void setFullName(String name) throws UserException {
+		if (name == null || name.length() == 0)
+			throw new UserException("Name should be specified");
+		this.name = name;
+	}
 
-    public boolean isInAdminGroup() {
-        return inAdminGroup;
-    }
+	public boolean isInAdminGroup() {
+		return inAdminGroup;
+	}
 
-    public void setInAdminGroup(boolean inAdminGroup) {
-        this.inAdminGroup = inAdminGroup;
-    }
+	public void setInAdminGroup(boolean inAdminGroup) {
+		this.inAdminGroup = inAdminGroup;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public void setPassword(String password) throws UserException {
+		if (password == null)
+			throw new UserException("Password should be specified");
 
-    public void setPassword(String password) throws UserException {
-        if (password == null)
-            throw new UserException("Password should be specified");
+		if (password.length() < 8) {
+			throw new UserException(
+					"Password should have at least 8 characters");
+		}
 
-        if (password.length() < 8) {
-            throw new UserException("Password should have at least 8 characters");
-        }
+		// FIXME: This condition is too restrictive and is causing problems
+		// password should start w/ an alphabet, contain atleast one digit,
+		// and only contains digits or alphabets
+		if (!Pattern.matches("^([a-zA-Z]+)(\\d+)(\\w)*", password)) {
+			throw new UserException(
+					"One or more characters of password should be a non-letter");
+		}
 
-        // password should start w/ an alphabet, contain atleast one digit,
-        // and only contains digits or alphabets
-        if (!Pattern.matches("^([a-zA-Z]+)(\\d+)(\\w)*", password)) {
-            throw new UserException("One or more characters of password should be a non-letter");
-        }
+		if (password.equals(userName)) {
+			throw new UserException(
+					"Username should be different from Password");
+		}
 
-        if (password.equals(userName)) {
-            throw new UserException("Username should be different from Password");
-        }
+		try {
+			this.encryptedPassword = PasswordService.encrypt(password);
+			System.out.println("User setting password: " + password);
+			System.out.println("User setting encrypted password: "
+					+ encryptedPassword);
 
-        this.password = password;
-    }
+		} catch (EmfException e) {
+			e.printStackTrace();
+			throw new UserException("Error encrypting password");
+		}
+	}
 
-    public String getUsername() {
-        return userName;
-    }
+	public String getUsername() {
+		return userName;
+	}
 
-    public void setUsername(String username) throws UserException {
-        if (username == null) {
-            throw new UserException("Username should be specified");
-        }
-        if (username.length() < 3) {
-            throw new UserException("Username should have at least 3 characters");
-        }
+	public void setUsername(String username) throws UserException {
+		if (username == null) {
+			throw new UserException("Username should be specified");
+		}
+		if (username.length() < 3) {
+			throw new UserException(
+					"Username should have at least 3 characters");
+		}
 
-        if (username.equals(password)) {
-            throw new UserException("Username should be different from Password");
-        }
+		verifyUsernamePasswordDontMatch(username);
 
-        this.userName = username;
-    }
+		this.userName = username;
+	}
 
-    public String getPhone() {
-        return phone;
-    }
+	private void verifyUsernamePasswordDontMatch(String username)
+			throws UserException {
+		if (encryptedPassword == null)
+			return;
 
-    public void setPhone(String phone) throws UserException {
-        if (phone == null || phone.length() == 0)
-            throw new UserException("Phone should be specified");
+		String encryptedUsername = null;
+		try {
+			encryptedUsername = PasswordService.encrypt(username);
+		} catch (EmfException e) {
+			throw new UserException(
+					"failed on verification of username with password", e
+							.getMessage(), e);
+		}
+		if (encryptedPassword.equals(encryptedUsername))
+			throw new UserException(
+					"Username should be different from Password");
+	}
 
-        this.phone = phone;
-    }
+	public String getPhone() {
+		return phone;
+	}
 
-    public void confirmPassword(String confirmPassword) throws UserException {
-        if (!password.equals(confirmPassword)) {
-            throw new UserException("Confirm Password should match Password");
-        }
+	public void setPhone(String phone) throws UserException {
+		if (phone == null || phone.length() == 0)
+			throw new UserException("Phone should be specified");
 
-    }
+		this.phone = phone;
+	}
+
+	public void confirmPassword(String confirmPassword) throws UserException {
+		String encryptConfirmPwd = null;
+
+		try {
+			encryptConfirmPwd = PasswordService.encrypt(confirmPassword);
+		} catch (EmfException e) {
+			e.printStackTrace();
+			throw new UserException("Error encrypting password");
+		}
+		if (!encryptedPassword.equals(encryptConfirmPwd)) {
+			throw new UserException("Confirm Password should match Password");
+		}
+
+	}
+
+	public String getEncryptedPassword() {
+		return encryptedPassword;
+	}
+
+	public void setEncryptedPassword(String encryptedPassword) {
+		this.encryptedPassword = encryptedPassword;
+	}
 }

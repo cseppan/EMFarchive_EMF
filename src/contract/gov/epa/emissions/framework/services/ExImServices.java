@@ -15,4 +15,6 @@ public interface ExImServices extends EMFServices {
     //FIXME: Move this to (Meta)DataServices ??
     public void insertDatasetType(DatasetType datasetType) throws EmfException;
 
+    public String getImportBaseFolder() throws EmfException;
+    public String getExportBaseFolder() throws EmfException;
 }

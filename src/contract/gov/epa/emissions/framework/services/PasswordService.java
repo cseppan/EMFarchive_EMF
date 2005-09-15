@@ -8,7 +8,7 @@
  * 
  */
 
-package gov.epa.emissions.framework.client.admin;
+package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.framework.EmfException;
 
@@ -25,13 +25,6 @@ import sun.misc.BASE64Encoder;
 public class PasswordService {
 
 	/**
-	 * 
-	 */
-	public PasswordService() {
-		super();
-	}
-
-	/**
 	 * This method encrypts the plain text password and returns a
 	 * string.
 	 * 
@@ -39,7 +32,7 @@ public class PasswordService {
 	 * @return encrypted password
 	 * @throws EmfException
 	 */
-	  public String encrypt(String textPassword) throws EmfException
+	  public static String encrypt(String textPassword) throws EmfException
 	  {
 	    MessageDigest md = null;
 	    try
@@ -63,4 +56,20 @@ public class PasswordService {
 	    return hash;
 	  }
 
+	  /**
+	   * A utility main to encrypt some of the passwords
+	   * in the database.  Remove after devlopment.
+	   * @param args
+	   */
+	  public static void main(String[]args){
+
+		String plainPwd="james12345";
+		try {
+			System.out.println(encrypt(plainPwd));
+		} catch (EmfException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	  }
 }//PasswordService

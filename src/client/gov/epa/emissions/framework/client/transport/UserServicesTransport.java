@@ -42,6 +42,7 @@ public class UserServicesTransport implements UserServices {
     private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
     private static String endpoint = "";
+    
 
     /**
      * 
@@ -80,7 +81,7 @@ public class UserServicesTransport implements UserServices {
      *      java.lang.String, boolean)
      */
     public void authenticate(String username, String password) throws EmfException {
-        log.debug("Authenticate: " + username);
+        log.debug("Authenticate: " + username + " pwd= " + password);
         Service service = new Service();
         Call call;
         try {

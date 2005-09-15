@@ -1,7 +1,7 @@
 CREATE TABLE users
 (
   user_name varchar(255) NOT NULL,
-  user_pass varchar(15) NOT NULL,
+  user_pass varchar(255) NOT NULL,
   fullname varchar(255) NOT NULL,
   affiliation varchar(255) NOT NULL,
   workphone varchar(15) NOT NULL,
@@ -10,5 +10,5 @@ CREATE TABLE users
   acctdisabled bool NOT NULL DEFAULT false,
   CONSTRAINT pk_users PRIMARY KEY (user_name)
 ) 
-WITH OIDS;
+WITHOUT OIDS;
 ALTER TABLE users OWNER TO emf;
