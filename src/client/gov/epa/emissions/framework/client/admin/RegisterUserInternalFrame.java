@@ -10,7 +10,7 @@ public class RegisterUserInternalFrame extends EmfInteralFrame implements EmfWid
     public RegisterUserInternalFrame(PostRegisterStrategy postRegisterStrategy) {
         super("Register New User");
 
-        view = new RegisterUserPanelWithAdminOption(postRegisterStrategy, new CloseViewOnCancelStrategy(), this);
+        view = new RegisterUserPanel(postRegisterStrategy, new CloseViewOnCancelStrategy(), this, new AddAdminOption());
 
         super.setSize(view.getSize());
         super.getContentPane().add(view);

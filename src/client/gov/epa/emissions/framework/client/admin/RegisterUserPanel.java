@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 public class RegisterUserPanel extends JPanel implements RegisterUserView {
@@ -29,16 +28,21 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, RegisterCancelStrategy cancelStrategy,
             EmfWidgetContainer parent) {
+        this(postRegisterStrategy, cancelStrategy, parent, new NoAdminOption());
+    }
+
+    public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, RegisterCancelStrategy cancelStrategy,
+            EmfWidgetContainer parent, AdminOption adminOption) {
         this.postRegisterStrategy = postRegisterStrategy;
         this.cancelStrategy = cancelStrategy;
         this.parent = parent;
 
-        createLayout();
+        createLayout(adminOption);
 
         this.setSize(new Dimension(375, 425));
     }
 
-    private void createLayout() {
+    private void createLayout(AdminOption adminOption) {
         Action okAction = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 registerUser();
@@ -50,7 +54,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
             }
         };
 
-        panel = new UserProfilePanel(okAction, cancelAction);
+        panel = new UserProfilePanel(okAction, cancelAction, adminOption);
         this.add(panel);
     }
 
@@ -89,11 +93,6 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     public RegisterUserPresenter getPresenter() {
         return presenter;
-    }
-
-    // FIXME: a cleaner, refactored version needed
-    public void addToProfilePanel(JComponent component) {
-        panel.addToProfilePanel(component);
     }
 
 }

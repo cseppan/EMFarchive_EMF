@@ -17,7 +17,6 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -43,22 +42,22 @@ public class UserProfilePanel extends JPanel {
 
     private MessagePanel messagePanel;
 
-    protected JPanel profileValuesPanel;
+    private AdminOption adminOption;
 
-    private JPanel profileLabelsPanel;
-
-    public UserProfilePanel(Action okAction, Action cancelAction) {
-        createLayout(okAction, cancelAction);
+    public UserProfilePanel(Action okAction, Action cancelAction, AdminOption adminOption) {
+        this.adminOption = adminOption;
+        createLayout(okAction, cancelAction, adminOption);
 
         this.setSize(new Dimension(375, 425));
     }
 
-    private void createLayout(Action okAction, Action cancelAction) {
+    private void createLayout(Action okAction, Action cancelAction, AdminOption adminOption) {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
         this.add(messagePanel);
-        this.add(createProfilePanel());
+        this.add(createProfilePanel(adminOption));
+
         this.add(createLoginPanel());
         this.add(createButtonsPanel(okAction, cancelAction));
     }
@@ -111,45 +110,57 @@ public class UserProfilePanel extends JPanel {
         return panel;
     }
 
-    private JPanel createProfilePanel() {
-        JPanel profilePanel = new JPanel();
+    private JPanel createProfilePanel(AdminOption adminOption) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(createBorder("Profile"));
 
-        Border titledBorder = createBorder("Profile");
-        profilePanel.setBorder(titledBorder);
+        JPanel mandatoryPanel = createManadatoryProfilePanel();
+        panel.add(mandatoryPanel);
 
-        profileLabelsPanel = new JPanel();
-        profileLabelsPanel.setLayout(new BoxLayout(profileLabelsPanel, BoxLayout.Y_AXIS));
+        JPanel optionsPanel = new JPanel();
+        adminOption.add(optionsPanel);
+        panel.add(optionsPanel);
+        
+        return panel;
+    }
 
-        profileLabelsPanel.add(new JLabel("Name"));
-        profileLabelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        profileLabelsPanel.add(new JLabel("Affiliation"));
-        profileLabelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        profileLabelsPanel.add(new JLabel("Phone"));
-        profileLabelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        profileLabelsPanel.add(new JLabel("Email"));
+    private JPanel createManadatoryProfilePanel() {
+        JPanel panel = new JPanel();
 
-        profilePanel.add(profileLabelsPanel);
+        JPanel labelsPanel = new JPanel();
+        labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
 
-        profileValuesPanel = new JPanel();
-        profileValuesPanel.setLayout(new BoxLayout(profileValuesPanel, BoxLayout.Y_AXIS));
+        labelsPanel.add(new JLabel("Name"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
+        labelsPanel.add(new JLabel("Affiliation"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
+        labelsPanel.add(new JLabel("Phone"));
+        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
+        labelsPanel.add(new JLabel("Email"));
+
+        panel.add(labelsPanel);
+
+        JPanel valuesPanel = new JPanel();
+        valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
 
         name = new TextField("name", 15);
-        profileValuesPanel.add(name);
-        profileValuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        valuesPanel.add(name);
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
         affiliation = new TextField("affiliation", 15);
-        profileValuesPanel.add(affiliation);
-        profileValuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        valuesPanel.add(affiliation);
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
         phone = new TextField("phone", 15);
-        profileValuesPanel.add(phone);
-        profileValuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
+        valuesPanel.add(phone);
+        valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
         email = new TextField("email", 15);
-        profileValuesPanel.add(email);
+        valuesPanel.add(email);
 
-        profilePanel.add(profileValuesPanel);
+        panel.add(valuesPanel);
 
-        profilePanel.setMaximumSize(new Dimension(300, 175));
+        panel.setMaximumSize(new Dimension(300, 175));
 
-        return profilePanel;
+        return panel;
     }
 
     private Border createBorder(String title) {
@@ -168,14 +179,8 @@ public class UserProfilePanel extends JPanel {
         user.setUserName(username.getText());
         user.setPassword(new String(password.getPassword()));
         user.confirmPassword(new String(confirmPassword.getPassword()));
-    }
 
-    // FIXME: a cleaner, refactored version needed
-    void addToProfilePanel(JComponent component) {
-        profileLabelsPanel.add(Box.createRigidArea(new Dimension(1, 40)));
-
-        profileValuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        profileValuesPanel.add(component);
+        adminOption.setInAdminGroup(user);
     }
 
     void setError(String message) {
