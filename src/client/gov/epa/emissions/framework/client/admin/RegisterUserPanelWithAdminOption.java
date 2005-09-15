@@ -14,11 +14,11 @@ public class RegisterUserPanelWithAdminOption extends RegisterUserPanel {
             EmfWidgetContainer parent) {
         super(postRegisterStrategy, cancelStrategy, parent);
 
-        addSelection();
+        addAdminSelection();
         super.refresh();
     }
 
-    private void addSelection() {
+    private void addAdminSelection() {
         this.isAdmin = new JCheckBox("Is Admin ?");
         super.addToProfilePanel(isAdmin);
     }
