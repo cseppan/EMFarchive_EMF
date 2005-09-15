@@ -56,7 +56,7 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
 
         layout = new JPanel();
         this.getContentPane().add(layout);
-        this.setSize(new Dimension(750, 300));
+        this.setSize(new Dimension(800, 300));
 
         // FIXME: OverallTableModel has a bug w/ respect to row-count &
         // cannot refresh itself. So, we will regen the layout on every

@@ -41,13 +41,14 @@ public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
     }
 
     public void testShouldReturnColumnsNames() {
-        assertEquals(5, model.getColumnCount());
+        assertEquals(6, model.getColumnCount());
 
         assertEquals("Name", model.getColumnName(0));
-        assertEquals("Start Date", model.getColumnName(1));
-        assertEquals("End Date", model.getColumnName(2));
+        assertEquals("Type", model.getColumnName(1));
+        assertEquals("Creator", model.getColumnName(2));
         assertEquals("Region", model.getColumnName(3));
-        assertEquals("Creator", model.getColumnName(4));
+        assertEquals("Start Date", model.getColumnName(4));
+        assertEquals("End Date", model.getColumnName(5));
     }
 
     public void testShouldReturnRowsEqualingNumberOfDatasets() {
@@ -56,10 +57,11 @@ public class DatasetsBrowserTableModelTest extends MockObjectTestCase {
 
     public void testShouldReturnUserAttributesAtSpecifiedIndex() {
         assertEquals(dataset1.getName(), model.getValueAt(0, 0));
-        assertEquals(dataset1.getStartDateTime(), model.getValueAt(0, 1));
-        assertEquals(dataset1.getStopDateTime(), model.getValueAt(0, 2));
+        assertEquals(dataset1.getDatasetType(), model.getValueAt(0, 1));
+        assertEquals(dataset1.getCreator(), model.getValueAt(0, 2));
         assertEquals(dataset1.getRegion(), model.getValueAt(0, 3));
-        assertEquals(dataset1.getCreator(), model.getValueAt(0, 4));
+        assertEquals(dataset1.getStartDateTime(), model.getValueAt(0, 4));
+        assertEquals(dataset1.getStopDateTime(), model.getValueAt(0, 5));
     }
 
     public void testShouldMarkEmailColumnAsEditable() {

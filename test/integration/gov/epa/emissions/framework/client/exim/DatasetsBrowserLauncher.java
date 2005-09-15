@@ -46,6 +46,7 @@ public class DatasetsBrowserLauncher {
 
         Dataset dataset1 = new EmfDataset();
         dataset1.setName("name1");
+        dataset1.setDatasetType("type 1");
         dataset1.setCreator("creator1");
         dataset1.setRegion("region1");
         dataset1.setStartDateTime(new Date());
@@ -54,6 +55,7 @@ public class DatasetsBrowserLauncher {
 
         Dataset dataset2 = new EmfDataset();
         dataset2.setName("name2");
+        dataset2.setDatasetType("type 2");
         dataset2.setCreator("creator2");
         dataset2.setRegion("region2");
         dataset2.setStartDateTime(new Date());

@@ -19,7 +19,7 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
     private List rows;
 
     public DatasetsBrowserTableModel(EmfDataset[] datasets) {
-        this.header = new TableHeader(new String[] { "Name", "Start Date", "End Date", "Region", "Creator" });
+        this.header = new TableHeader(new String[] { "Name", "Type", "Creator", "Region", "Start Date", "End Date" });
 
         populate(datasets);
     }
@@ -61,11 +61,11 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
 
             columns = new HashMap();
             columns.put(new Integer(0), new Column(dataset.getName()));
-
-            columns.put(new Integer(1), new Column(dataset.getStartDateTime()));
-            columns.put(new Integer(2), new Column(dataset.getStopDateTime()));
+            columns.put(new Integer(1), new Column(dataset.getDatasetType()));
+            columns.put(new Integer(2), new Column(dataset.getCreator()));
             columns.put(new Integer(3), new Column(dataset.getRegion()));
-            columns.put(new Integer(4), new Column(dataset.getCreator()));
+            columns.put(new Integer(4), new Column(dataset.getStartDateTime()));
+            columns.put(new Integer(5), new Column(dataset.getStopDateTime()));
         }
 
         public Object getValueAt(int column) {
