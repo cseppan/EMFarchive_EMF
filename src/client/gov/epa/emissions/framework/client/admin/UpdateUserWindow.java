@@ -100,15 +100,15 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
         name = createEditAwareTextField(user.getFullName());
         valuesPanel.add(name);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        
+
         affiliation = createEditAwareTextField(user.getAffiliation());
         valuesPanel.add(affiliation);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        
+
         phone = createEditAwareTextField(user.getWorkPhone());
         valuesPanel.add(phone);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        
+
         email = createEditAwareTextField(user.getEmailAddr());
         valuesPanel.add(email);
 
@@ -145,8 +145,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
 
     private void markAsEdited() {
         this.setTitle(windowTitle + " *");
-        if (presenter != null)
-            presenter.notifyChanges();
+        presenter.notifyChanges();
     }
 
     private JPanel createLoginPanel() {
@@ -214,8 +213,6 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
     }
 
     private void updateUser() {
-        if (presenter == null)
-            return;
         try {
             user.setFullName(name.getText());
             user.setAffiliation(affiliation.getText());
@@ -254,7 +251,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
 
     public void closeOnConfirmLosingChanges() {
         int option = JOptionPane.showConfirmDialog(null,
-                "You will lose changes if you Close without Save. \nContinue ?", "Close", JOptionPane.YES_NO_OPTION);
+                "Would you like to Close(without saving and lose the updates)?", "Close", JOptionPane.YES_NO_OPTION);
         if (option == 0)
             close();
     }
