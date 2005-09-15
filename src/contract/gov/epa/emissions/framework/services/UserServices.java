@@ -11,10 +11,10 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.framework.EmfException;
 
 /**
- * @author Conrad F. D'Cruz
- * Provides services for Login and Administrative functions
+ * @author Conrad F. D'Cruz Provides services for Login and Administrative
+ *         functions
  */
-public interface UserServices extends EMFServices{
+public interface UserServices extends EMFServices {
 
     public void authenticate(String username, String password) throws EmfException;
 
@@ -28,10 +28,7 @@ public interface UserServices extends EMFServices{
 
     public void updateUsers(User[] users) throws EmfException;
 
-    //FIXME: should use a User object instead
+    // FIXME: should use a User object instead
     public void deleteUser(String userName) throws EmfException;
-
-    // UNUSED methods
-    public boolean resetPassword() throws EmfException;
 
 }

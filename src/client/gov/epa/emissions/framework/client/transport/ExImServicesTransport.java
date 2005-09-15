@@ -113,7 +113,6 @@ public class ExImServicesTransport implements ExImServices {
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);
         } catch (MalformedURLException e) {
-            System.out.println();
             log.error("Error in format of URL string", e);
         } catch (AxisFault fault) {
             log.error("Axis Fault details", fault);
@@ -264,7 +263,6 @@ public class ExImServicesTransport implements ExImServices {
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);
         } catch (MalformedURLException e) {
-            System.out.println();
             log.error("Error in format of URL string", e);
         } catch (AxisFault fault) {
             log.error("Axis Fault details", fault);
@@ -309,7 +307,6 @@ public class ExImServicesTransport implements ExImServices {
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);
         } catch (MalformedURLException e) {
-            System.out.println();
             log.error("Error in format of URL string", e);
         } catch (AxisFault fault) {
             log.error("Axis Fault details", fault);
@@ -349,7 +346,6 @@ public class ExImServicesTransport implements ExImServices {
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);
         } catch (MalformedURLException e) {
-            System.out.println();
             log.error("Error in format of URL string", e);
         } catch (AxisFault fault) {
             log.error("Axis Fault details", fault);
@@ -382,7 +378,6 @@ public class ExImServicesTransport implements ExImServices {
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);
         } catch (MalformedURLException e) {
-            System.out.println();
             log.error("Error in format of URL string", e);
         } catch (AxisFault fault) {
             log.error("Axis Fault details", fault);

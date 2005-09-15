@@ -42,7 +42,6 @@ public class UserServicesTransport implements UserServices {
     private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
     private static String endpoint = "";
-    
 
     /**
      * 
@@ -115,21 +114,6 @@ public class UserServicesTransport implements UserServices {
             throw new CommunicationFailureException("Error communicating with WS end point");
         }
         log.debug("Authenticate: " + username);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#resetPassword()
-     */
-    public boolean resetPassword() {
-        log.debug("resetting password");
-        boolean resetStatus = false;
-
-        // TODO complete reset password logic
-
-        log.debug("resetting password");
-        return resetStatus;
     }
 
     /*

@@ -190,4 +190,8 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
         messagePanel.clear();
         refresh();
     }
+
+    public void setDefaultBaseFolder(String folder) {
+        this.folder.setText(folder);
+    }
 }

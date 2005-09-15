@@ -202,7 +202,6 @@ public class ExImServicesImpl implements ExImServices {
             File file = new File(fileName);
             StatusServices statusSvc = new StatusServicesImpl();
             Exporter exporter = exporterFactory.create(dataset.getDatasetType());
-            System.out.println("Is exporter null? " + (exporter == null));
             ExportTask eximTask = new ExportTask(user, file, dataset, statusSvc, exporter);
 
             // FIXME: use a thread pool

@@ -15,10 +15,9 @@ public class ImportPresenter {
 
     private User user;
 
-    public ImportPresenter(User user, ExImServices model, ImportView view) {
+    public ImportPresenter(User user, ExImServices model) {
         this.user = user;
         this.model = model;
-        this.view = view;
     }
 
     public void notifyImport(String directory, String filename, String datasetName, DatasetType type)
@@ -35,17 +34,18 @@ public class ImportPresenter {
         dataset.setCreator(user.getFullName());
         dataset.setName(datasetName);
 
-
-//      String filepath = directory + File.separator + filename;
-      model.startImport(user, directory, filename , dataset, type);
+        // String filepath = directory + File.separator + filename;
+        model.startImport(user, directory, filename, dataset, type);
     }
 
     public void notifyDone() {
         view.close();
     }
 
-    public void observe() {
+    public void observe(ImportView view) throws EmfException {
+        this.view = view;
         view.register(this);
+        view.setDefaultBaseFolder(model.getImportBaseFolder());
     }
 
     public void notifyBeginInput() {

@@ -13,6 +13,15 @@ import org.jmock.core.Constraint;
 
 public class ImportPresenterTest extends MockObjectTestCase {
 
+    private Mock model;
+    private String folder;
+
+    protected void setUp() {
+        model = mock(ExImServices.class);
+        folder = "/blah/blagh";
+        model.stubs().method("getImportBaseFolder").will(returnValue(folder));    
+    }
+    
     public void testSendsImportRequestToEximServiceOnImport() throws EmfException {
         DatasetType type = new DatasetType("ORL NonRoad");
 
@@ -31,13 +40,13 @@ public class ImportPresenterTest extends MockObjectTestCase {
         Constraint[] constraints = new Constraint[] { eq(user), eq(dir), eq(filename), eq(dataset), eq(type) };
         model.expects(once()).method("startImport").with(constraints);
 
-        ImportPresenter presenter = new ImportPresenter(user, (ExImServices) model.proxy(), null);
+        ImportPresenter presenter = new ImportPresenter(user, (ExImServices) model.proxy());
 
         presenter.notifyImport(dir, filename, dataset.getName(), type);
     }
 
     public void testDuringImportRaisesExceptionOnBlankFilename() {
-        ImportPresenter presenter = new ImportPresenter(null, null, null);
+        ImportPresenter presenter = new ImportPresenter(null, null);
 
         try {
             presenter.notifyImport("dir", "", "dataset name", new DatasetType("ORL NonRoad"));
@@ -50,7 +59,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
     }
 
     public void testDuringImportRaisesExceptionOnBlankDatasetName() {
-        ImportPresenter presenter = new ImportPresenter(null, null, null);
+        ImportPresenter presenter = new ImportPresenter(null, null);
 
         try {
             presenter.notifyImport("dir", "filename", "", new DatasetType("ORL NonRoad"));
@@ -63,7 +72,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
     }
 
     public void testDuringImportRaisesExceptionOnBlankFolder() {
-        ImportPresenter presenter = new ImportPresenter(null, null, null);
+        ImportPresenter presenter = new ImportPresenter(null, null);
 
         try {
             presenter.notifyImport("", "file.txt", "dataset name", new DatasetType("ORL NonRoad"));
@@ -75,32 +84,37 @@ public class ImportPresenterTest extends MockObjectTestCase {
         fail("should have raised an exception if a blank filename is provided");
     }
 
-    public void testClosesViewOnDoneImport() {
+    public void testClosesViewOnDoneImport() throws EmfException {
         Mock view = mock(ImportView.class);
         view.expects(once()).method("close");
-
-        ImportPresenter presenter = new ImportPresenter(null, null, (ImportView) view.proxy());
+        view.expects(once()).method("setDefaultBaseFolder").with(eq(folder));
+        
+        ImportPresenter presenter = new ImportPresenter(null, (ExImServices) model.proxy());
+        view.expects(once()).method("register").with(eq(presenter));
+        presenter.observe((ImportView) view.proxy());
 
         presenter.notifyDone();
     }
 
-    public void testShouldRegisterWithViewOnObserve() {
+    public void testShouldRegisterWithViewAndSetDefaultFolderOnObserve() throws EmfException {
+        ImportPresenter presenter = new ImportPresenter(null, (ExImServices) model.proxy());
+
         Mock view = mock(ImportView.class);
-
-        ImportPresenter presenter = new ImportPresenter(null, null, (ImportView) view.proxy());
         view.expects(once()).method("register").with(eq(presenter));
+        view.expects(once()).method("setDefaultBaseFolder").with(eq(folder));
 
-        presenter.observe();
+        presenter.observe((ImportView) view.proxy());
     }
 
-    public void testShouldClearMessagePanelOnEdit() {
+    public void testShouldClearMessagePanelOnEdit() throws EmfException {
         Mock view = mock(ImportView.class);
 
-        ImportPresenter presenter = new ImportPresenter(null, null, (ImportView) view.proxy());
+        ImportPresenter presenter = new ImportPresenter(null, (ExImServices) model.proxy());
         view.expects(once()).method("register").with(eq(presenter));
         view.expects(once()).method("clearMessagePanel").withNoArguments();
-
-        presenter.observe();
+        view.expects(once()).method("setDefaultBaseFolder").with(eq(folder));
+        
+        presenter.observe((ImportView) view.proxy());
 
         presenter.notifyBeginInput();
     }

@@ -2,13 +2,10 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.gui.RefreshableTableModel;
 import gov.epa.emissions.commons.gui.TableHeader;
-import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -19,7 +16,8 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
     private List rows;
 
     public DatasetsBrowserTableModel(EmfDataset[] datasets) {
-        this.header = new TableHeader(new String[] { "Name", "Type", "Creator", "Region", "Start Date", "End Date" });
+        this.header = new TableHeader(new String[] { "Name", "Type", "Status", "Creator", "Region", "Start Date",
+                "End Date" });
 
         populate(datasets);
     }
@@ -40,40 +38,6 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
         return ((Row) rows.get(row)).getValueAt(column);
     }
 
-    private class Column {
-
-        private Object value;
-
-        public Column(Object value) {
-            this.value = value;
-        }
-
-    }
-
-    // TODO: refactor this row-column pattern into the commons package
-    private class Row {
-        private Map columns;
-
-        private Dataset dataset;
-
-        public Row(Dataset dataset) {
-            this.dataset = dataset;
-
-            columns = new HashMap();
-            columns.put(new Integer(0), new Column(dataset.getName()));
-            columns.put(new Integer(1), new Column(dataset.getDatasetType()));
-            columns.put(new Integer(2), new Column(dataset.getCreator()));
-            columns.put(new Integer(3), new Column(dataset.getRegion()));
-            columns.put(new Integer(4), new Column(dataset.getStartDateTime()));
-            columns.put(new Integer(5), new Column(dataset.getStopDateTime()));
-        }
-
-        public Object getValueAt(int column) {
-            Column columnHolder = (Column) columns.get(new Integer(column));
-            return columnHolder.value;
-        }
-    }
-
     public void refresh() {
         // TODO: what to do ?
     }
@@ -84,16 +48,18 @@ public class DatasetsBrowserTableModel extends AbstractTableModel implements Ref
 
     public EmfDataset getDataset(int index) {
         Row row = (Row) rows.get(index);
-
-        return (EmfDataset) row.dataset;// FIXME: merge EmfDataset and Dataset
-        // into one
+        return (EmfDataset) row.record();
     }
 
     public void populate(EmfDataset[] datasets) {
         this.rows = new ArrayList();
 
         for (int i = 0; i < datasets.length; i++) {
-            Row row = new Row(datasets[i]);
+            EmfDataset dataset = datasets[i];
+            Object[] values = { dataset.getName(), dataset.getDatasetType(), dataset.getStatus(), dataset.getCreator(),
+                    dataset.getRegion(), dataset.getStartDateTime(), dataset.getStopDateTime() };
+
+            Row row = new Row(dataset, values);
             rows.add(row);
         }
     }

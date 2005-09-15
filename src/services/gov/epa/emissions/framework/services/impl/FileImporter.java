@@ -85,12 +85,10 @@ public class FileImporter {
             {
                 linNum++;
                 if (line.indexOf(",")>0){
-                    System.out.println(linNum + " Data line has " + getNumber(line) + " elements");
                     if (linNum == 2) readNames(line);
                     if (linNum ==3) readCount(line);
                 }else{
                     carrierName=line.trim();
-                    System.out.println("Carrier Name: " + carrierName);
                 }
             }// while file is not empty
 
@@ -108,18 +106,15 @@ public class FileImporter {
         try{
             if (ds != null) {
                 Connection conn = ds.getConnection();
-                System.out.println("Is connection null? " + (conn ==null));
 
                 if(conn != null)  {
                     PreparedStatement insertStmt = conn.prepareStatement(INSERT_RECORD_QUERY);
-                    System.out.println("Is statement null? " + (insertStmt ==null));
 
                     insertStmt.setString(1,carrierName);
                     insertStmt.setString(2,acType);
                     insertStmt.setInt(3,number);
                     
-                    insertStmt.executeUpdate();
-                    
+                    insertStmt.executeUpdate();                    
                     
                     // Close the result set, statement and the connection
                     insertStmt.close() ;

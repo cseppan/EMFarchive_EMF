@@ -114,7 +114,6 @@ public class StatusServicesTransport implements StatusServices {
             log.error("Axis fault", fault);
             throw new EmfException(extractMessage(fault.getMessage()));
         } catch (RemoteException e) {
-            System.out.println();
             log.error("Error communicating with WS end point", e);
         }
 

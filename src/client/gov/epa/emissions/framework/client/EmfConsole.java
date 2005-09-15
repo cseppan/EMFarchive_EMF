@@ -139,8 +139,8 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     protected void displayImport() throws EmfException {
         ExImServices eximServices = serviceLocator.getExImServices();
         ImportWindow view = new ImportWindow(eximServices);
-        ImportPresenter presenter = new ImportPresenter(user, eximServices, view);
-        presenter.observe();
+        ImportPresenter presenter = new ImportPresenter(user, eximServices);
+        presenter.observe(view);
 
         desktop.add(view);
 

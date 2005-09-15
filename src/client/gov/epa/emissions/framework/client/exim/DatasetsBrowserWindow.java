@@ -90,12 +90,12 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.CENTER);
 
-        panel.add(createRefreshButton(), BorderLayout.EAST);
+        panel.add(createRefreshPanel(), BorderLayout.EAST);
 
         return panel;
     }
 
-    private JButton createRefreshButton() {
+    private JPanel createRefreshPanel() {
         ResourceBundle bundle = ResourceBundle.getBundle("images");
         URL url = StatusWindow.class.getResource(bundle.getString("refresh"));
         ImageIcon icon = new ImageIcon(url, "Refresh Datasets");
@@ -112,8 +112,11 @@ public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBr
                 }
             }
         });
-
-        return button;
+        
+        JPanel panel = new JPanel();
+        panel.add(button);
+        
+        return panel;
     }
 
     private JPanel createControlPanel() {

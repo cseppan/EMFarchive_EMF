@@ -41,19 +41,4 @@ public abstract class StatusServicesTestCase extends ServicesTestCase {
         service.setStatus(aStat);
     }
 
-    public void testGet() throws EmfException {
-        Status[] stats = service.getMessages("emf");
-        // FIXME: insert first, before assertion
-
-        for (int i = 0; i < stats.length; i++) {
-            Status aStat = stats[i];
-            System.out.println("" + aStat.getUserName());
-            System.out.println("" + aStat.getTimestamp());
-            System.out.println("" + aStat.getMessageType());
-            System.out.println("" + aStat.getMessage());
-            System.out.println("" + aStat.isMsgRead());
-        }
-
-    }
-
 }

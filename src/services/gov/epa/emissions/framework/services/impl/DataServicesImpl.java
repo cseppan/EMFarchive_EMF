@@ -31,10 +31,8 @@ public class DataServicesImpl implements DataServices {
     }
 
     public Dataset[] getDatasets() {
-        // Session session = HibernateUtils.currentSession();
         Session session = EMFHibernateUtil.getSession();
         List datasets = DatasetDAO.getDatasets(session);
-        System.out.println("Total number of datasets in the List= " + datasets.size());
         session.flush();
         session.close();
         return (Dataset[]) datasets.toArray(new Dataset[datasets.size()]);

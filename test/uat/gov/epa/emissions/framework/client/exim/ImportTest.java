@@ -89,8 +89,8 @@ public class ImportTest extends UserAcceptanceTestCase {
         setTextfield(importWindow, "filename", filename);
 
         clickImport();
-        
-        //TODO: assert status messages
+
+        // TODO: assert status messages
     }
 
     public void testShouldShowErrorMessageIfNameIsUnspecified() throws Exception {
@@ -99,15 +99,6 @@ public class ImportTest extends UserAcceptanceTestCase {
         clickImport();
 
         assertErrorMessage(importWindow, "Dataset Name should be specified");
-    }
-
-    public void testShouldShowErrorMessageIfFolderIsUnspecified() throws Exception {
-        selectComboBoxItem(importWindow, "datasetTypes", "ORL Point Inventory");
-        setTextfield(importWindow, "name", " UAT - " + new Random().nextInt());
-
-        clickImport();
-
-        assertErrorMessage(importWindow, "Folder should be specified");
     }
 
     public void testShouldShowErrorMessageIfFilenameIsUnspecified() throws Exception {

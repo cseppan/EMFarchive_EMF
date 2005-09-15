@@ -53,7 +53,6 @@ public class Proxy implements InvocationHandler {
                     smr = new SOAPMappingRegistry();
                 if (beanSer == null)
                     beanSer = new BeanSerializer();
-                // System.out.println("Adding a default mapping");
                 ArraySerializer arraySer = new ArraySerializer();
                 smr.mapTypes(Constants.NS_URI_SOAP_ENC, null, null, beanSer, beanSer);
                 smr.mapTypes(Constants.NS_URI_SOAP_ENC, null, args[i].getClass(), arraySer, arraySer);
@@ -66,7 +65,6 @@ public class Proxy implements InvocationHandler {
                 if (beanSer == null)
                     beanSer = new BeanSerializer();
                 String qnamePart = args[i].getClass().getName();
-                // System.out.println("qnamePart = " + qnamePart);
                 smr
                         .mapTypes(Constants.NS_URI_SOAP_ENC, new QName(urn, qnamePart), args[i].getClass(), beanSer,
                                 beanSer);
@@ -152,17 +150,13 @@ public class Proxy implements InvocationHandler {
         if (o == null)
             return;
 
-        if (isSimple(o) || isSimpleArray(o)) {
-            // System.out.println("Vector contains simple elements only.");
-        } else if (isVector(o)) {
-            // System.out.println("Recursive Vector...");
+        if (isVector(o)) {
             addMapping((java.util.Vector) o);
         } else {
             if (smr == null)
                 smr = new SOAPMappingRegistry();
             if (beanSer == null)
                 beanSer = new BeanSerializer();
-            // System.out.println("Adding a default mapping");
             smr.mapTypes(Constants.NS_URI_SOAP_ENC, null, null, beanSer, beanSer);
         }
     }

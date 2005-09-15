@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.commons;
+package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.services.User;
@@ -163,7 +163,7 @@ public class UserTest extends TestCase {
         try {
             user.setPassword(password);
         } catch (UserException ex) {
-            assertEquals("One or more characters of password should be a non-letter", ex.getMessage());
+            assertEquals("One or more characters of password should be a number", ex.getMessage());
             return;
         }
 
