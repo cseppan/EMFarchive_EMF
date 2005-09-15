@@ -494,5 +494,33 @@
     </target>
     <!--  ===============END Launch EMF ============================== -->
 
+    <!--  ===============START EMF-dependent modules ============================== -->
+    <target name="commons.basedir.check">
+        <property name="commons.basedir" value="${basedir}/../Commons" />
+        <available file="${commons.basedir}"
+                   property="commons.basedir.present"
+        />
+    </target>
+
+    <target name="commons-dist-warning"
+            depends="commons.basedir.check"
+            unless="commons.basedir.present"
+    >
+        <echo message="You need to checkout Commons module from CVS in the same parent folder as EMF before attempting to build Commons"
+        />
+    </target>
+
+    <target name="commons-dist"
+            depends="commons.basedir.check, commons-dist-warning"
+            if="commons.basedir.present"
+    >
+        <ant dir="${commons.basedir}" target="do-dist" inheritall="false" />
+        <copy todir="${lib.dir}">
+            <fileset dir="${commons.basedir}/build/sandbox" includes="*.jar" />
+        </copy>
+    </target>
+
+    <!--  ===============END EMF-dependent modules ============================== -->
+
 </project>
 
