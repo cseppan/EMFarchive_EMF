@@ -235,7 +235,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     public void displayUserManager() {
         try {
             UserServices userServices = serviceLocator.getUserServices();
-            UserManagerWindow console = new UserManagerWindow(userServices, this);
+            UserManagerWindow console = new UserManagerWindow(user, userServices, this);
             UserManagerPresenter presenter = new UserManagerPresenter(user, userServices, console);
             presenter.observe();
 

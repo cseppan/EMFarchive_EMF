@@ -28,7 +28,7 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         Mock view = mock(UserManagerView.class);
         view.expects(once()).method("refresh").withNoArguments();
         User user = new User();
-        user.setUserName("joe");
+        user.setUsername("joe");
 
         UserManagerPresenter presenter = new UserManagerPresenter(user, (UserServices) emfUserAdmin.proxy(),
                 (UserManagerView) view.proxy());
@@ -38,14 +38,14 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
 
     public void testShouldNotDeleteCurrentlyLoggedInUserOnNotifyDelete() throws EmfException {
         User user = new User();
-        user.setUserName("joe");
+        user.setUsername("joe");
 
         UserManagerPresenter presenter = new UserManagerPresenter(user, null, null);
 
         try {
-            presenter.notifyDelete(user.getUserName());
+            presenter.notifyDelete(user.getUsername());
         } catch (EmfException e) {
-            assertEquals("Cannot delete yourself - '" + user.getUserName() + "'", e.getMessage());
+            assertEquals("Cannot delete yourself - '" + user.getUsername() + "'", e.getMessage());
             return;
         }
 

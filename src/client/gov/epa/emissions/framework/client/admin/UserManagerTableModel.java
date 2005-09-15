@@ -109,7 +109,7 @@ public class UserManagerTableModel extends AbstractTableModel implements Refresh
             this.user = user;
             columns = new HashMap();
 
-            columns.put(new Integer(0), new Column(user.getUserName()) {
+            columns.put(new Integer(0), new Column(user.getUsername()) {
                 void setUnderlyingValue(Object value) {// uneditable
                 }
             });
@@ -123,10 +123,10 @@ public class UserManagerTableModel extends AbstractTableModel implements Refresh
                     }
                 }
             });
-            columns.put(new Integer(2), new Column(user.getEmailAddr()) {
+            columns.put(new Integer(2), new Column(user.getEmail()) {
                 void setUnderlyingValue(Object value) {
                     try {
-                        user.setEmailAddr((String) value);
+                        user.setEmail((String) value);
                     } catch (UserException e) {
                         throw new RuntimeException(e);// TODO: verify
                     }

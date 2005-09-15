@@ -16,11 +16,11 @@ public class UpdateUserWindowLauncher {
     public static void main(String[] args) throws Exception {
         UserServices userAdmin = new UserServicesStub(Collections.EMPTY_LIST);
         User user = new User();
-        user.setUserName("joes");
+        user.setUsername("joes");
         user.setFullName("Joe Schmoe");
         user.setAffiliation("Joey Inc");
-        user.setWorkPhone("123-123-123");
-        user.setEmailAddr("joes@joey.inc");
+        user.setPhone("123-123-123");
+        user.setEmail("joes@joey.inc");
         
         UpdateUserWindow window = new UpdateUserWindow(user);
         UpdateUserPresenter presenter = new UpdateUserPresenter(userAdmin, window);

@@ -131,7 +131,7 @@ public class ExImServicesImpl implements ExImServices {
     }
 
     public void startExport(User user, EmfDataset[] datasets, String dirName) throws EmfException {
-        log.info("Start export for user: " + user.getUserName());
+        log.info("Start export for user: " + user.getUsername());
         int count = datasets.length;
         log.info("Total number of files to export: " + count);
         StatusServices statusSvc = new StatusServicesImpl();
@@ -154,7 +154,7 @@ public class ExImServicesImpl implements ExImServices {
             throw new EmfException(e.getMessage());
         }
 
-        log.info("Start export for user: " + user.getUserName());
+        log.info("Start export for user: " + user.getUsername());
     }
 
     private String getCleanDatasetName(String name) {

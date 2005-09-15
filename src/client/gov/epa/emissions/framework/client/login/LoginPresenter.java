@@ -17,7 +17,7 @@ public class LoginPresenter implements EmfPresenter {
     }
 
     public User notifyLogin(String username, String password) throws EmfException {
-        userAdmin.authenticate(username, password, false);
+        userAdmin.authenticate(username, password);
         return userAdmin.getUser(username);
     }
 

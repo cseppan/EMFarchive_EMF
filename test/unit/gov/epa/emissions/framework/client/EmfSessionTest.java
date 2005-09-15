@@ -13,7 +13,7 @@ public class EmfSessionTest extends MockObjectTestCase {
 
     public void testGetUser() throws UserException {
         User user = new User();
-        user.setUserName("user");
+        user.setUsername("user");
         EmfSession session = new EmfSession(user, null);
 
         assertEquals(user, session.getUser());

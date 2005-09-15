@@ -84,7 +84,7 @@ System.out.println("STARTING EXPORT");
 
     private void setStatus(String message) throws EmfException {
         Status endStatus = new Status();
-        endStatus.setUserName(user.getUserName());
+        endStatus.setUserName(user.getUsername());
         endStatus.setMessageType(EMFConstants.EXPORT_MESSAGE_TYPE);
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());

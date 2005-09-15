@@ -17,12 +17,12 @@ public class StatusPresenterTest extends MockObjectTestCase {
 
     public void testShouldUpdateViewOnSuccessfulPoll() throws Exception {
         User user = new User();
-        user.setUserName("user");
+        user.setUsername("user");
 
-        Status status = new Status(user.getUserName(), "type", "message", new Date());
+        Status status = new Status(user.getUsername(), "type", "message", new Date());
         Status[] messages = new Status[] { status };
         Mock service = mock(StatusServices.class);
-        service.expects(atLeastOnce()).method("getMessages").with(eq(user.getUserName())).will(returnValue(messages));
+        service.expects(atLeastOnce()).method("getMessages").with(eq(user.getUsername())).will(returnValue(messages));
 
         Mock view = mock(StatusView.class);
         view.expects(atLeastOnce()).method("update").with(same(messages));
@@ -44,10 +44,10 @@ public class StatusPresenterTest extends MockObjectTestCase {
 
     public void testShouldNotifyViewOnFailedPoll() throws Exception {
         User user = new User();
-        user.setUserName("user");
+        user.setUsername("user");
 
         Mock service = mock(StatusServices.class);
-        service.expects(atLeastOnce()).method("getMessages").with(eq(user.getUserName())).will(
+        service.expects(atLeastOnce()).method("getMessages").with(eq(user.getUsername())).will(
                 throwException(new EmfException("poll failure")));
 
         Mock view = mock(StatusView.class);

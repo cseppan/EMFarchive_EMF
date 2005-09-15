@@ -27,10 +27,10 @@ public class UserManagerPresenter implements EmfPresenter{
     }
 
     public void notifyDelete(String username) throws EmfException {
-        if(username.equals("admin"))//NOTE: super user name is fixed
+        if(username.equals("admin"))//NOTE: super user's name is fixed
             throw new UserException("Cannot delete EMF super user - '" + username + "'");
         
-        if(user.getUserName().equals(username))
+        if(user.getUsername().equals(username))
             throw new UserException("Cannot delete yourself - '" + username + "'");
         
         model.deleteUser(username);

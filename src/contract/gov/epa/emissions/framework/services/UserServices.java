@@ -16,7 +16,7 @@ import gov.epa.emissions.framework.EmfException;
  */
 public interface UserServices extends EMFServices{
 
-    public void authenticate(String userName, String pwd, boolean wantAdminStatus) throws EmfException;
+    public void authenticate(String username, String password) throws EmfException;
 
     public User getUser(String userName) throws EmfException;
 

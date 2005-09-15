@@ -17,12 +17,12 @@ public class AuthenticateTest extends TestCase {
     }
 
     public void testShouldSucceedOnValidUsernamePassword() throws EmfException {
-        emfUserAdmin.authenticate("emf", "emf12345", false);
+        emfUserAdmin.authenticate("emf", "emf12345");
     }
 
     public void testShouldFailOnInvalidPassword() {
         try {
-            emfUserAdmin.authenticate("emf", "password", false);
+            emfUserAdmin.authenticate("emf", "password");
         } catch (EmfException ex) {
             return;
         }
@@ -32,7 +32,7 @@ public class AuthenticateTest extends TestCase {
 
     public void testShouldFailOnUnknownUsername() {
         try {
-            emfUserAdmin.authenticate("sdfsfr45gn", "password", false);
+            emfUserAdmin.authenticate("sdfsfr45gn", "password");
         } catch (EmfException ex) {
             return;
         }

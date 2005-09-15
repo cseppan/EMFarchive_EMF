@@ -63,13 +63,13 @@ public class UserTest extends TestCase {
 
     public void testShouldAllowUsernameIfSizeIsGreaterThan2Characters() throws UserException {
         User user = new User();
-        user.setUserName("abcd");
+        user.setUsername("abcd");
     }
 
     private void assertInvalidUsername(String username) {
         User user = new User();
         try {
-            user.setUserName(username);
+            user.setUsername(username);
         } catch (UserException ex) {
             assertEquals("Username should have at least 3 characters", ex.getMessage());
             return;
@@ -108,7 +108,7 @@ public class UserTest extends TestCase {
 
     public void testShouldFailIfUsernameMatchesPasswordOnSetPassword() throws UserException {
         User user = new User();
-        user.setUserName("abcdefg1");
+        user.setUsername("abcdefg1");
 
         try {
             user.setPassword("abcdefg1");
@@ -124,7 +124,7 @@ public class UserTest extends TestCase {
         User user = new User();
 
         try {
-            user.setUserName(null);
+            user.setUsername(null);
         } catch (UserException ex) {
             assertEquals("Username should be specified", ex.getMessage());
             return;
@@ -138,7 +138,7 @@ public class UserTest extends TestCase {
         user.setPassword("abcdefg1");
 
         try {
-            user.setUserName("abcdefg1");
+            user.setUsername("abcdefg1");
         } catch (UserException ex) {
             assertEquals("Username should be different from Password", ex.getMessage());
             return;
@@ -246,7 +246,7 @@ public class UserTest extends TestCase {
         User user = new User();
 
         try {
-            user.setWorkPhone(null);
+            user.setPhone(null);
         } catch (UserException ex) {
             assertEquals("Phone should be specified", ex.getMessage());
             return;
@@ -259,7 +259,7 @@ public class UserTest extends TestCase {
         User user = new User();
 
         try {
-            user.setWorkPhone("");
+            user.setPhone("");
         } catch (UserException ex) {
             assertEquals("Phone should be specified", ex.getMessage());
             return;
@@ -284,15 +284,15 @@ public class UserTest extends TestCase {
     public void testShouldPassIfEmailHasValidFormat() throws UserException {
         User user = new User();
 
-        user.setEmailAddr("user@user.edu");
-        user.setEmailAddr("user@user.unc.edu");
-        user.setEmailAddr("first.last@user.unc.edu");
-        user.setEmailAddr("first234.last2q34@user.unc.edu");
-        user.setEmailAddr("first_last@user.unc.edu");
-        user.setEmailAddr("_first_last@user.unc.edu");
-        user.setEmailAddr("first_234@user.unc.edu");
-        user.setEmailAddr("234first_234@user.unc.edu");
-        user.setEmailAddr("firs234t_234@user.unc.edu");
+        user.setEmail("user@user.edu");
+        user.setEmail("user@user.unc.edu");
+        user.setEmail("first.last@user.unc.edu");
+        user.setEmail("first234.last2q34@user.unc.edu");
+        user.setEmail("first_last@user.unc.edu");
+        user.setEmail("_first_last@user.unc.edu");
+        user.setEmail("first_234@user.unc.edu");
+        user.setEmail("234first_234@user.unc.edu");
+        user.setEmail("firs234t_234@user.unc.edu");
     }
 
     public void testShouldFailOnConstructionIfEmailIsInvalid() {
@@ -310,7 +310,7 @@ public class UserTest extends TestCase {
         User user = new User();
 
         try {
-            user.setEmailAddr(email);
+            user.setEmail(email);
         } catch (UserException ex) {
             assertEquals("Email should have the format xx@yy.zz", ex.getMessage());
             return;
@@ -323,7 +323,7 @@ public class UserTest extends TestCase {
         User user = new User();
 
         try {
-            user.setEmailAddr(null);
+            user.setEmail(null);
         } catch (UserException ex) {
             assertEquals("Email should be specified", ex.getMessage());
             return;

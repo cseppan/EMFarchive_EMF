@@ -78,7 +78,7 @@ public class ExImServicesTransport implements ExImServices {
      */
     public void startImport(User user, String folderPath, String fileName, EmfDataset dataset, DatasetType datasetType)
             throws EmfException {
-        log.debug("Begin import file for user:filename:datasettype:: " + user.getUserName() + " :: " + fileName
+        log.debug("Begin import file for user:filename:datasettype:: " + user.getUsername() + " :: " + fileName
                 + " :: " + datasetType.getName());
         Service service = new Service();
         Call call;
@@ -122,7 +122,7 @@ public class ExImServicesTransport implements ExImServices {
             log.error("Error communicating with WS end point", e);
         }
 
-        log.debug("Begin import file for user:filename:datasettype:: " + user.getUserName() + " :: " + fileName
+        log.debug("Begin import file for user:filename:datasettype:: " + user.getUsername() + " :: " + fileName
                 + " :: " + datasetType.getName());
 
     }
@@ -277,7 +277,7 @@ public class ExImServicesTransport implements ExImServices {
 	}
 
     public void startExport(User user, EmfDataset dataset, String fileName) throws EmfException {
-        log.debug("Begin export file for user:filename:datasettype:: " + user.getUserName() + " :: " + fileName
+        log.debug("Begin export file for user:filename:datasettype:: " + user.getUsername() + " :: " + fileName
                 + " :: " + dataset.getDatasetType());
         Service service = new Service();
         Call call;
@@ -318,7 +318,7 @@ public class ExImServicesTransport implements ExImServices {
             log.error("Error communicating with WS end point", e);
         }
 
-        log.debug("End export file for user:filename:datasettype:: " + user.getUserName() + " :: " + fileName + " :: "
+        log.debug("End export file for user:filename:datasettype:: " + user.getUsername() + " :: " + fileName + " :: "
                 + dataset.getDatasetType());
 
     }

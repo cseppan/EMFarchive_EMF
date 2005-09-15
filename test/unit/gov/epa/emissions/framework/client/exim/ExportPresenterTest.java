@@ -28,7 +28,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
 
     public void testSendsExportRequestToEximServiceOnExport() throws EmfException {
         User user = new User();
-        user.setUserName("user");
+        user.setUsername("user");
         user.setFullName("full name");
 
         EmfDataset dataset = new EmfDataset();

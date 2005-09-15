@@ -11,13 +11,13 @@ public class LoginPresenterTest extends MockObjectTestCase {
 
     public void testShouldAuthenticateWithEmfUserAdminOnNotifyLogin() throws EmfException {
         User user = new User();
-        user.setUserName("joey");
+        user.setUsername("joey");
         user.setPassword("joeymoey12");
 
         Mock userAdmin = mock(UserServices.class);
         userAdmin.expects(once()).method("authenticate")
-                .with(eq(user.getUserName()), eq(user.getPassword()), eq(false));
-        userAdmin.expects(once()).method("getUser").with(eq(user.getUserName())).will(returnValue(user));
+                .with(eq(user.getUsername()), eq(user.getPassword()));
+        userAdmin.expects(once()).method("getUser").with(eq(user.getUsername())).will(returnValue(user));
 
         LoginPresenter presenter = new LoginPresenter((UserServices) userAdmin.proxy(), null);
 
@@ -27,7 +27,7 @@ public class LoginPresenterTest extends MockObjectTestCase {
     public void testShouldFailIfAuthenticateFailsOnNotifyLogin() {
         Mock userAdmin = mock(UserServices.class);
         Throwable exception = new EmfException("authentication failure");
-        userAdmin.expects(once()).method("authenticate").with(eq("username"), eq("password"), eq(false)).will(
+        userAdmin.expects(once()).method("authenticate").with(eq("username"), eq("password")).will(
                 throwException(exception));
 
         LoginPresenter presenter = new LoginPresenter((UserServices) userAdmin.proxy(), null);

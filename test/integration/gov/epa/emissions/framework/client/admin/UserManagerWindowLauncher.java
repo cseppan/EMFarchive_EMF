@@ -20,18 +20,18 @@ public class UserManagerWindowLauncher {
         UserServices userAdmin = launcher.createUserAdmin();
         JFrame frame = new JFrame();
 
-        UserManagerWindow console = new UserManagerWindow(userAdmin, frame);
+        UserManagerWindow console = new UserManagerWindow(null, userAdmin, frame);
         UserManagerPresenter presenter = new UserManagerPresenter(null, userAdmin, console);
         presenter.observe();
 
         console.setVisible(true);
 
         launcher.addAsInternalFrame(console, frame);
-        
+
         frame.setSize(new Dimension(800, 600));
         frame.setLocation(new Point(400, 200));
         frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     private void addAsInternalFrame(UserManagerWindow console, JFrame frame) {
@@ -57,11 +57,11 @@ public class UserManagerWindowLauncher {
 
     private User createUser(String username, String name, String email, boolean isAdmin) throws EmfException {
         User user = new User();
-        user.setUserName(username);
+        user.setUsername(username);
         user.setFullName(name);
-        user.setEmailAddr(email);
+        user.setEmail(email);
         user.setInAdminGroup(isAdmin);
-        
+
         return user;
     }
 }

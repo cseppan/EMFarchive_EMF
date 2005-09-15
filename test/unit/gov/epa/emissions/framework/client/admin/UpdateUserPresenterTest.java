@@ -11,7 +11,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
 
     public void testShouldUpdateUserViaEmfUserAdminOnNotifySave() throws EmfException {
         User user = new User();
-        user.setUserName("joey");
+        user.setUsername("joey");
         user.setFullName("Joey Moey");
 
         Mock emfUserAdmin = mock(UserServices.class);
@@ -52,7 +52,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
     
     public void testShouldCloseWithNoPromptsOnSaveFollowedByClose() throws EmfException {
         User user = new User();
-        user.setUserName("joey");
+        user.setUsername("joey");
         user.setFullName("Joey Moey");
 
         Mock emfUserAdmin = mock(UserServices.class);

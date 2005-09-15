@@ -62,9 +62,9 @@ public class User implements Serializable {
 
         setFullName(name);
         setAffiliation(affiliation);
-        setWorkPhone(phone);
-        setEmailAddr(email);
-        setUserName(username);
+        setPhone(phone);
+        setEmail(email);
+        setUsername(username);
         setPassword(password);
 
         this.inAdminGroup = beAdmin;
@@ -97,11 +97,11 @@ public class User implements Serializable {
         this.affiliation = affiliation;
     }
 
-    public String getEmailAddr() {
+    public String getEmail() {
         return email;
     }
 
-    public void setEmailAddr(String email) throws UserException {
+    public void setEmail(String email) throws UserException {
         if (email == null)
             throw new UserException("Email should be specified");
 
@@ -154,11 +154,11 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public String getUserName() {
+    public String getUsername() {
         return userName;
     }
 
-    public void setUserName(String username) throws UserException {
+    public void setUsername(String username) throws UserException {
         if (username == null) {
             throw new UserException("Username should be specified");
         }
@@ -173,11 +173,11 @@ public class User implements Serializable {
         this.userName = username;
     }
 
-    public String getWorkPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setWorkPhone(String phone) throws UserException {
+    public void setPhone(String phone) throws UserException {
         if (phone == null || phone.length() == 0)
             throw new UserException("Phone should be specified");
 

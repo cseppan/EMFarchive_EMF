@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.services.User;
 
@@ -25,6 +24,8 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
     private RegisterCancelStrategy cancelStrategy;
 
     private UserProfilePanel panel;
+
+    private User user;
 
     public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, RegisterCancelStrategy cancelStrategy,
             EmfWidgetContainer parent) {
@@ -54,29 +55,24 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
             }
         };
 
-        panel = new UserProfilePanel(okAction, cancelAction, adminOption);
+        user = new User();
+        panel = new UserProfilePanel(user, okAction, cancelAction, adminOption,
+                new PopulateUserOnRegisterStrategy(user));
         this.add(panel);
     }
 
     private void registerUser() {
-        if (presenter == null)
-            return;
-
         try {
-            User user = new User();
-            populateUser(user);
-
+            panel.populateUser();
             presenter.notifyRegister(user);
-            postRegisterStrategy.execute(user);
-            close();
         } catch (EmfException e) {
             panel.setError(e.getMessage());
             refresh();
+            return;
         }
-    }
 
-    protected void populateUser(User user) throws UserException {
-        panel.populateUser(user);
+        postRegisterStrategy.execute(user);
+        close();
     }
 
     public void refresh() {

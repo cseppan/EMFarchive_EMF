@@ -24,12 +24,12 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
 
     public void testShouldCreateUserAndLoginOnNotifyCreateUser() throws EmfException {
         User user = new User();
-        user.setUserName("joey");
+        user.setUsername("joey");
         user.setPassword("passwd234");
 
         Mock emfUserAdmin = mock(UserServices.class);
         emfUserAdmin.expects(once()).method("createUser").with(eq(user));
-        emfUserAdmin.expects(once()).method("authenticate").with(eq("joey"), eq("passwd234"), eq(false));
+        emfUserAdmin.expects(once()).method("authenticate").with(eq("joey"), eq("passwd234"));
 
         Mock view = mock(RegisterUserView.class);
 

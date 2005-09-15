@@ -14,7 +14,7 @@ public class UserServicesStub implements UserServices {
         this.users = users;
     }
 
-    public void authenticate(String userName, String pwd, boolean wantAdminStatus) {
+    public void authenticate(String userName, String pwd) {
         // TODO
     }
 
@@ -41,7 +41,7 @@ public class UserServicesStub implements UserServices {
     public void deleteUser(String userName) {
         for (Iterator iter = users.iterator(); iter.hasNext();) {
             User user = (User) iter.next();
-            if (user.getUserName().equals(userName)) {
+            if (user.getUsername().equals(userName)) {
                 users.remove(user);
                 break;
             }

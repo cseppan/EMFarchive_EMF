@@ -38,7 +38,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
 
     private UserManagerTableModel model;
 
-    private UserServices userAdmin;
+    private UserServices userServices;
 
     private JPanel layout;
 
@@ -46,11 +46,15 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
 
     private JFrame parentConsole;
 
-    public UserManagerWindow(UserServices userAdmin, JFrame parentConsole) throws Exception {
+    private User user;
+
+    // FIXME: this class needs to be refactored into smaller components
+    public UserManagerWindow(User user, UserServices userServices, JFrame parentConsole) throws Exception {
         super("User Management Console");
-        this.userAdmin = userAdmin;
+        this.user = user;
+        this.userServices = userServices;
         this.parentConsole = parentConsole;
-        model = new UserManagerTableModel(userAdmin);
+        model = new UserManagerTableModel(userServices);
         selectModel = new SortFilterSelectModel(model);
 
         layout = new JPanel();
@@ -84,9 +88,12 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
         });
     }
 
-    private void updateUser(User user) {
-        UpdateUserWindow view = new UpdateUserWindow(user);
-        UpdateUserPresenter presenter = new UpdateUserPresenter(userAdmin, view);
+    private void updateUser(User updateUser) {
+        //FIXME: drive this logic via Presenter
+        UpdateUserWindow view = updateUser.equals(user) ? 
+                  new UpdateUserWindow(updateUser, new NoAdminOption()) :
+                  new UpdateUserWindow(updateUser, new AddAdminOption());
+        UpdateUserPresenter presenter = new UpdateUserPresenter(userServices, view);
         presenter.observe();
 
         getDesktopPane().add(view);
@@ -168,8 +175,6 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
     }
 
     private void updateUsers() {
-        if (presenter == null)
-            return;
         List users = getSelectedUsers();
         for (Iterator iter = users.iterator(); iter.hasNext();) {
             User user = (User) iter.next();
@@ -177,6 +182,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
         }
     }
 
+    // FIXME: if no users are selected, add appropriate behavior to Presenter
     private List getSelectedUsers() {
         List users = new ArrayList();
 
@@ -191,11 +197,6 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
     }
 
     private void deleteUser() {
-        if (presenter == null)
-            return;
-        int[] selected = selectModel.getSelectedIndexes();
-        if (selected.length == 0)
-            return;
         int option = JOptionPane.showConfirmDialog(null, "Are you sure about deleting user(s)", "Delete User",
                 JOptionPane.YES_NO_OPTION);
         if (option == 1) {
@@ -207,11 +208,11 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
         for (Iterator iter = users.iterator(); iter.hasNext();) {
             User user = (User) iter.next();
             try {
-                presenter.notifyDelete(user.getUserName());
+                presenter.notifyDelete(user.getUsername());
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
                 // TODO: temp, until the HACK is addressed (then, use refresh)
-                validate();
+                doSimpleRefresh();
                 break;// TODO: should continue ?
             }
         }
@@ -219,7 +220,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
 
     private void displayRegisterUser() {
         RegisterUserInternalFrame container = new RegisterUserInternalFrame(new NoOpPostRegisterStrategy());
-        RegisterUserPresenter presenter = new RegisterUserPresenter(userAdmin, container.getView());
+        RegisterUserPresenter presenter = new RegisterUserPresenter(userServices, container.getView());
         presenter.observe();
 
         getDesktopPane().add(container);

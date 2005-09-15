@@ -117,12 +117,12 @@ public class UserManagerDAO {
                         emfUser = new User();
                         emfUser.setAcctDisabled(rst.getBoolean("acctdisabled"));
                         emfUser.setAffiliation(rst.getString("affiliation"));
-                        emfUser.setEmailAddr(rst.getString("emailaddr"));
+                        emfUser.setEmail(rst.getString("emailaddr"));
                         emfUser.setFullName(rst.getString("fullname"));
                         emfUser.setInAdminGroup(rst.getBoolean("inadmingrp"));
                         emfUser.setPassword(rst.getString("user_pass"));
-                        emfUser.setUserName(rst.getString("user_name"));
-                        emfUser.setWorkPhone(rst.getString("workphone"));
+                        emfUser.setUsername(rst.getString("user_name"));
+                        emfUser.setPhone(rst.getString("workphone"));
                     }// while
 
                     // Close the result set, statement and the connection
@@ -181,15 +181,15 @@ public class UserManagerDAO {
                         emfUser = new User();
                         emfUser.setAcctDisabled(rst.getBoolean("acctdisabled"));
                         emfUser.setAffiliation(rst.getString("affiliation"));
-                        emfUser.setEmailAddr(rst.getString("emailaddr"));
+                        emfUser.setEmail(rst.getString("emailaddr"));
                         emfUser.setFullName(rst.getString("fullname"));
                         emfUser.setInAdminGroup(rst.getBoolean("inadmingrp"));
                         emfUser.setPassword(rst.getString("user_pass"));
-                        emfUser.setUserName(rst.getString("user_name"));
-                        emfUser.setWorkPhone(rst.getString("workphone"));
+                        emfUser.setUsername(rst.getString("user_name"));
+                        emfUser.setPhone(rst.getString("workphone"));
 
                         users.add(emfUser);
-                        log.debug(emfUser.getUserName());
+                        log.debug(emfUser.getUsername());
                     }// while
 
                     // Close the result set, statement and the connection
@@ -247,15 +247,15 @@ public class UserManagerDAO {
                     log.debug("Is statement null? " + (updateStmt == null));
                     log.debug("The query string " + UPDATE_USER_QUERY);
 
-                    updateStmt.setString(1, user.getUserName());
+                    updateStmt.setString(1, user.getUsername());
                     updateStmt.setString(2, user.getPassword());
                     updateStmt.setString(3, user.getFullName());
                     updateStmt.setString(4, user.getAffiliation());
-                    updateStmt.setString(5, user.getWorkPhone());
-                    updateStmt.setString(6, user.getEmailAddr());
+                    updateStmt.setString(5, user.getPhone());
+                    updateStmt.setString(6, user.getEmail());
                     updateStmt.setBoolean(7, user.isInAdminGroup());
                     updateStmt.setBoolean(8, user.isAcctDisabled());
-                    updateStmt.setString(9, user.getUserName());
+                    updateStmt.setString(9, user.getUsername());
                     updateStmt.executeUpdate();
 
                     // Close the result set, statement and the connection
@@ -283,12 +283,12 @@ public class UserManagerDAO {
                     log.debug("Is statement null? " + (insertStmt == null));
                     log.debug("The query string " + INSERT_USER_QUERY);
 
-                    insertStmt.setString(1, user.getUserName());
+                    insertStmt.setString(1, user.getUsername());
                     insertStmt.setString(2, user.getPassword());
                     insertStmt.setString(3, user.getFullName());
                     insertStmt.setString(4, user.getAffiliation());
-                    insertStmt.setString(5, user.getWorkPhone());
-                    insertStmt.setString(6, user.getEmailAddr());
+                    insertStmt.setString(5, user.getPhone());
+                    insertStmt.setString(6, user.getEmail());
                     insertStmt.setBoolean(7, user.isInAdminGroup());
                     insertStmt.setBoolean(8, user.isAcctDisabled());
 

@@ -38,11 +38,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UserServicesTransport implements UserServices {
     private static Log log = LogFactory.getLog(UserServicesTransport.class);
+
     private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
     private static String endpoint = "";
 
-    
     /**
      * 
      */
@@ -79,8 +79,8 @@ public class UserServicesTransport implements UserServices {
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#authenticate(java.lang.String,
      *      java.lang.String, boolean)
      */
-    public void authenticate(String userName, String pwd, boolean wantAdminStatus) throws EmfException {
-        log.debug("Authenticate: " + userName);
+    public void authenticate(String username, String password) throws EmfException {
+        log.debug("Authenticate: " + username);
         Service service = new Service();
         Call call;
         try {
@@ -92,15 +92,13 @@ public class UserServicesTransport implements UserServices {
             Class cls = gov.epa.emissions.framework.services.User.class;
             call.registerTypeMapping(cls, qname, BeanSerializerFactory.class, BeanDeserializerFactory.class);
 
-            call.addParameter("uname", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("username", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
 
-            call.addParameter("pwd", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
-
-            call.addParameter("wantAdmin", org.apache.axis.Constants.XSD_BOOLEAN, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("password", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
 
             call.setReturnType(org.apache.axis.Constants.XSD_STRING);
 
-            call.invoke(new Object[] { userName, pwd, new Boolean(wantAdminStatus) });
+            call.invoke(new Object[] { username, password });
 
         } catch (ServiceException e) {
             log.error(e);
@@ -115,7 +113,7 @@ public class UserServicesTransport implements UserServices {
             log.error(e);
             throw new CommunicationFailureException("Error communicating with WS end point");
         }
-        log.debug("Authenticate: " + userName);
+        log.debug("Authenticate: " + username);
     }
 
     /*
@@ -180,7 +178,7 @@ public class UserServicesTransport implements UserServices {
      * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#createUser(gov.epa.emissions.framework.commons.User)
      */
     public void createUser(User newUser) throws CommunicationFailureException, AuthenticationException {
-        log.debug("getting user " + newUser.getUserName());
+        log.debug("getting user " + newUser.getUsername());
         Service service = new Service();
         Call call;
         try {
@@ -188,9 +186,8 @@ public class UserServicesTransport implements UserServices {
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
             call.setOperationName(new QName(emfSvcsNamespace, "createUser"));
             QName qname = new QName(emfSvcsNamespace, "ns1:User");
-            Class cls = gov.epa.emissions.framework.services.User.class;
-            call.registerTypeMapping(cls, qname, new org.apache.axis.encoding.ser.BeanSerializerFactory(cls, qname),
-                    new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls, qname));
+            call.registerTypeMapping(User.class, qname, new BeanSerializerFactory(User.class, qname),
+                    new BeanDeserializerFactory(User.class, qname));
 
             call.addParameter("newuser", qname, ParameterMode.IN);
 
@@ -211,7 +208,7 @@ public class UserServicesTransport implements UserServices {
             throw new CommunicationFailureException("Error communicating with WS end point");
         }
 
-        log.debug("getting user " + newUser.getUserName());
+        log.debug("getting user " + newUser.getUsername());
     }
 
     /*

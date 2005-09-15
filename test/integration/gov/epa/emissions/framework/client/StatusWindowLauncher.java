@@ -51,7 +51,7 @@ public class StatusWindowLauncher {
 
         Mock service = new Mock(StatusServices.class);
         service.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getMessages")).with(
-                new IsEqual(user.getUserName())).will(new ReturnStub(statuses));
+                new IsEqual(user.getUsername())).will(new ReturnStub(statuses));
 
         return (StatusServices) service.proxy();
     }
@@ -65,9 +65,9 @@ public class StatusWindowLauncher {
 
     static private User createUser(String username, String name, String email) throws EmfException {
         User user = new User();
-        user.setUserName(username);
+        user.setUsername(username);
         user.setFullName(name);
-        user.setEmailAddr(email);
+        user.setEmail(email);
 
         return user;
     }

@@ -17,7 +17,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         DatasetType type = new DatasetType("ORL NonRoad");
 
         User user = new User();
-        user.setUserName("user");
+        user.setUsername("user");
         user.setFullName("full name");
 
         Dataset dataset = new EmfDataset();
