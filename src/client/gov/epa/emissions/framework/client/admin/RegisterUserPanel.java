@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.gui.TextFieldWidget;
+import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.services.User;
@@ -56,7 +58,8 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         };
 
         user = new User();
-        panel = new UserProfilePanel(user, okAction, cancelAction, adminOption,
+        Widget name = new TextFieldWidget("name", user.getFullName(), 15);
+        panel = new UserProfilePanel(user, name, okAction, cancelAction, adminOption,
                 new PopulateUserOnRegisterStrategy(user));
         this.add(panel);
     }

@@ -22,12 +22,9 @@ public abstract class DatasetTypesServicesTestCase extends ServicesTestCase {
     }
 
     public void testInsert() throws EmfException {
-        int firstCount = 0;
-        int secondCount = 0;
-
         // Count the number of records in the table
         DatasetType[] allDsetTypes = eximService.getDatasetTypes();
-        firstCount = allDsetTypes.length;
+        int firstCount = allDsetTypes.length;
 
         // insert the new record
         DatasetType aDsetType = new DatasetType();
@@ -39,7 +36,7 @@ public abstract class DatasetTypesServicesTestCase extends ServicesTestCase {
 
         // FIXME: figure a way to update sequence count for the table in
         // Postgres
-        
+
         // eximService.insertDatasetType(aDsetType);
         //
         // // Count the number of records in the table

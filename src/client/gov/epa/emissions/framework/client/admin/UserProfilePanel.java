@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.PasswordField;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
@@ -33,7 +34,7 @@ public class UserProfilePanel extends JPanel {
 
     private JPasswordField confirmPassword;
 
-    private JTextField name;
+    private Widget name;
 
     private JTextField affiliation;
 
@@ -49,22 +50,24 @@ public class UserProfilePanel extends JPanel {
 
     private User user;
 
-    public UserProfilePanel(User user, Action okAction, Action cancelAction, AdminOption adminOption,
-            PopulateUserStrategy populateUserStrategy) {
+    // FIXME: one to many params ?
+    public UserProfilePanel(User user, Widget nameWidget, Action okAction, Action cancelAction,
+            AdminOption adminOption, PopulateUserStrategy populateUserStrategy) {
         this.user = user;
         this.adminOption = adminOption;
         this.populateUserStrategy = populateUserStrategy;
 
-        createLayout(user, okAction, cancelAction, adminOption);
+        createLayout(user, nameWidget, okAction, cancelAction, adminOption);
         this.setSize(new Dimension(375, 425));
     }
 
-    private void createLayout(User user, Action okAction, Action cancelAction, AdminOption adminOption) {
+    private void createLayout(User user, Widget nameWidget, Action okAction, Action cancelAction,
+            AdminOption adminOption) {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
         this.add(messagePanel);
-        this.add(createProfilePanel(user, adminOption));
+        this.add(createProfilePanel(user, nameWidget, adminOption));
 
         this.add(createLoginPanel(user));
         this.add(createButtonsPanel(okAction, cancelAction));
@@ -79,7 +82,8 @@ public class UserProfilePanel extends JPanel {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        container.add(new Button("Ok", okAction));
+        Button okButton = new Button("Ok", okAction);
+        container.add(okButton);
         container.add(new Button("Cancel", cancelAction));
 
         panel.add(container, BorderLayout.EAST);
@@ -118,12 +122,12 @@ public class UserProfilePanel extends JPanel {
         return panel;
     }
 
-    private JPanel createProfilePanel(User user, AdminOption adminOption) {
+    private JPanel createProfilePanel(User user, Widget nameWidget, AdminOption adminOption) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(createBorder("Profile"));
 
-        JPanel mandatoryPanel = createManadatoryProfilePanel(user);
+        JPanel mandatoryPanel = createManadatoryProfilePanel(user, nameWidget);
         panel.add(mandatoryPanel);
 
         JPanel optionsPanel = new JPanel();
@@ -133,7 +137,7 @@ public class UserProfilePanel extends JPanel {
         return panel;
     }
 
-    private JPanel createManadatoryProfilePanel(User user) {
+    private JPanel createManadatoryProfilePanel(User user, Widget nameWidget) {
         JPanel panel = new JPanel();
 
         JPanel labelsPanel = new JPanel();
@@ -152,8 +156,8 @@ public class UserProfilePanel extends JPanel {
         JPanel valuesPanel = new JPanel();
         valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
 
-        name = new TextField("name", user.getFullName(), 15);
-        valuesPanel.add(name);
+        name = nameWidget;
+        valuesPanel.add(nameWidget.element());
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
 
         affiliation = new TextField("affiliation", user.getAffiliation(), 15);
@@ -182,7 +186,7 @@ public class UserProfilePanel extends JPanel {
     }
 
     protected void populateUser() throws UserException {
-        populateUserStrategy.populate(name.getText(), affiliation.getText(), phone.getText(), email.getText(), username
+        populateUserStrategy.populate(name.value(), affiliation.getText(), phone.getText(), email.getText(), username
                 .getText(), password.getPassword(), confirmPassword.getPassword());
 
         // FIXME: where should we put this ?

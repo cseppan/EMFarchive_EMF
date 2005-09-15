@@ -15,7 +15,6 @@ public class RegisterUserWindow extends EmfFrame implements EmfWidgetContainer {
 
     private LaunchLoginOnCancelStrategy onCancelStrategy;
 
-    // TODO: should the app exit if 'x-close' is clicked ?
     public RegisterUserWindow(ServiceLocator serviceLocator, PostRegisterStrategy postRegisterStrategy) {
         super("RegisterUser", "Register New User");
         onCancelStrategy = new LaunchLoginOnCancelStrategy(serviceLocator);
@@ -24,7 +23,7 @@ public class RegisterUserWindow extends EmfFrame implements EmfWidgetContainer {
 
         this.setSize(view.getSize());
         this.setLocation(new Point(400, 200));
-        this.setVisible(true);
+        display();
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent event) {

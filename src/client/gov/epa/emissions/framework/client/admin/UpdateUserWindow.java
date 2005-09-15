@@ -1,11 +1,12 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.gui.LabelWidget;
+import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInteralFrame;
 import gov.epa.emissions.framework.client.EmfWidgetContainer;
 import gov.epa.emissions.framework.services.User;
 
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -13,6 +14,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContainer, UpdateUserView {
 
@@ -30,10 +32,12 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
         this.windowTitle = "Update User - " + user.getUsername();
         this.user = user;
 
-        panel = createLayout(adminOption);
-        super.getContentPane().add(panel);
-
-        super.setSize(new Dimension(375, 425));
+        panel = createLayout(adminOption);        
+        JPanel container = new JPanel();
+        container.add(panel);
+        super.getContentPane().add(container);
+        
+        super.setSize(panel.getSize());
         super.setResizable(false);
     }
 
@@ -53,7 +57,13 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
             }
         };
 
-        UserProfilePanel panel = new UserProfilePanel(user, saveAction, closeAction, adminOption,
+        Widget name = new LabelWidget("name", user.getFullName());
+        return createUserProfilePanel(name, saveAction, closeAction, adminOption);
+    }
+
+    private UserProfilePanel createUserProfilePanel(Widget name, Action saveAction, Action closeAction,
+            AdminOption adminOption) {
+        UserProfilePanel panel = new UserProfilePanel(user, name, saveAction, closeAction, adminOption,
                 new PopulateUserOnUpdateStrategy(user));
 
         panel.addEditListener(new KeyAdapter() {
@@ -61,7 +71,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfWidgetContai
                 markAsEdited();
             }
         });
-
+        
         return panel;
     }
 

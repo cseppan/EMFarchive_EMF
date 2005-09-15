@@ -89,10 +89,9 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
     }
 
     private void updateUser(User updateUser) {
-        //FIXME: drive this logic via Presenter
-        UpdateUserWindow view = updateUser.equals(user) ? 
-                  new UpdateUserWindow(updateUser, new NoAdminOption()) :
-                  new UpdateUserWindow(updateUser, new AddAdminOption());
+        // FIXME: drive this logic via Presenter
+        UpdateUserWindow view = updateUser.equals(user) ? new UpdateUserWindow(updateUser) : new UpdateUserWindow(
+                updateUser, new AddAdminOption());
         UpdateUserPresenter presenter = new UpdateUserPresenter(userServices, view);
         presenter.observe();
 
@@ -196,6 +195,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
         return users;
     }
 
+    //FIXME: cannot delete oneself
     private void deleteUser() {
         int option = JOptionPane.showConfirmDialog(null, "Are you sure about deleting user(s)", "Delete User",
                 JOptionPane.YES_NO_OPTION);
