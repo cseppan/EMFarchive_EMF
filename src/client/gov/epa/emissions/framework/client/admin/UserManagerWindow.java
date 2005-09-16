@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.mims.analysisengine.table.OverallTableModel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -51,6 +52,8 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
 
     private JDesktopPane desktop;
 
+    private SortFilterSelectionPanel sortFilterSelectPanel;
+
     // FIXME: this class needs to be refactored into smaller components
     public UserManagerWindow(User user, UserServices userServices, JFrame parentConsole, JDesktopPane desktop)
             throws Exception {
@@ -74,7 +77,7 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
 
     private void createLayout(JFrame parentConsole) {
         layout.removeAll();
-        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
+        sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         createLayout(layout, sortFilterSelectPanel);
         listenForUpdateSelection(sortFilterSelectPanel.getTable());
 
@@ -87,7 +90,11 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event) {
                 if (event.getClickCount() == 2) {
-                    User user = model.getUser(table.getSelectedRow());
+                    // FIXME: hack - need to use Overall Table Model to get
+                    // 'selected row'
+                    int selectedRow = table.getSelectedRow();
+                    OverallTableModel overallTableModel = sortFilterSelectPanel.getOverallTableModel();
+                    User user = model.getUser(overallTableModel.getBaseModelRowIndex(selectedRow));
                     updateUser(user);
                 }
             }
@@ -96,8 +103,8 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
 
     private void updateUser(User updateUser) {
         // FIXME: drive this logic via Presenter
-        UpdateUserWindow view = updateUser.equals(user) ? new UpdateUserWindow(updateUser)
-                : new UpdateUserWindow(updateUser, new AddAdminOption());
+        UpdateUserWindow view = updateUser.equals(user) ? new UpdateUserWindow(updateUser) : new UpdateUserWindow(
+                updateUser, new AddAdminOption());
         UpdateUserPresenter presenter = new UpdateUserPresenter(userServices, view);
         presenter.observe();
 
