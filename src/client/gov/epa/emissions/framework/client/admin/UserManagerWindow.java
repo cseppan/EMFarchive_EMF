@@ -3,8 +3,8 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -48,12 +49,17 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
 
     private User user;
 
+    private JDesktopPane desktop;
+
     // FIXME: this class needs to be refactored into smaller components
-    public UserManagerWindow(User user, UserServices userServices, JFrame parentConsole) throws Exception {
-        super("User Management Console");
+    public UserManagerWindow(User user, UserServices userServices, JFrame parentConsole, JDesktopPane desktop)
+            throws Exception {
+        super("User Management Console", desktop);
         this.user = user;
         this.userServices = userServices;
         this.parentConsole = parentConsole;
+        this.desktop = desktop;
+
         model = new UserManagerTableModel(userServices);
         selectModel = new SortFilterSelectModel(model);
 
@@ -90,8 +96,8 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
 
     private void updateUser(User updateUser) {
         // FIXME: drive this logic via Presenter
-        UpdateUserWindow view = updateUser.equals(user) ? new UpdateUserWindow(updateUser) : new UpdateUserWindow(
-                updateUser, new AddAdminOption());
+        UpdateUserWindow view = updateUser.equals(user) ? new UpdateUserWindow(updateUser, desktop)
+                : new UpdateUserWindow(updateUser, new AddAdminOption(), desktop);
         UpdateUserPresenter presenter = new UpdateUserPresenter(userServices, view);
         presenter.observe();
 
@@ -219,7 +225,7 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
     }
 
     private void displayRegisterUser() {
-        RegisterUserInternalFrame container = new RegisterUserInternalFrame(new NoOpPostRegisterStrategy());
+        RegisterUserInternalFrame container = new RegisterUserInternalFrame(new NoOpPostRegisterStrategy(), desktop);
         RegisterUserPresenter presenter = new RegisterUserPresenter(userServices, container.getView());
         presenter.observe();
 

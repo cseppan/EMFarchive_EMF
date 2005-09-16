@@ -20,13 +20,14 @@ public class UserManagerWindowLauncher {
         UserServices userAdmin = launcher.createUserAdmin();
         JFrame frame = new JFrame();
 
-        UserManagerWindow console = new UserManagerWindow(null, userAdmin, frame);
+        JDesktopPane desktop = new JDesktopPane();
+        UserManagerWindow console = new UserManagerWindow(null, userAdmin, frame, desktop);
         UserManagerPresenter presenter = new UserManagerPresenter(null, userAdmin, console);
         presenter.observe();
 
         console.setVisible(true);
 
-        launcher.addAsInternalFrame(console, frame);
+        launcher.addAsInternalFrame(console, frame, desktop);
 
         frame.setSize(new Dimension(800, 600));
         frame.setLocation(new Point(400, 200));
@@ -34,8 +35,7 @@ public class UserManagerWindowLauncher {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private void addAsInternalFrame(UserManagerWindow console, JFrame frame) {
-        JDesktopPane desktop = new JDesktopPane();
+    private void addAsInternalFrame(UserManagerWindow console, JFrame frame, JDesktopPane desktop) {
         desktop.setName("EMF Console");
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
         desktop.add(console);

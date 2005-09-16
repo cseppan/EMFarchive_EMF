@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.ReusableInteralFrame;
+import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -22,7 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class ExportWindow extends ReusableInteralFrame implements ExportView {
+public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private EmfDataset[] datasets;
 

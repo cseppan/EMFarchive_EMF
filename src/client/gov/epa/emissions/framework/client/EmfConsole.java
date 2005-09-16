@@ -68,7 +68,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private void showStatus() {
         StatusServices statusServices = serviceLocator.getStatusServices();
-        status = new StatusWindow(user, statusServices, this);
+        status = new StatusWindow(user, statusServices, this, desktop);
         windowMenuPresenter.notifyAdd(status);
 
         desktop.add(status);
@@ -147,10 +147,11 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         }
 
         ExImServices eximServices = serviceLocator.getExImServices();
-        importView = new ImportWindow(eximServices);
-        ImportPresenter presenter = new ImportPresenter(user, eximServices);
+
+        importView = new ImportWindow(eximServices, desktop);
         desktop.add(importView);
 
+        ImportPresenter presenter = new ImportPresenter(user, eximServices);
         presenter.observe(importView);
     }
 

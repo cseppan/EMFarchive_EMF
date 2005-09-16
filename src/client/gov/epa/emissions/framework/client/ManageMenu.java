@@ -27,6 +27,12 @@ public class ManageMenu extends JMenu {
 
     private EmfFrame parent;
 
+    private UserManagerWindow userManagerView;
+
+    private UpdateUserWindow updateUserView;
+
+    private DatasetsBrowserWindow datasetsBrowserView;
+
     public ManageMenu(EmfSession session, EmfFrame parent, JDesktopPane desktop, MessagePanel messagePanel) {
         super("Manage");
         this.session = session;
@@ -40,14 +46,14 @@ public class ManageMenu extends JMenu {
         super.addSeparator();
 
         addUsers(session.getUser());
-        addMyProfile();
+        addMyProfile(session);
     }
 
-    private void addMyProfile() {
+    private void addMyProfile(final EmfSession session) {
         JMenuItem myProfile = new JMenuItem("My Profile");
         myProfile.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                displayUpdateUser();
+                displayUpdateUser(session);
             }
         });
         super.add(myProfile);
@@ -58,8 +64,7 @@ public class ManageMenu extends JMenu {
             JMenuItem users = new JMenuItem("Users");
             users.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    if (presenter != null)
-                        presenter.notifyManageUsers();
+                    presenter.notifyManageUsers();
                 }
             });
             super.add(users);
@@ -81,23 +86,33 @@ public class ManageMenu extends JMenu {
     }
 
     private void displayDatasets(EmfFrame parent) throws EmfException {
-        DatasetsBrowserWindow view = new DatasetsBrowserWindow(session.getDataServices(), parent);
+        if (datasetsBrowserView != null) {
+            datasetsBrowserView.bringToFront();
+            return;
+        }
+
+        datasetsBrowserView = new DatasetsBrowserWindow(session.getDataServices(), parent, desktop);
+        desktop.add(datasetsBrowserView);
+
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session);
-        presenter.observe(view);
+        presenter.observe(datasetsBrowserView);
 
-        desktop.add(view);
-
-        view.display();
+        datasetsBrowserView.display();
     }
 
-    private void displayUpdateUser() {
-        UpdateUserWindow view = new UpdateUserWindow(session.getUser());
-        UpdateUserPresenter presenter = new UpdateUserPresenter(session.getUserServices(), view);
+    private void displayUpdateUser(EmfSession session) {
+        if (updateUserView != null) {
+            updateUserView.bringToFront();
+            return;
+        }
+
+        updateUserView = new UpdateUserWindow(session.getUser(), desktop);
+        desktop.add(updateUserView);
+
+        UpdateUserPresenter presenter = new UpdateUserPresenter(session.getUserServices(), updateUserView);
         presenter.observe();
 
-        desktop.add(view);
-
-        view.display();
+        updateUserView.display();
     }
 
     private JMenuItem createDisabledMenuItem(String name) {
@@ -108,15 +123,20 @@ public class ManageMenu extends JMenu {
     }
 
     public void displayUserManager() {
+        if (userManagerView != null) {
+            userManagerView.bringToFront();
+            return;
+        }
+
         try {
             UserServices userServices = session.getUserServices();
-            User user = session.getUser();
-            UserManagerWindow console = new UserManagerWindow(user, userServices, parent);
-            UserManagerPresenter presenter = new UserManagerPresenter(user, userServices, console);
+            userManagerView = new UserManagerWindow(session.getUser(), userServices, parent, desktop);
+            desktop.add(userManagerView);
+
+            UserManagerPresenter presenter = new UserManagerPresenter(session.getUser(), userServices, userManagerView);
             presenter.observe();
 
-            desktop.add(console);
-            console.display();
+            userManagerView.display();
         } catch (Exception e) {
             // TODO: error handling
         }

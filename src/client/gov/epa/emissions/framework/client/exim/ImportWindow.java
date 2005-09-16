@@ -4,8 +4,8 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.ExImServices;
 
@@ -20,6 +20,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -42,8 +43,8 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     private JTextField folder;
 
-    public ImportWindow(ExImServices eximServices) throws EmfException {
-        super("Import Dataset");
+    public ImportWindow(ExImServices eximServices, JDesktopPane desktop) throws EmfException {
+        super("Import Dataset", desktop);
         super.setName("importWindow");
         this.eximServices = eximServices;
 

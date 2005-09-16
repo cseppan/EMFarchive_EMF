@@ -35,10 +35,11 @@ public class DatasetsBrowserLauncher {
         services.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getDatasets")).will(
                 new ReturnStub(datasets));
 
-        DatasetsBrowserWindow console = new DatasetsBrowserWindow((DataServices) services.proxy(), frame);
+        JDesktopPane desktop = new JDesktopPane();
+        DatasetsBrowserWindow console = new DatasetsBrowserWindow((DataServices) services.proxy(), frame, desktop);
         console.setVisible(true);
 
-        launcher.addAsInternalFrame(console, frame);
+        launcher.addAsInternalFrame(console, frame, desktop);
     }
 
     private EmfDataset[] createDatasets() {
@@ -65,8 +66,7 @@ public class DatasetsBrowserLauncher {
         return (EmfDataset[]) datasets.toArray(new EmfDataset[0]);
     }
 
-    private void addAsInternalFrame(ReusableInteralFrame console, JFrame frame) {
-        JDesktopPane desktop = new JDesktopPane();
+    private void addAsInternalFrame(ReusableInteralFrame console, JFrame frame, JDesktopPane desktop) {
         desktop.setName("EMF Console");
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
         desktop.add(console);

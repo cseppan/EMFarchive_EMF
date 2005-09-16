@@ -24,6 +24,7 @@ import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -46,8 +47,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     // FIXME: this is very similar to UserManagerWindow. Can we refactory &
     // reuse ?
-    public DatasetsBrowserWindow(DataServices services, JFrame parentConsole) throws EmfException {
-        super("Datasets Browser");
+    public DatasetsBrowserWindow(DataServices services, JFrame parentConsole, JDesktopPane desktop) throws EmfException {
+        super("Datasets Browser", desktop);
 
         // FIXME: change the type from Dataset to EmfDataset
         model = new DatasetsBrowserTableModel((EmfDataset[]) services.getDatasets());
@@ -112,10 +113,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                 }
             }
         });
-        
+
         JPanel panel = new JPanel();
         panel.add(button);
-        
+
         return panel;
     }
 

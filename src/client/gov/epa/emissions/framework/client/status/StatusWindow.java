@@ -2,8 +2,8 @@ package gov.epa.emissions.framework.client.status;
 
 import gov.epa.emissions.framework.ConcurrentTaskRunner;
 import gov.epa.emissions.framework.TaskRunner;
-import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
@@ -25,6 +25,7 @@ import java.util.ResourceBundle;
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -41,8 +42,8 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
     private TaskRunner taskRunner;
 
-    public StatusWindow(User user, StatusServices statusServices, Container parent) {
-        super("Status");
+    public StatusWindow(User user, StatusServices statusServices, Container parent, JDesktopPane desktop) {
+        super("Status", desktop);
         super.setName("status");
 
         position(parent);

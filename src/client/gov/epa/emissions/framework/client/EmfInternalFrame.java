@@ -14,6 +14,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements EmfView
     }
 
     public void bringToFront() {
+
         super.toFront();
         try {
             super.setIcon(false);

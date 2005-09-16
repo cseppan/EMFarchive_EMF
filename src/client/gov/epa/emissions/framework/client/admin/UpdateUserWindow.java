@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.commons.gui.LabelWidget;
 import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.DisposableEmfInteralFrame;
+import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfView;
 import gov.epa.emissions.framework.services.User;
 
@@ -13,10 +13,11 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class UpdateUserWindow extends DisposableEmfInteralFrame implements EmfView, UpdateUserView {
+public class UpdateUserWindow extends DisposableInteralFrame implements EmfView, UpdateUserView {
 
     private UpdateUserPresenter presenter;
 
@@ -26,7 +27,7 @@ public class UpdateUserWindow extends DisposableEmfInteralFrame implements EmfVi
 
     private UserProfilePanel panel;
 
-    public UpdateUserWindow(User user, AdminOption adminOption) {
+    public UpdateUserWindow(User user, AdminOption adminOption, JDesktopPane desktop) {
         super("Update User - " + user.getUsername());
 
         this.windowTitle = "Update User - " + user.getUsername();
@@ -41,8 +42,8 @@ public class UpdateUserWindow extends DisposableEmfInteralFrame implements EmfVi
         super.setResizable(false);
     }
 
-    public UpdateUserWindow(User user) {
-        this(user, new NoAdminOption());
+    public UpdateUserWindow(User user, JDesktopPane desktop) {
+        this(user, new NoAdminOption(), desktop);
     }
 
     private UserProfilePanel createLayout(AdminOption adminOption) {
