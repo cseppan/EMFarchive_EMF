@@ -137,11 +137,7 @@ public class StatusWindow extends EmfInteralFrame implements StatusView {
 
     public void close() {
         taskRunner.stop();
-        super.dispose();
-    }
-
-    public void display() {
-        super.setVisible(true);
+        super.close();
     }
 
     public void update(Status[] statuses) {

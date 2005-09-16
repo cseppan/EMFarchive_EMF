@@ -16,7 +16,7 @@ public class WindowMenuPresenter {
         view.unregister(managedView);
     }
 
-    public void notifyBringToFront(ManagedView managedView) {
+    public void select(ManagedView managedView) {
         managedView.bringToFront();
     }
 

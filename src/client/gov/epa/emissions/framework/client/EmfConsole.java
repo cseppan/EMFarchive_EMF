@@ -46,6 +46,8 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private EmfSession session;
 
+    private WindowMenuPresenter windowMenuPresenter;
+
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(EmfSession session) {
         super("EMF Console", "Emissions Modeling Framework (EMF)");
@@ -74,7 +76,8 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     private void showStatus() {
         StatusServices statusServices = serviceLocator.getStatusServices();
         status = new StatusWindow(user, statusServices, this);
-
+        windowMenuPresenter.notifyAdd(status);
+        
         desktop.add(status);
 
         status.display();
@@ -90,9 +93,17 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
         menubar.add(createFileMenu());
         menubar.add(createManageMenu());
+        menubar.add(createWindowMenu());
         menubar.add(createHelpMenu());
 
         return menubar;
+    }
+
+    private WindowMenu createWindowMenu() {
+        WindowMenu menu = new WindowMenu();
+        windowMenuPresenter = new WindowMenuPresenter(menu);
+
+        return menu;
     }
 
     private JMenu createFileMenu() {

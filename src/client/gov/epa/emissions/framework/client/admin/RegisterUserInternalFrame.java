@@ -1,9 +1,8 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.client.EmfInteralFrame;
-import gov.epa.emissions.framework.client.EmfView;
 
-public class RegisterUserInternalFrame extends EmfInteralFrame implements EmfView {
+public class RegisterUserInternalFrame extends EmfInteralFrame {
 
     private RegisterUserPanel view;
 
@@ -16,16 +15,8 @@ public class RegisterUserInternalFrame extends EmfInteralFrame implements EmfVie
         super.getContentPane().add(view);
     }
 
-    public void close() {
-        super.dispose();
-    }
-
     public RegisterUserView getView() {
         return view;
-    }
-
-    public void display() {
-        super.show();
     }
 
 }

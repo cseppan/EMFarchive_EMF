@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.client;
 
 public interface ManagedView {
-    String getName();
+    String getTitle();
 
     void bringToFront();
+
+    String getName();
 }

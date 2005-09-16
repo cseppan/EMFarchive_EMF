@@ -33,6 +33,6 @@ public class WindowMenuPresenterTest extends MockObjectTestCase {
 
     public void testShouldBringManagedViewToFrontOnBeingSelectedFromMenu() {
         managedView.expects(once()).method("bringToFront").withNoArguments();
-        presenter.notifyBringToFront(managedViewProxy);
+        presenter.select(managedViewProxy);
     }
 }
