@@ -9,7 +9,7 @@ public class EmfConsolePresenter implements EmfPresenter {
     }
 
     public void observe() {
-        view.setObserver(this);
+        view.observe(this);
     }
 
     public void notifyManageUsers() {

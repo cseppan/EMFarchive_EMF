@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfInteralFrame;
+import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.meta.MetadataWindow;
 import gov.epa.emissions.framework.client.status.StatusWindow;
@@ -28,7 +28,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class DatasetsBrowserWindow extends EmfInteralFrame implements DatasetsBrowserView {
+public class DatasetsBrowserWindow extends ReusableInteralFrame implements DatasetsBrowserView {
 
     private DatasetsBrowserTableModel model;
 

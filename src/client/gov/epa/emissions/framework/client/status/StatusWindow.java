@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.status;
 
 import gov.epa.emissions.framework.ConcurrentTaskRunner;
 import gov.epa.emissions.framework.TaskRunner;
-import gov.epa.emissions.framework.client.EmfInteralFrame;
+import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.Status;
@@ -31,7 +31,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-public class StatusWindow extends EmfInteralFrame implements StatusView {
+public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
     private StatusPresenter presenter;
 

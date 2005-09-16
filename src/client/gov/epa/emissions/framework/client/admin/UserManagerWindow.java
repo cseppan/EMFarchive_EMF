@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfInteralFrame;
+import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.User;
@@ -30,7 +30,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-public class UserManagerWindow extends EmfInteralFrame implements UserManagerView {
+public class UserManagerWindow extends ReusableInteralFrame implements UserManagerView {
 
     private UserManagerPresenter presenter;
 
@@ -195,7 +195,7 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
         return users;
     }
 
-    //FIXME: cannot delete oneself
+    // FIXME: cannot delete oneself
     private void deleteUser() {
         int option = JOptionPane.showConfirmDialog(null, "Are you sure about deleting user(s)", "Delete User",
                 JOptionPane.YES_NO_OPTION);
@@ -238,10 +238,6 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
         this.presenter = presenter;
     }
 
-    public void close() {
-        super.dispose();
-    }
-
     public void refresh() {
         selectModel.refresh();
         // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
@@ -251,10 +247,6 @@ public class UserManagerWindow extends EmfInteralFrame implements UserManagerVie
 
     private void refreshLayout() {
         super.validate();
-    }
-
-    public void display() {
-        super.setVisible(true);
     }
 
     private void doSimpleRefresh() {

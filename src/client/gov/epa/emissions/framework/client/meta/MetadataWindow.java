@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.framework.client.EmfInteralFrame;
+import gov.epa.emissions.framework.client.DisposableEmfInteralFrame;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -13,7 +13,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-public class MetadataWindow extends EmfInteralFrame implements MetadataView {
+public class MetadataWindow extends DisposableEmfInteralFrame implements MetadataView {
 
     private MetadataPresenter presenter;
 
@@ -54,7 +54,7 @@ public class MetadataWindow extends EmfInteralFrame implements MetadataView {
 
         contentPane.add(panel);
 
-        this.setVisible(true);
+        super.display();
     }
 
     private JPanel createBottomPanel() {
@@ -71,15 +71,11 @@ public class MetadataWindow extends EmfInteralFrame implements MetadataView {
             }
         });
         getRootPane().setDefaultButton(close);
-        
+
         JPanel closePanel = new JPanel();
         closePanel.add(close);
-        
-        return closePanel;
-    }
 
-    public void close() {
-        super.dispose();
+        return closePanel;
     }
 
     public void register(MetadataPresenter presenter) {

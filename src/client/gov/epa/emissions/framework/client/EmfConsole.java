@@ -1,12 +1,6 @@
 package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
-import gov.epa.emissions.framework.client.admin.UpdateUserWindow;
-import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
-import gov.epa.emissions.framework.client.admin.UserManagerWindow;
-import gov.epa.emissions.framework.client.exim.DatasetsBrowserPresenter;
-import gov.epa.emissions.framework.client.exim.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
@@ -36,48 +30,47 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private User user;
 
-    private EmfConsolePresenter presenter;
-
     private ServiceLocator serviceLocator;
 
     private MessagePanel messagePanel;
 
     private StatusWindow status;
 
-    private EmfSession session;
-
     private WindowMenuPresenter windowMenuPresenter;
+
+    private ImportWindow importView;
+
+    private ManageMenu manageMenu;
 
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(EmfSession session) {
         super("EMF Console", "Emissions Modeling Framework (EMF)");
-        this.session = session;
-        this.user = session.getUser();
+        user = session.getUser();
         this.serviceLocator = session.getServiceLocator();
 
         setProperties();
-        setLayout();
+        setLayout(session);
         showStatus();
     }
 
-    private void setLayout() {
-        JMenuBar menuBar = createMenuBar();
-        super.setJMenuBar(menuBar);
-
-        messagePanel = new SingleLineMessagePanel();
-        menuBar.add(messagePanel);
-
+    private void setLayout(EmfSession session) {
         desktop = new JDesktopPane();
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
 
         this.setContentPane(desktop);
+
+        JMenuBar menuBar = createMenuBar(session, desktop);
+        super.setJMenuBar(menuBar);
+
+        messagePanel = new SingleLineMessagePanel();
+        menuBar.add(messagePanel);
     }
 
     private void showStatus() {
         StatusServices statusServices = serviceLocator.getStatusServices();
         status = new StatusWindow(user, statusServices, this);
         windowMenuPresenter.notifyAdd(status);
-        
+
         desktop.add(status);
 
         status.display();
@@ -88,11 +81,11 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private JMenuBar createMenuBar() {
+    private JMenuBar createMenuBar(EmfSession session, JDesktopPane desktop) {
         JMenuBar menubar = new JMenuBar();
 
         menubar.add(createFileMenu());
-        menubar.add(createManageMenu());
+        menubar.add(createManageMenu(session, desktop));
         menubar.add(createWindowMenu());
         menubar.add(createHelpMenu());
 
@@ -148,12 +141,17 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     protected void displayImport() throws EmfException {
-        ExImServices eximServices = serviceLocator.getExImServices();
-        ImportWindow view = new ImportWindow(eximServices);
-        ImportPresenter presenter = new ImportPresenter(user, eximServices);
-        presenter.observe(view);
+        if (importView != null) {
+            importView.bringToFront();
+            return;
+        }
 
-        desktop.add(view);
+        ExImServices eximServices = serviceLocator.getExImServices();
+        importView = new ImportWindow(eximServices);
+        ImportPresenter presenter = new ImportPresenter(user, eximServices);
+        desktop.add(importView);
+
+        presenter.observe(importView);
     }
 
     private void logout() {
@@ -180,79 +178,10 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         return menuItem;
     }
 
-    private JMenu createManageMenu() {
-        JMenu menu = new JMenu("Manage");
+    private JMenu createManageMenu(EmfSession session, JDesktopPane desktop) {
+        manageMenu = new ManageMenu(session, this, desktop, messagePanel);
 
-        JMenuItem datasets = new JMenuItem("Datasets");
-        datasets.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    displayDatasets();
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
-                }
-            }
-        });
-        menu.add(datasets);
-
-        menu.add(createDisabledMenuItem("Dataset Types"));
-        menu.add(createDisabledMenuItem("Sectors"));
-        menu.addSeparator();
-
-        if (user.isInAdminGroup()) {
-            JMenuItem users = new JMenuItem("Users");
-            users.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    if (presenter != null)
-                        presenter.notifyManageUsers();
-                }
-            });
-            menu.add(users);
-        }
-
-        JMenuItem myProfile = new JMenuItem("My Profile");
-        myProfile.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                displayUpdateUser();
-            }
-        });
-        menu.add(myProfile);
-
-        return menu;
-    }
-
-    private void displayDatasets() throws EmfException {
-        DatasetsBrowserWindow view = new DatasetsBrowserWindow(serviceLocator.getDataServices(), this);
-        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session);
-        presenter.observe(view);
-
-        desktop.add(view);
-
-        view.display();
-    }
-
-    private void displayUpdateUser() {
-        UpdateUserWindow view = new UpdateUserWindow(user);
-        UpdateUserPresenter presenter = new UpdateUserPresenter(serviceLocator.getUserServices(), view);
-        presenter.observe();
-
-        desktop.add(view);
-
-        view.display();
-    }
-
-    public void displayUserManager() {
-        try {
-            UserServices userServices = serviceLocator.getUserServices();
-            UserManagerWindow console = new UserManagerWindow(user, userServices, this);
-            UserManagerPresenter presenter = new UserManagerPresenter(user, userServices, console);
-            presenter.observe();
-
-            desktop.add(console);
-            console.display();
-        } catch (Exception e) {
-            // TODO: error handling
-        }
+        return manageMenu;
     }
 
     private JMenu createHelpMenu() {
@@ -274,12 +203,16 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         return menu;
     }
 
-    public void setObserver(EmfConsolePresenter presenter) {
-        this.presenter = presenter;
+    public void observe(EmfConsolePresenter presenter) {
+        manageMenu.observe(presenter);
     }
 
     public void display() {
         super.setVisible(true);
+    }
+
+    public void displayUserManager() {
+        manageMenu.displayUserManager();
     }
 
 }

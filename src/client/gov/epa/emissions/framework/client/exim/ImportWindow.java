@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfInteralFrame;
+import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.ExImServices;
@@ -26,7 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-public class ImportWindow extends EmfInteralFrame implements ImportView {
+public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     private ImportPresenter presenter;
 
@@ -161,14 +161,6 @@ public class ImportWindow extends EmfInteralFrame implements ImportView {
 
     public void register(ImportPresenter presenter) {
         this.presenter = presenter;
-    }
-
-    public void close() {
-        super.dispose();
-    }
-
-    public void display() {
-        super.setVisible(true);
     }
 
     private void refresh() {

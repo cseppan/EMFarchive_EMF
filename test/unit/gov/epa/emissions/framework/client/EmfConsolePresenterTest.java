@@ -9,7 +9,7 @@ public class EmfConsolePresenterTest extends MockObjectTestCase {
         Mock view = mock(EmfConsoleView.class);         
         
         EmfConsolePresenter presenter = new EmfConsolePresenter((EmfConsoleView)view.proxy());
-        view.expects(once()).method("setObserver").with(eq(presenter));
+        view.expects(once()).method("observe").with(eq(presenter));
 
         presenter.observe();
     }

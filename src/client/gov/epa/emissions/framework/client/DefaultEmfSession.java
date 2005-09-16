@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.framework.services.UserServices;
 
 public class DefaultEmfSession implements EmfSession {
 
@@ -42,5 +43,9 @@ public class DefaultEmfSession implements EmfSession {
 
     public void setMostRecentExportFolder(String mostRecentExportFolder) {
         this.mostRecentExportFolder = mostRecentExportFolder;
+    }
+
+    public UserServices getUserServices() {
+        return serviceLocator.getUserServices();
     }
 }

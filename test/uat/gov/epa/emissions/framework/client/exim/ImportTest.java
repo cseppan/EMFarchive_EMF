@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.Random;
 
 import javax.swing.JComboBox;
+import javax.swing.JInternalFrame;
 import javax.swing.JList;
 import javax.swing.ListModel;
 
@@ -31,13 +32,8 @@ public class ImportTest extends UserAcceptanceTestCase {
     public void tearDown() throws Exception {
         click(importWindow, "done");
 
-        try {
-            findInternalFrame(consoleWindow, "importWindow");
-        } catch (Exception e) {
-            return;
-        }
-
-        fail("should have closed the Import window on clicking Done");
+        JInternalFrame importWindow = findInternalFrame(consoleWindow, "importWindow");
+        assertFalse("Import Window should be hidden from view", importWindow.isVisible());
     }
 
     public void testShouldShowAtleastFourORLDatasetTypesAsOptions() throws Exception {

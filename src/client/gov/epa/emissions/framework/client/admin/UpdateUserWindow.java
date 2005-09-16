@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.commons.gui.LabelWidget;
 import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfInteralFrame;
+import gov.epa.emissions.framework.client.DisposableEmfInteralFrame;
 import gov.epa.emissions.framework.client.EmfView;
 import gov.epa.emissions.framework.services.User;
 
@@ -16,7 +16,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class UpdateUserWindow extends EmfInteralFrame implements EmfView, UpdateUserView {
+public class UpdateUserWindow extends DisposableEmfInteralFrame implements EmfView, UpdateUserView {
 
     private UpdateUserPresenter presenter;
 
@@ -32,11 +32,11 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfView, Update
         this.windowTitle = "Update User - " + user.getUsername();
         this.user = user;
 
-        panel = createLayout(adminOption);        
+        panel = createLayout(adminOption);
         JPanel container = new JPanel();
         container.add(panel);
         super.getContentPane().add(container);
-        
+
         super.setSize(panel.getSize());
         super.setResizable(false);
     }
@@ -71,7 +71,7 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfView, Update
                 markAsEdited();
             }
         });
-        
+
         return panel;
     }
 
@@ -90,14 +90,6 @@ public class UpdateUserWindow extends EmfInteralFrame implements EmfView, Update
         }
 
         close();
-    }
-
-    public void close() {
-        this.dispose();
-    }
-
-    public void display() {
-        this.setVisible(true);
     }
 
     public void setObserver(UpdateUserPresenter presenter) {

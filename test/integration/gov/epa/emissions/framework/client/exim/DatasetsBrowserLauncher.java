@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.Dataset;
-import gov.epa.emissions.framework.client.EmfInteralFrame;
+import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -65,7 +65,7 @@ public class DatasetsBrowserLauncher {
         return (EmfDataset[]) datasets.toArray(new EmfDataset[0]);
     }
 
-    private void addAsInternalFrame(EmfInteralFrame console, JFrame frame) {
+    private void addAsInternalFrame(ReusableInteralFrame console, JFrame frame) {
         JDesktopPane desktop = new JDesktopPane();
         desktop.setName("EMF Console");
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);

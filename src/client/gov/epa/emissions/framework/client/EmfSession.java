@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.framework.services.UserServices;
 
 public interface EmfSession {
 
@@ -18,5 +19,7 @@ public interface EmfSession {
     public abstract String getMostRecentExportFolder();
 
     public abstract void setMostRecentExportFolder(String mostRecentExportFolder);
+
+    public abstract UserServices getUserServices();
 
 }

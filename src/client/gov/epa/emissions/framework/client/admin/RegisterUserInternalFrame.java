@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.framework.client.EmfInteralFrame;
+import gov.epa.emissions.framework.client.ReusableInteralFrame;
 
-public class RegisterUserInternalFrame extends EmfInteralFrame {
+public class RegisterUserInternalFrame extends ReusableInteralFrame {
 
     private RegisterUserPanel view;
 
