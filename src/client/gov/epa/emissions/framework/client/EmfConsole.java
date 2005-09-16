@@ -1,16 +1,9 @@
 package gov.epa.emissions.framework.client;
 
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.exim.ImportPresenter;
-import gov.epa.emissions.framework.client.exim.ImportWindow;
-import gov.epa.emissions.framework.client.login.LoginPresenter;
-import gov.epa.emissions.framework.client.login.LoginWindow;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -37,8 +30,6 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     private StatusWindow status;
 
     private WindowMenuPresenter windowMenuPresenter;
-
-    private ImportWindow importView;
 
     private ManageMenu manageMenu;
 
@@ -84,7 +75,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     private JMenuBar createMenuBar(EmfSession session, JDesktopPane desktop) {
         JMenuBar menubar = new JMenuBar();
 
-        menubar.add(createFileMenu());
+        menubar.add(createFileMenu(session, desktop));
         menubar.add(createManageMenu(session, desktop));
         menubar.add(createWindowMenu());
         menubar.add(createHelpMenu());
@@ -99,74 +90,11 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         return menu;
     }
 
-    private JMenu createFileMenu() {
-        JMenu menu = new JMenu("File");
-        menu.setName("file");
-
-        JMenuItem importMenu = new JMenuItem("Import");
-        importMenu.setName("import");
-        importMenu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    displayImport();
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
-                }
-            }
-        });
-        menu.add(importMenu);
-
-        menu.addSeparator();
-
-        JMenuItem logout = new JMenuItem("Logout");
-        logout.setName("logout");
-        logout.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                logout();
-            }
-        });
-        menu.add(logout);
-
-        JMenuItem exit = new JMenuItem("Exit");
-        exit.setName("exit");
-        exit.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                // TODO: logout before exiting. Should prompt the user ?
-                System.exit(0);
-            }
-        });
-        menu.add(exit);
-
-        return menu;
+    private JMenu createFileMenu(EmfSession session, JDesktopPane desktop) {
+        return new FileMenu(session, this, desktop, messagePanel);
     }
 
-    protected void displayImport() throws EmfException {
-        if (importView != null) {
-            importView.bringToFront();
-            return;
-        }
-
-        ExImServices eximServices = serviceLocator.getExImServices();
-
-        importView = new ImportWindow(eximServices, desktop);
-        desktop.add(importView);
-
-        ImportPresenter presenter = new ImportPresenter(user, eximServices);
-        presenter.observe(importView);
-    }
-
-    private void logout() {
-        UserServices userServices = serviceLocator.getUserServices();
-        LoginWindow view = new LoginWindow(serviceLocator);
-        LoginPresenter presenter = new LoginPresenter(userServices, view);
-        presenter.observe();
-
-        view.display();
-
-        close();
-    }
-
-    private void close() {
+    public void close() {
         // TODO: auto logout of a session
         status.close();
         super.dispose();

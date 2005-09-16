@@ -13,7 +13,6 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -27,7 +26,7 @@ public class UpdateUserWindow extends DisposableInteralFrame implements EmfView,
 
     private UserProfilePanel panel;
 
-    public UpdateUserWindow(User user, AdminOption adminOption, JDesktopPane desktop) {
+    public UpdateUserWindow(User user, AdminOption adminOption) {
         super("Update User - " + user.getUsername());
 
         this.windowTitle = "Update User - " + user.getUsername();
@@ -42,8 +41,8 @@ public class UpdateUserWindow extends DisposableInteralFrame implements EmfView,
         super.setResizable(false);
     }
 
-    public UpdateUserWindow(User user, JDesktopPane desktop) {
-        this(user, new NoAdminOption(), desktop);
+    public UpdateUserWindow(User user) {
+        this(user, new NoAdminOption());
     }
 
     private UserProfilePanel createLayout(AdminOption adminOption) {

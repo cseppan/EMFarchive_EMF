@@ -39,24 +39,24 @@ public class ManageMenu extends JMenu {
         this.desktop = desktop;
         this.parent = parent;
 
-        addDatasets(parent, messagePanel);
-
+        super.add(createDatasets(parent, messagePanel));
         super.add(createDisabledMenuItem("Dataset Types"));
         super.add(createDisabledMenuItem("Sectors"));
         super.addSeparator();
 
         addUsers(session.getUser());
-        addMyProfile(session);
+        super.add(createMyProfile(session));
     }
 
-    private void addMyProfile(final EmfSession session) {
-        JMenuItem myProfile = new JMenuItem("My Profile");
-        myProfile.addActionListener(new ActionListener() {
+    private JMenuItem createMyProfile(final EmfSession session) {
+        JMenuItem menuItem = new JMenuItem("My Profile");
+        menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 displayUpdateUser(session);
             }
         });
-        super.add(myProfile);
+
+        return menuItem;
     }
 
     private void addUsers(User user) {
@@ -67,13 +67,14 @@ public class ManageMenu extends JMenu {
                     presenter.notifyManageUsers();
                 }
             });
+
             super.add(users);
         }
     }
 
-    private void addDatasets(final EmfFrame parent, final MessagePanel messagePanel) {
-        JMenuItem datasets = new JMenuItem("Datasets");
-        datasets.addActionListener(new ActionListener() {
+    private JMenuItem createDatasets(final EmfFrame parent, final MessagePanel messagePanel) {
+        JMenuItem menuItem = new JMenuItem("Datasets");
+        menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     displayDatasets(parent);
@@ -82,7 +83,8 @@ public class ManageMenu extends JMenu {
                 }
             }
         });
-        super.add(datasets);
+
+        return menuItem;
     }
 
     private void displayDatasets(EmfFrame parent) throws EmfException {
@@ -106,7 +108,7 @@ public class ManageMenu extends JMenu {
             return;
         }
 
-        updateUserView = new UpdateUserWindow(session.getUser(), desktop);
+        updateUserView = new UpdateUserWindow(session.getUser());
         desktop.add(updateUserView);
 
         UpdateUserPresenter presenter = new UpdateUserPresenter(session.getUserServices(), updateUserView);
