@@ -5,40 +5,18 @@ import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
-public class EmfSession {
+public interface EmfSession {
 
-    private User user;
+    public abstract ServiceLocator getServiceLocator();
 
-    private ServiceLocator serviceLocator;
+    public abstract User getUser();
 
-    private String mostRecentExportFolder;
+    public abstract ExImServices getExImServices();
 
-    public EmfSession(User user, ServiceLocator locator) {
-        serviceLocator = locator;
-        this.user = user;
-    }
+    public abstract DataServices getDataServices();
 
-    public ServiceLocator getServiceLocator() {
-        return serviceLocator;
-    }
+    public abstract String getMostRecentExportFolder();
 
-    public User getUser() {
-        return user;
-    }
+    public abstract void setMostRecentExportFolder(String mostRecentExportFolder);
 
-    public ExImServices getExImServices() {
-        return serviceLocator.getExImServices();
-    }
-
-    public DataServices getDataServices() {
-        return serviceLocator.getDataServices();
-    }
-
-    public String getMostRecentExportFolder() {
-        return mostRecentExportFolder;
-    }
-
-    public void setMostRecentExportFolder(String mostRecentExportFolder) {
-        this.mostRecentExportFolder = mostRecentExportFolder;
-    }
 }

@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.client.EmfInteralFrame;
-import gov.epa.emissions.framework.client.EmfWidgetContainer;
+import gov.epa.emissions.framework.client.EmfView;
 
-public class RegisterUserInternalFrame extends EmfInteralFrame implements EmfWidgetContainer {
+public class RegisterUserInternalFrame extends EmfInteralFrame implements EmfView {
 
     private RegisterUserPanel view;
 

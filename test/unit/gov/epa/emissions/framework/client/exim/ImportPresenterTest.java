@@ -14,14 +14,28 @@ import org.jmock.core.Constraint;
 public class ImportPresenterTest extends MockObjectTestCase {
 
     private Mock model;
-    private String folder;
 
-    protected void setUp() {
+    private Mock view;
+
+    private ImportPresenter presenter;
+
+    protected void setUp() throws EmfException {
         model = mock(ExImServices.class);
-        folder = "/blah/blagh";
-        model.stubs().method("getImportBaseFolder").will(returnValue(folder));    
+        String folder = "/blah/blagh";
+        model.stubs().method("getImportBaseFolder").will(returnValue(folder));
+
+        view = mock(ImportView.class);
+
+        presenter = new ImportPresenter(null, (ExImServices) model.proxy());
+        // should register with the view, set default folder, and display the
+        // view
+        view.expects(once()).method("register").with(eq(presenter));
+        view.expects(once()).method("setDefaultBaseFolder").with(eq(folder));
+        view.expects(once()).method("display");
+
+        presenter.observe((ImportView) view.proxy());
     }
-    
+
     public void testSendsImportRequestToEximServiceOnImport() throws EmfException {
         DatasetType type = new DatasetType("ORL NonRoad");
 
@@ -84,37 +98,14 @@ public class ImportPresenterTest extends MockObjectTestCase {
         fail("should have raised an exception if a blank filename is provided");
     }
 
-    public void testClosesViewOnDoneImport() throws EmfException {
-        Mock view = mock(ImportView.class);
+    public void testClosesViewOnDoneImport() {
         view.expects(once()).method("close");
-        view.expects(once()).method("setDefaultBaseFolder").with(eq(folder));
-        
-        ImportPresenter presenter = new ImportPresenter(null, (ExImServices) model.proxy());
-        view.expects(once()).method("register").with(eq(presenter));
-        presenter.observe((ImportView) view.proxy());
 
         presenter.notifyDone();
     }
 
-    public void testShouldRegisterWithViewAndSetDefaultFolderOnObserve() throws EmfException {
-        ImportPresenter presenter = new ImportPresenter(null, (ExImServices) model.proxy());
-
-        Mock view = mock(ImportView.class);
-        view.expects(once()).method("register").with(eq(presenter));
-        view.expects(once()).method("setDefaultBaseFolder").with(eq(folder));
-
-        presenter.observe((ImportView) view.proxy());
-    }
-
-    public void testShouldClearMessagePanelOnEdit() throws EmfException {
-        Mock view = mock(ImportView.class);
-
-        ImportPresenter presenter = new ImportPresenter(null, (ExImServices) model.proxy());
-        view.expects(once()).method("register").with(eq(presenter));
+    public void testShouldClearMessagePanelOnEdit() {
         view.expects(once()).method("clearMessagePanel").withNoArguments();
-        view.expects(once()).method("setDefaultBaseFolder").with(eq(folder));
-        
-        presenter.observe((ImportView) view.proxy());
 
         presenter.notifyBeginInput();
     }

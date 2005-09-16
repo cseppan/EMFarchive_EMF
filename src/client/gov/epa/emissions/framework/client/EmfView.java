@@ -7,7 +7,7 @@ package gov.epa.emissions.framework.client;
  * JPanel/SortFilterSelectionPanel etc. It allows us to host a widget standalone
  * (in a JFrame) or as a part of a desktop pane (in a JInternalFrame)
  */
-public interface EmfWidgetContainer {
+public interface EmfView {
 
     void close();
 

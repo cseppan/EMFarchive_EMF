@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfConsolePresenter;
-import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.DefaultEmfSession;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
@@ -114,8 +114,8 @@ public class LoginWindow extends EmfFrame implements LoginView {
         }
     }
 
-    private void launchConsole(User user) {
-        EmfConsole console = new EmfConsole(new EmfSession(user, serviceLocator));
+    private void launchConsole(User user) throws EmfException {
+        EmfConsole console = new EmfConsole(new DefaultEmfSession(user, serviceLocator));
         EmfConsolePresenter presenter = new EmfConsolePresenter(console);
         presenter.observe();
 

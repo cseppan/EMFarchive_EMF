@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.EmfConsolePresenter;
-import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.DefaultEmfSession;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.User;
@@ -19,7 +19,7 @@ public class ImportWindowLauncher {
         UserServices userServices = serviceLocator.getUserServices();
         User user = userServices.getUser("emf");
 
-        EmfConsole console = new EmfConsole(new EmfSession(user, serviceLocator));
+        EmfConsole console = new EmfConsole(new DefaultEmfSession(user, serviceLocator));
         console.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         EmfConsolePresenter presenter = new EmfConsolePresenter(console);

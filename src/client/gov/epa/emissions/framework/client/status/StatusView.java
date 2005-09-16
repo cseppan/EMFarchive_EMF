@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.status;
 
-import gov.epa.emissions.framework.client.EmfWidgetContainer;
+import gov.epa.emissions.framework.client.EmfView;
 import gov.epa.emissions.framework.services.Status;
 
-public interface StatusView extends EmfWidgetContainer {
+public interface StatusView extends EmfView {
 
     void update(Status[] statuses);
 

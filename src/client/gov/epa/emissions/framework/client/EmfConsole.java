@@ -143,8 +143,6 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         presenter.observe(view);
 
         desktop.add(view);
-
-        view.display();
     }
 
     private void logout() {

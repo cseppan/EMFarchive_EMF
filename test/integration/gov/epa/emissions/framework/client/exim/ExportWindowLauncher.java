@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.DefaultEmfSession;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImServices;
@@ -20,8 +21,10 @@ import org.jmock.core.stub.ReturnStub;
 
 public class ExportWindowLauncher {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws EmfException {
         Mock exim = new Mock(ExImServices.class);
+        exim.stubs().method("getExportBaseFolder").will(new ReturnStub("folder/blah"));
+
         exim.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("startExport")).withAnyArguments();
 
         User user = new User();
@@ -33,10 +36,11 @@ public class ExportWindowLauncher {
                 createDataset("ORL Non Point") };
 
         Mock servicesLocator = new Mock(ServiceLocator.class);
-        exim.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getExImServices")).withAnyArguments().will(
+        servicesLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getExImServices")).withAnyArguments().will(
                 new ReturnStub(exim.proxy()));
 
-        ExportPresenter presenter = new ExportPresenter(new EmfSession(user, (ServiceLocator) servicesLocator.proxy()));
+        ExportPresenter presenter = new ExportPresenter(new DefaultEmfSession(user, (ServiceLocator) servicesLocator
+                .proxy()));
 
         ExportWindow view = new ExportWindow(datasets);
         presenter.observe(view);

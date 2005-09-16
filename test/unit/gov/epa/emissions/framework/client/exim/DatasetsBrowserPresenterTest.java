@@ -1,12 +1,13 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.DefaultEmfSession;
 import gov.epa.emissions.framework.client.meta.MetadataPresenter;
 import gov.epa.emissions.framework.client.meta.MetadataView;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.ExImServices;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -20,13 +21,16 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
     private DatasetsBrowserPresenter presenter;
 
-    protected void setUp() {
+    protected void setUp() throws EmfException {        
+        Mock eximServices = mock(ExImServices.class);
+        eximServices.stubs().method("getExportBaseFolder").will(returnValue("folder/blah"));
+        
         serviceLocator = mock(ServiceLocator.class);
-        serviceLocator.stubs().method("getExImServices").will(returnValue(null));
+        serviceLocator.stubs().method("getExImServices").will(returnValue(eximServices.proxy()));
 
         view = mock(DatasetsBrowserView.class);
 
-        presenter = new DatasetsBrowserPresenter(new EmfSession(null, (ServiceLocator) serviceLocator.proxy()));
+        presenter = new DatasetsBrowserPresenter(new DefaultEmfSession(null, (ServiceLocator) serviceLocator.proxy()));
         view.expects(once()).method("observe").with(eq(presenter));
 
         presenter.observe((DatasetsBrowserView) view.proxy());
@@ -46,7 +50,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         view.expects(once()).method("refresh").with(eq(datasets));
 
-        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(new EmfSession(null,
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(new DefaultEmfSession(null,
                 (ServiceLocator) serviceLocator.proxy()));
         view.expects(once()).method("observe").with(eq(presenter));
 

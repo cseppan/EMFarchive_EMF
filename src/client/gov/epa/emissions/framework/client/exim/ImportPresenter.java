@@ -44,8 +44,10 @@ public class ImportPresenter {
 
     public void observe(ImportView view) throws EmfException {
         this.view = view;
+        
         view.register(this);
         view.setDefaultBaseFolder(model.getImportBaseFolder());
+        view.display();
     }
 
     public void notifyBeginInput() {

@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.EmfSessionStub;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
@@ -17,7 +16,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
     private String folder;
 
     protected void setUp() {
-        session = mock(EmfSessionStub.class);
+        session = mock(EmfSession.class);
 
         session.stubs().method("getUser").withNoArguments().will(returnValue(null));
         session.stubs().method("getExImServices").withNoArguments().will(returnValue(null));
