@@ -259,7 +259,7 @@
 
     <!-- Continuous Integration target -->
     <target name="ci-build"
-            depends="compile, all-tests, app-dist"
+            depends="compile, unit-tests, app-dist"
             description="Continuous Integration build"
     />
 
