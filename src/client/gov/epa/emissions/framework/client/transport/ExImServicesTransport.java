@@ -227,7 +227,7 @@ public class ExImServicesTransport implements ExImServices {
 
     }
 
-	public void startExport(User user, EmfDataset[] datasets, String folderName) throws EmfException {
+	public void startExport(User user, EmfDataset[] datasets, String folderName, boolean overwrite) throws EmfException {
         log.debug("Begin export of files for user: Total files: " + datasets.length);
         Service service = new Service();
         Call call;
@@ -255,10 +255,10 @@ public class ExImServicesTransport implements ExImServices {
             call.addParameter("user", userQName, ParameterMode.IN);
             call.addParameter("datasets", datasetsQName, ParameterMode.IN);
             call.addParameter("foldername", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
-
+            call.addParameter("overwrite", org.apache.axis.Constants.XSD_BOOLEAN, ParameterMode.IN);
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
 
-            call.invoke(new Object[] { user, datasets, folderName });
+            call.invoke(new Object[] { user, datasets, folderName, new Boolean(overwrite) });
 
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);

@@ -57,7 +57,7 @@ public class ExImServicesImpl implements ExImServices {
         DataSource datasource = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
 
         //FIXME: Get base directory
-        File baseFile=new File(System.getProperty("user.dir"));
+        File baseFile=new File(System.getProperty("user.dir"),"emf");
         File baseImportFile=new File(baseFile,"import");
         File baseExportFile=new File(baseFile,"export");
         baseImportFolder=baseImportFile.getAbsolutePath();
@@ -69,6 +69,22 @@ public class ExImServicesImpl implements ExImServices {
 
         importerFactory = new ImporterFactory(dbServer);
         exporterFactory = new ExporterFactory(dbServer);
+    }
+
+    private File validateExportFile(String fileName, boolean overwrite) throws EmfException {
+        log.debug("check if file exists " + fileName);
+        File file = new File(fileName);
+
+        if (!overwrite){
+            if (file.exists() && file.isFile()) {
+                log.error("File exists and cannot be overwritten");
+                throw new EmfException("Cannot export to existing file.  Choose overwrite option");
+            }        	
+        }
+        
+        log.debug("check if file exists " + fileName);
+
+        return file;
     }
 
     private File validateFile(File folder, String fileName) throws EmfException {
@@ -140,7 +156,7 @@ public class ExImServicesImpl implements ExImServices {
         log.debug("In ExImServicesImpl:startImport END");
     }
 
-    public void startExport(User user, EmfDataset[] datasets, String dirName) throws EmfException {
+    public void startExport(User user, EmfDataset[] datasets, String dirName, boolean overwrite) throws EmfException {
         log.info("Start export for user: " + user.getUsername());
         int count = datasets.length;
         log.info("Total number of files to export: " + count);
@@ -153,8 +169,8 @@ public class ExImServicesImpl implements ExImServices {
                 EmfDataset aDataset = datasets[i];
 
                 // FIXME: Default is overwrite
-                File file = new File(path, getCleanDatasetName(aDataset.getName()));
-
+                //File file = new File(path, getCleanDatasetName(aDataset.getName()));
+                File file = validateExportFile(getCleanDatasetName(aDataset.getName()),overwrite);
                 Exporter exporter = exporterFactory.create(aDataset.getDatasetType());
                 ExportTask eximTask = new ExportTask(user, file, aDataset, statusSvc, exporter);
                 new Thread(eximTask).start();

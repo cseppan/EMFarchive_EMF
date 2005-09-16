@@ -51,7 +51,8 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
     }
 
     public void testExportOrlNonPoint() throws EmfException {
-        DatasetType datasetType = new DatasetType();
+    	
+    	DatasetType datasetType = new DatasetType();
         datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
         User user = userService.getUser("emf");
 
@@ -68,7 +69,7 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
         if (!outputFile.exists()) outputFile.mkdir();
         
         eximService.startImport(user, repository.getAbsolutePath(), filename, dataset, datasetType);
-        eximService.startExport(user, new EmfDataset[]{dataset}, outputFile.getAbsolutePath());
+        eximService.startExport(user, new EmfDataset[]{dataset}, outputFile.getAbsolutePath(), true);
 
     }
 

@@ -32,6 +32,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private ExportPresenter presenter;
 
+	private JCheckBox overwrite;
+
     public ExportWindow(EmfDataset[] datasets) {
         super("Export Dataset(s)");
         this.datasets = datasets;
@@ -94,8 +96,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         // TODO: needs to be implemented
         JPanel overwritePanel = new JPanel();
         overwritePanel.setLayout(new BoxLayout(overwritePanel, BoxLayout.Y_AXIS));
-        JCheckBox overwrite = new JCheckBox("Overwrite?", true);
-        overwrite.setEnabled(false);
+        overwrite = new JCheckBox("Overwrite?", true);
+        overwrite.setEnabled(true);
         overwrite.setToolTipText("To be implemented");
         overwritePanel.add(Box.createRigidArea(new Dimension(1, 65)));
         overwritePanel.add(overwrite);
@@ -155,7 +157,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private void doExport() {
         try {
-            presenter.notifyExport(datasets, folder.getText());
+            presenter.notifyExport(datasets, folder.getText(), overwrite.isSelected());
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
         } catch (EmfException e) {

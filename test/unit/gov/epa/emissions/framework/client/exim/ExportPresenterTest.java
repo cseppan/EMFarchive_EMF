@@ -26,7 +26,8 @@ public class ExportPresenterTest extends MockObjectTestCase {
     }
 
     public void testSendsExportRequestToEximServiceOnExport() throws EmfException {
-        User user = new User();
+    	boolean overwrite = true;
+    	User user = new User();
         user.setUsername("user");
         user.setFullName("full name");
 
@@ -36,7 +37,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
         EmfDataset[] datasets = new EmfDataset[] { dataset };
 
         Mock model = mock(ExImServices.class);
-        model.expects(once()).method("startExport").with(eq(user), eq(datasets), eq(folder));
+        model.expects(once()).method("startExport").with(eq(user), eq(datasets), eq(folder), eq(overwrite));
 
         session.stubs().method("getUser").withNoArguments().will(returnValue(user));
         session.stubs().method("getExImServices").withNoArguments().will(returnValue(model.proxy()));
@@ -44,7 +45,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
 
         ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
 
-        presenter.notifyExport(datasets, folder);
+        presenter.notifyExport(datasets, folder, overwrite);
     }
 
     public void testClosesViewOnDoneExport() {
