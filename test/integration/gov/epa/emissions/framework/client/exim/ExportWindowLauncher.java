@@ -45,8 +45,6 @@ public class ExportWindowLauncher {
         ExportWindow view = new ExportWindow(datasets);
         presenter.display(view);
 
-        view.display();
-
         JFrame frame = new JFrame();
 
         addAsInternalFrame(view, frame);

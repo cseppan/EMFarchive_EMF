@@ -226,7 +226,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         exportPresenter.display(exportView);
 
         getDesktopPane().add(exportView);
-        exportView.display();
     }
 
     public void refresh(EmfDataset[] datasets) {

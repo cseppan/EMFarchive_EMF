@@ -44,7 +44,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         this.getContentPane().add(layoutPanel);
     }
 
-    public void register(ExportPresenter presenter) {
+    public void observe(ExportPresenter presenter) {
         this.presenter = presenter;
     }
 

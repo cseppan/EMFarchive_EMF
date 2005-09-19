@@ -18,17 +18,12 @@ public class StatusPresenter {
 
     private TaskRunner runner;
 
-    public StatusPresenter(User user, StatusServices model, StatusView view) {
+    public StatusPresenter(User user, StatusServices model, TaskRunner runner) {
         this.user = user;
         this.model = model;
-        this.view = view;
+        this.runner = runner;
 
         this.monitor = new StatusMonitor();
-    }
-
-    public void start(TaskRunner runner) {
-        runner.start(monitor);
-        this.runner = runner;
     }
 
     public void stop() {
@@ -44,5 +39,16 @@ public class StatusPresenter {
                 view.notifyError(e.getMessage());
             }
         }
+    }
+
+    public void display(StatusView view) {
+        this.view = view;
+        view.display();
+
+        runner.start(monitor);
+    }
+
+    public void close() {
+        runner.stop();
     }
 }

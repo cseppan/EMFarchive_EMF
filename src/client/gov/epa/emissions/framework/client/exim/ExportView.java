@@ -2,9 +2,11 @@ package gov.epa.emissions.framework.client.exim;
 
 public interface ExportView {
 
-    void register(ExportPresenter presenter);
+    void observe(ExportPresenter presenter);
 
     void setMostRecentUsedFolder(String mostRecentUsedFolder);
 
     void close();
+
+    void display();
 }

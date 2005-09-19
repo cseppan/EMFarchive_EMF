@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client;
 
+import gov.epa.emissions.framework.ConcurrentTaskRunner;
+import gov.epa.emissions.framework.client.status.StatusPresenter;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.StatusServices;
@@ -27,11 +29,11 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private MessagePanel messagePanel;
 
-    private StatusWindow status;
-
     private WindowMenuPresenter windowMenuPresenter;
 
     private ManageMenu manageMenu;
+
+    private StatusPresenter presenter;
 
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(EmfSession session) {
@@ -59,12 +61,13 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private void showStatus() {
         StatusServices statusServices = serviceLocator.getStatusServices();
-        status = new StatusWindow(user, statusServices, this, desktop);
+        StatusWindow status = new StatusWindow(this, desktop);
         windowMenuPresenter.notifyAdd(status);
 
         desktop.add(status);
 
-        status.display();
+        presenter = new StatusPresenter(user, statusServices, new ConcurrentTaskRunner());
+        presenter.display(status);
     }
 
     private void setProperties() {
@@ -96,7 +99,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     public void close() {
         // TODO: auto logout of a session
-        status.close();
+        presenter.close();
         super.dispose();
     }
 

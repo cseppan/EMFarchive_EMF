@@ -184,10 +184,9 @@ public class LoginWindow extends EmfFrame implements LoginView {
     private void launchRegisterUser() throws Exception {
         PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(serviceLocator);
         RegisterUserWindow view = new RegisterUserWindow(serviceLocator, strategy);
+        
         RegisterUserPresenter presenter = new RegisterUserPresenter(serviceLocator.getUserServices());
         presenter.display(view);
-
-        view.display();
     }
 
     private void refresh() {

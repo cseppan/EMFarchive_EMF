@@ -21,8 +21,10 @@ public class ExportPresenter {
 
     public void display(ExportView view) {
         this.view = view;
-        view.register(this);
+        view.observe(this);
         view.setMostRecentUsedFolder(session.getMostRecentExportFolder());
+        
+        view.display();
     }
 
     public void notifyExport(EmfDataset[] datasets, String folder, boolean overwrite) throws EmfException {

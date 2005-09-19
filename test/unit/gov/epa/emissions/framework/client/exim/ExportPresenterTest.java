@@ -55,7 +55,8 @@ public class ExportPresenterTest extends MockObjectTestCase {
         ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
 
         ExportView viewProxy = (ExportView) view.proxy();
-        view.expects(once()).method("register").with(eq(presenter));
+        view.expects(once()).method("observe").with(eq(presenter));
+        view.expects(once()).method("display").withNoArguments();
         view.expects(once()).method("setMostRecentUsedFolder").with(eq(folder));
 
         presenter.display(viewProxy);
@@ -64,15 +65,15 @@ public class ExportPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldRegisterWithViewOnObserve() {
-        Mock view = mock(ExportView.class);
-
         session.stubs().method("getUser").withNoArguments().will(returnValue(null));
         session.stubs().method("getExImServices").withNoArguments().will(returnValue(null));
 
         ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
 
-        ExportView viewProxy = (ExportView) view.proxy();
-        view.expects(once()).method("register").with(eq(presenter));
+        Mock view = mock(ExportView.class);
+        ExportView viewProxy = (ExportView) view.proxy();        
+        view.expects(once()).method("observe").with(eq(presenter));
+        view.expects(once()).method("display").withNoArguments();
         view.expects(once()).method("setMostRecentUsedFolder").with(eq(folder));
 
         presenter.display(viewProxy);

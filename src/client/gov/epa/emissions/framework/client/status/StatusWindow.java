@@ -1,13 +1,9 @@
 package gov.epa.emissions.framework.client.status;
 
-import gov.epa.emissions.framework.ConcurrentTaskRunner;
-import gov.epa.emissions.framework.TaskRunner;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.Status;
-import gov.epa.emissions.framework.services.StatusServices;
-import gov.epa.emissions.framework.services.User;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,15 +30,11 @@ import javax.swing.table.TableColumnModel;
 
 public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
-    private StatusPresenter presenter;
-
     private MessagePanel messagePanel;
 
     private StatusTableModel statusTableModel;
 
-    private TaskRunner taskRunner;
-
-    public StatusWindow(User user, StatusServices statusServices, Container parent, JDesktopPane desktop) {
+    public StatusWindow(Container parent, JDesktopPane desktop) {
         super("Status", desktop);
         super.setName("status");
 
@@ -53,10 +45,6 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         super.setIconifiable(true);
         super.setMaximizable(false);
         super.setResizable(true);
-
-        this.presenter = new StatusPresenter(user, statusServices, this);
-        taskRunner = new ConcurrentTaskRunner();
-        this.presenter.start(taskRunner);
     }
 
     private JPanel createLayout() {
@@ -136,9 +124,8 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         setLocation(x, y);
     }
 
-    public void close() {
-        taskRunner.stop();
-        super.close();
+    public void close() {       
+        super.dispose();
     }
 
     public void update(Status[] statuses) {

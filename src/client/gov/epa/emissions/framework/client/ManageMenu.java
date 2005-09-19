@@ -98,8 +98,6 @@ public class ManageMenu extends JMenu {
 
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session);
         presenter.display(datasetsBrowserView);
-
-        datasetsBrowserView.display();
     }
 
     private void displayUpdateUser(EmfSession session) {
