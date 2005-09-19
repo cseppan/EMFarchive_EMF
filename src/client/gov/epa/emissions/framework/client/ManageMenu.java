@@ -5,8 +5,8 @@ import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
 import gov.epa.emissions.framework.client.admin.UpdateUserWindow;
 import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
 import gov.epa.emissions.framework.client.admin.UserManagerWindow;
-import gov.epa.emissions.framework.client.exim.DatasetsBrowserPresenter;
-import gov.epa.emissions.framework.client.exim.DatasetsBrowserWindow;
+import gov.epa.emissions.framework.client.data.DatasetsBrowserPresenter;
+import gov.epa.emissions.framework.client.data.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 

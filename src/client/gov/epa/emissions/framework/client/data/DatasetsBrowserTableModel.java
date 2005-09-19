@@ -1,7 +1,8 @@
-package gov.epa.emissions.framework.client.exim;
+package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.RefreshableTableModel;
 import gov.epa.emissions.commons.gui.TableHeader;
+import gov.epa.emissions.framework.client.exim.Row;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.util.ArrayList;

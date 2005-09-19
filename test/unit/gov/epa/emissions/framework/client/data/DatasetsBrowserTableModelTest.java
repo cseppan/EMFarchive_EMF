@@ -1,5 +1,6 @@
-package gov.epa.emissions.framework.client.exim;
+package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.framework.client.data.DatasetsBrowserTableModel;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.util.ArrayList;

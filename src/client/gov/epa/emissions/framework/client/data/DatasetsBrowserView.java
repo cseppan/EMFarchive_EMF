@@ -1,6 +1,7 @@
-package gov.epa.emissions.framework.client.exim;
+package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 public interface DatasetsBrowserView {
