@@ -35,6 +35,7 @@ public class ManageMenu extends JMenu {
 
     public ManageMenu(EmfSession session, EmfFrame parent, JDesktopPane desktop, MessagePanel messagePanel) {
         super("Manage");
+        super.setName("manage");
         this.session = session;
         this.desktop = desktop;
         this.parent = parent;
@@ -74,6 +75,7 @@ public class ManageMenu extends JMenu {
 
     private JMenuItem createDatasets(final EmfFrame parent, final MessagePanel messagePanel) {
         JMenuItem menuItem = new JMenuItem("Datasets");
+        menuItem.setName("datasets");
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {

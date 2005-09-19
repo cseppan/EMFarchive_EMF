@@ -51,6 +51,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     // reuse ?
     public DatasetsBrowserWindow(DataServices services, JFrame parentConsole, JDesktopPane desktop) throws EmfException {
         super("Datasets Browser", desktop);
+        super.setName("datasetsBrowser");
 
         // FIXME: change the type from Dataset to EmfDataset
         model = new DatasetsBrowserTableModel((EmfDataset[]) services.getDatasets());
@@ -79,10 +80,11 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     private JScrollPane createSortFilterPane(JFrame parentConsole) {
-        SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
+        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
+        panel.getTable().setName("datasetsTable");
 
-        JScrollPane scrollPane = new JScrollPane(sortFilterSelectionPanel);
-        sortFilterSelectionPanel.setPreferredSize(new Dimension(450, 120));
+        JScrollPane scrollPane = new JScrollPane(panel);
+        panel.setPreferredSize(new Dimension(450, 120));
 
         return scrollPane;
     }
@@ -225,9 +227,9 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     public void showExport(EmfDataset[] datasets, ExportPresenter exportPresenter) {
         ExportWindow exportView = new ExportWindow(datasets);
-        exportPresenter.display(exportView);
-
         getDesktopPane().add(exportView);
+
+        exportPresenter.display(exportView);
     }
 
     public void refresh(EmfDataset[] datasets) {
