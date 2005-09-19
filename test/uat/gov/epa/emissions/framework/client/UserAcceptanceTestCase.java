@@ -45,15 +45,15 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
     protected LoginWindow createLoginWindow() {
         ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
 
-        LoginWindow window = new LoginWindow(serviceLocator);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        LoginWindow view = new LoginWindow(serviceLocator);
+        view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        LoginPresenter presenter = new LoginPresenter(serviceLocator.getUserServices(), window);
-        presenter.observe();
+        LoginPresenter presenter = new LoginPresenter(serviceLocator.getUserServices());
+        presenter.observe(view);
 
-        assertEquals("Login to EMF", window.getTitle());
+        assertEquals("Login to EMF", view.getTitle());
 
-        return window;
+        return view;
     }
 
     protected void setTextfield(Container window, String name, String value) throws Exception {

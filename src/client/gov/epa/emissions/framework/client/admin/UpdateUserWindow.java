@@ -53,7 +53,7 @@ public class UpdateUserWindow extends DisposableInteralFrame implements EmfView,
         };
         Action closeAction = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                presenter.notifyClose();
+                presenter.doClose();
             }
         };
 
@@ -77,13 +77,13 @@ public class UpdateUserWindow extends DisposableInteralFrame implements EmfView,
 
     private void markAsEdited() {
         this.setTitle(windowTitle + " *");
-        presenter.notifyChanges();
+        presenter.onChange();
     }
 
     private void updateUser() {
         try {
             panel.populateUser();
-            presenter.notifySave(user);
+            presenter.doSave(user);
         } catch (EmfException e) {
             panel.setError(e.getMessage());
             return;

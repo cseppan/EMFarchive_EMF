@@ -10,63 +10,57 @@ import org.jmock.MockObjectTestCase;
 
 public class LoginPresenterTest extends MockObjectTestCase {
 
-	public void testShouldAuthenticateWithEmfUserAdminOnNotifyLogin()
-			throws EmfException {
-		User user = new User();
-		user.setUsername("joey");
-		user.setPassword("joeymoey12");
+    private Mock view;
 
-		Mock userAdmin = mock(UserServices.class);
-		userAdmin.expects(once()).method("authenticate").with(
-				eq(user.getUsername()), eq(user.getEncryptedPassword()));
-		userAdmin.expects(once()).method("getUser")
-				.with(eq(user.getUsername())).will(returnValue(user));
+    private LoginPresenter presenter;
 
-		LoginPresenter presenter = new LoginPresenter((UserServices) userAdmin
-				.proxy(), null);
+    protected void setUp() {
+        view = mock(LoginView.class);
 
-		assertSame(user, presenter.notifyLogin("joey", "joeymoey12"));
-	}
+        presenter = new LoginPresenter(null);
+        view.expects(once()).method("setObserver").with(eq(presenter));
+        view.expects(once()).method("display").withNoArguments();
+        
+        presenter.observe((LoginView) view.proxy());
+    }
 
-	public void testShouldFailIfAuthenticateFailsOnNotifyLogin()
-			throws EmfException {
-		Mock userAdmin = mock(UserServices.class);
-		Throwable exception = new EmfException("authentication failure");
-		String encryptedPassword = PasswordService.encrypt("password");
-		userAdmin.expects(once()).method("authenticate").with(eq("username"),
-				eq(encryptedPassword)).will(throwException(exception));
+    public void testShouldAuthenticateWithEmfUserAdminOnNotifyLogin() throws EmfException {
+        User user = new User();
+        user.setUsername("joey");
+        user.setPassword("joeymoey12");
 
-		LoginPresenter presenter = new LoginPresenter((UserServices) userAdmin
-				.proxy(), null);
+        Mock userAdmin = mock(UserServices.class);
+        userAdmin.expects(once()).method("authenticate").with(eq(user.getUsername()), eq(user.getEncryptedPassword()));
+        userAdmin.expects(once()).method("getUser").with(eq(user.getUsername())).will(returnValue(user));
 
-		try {
-			presenter.notifyLogin("username", "password");
-		} catch (EmfException e) {
-			assertSame(exception, e);
-			return;
-		}
+        LoginPresenter presenter = new LoginPresenter((UserServices) userAdmin.proxy());
 
-		fail("should have raised an exception on authentication failure");
-	}
+        assertSame(user, presenter.doLogin("joey", "joeymoey12"));
+    }
 
-	public void testShouldCloseViewOnNotifyCancel() {
-		Mock view = mock(LoginView.class);
-		view.expects(once()).method("close").withNoArguments();
+    public void testShouldFailIfAuthenticateFailsOnNotifyLogin() throws EmfException {
+        Mock userAdmin = mock(UserServices.class);
+        Throwable exception = new EmfException("authentication failure");
+        String encryptedPassword = PasswordService.encrypt("password");
+        userAdmin.expects(once()).method("authenticate").with(eq("username"), eq(encryptedPassword)).will(
+                throwException(exception));
 
-		LoginPresenter presenter = new LoginPresenter(null, (LoginView) view
-				.proxy());
+        LoginPresenter presenter = new LoginPresenter((UserServices) userAdmin.proxy());
 
-		presenter.notifyCancel();
-	}
+        try {
+            presenter.doLogin("username", "password");
+        } catch (EmfException e) {
+            assertSame(exception, e);
+            return;
+        }
 
-	public void testShouldRegisterWithViewOnInit() {
-		Mock view = mock(LoginView.class);
+        fail("should have raised an exception on authentication failure");
+    }
 
-		LoginPresenter presenter = new LoginPresenter(null, (LoginView) view
-				.proxy());
-		view.expects(once()).method("setObserver").with(eq(presenter));
+    public void testShouldCloseViewOnNotifyCancel() {
+        view.expects(once()).method("close").withNoArguments();
 
-		presenter.observe();
-	}
+        presenter.doCancel();
+    }
 
 }

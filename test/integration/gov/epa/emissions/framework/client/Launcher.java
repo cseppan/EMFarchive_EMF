@@ -12,13 +12,13 @@ public class Launcher {
     public static void main(String[] args) {
         ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
 
-        LoginWindow login = new LoginWindow(serviceLocator);
-        login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        LoginWindow view = new LoginWindow(serviceLocator);
+        view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        LoginPresenter presenter = new LoginPresenter(serviceLocator.getUserServices(), login);
-        presenter.observe();
+        LoginPresenter presenter = new LoginPresenter(serviceLocator.getUserServices());
+        presenter.observe(view);
 
-        login.display();
+        view.display();
     }
 
 }

@@ -15,19 +15,19 @@ public class LaunchLoginOnCancelStrategy implements RegisterCancelStrategy {
     }
 
     public void execute(RegisterUserPresenter presenter) {
-        presenter.notifyCancel();
+        presenter.doCancel();
 
         launchLoginWindow();
     }
 
     private void launchLoginWindow() {
-        LoginWindow login = new LoginWindow(serviceLocator);
-        login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        LoginWindow view = new LoginWindow(serviceLocator);
+        view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        LoginPresenter loginPresenter = new LoginPresenter(serviceLocator.getUserServices(), login);
-        loginPresenter.observe();
+        LoginPresenter loginPresenter = new LoginPresenter(serviceLocator.getUserServices());
+        loginPresenter.observe(view);
 
-        login.display();
+        view.display();
     }
 
 }

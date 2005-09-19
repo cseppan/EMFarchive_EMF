@@ -11,4 +11,6 @@ public interface UpdateUserView {
     void closeOnConfirmLosingChanges();
 
     void close();
+
+    void display();
 }

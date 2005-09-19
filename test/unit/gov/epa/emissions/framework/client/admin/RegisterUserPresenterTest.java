@@ -9,52 +9,38 @@ import org.jmock.MockObjectTestCase;
 
 public class RegisterUserPresenterTest extends MockObjectTestCase {
 
-	private RegisterUserPresenter presenter;
+    private RegisterUserPresenter presenter;
 
-	private Mock view;
+    private Mock view;
 
-	protected void setUp() {
-		view = mock(RegisterUserView.class);
+    private Mock userServices;
 
-		presenter = new RegisterUserPresenter(null, (RegisterUserView) view
-				.proxy());
+    protected void setUp() {
+        view = mock(RegisterUserView.class);
+        userServices = mock(UserServices.class);
 
-		view.expects(once()).method("observe").with(eq(presenter));
-		presenter.observe();
-	}
+        presenter = new RegisterUserPresenter((UserServices) userServices.proxy());
+        view.expects(once()).method("observe").with(eq(presenter));
+        view.expects(once()).method("display").withNoArguments();
+        
+        presenter.observe((RegisterUserView) view.proxy());
+    }
 
-	public void testShouldCreateUserAndLoginOnNotifyCreateUser()
-			throws EmfException {
-		User user = new User();
-		user.setUsername("joey");
-		user.setPassword("passwd234");
+    public void testShouldCreateUserAndLoginOnNotifyCreateUser() throws EmfException {
+        User user = new User();
+        user.setUsername("joey");
+        user.setPassword("passwd234");
 
-		Mock emfUserAdmin = mock(UserServices.class);
-		emfUserAdmin.expects(once()).method("createUser").with(eq(user));
-		emfUserAdmin.expects(once()).method("authenticate").with(eq("joey"),
-				eq(user.getEncryptedPassword()));
+        userServices.expects(once()).method("createUser").with(eq(user));
+        userServices.expects(once()).method("authenticate").with(eq("joey"), eq(user.getEncryptedPassword()));
 
-		Mock view = mock(RegisterUserView.class);
+        presenter.doRegister(user);
+    }
 
-		RegisterUserPresenter presenter = new RegisterUserPresenter(
-				(UserServices) emfUserAdmin.proxy(), (RegisterUserView) view
-						.proxy());
-		view.expects(once()).method("observe").with(eq(presenter));
-		presenter.observe();
+    public void testShouldCloseViewOnCancelAction() {
+        view.expects(once()).method("close").withNoArguments();
 
-		presenter.notifyRegister(user);
-	}
-
-	public void testShouldCloseViewOnCancelAction() {
-		Mock view = mock(RegisterUserView.class);
-		view.expects(once()).method("close").withNoArguments();
-
-		RegisterUserPresenter presenter = new RegisterUserPresenter(null,
-				(RegisterUserView) view.proxy());
-		view.expects(once()).method("observe").with(eq(presenter));
-		presenter.observe();
-
-		presenter.notifyCancel();
-	}
+        presenter.doCancel();
+    }
 
 }

@@ -23,15 +23,13 @@ public class UpdateUserWindowLauncher {
         user.setEmail("joes@joey.inc");
 
         JDesktopPane desktop = new JDesktopPane();
-        UpdateUserWindow window = new UpdateUserWindow(user);
-        UpdateUserPresenter presenter = new UpdateUserPresenter(userAdmin, window);
-        presenter.observe();
-
-        window.display();
+        UpdateUserWindow view = new UpdateUserWindow(user);
+        UpdateUserPresenter presenter = new UpdateUserPresenter(userAdmin);
+        presenter.observe(view);
 
         JFrame frame = new JFrame();
 
-        addAsInternalFrame(window, frame, desktop);
+        addAsInternalFrame(view, frame, desktop);
 
         frame.setSize(new Dimension(800, 600));
         frame.setLocation(new Point(400, 200));

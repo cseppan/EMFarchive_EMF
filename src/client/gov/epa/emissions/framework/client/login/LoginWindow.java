@@ -104,7 +104,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
         if (presenter == null)
             return;
         try {
-            User user = presenter.notifyLogin(username.getText(), new String(password.getPassword()));
+            User user = presenter.doLogin(username.getText(), new String(password.getPassword()));
             messagePanel.clear();
             refresh();
             launchConsole(user);
@@ -185,11 +185,11 @@ public class LoginWindow extends EmfFrame implements LoginView {
 
     private void launchRegisterUser() throws Exception {
         PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(serviceLocator);
-        RegisterUserWindow window = new RegisterUserWindow(serviceLocator, strategy);
-        RegisterUserPresenter presenter = new RegisterUserPresenter(serviceLocator.getUserServices(), window.getView());
-        presenter.observe();
+        RegisterUserWindow view = new RegisterUserWindow(serviceLocator, strategy);
+        RegisterUserPresenter presenter = new RegisterUserPresenter(serviceLocator.getUserServices());
+        presenter.observe(view);
 
-        window.display();
+        view.display();
     }
 
     private void refresh() {

@@ -1,11 +1,10 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfPresenter;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
-public class UpdateUserPresenter implements EmfPresenter {
+public class UpdateUserPresenter {
 
     private UserServices model;
 
@@ -13,21 +12,23 @@ public class UpdateUserPresenter implements EmfPresenter {
 
     private boolean userDataChanged;
 
-    public UpdateUserPresenter(UserServices model, UpdateUserView view) {
+    public UpdateUserPresenter(UserServices model) {
         this.model = model;
+    }
+
+    public void observe(UpdateUserView view) {
         this.view = view;
-    }
-
-    public void observe() {
         view.setObserver(this);
+
+        view.display();
     }
 
-    public void notifySave(User user) throws EmfException {
+    public void doSave(User user) throws EmfException {
         model.updateUser(user);
         this.userDataChanged = false;// reset
     }
 
-    public void notifyClose() {
+    public void doClose() {
         if (userDataChanged) {
             view.closeOnConfirmLosingChanges();
             return;
@@ -36,7 +37,7 @@ public class UpdateUserPresenter implements EmfPresenter {
         view.close();
     }
 
-    public void notifyChanges() {
+    public void onChange() {
         this.userDataChanged = true;
     }
 

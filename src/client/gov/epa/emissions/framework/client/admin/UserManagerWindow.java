@@ -105,8 +105,6 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         // FIXME: drive this logic via Presenter
         UpdateUserWindow view = updateUser.equals(user) ? new UpdateUserWindow(updateUser) : new UpdateUserWindow(
                 updateUser, new AddAdminOption());
-        UpdateUserPresenter presenter = new UpdateUserPresenter(userServices, view);
-        presenter.observe();
 
         getDesktopPane().add(view);
 
@@ -116,7 +114,8 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
             }
         });
 
-        view.display();
+        UpdateUserPresenter presenter = new UpdateUserPresenter(userServices);
+        presenter.observe(view);
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
@@ -233,8 +232,6 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
 
     private void displayRegisterUser() {
         RegisterUserInternalFrame container = new RegisterUserInternalFrame(new NoOpPostRegisterStrategy(), desktop);
-        RegisterUserPresenter presenter = new RegisterUserPresenter(userServices, container.getView());
-        presenter.observe();
 
         getDesktopPane().add(container);
 
@@ -244,7 +241,8 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
             }
         });
 
-        container.display();
+        RegisterUserPresenter presenter = new RegisterUserPresenter(userServices);
+        presenter.observe(container.getView());
     }
 
     public void setObserver(UserManagerPresenter presenter) {

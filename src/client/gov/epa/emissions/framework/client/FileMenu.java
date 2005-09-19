@@ -56,8 +56,9 @@ public class FileMenu extends JMenu {
     private void logout(EmfSession session, EmfConsole parent) {
         UserServices userServices = session.getUserServices();
         LoginWindow view = new LoginWindow(session.getServiceLocator());
-        LoginPresenter presenter = new LoginPresenter(userServices, view);
-        presenter.observe();
+        
+        LoginPresenter presenter = new LoginPresenter(userServices);
+        presenter.observe(view);
 
         view.display();
 

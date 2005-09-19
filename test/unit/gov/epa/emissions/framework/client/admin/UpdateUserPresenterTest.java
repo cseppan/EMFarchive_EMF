@@ -9,65 +9,57 @@ import org.jmock.MockObjectTestCase;
 
 public class UpdateUserPresenterTest extends MockObjectTestCase {
 
+    private UpdateUserPresenter presenter;
+
+    private Mock userServices;
+
+    private Mock view;
+
+    protected void setUp() {
+        userServices = mock(UserServices.class);
+        view = mock(UpdateUserView.class);
+
+        presenter = new UpdateUserPresenter((UserServices) userServices.proxy());
+        view.expects(once()).method("setObserver").with(eq(presenter));
+        view.expects(once()).method("display").withNoArguments();
+
+        presenter.observe((UpdateUserView) view.proxy());
+    }
+
     public void testShouldUpdateUserViaEmfUserAdminOnNotifySave() throws EmfException {
         User user = new User();
         user.setUsername("joey");
         user.setFullName("Joey Moey");
 
-        Mock emfUserAdmin = mock(UserServices.class);
-        emfUserAdmin.expects(once()).method("updateUser").with(eq(user));
+        userServices.expects(once()).method("updateUser").with(eq(user));
 
-        Mock view = mock(UpdateUserView.class);
-
-        UpdateUserPresenter presenter = new UpdateUserPresenter((UserServices) emfUserAdmin.proxy(),
-                (UpdateUserView) view.proxy());
-        view.expects(once()).method("setObserver").with(eq(presenter));
-        presenter.observe();
-
-        presenter.notifySave(user);
+        presenter.doSave(user);
     }
 
     public void testShouldCloseViewOnCloseActionWithNoUserDataEdits() {
-        Mock view = mock(UpdateUserView.class);
         view.expects(once()).method("close").withNoArguments();
 
-        UpdateUserPresenter presenter = new UpdateUserPresenter(null, (UpdateUserView) view.proxy());
-        view.expects(once()).method("setObserver").with(eq(presenter));
-        presenter.observe();
-
-        presenter.notifyClose();
+        presenter.doClose();
     }
 
     public void testShouldConfirmLosingChangesOnCloseAfterEdits() {
-        Mock view = mock(UpdateUserView.class);
         view.expects(once()).method("closeOnConfirmLosingChanges").withNoArguments();
-       
-        UpdateUserPresenter presenter = new UpdateUserPresenter(null, (UpdateUserView) view.proxy());
-        view.expects(once()).method("setObserver").with(eq(presenter));
-        presenter.observe();
 
-        presenter.notifyChanges();
-        presenter.notifyClose();
+        presenter.onChange();
+        presenter.doClose();
     }
-    
+
     public void testShouldCloseWithNoPromptsOnSaveFollowedByClose() throws EmfException {
         User user = new User();
         user.setUsername("joey");
         user.setFullName("Joey Moey");
 
-        Mock emfUserAdmin = mock(UserServices.class);
-        emfUserAdmin.expects(once()).method("updateUser").with(eq(user));
+        userServices.expects(once()).method("updateUser").with(eq(user));
 
-        Mock view = mock(UpdateUserView.class);
         view.expects(once()).method("close").withNoArguments();
-        
-        UpdateUserPresenter presenter = new UpdateUserPresenter((UserServices) emfUserAdmin.proxy(),
-                (UpdateUserView) view.proxy());
-        view.expects(once()).method("setObserver").with(eq(presenter));
-        presenter.observe();
 
-        presenter.notifySave(user);
-        presenter.notifyClose();
+        presenter.doSave(user);
+        presenter.doClose();
     }
-    
+
 }

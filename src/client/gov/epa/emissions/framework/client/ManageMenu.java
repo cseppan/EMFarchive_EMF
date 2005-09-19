@@ -111,10 +111,8 @@ public class ManageMenu extends JMenu {
         updateUserView = new UpdateUserWindow(session.getUser());
         desktop.add(updateUserView);
 
-        UpdateUserPresenter presenter = new UpdateUserPresenter(session.getUserServices(), updateUserView);
-        presenter.observe();
-
-        updateUserView.display();
+        UpdateUserPresenter presenter = new UpdateUserPresenter(session.getUserServices());
+        presenter.observe(updateUserView);
     }
 
     private JMenuItem createDisabledMenuItem(String name) {

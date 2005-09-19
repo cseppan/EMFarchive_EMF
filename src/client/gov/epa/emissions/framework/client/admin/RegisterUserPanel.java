@@ -67,7 +67,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
     private void registerUser() {
         try {
             panel.populateUser();
-            presenter.notifyRegister(user);
+            presenter.doRegister(user);
             postRegisterStrategy.execute(user);
         } catch (EmfException e) {
             panel.setError(e.getMessage());
@@ -92,6 +92,10 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     public RegisterUserPresenter getPresenter() {
         return presenter;
+    }
+
+    public void display() {
+        super.setVisible(true);
     }
 
 }
