@@ -97,7 +97,7 @@ public class ManageMenu extends JMenu {
         desktop.add(datasetsBrowserView);
 
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session);
-        presenter.observe(datasetsBrowserView);
+        presenter.display(datasetsBrowserView);
 
         datasetsBrowserView.display();
     }
@@ -112,7 +112,7 @@ public class ManageMenu extends JMenu {
         desktop.add(updateUserView);
 
         UpdateUserPresenter presenter = new UpdateUserPresenter(session.getUserServices());
-        presenter.observe(updateUserView);
+        presenter.display(updateUserView);
     }
 
     private JMenuItem createDisabledMenuItem(String name) {
@@ -133,10 +133,8 @@ public class ManageMenu extends JMenu {
             userManagerView = new UserManagerWindow(session.getUser(), userServices, parent, desktop);
             desktop.add(userManagerView);
 
-            UserManagerPresenter presenter = new UserManagerPresenter(session.getUser(), userServices, userManagerView);
-            presenter.observe();
-
-            userManagerView.display();
+            UserManagerPresenter presenter = new UserManagerPresenter(session.getUser(), userServices);
+            presenter.display(userManagerView);
         } catch (Exception e) {
             // TODO: error handling
         }

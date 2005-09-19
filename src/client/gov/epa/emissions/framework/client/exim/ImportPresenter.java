@@ -42,11 +42,12 @@ public class ImportPresenter {
         view.close();
     }
 
-    public void observe(ImportView view) throws EmfException {
+    public void display(ImportView view) throws EmfException {
         this.view = view;
         
         view.register(this);
         view.setDefaultBaseFolder(model.getImportBaseFolder());
+        
         view.display();
     }
 

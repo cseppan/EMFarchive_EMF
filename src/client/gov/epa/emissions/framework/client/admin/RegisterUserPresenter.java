@@ -25,7 +25,7 @@ public class RegisterUserPresenter {
         view.close();
     }
 
-    public void observe(RegisterUserView view) {
+    public void display(RegisterUserView view) {
         this.view = view;
         this.view.observe(this);
         

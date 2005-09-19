@@ -19,7 +19,7 @@ public class ExportPresenter {
         view.close();
     }
 
-    public void observe(ExportView view) {
+    public void display(ExportView view) {
         this.view = view;
         view.register(this);
         view.setMostRecentUsedFolder(session.getMostRecentExportFolder());

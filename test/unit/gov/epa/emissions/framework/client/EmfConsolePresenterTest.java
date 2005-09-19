@@ -5,21 +5,28 @@ import org.jmock.MockObjectTestCase;
 
 public class EmfConsolePresenterTest extends MockObjectTestCase {
 
-    public void testShouldSetAsObserverOnObserve() {
-        Mock view = mock(EmfConsoleView.class);         
-        
-        EmfConsolePresenter presenter = new EmfConsolePresenter((EmfConsoleView)view.proxy());
-        view.expects(once()).method("observe").with(eq(presenter));
+    private Mock view;
 
-        presenter.observe();
+    private EmfConsolePresenter presenter;
+
+    protected void setUp() {
+        view = mock(EmfConsoleView.class);
+
+        presenter = new EmfConsolePresenter();
+        view.expects(once()).method("observe").with(eq(presenter));
+        view.expects(once()).method("display").withNoArguments();
+    }
+
+    public void testShouldSetAsObserverOnObserve() {
+        presenter.display((EmfConsoleView) view.proxy());
     }
 
     public void testShouldDisplayUserManagerOnNotifyManagerUsers() {
-        Mock view = mock(EmfConsoleView.class);         
+        presenter.display((EmfConsoleView) view.proxy());
+        
         view.expects(once()).method("displayUserManager").withNoArguments();
-        
-        EmfConsolePresenter presenter = new EmfConsolePresenter((EmfConsoleView)view.proxy());
-        
+
         presenter.notifyManageUsers();
     }
+
 }

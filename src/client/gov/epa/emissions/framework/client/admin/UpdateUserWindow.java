@@ -92,7 +92,7 @@ public class UpdateUserWindow extends DisposableInteralFrame implements EmfView,
         close();
     }
 
-    public void setObserver(UpdateUserPresenter presenter) {
+    public void observe(UpdateUserPresenter presenter) {
         this.presenter = presenter;
     }
 

@@ -107,7 +107,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    presenter.notifyRefresh();
+                    presenter.doRefresh();
                 } catch (EmfException e) {
                     showError(e.getMessage());
                 }
@@ -154,7 +154,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         JButton closeButton = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                presenter.notifyClose();
+                presenter.doClose();
             }
         });
         panel.add(closeButton);
@@ -171,7 +171,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         List datasets = getSelectedDatasets();
 
         try {
-            presenter.notifyExport((EmfDataset[]) datasets.toArray(new EmfDataset[0]));
+            presenter.doExport((EmfDataset[]) datasets.toArray(new EmfDataset[0]));
         } catch (EmfException e) {
             showError(e.getMessage());
         }
@@ -223,7 +223,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     public void showExport(EmfDataset[] datasets, ExportPresenter exportPresenter) {
         ExportWindow exportView = new ExportWindow(datasets);
-        exportPresenter.observe(exportView);
+        exportPresenter.display(exportView);
 
         getDesktopPane().add(exportView);
         exportView.display();

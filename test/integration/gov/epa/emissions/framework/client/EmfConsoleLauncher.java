@@ -19,10 +19,8 @@ public class EmfConsoleLauncher {
         EmfConsole console = new EmfConsole(new DefaultEmfSession(user, serviceLocator));
         console.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        EmfConsolePresenter presenter = new EmfConsolePresenter(console);
-        presenter.observe();
-
-        console.setVisible(true);
+        EmfConsolePresenter presenter = new EmfConsolePresenter();
+        presenter.display(console);
     }
 
 }

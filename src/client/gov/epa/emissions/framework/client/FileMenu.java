@@ -58,9 +58,7 @@ public class FileMenu extends JMenu {
         LoginWindow view = new LoginWindow(session.getServiceLocator());
         
         LoginPresenter presenter = new LoginPresenter(userServices);
-        presenter.observe(view);
-
-        view.display();
+        presenter.display(view);
 
         parent.close();
     }
@@ -93,7 +91,7 @@ public class FileMenu extends JMenu {
         desktop.add(importView);
 
         ImportPresenter presenter = new ImportPresenter(session.getUser(), eximServices);
-        presenter.observe(importView);
+        presenter.display(importView);
     }
 
 }

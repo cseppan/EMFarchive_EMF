@@ -16,9 +16,9 @@ public class UpdateUserPresenter {
         this.model = model;
     }
 
-    public void observe(UpdateUserView view) {
+    public void display(UpdateUserView view) {
         this.view = view;
-        view.setObserver(this);
+        view.observe(this);
 
         view.display();
     }

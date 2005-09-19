@@ -17,21 +17,23 @@ public class DatasetsBrowserPresenter {
         this.session = session;
     }
 
-    public void observe(DatasetsBrowserView view) {
+    public void display(DatasetsBrowserView view) {
         this.view = view;
         view.observe(this);
+        
+        view.display();
     }
 
-    public void notifyClose() {
+    public void doClose() {
         view.close();
     }
 
-    public void notifyExport(EmfDataset[] datasets) throws EmfException {
+    public void doExport(EmfDataset[] datasets) throws EmfException {
         ExportPresenter presenter = new ExportPresenter(session);
         view.showExport(datasets, presenter);
     }
 
-    public void notifyRefresh() throws EmfException {
+    public void doRefresh() throws EmfException {
         DataServices dataServices = session.getDataServices();
         // FIXME: fix the type casting
         view.refresh((EmfDataset[]) dataServices.getDatasets());
@@ -40,9 +42,7 @@ public class DatasetsBrowserPresenter {
     // FIXME: change other presenters to follow this design
     public void notifyShowMetadata(MetadataView metadataView, EmfDataset dataset) {
         MetadataPresenter presenter = new MetadataPresenter(dataset);
-        presenter.observe(metadataView);
-
-        presenter.notifyDisplay();
+        presenter.display(metadataView);
     }
 
 }

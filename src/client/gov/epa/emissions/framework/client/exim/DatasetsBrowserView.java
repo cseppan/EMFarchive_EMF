@@ -12,4 +12,6 @@ public interface DatasetsBrowserView {
     void refresh(EmfDataset[] datasets);
 
     void close();
+
+    void display();
 }

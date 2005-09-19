@@ -22,10 +22,9 @@ public class UserManagerWindowLauncher {
 
         JDesktopPane desktop = new JDesktopPane();
         UserManagerWindow console = new UserManagerWindow(null, userAdmin, frame, desktop);
-        UserManagerPresenter presenter = new UserManagerPresenter(null, userAdmin, console);
-        presenter.observe();
 
-        console.setVisible(true);
+        UserManagerPresenter presenter = new UserManagerPresenter(null, userAdmin);
+        presenter.display(console);
 
         launcher.addAsInternalFrame(console, frame, desktop);
 

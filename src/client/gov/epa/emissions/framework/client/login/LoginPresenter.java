@@ -25,9 +25,9 @@ public class LoginPresenter {
         view.close();
     }
 
-    public void observe(LoginView view) {
+    public void display(LoginView view) {
         this.view = view;
-        view.setObserver(this);
+        view.observe(this);
 
         view.display();
     }

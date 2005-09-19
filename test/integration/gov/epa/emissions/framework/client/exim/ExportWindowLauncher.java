@@ -43,7 +43,7 @@ public class ExportWindowLauncher {
                 .proxy()));
 
         ExportWindow view = new ExportWindow(datasets);
-        presenter.observe(view);
+        presenter.display(view);
 
         view.display();
 

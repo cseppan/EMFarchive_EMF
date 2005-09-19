@@ -49,7 +49,7 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
         view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         LoginPresenter presenter = new LoginPresenter(serviceLocator.getUserServices());
-        presenter.observe(view);
+        presenter.display(view);
 
         assertEquals("Login to EMF", view.getTitle());
 

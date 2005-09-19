@@ -33,13 +33,11 @@ public class StatusWindowLauncher {
         serviceLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getStatusServices")).will(
                 new ReturnStub(statusServices));
 
-        EmfConsole console = new EmfConsole(new DefaultEmfSession(user, (ServiceLocator) serviceLocator.proxy()));
-        console.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        EmfConsole view = new EmfConsole(new DefaultEmfSession(user, (ServiceLocator) serviceLocator.proxy()));
+        view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        EmfConsolePresenter presenter = new EmfConsolePresenter(console);
-        presenter.observe();
-
-        console.display();
+        EmfConsolePresenter presenter = new EmfConsolePresenter();
+        presenter.display(view);
     }
 
     private static StatusServices createStatusServices(User user) {

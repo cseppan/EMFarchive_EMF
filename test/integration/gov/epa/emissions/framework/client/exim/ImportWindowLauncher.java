@@ -19,13 +19,11 @@ public class ImportWindowLauncher {
         UserServices userServices = serviceLocator.getUserServices();
         User user = userServices.getUser("emf");
 
-        EmfConsole console = new EmfConsole(new DefaultEmfSession(user, serviceLocator));
-        console.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        EmfConsole view = new EmfConsole(new DefaultEmfSession(user, serviceLocator));
+        view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        EmfConsolePresenter presenter = new EmfConsolePresenter(console);
-        presenter.observe();
-
-        console.display();
+        EmfConsolePresenter presenter = new EmfConsolePresenter();
+        presenter.display(view);
     }
 
 }

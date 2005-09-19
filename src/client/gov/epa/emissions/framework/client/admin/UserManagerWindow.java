@@ -115,7 +115,7 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         });
 
         UpdateUserPresenter presenter = new UpdateUserPresenter(userServices);
-        presenter.observe(view);
+        presenter.display(view);
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
@@ -138,7 +138,7 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 if (presenter != null) {
-                    presenter.notifyCloseView();
+                    presenter.doCloseView();
                 }
             }
         });
@@ -220,7 +220,7 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         for (Iterator iter = users.iterator(); iter.hasNext();) {
             User user = (User) iter.next();
             try {
-                presenter.notifyDelete(user.getUsername());
+                presenter.doDelete(user.getUsername());
             } catch (EmfException e) {
                 messagePanel.setError(e.getMessage());
                 // TODO: temp, until the HACK is addressed (then, use refresh)
@@ -242,10 +242,10 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         });
 
         RegisterUserPresenter presenter = new RegisterUserPresenter(userServices);
-        presenter.observe(container.getView());
+        presenter.display(container.getView());
     }
 
-    public void setObserver(UserManagerPresenter presenter) {
+    public void observe(UserManagerPresenter presenter) {
         this.presenter = presenter;
     }
 

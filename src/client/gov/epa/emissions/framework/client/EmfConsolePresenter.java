@@ -1,15 +1,14 @@
 package gov.epa.emissions.framework.client;
 
-public class EmfConsolePresenter implements EmfPresenter {
+public class EmfConsolePresenter {
 
     private EmfConsoleView view;
 
-    public EmfConsolePresenter(EmfConsoleView view) {
+    public void display(EmfConsoleView view) {
         this.view = view;
-    }
-
-    public void observe() {
         view.observe(this);
+        
+        view.display();
     }
 
     public void notifyManageUsers() {

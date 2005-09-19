@@ -19,10 +19,8 @@ public class LaunchEmfConsolePostRegisterStrategy implements PostRegisterStrateg
     public void execute(User user) throws EmfException {
         EmfConsole console = new EmfConsole(new DefaultEmfSession(user, serviceLocator));
 
-        EmfConsolePresenter presenter = new EmfConsolePresenter(console);
-        presenter.observe();
-
-        console.display();
+        EmfConsolePresenter presenter = new EmfConsolePresenter();
+        presenter.display(console);
     }
 
 }

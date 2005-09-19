@@ -20,20 +20,15 @@ public class MetadataPresenterTest extends MockObjectTestCase {
         view = mock(MetadataView.class);
 
         presenter = new MetadataPresenter(dataset);
-        view.expects(once()).method("register").with(eq(presenter));
-
-        presenter.observe((MetadataView) view.proxy());
-    }
-
-    public void testShouldDisplayViewOnNotifyDisplay() {
+        view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(eq(dataset));
 
-        presenter.notifyDisplay();
+        presenter.display((MetadataView) view.proxy());
     }
 
     public void testShouldCloseViewOnNotifyClose() {
         view.expects(once()).method("close");
 
-        presenter.notifyClose();
+        presenter.doClose();
     }
 }

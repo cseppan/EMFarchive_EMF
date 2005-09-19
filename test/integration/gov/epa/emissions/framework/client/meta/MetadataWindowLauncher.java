@@ -25,9 +25,7 @@ public class MetadataWindowLauncher {
 
         MetadataWindow view = new MetadataWindow();
         MetadataPresenter presenter = new MetadataPresenter(dataset);
-        presenter.observe(view);
-
-        presenter.notifyDisplay();
+        presenter.display(view);
 
         JFrame frame = new JFrame();
 

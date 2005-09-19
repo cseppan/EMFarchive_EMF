@@ -25,9 +25,7 @@ public class LaunchLoginOnCancelStrategy implements RegisterCancelStrategy {
         view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         LoginPresenter loginPresenter = new LoginPresenter(serviceLocator.getUserServices());
-        loginPresenter.observe(view);
-
-        view.display();
+        loginPresenter.display(view);
     }
 
 }

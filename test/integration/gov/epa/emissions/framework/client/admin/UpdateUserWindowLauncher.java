@@ -25,7 +25,7 @@ public class UpdateUserWindowLauncher {
         JDesktopPane desktop = new JDesktopPane();
         UpdateUserWindow view = new UpdateUserWindow(user);
         UpdateUserPresenter presenter = new UpdateUserPresenter(userAdmin);
-        presenter.observe(view);
+        presenter.display(view);
 
         JFrame frame = new JFrame();
 

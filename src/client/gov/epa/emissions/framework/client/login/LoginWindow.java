@@ -116,10 +116,8 @@ public class LoginWindow extends EmfFrame implements LoginView {
 
     private void launchConsole(User user) throws EmfException {
         EmfConsole console = new EmfConsole(new DefaultEmfSession(user, serviceLocator));
-        EmfConsolePresenter presenter = new EmfConsolePresenter(console);
-        presenter.observe();
-
-        console.display();
+        EmfConsolePresenter presenter = new EmfConsolePresenter();
+        presenter.display(console);
     }
 
     private JPanel createLoginPanel() {
@@ -187,7 +185,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
         PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(serviceLocator);
         RegisterUserWindow view = new RegisterUserWindow(serviceLocator, strategy);
         RegisterUserPresenter presenter = new RegisterUserPresenter(serviceLocator.getUserServices());
-        presenter.observe(view);
+        presenter.display(view);
 
         view.display();
     }
@@ -200,7 +198,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
         this.dispose();
     }
 
-    public void setObserver(LoginPresenter presenter) {
+    public void observe(LoginPresenter presenter) {
         this.presenter = presenter;
     }
 

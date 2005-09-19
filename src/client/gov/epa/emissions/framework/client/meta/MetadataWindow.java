@@ -67,7 +67,7 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
     private JPanel createButtonsPanel() {
         Button close = new Button("close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                presenter.notifyClose();
+                presenter.doClose();
             }
         });
         getRootPane().setDefaultButton(close);
@@ -78,7 +78,7 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
         return closePanel;
     }
 
-    public void register(MetadataPresenter presenter) {
+    public void observe(MetadataPresenter presenter) {
         this.presenter = presenter;
     }
 

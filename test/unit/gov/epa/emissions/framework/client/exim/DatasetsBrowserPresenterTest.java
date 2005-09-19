@@ -32,14 +32,15 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         presenter = new DatasetsBrowserPresenter(new DefaultEmfSession(null, (ServiceLocator) serviceLocator.proxy()));
         view.expects(once()).method("observe").with(eq(presenter));
+        view.expects(once()).method("display").withNoArguments();
 
-        presenter.observe((DatasetsBrowserView) view.proxy());
+        presenter.display((DatasetsBrowserView) view.proxy());
     }
 
     public void testShouldCloseViewOnClickOfCloseButton() {
         view.expects(once()).method("close").withNoArguments();
 
-        presenter.notifyClose();
+        presenter.doClose();
     }
 
     public void testShouldRefreshViewOnClickOfRefreshButton() throws EmfException {
@@ -53,10 +54,11 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(new DefaultEmfSession(null,
                 (ServiceLocator) serviceLocator.proxy()));
         view.expects(once()).method("observe").with(eq(presenter));
+        view.expects(once()).method("display").withNoArguments();
+        
+        presenter.display((DatasetsBrowserView) view.proxy());
 
-        presenter.observe((DatasetsBrowserView) view.proxy());
-
-        presenter.notifyRefresh();
+        presenter.doRefresh();
     }
 
     public void testShouldNotifyViewToDisplayExportViewOnClickOfExportButton() throws EmfException {
@@ -69,17 +71,17 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         EmfDataset[] datasets = new EmfDataset[] { dataset1, dataset2 };
         view.expects(once()).method("showExport").with(eq(datasets), new IsInstanceOf(ExportPresenter.class));
 
-        presenter.notifyExport(datasets);
+        presenter.doExport(datasets);
     }
 
     public void testShouldDisplayMetadataViewOnClickOfMetadataButton() {
         EmfDataset dataset = new EmfDataset();
         dataset.setName("name");
 
-        Mock metadataView = mock(MetadataView.class);
-        metadataView.expects(once()).method("register").with(new IsInstanceOf(MetadataPresenter.class));
-        metadataView.expects(once()).method("display").with(eq(dataset));
-
-        presenter.notifyShowMetadata((MetadataView) metadataView.proxy(), dataset);
+        Mock view = mock(MetadataView.class);
+        view.expects(once()).method("observe").with(new IsInstanceOf(MetadataPresenter.class));
+        view.expects(once()).method("display").with(eq(dataset));
+        
+        presenter.notifyShowMetadata((MetadataView) view.proxy(), dataset);
     }
 }

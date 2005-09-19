@@ -33,7 +33,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("setDefaultBaseFolder").with(eq(folder));
         view.expects(once()).method("display");
 
-        presenter.observe((ImportView) view.proxy());
+        presenter.display((ImportView) view.proxy());
     }
 
     public void testSendsImportRequestToEximServiceOnImport() throws EmfException {

@@ -20,10 +20,10 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         view = mock(UpdateUserView.class);
 
         presenter = new UpdateUserPresenter((UserServices) userServices.proxy());
-        view.expects(once()).method("setObserver").with(eq(presenter));
+        view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();
 
-        presenter.observe((UpdateUserView) view.proxy());
+        presenter.display((UpdateUserView) view.proxy());
     }
 
     public void testShouldUpdateUserViaEmfUserAdminOnNotifySave() throws EmfException {

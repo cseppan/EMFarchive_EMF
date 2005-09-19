@@ -28,7 +28,7 @@ public class RegisterUserWindowLauncher {
         view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         RegisterUserPresenter presenter = new RegisterUserPresenter(userServices);
-        presenter.observe(view);
+        presenter.display(view);
     }
 
 }

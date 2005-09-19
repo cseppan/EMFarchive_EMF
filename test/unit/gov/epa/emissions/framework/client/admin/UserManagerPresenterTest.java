@@ -9,41 +9,53 @@ import org.jmock.MockObjectTestCase;
 
 public class UserManagerPresenterTest extends MockObjectTestCase {
 
+    private Mock view;
+    private UserManagerPresenter presenter;
+
+    protected void setUp() {
+        presenter = new UserManagerPresenter(null, null);
+
+        view = mock(UserManagerView.class);
+
+        view.expects(once()).method("observe").with(eq(presenter));
+        view.expects(once()).method("display").withNoArguments();    
+        
+        presenter.display((UserManagerView) view.proxy());
+    }
+    
     public void testShouldCloseViewOnClickOfCloseButton() {
-        Mock view = mock(UserManagerView.class);
-
-        UserManagerPresenter presenter = new UserManagerPresenter(null, null, (UserManagerView) view.proxy());
-
-        view.expects(once()).method("setObserver").with(eq(presenter));
         view.expects(once()).method("close").withNoArguments();
-
-        presenter.observe();
-        presenter.notifyCloseView();
+       
+        presenter.doCloseView();
     }
 
     public void testShouldDeleteUserViaEMFUserAdminOnNotifyDelete() throws EmfException {
-        Mock emfUserAdmin = mock(UserServices.class);
-        emfUserAdmin.expects(once()).method("deleteUser").with(eq("matts"));
+        Mock userServices = mock(UserServices.class);
+        userServices.expects(once()).method("deleteUser").with(eq("matts"));
 
-        Mock view = mock(UserManagerView.class);
+        Mock view = mock(UserManagerView.class);        
+        view.expects(once()).method("display").withNoArguments();    
         view.expects(once()).method("refresh").withNoArguments();
+
         User user = new User();
         user.setUsername("joe");
 
-        UserManagerPresenter presenter = new UserManagerPresenter(user, (UserServices) emfUserAdmin.proxy(),
-                (UserManagerView) view.proxy());
-
-        presenter.notifyDelete("matts");
+        UserManagerPresenter presenter = new UserManagerPresenter(user, (UserServices) userServices.proxy());
+        view.expects(once()).method("observe").with(eq(presenter));
+        
+        presenter.display((UserManagerView) view.proxy());
+        
+        presenter.doDelete("matts");
     }
 
     public void testShouldNotDeleteCurrentlyLoggedInUserOnNotifyDelete() throws EmfException {
         User user = new User();
         user.setUsername("joe");
 
-        UserManagerPresenter presenter = new UserManagerPresenter(user, null, null);
+        UserManagerPresenter presenter = new UserManagerPresenter(user, null);
 
         try {
-            presenter.notifyDelete(user.getUsername());
+            presenter.doDelete(user.getUsername());
         } catch (EmfException e) {
             assertEquals("Cannot delete yourself - '" + user.getUsername() + "'", e.getMessage());
             return;
@@ -53,10 +65,10 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldNotDeleteAdminOnNotifyDelete() {
-        UserManagerPresenter presenter = new UserManagerPresenter(null, null, null);
+        UserManagerPresenter presenter = new UserManagerPresenter(null, null);
 
         try {
-            presenter.notifyDelete("admin");
+            presenter.doDelete("admin");
         } catch (EmfException e) {
             assertEquals("Cannot delete EMF super user - 'admin'", e.getMessage());
             return;

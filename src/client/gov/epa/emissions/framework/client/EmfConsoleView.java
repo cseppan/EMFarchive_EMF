@@ -4,4 +4,6 @@ public interface EmfConsoleView {
     void displayUserManager();
 
     void observe(EmfConsolePresenter presenter);
+
+    void display();
 }

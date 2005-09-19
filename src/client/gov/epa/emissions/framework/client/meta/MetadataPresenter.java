@@ -12,16 +12,14 @@ public class MetadataPresenter {
         this.dataset = dataset;
     }
 
-    public void notifyDisplay() {
+    public void display(MetadataView view) {
+        this.view = view;
+        view.observe(this);
+
         view.display(dataset);
     }
 
-    public void observe(MetadataView view) {
-        this.view = view;
-        view.register(this);
-    }
-
-    public void notifyClose() {
+    public void doClose() {
         view.close();
     }
 

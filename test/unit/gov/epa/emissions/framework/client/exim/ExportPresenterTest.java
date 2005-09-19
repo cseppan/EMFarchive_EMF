@@ -58,7 +58,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("register").with(eq(presenter));
         view.expects(once()).method("setMostRecentUsedFolder").with(eq(folder));
 
-        presenter.observe(viewProxy);
+        presenter.display(viewProxy);
 
         presenter.notifyDone();
     }
@@ -75,7 +75,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("register").with(eq(presenter));
         view.expects(once()).method("setMostRecentUsedFolder").with(eq(folder));
 
-        presenter.observe(viewProxy);
+        presenter.display(viewProxy);
     }
 
 }

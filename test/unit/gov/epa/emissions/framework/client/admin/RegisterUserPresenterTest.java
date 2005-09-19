@@ -23,7 +23,7 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();
         
-        presenter.observe((RegisterUserView) view.proxy());
+        presenter.display((RegisterUserView) view.proxy());
     }
 
     public void testShouldCreateUserAndLoginOnNotifyCreateUser() throws EmfException {
