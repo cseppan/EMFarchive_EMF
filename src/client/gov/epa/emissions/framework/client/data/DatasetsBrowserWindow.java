@@ -107,6 +107,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         JButton button = new JButton(icon);
         button.setToolTipText("Refresh Datasets");
+        button.setName("refresh");
         button.setBorderPainted(false);
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -240,6 +241,16 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         createLayout(layout, parentConsole);
 
         this.refreshLayout();
+    }
+
+    public void showMessage(String message) {
+        messagePanel.setMessage(message);
+        refreshLayout();
+    }
+
+    public void clearMessage() {
+        messagePanel.clear();
+        refreshLayout();
     }
 
 }

@@ -15,4 +15,8 @@ public interface DatasetsBrowserView {
     void close();
 
     void display();
+    
+    void showMessage(String message);
+
+    void clearMessage();
 }

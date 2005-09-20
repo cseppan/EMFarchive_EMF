@@ -14,7 +14,7 @@ import org.dbunit.operation.DatabaseOperation;
 
 public class DbUpdate {
 
-    private DatabaseConnection connection;
+    protected DatabaseConnection connection;
 
     public DbUpdate() throws Exception {
         connection = connection(new Config("test/uat/uat.conf"));
@@ -32,7 +32,7 @@ public class DbUpdate {
         DatabaseOperation.DELETE_ALL.execute(connection, dataset);
     }
 
-    private void deleteAll(IDataSet dataset) throws DatabaseUnitException, SQLException {
+    protected void doDelete(IDataSet dataset) throws DatabaseUnitException, SQLException {
         DatabaseOperation.DELETE.execute(connection, dataset);
     }
 
@@ -41,7 +41,7 @@ public class DbUpdate {
         QueryDataSet dataset = new QueryDataSet(connection);
         dataset.addTable(table, "SELECT * from " + table + " WHERE " + name + " ='" + value + "'");
 
-        deleteAll(dataset);
+        doDelete(dataset);
     }
 
 }

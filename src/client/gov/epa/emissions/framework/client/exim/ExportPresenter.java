@@ -23,10 +23,11 @@ public class ExportPresenter {
         this.view = view;
         view.observe(this);
         view.setMostRecentUsedFolder(session.getMostRecentExportFolder());
-        
+
         view.display();
     }
 
+    // FIXME: have two separate, explicit methods for overwrite/no overwrite
     public void notifyExport(EmfDataset[] datasets, String folder, boolean overwrite, String description) throws EmfException {
         session.setMostRecentExportFolder(folder);
 

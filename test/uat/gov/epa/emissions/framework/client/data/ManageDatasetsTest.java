@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.framework.client.ConsoleActions;
 import gov.epa.emissions.framework.client.DbUpdate;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
@@ -11,13 +12,14 @@ import javax.swing.JTable;
 
 public class ManageDatasetsTest extends UserAcceptanceTestCase {
 
-    private EmfConsole consoleWindow;
+    private EmfConsole console;
 
     private DatasetsBrowserActions browserActions;
 
     public void setUp() throws Exception {
-        browserActions = new DatasetsBrowserActions(this);
-        consoleWindow = browserActions.openConsole();
+        ConsoleActions consoleActions = new ConsoleActions(this);
+        console = consoleActions.open();
+        browserActions = new DatasetsBrowserActions(console, this);
     }
 
     public void testShouldDisplayImportedDatasets() throws Exception {
@@ -31,8 +33,10 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
     }
 
     private void doShouldDisplayImportedDatasets(String datasetName) throws Exception, InterruptedException {
-        ImportActions importActions = new ImportActions(consoleWindow, this);
-        importActions.doImport(datasetName, "ORL Nonroad Inventory");
+        ImportActions importActions = new ImportActions(console, this);
+        importActions.open();
+        importActions.importOrlNonRoad(datasetName);
+        importActions.done();
 
         DatasetsBrowserWindow browser = browserActions.open();
         assertNotNull("browser should have been opened", browser);
@@ -48,12 +52,36 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
         browserActions.close();
 
         try {
-            findInternalFrame(consoleWindow, "datasetsBrowser");
+            findInternalFrame(console, "datasetsBrowser");
         } catch (Exception e) {
             return;
         }
 
         fail("Datasets Browser should not be present and displayed on Close");
+    }
+
+    public void testShouldDisplayExportWindowOnClickOfExportButton() throws Exception {
+        String datasetName = "ORL Nonroad Inventory" + " UAT - " + new Random().nextInt();
+        try {
+            doShouldDisplayExportWindowOnClickOfExport(datasetName);
+        } finally {
+            DbUpdate update = new DbUpdate();
+            update.delete("datasets", "name", datasetName);
+        }
+    }
+
+    private void doShouldDisplayExportWindowOnClickOfExport(String datasetName) throws Exception {
+        ImportActions importActions = new ImportActions(console, this);
+        importActions.open();
+        importActions.importOrlNonRoad(datasetName);
+        importActions.done();
+        
+        browserActions.open();
+
+        browserActions.select(0);
+        browserActions.export();
+
+        findByName(console, "exportWindow");
     }
 
 }

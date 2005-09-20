@@ -1,9 +1,10 @@
 package gov.epa.emissions.framework.client.exim;
 
+import gov.epa.emissions.framework.client.ConsoleActions;
+import gov.epa.emissions.framework.client.DbUpdate;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 
-import java.io.File;
 import java.util.Random;
 
 import javax.swing.JComboBox;
@@ -17,22 +18,23 @@ public class ImportTest extends UserAcceptanceTestCase {
 
     private ImportWindow importWindow;
 
-    private EmfConsole consoleWindow;
+    private EmfConsole console;
+
+    private ImportActions importActions;
 
     protected void setUp() throws Exception {
-        consoleWindow = openConsole();
+        ConsoleActions consoleActions = new ConsoleActions(this);
+        console = consoleActions.open();
 
-        click(consoleWindow, "file");
-        click(consoleWindow, "import");
-
-        importWindow = (ImportWindow) findInternalFrame(consoleWindow, "importWindow");
+        importActions = new ImportActions(console, this);
+        importWindow = importActions.open();
         assertNotNull(importWindow);
     }
 
     public void tearDown() throws Exception {
-        click(importWindow, "done");
+        importActions.done();
 
-        JInternalFrame importWindow = findInternalFrame(consoleWindow, "importWindow");
+        JInternalFrame importWindow = importActions.find();
         assertFalse("Import Window should be hidden from view", importWindow.isVisible());
     }
 
@@ -46,69 +48,73 @@ public class ImportTest extends UserAcceptanceTestCase {
     }
 
     public void testShouldImportORLNonRoad() throws Exception {
-        doImport("datasetTypes", "ORL Nonroad Inventory", "arinv.nonroad.nti99d_NC.new.txt");
+        String name = datasetName("ORL Nonroad Inventory");
+        try {
+            importActions.importOrlNonRoad(name);
+        } finally {
+            DbUpdate update = new DbUpdate();
+            update.delete("datasets", "name", name);
+        }
     }
 
     public void testShouldImportORLNonPoint() throws Exception {
-        doImport("datasetTypes", "ORL Nonpoint Inventory", "arinv.nonpoint.nti99_NC.txt");
+        String name = datasetName("ORL NonPoint Inventory");
+        try {
+            importActions.importOrlNonPoint(name);
+        } finally {
+            DbUpdate update = new DbUpdate();
+            update.delete("datasets", "name", name);
+        }
     }
 
     public void testShouldImportORLPoint() throws Exception {
-        doImport("datasetTypes", "ORL Point Inventory", "ptinv.nti99_NC.txt");
+        String name = datasetName("ORL Point Inventory");
+        try {
+            importActions.importOrlPoint(name);
+        } finally {
+            DbUpdate update = new DbUpdate();
+            update.delete("datasets", "name", name);
+        }
     }
 
     public void testShouldImportORLOnRoadMobile() throws Exception {
-        doImport("datasetTypes", "ORL Onroad Inventory", "nti99.NC.onroad.SMOKE.txt");
+        String name = datasetName("ORL Onroad Inventory");
+        try {
+            importActions.importOrlOnRoadMobile(name);
+        } finally {
+            DbUpdate update = new DbUpdate();
+            update.delete("datasets", "name", name);
+        }
     }
 
     public void TODO_testShouldFailIfImportIsAttemptedWithDuplicateName() throws Exception {
         String name = "ORL Onroad Inventory" + " UAT - " + new Random().nextInt();
-        doImport("datasetTypes", name, "ORL Onroad Inventory", "nti99.NC.onroad.SMOKE.txt");
+        importActions.doImport("ORL Onroad Inventory", name, "nti99.NC.onroad.SMOKE.txt");
 
-        doImport("datasetTypes", name, "ORL Onroad Inventory", "nti99.NC.onroad.SMOKE.txt");
+        importActions.doImport("ORL Onroad Inventory", name, "nti99.NC.onroad.SMOKE.txt");
         // TODO: assert failure - check the status messages
     }
 
-    private void doImport(String comboBoxName, String value, String filename) throws Exception {
-        doImport(comboBoxName, value + " UAT - " + new Random().nextInt(), value, filename);
-    }
-
-    private void doImport(String comboBoxName, String name, String value, String filename) throws Exception {
-        selectComboBoxItem(importWindow, comboBoxName, value);
-        setTextfield(importWindow, "name", name);
-
-        File userDir = new File(System.getProperty("user.dir"));
-        String pathToFile = "test/data/orl/nc/";
-        File repository = new File(userDir, pathToFile);
-        setTextfield(importWindow, "folder", repository.getAbsolutePath());
-
-        setTextfield(importWindow, "filename", filename);
-
-        clickImport();
-
-        // TODO: assert status messages
+    private String datasetName(String value) {
+        return value + " UAT - " + new Random().nextInt();
     }
 
     public void testShouldShowErrorMessageIfNameIsUnspecified() throws Exception {
-        selectComboBoxItem(importWindow, "datasetTypes", "ORL Point Inventory");
+        importActions.selectDatasetType("ORL Point Inventory");
 
-        clickImport();
+        importActions.clickImport();
 
         assertErrorMessage(importWindow, "Dataset Name should be specified");
     }
 
     public void testShouldShowErrorMessageIfFilenameIsUnspecified() throws Exception {
-        selectComboBoxItem(importWindow, "datasetTypes", "ORL Point Inventory");
-        setTextfield(importWindow, "name", " UAT - " + new Random().nextInt());
-        setTextfield(importWindow, "folder", "/folder/name");
+        importActions.selectDatasetType("ORL Point Inventory");
+        importActions.setName(" UAT - " + new Random().nextInt());
+        importActions.setFolder("/folder/name");
 
-        clickImport();
+        importActions.clickImport();
 
         assertErrorMessage(importWindow, "Filename should be specified");
-    }
-
-    private void clickImport() throws Exception {
-        click(importWindow, "import");
     }
 
     protected ListModel findComboBoxList(JComboBox comboBox) {
