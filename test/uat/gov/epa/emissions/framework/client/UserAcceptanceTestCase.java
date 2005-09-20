@@ -35,14 +35,14 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
         return (RegisterUserWindow) findWindow("RegisterUser");
     }
 
-    protected void click(Container window, String componentName) throws Exception {
+    public void click(Container window, String componentName) throws Exception {
         Component component = findByName(window, componentName);
         ComponentTester tester = new ComponentTester();
 
         tester.actionClick(component);
     }
 
-    protected LoginWindow createLoginWindow() {
+    public LoginWindow createLoginWindow() {
         ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
 
         LoginWindow view = new LoginWindow(serviceLocator);
@@ -56,27 +56,27 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
         return view;
     }
 
-    protected void setTextfield(Container window, String name, String value) throws Exception {
+    public void setTextfield(Container window, String name, String value) throws Exception {
         JTextField field = (JTextField) findByName(window, name);
         field.setText(value);
     }
 
-    protected void assertErrorMessage(Container window, String errorMessage) throws Exception {
+    public void assertErrorMessage(Container window, String errorMessage) throws Exception {
         MessagePanel messagePanel = (MessagePanel) findByName(window, "messagePanel");
         assertEquals(errorMessage, messagePanel.getMessage());
     }
 
-    protected Component findByName(Container window, String componentName) throws Exception {
+    public Component findByName(Container window, String componentName) throws Exception {
         return getFinder().find(window, new NameMatcher(componentName));
     }
 
-    protected void assertEmfConsoleShown() throws Exception {
+    public void assertEmfConsoleShown() throws Exception {
         EmfConsole console = (EmfConsole) findWindow("EMF Console");
         assertNotNull(console);
         assertTrue(console.isVisible());
     }
 
-    protected EmfConsole gotoConsole() throws Exception {
+    public EmfConsole openConsole() throws Exception {
         LoginWindow window = createLoginWindow();
         showWindow(window);
 
@@ -96,11 +96,11 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
         setTextfield(window, "username", username);
     }
 
-    protected Component findWindow(String title) throws Exception {
+    public Component findWindow(String title) throws Exception {
         return getFinder().find(new WindowMatcher(title));
     }
 
-    protected JInternalFrame findInternalFrame(JFrame frame, final String name) throws Exception {
+    public JInternalFrame findInternalFrame(JFrame frame, final String name) throws Exception {
         return (JInternalFrame) getFinder().find(frame, new Matcher() {
             public boolean matches(Component component) {
                 if (!(component instanceof JInternalFrame))
@@ -112,25 +112,25 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
         });
     }
 
-    protected JComboBox findComboBox(Container container, final String name) throws Exception {
+    public JComboBox findComboBox(Container container, final String name) throws Exception {
         return (JComboBox) getFinder().find(container, new Matcher() {
             public boolean matches(Component component) {
                 if (!(component instanceof JComboBox))
                     return false;
-    
+
                 JComboBox comboBox = (JComboBox) component;
                 return name.equals(comboBox.getName());
             }
         });
     }
 
-    protected void selectComboBoxItem(ImportWindow window, String comboBoxName, String value) throws Exception {
+    public void selectComboBoxItem(ImportWindow window, String comboBoxName, String value) throws Exception {
         JComboBox comboBox = findComboBox(window, comboBoxName);
         JComboBoxTester tester = new JComboBoxTester();
         tester.actionSelectItem(comboBox, value);
     }
 
-    protected StatusWindow getStatusWindow(EmfConsole window) throws Exception {
+    public StatusWindow getStatusWindow(EmfConsole window) throws Exception {
         return (StatusWindow) findInternalFrame(window, "status");
     }
 

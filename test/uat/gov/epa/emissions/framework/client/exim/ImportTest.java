@@ -20,7 +20,7 @@ public class ImportTest extends UserAcceptanceTestCase {
     private EmfConsole consoleWindow;
 
     protected void setUp() throws Exception {
-        consoleWindow = gotoConsole();
+        consoleWindow = openConsole();
 
         click(consoleWindow, "file");
         click(consoleWindow, "import");

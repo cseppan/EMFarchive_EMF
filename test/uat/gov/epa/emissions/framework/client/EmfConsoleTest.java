@@ -15,7 +15,7 @@ public class EmfConsoleTest extends UserAcceptanceTestCase {
     private EmfConsole window;
 
     protected void setUp() throws Exception {
-        window = gotoConsole();
+        window = openConsole();
 
         window.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent arg0) {
