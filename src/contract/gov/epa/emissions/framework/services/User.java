@@ -54,6 +54,11 @@ public class User implements Serializable {
         return userName.hashCode();
     }
 
+	/**
+	 * No argument constructor needed for hibernate
+	 * bean mapping
+	 * 
+	 */
     public User() {
         super();
     }

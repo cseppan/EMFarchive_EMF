@@ -27,11 +27,11 @@ public class ExportPresenter {
         view.display();
     }
 
-    public void notifyExport(EmfDataset[] datasets, String folder, boolean overwrite) throws EmfException {
+    public void notifyExport(EmfDataset[] datasets, String folder, boolean overwrite, String description) throws EmfException {
         session.setMostRecentExportFolder(folder);
 
         ExImServices services = session.getExImServices();
-        services.startExport(session.getUser(), datasets, folder, overwrite);
+        services.startExport(session.getUser(), datasets, folder, overwrite, description);
     }
 
 }

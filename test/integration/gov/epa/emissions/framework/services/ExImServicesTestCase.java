@@ -69,7 +69,7 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
         if (!outputFile.exists()) outputFile.mkdir();
         
         eximService.startImport(user, repository.getAbsolutePath(), filename, dataset, datasetType);
-        eximService.startExport(user, new EmfDataset[]{dataset}, outputFile.getAbsolutePath(), true);
+        eximService.startExport(user, new EmfDataset[]{dataset}, outputFile.getAbsolutePath(), true, "HELLO EMF ACCESSLOGS TESTCASE");
 
     }
 

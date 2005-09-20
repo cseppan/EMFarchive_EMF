@@ -57,6 +57,11 @@ public class EmfDataset implements Dataset {
 
     private List tables;
 
+	/**
+	 * No argument constructor needed for hibernate
+	 * bean mapping
+	 * 
+	 */
     public EmfDataset() {
         tables = new ArrayList();
     }

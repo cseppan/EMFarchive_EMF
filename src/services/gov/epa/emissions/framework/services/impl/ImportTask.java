@@ -45,13 +45,12 @@ public class ImportTask implements Runnable {
 
     private EmfDataset dataset;
 
-    public ImportTask(User user, File file, EmfDataset dataset, DatasetType datasetType, DataServices dataServices,
-            StatusServices statusServices, Importer importer) {
+    public ImportTask(User user, File file, EmfDataset dataset, DatasetType datasetType, ServicesHolder svcHolder, Importer importer) {
         this.user = user;
         this.file = file;
         this.dataset = dataset;
-        this.dataServices = dataServices;
-        this.statusServices = statusServices;
+        this.dataServices = svcHolder.getDataSvc();
+        this.statusServices = svcHolder.getStatusSvc();
         this.datasetType = datasetType;
 
         this.importer = importer;
@@ -101,7 +100,7 @@ public class ImportTask implements Runnable {
 
     private void setStatus(String message) throws EmfException {
         Status endStatus = new Status();
-        endStatus.setUserName(user.getUsername());
+        endStatus.setUsername(user.getUsername());
         endStatus.setMessageType(EMFConstants.IMPORT_MESSAGE_TYPE);
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());

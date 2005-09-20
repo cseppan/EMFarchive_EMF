@@ -12,8 +12,10 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.exporter.Exporter;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.LoggingServices;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
@@ -34,9 +36,10 @@ public class ExportTask implements Runnable {
     private User user;
     private File file;
     private StatusServices statusServices = null;
+	private LoggingServices loggingServices = null;
     private EmfDataset dataset;
 	private Exporter exporter;
-
+	private AccessLog accesslog=null;
 
     /**
      * 
@@ -46,12 +49,14 @@ public class ExportTask implements Runnable {
      * @param statusSvc
      * @param exporter
      */
-	protected ExportTask(User user, File file, EmfDataset dataset, StatusServices statusSvc, Exporter exporter) {
+	protected ExportTask(User user, File file, EmfDataset dataset, ServicesHolder  svcHolder, AccessLog accesslog, Exporter exporter) {
 		this.user=user;
 		this.file=file;
 		this.dataset=dataset;
-		this.statusServices=statusSvc;
+		this.statusServices=svcHolder.getStatusSvc();
+		this.loggingServices =svcHolder.getLogSvc();
 		this.exporter=exporter;
+		this.accesslog=accesslog;
 	}
 
 	/* (non-Javadoc)
@@ -61,9 +66,9 @@ public class ExportTask implements Runnable {
         log.info("starting export - file: " + file.getName() + " of type: " + dataset.getDatasetType());
         try {
             setStartStatus();
-
             exporter.run( dataset, file);
-
+            //update access logs
+            loggingServices.setAccessLog(accesslog);
             setStatus(EMFConstants.END_EXPORT_MESSAGE_Prefix + dataset.getName() + ":" + file.getName());
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + file, e);
@@ -83,7 +88,7 @@ public class ExportTask implements Runnable {
 
     private void setStatus(String message) throws EmfException {
         Status endStatus = new Status();
-        endStatus.setUserName(user.getUsername());
+        endStatus.setUsername(user.getUsername());
         endStatus.setMessageType(EMFConstants.EXPORT_MESSAGE_TYPE);
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());

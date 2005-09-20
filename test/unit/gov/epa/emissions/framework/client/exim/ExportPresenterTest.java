@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.User;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.core.Constraint;
 
 public class ExportPresenterTest extends MockObjectTestCase {
 
@@ -30,14 +31,14 @@ public class ExportPresenterTest extends MockObjectTestCase {
     	User user = new User();
         user.setUsername("user");
         user.setFullName("full name");
-
+        String description="HELLO EMF ACCESSLOGS FOR MOCK EXPORT";
         EmfDataset dataset = new EmfDataset();
         dataset.setName("dataset test");
 
         EmfDataset[] datasets = new EmfDataset[] { dataset };
 
         Mock model = mock(ExImServices.class);
-        model.expects(once()).method("startExport").with(eq(user), eq(datasets), eq(folder), eq(overwrite));
+        model.expects(once()).method("startExport").with(new Constraint[]{eq(user), eq(datasets), eq(folder), eq(overwrite), eq(description)});
 
         session.stubs().method("getUser").withNoArguments().will(returnValue(user));
         session.stubs().method("getExImServices").withNoArguments().will(returnValue(model.proxy()));
@@ -45,7 +46,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
 
         ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
 
-        presenter.notifyExport(datasets, folder, overwrite);
+        presenter.notifyExport(datasets, folder, overwrite, description);
     }
 
     public void testClosesViewOnDoneExport() {

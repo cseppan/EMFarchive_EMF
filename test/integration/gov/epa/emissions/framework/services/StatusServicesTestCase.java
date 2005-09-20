@@ -36,7 +36,7 @@ public abstract class StatusServicesTestCase extends ServicesTestCase {
         aStat.setMessage("import started for file XYZABC");
         aStat.setMessageType("INFOMATICA");
         aStat.setTimestamp(new Date());
-        aStat.setUserName("cdcruz");
+        aStat.setUsername("cdcruz");
 
         service.setStatus(aStat);
     }

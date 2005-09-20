@@ -18,7 +18,7 @@ import java.util.Date;
 public class Status implements Serializable{
 
     private long statusid;
-    private String userName;
+    private String username;
     private String messageType;
     private String message;
     private boolean msgRead=false;
@@ -56,31 +56,31 @@ public class Status implements Serializable{
     /**
      * The constructor that takes in the status message parameters
      * 
-     * @param userName
+     * @param username
      * @param msgType
      * @param message
      * @param timestamp
      */
-    public Status(String userName, String msgType, String message,
+    public Status(String username, String msgType, String message,
             Date timestamp) {
         super();
-        this.userName = userName;
+        this.username = username;
         this.messageType = msgType;
         this.message = message;
         this.timestamp = timestamp;
     }
 
     /**
-     * @return Returns the userName.
+     * @return Returns the username.
      */
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
     /**
-     * @param userName The userName to set.
+     * @param username The username to set.
      */
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     /**
@@ -121,7 +121,7 @@ public class Status implements Serializable{
     }
 
     public String toString() {
-        return "Message : " + message + " for user: " + userName;
+        return "Message : " + message + " for user: " + username;
     }
 
 	public long getStatusid() {

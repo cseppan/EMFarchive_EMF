@@ -157,7 +157,10 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private void doExport() {
         try {
-            presenter.notifyExport(datasets, folder.getText(), overwrite.isSelected());
+        	//FIXME: Need description text field/area on export window
+        	//FIXME: parameter in the notifyExport call (last paramter in list)
+        	//FIXME: will be the description from the GUI
+            presenter.notifyExport(datasets, folder.getText(), overwrite.isSelected(), "HELLO EMF ACCESS LOGS EXPORTS");
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
         } catch (EmfException e) {

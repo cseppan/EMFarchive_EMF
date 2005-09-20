@@ -138,7 +138,7 @@ public class StatusServicesTransport implements StatusServices {
      * @see gov.epa.emissions.framework.commons.EMFStatus#setStatus(gov.epa.emissions.framework.commons.Status)
      */
     public void setStatus(Status status) throws EmfException {
-        log.debug("Setting status for user:message " + status.getUserName() + " :: " + status.getMessage());
+        log.debug("Setting status for user:message " + status.getUsername() + " :: " + status.getMessage());
         Service service = new Service();
         Call call;
 
@@ -169,7 +169,7 @@ public class StatusServicesTransport implements StatusServices {
         } catch (RemoteException e) {
             log.error("Error communicating with WS end point", e);
         }
-        log.debug("Setting status for user:message " + status.getUserName() + " :: " + status.getMessage());
+        log.debug("Setting status for user:message " + status.getUsername() + " :: " + status.getMessage());
     }
 
 }

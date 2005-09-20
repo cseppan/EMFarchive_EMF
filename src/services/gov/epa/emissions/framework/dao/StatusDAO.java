@@ -28,9 +28,9 @@ import org.hibernate.Transaction;
 public class StatusDAO {
     private static Log log = LogFactory.getLog(StatusDAO.class);
 
-    private static final String GET_STATUS_QUERY = "select stat from Status as stat where stat.userName=:username";
+    private static final String GET_STATUS_QUERY = "select stat from Status as stat where stat.username=:username";
 
-    private static final String GET_READ_STATUS_QUERY = "select stat from Status as stat where stat.msgRead=true and stat.userName=:username";
+    private static final String GET_READ_STATUS_QUERY = "select stat from Status as stat where stat.msgRead=true and stat.username=:username";
 
     // FIXME: Verify if exception needs to be thrown/caught here
     public static List getMessages(String userName, Session session) {
@@ -57,7 +57,7 @@ public class StatusDAO {
 
     // FIXME: Verify if exception needs to be thrown/caught here
     public static void insertStatusMessage(Status status, Session session) {
-        log.debug("StatusDAO: insertStatusMessage: " + status.getUserName() + "\n" + session.toString());
+        log.debug("StatusDAO: insertStatusMessage: " + status.getUsername() + "\n" + session.toString());
         Transaction tx = session.beginTransaction();
         log.debug("StatusDAO: insertStatusMessage before session.save");
         session.save(status);

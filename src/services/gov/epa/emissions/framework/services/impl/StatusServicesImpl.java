@@ -69,7 +69,7 @@ public class StatusServicesImpl implements StatusServices {
     }
 
     public void setStatus(Status status) {
-        log.debug("EMFStatusService: setStatus " + status.getUserName());
+        log.debug("EMFStatusService: setStatus " + status.getUsername());
         // Session session = HibernateUtils.currentSession();
         Session session = EMFHibernateUtil.getSession();
         log.debug("EMFStatusService: Before insertStatusMessage");
@@ -79,7 +79,7 @@ public class StatusServicesImpl implements StatusServices {
         session.flush();
         session.close();
         log.debug("EMFStatusService: After insertStatusMessage");
-        log.debug("EMFStatusService: setStatus " + status.getUserName());
+        log.debug("EMFStatusService: setStatus " + status.getUsername());
     }
 
 }

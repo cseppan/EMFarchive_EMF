@@ -16,14 +16,14 @@ import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDAO;
 import gov.epa.emissions.framework.dao.DatasetTypesDAO;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImServices;
-import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -71,9 +71,9 @@ public class ExImServicesImpl implements ExImServices {
         exporterFactory = new ExporterFactory(dbServer);
     }
 
-    private File validateExportFile(String fileName, boolean overwrite) throws EmfException {
+    private File validateExportFile(File path, String fileName, boolean overwrite) throws EmfException {
         log.debug("check if file exists " + fileName);
-        File file = new File(fileName);
+        File file = new File(path,fileName);
 
         if (!overwrite){
             if (file.exists() && file.isFile()) {
@@ -140,11 +140,12 @@ public class ExImServicesImpl implements ExImServices {
             File path = validatePath(folderPath);
             File file = validateFile(path, fileName);
             validateDatasetName(dataset);
-            StatusServices statusSvc = new StatusServicesImpl();
-            DataServices dataSvc = new DataServicesImpl();
+            ServicesHolder svcHolder = new ServicesHolder();
+            svcHolder.setDataSvc(new DataServicesImpl());
+            svcHolder.setStatusSvc(new StatusServicesImpl());
 
             Importer importer = importerFactory.create(datasetType);
-            ImportTask eximTask = new ImportTask(user, file, dataset, datasetType, dataSvc, statusSvc, importer);
+            ImportTask eximTask = new ImportTask(user, file, dataset, datasetType, svcHolder, importer);
 
             // FIXME: use a thread pool
             new Thread(eximTask).start();
@@ -156,11 +157,10 @@ public class ExImServicesImpl implements ExImServices {
         log.debug("In ExImServicesImpl:startImport END");
     }
 
-    public void startExport(User user, EmfDataset[] datasets, String dirName, boolean overwrite) throws EmfException {
+    public void startExport(User user, EmfDataset[] datasets, String dirName, boolean overwrite, String description) throws EmfException {
         log.info("Start export for user: " + user.getUsername());
         int count = datasets.length;
         log.info("Total number of files to export: " + count);
-        StatusServices statusSvc = new StatusServicesImpl();
         File path = validatePath(dirName);
 
         try {
@@ -170,9 +170,13 @@ public class ExImServicesImpl implements ExImServices {
 
                 // FIXME: Default is overwrite
                 //File file = new File(path, getCleanDatasetName(aDataset.getName()));
-                File file = validateExportFile(getCleanDatasetName(aDataset.getName()),overwrite);
+                File file = validateExportFile(path,getCleanDatasetName(aDataset.getName()),overwrite);
+                ServicesHolder svcHolder = new ServicesHolder();
+                svcHolder.setLogSvc(new LoggingServicesImpl());
+                svcHolder.setStatusSvc(new StatusServicesImpl());
                 Exporter exporter = exporterFactory.create(aDataset.getDatasetType());
-                ExportTask eximTask = new ExportTask(user, file, aDataset, statusSvc, exporter);
+                AccessLog accesslog = new AccessLog(user.getUsername(),aDataset.getDatasetid(), new Date(),"Version 1.0", description,dirName);
+				ExportTask eximTask = new ExportTask(user, file, aDataset, svcHolder, accesslog ,exporter);
                 new Thread(eximTask).start();
             }
         } catch (Exception e) {
@@ -203,32 +207,6 @@ public class ExImServicesImpl implements ExImServices {
         // FIXME: Is Error checking for empty name needed?
 
         return cleanName;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.services.ExImServices#startExport(gov.epa.emissions.framework.services.User,
-     *      gov.epa.emissions.commons.io.Dataset, java.lang.String)
-     */
-    public void startExport(User user, EmfDataset dataset, String fileName) throws EmfException {
-        log.debug("In ExImServicesImpl:startExport START");
-
-        try {
-            File file = new File(fileName);
-            StatusServices statusSvc = new StatusServicesImpl();
-            Exporter exporter = exporterFactory.create(dataset.getDatasetType());
-            ExportTask eximTask = new ExportTask(user, file, dataset, statusSvc, exporter);
-
-            // FIXME: use a thread pool
-            new Thread(eximTask).start();
-        } catch (Exception e) {
-            log.error("Exception attempting to start export of file: " + fileName, e);
-            throw new EmfException(e.getMessage());
-        }
-
-        log.debug("In ExImServicesImpl:startExport END");
-
     }
 
     /*
