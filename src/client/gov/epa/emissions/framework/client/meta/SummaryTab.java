@@ -92,11 +92,11 @@ public class SummaryTab extends JPanel {
         labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
 
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        labelsPanel.add(createRightAlignedLabel("Status"));
+        labelsPanel.add(createRightAlignedLabel("Status:"));
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        labelsPanel.add(createRightAlignedLabel("Last Modified Date"));
+        labelsPanel.add(createRightAlignedLabel("Last Modified Date:"));
         labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        labelsPanel.add(createRightAlignedLabel("Last Accessed Date"));
+        labelsPanel.add(createRightAlignedLabel("Last Accessed Date:"));
 
         panel.add(labelsPanel);
 
@@ -105,13 +105,13 @@ public class SummaryTab extends JPanel {
         valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
 
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        valuesPanel.add(createRightAlignedLabel("<TBD>"));
+        valuesPanel.add(createRightAlignedLabel("Imported"));
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 13)));
 
-        valuesPanel.add(createRightAlignedLabel("<TBD>"));
+        valuesPanel.add(createRightAlignedLabel(" "));
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 17)));
 
-        valuesPanel.add(createRightAlignedLabel("<TBD>"));
+        valuesPanel.add(createRightAlignedLabel(" "));
 
         panel.add(valuesPanel);
 

@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.SpringUtilities;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -12,15 +13,16 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 
 public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
@@ -32,14 +34,14 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private ExportPresenter presenter;
 
-	private JCheckBox overwrite;
+    private JCheckBox overwrite;
 
     public ExportWindow(EmfDataset[] datasets) {
         super("Export Dataset(s)");
         super.setName("exportWindow");
         this.datasets = datasets;
 
-        super.setSize(new Dimension(600, 225));
+        super.setSize(new Dimension(600, 300));
 
         JPanel layoutPanel = createLayout();
         this.getContentPane().add(layoutPanel);
@@ -66,46 +68,57 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     }
 
     private JPanel createExportPanel() {
-        JPanel panel = new JPanel();
+        SpringLayout layout = new SpringLayout();
+        JPanel panel = new JPanel(layout);
 
-        JPanel labelsPanel = new JPanel();
-        labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
-
-        labelsPanel.add(new JLabel("Datasets"));
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 45)));
-        labelsPanel.add(new JLabel("Folder"));
-        panel.add(labelsPanel);
-
-        JPanel valuesPanel = new JPanel();
-        valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
-
-        JTextArea datasetNames = new JTextArea(2, 15);
+        // datasets
+        JTextArea datasetNames = new JTextArea(2, 45);
         datasetNames.setLineWrap(false);
         datasetNames.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(datasetNames, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
         datasetNames.setText(getDatasetsLabel(datasets));
-        valuesPanel.add(scrollPane);
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        folder = new JTextField(35);
+
+        addLabelWidgetPair("Datasets", scrollPane, panel);
+
+        // folder
+        folder = new JTextField(40);
         folder.setName("folder");
-        valuesPanel.add(folder);
+        addLabelWidgetPair("Folder", folder, panel);
 
-        panel.add(valuesPanel);
+        // purpose
+        JTextArea purpose = new JTextArea(2, 45);
+        purpose.setLineWrap(false);
+        JScrollPane purposeScrollPane = new JScrollPane(purpose, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        JPanel overwritePanel = new JPanel();
-        overwritePanel.setLayout(new BoxLayout(overwritePanel, BoxLayout.Y_AXIS));
+        addLabelWidgetPair("Purpose", purposeScrollPane, panel);
+
+        // overwrite
+        JPanel overwritePanel = new JPanel(new BorderLayout());
         overwrite = new JCheckBox("Overwrite?", true);
         overwrite.setEnabled(true);
         overwrite.setName("overwrite");
-        overwrite.setToolTipText("To be implemented");
-        overwritePanel.add(Box.createRigidArea(new Dimension(1, 65)));
-        overwritePanel.add(overwrite);
+        overwritePanel.add(overwrite, BorderLayout.LINE_START);
 
+        panel.add(new JPanel());// filler
         panel.add(overwritePanel);
 
+        // Lay out the panel.
+        // FIXME: turn into an object invocation
+        SpringUtilities.makeCompactGrid(panel, 4, 2, // rows, cols
+                5, 5, // initialX, initialY
+                5, 5);// xPad, yPad
+
         return panel;
+    }
+
+    private void addLabelWidgetPair(String label, JComponent widget, JPanel panel) {
+        panel.add(new JLabel(label));
+
+        JPanel widgetPanel = new JPanel(new BorderLayout());
+        widgetPanel.add(widget, BorderLayout.LINE_START);
+        panel.add(widgetPanel);
     }
 
     private String getDatasetsLabel(EmfDataset[] datasets) {
@@ -155,9 +168,9 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private void doExport() {
         try {
-        	//FIXME: Need description text field/area on export window
-        	//FIXME: parameter in the notifyExport call (last paramter in list)
-        	//FIXME: will be the description from the GUI
+            // FIXME: Need description text field/area on export window
+            // FIXME: parameter in the notifyExport call (last paramter in list)
+            // FIXME: will be the description from the GUI
             presenter.notifyExport(datasets, folder.getText(), overwrite.isSelected(), "HELLO EMF ACCESS LOGS EXPORTS");
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");

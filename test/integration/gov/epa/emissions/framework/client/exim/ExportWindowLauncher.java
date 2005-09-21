@@ -7,7 +7,6 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 
@@ -36,18 +35,19 @@ public class ExportWindowLauncher {
                 createDataset("ORL Non Point") };
 
         Mock servicesLocator = new Mock(ServiceLocator.class);
-        servicesLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getExImServices")).withAnyArguments().will(
-                new ReturnStub(exim.proxy()));
+        servicesLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getExImServices"))
+                .withAnyArguments().will(new ReturnStub(exim.proxy()));
 
         ExportPresenter presenter = new ExportPresenter(new DefaultEmfSession(user, (ServiceLocator) servicesLocator
                 .proxy()));
 
+        JDesktopPane desktop = new JDesktopPane();
         ExportWindow view = new ExportWindow(datasets);
+        desktop.add(view);
         presenter.display(view);
 
         JFrame frame = new JFrame();
-
-        addAsInternalFrame(view, frame);
+        addAsInternalFrame(frame, desktop);
 
         frame.setSize(new Dimension(800, 600));
         frame.setLocation(new Point(400, 200));
@@ -62,11 +62,9 @@ public class ExportWindowLauncher {
         return dataset;
     }
 
-    private static void addAsInternalFrame(Container window, JFrame frame) {
-        JDesktopPane desktop = new JDesktopPane();
+    private static void addAsInternalFrame(JFrame frame, JDesktopPane desktop) {
         desktop.setName("EMF Console");
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
-        desktop.add(window);
 
         frame.setContentPane(desktop);
     }

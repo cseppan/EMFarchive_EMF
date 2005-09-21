@@ -44,7 +44,7 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
         JTable table = browserActions.table();
         assertNotNull("datasets table should be displayed", table);
 
-        assertEquals(datasetName, browserActions.cell(table.getRowCount() - 1, 2));
+        assertEquals(datasetName, browserActions.cell(browserActions.rowCount() - 1, 2));
     }
 
     public void testShouldCloseWindowOnClose() throws Exception {

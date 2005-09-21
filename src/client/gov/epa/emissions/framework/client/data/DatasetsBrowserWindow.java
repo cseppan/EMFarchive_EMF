@@ -137,7 +137,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
 
-        JButton metadata = new Button("Metadata", new AbstractAction() {
+        JButton metadata = new Button("Properties", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doShowMetadata();
             }

@@ -31,8 +31,8 @@ public class ExportOrlDatasetsTest extends UserAcceptanceTestCase {
         }
     }
 
-    public void itestShouldFailToExportIfOverwriteIsUncheckedAndFileAlreadyExists() throws Exception {
-        String datasetName = "ORL Nonroad Inventory" + " UAT - " + new Random().nextInt();
+    public void testShouldFailToExportIfOverwriteIsUncheckedAndFileAlreadyExists() throws Exception {
+        String datasetName = "ORL Nonroad Inventory UAT - " + new Random().nextInt();
         try {
             doExport(datasetName);
             failOnExportDueToOverwrite(datasetName);
@@ -46,35 +46,31 @@ public class ExportOrlDatasetsTest extends UserAcceptanceTestCase {
         ExportWindow exportWindow = selectDatasetToExport(datasetName);
 
         String folder = System.getProperty("java.io.tmpdir");
-        try {
-            ExportActions exportActions = new ExportActions(exportWindow, this);
-            exportActions.setFolder(folder);
-            exportActions.setOverwriteFalse();
 
-            exportActions.clickExport();
-        } catch (Exception e) {
-            return;
-        }
+        ExportActions exportActions = new ExportActions(exportWindow, this);
+        exportActions.setFolder(folder);
+        exportActions.setOverwriteFalse();
+        exportActions.clickExport();
 
-        File file = file(datasetName, folder);
-        fail("should have failed if Overwrite was unchecked, and the file " + file.getAbsolutePath()
-                + " already exists");
+        exportActions.assertErrorMessage("Cannot export to existing file.  Choose overwrite option");
     }
 
-    public void itestShouldExportMultipleSelectedDatasetsToFilesOnClickOfExportButton() throws Exception {
-        String dataset1 = "ORL Nonroad Inventory" + " UAT 1- " + new Random().nextInt();
-        String dataset2 = "ORL Nonroad Inventory" + " UAT 2- " + new Random().nextInt();
+    public void testShouldExportMultipleSelectedDatasetsToFilesOnClickOfExportButton() throws Exception {
+        String dataset1 = "UAT 1- " + new Random().nextInt();
+        String dataset2 = "UAT 2- " + new Random().nextInt();
         String folder = System.getProperty("java.io.tmpdir");
 
         try {
+            int preImportTotal = browserActions.rowCount();
             importOrlNonRoad(dataset1);
             importOrlNonRoad(dataset2);
+            
+            int postImportTotal = browserActions.rowCount();
+            assertEquals(preImportTotal, postImportTotal - 2);
+            
+            browserActions.select(new int[]{postImportTotal - 2,  postImportTotal - 1});
 
-            int total = browserActions.table().getRowCount();
-            browserActions.select(total - 2);
-            browserActions.select(total - 1);
-
-            exportSelectedDataset(browserActions.export(), folder);
+            exportSelectedDatasets(browserActions.export(), folder);
         } finally {
             new ExImDbUpdate().deleteDataset(dataset1);
             new ExImDbUpdate().deleteDataset(dataset2);
@@ -107,7 +103,7 @@ public class ExportOrlDatasetsTest extends UserAcceptanceTestCase {
         ExportWindow exportWindow = selectDatasetToExport(datasetName);
 
         String folder = System.getProperty("java.io.tmpdir");
-        exportSelectedDataset(exportWindow, folder);
+        exportSelectedDatasets(exportWindow, folder);
 
         assertExportedFileExists(datasetName, folder);
     }
@@ -117,7 +113,7 @@ public class ExportOrlDatasetsTest extends UserAcceptanceTestCase {
         return browserActions.export();
     }
 
-    private void exportSelectedDataset(ExportWindow exportWindow, String folder) throws Exception {
+    private void exportSelectedDatasets(ExportWindow exportWindow, String folder) throws Exception {
         ExportActions exportActions = new ExportActions(exportWindow, this);
         exportActions.setFolder(folder);
 

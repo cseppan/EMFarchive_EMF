@@ -47,14 +47,22 @@ public class DatasetsBrowserActions {
     }
 
     public void select(int row) throws Exception {
-        refresh();
-
-        JTableTester tester = new JTableTester();
-        tester.actionSelectCell(table(), row, 1);// 'Select' col is 2nd
+        select(new int[] { row });
     }
 
-    public void refresh() throws Exception {
+    public void select(int[] rows) throws Exception {
+        JTable table = refresh();
+
+        JTableTester tester = new JTableTester();
+        for (int i = 0; i < rows.length; i++) {
+            // 'Select' is 2nd col
+            tester.actionSelectCell(table, rows[i], 1);
+        }
+    }
+
+    public JTable refresh() throws Exception {
         testcase.click(browser, "refresh");
+        return table();
     }
 
     public ExportWindow export() throws Exception {
@@ -72,9 +80,9 @@ public class DatasetsBrowserActions {
     }
 
     public void selectDataset(String dataset) throws Exception {
-        refresh();
+        JTable table = refresh();
 
-        int rows = table().getRowCount();
+        int rows = table.getRowCount();
         for (int i = 0; i < rows; i++) {
             String actualDataset = (String) cell(i, 2);
             if (dataset.equals(actualDataset)) {
@@ -83,4 +91,10 @@ public class DatasetsBrowserActions {
             }
         }
     }
+
+    public int rowCount() throws Exception {
+        JTable table = refresh();
+        return table.getRowCount();
+    }
+
 }

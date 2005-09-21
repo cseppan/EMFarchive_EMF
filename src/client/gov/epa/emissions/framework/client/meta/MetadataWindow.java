@@ -18,7 +18,7 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
     private MetadataPresenter presenter;
 
     public MetadataWindow() {
-        super("Metadata Editor");
+        super("Dataset Properties Editor");
 
         super.setSize(new Dimension(700, 450));
     }
