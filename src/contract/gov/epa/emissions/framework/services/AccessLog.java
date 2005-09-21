@@ -36,6 +36,10 @@ public class AccessLog {
 		super();
 	}
 	
+	public String toString(){
+		return "[ " + accesslogid + " " + datasetid + " " + username + " " + version + " ]";
+	}
+	
 	public AccessLog(String username, long datasetid, Date date, String version, String description, String folderPath) {
 		super();
 		setUsername(username);

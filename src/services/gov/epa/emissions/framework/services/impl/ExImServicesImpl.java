@@ -16,7 +16,9 @@ import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDAO;
 import gov.epa.emissions.framework.dao.DatasetTypesDAO;
+import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.AccessLog;
+import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
@@ -57,21 +59,36 @@ public class ExImServicesImpl implements ExImServices {
         DataSource datasource = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
 
         //FIXME: Get base directory
-        File baseFile=new File(System.getProperty("user.dir"),"emf");
-        File baseImportFile=new File(baseFile,"import");
-        File baseExportFile=new File(baseFile,"export");
-        baseImportFolder=baseImportFile.getAbsolutePath();
-        baseExportFolder=baseExportFile.getAbsolutePath();
+        String baseDirectory=getBaseDirectoryProperty();
+		File baseFile=new File(baseDirectory);
+		File baseImportFile=new File(baseFile,"import");
+		File baseExportFile=new File(baseFile,"export");
+		
+		baseImportFolder=baseImportFile.getAbsolutePath();
+		baseExportFolder=baseExportFile.getAbsolutePath();
+		log.info("### baseImportFolder= " + baseImportFolder);
+		log.info("### baseExportFolder= " + baseExportFolder);
         
         // FIXME: we should not hard-code the db server. Also, read the
         // datasource names from properties
-        DbServer dbServer = new PostgresDbServer(datasource.getConnection(), "reference", "emissions");
+        DbServer dbServer = new PostgresDbServer(datasource.getConnection(), EMFConstants.EMF_REFERENCE_SCHEMA, EMFConstants.EMF_EMISSIONS_SCHEMA);
 
         importerFactory = new ImporterFactory(dbServer);
         exporterFactory = new ExporterFactory(dbServer);
     }
 
-    private File validateExportFile(File path, String fileName, boolean overwrite) throws EmfException {
+    private String getBaseDirectoryProperty() {
+        log.debug("In ExImServicesImpl:getBaseDirectoryProperty START");
+
+        Session session = EMFHibernateUtil.getSession();
+        String propvalue = EmfPropertiesDAO.getEmfPropertyValue(EMFConstants.EMF_DATA_ROOT_FOLDER,session);
+        log.debug("In ExImServicesImpl:getBaseDirectoryProperty END");
+        session.flush();
+        session.close();
+        return propvalue;
+	}
+
+	private File validateExportFile(File path, String fileName, boolean overwrite) throws EmfException {
         log.debug("check if file exists " + fileName);
         File file = new File(path,fileName);
 

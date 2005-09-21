@@ -11,6 +11,8 @@ import gov.epa.emissions.framework.dao.LoggingDAO;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.LoggingServices;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
@@ -35,5 +37,17 @@ public class LoggingServicesImpl implements LoggingServices {
         log.debug("Dataset Access: After insertAccessLog");
         log.debug("Dataset Access: setAccessLog for " + accesslog.getUsername());
 	}
+
+    public AccessLog[] getAccessLogs(long datasetid) {
+        log.debug("get all access log entries for datasetid " + datasetid);
+        // Session session = HibernateUtils.currentSession();
+        Session session = EMFHibernateUtil.getSession();
+        List allLogs = LoggingDAO.getAccessLogs(datasetid,session);
+        session.flush();
+        session.close();
+        log.debug("Total number of messages in the List= " + allLogs.size());
+        log.debug("get all access log entries for datasetid " + datasetid);
+        return (AccessLog[]) allLogs.toArray(new AccessLog[allLogs.size()]);
+    }
 
 }

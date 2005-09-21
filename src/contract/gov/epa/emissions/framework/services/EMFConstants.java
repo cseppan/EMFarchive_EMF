@@ -30,4 +30,12 @@ public final class EMFConstants {
 
     public static final String URI_FILENAME_PREFIX = "file:///";
 
+    //public static final String EMF_REPOSITORIES = "conf/emf/emf_repositories.mount";
+    public static final String EMF_DATA_ROOT_FOLDER="emf.data.root.folder";
+    public static final String EMF_DATA_IMPORT_FOLDER="emf.data.import.folder";
+    public static final String EMF_DATA_EXPORT_FOLDER="emf.data.export.folder";
+
+    //public static final String EMF_REPOSITORIES = "emf_repositories.mount";
+    public static final String EMF_REFERENCE_SCHEMA="reference";
+    public static final String EMF_EMISSIONS_SCHEMA="emissions";
 }
