@@ -157,7 +157,7 @@ public class ExImServicesImpl implements ExImServices {
         log.debug("In ExImServicesImpl:startImport END");
     }
 
-    public void startExport(User user, EmfDataset[] datasets, String dirName, boolean overwrite, String description) throws EmfException {
+    public void startExport(User user, EmfDataset[] datasets, String dirName, boolean overwrite, String purpose) throws EmfException {
         log.info("Start export for user: " + user.getUsername());
         int count = datasets.length;
         log.info("Total number of files to export: " + count);
@@ -175,7 +175,7 @@ public class ExImServicesImpl implements ExImServices {
                 svcHolder.setLogSvc(new LoggingServicesImpl());
                 svcHolder.setStatusSvc(new StatusServicesImpl());
                 Exporter exporter = exporterFactory.create(aDataset.getDatasetType());
-                AccessLog accesslog = new AccessLog(user.getUsername(),aDataset.getDatasetid(), new Date(),"Version 1.0", description,dirName);
+                AccessLog accesslog = new AccessLog(user.getUsername(),aDataset.getDatasetid(), new Date(),"Version 1.0", purpose,dirName);
 				ExportTask eximTask = new ExportTask(user, file, aDataset, svcHolder, accesslog ,exporter);
                 new Thread(eximTask).start();
             }

@@ -23,7 +23,7 @@ public class ExportOrlDatasetsTest extends UserAcceptanceTestCase {
     }
 
     public void testShouldExportDatasetToFileOnClickOfExportButton() throws Exception {
-        String datasetName = "UAT-" + new Random().nextInt();
+        String datasetName = "ORL Nonroad Inventory UAT-" + new Random().nextInt();
         try {
             doExport(datasetName);
         } finally {
@@ -116,9 +116,11 @@ public class ExportOrlDatasetsTest extends UserAcceptanceTestCase {
     private void exportSelectedDatasets(ExportWindow exportWindow, String folder) throws Exception {
         ExportActions exportActions = new ExportActions(exportWindow, this);
         exportActions.setFolder(folder);
-
+        exportActions.setPurpose("Testing export...");
+        
         exportActions.clickExport();
 
+        //FIXME: poll the Status window instead
         Thread.sleep(2000);// pause, until export is complete
     }
 

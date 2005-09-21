@@ -36,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ExImServicesTransport implements ExImServices {
     private static Log log = LogFactory.getLog(ExImServicesTransport.class);
+
     private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
     private static String endpoint = "";
@@ -227,7 +228,8 @@ public class ExImServicesTransport implements ExImServices {
 
     }
 
-	public void startExport(User user, EmfDataset[] datasets, String folderName, boolean overwrite,String description) throws EmfException {
+    public void startExport(User user, EmfDataset[] datasets, String folderName, boolean overwrite, String purpose)
+            throws EmfException {
         log.debug("Begin export of files for user: Total files: " + datasets.length);
         Service service = new Service();
         Call call;
@@ -245,10 +247,10 @@ public class ExImServicesTransport implements ExImServices {
             call.setOperationName(operationQName);
             registerMapping(call, userQName, gov.epa.emissions.framework.services.User.class);
             registerMapping(call, datasetQName, EmfDataset.class);
-            
-		    call.registerTypeMapping(EmfDataset[].class, datasetsQName,
-					  new org.apache.axis.encoding.ser.ArraySerializerFactory(EmfDataset[].class, datasetsQName),        
-					  new org.apache.axis.encoding.ser.ArrayDeserializerFactory(datasetsQName));        			  
+
+            call.registerTypeMapping(EmfDataset[].class, datasetsQName,
+                    new org.apache.axis.encoding.ser.ArraySerializerFactory(EmfDataset[].class, datasetsQName),
+                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(datasetsQName));
 
             registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
 
@@ -256,11 +258,11 @@ public class ExImServicesTransport implements ExImServices {
             call.addParameter("datasets", datasetsQName, ParameterMode.IN);
             call.addParameter("foldername", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
             call.addParameter("overwrite", org.apache.axis.Constants.XSD_BOOLEAN, ParameterMode.IN);
-            call.addParameter("description", org.apache.axis.Constants.XSD_BOOLEAN, ParameterMode.IN);
-            
+            call.addParameter("purpose", org.apache.axis.Constants.XSD_BOOLEAN, ParameterMode.IN);
+
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
 
-            call.invoke(new Object[] { user, datasets, folderName, new Boolean(overwrite), description });
+            call.invoke(new Object[] { user, datasets, folderName, new Boolean(overwrite), purpose });
 
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);
@@ -274,52 +276,6 @@ public class ExImServicesTransport implements ExImServices {
         }
 
         log.debug("Begin export of files for user");
-	}
-
-    public void startExport(User user, EmfDataset dataset, String fileName) throws EmfException {
-        log.debug("Begin export file for user:filename:datasettype:: " + user.getUsername() + " :: " + fileName
-                + " :: " + dataset.getDatasetType());
-        Service service = new Service();
-        Call call;
-
-        try {
-            call = (Call) service.createCall();
-            call.setTargetEndpointAddress(new java.net.URL(endpoint));
-
-            QName userQName = new QName(emfSvcsNamespace, "ns1:User");
-            QName datasetQName = new QName(emfSvcsNamespace, "ns1:EmfDataset");
-            QName operationQName = new QName(emfSvcsNamespace, "startExport");
-            QName tableQName = new QName(emfSvcsNamespace, "ns1:Table");
-
-            call.setOperationName(operationQName);
-
-            registerMapping(call, userQName, gov.epa.emissions.framework.services.User.class);
-            registerMapping(call, datasetQName, EmfDataset.class);
-            // registerMappingForTable(call);
-            registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
-
-            call.addParameter("user", userQName, ParameterMode.IN);
-            call.addParameter("dataset", datasetQName, ParameterMode.IN);
-            call.addParameter("filename", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
-
-            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
-
-            call.invoke(new Object[] { user, dataset, fileName });
-
-        } catch (ServiceException e) {
-            log.error("Error invoking the service", e);
-        } catch (MalformedURLException e) {
-            log.error("Error in format of URL string", e);
-        } catch (AxisFault fault) {
-            log.error("Axis Fault details", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
-        } catch (RemoteException e) {
-            log.error("Error communicating with WS end point", e);
-        }
-
-        log.debug("End export file for user:filename:datasettype:: " + user.getUsername() + " :: " + fileName + " :: "
-                + dataset.getDatasetType());
-
     }
 
     private void registerMapping(Call call, QName emfQName, Class emfClass) {
@@ -327,8 +283,8 @@ public class ExImServicesTransport implements ExImServices {
                 emfQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(emfClass, emfQName));
     }
 
-	public String getImportBaseFolder() throws EmfException {
-        String importFolder=null;
+    public String getImportBaseFolder() throws EmfException {
+        String importFolder = null;
 
         Service service = new Service();
         Call call;
@@ -343,7 +299,7 @@ public class ExImServicesTransport implements ExImServices {
 
             call.setReturnType(org.apache.axis.Constants.XSD_STRING);
 
-            importFolder = (String)call.invoke(new Object[] {});
+            importFolder = (String) call.invoke(new Object[] {});
 
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);
@@ -356,11 +312,11 @@ public class ExImServicesTransport implements ExImServices {
             log.error("Error communicating with WS end point", e);
         }
 
-		return importFolder;
-	}
+        return importFolder;
+    }
 
-	public String getExportBaseFolder() throws EmfException {
-        String exportFolder=null;
+    public String getExportBaseFolder() throws EmfException {
+        String exportFolder = null;
 
         Service service = new Service();
         Call call;
@@ -375,7 +331,7 @@ public class ExImServicesTransport implements ExImServices {
 
             call.setReturnType(org.apache.axis.Constants.XSD_STRING);
 
-            exportFolder = (String)call.invoke(new Object[] {});
+            exportFolder = (String) call.invoke(new Object[] {});
 
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);
@@ -388,8 +344,8 @@ public class ExImServicesTransport implements ExImServices {
             log.error("Error communicating with WS end point", e);
         }
 
-		return exportFolder;
+        return exportFolder;
 
-	}
+    }
 
 }// EMFDataTransport

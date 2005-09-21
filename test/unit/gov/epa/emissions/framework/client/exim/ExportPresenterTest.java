@@ -27,18 +27,18 @@ public class ExportPresenterTest extends MockObjectTestCase {
     }
 
     public void testSendsExportRequestToEximServiceOnExport() throws EmfException {
-    	boolean overwrite = true;
-    	User user = new User();
+        User user = new User();
         user.setUsername("user");
         user.setFullName("full name");
-        String description="HELLO EMF ACCESSLOGS FOR MOCK EXPORT";
+        String purpose = "HELLO EMF ACCESSLOGS FOR MOCK EXPORT";
         EmfDataset dataset = new EmfDataset();
         dataset.setName("dataset test");
 
         EmfDataset[] datasets = new EmfDataset[] { dataset };
 
         Mock model = mock(ExImServices.class);
-        model.expects(once()).method("startExport").with(new Constraint[]{eq(user), eq(datasets), eq(folder), eq(overwrite), eq(description)});
+        model.expects(once()).method("startExport").with(
+                new Constraint[] { eq(user), eq(datasets), eq(folder), eq(true), eq(purpose) });
 
         session.stubs().method("getUser").withNoArguments().will(returnValue(user));
         session.stubs().method("getExImServices").withNoArguments().will(returnValue(model.proxy()));
@@ -46,7 +46,30 @@ public class ExportPresenterTest extends MockObjectTestCase {
 
         ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
 
-        presenter.notifyExport(datasets, folder, overwrite, description);
+        presenter.notifyExport(datasets, folder, purpose);
+    }
+
+    public void testSendsExportRequestToEximServiceOnExportWithoutOverwrite() throws EmfException {
+        User user = new User();
+        user.setUsername("user");
+        user.setFullName("full name");
+        String description = "HELLO EMF ACCESSLOGS FOR MOCK EXPORT";
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("dataset test");
+
+        EmfDataset[] datasets = new EmfDataset[] { dataset };
+
+        Mock model = mock(ExImServices.class);
+        model.expects(once()).method("startExport").with(
+                new Constraint[] { eq(user), eq(datasets), eq(folder), eq(false), eq(description) });
+
+        session.stubs().method("getUser").withNoArguments().will(returnValue(user));
+        session.stubs().method("getExImServices").withNoArguments().will(returnValue(model.proxy()));
+        session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
+
+        ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
+
+        presenter.notifyExportWithoutOverwrite(datasets, folder, description);
     }
 
     public void testClosesViewOnDoneExport() {
@@ -72,7 +95,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
         ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
 
         Mock view = mock(ExportView.class);
-        ExportView viewProxy = (ExportView) view.proxy();        
+        ExportView viewProxy = (ExportView) view.proxy();
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();
         view.expects(once()).method("setMostRecentUsedFolder").with(eq(folder));

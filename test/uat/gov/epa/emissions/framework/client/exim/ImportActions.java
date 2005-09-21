@@ -44,14 +44,14 @@ public class ImportActions {
 
     public void doImport(String type, String name, String filename) throws Exception {
         testcase.selectComboBoxItem(importWindow, "datasetTypes", type);
-        testcase.setTextfield(importWindow, "name", name);
+        testcase.setText(importWindow, "name", name);
 
         File userDir = new File(System.getProperty("user.dir"));
         String pathToFile = "test/data/orl/nc/";
         File repository = new File(userDir, pathToFile);
-        testcase.setTextfield(importWindow, "folder", repository.getAbsolutePath());
+        testcase.setText(importWindow, "folder", repository.getAbsolutePath());
 
-        testcase.setTextfield(importWindow, "filename", filename);
+        testcase.setText(importWindow, "filename", filename);
 
         testcase.click(importWindow, "import");
 
@@ -75,11 +75,11 @@ public class ImportActions {
     }
 
     public void setName(String name) throws Exception {
-        testcase.setTextfield(importWindow, "name", name);
+        testcase.setText(importWindow, "name", name);
     }
 
     public void setFolder(String folder) throws Exception {
-        testcase.setTextfield(importWindow, "folder", folder);
+        testcase.setText(importWindow, "folder", folder);
     }
 
 }

@@ -1,10 +1,11 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.client.SpringUtilities;
+import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -36,6 +37,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private JCheckBox overwrite;
 
+    private JTextArea purpose;
+
     public ExportWindow(EmfDataset[] datasets) {
         super("Export Dataset(s)");
         super.setName("exportWindow");
@@ -43,8 +46,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
         super.setSize(new Dimension(600, 300));
 
-        JPanel layoutPanel = createLayout();
-        this.getContentPane().add(layoutPanel);
+        this.getContentPane().add(createLayout());
     }
 
     public void observe(ExportPresenter presenter) {
@@ -87,7 +89,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         addLabelWidgetPair("Folder", folder, panel);
 
         // purpose
-        JTextArea purpose = new JTextArea(2, 45);
+        purpose = new TextArea("purpose", "");
+        purpose.setSize(2, 45);
         purpose.setLineWrap(false);
         JScrollPane purposeScrollPane = new JScrollPane(purpose, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -106,7 +109,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
         // Lay out the panel.
         // FIXME: turn into an object invocation
-        SpringUtilities.makeCompactGrid(panel, 4, 2, // rows, cols
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
 
@@ -168,10 +172,11 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private void doExport() {
         try {
-            // FIXME: Need description text field/area on export window
-            // FIXME: parameter in the notifyExport call (last paramter in list)
-            // FIXME: will be the description from the GUI
-            presenter.notifyExport(datasets, folder.getText(), overwrite.isSelected(), "HELLO EMF ACCESS LOGS EXPORTS");
+            if (!overwrite.isSelected())
+                presenter.notifyExportWithoutOverwrite(datasets, folder.getText(), purpose.getText());
+            else
+                presenter.notifyExport(datasets, folder.getText(), purpose.getText());
+            
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
         } catch (EmfException e) {

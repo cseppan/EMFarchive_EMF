@@ -11,7 +11,8 @@ import javax.swing.SpringLayout;
  * layouts with SpringLayout. These utilities are used by several programs, such
  * as SpringBox and SpringCompactGrid.
  */
-public class SpringUtilities {
+public class SpringLayoutGenerator {
+
     /**
      * A debugging utility that prints to stdout the component's minimum,
      * preferred, and maximum sizes.
@@ -41,7 +42,7 @@ public class SpringUtilities {
      * @param yPad
      *            y padding between cells
      */
-    public static void makeGrid(Container parent, int rows, int cols, int initialX, int initialY, int xPad, int yPad) {
+    public void makeGrid(Container parent, int rows, int cols, int initialX, int initialY, int xPad, int yPad) {
         SpringLayout layout;
         try {
             layout = (SpringLayout) parent.getLayout();
@@ -106,7 +107,7 @@ public class SpringUtilities {
     }
 
     /* Used by makeCompactGrid. */
-    private static SpringLayout.Constraints getConstraintsForCell(int row, int col, Container parent, int cols) {
+    private SpringLayout.Constraints getConstraintsForCell(int row, int col, Container parent, int cols) {
         SpringLayout layout = (SpringLayout) parent.getLayout();
         Component c = parent.getComponent(row * cols + col);
         return layout.getConstraints(c);
@@ -132,8 +133,7 @@ public class SpringUtilities {
      * @param yPad
      *            y padding between cells
      */
-    public static void makeCompactGrid(Container parent, int rows, int cols, int initialX, int initialY, int xPad,
-            int yPad) {
+    public void makeCompactGrid(Container parent, int rows, int cols, int initialX, int initialY, int xPad, int yPad) {
         SpringLayout layout;
         try {
             layout = (SpringLayout) parent.getLayout();

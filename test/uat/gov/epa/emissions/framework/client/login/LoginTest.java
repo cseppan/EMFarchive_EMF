@@ -64,11 +64,11 @@ public class LoginTest extends UserAcceptanceTestCase {
     }
 
     private void setPassword(LoginWindow window, String password) throws Exception {
-        setTextfield(window, "password", password);
+        setText(window, "password", password);
     }
 
     private void setUsername(LoginWindow window, String username) throws Exception {
-        setTextfield(window, "username", username);
+        setText(window, "username", username);
     }
 
     public void testShouldShowErrorMessageOnInvalidUsername() throws Exception {

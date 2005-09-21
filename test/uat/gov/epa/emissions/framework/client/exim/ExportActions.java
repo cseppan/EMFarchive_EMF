@@ -16,7 +16,7 @@ public class ExportActions {
     }
 
     public void setFolder(String folder) throws Exception {
-        testcase.setTextfield(exportWindow, "folder", folder);
+        testcase.setText(exportWindow, "folder", folder);
     }
 
     public void clickExport() throws Exception {
@@ -30,6 +30,10 @@ public class ExportActions {
     public void assertErrorMessage(String error) throws Exception {
         MessagePanel panel = (MessagePanel) testcase.findByName(exportWindow, "messagePanel");
         Assert.assertEquals(error, panel.getMessage());
+    }
+
+    public void setPurpose(String purpose) throws Exception {
+        testcase.setText(exportWindow, "purpose", purpose);
     }
 
 }

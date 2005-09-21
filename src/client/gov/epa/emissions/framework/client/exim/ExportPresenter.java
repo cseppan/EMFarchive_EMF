@@ -28,11 +28,19 @@ public class ExportPresenter {
     }
 
     // FIXME: have two separate, explicit methods for overwrite/no overwrite
-    public void notifyExport(EmfDataset[] datasets, String folder, boolean overwrite, String description) throws EmfException {
+    public void notifyExport(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
+        doExport(datasets, folder, true, purpose);
+    }
+
+    private void doExport(EmfDataset[] datasets, String folder, boolean overwrite, String purpose) throws EmfException {
         session.setMostRecentExportFolder(folder);
 
         ExImServices services = session.getExImServices();
-        services.startExport(session.getUser(), datasets, folder, overwrite, description);
+        services.startExport(session.getUser(), datasets, folder, overwrite, purpose);
+    }
+
+    public void notifyExportWithoutOverwrite(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
+        doExport(datasets, folder, false, purpose);
     }
 
 }

@@ -14,7 +14,7 @@ import javax.swing.ListModel;
 
 import abbot.tester.JComboBoxTester;
 
-public class ImportTest extends UserAcceptanceTestCase {
+public class ImportORLDatasetTest extends UserAcceptanceTestCase {
 
     private ImportWindow importWindow;
 
@@ -52,8 +52,7 @@ public class ImportTest extends UserAcceptanceTestCase {
         try {
             importActions.importOrlNonRoad(name);
         } finally {
-            DbUpdate update = new DbUpdate();
-            update.delete("datasets", "name", name);
+            new DbUpdate().delete("datasets", "name", name);
         }
     }
 
@@ -62,8 +61,7 @@ public class ImportTest extends UserAcceptanceTestCase {
         try {
             importActions.importOrlNonPoint(name);
         } finally {
-            DbUpdate update = new DbUpdate();
-            update.delete("datasets", "name", name);
+            new DbUpdate().delete("datasets", "name", name);
         }
     }
 

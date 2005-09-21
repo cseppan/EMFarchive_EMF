@@ -55,7 +55,7 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     public void testShouldShowErrorsOnMissingAffiliation() throws Exception {
         RegisterUserWindow window = gotoRegisterNewUserScreen();
 
-        setTextfield(window, "name", "A User");
+        setText(window, "name", "A User");
 
         click(window, "ok");
 
@@ -65,8 +65,8 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     public void testShouldShowErrorsOnMissingPhone() throws Exception {
         RegisterUserWindow window = gotoRegisterNewUserScreen();
 
-        setTextfield(window, "name", "A User");
-        setTextfield(window, "affiliation", "User's affiliation");
+        setText(window, "name", "A User");
+        setText(window, "affiliation", "User's affiliation");
 
         click(window, "ok");
 
@@ -76,9 +76,9 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     public void testShouldShowErrorsOnMissingEmail() throws Exception {
         RegisterUserWindow window = gotoRegisterNewUserScreen();
 
-        setTextfield(window, "name", "A User");
-        setTextfield(window, "affiliation", "User's affiliation");
-        setTextfield(window, "phone", "123-123-1234-123");
+        setText(window, "name", "A User");
+        setText(window, "affiliation", "User's affiliation");
+        setText(window, "phone", "123-123-1234-123");
 
         click(window, "ok");
 
@@ -88,10 +88,10 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     public void testShouldShowErrorsOnMissingUsername() throws Exception {
         RegisterUserWindow window = gotoRegisterNewUserScreen();
 
-        setTextfield(window, "name", "A User");
-        setTextfield(window, "affiliation", "User's affiliation");
-        setTextfield(window, "phone", "123-123-1234-123");
-        setTextfield(window, "email", "uat-user@uat.emf.edu");
+        setText(window, "name", "A User");
+        setText(window, "affiliation", "User's affiliation");
+        setText(window, "phone", "123-123-1234-123");
+        setText(window, "email", "uat-user@uat.emf.edu");
 
         click(window, "ok");
 
@@ -101,11 +101,11 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     public void testShouldShowErrorsOnInvalidUsername() throws Exception {
         RegisterUserWindow window = gotoRegisterNewUserScreen();
 
-        setTextfield(window, "name", "A User");
-        setTextfield(window, "affiliation", "User's affiliation");
-        setTextfield(window, "phone", "123-123-1234-123");
-        setTextfield(window, "email", "uat-user@uat.emf.edu");
-        setTextfield(window, "username", "ua");
+        setText(window, "name", "A User");
+        setText(window, "affiliation", "User's affiliation");
+        setText(window, "phone", "123-123-1234-123");
+        setText(window, "email", "uat-user@uat.emf.edu");
+        setText(window, "username", "ua");
 
         click(window, "ok");
 
@@ -115,11 +115,11 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     public void testShouldShowErrorsOnMissingPassword() throws Exception {
         RegisterUserWindow window = gotoRegisterNewUserScreen();
 
-        setTextfield(window, "name", "A User");
-        setTextfield(window, "affiliation", "User's affiliation");
-        setTextfield(window, "phone", "123-123-1234-123");
-        setTextfield(window, "email", "uat-user@uat.emf.edu");
-        setTextfield(window, "username", "uat-emf");
+        setText(window, "name", "A User");
+        setText(window, "affiliation", "User's affiliation");
+        setText(window, "phone", "123-123-1234-123");
+        setText(window, "email", "uat-user@uat.emf.edu");
+        setText(window, "username", "uat-emf");
 
         click(window, "ok");
 
@@ -129,12 +129,12 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     public void testShouldShowErrorsOnPasswordNotMatchingConfirmPassword() throws Exception {
         RegisterUserWindow window = gotoRegisterNewUserScreen();
 
-        setTextfield(window, "name", "A User");
-        setTextfield(window, "affiliation", "User's affiliation");
-        setTextfield(window, "phone", "123-123-1234-123");
-        setTextfield(window, "email", "uat-user@uat.emf.edu");
-        setTextfield(window, "username", "uat-emf");
-        setTextfield(window, "password", "uatemf12");
+        setText(window, "name", "A User");
+        setText(window, "affiliation", "User's affiliation");
+        setText(window, "phone", "123-123-1234-123");
+        setText(window, "email", "uat-user@uat.emf.edu");
+        setText(window, "username", "uat-emf");
+        setText(window, "password", "uatemf12");
 
         click(window, "ok");
 
@@ -144,13 +144,13 @@ public class RegisterNewUserOnStartupTest extends UserAcceptanceTestCase {
     public void testShouldShowEmfConsoleOnSuccessfulRegistration() throws Exception {
         RegisterUserWindow window = gotoRegisterNewUserScreen();
 
-        setTextfield(window, "name", "A User");
-        setTextfield(window, "affiliation", "User's affiliation");
-        setTextfield(window, "phone", "123-123-1234");
-        setTextfield(window, "email", "uat-user@uat.emf.edu");
-        setTextfield(window, "username", "uat" + new Random().nextInt());
-        setTextfield(window, "password", "uatemf12");
-        setTextfield(window, "confirmPassword", "uatemf12");
+        setText(window, "name", "A User");
+        setText(window, "affiliation", "User's affiliation");
+        setText(window, "phone", "123-123-1234");
+        setText(window, "email", "uat-user@uat.emf.edu");
+        setText(window, "username", "uat" + new Random().nextInt());
+        setText(window, "password", "uatemf12");
+        setText(window, "confirmPassword", "uatemf12");
 
         window.addWindowListener(new WindowAdapter() {
             public void windowClosed(WindowEvent arg0) {

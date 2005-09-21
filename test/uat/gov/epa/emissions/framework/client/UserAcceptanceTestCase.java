@@ -14,7 +14,7 @@ import java.awt.Container;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
-import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
 
 import junit.extensions.abbot.ComponentTestFixture;
 import abbot.finder.Matcher;
@@ -56,8 +56,8 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
         return view;
     }
 
-    public void setTextfield(Container window, String name, String value) throws Exception {
-        JTextField field = (JTextField) findByName(window, name);
+    public void setText(Container window, String name, String value) throws Exception {
+        JTextComponent field = (JTextComponent) findByName(window, name);
         field.setText(value);
     }
 
@@ -89,11 +89,11 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
     }
 
     private void setPassword(LoginWindow window, String password) throws Exception {
-        setTextfield(window, "password", password);
+        setText(window, "password", password);
     }
 
     private void setUsername(LoginWindow window, String username) throws Exception {
-        setTextfield(window, "username", username);
+        setText(window, "username", username);
     }
 
     public Component findWindow(String title) throws Exception {
