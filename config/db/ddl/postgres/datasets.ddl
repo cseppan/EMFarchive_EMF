@@ -1,4 +1,8 @@
 --- Table: emf.datasets
+DROP TABLE datasets CASCADE;
+DELETE FROM DATASET_ACCESS_LOGS;
+DELETE FROM DATASETTABLES;
+
 CREATE TABLE datasets
 (
   dataset_id serial NOT NULL,
@@ -14,10 +18,13 @@ CREATE TABLE datasets
   start_date_time timestamp,
   stop_date_time timestamp,
   description text,
+  sector varchar(255),
+  project varchar(255),
+  created_date_time timestamp,
+  modified_date_time timestamp,
+  accessed_time timestamp,
   CONSTRAINT datasets_pkey PRIMARY KEY (dataset_id),
   CONSTRAINT datasets_name_key UNIQUE (name)
 ) 
 WITHOUT OIDS;
 ALTER TABLE datasets OWNER TO emf;
-
-
