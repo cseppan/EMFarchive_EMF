@@ -16,17 +16,13 @@ public class DatasetsBrowserActions {
 
     private DatasetsBrowserWindow browser;
 
-    private JTable table;
-
     public DatasetsBrowserActions(EmfConsole console, UserAcceptanceTestCase testcase) {
         this.console = console;
         this.testcase = testcase;
     }
 
     public Object cell(int row, int col) throws Exception {
-        if (table == null)
-            table();
-        return table.getValueAt(row, col);
+        return table().getValueAt(row, col);
     }
 
     public DatasetsBrowserWindow open() throws Exception {
@@ -38,8 +34,7 @@ public class DatasetsBrowserActions {
     }
 
     public JTable table() throws Exception {
-        table = (JTable) testcase.findByName(browser, "datasetsTable");
-        return table;
+        return (JTable) testcase.findByName(browser, "datasetsTable");
     }
 
     public void close() throws Exception {
@@ -80,9 +75,7 @@ public class DatasetsBrowserActions {
     }
 
     public void selectDataset(String dataset) throws Exception {
-        JTable table = refresh();
-
-        int rows = table.getRowCount();
+        int rows = rowCount();
         for (int i = 0; i < rows; i++) {
             String actualDataset = (String) cell(i, 2);
             if (dataset.equals(actualDataset)) {
@@ -93,8 +86,7 @@ public class DatasetsBrowserActions {
     }
 
     public int rowCount() throws Exception {
-        JTable table = refresh();
-        return table.getRowCount();
+        return refresh().getRowCount();
     }
 
 }

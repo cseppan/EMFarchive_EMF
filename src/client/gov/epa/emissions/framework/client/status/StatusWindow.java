@@ -36,7 +36,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
     public StatusWindow(Container parent, JDesktopPane desktop) {
         super("Status", desktop);
-        super.setName("status");
+        super.setName("statusWindow");
 
         position(parent);
         super.setContentPane(createLayout());
@@ -63,6 +63,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         JPanel container = new JPanel(new FlowLayout());
         messagePanel = new SingleLineMessagePanel();
         container.add(messagePanel);
+        
         JButton clearButton = createClearButton();
         getRootPane().setDefaultButton(clearButton);
         container.add(clearButton);

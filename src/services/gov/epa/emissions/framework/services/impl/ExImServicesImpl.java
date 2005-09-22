@@ -49,56 +49,57 @@ public class ExImServicesImpl implements ExImServices {
     private ImporterFactory importerFactory;
 
     private ExporterFactory exporterFactory;
-    
-    private String baseImportFolder=null;
-    private String baseExportFolder=null;
+
+    private String baseImportFolder = null;
+
+    private String baseExportFolder = null;
 
     public ExImServicesImpl() throws NamingException, SQLException {
         // TODO: should we move this into an abstract super class ?
         Context ctx = new InitialContext();
         DataSource datasource = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
 
-        //FIXME: Get base directory
-        String baseDirectory=getBaseDirectoryProperty();
-		File baseFile=new File(baseDirectory);
-		File baseImportFile=new File(baseFile,"import");
-		File baseExportFile=new File(baseFile,"export");
-		
-		baseImportFolder=baseImportFile.getAbsolutePath();
-		baseExportFolder=baseExportFile.getAbsolutePath();
-		log.info("### baseImportFolder= " + baseImportFolder);
-		log.info("### baseExportFolder= " + baseExportFolder);
-        
+        // FIXME: Get base directory
+        File mountPoint = new File(getValue(EMFConstants.EMF_DATA_ROOT_FOLDER));
+        File importFolder = new File(mountPoint, getValue(EMFConstants.EMF_DATA_IMPORT_FOLDER));
+        File exportFolder = new File(mountPoint, getValue(EMFConstants.EMF_DATA_EXPORT_FOLDER));
+
+        baseImportFolder = importFolder.getAbsolutePath();
+        baseExportFolder = exportFolder.getAbsolutePath();
+        log.info("### baseImportFolder= " + baseImportFolder);
+        log.info("### baseExportFolder= " + baseExportFolder);
+
         // FIXME: we should not hard-code the db server. Also, read the
         // datasource names from properties
-        DbServer dbServer = new PostgresDbServer(datasource.getConnection(), EMFConstants.EMF_REFERENCE_SCHEMA, EMFConstants.EMF_EMISSIONS_SCHEMA);
+        DbServer dbServer = new PostgresDbServer(datasource.getConnection(), EMFConstants.EMF_REFERENCE_SCHEMA,
+                EMFConstants.EMF_EMISSIONS_SCHEMA);
 
         importerFactory = new ImporterFactory(dbServer);
         exporterFactory = new ExporterFactory(dbServer);
     }
 
-    private String getBaseDirectoryProperty() {
+    private String getValue(String root) {
         log.debug("In ExImServicesImpl:getBaseDirectoryProperty START");
 
         Session session = EMFHibernateUtil.getSession();
-        String propvalue = EmfPropertiesDAO.getEmfPropertyValue(EMFConstants.EMF_DATA_ROOT_FOLDER,session);
+        String propvalue = EmfPropertiesDAO.getEmfPropertyValue(root, session);
         log.debug("In ExImServicesImpl:getBaseDirectoryProperty END");
         session.flush();
         session.close();
         return propvalue;
-	}
+    }
 
-	private File validateExportFile(File path, String fileName, boolean overwrite) throws EmfException {
+    private File validateExportFile(File path, String fileName, boolean overwrite) throws EmfException {
         log.debug("check if file exists " + fileName);
-        File file = new File(path,fileName);
+        File file = new File(path, fileName);
 
-        if (!overwrite){
+        if (!overwrite) {
             if (file.exists() && file.isFile()) {
                 log.error("File exists and cannot be overwritten");
                 throw new EmfException("Cannot export to existing file.  Choose overwrite option");
-            }        	
+            }
         }
-        
+
         log.debug("check if file exists " + fileName);
 
         return file;
@@ -174,7 +175,8 @@ public class ExImServicesImpl implements ExImServices {
         log.debug("In ExImServicesImpl:startImport END");
     }
 
-    public void startExport(User user, EmfDataset[] datasets, String dirName, boolean overwrite, String purpose) throws EmfException {
+    public void startExport(User user, EmfDataset[] datasets, String dirName, boolean overwrite, String purpose)
+            throws EmfException {
         log.info("Start export for user: " + user.getUsername());
         int count = datasets.length;
         log.info("Total number of files to export: " + count);
@@ -186,14 +188,16 @@ public class ExImServicesImpl implements ExImServices {
                 EmfDataset aDataset = datasets[i];
 
                 // FIXME: Default is overwrite
-                //File file = new File(path, getCleanDatasetName(aDataset.getName()));
-                File file = validateExportFile(path,getCleanDatasetName(aDataset.getName()),overwrite);
+                // File file = new File(path,
+                // getCleanDatasetName(aDataset.getName()));
+                File file = validateExportFile(path, getCleanDatasetName(aDataset.getName()), overwrite);
                 ServicesHolder svcHolder = new ServicesHolder();
                 svcHolder.setLogSvc(new LoggingServicesImpl());
                 svcHolder.setStatusSvc(new StatusServicesImpl());
                 Exporter exporter = exporterFactory.create(aDataset.getDatasetType());
-                AccessLog accesslog = new AccessLog(user.getUsername(),aDataset.getDatasetid(), new Date(),"Version 1.0", purpose,dirName);
-				ExportTask eximTask = new ExportTask(user, file, aDataset, svcHolder, accesslog ,exporter);
+                AccessLog accesslog = new AccessLog(user.getUsername(), aDataset.getDatasetid(), new Date(),
+                        "Version 1.0", purpose, dirName);
+                ExportTask eximTask = new ExportTask(user, file, aDataset, svcHolder, accesslog, exporter);
                 new Thread(eximTask).start();
             }
         } catch (Exception e) {
@@ -255,25 +259,24 @@ public class ExImServicesImpl implements ExImServices {
 
     }
 
-	public String getImportBaseFolder() throws EmfException {
-		
-		//FIXME:
-		boolean broke=false;
-		if (broke) throw new EmfException("TEMP");
-		
-		
-		
-		return baseImportFolder;
-	}
+    public String getImportBaseFolder() throws EmfException {
 
-	public String getExportBaseFolder() throws EmfException {
+        // FIXME:
+        boolean broke = false;
+        if (broke)
+            throw new EmfException("TEMP");
 
-		//FIXME:
-		boolean broke=false;
-		if (broke) throw new EmfException("TEMP");
-		
-		
-		return baseExportFolder;
-	}
+        return baseImportFolder;
+    }
+
+    public String getExportBaseFolder() throws EmfException {
+
+        // FIXME:
+        boolean broke = false;
+        if (broke)
+            throw new EmfException("TEMP");
+
+        return baseExportFolder;
+    }
 
 }

@@ -36,40 +36,49 @@ public abstract class ExImServicesTestCase extends ServicesTestCase {
         datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
         User user = userService.getUser("emf");
 
-        File userDir = new File(System.getProperty("user.dir"));
-        String pathToFile = "test/data/orl/nc/";
-        File repository = new File(userDir, pathToFile);
+        File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
         String filename = "arinv.nonpoint.nti99_NC.txt";
 
         EmfDataset dataset = new EmfDataset();
-        Random random = new Random();//FIXME: drop test data during setup
+        Random random = new Random();// FIXME: drop test data during setup
         dataset.setName("ORL NonPoint - Test" + random.nextInt());
+        dataset.setCreator("creator");
 
         eximService.startImport(user, repository.getAbsolutePath(), filename, dataset, datasetType);
 
-        // TODO: verify status
+        // FIXME: verify that import is complete
     }
 
     public void testExportOrlNonPoint() throws EmfException {
-    	
-    	DatasetType datasetType = new DatasetType();
+        DatasetType datasetType = new DatasetType();
         datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
         User user = userService.getUser("emf");
 
-        File userDir = new File(System.getProperty("user.dir"));
-        String pathToFile = "test/data/orl/nc/";
-        File repository = new File(userDir, pathToFile);
-        String filename = "arinv.nonpoint.nti99_NC.txt";
-
         EmfDataset dataset = new EmfDataset();
-        Random random = new Random();//FIXME: drop test data during setup
+        Random random = new Random();// FIXME: drop test data during setup
         dataset.setName("ORL NonPoint - Test" + random.nextInt());
+        dataset.setCreator("creator");
+        dataset.setDatasetType("ORL Nonpoint Inventory");
+        dataset.setDescription("description");
+        dataset.setStatus("imported");
 
-        File outputFile = new File(repository, "output");
-        if (!outputFile.exists()) outputFile.mkdir();
-        
+        // import
+        File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
+        String filename = "arinv.nonpoint.nti99_NC.txt";
         eximService.startImport(user, repository.getAbsolutePath(), filename, dataset, datasetType);
-        eximService.startExport(user, new EmfDataset[]{dataset}, outputFile.getAbsolutePath(), true, "HELLO EMF ACCESSLOGS TESTCASE");
+
+        // FIXME: verify that import is complete
+
+        // export
+        File outputFile = new File(System.getProperty("java.io.tmpdir"));
+        outputFile.deleteOnExit();
+        if (!outputFile.exists())
+            outputFile.mkdir();
+
+        eximService.startExport(user, new EmfDataset[] { dataset }, outputFile.getAbsolutePath(), true,
+                "HELLO EMF ACCESSLOGS TESTCASE");
+
+        // FIXME: verify the exported file exists
 
     }
 

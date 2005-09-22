@@ -10,7 +10,7 @@ public class ConsoleActions {
         this.testcase = testcase;
     }
 
-    public EmfConsole open() throws Exception {
+    public EmfConsole open() {
         console = testcase.openConsole();
         return console;
     }

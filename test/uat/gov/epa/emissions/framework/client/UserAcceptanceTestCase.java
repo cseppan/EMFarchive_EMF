@@ -4,7 +4,6 @@ import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
-import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
@@ -17,6 +16,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.text.JTextComponent;
 
 import junit.extensions.abbot.ComponentTestFixture;
+import abbot.finder.ComponentFinder;
 import abbot.finder.Matcher;
 import abbot.finder.matchers.NameMatcher;
 import abbot.finder.matchers.WindowMatcher;
@@ -26,7 +26,7 @@ import abbot.tester.JComboBoxTester;
 //TODO: reorganize EMF-specific vs Abbot-specific methods
 public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
 
-    protected RegisterUserWindow gotoRegisterNewUserScreen() throws Exception {
+    protected RegisterUserWindow gotoRegisterNewUserScreen() {
         LoginWindow window = createLoginWindow();
         showWindow(window);
 
@@ -35,7 +35,7 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
         return (RegisterUserWindow) findWindow("RegisterUser");
     }
 
-    public void click(Container window, String componentName) throws Exception {
+    public void click(Container window, String componentName) {
         Component component = findByName(window, componentName);
         ComponentTester tester = new ComponentTester();
 
@@ -56,27 +56,32 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
         return view;
     }
 
-    public void setText(Container window, String name, String value) throws Exception {
+    public void setText(Container window, String name, String value) {
         JTextComponent field = (JTextComponent) findByName(window, name);
         field.setText(value);
     }
 
-    public void assertErrorMessage(Container window, String errorMessage) throws Exception {
+    public void assertErrorMessage(Container window, String errorMessage) {
         MessagePanel messagePanel = (MessagePanel) findByName(window, "messagePanel");
         assertEquals(errorMessage, messagePanel.getMessage());
     }
 
-    public Component findByName(Container window, String componentName) throws Exception {
-        return getFinder().find(window, new NameMatcher(componentName));
+    public Component findByName(Container window, String componentName) {
+        try {
+            return getFinder().find(window, new NameMatcher(componentName));
+        } catch (Exception e) {
+            throw new RuntimeException("could not find component - " + componentName + " in window - "
+                    + window.getName());
+        }
     }
 
-    public void assertEmfConsoleShown() throws Exception {
+    public void assertEmfConsoleShown() {
         EmfConsole console = (EmfConsole) findWindow("EMF Console");
         assertNotNull(console);
         assertTrue(console.isVisible());
     }
 
-    public EmfConsole openConsole() throws Exception {
+    public EmfConsole openConsole() {
         LoginWindow window = createLoginWindow();
         showWindow(window);
 
@@ -88,50 +93,63 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
         return (EmfConsole) findWindow("EMF Console");
     }
 
-    private void setPassword(LoginWindow window, String password) throws Exception {
+    private void setPassword(LoginWindow window, String password) {
         setText(window, "password", password);
     }
 
-    private void setUsername(LoginWindow window, String username) throws Exception {
+    private void setUsername(LoginWindow window, String username) {
         setText(window, "username", username);
     }
 
-    public Component findWindow(String title) throws Exception {
-        return getFinder().find(new WindowMatcher(title));
+    public Component findWindow(String title) {
+        try {
+            return getFinder().find(new WindowMatcher(title));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public JInternalFrame findInternalFrame(JFrame frame, final String name) throws Exception {
-        return (JInternalFrame) getFinder().find(frame, new Matcher() {
-            public boolean matches(Component component) {
-                if (!(component instanceof JInternalFrame))
-                    return false;
+    public JInternalFrame findInternalFrame(JFrame frame, final String name) {
+        try {
+            return (JInternalFrame) getFinder().find(frame, new Matcher() {
+                public boolean matches(Component component) {
+                    if (!(component instanceof JInternalFrame))
+                        return false;
 
-                JInternalFrame internalFrame = (JInternalFrame) component;
-                return name.equals(internalFrame.getName());
-            }
-        });
+                    JInternalFrame internalFrame = (JInternalFrame) component;
+                    return name.equals(internalFrame.getName());
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException("could not find internal frame - " + name + " in frame - " + frame.getName());
+        }
     }
 
-    public JComboBox findComboBox(Container container, final String name) throws Exception {
-        return (JComboBox) getFinder().find(container, new Matcher() {
-            public boolean matches(Component component) {
-                if (!(component instanceof JComboBox))
-                    return false;
+    public JComboBox findComboBox(Container container, final String name) {
+        ComponentFinder finder = getFinder();
+        try {
+            return (JComboBox) finder.find(container, new Matcher() {
+                public boolean matches(Component component) {
+                    if (!(component instanceof JComboBox))
+                        return false;
 
-                JComboBox comboBox = (JComboBox) component;
-                return name.equals(comboBox.getName());
-            }
-        });
+                    JComboBox comboBox = (JComboBox) component;
+                    return name.equals(comboBox.getName());
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void selectComboBoxItem(ImportWindow window, String comboBoxName, String value) throws Exception {
-        JComboBox comboBox = findComboBox(window, comboBoxName);
-        JComboBoxTester tester = new JComboBoxTester();
-        tester.actionSelectItem(comboBox, value);
-    }
-
-    public StatusWindow getStatusWindow(EmfConsole window) throws Exception {
-        return (StatusWindow) findInternalFrame(window, "status");
+    public void selectComboBoxItem(ImportWindow window, String comboBoxName, String value) {
+        try {
+            JComboBox comboBox = findComboBox(window, comboBoxName);
+            JComboBoxTester tester = new JComboBoxTester();
+            tester.actionSelectItem(comboBox, value);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

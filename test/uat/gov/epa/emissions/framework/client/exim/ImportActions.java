@@ -1,9 +1,12 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.framework.client.EmfConsole;
+import gov.epa.emissions.framework.client.StatusActions;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 
 import java.io.File;
+
+import junit.framework.Assert;
 
 public class ImportActions {
 
@@ -13,24 +16,28 @@ public class ImportActions {
 
     private ImportWindow importWindow;
 
+    private StatusActions statusActions;
+
     public ImportActions(EmfConsole console, UserAcceptanceTestCase testcase) {
         this.console = console;
         this.testcase = testcase;
+
+        statusActions = new StatusActions(console, testcase);
     }
 
-    public void importOrlNonRoad(String name) throws Exception {
+    public void importOrlNonRoad(String name) {
         doImport("ORL Nonroad Inventory", name, "arinv.nonroad.nti99d_NC.new.txt");
     }
 
-    public void importOrlNonPoint(String name) throws Exception {
+    public void importOrlNonPoint(String name) {
         doImport("ORL Nonpoint Inventory", name, "arinv.nonpoint.nti99_NC.txt");
     }
 
-    public void importOrlPoint(String name) throws Exception {
+    public void importOrlPoint(String name) {
         doImport("ORL Point Inventory", name, "ptinv.nti99_NC.txt");
     }
 
-    public void importOrlOnRoadMobile(String name) throws Exception {
+    public void importOrlOnRoadMobile(String name) {
         doImport("ORL Onroad Inventory", name, "nti99.NC.onroad.SMOKE.txt");
     }
 
@@ -42,7 +49,9 @@ public class ImportActions {
         return importWindow;
     }
 
-    public void doImport(String type, String name, String filename) throws Exception {
+    public void doImport(String type, String name, String filename) {
+        statusActions.clear();
+
         testcase.selectComboBoxItem(importWindow, "datasetTypes", type);
         testcase.setText(importWindow, "name", name);
 
@@ -55,7 +64,21 @@ public class ImportActions {
 
         testcase.click(importWindow, "import");
 
-        Thread.sleep(4000);// import time assumption
+        confirmImportCompletion(10000, type, filename);
+    }
+
+    private void confirmImportCompletion(long waitTime, String type, String filename) {
+        for (int i = 0; i < waitTime; i += 500) {
+            if (statusActions.hasStarted(type, filename) && statusActions.hasCompleted(type, filename))
+                return;// success
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        Assert.fail("Did not find any completed status message after polling for " + waitTime + " msecs.");
     }
 
     public void done() throws Exception {
