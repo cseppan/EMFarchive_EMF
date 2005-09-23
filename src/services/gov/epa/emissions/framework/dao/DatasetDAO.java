@@ -89,34 +89,11 @@ public class DatasetDAO {
 
     public static void updateDataset(EmfDataset aDset, Session session){
     	log.debug("updating dataset: " + aDset.getDatasetid());
-//        Transaction tx = session.beginTransaction();
-//        EmfDataset updateDataset = (EmfDataset) session.load(EmfDataset.class,new Long(aDset.getDatasetid()));
-//        copyEmfDataset(aDset,updateDataset);	
-//        session.update(updateDataset);
-//        tx.commit();    	
+        Transaction tx = session.beginTransaction();
+        EmfDataset updateDataset = (EmfDataset) session.load(EmfDataset.class,new Long(aDset.getDatasetid()));
+        session.update(aDset);
+        tx.commit();    	
     	log.debug("updating dataset: " + aDset.getDatasetid());
     }
 
-	private static void copyEmfDataset(EmfDataset dset, EmfDataset updateDataset) {
-		updateDataset.setAccessedDateTime(dset.getAccessedDateTime());
-		updateDataset.setCountry(dset.getCountry());
-		updateDataset.setCreatedDateTime(dset.getCreatedDateTime());
-		updateDataset.setCreator(dset.getCreator());
-		updateDataset.setDatasetType(dset.getDatasetType());
-		updateDataset.setDataSources(dset.getDataSources());
-		updateDataset.setDescription(dset.getDescription());
-		updateDataset.setModifiedDateTime(dset.getModifiedDateTime());
-		updateDataset.setName(dset.getName());
-		updateDataset.setProject(dset.getProject());
-		updateDataset.setRegion(dset.getRegion());
-		updateDataset.setSector(dset.getSector());
-		updateDataset.setStartDateTime(dset.getStartDateTime());
-		updateDataset.setStatus(dset.getStatus());
-		updateDataset.setStopDateTime(dset.getStopDateTime());
-		updateDataset.setTablesMap(dset.getTablesMap());
-		updateDataset.setTemporalResolution(dset.getTemporalResolution());
-		updateDataset.setUnits(dset.getUnits());
-		updateDataset.setYear(dset.getYear());
-		
-	}
 }

@@ -17,11 +17,10 @@ public class TestDatasets {
 	
 	public TestDatasets() throws EmfException {
 		super();
-		getDatasets();
-		System.out.println("READY TO UPDATE");
+		//getDatasets();
 		EmfDataset aDset = getDataset();
-		System.out.println(aDset.getName());
-		aDset.setName("CONRAD DCRUZ");
+		System.out.println("READY TO UPDATE: " + aDset.getName());
+		aDset.setName("Busstop");
 		updateDataset(aDset);
 	}
 

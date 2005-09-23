@@ -1,3 +1,9 @@
+--- Table: emf.datasets
+DROP TABLE datasets CASCADE;
+DELETE FROM DATASET_ACCESS_LOGS;
+DELETE FROM DATASETTABLES;
+
+
 CREATE TABLE datasets
 (
   dataset_id serial NOT NULL,

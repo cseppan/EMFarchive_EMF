@@ -222,6 +222,6 @@ public class DataServicesTransport implements DataServices {
             log.error("Error communicating with WS end point", e);
         }
 
-        log.debug("insert a new dataset type object: " + aDset.getName());
+        log.debug("update a new dataset type object: " + aDset.getName());
 	}
 }
