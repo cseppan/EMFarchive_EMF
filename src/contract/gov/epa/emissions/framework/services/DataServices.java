@@ -6,7 +6,6 @@
  */
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.EmfException;
 
 /**
@@ -15,11 +14,8 @@ import gov.epa.emissions.framework.EmfException;
  */
 public interface DataServices {
 
-    public Dataset[] getDatasets() throws EmfException;
-
-    public Dataset[] getDatasets(User user) throws EmfException;
-
-    public void insertDataset(EmfDataset aDataset) throws EmfException;
-
-    public void updateDataset(EmfDataset aDataset) throws EmfException;
+	public EmfDataset[] getDatasets() throws EmfException;
+	public EmfDataset[] getDatasets(User user) throws EmfException;
+	public void insertDataset(EmfDataset aDataset) throws EmfException;
+	public void updateDataset(EmfDataset aDset) throws EmfException;
 }

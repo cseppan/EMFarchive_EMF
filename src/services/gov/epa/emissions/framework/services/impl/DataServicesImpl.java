@@ -10,7 +10,6 @@
 
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.dao.DatasetDAO;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -30,29 +29,31 @@ public class DataServicesImpl implements DataServices {
         super();
     }
 
-    public Dataset[] getDatasets() {
+    public EmfDataset[] getDatasets() {
         Session session = EMFHibernateUtil.getSession();
         List datasets = DatasetDAO.getDatasets(session);
         session.flush();
         session.close();
-        return (Dataset[]) datasets.toArray(new Dataset[datasets.size()]);
+        return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
     }
 
-    public Dataset[] getDatasets(User user) {
+    public EmfDataset[] getDatasets(User user) {
         // TODO Auto-generated method stub
         return null;
     }
 
     public void insertDataset(EmfDataset aDataset) {
-        // Session session = HibernateUtils.currentSession();
         Session session = EMFHibernateUtil.getSession();
         DatasetDAO.insertDataset(aDataset, session);
         session.flush();
         session.close();
     }
 
-    public void updateDataset(EmfDataset aDataset) {
-        //TODO: implement 'update dataset'
-    }
+	public void updateDataset(EmfDataset aDset) {
+        Session session = EMFHibernateUtil.getSession();
+        DatasetDAO.updateDataset(aDset, session);
+        session.flush();
+        session.close();
+	}
 
 }

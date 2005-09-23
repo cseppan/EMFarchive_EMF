@@ -22,7 +22,7 @@ CREATE TABLE datasets
   project varchar(255),
   created_date_time timestamp,
   modified_date_time timestamp,
-  accessed_time timestamp,
+  accessed_date_time timestamp,
   CONSTRAINT datasets_pkey PRIMARY KEY (dataset_id),
   CONSTRAINT datasets_name_key UNIQUE (name)
 ) 

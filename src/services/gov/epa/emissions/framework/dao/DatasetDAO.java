@@ -7,8 +7,8 @@
 
 package gov.epa.emissions.framework.dao;
 
-import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -71,7 +71,7 @@ public class DatasetDAO {
 
         Iterator iter = query.iterate();
         while (iter.hasNext()) {
-            Dataset aDset = (Dataset) iter.next();
+            EmfDataset aDset = (EmfDataset) iter.next();
             datasets.add(aDset);
         }
 
@@ -81,10 +81,42 @@ public class DatasetDAO {
         return datasets;
     }// getDatasetTypes()
 
-    public static void insertDataset(Dataset aDset, Session session) {
+    public static void insertDataset(EmfDataset aDset, Session session) {
         Transaction tx = session.beginTransaction();
         session.save(aDset);
         tx.commit();
     }
 
+    public static void updateDataset(EmfDataset aDset, Session session){
+    	log.debug("updating dataset: " + aDset.getDatasetid());
+//        Transaction tx = session.beginTransaction();
+//        EmfDataset updateDataset = (EmfDataset) session.load(EmfDataset.class,new Long(aDset.getDatasetid()));
+//        copyEmfDataset(aDset,updateDataset);	
+//        session.update(updateDataset);
+//        tx.commit();    	
+    	log.debug("updating dataset: " + aDset.getDatasetid());
+    }
+
+	private static void copyEmfDataset(EmfDataset dset, EmfDataset updateDataset) {
+		updateDataset.setAccessedDateTime(dset.getAccessedDateTime());
+		updateDataset.setCountry(dset.getCountry());
+		updateDataset.setCreatedDateTime(dset.getCreatedDateTime());
+		updateDataset.setCreator(dset.getCreator());
+		updateDataset.setDatasetType(dset.getDatasetType());
+		updateDataset.setDataSources(dset.getDataSources());
+		updateDataset.setDescription(dset.getDescription());
+		updateDataset.setModifiedDateTime(dset.getModifiedDateTime());
+		updateDataset.setName(dset.getName());
+		updateDataset.setProject(dset.getProject());
+		updateDataset.setRegion(dset.getRegion());
+		updateDataset.setSector(dset.getSector());
+		updateDataset.setStartDateTime(dset.getStartDateTime());
+		updateDataset.setStatus(dset.getStatus());
+		updateDataset.setStopDateTime(dset.getStopDateTime());
+		updateDataset.setTablesMap(dset.getTablesMap());
+		updateDataset.setTemporalResolution(dset.getTemporalResolution());
+		updateDataset.setUnits(dset.getUnits());
+		updateDataset.setYear(dset.getYear());
+		
+	}
 }

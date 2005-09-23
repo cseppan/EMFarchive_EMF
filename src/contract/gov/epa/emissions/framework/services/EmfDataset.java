@@ -56,6 +56,51 @@ public class EmfDataset implements Dataset {
     private Map datasources;
 
     private List tables;
+    private String sector;
+    private String project;
+    private Date createdDateTime;
+    private Date modifiedDateTime;
+    private Date accessedDateTime;
+    
+	public Date getAccessedDateTime() {
+		return accessedDateTime;
+	}
+
+	public void setAccessedDateTime(Date accessedDateTime) {
+		this.accessedDateTime = accessedDateTime;
+	}
+
+	public Date getCreatedDateTime() {
+		return createdDateTime;
+	}
+
+	public void setCreatedDateTime(Date createdDateTime) {
+		this.createdDateTime = createdDateTime;
+	}
+
+	public Date getModifiedDateTime() {
+		return modifiedDateTime;
+	}
+
+	public void setModifiedDateTime(Date modifiedDateTime) {
+		this.modifiedDateTime = modifiedDateTime;
+	}
+
+	public String getProject() {
+		return project;
+	}
+
+	public void setProject(String project) {
+		this.project = project;
+	}
+
+	public String getSector() {
+		return sector;
+	}
+
+	public void setSector(String sector) {
+		this.sector = sector;
+	}
 
 	/**
 	 * No argument constructor needed for hibernate
@@ -64,6 +109,9 @@ public class EmfDataset implements Dataset {
 	 */
     public EmfDataset() {
         tables = new ArrayList();
+        setCreatedDateTime(new Date());
+        setModifiedDateTime(new Date());
+        setAccessedDateTime(new Date());
     }
 
     public String getDatasetType() {

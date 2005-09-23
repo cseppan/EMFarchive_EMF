@@ -58,7 +58,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         this.session = session;
         DataServices services = session.getDataServices();
         // FIXME: change the type from Dataset to EmfDataset
-        model = new DatasetsBrowserTableModel((EmfDataset[]) services.getDatasets());
+        model = new DatasetsBrowserTableModel(services.getDatasets());
         selectModel = new SortFilterSelectModel(model);
         this.parentConsole = parentConsole;
 

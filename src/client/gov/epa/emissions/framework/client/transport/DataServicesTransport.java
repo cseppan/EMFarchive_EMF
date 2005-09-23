@@ -10,7 +10,6 @@
 
 package gov.epa.emissions.framework.client.transport;
 
-import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataServices;
@@ -56,13 +55,13 @@ public class DataServicesTransport implements DataServices {
      * 
      * @see gov.epa.emissions.framework.services.DataServices#getDatasets()
      */
-    public Dataset[] getDatasets() throws EmfException {
+    public EmfDataset[] getDatasets() throws EmfException {
         log.debug("Get all dataset types");
 
         // Call the ExImServices endpoint and acquire the array of all dataset
         // types
         // defined in the system
-        Dataset[] datasets = null;
+        EmfDataset[] datasets = null;
 
         Service service = new Service();
         Call call;
@@ -71,8 +70,8 @@ public class DataServicesTransport implements DataServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
-            QName qname1 = new QName(emfSvcsNamespace, "ns1:Dataset");
-            QName qname2 = new QName(emfSvcsNamespace, "ns1:Datasets");
+            QName qname1 = new QName(emfSvcsNamespace, "ns1:EmfDataset");
+            QName qname2 = new QName(emfSvcsNamespace, "ns1:EmfDatasets");
             QName qname3 = new QName(emfSvcsNamespace, "getDatasets");
 
             call.setOperationName(qname3);
@@ -93,7 +92,7 @@ public class DataServicesTransport implements DataServices {
 
             Object obj = call.invoke(new Object[] {});
 
-            datasets = (Dataset[]) obj;
+            datasets = (EmfDataset[]) obj;
 
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);
@@ -114,7 +113,7 @@ public class DataServicesTransport implements DataServices {
      * 
      * @see gov.epa.emissions.framework.services.DataServices#getDatasets(gov.epa.emissions.framework.services.User)
      */
-    public Dataset[] getDatasets(User user) {
+    public EmfDataset[] getDatasets(User user) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -188,8 +187,41 @@ public class DataServicesTransport implements DataServices {
         return message;
     }
 
-    public void updateDataset(EmfDataset aDataset)  {
-        //TODO: implement 'update dataset'
-    }
+	public void updateDataset(EmfDataset aDset) throws EmfException {
+        log.debug("update a new dataset type object: " + aDset.getName());
+        Service service = new Service();
+        Call call;
+        try {
+            call = (Call) service.createCall();
+            call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
+            QName qname2 = new QName(emfSvcsNamespace, "ns1:EmfDataset");
+            QName qname3 = new QName(emfSvcsNamespace, "updateDataset");
+
+            call.setOperationName(qname3);
+
+            call.registerTypeMapping(EmfDataset.class, qname2, new org.apache.axis.encoding.ser.BeanSerializerFactory(
+                    EmfDataset.class, qname2), new org.apache.axis.encoding.ser.BeanDeserializerFactory(
+                    EmfDataset.class, qname2));
+
+            registerMappingForTable(call);
+
+            call.addParameter("dataset", qname2, ParameterMode.IN);
+
+            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+            call.invoke(new Object[] { aDset });
+
+        } catch (ServiceException e) {
+            log.error("Error invoking the service", e);
+        } catch (MalformedURLException e) {
+            log.error("Error in format of URL string", e);
+        } catch (AxisFault fault) {
+            log.error("Axis Fault details", fault);
+            throw new EmfException(extractMessage(fault.getMessage()));
+        } catch (RemoteException e) {
+            log.error("Error communicating with WS end point", e);
+        }
+
+        log.debug("insert a new dataset type object: " + aDset.getName());
+	}
 }

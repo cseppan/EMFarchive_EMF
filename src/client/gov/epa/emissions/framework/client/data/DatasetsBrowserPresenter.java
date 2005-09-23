@@ -47,8 +47,8 @@ public class DatasetsBrowserPresenter {
 
     public void doRefresh() throws EmfException {
         // FIXME: fix the type casting
-        view.refresh((EmfDataset[]) dataServices.getDatasets());
-
+        view.refresh(dataServices.getDatasets());
+        
         view.clearMessage();
     }
 
