@@ -1,10 +1,14 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.LoggingServices;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -19,10 +23,16 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
 
     private MetadataPresenter presenter;
 
-    private SingleLineMessagePanel messagePanel;
+    private MessagePanel messagePanel;
 
-    public MetadataWindow() {
+    private EmfFrame parentConsole;
+
+    private EmfSession session;
+
+    public MetadataWindow(EmfSession session, EmfFrame parentConsole) {
         super("Dataset Properties Editor");
+        this.session = session;
+        this.parentConsole = parentConsole;
 
         super.setSize(new Dimension(700, 485));
     }
@@ -33,12 +43,29 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
         tabbedPane.addTab("Summary", createSummaryTab(dataset, messagePanel));
         tabbedPane.addTab("Data", createTab());
         tabbedPane.addTab("Keywords", createTab());
-        tabbedPane.addTab("Logs", createTab());
+        tabbedPane.addTab("Logs", createLogsTab(dataset, session.getLoggingServices(), parentConsole));
         tabbedPane.addTab("Info", createTab());
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         return tabbedPane;
+    }
+
+    private JPanel createLogsTab(EmfDataset dataset, LoggingServices services, EmfFrame parentConsole) {
+        try {
+            LogsTab view = new LogsTab(dataset, services, parentConsole);
+
+            // FIXME: activate the presenter on tab-click
+            // LogsTabPresenter presenter = new LogsTabPresenter(view, dataset,
+            // session.getLoggingServices());
+            // presenter.display();
+
+            return view;
+        } catch (EmfException e) {
+            messagePanel.setError("could not load Logs tab. Failed communication with remote Logging Services.");
+        }
+
+        return createTab();
     }
 
     private SummaryTab createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {

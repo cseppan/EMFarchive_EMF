@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.LoggingServices;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
@@ -47,5 +48,9 @@ public class DefaultEmfSession implements EmfSession {
 
     public UserServices getUserServices() {
         return serviceLocator.getUserServices();
+    }
+
+    public LoggingServices getLoggingServices() {
+        return serviceLocator.getLoggingServices();
     }
 }

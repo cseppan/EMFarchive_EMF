@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.LoggingServices;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 
@@ -77,6 +78,17 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
         assertEquals(servicesProxy, session.getUserServices());
     }
 
+    public void testGetLoggingServices() throws EmfException {
+        Mock services = mock(LoggingServices.class);
+
+        LoggingServices servicesProxy = (LoggingServices) services.proxy();
+        locator.stubs().method("getLoggingServices").will(returnValue(servicesProxy));
+
+        EmfSession session = new DefaultEmfSession(null, ((ServiceLocator) locator.proxy()));
+
+        assertEquals(servicesProxy, session.getLoggingServices());
+    }
+    
     public void testCacheMostRecentExportFolder() throws EmfException {
         EmfSession session = new DefaultEmfSession(null, (ServiceLocator) locator.proxy());
 

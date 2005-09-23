@@ -40,7 +40,6 @@ public class LoggingServicesImpl implements LoggingServices {
 
     public AccessLog[] getAccessLogs(long datasetid) {
         log.debug("get all access log entries for datasetid " + datasetid);
-        // Session session = HibernateUtils.currentSession();
         Session session = EMFHibernateUtil.getSession();
         List allLogs = LoggingDAO.getAccessLogs(datasetid,session);
         session.flush();

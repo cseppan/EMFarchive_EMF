@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.Dataset;
+import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserWindow;
@@ -26,7 +27,7 @@ public class DatasetsBrowserLauncher {
     public static void main(String[] args) throws Exception {
         DatasetsBrowserLauncher launcher = new DatasetsBrowserLauncher();
 
-        JFrame frame = new JFrame();
+        EmfFrame frame = new EmfFrame("DatasetsBrowserLauncher", "Datasets Browser");
         frame.setSize(new Dimension(900, 700));
         frame.setLocation(new Point(300, 200));
         frame.setVisible(true);

@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
@@ -45,13 +46,13 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private DatasetsBrowserPresenter presenter;
 
-    private JFrame parentConsole;
+    private EmfFrame parentConsole;
 
     private JScrollPane sortFilterPane;
 
     private EmfSession session;
 
-    public DatasetsBrowserWindow(EmfSession session, JFrame parentConsole, JDesktopPane desktop) throws EmfException {
+    public DatasetsBrowserWindow(EmfSession session, EmfFrame parentConsole, JDesktopPane desktop) throws EmfException {
         super("Datasets Browser", desktop);
         super.setName("datasetsBrowser");
 
@@ -198,7 +199,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         List datasets = getSelectedDatasets();
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
-            MetadataWindow view = new MetadataWindow();
+            MetadataWindow view = new MetadataWindow(session, parentConsole);
             getDesktopPane().add(view);
 
             presenter.doShowMetadata(view, (EmfDataset) iter.next());

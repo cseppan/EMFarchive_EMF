@@ -32,7 +32,7 @@ public class MetadataPresenter {
 
     public void doSave() {
         try {
-            summaryTabPresenter.doSave();
+            summaryTabPresenter.save();
             dataServices.updateDataset(dataset);
         } catch (EmfException e) {
             view.showError("Could not update dataset - " + dataset.getName());

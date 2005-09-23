@@ -16,6 +16,6 @@ public class SummaryTabPresenterTest extends MockObjectTestCase {
 
         SummaryTabPresenter presenter = new SummaryTabPresenter(dataset, (SummaryTabView) view.proxy());
 
-        presenter.doSave();
+        presenter.save();
     }
 }

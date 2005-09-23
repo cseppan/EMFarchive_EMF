@@ -13,7 +13,7 @@ public class SummaryTabPresenter {
         this.view = view;
     }
 
-    public void doSave() {
+    public void save() {
         view.updateDataset(dataset);
     }
 

@@ -65,11 +65,6 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         this.messagePanel = messagePanel;
 
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        setLayout();
-    }
-
-    private void setLayout() {
         super.add(createOverviewSection());
         super.add(createLowerSection());
     }
@@ -141,7 +136,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         startDatePanel.add(startDateTime);
 
         JPanel endDatePanel = new JPanel();
-        endDatePanel.add(new JLabel("End"));
+        endDatePanel.add(new JLabel("End  "));
         endDateTime = new FormattedTextField("endDateTime", dataset.getStopDateTime(), DATE_FORMATTER);
         endDatePanel.add(endDateTime);
 
@@ -164,7 +159,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
         // sectors: TODO: lookup sectors
         sectors = new DefaultListModel();
-        dumptArrayIntoListModel(new String[] { "A", "B" }, sectors);
+        dumptArrayIntoListModel(new String[] { "TBD", "" }, sectors);
         layoutGenerator.addLabelWidgetPair("Sectors", createList("sectors", sectors), panel);
 
         // region
@@ -173,7 +168,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
         // country - TODO: lookup countries
         countries = new DefaultListModel();
-        dumptArrayIntoListModel(new String[] { dataset.getCountry(), "Jamaica" }, countries);
+        dumptArrayIntoListModel(new String[] { dataset.getCountry(), "" }, countries);
         layoutGenerator.addLabelWidgetPair("Country", createList("countries", countries), panel);
 
         // Lay out the panel.
@@ -275,6 +270,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
             super(format);
             super.setName(name);
             super.setValue(value);
+            super.setColumns(12);
 
             super.setInputVerifier(new FormattedTextFieldVerifier());
         }
@@ -290,7 +286,8 @@ public class SummaryTab extends JPanel implements SummaryTabView {
                 formatter.stringToValue(text);
                 messagePanel.clear();
             } catch (ParseException pe) {
-                messagePanel.setError("Invalid date - " + text);
+                messagePanel.setError("Invalid date - " + text + ".  Please use the format - "
+                        + DATE_FORMATTER.toPattern());
                 return false;
             }
 
