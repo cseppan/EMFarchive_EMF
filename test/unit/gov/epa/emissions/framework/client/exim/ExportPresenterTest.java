@@ -44,7 +44,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
         session.stubs().method("getExImServices").withNoArguments().will(returnValue(model.proxy()));
         session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
 
-        ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
+        ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
 
         presenter.notifyExport(datasets, folder, purpose);
     }
@@ -67,7 +67,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
         session.stubs().method("getExImServices").withNoArguments().will(returnValue(model.proxy()));
         session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
 
-        ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
+        ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
 
         presenter.notifyExportWithoutOverwrite(datasets, folder, description);
     }
@@ -76,7 +76,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
         Mock view = mock(ExportView.class);
         view.expects(once()).method("close");
 
-        ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
+        ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
 
         ExportView viewProxy = (ExportView) view.proxy();
         view.expects(once()).method("observe").with(eq(presenter));
@@ -92,7 +92,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
         session.stubs().method("getUser").withNoArguments().will(returnValue(null));
         session.stubs().method("getExImServices").withNoArguments().will(returnValue(null));
 
-        ExportPresenter presenter = new ExportPresenter((EmfSession) session.proxy());
+        ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
 
         Mock view = mock(ExportView.class);
         ExportView viewProxy = (ExportView) view.proxy();

@@ -9,6 +9,8 @@ import gov.epa.emissions.framework.client.data.DatasetsBrowserPresenter;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.ui.DefaultWindowLayoutManager;
+import gov.epa.emissions.framework.ui.WindowLayoutManager;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,12 +35,18 @@ public class ManageMenu extends JMenu {
 
     private DatasetsBrowserWindow datasetsBrowserView;
 
-    public ManageMenu(EmfSession session, EmfFrame parent, JDesktopPane desktop, MessagePanel messagePanel) {
+    private WindowLayoutManager windowLayoutManager;
+
+    // FIXME: where's the associated Presenter ?
+    public ManageMenu(EmfSession session, EmfFrame parent, JDesktopPane desktop, MessagePanel messagePanel,
+            WindowLayoutManager windowLayoutManager) {
         super("Manage");
         super.setName("manage");
+
         this.session = session;
         this.desktop = desktop;
         this.parent = parent;
+        this.windowLayoutManager = windowLayoutManager;
 
         super.add(createDatasets(parent, messagePanel));
         super.add(createDisabledMenuItem("Dataset Types"));
@@ -95,10 +103,12 @@ public class ManageMenu extends JMenu {
             return;
         }
 
-        datasetsBrowserView = new DatasetsBrowserWindow(session.getDataServices(), parent, desktop);
+        datasetsBrowserView = new DatasetsBrowserWindow(session, parent, desktop);
+        windowLayoutManager.add(datasetsBrowserView);
         desktop.add(datasetsBrowserView);
 
-        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session);
+        DefaultWindowLayoutManager browserLayout = new DefaultWindowLayoutManager(datasetsBrowserView);
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session.getDataServices(), browserLayout);
         presenter.display(datasetsBrowserView);
     }
 
@@ -109,6 +119,7 @@ public class ManageMenu extends JMenu {
         }
 
         updateUserView = new UpdateUserWindow(session.getUser());
+        windowLayoutManager.add(updateUserView);
         desktop.add(updateUserView);
 
         UpdateUserPresenter presenter = new UpdateUserPresenter(session.getUserServices());

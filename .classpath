@@ -60,5 +60,6 @@
 	<classpathentry kind="lib" path="lib/emissions-commons-0.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/analysis-engine-0.1.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/concurrent.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

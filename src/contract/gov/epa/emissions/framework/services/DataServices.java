@@ -11,11 +11,15 @@ import gov.epa.emissions.framework.EmfException;
 
 /**
  * @author Conrad F. D'Cruz
- *
+ * 
  */
 public interface DataServices {
 
-	public Dataset[] getDatasets() throws EmfException;
-	public Dataset[] getDatasets(User user) throws EmfException;
-	public void insertDataset(EmfDataset aDataset) throws EmfException;
+    public Dataset[] getDatasets() throws EmfException;
+
+    public Dataset[] getDatasets(User user) throws EmfException;
+
+    public void insertDataset(EmfDataset aDataset) throws EmfException;
+
+    public void updateDataset(EmfDataset aDataset) throws EmfException;
 }

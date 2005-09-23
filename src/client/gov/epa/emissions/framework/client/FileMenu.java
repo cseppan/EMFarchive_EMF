@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.login.LoginWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.ui.WindowLayoutManager;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,7 +21,11 @@ public class FileMenu extends JMenu {
 
     private ImportWindow importView;
 
-    public FileMenu(EmfSession session, EmfConsole parent, JDesktopPane desktop, MessagePanel messagePanel) {
+    private WindowLayoutManager windowLayoutManager;
+
+    //FIXME: where's the associated Presenter ?
+    public FileMenu(EmfSession session, EmfConsole parent, JDesktopPane desktop, MessagePanel messagePanel,
+            WindowLayoutManager windowLayoutManager) {
         super("File");
         super.setName("file");
 
@@ -28,6 +33,8 @@ public class FileMenu extends JMenu {
         super.addSeparator();
         super.add(createLogout(session, parent));
         super.add(createExit());
+
+        this.windowLayoutManager = windowLayoutManager;
     }
 
     private JMenuItem createExit() {
@@ -56,7 +63,7 @@ public class FileMenu extends JMenu {
     private void logout(EmfSession session, EmfConsole parent) {
         UserServices userServices = session.getUserServices();
         LoginWindow view = new LoginWindow(session.getServiceLocator());
-        
+
         LoginPresenter presenter = new LoginPresenter(userServices);
         presenter.display(view);
 
@@ -88,6 +95,7 @@ public class FileMenu extends JMenu {
         ExImServices eximServices = serviceLocator.getExImServices();
 
         importView = new ImportWindow(eximServices, desktop);
+        windowLayoutManager.add(importView);
         desktop.add(importView);
 
         ImportPresenter presenter = new ImportPresenter(session.getUser(), eximServices);

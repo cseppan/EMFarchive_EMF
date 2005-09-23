@@ -29,8 +29,6 @@ public class EMFHibernateUtil {
         }
     }
 
-    public static final ThreadLocal sessionThread = new ThreadLocal();
-
     public static Session getSession() throws HibernateException {
         log.debug("get session");    	
         Session session = null;

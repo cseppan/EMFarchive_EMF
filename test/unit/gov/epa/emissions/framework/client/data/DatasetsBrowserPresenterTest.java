@@ -1,14 +1,13 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.DefaultEmfSession;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
+import gov.epa.emissions.framework.client.exim.ExportView;
 import gov.epa.emissions.framework.client.meta.MetadataPresenter;
 import gov.epa.emissions.framework.client.meta.MetadataView;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.ui.WindowLayoutManager;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -16,22 +15,22 @@ import org.jmock.core.constraint.IsInstanceOf;
 
 public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
-    private Mock serviceLocator;
-
     private Mock view;
 
     private DatasetsBrowserPresenter presenter;
 
-    protected void setUp() throws EmfException {
-        Mock eximServices = mock(ExImServices.class);
-        eximServices.stubs().method("getExportBaseFolder").will(returnValue("folder/blah"));
+    private Mock layout;
 
-        serviceLocator = mock(ServiceLocator.class);
-        serviceLocator.stubs().method("getExImServices").will(returnValue(eximServices.proxy()));
+    private Mock dataServices;
 
+    protected void setUp() {
         view = mock(DatasetsBrowserView.class);
 
-        presenter = new DatasetsBrowserPresenter(new DefaultEmfSession(null, (ServiceLocator) serviceLocator.proxy()));
+        layout = mock(WindowLayoutManager.class);
+        dataServices = mock(DataServices.class);
+        presenter = new DatasetsBrowserPresenter((DataServices) dataServices.proxy(), (WindowLayoutManager) layout
+                .proxy());
+
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();
 
@@ -46,43 +45,41 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
     public void testShouldRefreshViewOnClickOfRefreshButton() throws EmfException {
         EmfDataset[] datasets = new EmfDataset[0];
-        Mock dataservices = mock(DataServices.class);
-        dataservices.stubs().method("getDatasets").withNoArguments().will(returnValue(datasets));
-        serviceLocator.stubs().method("getDataServices").withNoArguments().will(returnValue(dataservices.proxy()));
+        dataServices.stubs().method("getDatasets").withNoArguments().will(returnValue(datasets));
 
         view.expects(once()).method("refresh").with(eq(datasets));
 
-        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(new DefaultEmfSession(null,
-                (ServiceLocator) serviceLocator.proxy()));
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter((DataServices) dataServices.proxy(), null);
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();
         view.expects(once()).method("clearMessage").withNoArguments();
-        
+
         presenter.display((DatasetsBrowserView) view.proxy());
 
         presenter.doRefresh();
     }
 
-    public void testShouldNotifyViewToDisplayExportViewOnClickOfExportButton() throws EmfException {
+    public void testShouldNotifyViewToDisplayExportViewOnClickOfExportButton() {
         EmfDataset dataset1 = new EmfDataset();
         dataset1.setName("name 1");
+        EmfDataset[] datasets = new EmfDataset[] { dataset1 };
 
-        EmfDataset dataset2 = new EmfDataset();
-        dataset2.setName("name 2");
-
-        EmfDataset[] datasets = new EmfDataset[] { dataset1, dataset2 };
-        view.expects(once()).method("showExport").with(eq(datasets), new IsInstanceOf(ExportPresenter.class));
         view.expects(once()).method("clearMessage").withNoArguments();
 
-        presenter.doExport(datasets);
+        Mock exportView = mock(ExportView.class);
+        Mock exportPresenter = mock(ExportPresenter.class);
+        ExportView exportViewProxy = (ExportView) exportView.proxy();
+        exportPresenter.expects(once()).method("display").with(eq(exportViewProxy));
+
+        presenter.doExport(exportViewProxy, (ExportPresenter) exportPresenter.proxy(), datasets);
     }
 
-    public void testShouldDisplayInformationalMessageOnClickOfExportButtonIfNoDatasetsAreSelected() throws EmfException {
+    public void testShouldDisplayInformationalMessageOnClickOfExportButtonIfNoDatasetsAreSelected() {
         EmfDataset[] datasets = new EmfDataset[0];
         String message = "To Export, you will need to select at least one Dataset";
         view.expects(once()).method("showMessage").with(eq(message));
 
-        presenter.doExport(datasets);
+        presenter.doExport(null, null, datasets);
     }
 
     public void testShouldDisplayMetadataViewOnClickOfMetadataButton() {
@@ -95,6 +92,9 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         metadataView.expects(once()).method("observe").with(new IsInstanceOf(MetadataPresenter.class));
         metadataView.expects(once()).method("display").with(eq(dataset));
 
-        presenter.notifyShowMetadata((MetadataView) metadataView.proxy(), dataset);
+        MetadataView viewProxy = (MetadataView) metadataView.proxy();
+        layout.expects(once()).method("add").with(eq(viewProxy));
+
+        presenter.doShowMetadata(viewProxy, dataset);
     }
 }

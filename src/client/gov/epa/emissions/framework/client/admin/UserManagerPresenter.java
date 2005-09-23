@@ -15,7 +15,7 @@ public class UserManagerPresenter {
 
     public UserManagerPresenter(User user, UserServices model) {
         this.user = user;
-        this.model = model;        
+        this.model = model;
     }
 
     public void doCloseView() {
@@ -25,19 +25,27 @@ public class UserManagerPresenter {
     public void display(UserManagerView view) {
         this.view = view;
         view.observe(this);
-        
+
         view.display();
     }
 
-    public void doDelete(String username) throws EmfException {
-        if (username.equals("admin"))// NOTE: super user's name is fixed
-            throw new UserException("Cannot delete EMF super user - '" + username + "'");
+    public void doDelete(User[] users) throws EmfException {
+        for (int i = 0; i < users.length; i++) {
+            doDelete(users[i]);
+        }
 
-        if (user.getUsername().equals(username))
-            throw new UserException("Cannot delete yourself - '" + username + "'");
-
-        model.deleteUser(username);
         view.refresh();
+    }
+
+    private void doDelete(User userToDelete) throws UserException, EmfException {
+        // NOTE: super user's name is fixed
+        if (userToDelete.getUsername().equals("admin"))
+            throw new UserException("Cannot delete EMF super user - '" + userToDelete.getUsername() + "'");
+
+        if (user.getUsername().equals(userToDelete.getUsername()))
+            throw new UserException("Cannot delete yourself - '" + userToDelete.getUsername() + "'");
+
+        model.deleteUser(userToDelete.getUsername());
     }
 
 }

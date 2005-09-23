@@ -38,7 +38,7 @@ public class ExportWindowLauncher {
         servicesLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getExImServices"))
                 .withAnyArguments().will(new ReturnStub(exim.proxy()));
 
-        ExportPresenter presenter = new ExportPresenter(new DefaultEmfSession(user, (ServiceLocator) servicesLocator
+        ExportPresenter presenter = new DefaultExportPresenter(new DefaultEmfSession(user, (ServiceLocator) servicesLocator
                 .proxy()));
 
         JDesktopPane desktop = new JDesktopPane();

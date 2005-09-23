@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -17,6 +18,8 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
 
     private MetadataPresenter presenter;
 
+    private SingleLineMessagePanel messagePanel;
+
     public MetadataWindow() {
         super("Dataset Properties Editor");
 
@@ -26,7 +29,7 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
     private JTabbedPane createTabbedPane(EmfDataset dataset) {
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        tabbedPane.addTab("Summary", new SummaryTab(dataset));
+        tabbedPane.addTab("Summary", createSummaryTab(dataset));
         tabbedPane.addTab("Data", createTab());
         tabbedPane.addTab("Keywords", createTab());
         tabbedPane.addTab("Logs", createTab());
@@ -35,6 +38,13 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         return tabbedPane;
+    }
+
+    private SummaryTab createSummaryTab(EmfDataset dataset) {
+        SummaryTab view = new SummaryTab(dataset);
+        presenter.add(view);
+        
+        return view;
     }
 
     // TODO: other tabs
@@ -49,6 +59,8 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
         contentPane.removeAll();
 
         JPanel panel = new JPanel(new BorderLayout());
+        messagePanel = new SingleLineMessagePanel();
+        panel.add(messagePanel, BorderLayout.PAGE_START);
         panel.add(createTabbedPane(dataset), BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
@@ -65,21 +77,34 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
     }
 
     private JPanel createButtonsPanel() {
-        Button close = new Button("close", new AbstractAction() {
+        JPanel buttonsPanel = new JPanel();
+
+        Button save = new Button("Save", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                presenter.doSave();
+            }
+        });
+        buttonsPanel.add(save);
+
+        Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }
         });
         getRootPane().setDefaultButton(close);
+        buttonsPanel.add(close);
 
-        JPanel closePanel = new JPanel();
-        closePanel.add(close);
-
-        return closePanel;
+        return buttonsPanel;
     }
 
     public void observe(MetadataPresenter presenter) {
         this.presenter = presenter;
+    }
+
+    // FIXME: should this be mandatory for all EmfViews ?
+    public void showError(String message) {
+        // TODO: error should go away at some point. when ?
+        messagePanel.setError(message);
     }
 
 }

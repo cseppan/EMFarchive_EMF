@@ -1,8 +1,12 @@
 package gov.epa.emissions.framework.client;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.Spring;
 import javax.swing.SpringLayout;
 
@@ -176,5 +180,13 @@ public class SpringLayoutGenerator {
         SpringLayout.Constraints pCons = layout.getConstraints(parent);
         pCons.setConstraint(SpringLayout.SOUTH, y);
         pCons.setConstraint(SpringLayout.EAST, x);
+    }
+
+    public void addLabelWidgetPair(String label, JComponent widget, JPanel panel) {
+        panel.add(new JLabel(label));
+
+        JPanel widgetPanel = new JPanel(new BorderLayout());
+        widgetPanel.add(widget, BorderLayout.LINE_START);
+        panel.add(widgetPanel);
     }
 }

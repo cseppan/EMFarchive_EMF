@@ -24,7 +24,7 @@ public class MetadataWindowLauncher {
         dataset.setStopDateTime(new Date());
 
         MetadataWindow view = new MetadataWindow();
-        MetadataPresenter presenter = new MetadataPresenter(dataset);
+        MetadataPresenter presenter = new MetadataPresenter(dataset, null);
         presenter.display(view);
 
         JFrame frame = new JFrame();

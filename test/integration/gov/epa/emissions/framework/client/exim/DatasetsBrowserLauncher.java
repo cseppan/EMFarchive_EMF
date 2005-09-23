@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.Dataset;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.services.DataServices;
@@ -36,8 +37,11 @@ public class DatasetsBrowserLauncher {
         services.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getDatasets")).will(
                 new ReturnStub(datasets));
 
+        Mock session = new Mock(EmfSession.class);
+        session.stubs().method(new IsEqual("getDataServices")).will(new ReturnStub(services.proxy()));
+
         JDesktopPane desktop = new JDesktopPane();
-        DatasetsBrowserWindow console = new DatasetsBrowserWindow((DataServices) services.proxy(), frame, desktop);
+        DatasetsBrowserWindow console = new DatasetsBrowserWindow((EmfSession) session.proxy(), frame, desktop);
         console.setVisible(true);
 
         launcher.addAsInternalFrame(console, frame, desktop);

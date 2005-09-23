@@ -188,4 +188,8 @@ public class DataServicesTransport implements DataServices {
         return message;
     }
 
+    public void updateDataset(EmfDataset aDataset)  {
+        //TODO: implement 'update dataset'
+    }
+
 }

@@ -1,5 +1,8 @@
 package gov.epa.emissions.framework.client;
 
+import gov.epa.emissions.framework.ui.Position;
+
+import java.awt.Point;
 import java.beans.PropertyVetoException;
 
 import javax.swing.JInternalFrame;
@@ -14,11 +17,9 @@ public abstract class EmfInternalFrame extends JInternalFrame implements EmfView
     }
 
     public void bringToFront() {
-
         super.toFront();
         try {
             super.setIcon(false);
-            super.setSelected(true);
         } catch (PropertyVetoException e) {
             throw new RuntimeException("could not bring the window - " + super.getTitle() + " to front of the desktop");
         }
@@ -26,8 +27,15 @@ public abstract class EmfInternalFrame extends JInternalFrame implements EmfView
     }
 
     public void display() {
-        super.getDesktopPane().setSelectedFrame(this);
         super.setVisible(true);
     }
 
+    public Position getPosition() {
+        Point point = super.getLocation();
+        return new Position(point.x, point.y);
+    }
+
+    public void setPosition(Position position) {
+        super.setLocation(new Point(position.x(), position.y()));
+    }
 }

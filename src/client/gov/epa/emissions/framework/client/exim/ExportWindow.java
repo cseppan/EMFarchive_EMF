@@ -17,8 +17,6 @@ import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -70,8 +68,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     }
 
     private JPanel createExportPanel() {
-        SpringLayout layout = new SpringLayout();
-        JPanel panel = new JPanel(layout);
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // datasets
         JTextArea datasetNames = new JTextArea(2, 45);
@@ -81,12 +79,12 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         datasetNames.setText(getDatasetsLabel(datasets));
 
-        addLabelWidgetPair("Datasets", scrollPane, panel);
+        layoutGenerator.addLabelWidgetPair("Datasets", scrollPane, panel);
 
         // folder
         folder = new JTextField(40);
         folder.setName("folder");
-        addLabelWidgetPair("Folder", folder, panel);
+        layoutGenerator.addLabelWidgetPair("Folder", folder, panel);
 
         // purpose
         purpose = new TextArea("purpose", "");
@@ -95,7 +93,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         JScrollPane purposeScrollPane = new JScrollPane(purpose, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        addLabelWidgetPair("Purpose", purposeScrollPane, panel);
+        layoutGenerator.addLabelWidgetPair("Purpose", purposeScrollPane, panel);
 
         // overwrite
         JPanel overwritePanel = new JPanel(new BorderLayout());
@@ -108,21 +106,11 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         panel.add(overwritePanel);
 
         // Lay out the panel.
-        // FIXME: turn into an object invocation
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
                 5, 5, // initialX, initialY
                 5, 5);// xPad, yPad
 
         return panel;
-    }
-
-    private void addLabelWidgetPair(String label, JComponent widget, JPanel panel) {
-        panel.add(new JLabel(label));
-
-        JPanel widgetPanel = new JPanel(new BorderLayout());
-        widgetPanel.add(widget, BorderLayout.LINE_START);
-        panel.add(widgetPanel);
     }
 
     private String getDatasetsLabel(EmfDataset[] datasets) {
@@ -176,7 +164,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
                 presenter.notifyExportWithoutOverwrite(datasets, folder.getText(), purpose.getText());
             else
                 presenter.notifyExport(datasets, folder.getText(), purpose.getText());
-            
+
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");
         } catch (EmfException e) {

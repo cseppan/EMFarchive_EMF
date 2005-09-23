@@ -184,7 +184,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
     private void launchRegisterUser() throws Exception {
         PostRegisterStrategy strategy = new LaunchEmfConsolePostRegisterStrategy(serviceLocator);
         RegisterUserWindow view = new RegisterUserWindow(serviceLocator, strategy);
-        
+
         RegisterUserPresenter presenter = new RegisterUserPresenter(serviceLocator.getUserServices());
         presenter.display(view);
     }
@@ -193,16 +193,8 @@ public class LoginWindow extends EmfFrame implements LoginView {
         super.validate();
     }
 
-    public void close() {
-        this.dispose();
-    }
-
     public void observe(LoginPresenter presenter) {
         this.presenter = presenter;
-    }
-
-    public void display() {
-        super.setVisible(true);
     }
 
 }

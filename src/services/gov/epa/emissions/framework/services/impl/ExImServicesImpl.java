@@ -38,6 +38,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 
+import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
+import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
+
 /**
  * @author Conrad F. D'Cruz
  * 
@@ -53,6 +56,8 @@ public class ExImServicesImpl implements ExImServices {
     private String baseImportFolder = null;
 
     private String baseExportFolder = null;
+
+    private PooledExecutor threadPool;
 
     public ExImServicesImpl() throws NamingException, SQLException {
         // TODO: should we move this into an abstract super class ?
@@ -76,6 +81,10 @@ public class ExImServicesImpl implements ExImServices {
 
         importerFactory = new ImporterFactory(dbServer);
         exporterFactory = new ExporterFactory(dbServer);
+        
+        //TODO: thread pooling policy
+        threadPool = new PooledExecutor(new BoundedBuffer(10), 20);
+        threadPool.setMinimumPoolSize(3);
     }
 
     private String getValue(String root) {
@@ -165,8 +174,7 @@ public class ExImServicesImpl implements ExImServices {
             Importer importer = importerFactory.create(datasetType);
             ImportTask eximTask = new ImportTask(user, file, dataset, datasetType, svcHolder, importer);
 
-            // FIXME: use a thread pool
-            new Thread(eximTask).start();
+            threadPool.execute(eximTask);
         } catch (Exception e) {
             log.error("Exception attempting to start import of file: " + fileName, e);
             throw new EmfException(e.getMessage());
@@ -188,8 +196,6 @@ public class ExImServicesImpl implements ExImServices {
                 EmfDataset aDataset = datasets[i];
 
                 // FIXME: Default is overwrite
-                // File file = new File(path,
-                // getCleanDatasetName(aDataset.getName()));
                 File file = validateExportFile(path, getCleanDatasetName(aDataset.getName()), overwrite);
                 ServicesHolder svcHolder = new ServicesHolder();
                 svcHolder.setLogSvc(new LoggingServicesImpl());
@@ -259,23 +265,11 @@ public class ExImServicesImpl implements ExImServices {
 
     }
 
-    public String getImportBaseFolder() throws EmfException {
-
-        // FIXME:
-        boolean broke = false;
-        if (broke)
-            throw new EmfException("TEMP");
-
+    public String getImportBaseFolder() {
         return baseImportFolder;
     }
 
-    public String getExportBaseFolder() throws EmfException {
-
-        // FIXME:
-        boolean broke = false;
-        if (broke)
-            throw new EmfException("TEMP");
-
+    public String getExportBaseFolder() {
         return baseExportFolder;
     }
 

@@ -1,21 +1,25 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
+import gov.epa.emissions.framework.client.exim.ExportView;
 import gov.epa.emissions.framework.client.meta.MetadataPresenter;
 import gov.epa.emissions.framework.client.meta.MetadataView;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.ui.WindowLayoutManager;
 
 public class DatasetsBrowserPresenter {
 
     private DatasetsBrowserView view;
 
-    private EmfSession session;
+    private WindowLayoutManager windowLayoutManager;
 
-    public DatasetsBrowserPresenter(EmfSession session) {
-        this.session = session;
+    private DataServices dataServices;
+
+    public DatasetsBrowserPresenter(DataServices dataServices, WindowLayoutManager windowLayoutManager) {
+        this.dataServices = dataServices;
+        this.windowLayoutManager = windowLayoutManager;
     }
 
     public void display(DatasetsBrowserView view) {
@@ -29,31 +33,30 @@ public class DatasetsBrowserPresenter {
         view.close();
     }
 
-    public void doExport(EmfDataset[] datasets) throws EmfException {
+    // FIXME: change other presenters to follow this design
+    // Also, look at doShowMetadata to identify a better pattern
+    public void doExport(ExportView exportView, ExportPresenter presenter, EmfDataset[] datasets) {
         if (datasets.length == 0) {
             view.showMessage("To Export, you will need to select at least one Dataset");
             return;
         }
-        
-        ExportPresenter presenter = new ExportPresenter(session);
-        view.showExport(datasets, presenter);
-        
+
         view.clearMessage();
+        presenter.display(exportView);
     }
 
     public void doRefresh() throws EmfException {
-        DataServices dataServices = session.getDataServices();
         // FIXME: fix the type casting
         view.refresh((EmfDataset[]) dataServices.getDatasets());
-        
+
         view.clearMessage();
     }
 
-    // FIXME: change other presenters to follow this design
-    public void notifyShowMetadata(MetadataView metadataView, EmfDataset dataset) {
-        MetadataPresenter presenter = new MetadataPresenter(dataset);
+    public void doShowMetadata(MetadataView metadataView, EmfDataset dataset) {
+        MetadataPresenter presenter = new MetadataPresenter(dataset, dataServices);
+        windowLayoutManager.add(metadataView);
         presenter.display(metadataView);
-        
+
         view.clearMessage();
     }
 

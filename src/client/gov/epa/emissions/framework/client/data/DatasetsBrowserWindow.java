@@ -4,8 +4,10 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.exim.DefaultExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.meta.MetadataWindow;
@@ -47,12 +49,14 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private JScrollPane sortFilterPane;
 
-    // FIXME: this is very similar to UserManagerWindow. Can we refactory &
-    // reuse ?
-    public DatasetsBrowserWindow(DataServices services, JFrame parentConsole, JDesktopPane desktop) throws EmfException {
+    private EmfSession session;
+
+    public DatasetsBrowserWindow(EmfSession session, JFrame parentConsole, JDesktopPane desktop) throws EmfException {
         super("Datasets Browser", desktop);
         super.setName("datasetsBrowser");
 
+        this.session = session;
+        DataServices services = session.getDataServices();
         // FIXME: change the type from Dataset to EmfDataset
         model = new DatasetsBrowserTableModel((EmfDataset[]) services.getDatasets());
         selectModel = new SortFilterSelectModel(model);
@@ -168,18 +172,14 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void exportSelectedDatasets() {
-
-        // FIXME: notify the Presenter. Let it handle a no-select
-        // if (selected.length == 0)
-        // return;
-
         List datasets = getSelectedDatasets();
+        EmfDataset[] emfDatasets = (EmfDataset[]) datasets.toArray(new EmfDataset[0]);
 
-        try {
-            presenter.doExport((EmfDataset[]) datasets.toArray(new EmfDataset[0]));
-        } catch (EmfException e) {
-            showError(e.getMessage());
-        }
+        ExportWindow exportView = new ExportWindow(emfDatasets);
+        getDesktopPane().add(exportView);
+
+        ExportPresenter exportPresenter = new DefaultExportPresenter(session);
+        presenter.doExport(exportView, exportPresenter, emfDatasets);
     }
 
     private List getSelectedDatasets() {
@@ -201,7 +201,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             MetadataWindow view = new MetadataWindow();
             getDesktopPane().add(view);
 
-            presenter.notifyShowMetadata(view, (EmfDataset) iter.next());
+            presenter.doShowMetadata(view, (EmfDataset) iter.next());
         }
     }
 
@@ -224,13 +224,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     public void display() {
         this.setVisible(true);
-    }
-
-    public void showExport(EmfDataset[] datasets, ExportPresenter exportPresenter) {
-        ExportWindow exportView = new ExportWindow(datasets);
-        getDesktopPane().add(exportView);
-        
-        exportPresenter.display(exportView);
     }
 
     public void refresh(EmfDataset[] datasets) {

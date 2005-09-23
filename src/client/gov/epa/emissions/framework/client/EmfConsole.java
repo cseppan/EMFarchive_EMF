@@ -6,6 +6,8 @@ import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.framework.ui.DefaultWindowLayoutManager;
+import gov.epa.emissions.framework.ui.WindowLayoutManager;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -35,12 +37,16 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private StatusPresenter presenter;
 
+    private WindowLayoutManager windowLayoutManager;
+
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(EmfSession session) {
         super("EMF Console", "Emissions Modeling Framework (EMF)");
         user = session.getUser();
         this.serviceLocator = session.getServiceLocator();
 
+        this.windowLayoutManager = new DefaultWindowLayoutManager(this);
+        
         setProperties();
         setLayout(session);
         showStatus();
@@ -94,13 +100,13 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private JMenu createFileMenu(EmfSession session, JDesktopPane desktop) {
-        return new FileMenu(session, this, desktop, messagePanel);
+        return new FileMenu(session, this, desktop, messagePanel, windowLayoutManager);
     }
 
     public void close() {
         // TODO: auto logout of a session
         presenter.close();
-        super.dispose();
+        super.close();
     }
 
     private JMenuItem createDisabledMenuItem(String name) {
@@ -111,7 +117,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private JMenu createManageMenu(EmfSession session, JDesktopPane desktop) {
-        manageMenu = new ManageMenu(session, this, desktop, messagePanel);
+        manageMenu = new ManageMenu(session, this, desktop, messagePanel, windowLayoutManager);
 
         return manageMenu;
     }
@@ -137,10 +143,6 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     public void observe(EmfConsolePresenter presenter) {
         manageMenu.observe(presenter);
-    }
-
-    public void display() {
-        super.setVisible(true);
     }
 
     public void displayUserManager() {

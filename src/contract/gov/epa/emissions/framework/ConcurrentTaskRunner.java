@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework;
 
-//TODO: use JDK 1.5 concurrency utilties to test 
 public class ConcurrentTaskRunner implements TaskRunner {
 
     private final Object mutex = new Object();
@@ -13,7 +12,8 @@ public class ConcurrentTaskRunner implements TaskRunner {
     public void start(Runnable task) {
         alive = true;
         this.delegate = new TaskDelegate(task);
-        Thread thread = new Thread(delegate);// FIXME: use thread pool
+        Thread thread = new Thread(delegate);// FIXME: use thread pool or
+        // does it matter ?
         thread.start();
     }
 
@@ -37,7 +37,7 @@ public class ConcurrentTaskRunner implements TaskRunner {
                 while (alive) {
                     task.run();
                     try {
-                        // FIXME: what's a reasonable polling time ? 
+                        // FIXME: what's a reasonable polling time ?
                         mutex.wait(1000);
                     } catch (InterruptedException e) {
                         alive = false;

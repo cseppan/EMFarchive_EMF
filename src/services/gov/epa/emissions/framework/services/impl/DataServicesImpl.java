@@ -51,4 +51,8 @@ public class DataServicesImpl implements DataServices {
         session.close();
     }
 
+    public void updateDataset(EmfDataset aDataset) {
+        //TODO: implement 'update dataset'
+    }
+
 }

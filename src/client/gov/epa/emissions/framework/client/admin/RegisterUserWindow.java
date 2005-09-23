@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.framework.client.EmfView;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.login.LaunchLoginOnCancelStrategy;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
@@ -9,7 +8,7 @@ import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class RegisterUserWindow extends EmfFrame implements EmfView, RegisterUserView {
+public class RegisterUserWindow extends EmfFrame implements RegisterUserView {
 
     private RegisterUserPanel view;
 
@@ -33,10 +32,6 @@ public class RegisterUserWindow extends EmfFrame implements EmfView, RegisterUse
         });
     }
 
-    public void close() {
-        super.dispose();
-    }
-
     private void doClose() {
         RegisterUserPresenter presenter = view.getPresenter();
         if (presenter != null)
@@ -45,10 +40,6 @@ public class RegisterUserWindow extends EmfFrame implements EmfView, RegisterUse
 
     public RegisterUserView getView() {
         return view;
-    }
-
-    public void display() {
-        this.setVisible(true);
     }
 
     public void observe(RegisterUserPresenter presenter) {

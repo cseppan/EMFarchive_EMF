@@ -207,7 +207,6 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         return users;
     }
 
-    // FIXME: cannot delete oneself
     private void deleteUser() {
         int option = JOptionPane.showConfirmDialog(null, "Are you sure about deleting user(s)", "Delete User",
                 JOptionPane.YES_NO_OPTION);
@@ -217,16 +216,12 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         }
 
         List users = getSelectedUsers();
-        for (Iterator iter = users.iterator(); iter.hasNext();) {
-            User user = (User) iter.next();
-            try {
-                presenter.doDelete(user.getUsername());
-            } catch (EmfException e) {
-                messagePanel.setError(e.getMessage());
-                // TODO: temp, until the HACK is addressed (then, use refresh)
-                doSimpleRefresh();
-                break;// TODO: should continue ?
-            }
+        try {
+            presenter.doDelete((User[]) users.toArray(new User[0]));
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+            // TODO: temp, until the HACK is addressed (then, use refresh)
+            doSimpleRefresh();
         }
     }
 
