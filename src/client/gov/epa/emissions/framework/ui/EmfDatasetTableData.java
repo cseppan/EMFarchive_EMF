@@ -6,7 +6,7 @@ import java.util.List;
 import gov.epa.emissions.framework.client.exim.Row;
 import gov.epa.emissions.framework.services.EmfDataset;
 
-public class EmfDatasetTableData implements EmfTableData {
+public class EmfDatasetTableData extends AbstractEmfTableData {
 
     private List rows;
 
@@ -39,11 +39,6 @@ public class EmfDatasetTableData implements EmfTableData {
 
     public boolean isEditable(int col) {
         return false;
-    }
-
-    public Object element(int row) {
-        Row rowObj = (Row) rows.get(row);
-        return rowObj.record();
     }
 
 }

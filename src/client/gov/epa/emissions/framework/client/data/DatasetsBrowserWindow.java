@@ -15,13 +15,14 @@ import gov.epa.emissions.framework.client.meta.MetadataWindow;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.ui.EmfDatasetTableData;
+import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -35,8 +36,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 public class DatasetsBrowserWindow extends ReusableInteralFrame implements DatasetsBrowserView {
-
-    private DatasetsBrowserTableModel model;
 
     private SortFilterSelectModel selectModel;
 
@@ -52,14 +51,15 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private EmfSession session;
 
+    private EmfTableModel model;
+
     public DatasetsBrowserWindow(EmfSession session, EmfFrame parentConsole, JDesktopPane desktop) throws EmfException {
         super("Datasets Browser", desktop);
         super.setName("datasetsBrowser");
 
         this.session = session;
         DataServices services = session.getDataServices();
-        // FIXME: change the type from Dataset to EmfDataset
-        model = new DatasetsBrowserTableModel(services.getDatasets());
+        model = new EmfTableModel(new EmfDatasetTableData(services.getDatasets()));
         selectModel = new SortFilterSelectModel(model);
         this.parentConsole = parentConsole;
 
@@ -186,13 +186,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private List getSelectedDatasets() {
         int[] selected = selectModel.getSelectedIndexes();
 
-        List datasets = new ArrayList();
-        for (int i = 0; i < selected.length; i++) {
-            EmfDataset dataset = model.getDataset(selected[i]);
-            datasets.add(dataset);
-        }
-
-        return datasets;
+        return model.elements(selected);
     }
 
     protected void doShowMetadata() {
@@ -228,7 +222,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     public void refresh(EmfDataset[] datasets) {
-        model.populate(datasets);
+        model.refresh(new EmfDatasetTableData(datasets));
         selectModel.refresh();
 
         // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel

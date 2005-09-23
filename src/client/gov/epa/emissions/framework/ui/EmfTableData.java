@@ -12,4 +12,6 @@ public interface EmfTableData {
 
     Object element(int row);
 
+    List elements(int[] selected);
+
 }

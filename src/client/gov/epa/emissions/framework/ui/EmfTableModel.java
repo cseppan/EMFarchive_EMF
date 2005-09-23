@@ -17,9 +17,7 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
     private EmfTableData tableData;
 
     public EmfTableModel(EmfTableData tableData) {
-        this.tableData = tableData;
-        this.header = new TableHeader(tableData.columns());
-        refresh();
+        refresh(tableData);
     }
 
     public int getRowCount() {
@@ -48,6 +46,18 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
 
     public Object element(int row) {
         return tableData.element(row);
+    }
+
+    //FIXME: TBT (to be tested)
+    public List elements(int[] selected) {
+        return tableData.elements(selected);
+    }
+
+    // FIXME: how does this differ from refresh() ?
+    public void refresh(EmfTableData tableData) {
+        this.tableData = tableData;
+        this.header = new TableHeader(tableData.columns());
+        refresh();
     }
 
 }

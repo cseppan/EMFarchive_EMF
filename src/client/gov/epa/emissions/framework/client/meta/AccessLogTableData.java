@@ -1,16 +1,16 @@
 package gov.epa.emissions.framework.client.meta;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.exim.Row;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.LoggingServices;
-import gov.epa.emissions.framework.ui.EmfTableData;
+import gov.epa.emissions.framework.ui.AbstractEmfTableData;
 
-public class AccessLogTableData implements EmfTableData {
+import java.util.ArrayList;
+import java.util.List;
+
+public class AccessLogTableData extends AbstractEmfTableData {
 
     private List rows;
 
@@ -31,11 +31,6 @@ public class AccessLogTableData implements EmfTableData {
         return false;
     }
 
-    public Object element(int row) {
-        Row rowObj = (Row) rows.get(row);
-        return rowObj.record();
-    }
-
     private List createRows(AccessLog[] logs) {
         List rows = new ArrayList();
 
@@ -50,4 +45,5 @@ public class AccessLogTableData implements EmfTableData {
 
         return rows;
     }
+
 }
