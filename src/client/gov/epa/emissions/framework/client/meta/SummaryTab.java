@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.io.importer.TemporalResolution;
+import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -9,17 +11,20 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.InputVerifier;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -27,8 +32,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 
 public class SummaryTab extends JPanel implements SummaryTabView {
 
@@ -40,9 +44,9 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private TextField project;
 
-    private TextField startDateTime;
+    private JFormattedTextField startDateTime;
 
-    private TextField endDateTime;
+    private FormattedTextField endDateTime;
 
     private DefaultComboBoxModel temporalResolutions;
 
@@ -54,8 +58,11 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private DefaultListModel countries;
 
-    public SummaryTab(EmfDataset dataset) {
+    private MessagePanel messagePanel;
+
+    public SummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
         this.dataset = dataset;
+        this.messagePanel = messagePanel;
 
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -105,105 +112,82 @@ public class SummaryTab extends JPanel implements SummaryTabView {
     }
 
     private JPanel createStatusDatesPanel() {
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        // labels
-        JPanel labelsPanel = new JPanel();
-        labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
+        layoutGenerator.addLabelWidgetPair("Status", new JLabel(dataset.getStatus()), panel);
+        layoutGenerator.addLabelWidgetPair("Last Modified Date", new JLabel(" "), panel);
+        layoutGenerator.addLabelWidgetPair("Last Accessed Date", new JLabel(" "), panel);
+        layoutGenerator.addLabelWidgetPair("Date of Creation", new JLabel(" "), panel);
 
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        labelsPanel.add(new JLabel("Status:"));
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        labelsPanel.add(new JLabel("Last Modified Date:"));
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        labelsPanel.add(new JLabel("Last Accessed Date:"));
-
-        panel.add(labelsPanel);
-
-        // values
-        JPanel valuesPanel = new JPanel();
-        valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
-
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 15)));
-        valuesPanel.add(new JLabel("Imported"));
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 13)));
-
-        valuesPanel.add(new JLabel(" "));
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 17)));
-
-        valuesPanel.add(new JLabel(" "));
-
-        panel.add(valuesPanel);
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
 
         return panel;
     }
 
     private JPanel createTimeSpaceSection() {
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new SpringLayout());
+        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        // labels
-        JPanel labelsPanel = new JPanel();
-        labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
-
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        labelsPanel.add(new JLabel("Time Period"));
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 30)));
-        labelsPanel.add(new JLabel("Temporal Resolution"));
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 20)));
-        labelsPanel.add(new JLabel("Sectors"));
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        labelsPanel.add(new JLabel("Region"));
-        labelsPanel.add(Box.createRigidArea(new Dimension(1, 10)));
-        labelsPanel.add(new JLabel("Country"));
-
-        panel.add(labelsPanel);
-
-        // values
-        JPanel valuesPanel = new JPanel();
-        valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
-
+        // time period
         JPanel startDatePanel = new JPanel();
-        startDatePanel.add(new JLabel("Start: "));
-        startDateTime = new TextField("startDateTime", 12);
-        startDateTime.setText(format(dataset.getStartDateTime()));
+        startDatePanel.add(new JLabel("Start"));
+        startDateTime = new FormattedTextField("startDateTime", dataset.getStartDateTime(), DATE_FORMATTER);
+        startDateTime.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
         startDatePanel.add(startDateTime);
-        valuesPanel.add(startDatePanel);
 
         JPanel endDatePanel = new JPanel();
-        endDatePanel.add(new JLabel("End:   "));
-        endDateTime = new TextField("startDateTime", 12);
-        endDateTime.setText(format(dataset.getStopDateTime()));
+        endDatePanel.add(new JLabel("End"));
+        endDateTime = new FormattedTextField("endDateTime", dataset.getStopDateTime(), DATE_FORMATTER);
         endDatePanel.add(endDateTime);
-        valuesPanel.add(endDatePanel);
 
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 5)));
+        JPanel datesPanel = new JPanel();
+        datesPanel.setLayout(new BoxLayout(datesPanel, BoxLayout.Y_AXIS));
+        datesPanel.add(startDatePanel);
+        datesPanel.add(endDatePanel);
 
-        temporalResolutions = new DefaultComboBoxModel(new String[] { dataset.getTemporalResolution() });
+        layoutGenerator.addLabelWidgetPair("Time Period", datesPanel, panel);
+
+        // temporal resolution
+        String[] temporalResolutionNames = (String[]) TemporalResolution.NAMES.toArray(new String[0]);
+        temporalResolutions = new DefaultComboBoxModel(temporalResolutionNames);
+        // TODO: set the selected
         JComboBox temporalResolutionsCombo = new JComboBox(temporalResolutions);
+        temporalResolutionsCombo.setSelectedItem(dataset.getTemporalResolution());
         temporalResolutionsCombo.setName("temporalResolutions");
         temporalResolutionsCombo.setPreferredSize(new Dimension(100, 20));
-        valuesPanel.add(temporalResolutionsCombo);
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 12)));
+        layoutGenerator.addLabelWidgetPair("Temporal Resolution", temporalResolutionsCombo, panel);
 
-        // TODO: lookup sectors
+        // sectors: TODO: lookup sectors
         sectors = new DefaultListModel();
-        sectors.copyInto(new String[] { "A", "B" });
-        valuesPanel.add(createList("sectors", sectors));
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 8)));
+        dumptArrayIntoListModel(new String[] { "A", "B" }, sectors);
+        layoutGenerator.addLabelWidgetPair("Sectors", createList("sectors", sectors), panel);
 
+        // region
         region = new TextField("region", dataset.getRegion(), 15);
-        valuesPanel.add(region);
-        valuesPanel.add(Box.createRigidArea(new Dimension(1, 6)));
+        layoutGenerator.addLabelWidgetPair("Region", region, panel);
 
-        // TODO: lookup countries
+        // country - TODO: lookup countries
         countries = new DefaultListModel();
-        countries.copyInto(new String[] { dataset.getCountry(), "Jamaica" });
-        JScrollPane list = createList("countries", countries);
-        valuesPanel.add(list);
+        dumptArrayIntoListModel(new String[] { dataset.getCountry(), "Jamaica" }, countries);
+        layoutGenerator.addLabelWidgetPair("Country", createList("countries", countries), panel);
 
-        panel.add(valuesPanel);
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
 
         return panel;
+    }
+
+    private void dumptArrayIntoListModel(String[] elements, DefaultListModel listModel) {
+        for (int i = 0; i < elements.length; i++) {
+            listModel.addElement(elements[i]);
+        }
     }
 
     private JScrollPane createList(String name, ListModel model) {
@@ -216,10 +200,6 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         scrollPane.setPreferredSize(new Dimension(100, 20));
 
         return scrollPane;
-    }
-
-    private String format(Date date) {
-        return DATE_FORMATTER.format(date);
     }
 
     private JPanel createOverviewSection() {
@@ -236,10 +216,8 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
         // description
         description = new TextArea("description", dataset.getDescription());
-        description.setSize(20, 45);
-        JScrollPane scrollPane = new JScrollPane(description, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+        JScrollPane scrollPane = new JScrollPane(description, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
         layoutGenerator.addLabelWidgetPair("Description", scrollPane, panel);
 
         // project
@@ -271,10 +249,6 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         return datasetTypeLabel;
     }
 
-    private Border createBorder() {
-        return BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
-    }
-
     public void updateDataset(EmfDataset dataset) {
         dataset.setName(name.getText());
         dataset.setDescription(description.getText());
@@ -295,4 +269,36 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         }
     }
 
+    public class FormattedTextField extends JFormattedTextField {
+
+        public FormattedTextField(String name, Object value, Format format) {
+            super(format);
+            super.setName(name);
+            super.setValue(value);
+
+            super.setInputVerifier(new FormattedTextFieldVerifier());
+        }
+
+    }
+
+    public class FormattedTextFieldVerifier extends InputVerifier {
+        public boolean verify(JComponent input) {
+            JFormattedTextField ftf = (JFormattedTextField) input;
+            AbstractFormatter formatter = ftf.getFormatter();
+            String text = ftf.getText();
+            try {
+                formatter.stringToValue(text);
+                messagePanel.clear();
+            } catch (ParseException pe) {
+                messagePanel.setError("Invalid date - " + text);
+                return false;
+            }
+
+            return true;
+        }
+
+        public boolean shouldYieldFocus(JComponent input) {
+            return verify(input);
+        }
+    }
 }

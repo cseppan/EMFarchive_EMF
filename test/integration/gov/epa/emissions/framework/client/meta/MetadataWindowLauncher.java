@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.io.importer.TemporalResolution;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.Container;
@@ -22,6 +23,7 @@ public class MetadataWindowLauncher {
                 + "owners to take a look at their properties.");
         dataset.setStartDateTime(new Date());
         dataset.setStopDateTime(new Date());
+        dataset.setTemporalResolution(TemporalResolution.MONTHLY.getName());
 
         MetadataWindow view = new MetadataWindow();
         MetadataPresenter presenter = new MetadataPresenter(dataset, null);

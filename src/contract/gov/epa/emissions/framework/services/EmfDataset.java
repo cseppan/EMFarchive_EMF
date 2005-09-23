@@ -173,6 +173,7 @@ public class EmfDataset implements Dataset {
         return creator;
     }
 
+    //FIXME: should use TemporalResolution type instead
     public String getTemporalResolution() {
         return temporalResolution;
     }

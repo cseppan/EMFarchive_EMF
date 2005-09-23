@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -23,13 +24,13 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
     public MetadataWindow() {
         super("Dataset Properties Editor");
 
-        super.setSize(new Dimension(700, 450));
+        super.setSize(new Dimension(700, 485));
     }
 
-    private JTabbedPane createTabbedPane(EmfDataset dataset) {
+    private JTabbedPane createTabbedPane(EmfDataset dataset, MessagePanel messagePanel) {
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        tabbedPane.addTab("Summary", createSummaryTab(dataset));
+        tabbedPane.addTab("Summary", createSummaryTab(dataset, messagePanel));
         tabbedPane.addTab("Data", createTab());
         tabbedPane.addTab("Keywords", createTab());
         tabbedPane.addTab("Logs", createTab());
@@ -40,10 +41,10 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
         return tabbedPane;
     }
 
-    private SummaryTab createSummaryTab(EmfDataset dataset) {
-        SummaryTab view = new SummaryTab(dataset);
+    private SummaryTab createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
+        SummaryTab view = new SummaryTab(dataset, messagePanel);
         presenter.add(view);
-        
+
         return view;
     }
 
@@ -61,7 +62,7 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
-        panel.add(createTabbedPane(dataset), BorderLayout.CENTER);
+        panel.add(createTabbedPane(dataset, messagePanel), BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         contentPane.add(panel);
