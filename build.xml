@@ -163,11 +163,6 @@
     </target>
 
     <target name="integration-tests"
-            depends="compile, local-webservices-tests, remote-webservices-tests"
-            description="All Integration Tests"
-    />
-
-    <target name="local-webservices-tests"
             depends="compile"
             description="Integration of Client and Web Services"
     >
@@ -177,25 +172,6 @@
             <batchtest fork="yes" todir="${reports.integrationtests.dir}">
                 <fileset dir="${test.integration.dir}">
                     <include name="**/emissions/framework/**/*Test.java" />
-                    <exclude name="**/emissions/framework/**/Remote*Test.java"
-                    />
-                </fileset>
-            </batchtest>
-        </junit>
-    </target>
-
-    <target name="remote-webservices-tests"
-            depends="compile"
-            description="Integration of Client and Web Services"
-    >
-        <junit printsummary="yes" haltonfailure="yes">
-            <classpath refid="classpath" />
-            <formatter type="xml" />
-            <batchtest fork="yes" todir="${reports.integrationtests.dir}">
-                <fileset dir="${test.integration.dir}">
-                    <include name="**/emissions/framework/**/Remote*Test.java"
-                    />
-                    <exclude name="**/emissions/framework/**/Local*Test.java" />
                 </fileset>
             </batchtest>
         </junit>

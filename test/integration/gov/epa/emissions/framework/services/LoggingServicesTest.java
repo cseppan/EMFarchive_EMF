@@ -14,31 +14,29 @@ import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
 import java.util.Date;
 
-import org.apache.commons.configuration.ConfigurationException;
-
 /**
  * @author Conrad F. D'Cruz
  * 
  */
-public abstract class StatusServicesTestCase extends ServicesTestCase {
+public class LoggingServicesTest extends ServicesTestCase {
 
-    private StatusServices service;
+    private LoggingServices service;
 
-    public StatusServicesTestCase(String baseUrlProperty) throws ConfigurationException {
-        super(baseUrlProperty);
-
+    protected void setUp() {
         ServiceLocator locator = new RemoteServiceLocator(super.baseUrl);
-        service = locator.getStatusServices();
+        service = locator.getLoggingServices();
     }
 
     public void testInsert() throws EmfException {
-        Status aStat = new Status();
-        aStat.setMessage("import started for file XYZABC");
-        aStat.setMessageType("INFOMATICA");
-        aStat.setTimestamp(new Date());
-        aStat.setUsername("cdcruz");
+        AccessLog al = new AccessLog();
+        al.setDatasetid(1);
+        al.setDescription("FOO BAR");
+        al.setFolderPath("somepath");
+        al.setTimestamp(new Date());
+        al.setUsername("jbond");
+        al.setVersion("v1");
 
-        service.setStatus(aStat);
+        service.setAccessLog(al);
     }
 
 }

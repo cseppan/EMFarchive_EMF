@@ -4,14 +4,8 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
-import org.apache.commons.configuration.ConfigurationException;
-
-public abstract class UserServicesTestCase extends ServicesTestCase {
+public class UserServicesTest extends ServicesTestCase {
     private UserServices service;
-
-    protected UserServicesTestCase(String baseUrlProperty) throws ConfigurationException {
-        super(baseUrlProperty);
-    }
 
     protected void setUp() {
         ServiceLocator serviceLocator = new RemoteServiceLocator(baseUrl);

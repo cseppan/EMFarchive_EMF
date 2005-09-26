@@ -8,17 +8,11 @@ import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import java.io.File;
 import java.util.Random;
 
-import org.apache.commons.configuration.ConfigurationException;
-
-public abstract class ExImServicesTestCase extends ServicesTestCase {
+public class ExImServicesTestCase extends ServicesTestCase {
 
     protected ExImServices eximService;
 
     private UserServices userService;
-
-    protected ExImServicesTestCase(String baseUrlProperty) throws ConfigurationException {
-        super(baseUrlProperty);
-    }
 
     protected void setUp() {
         RemoteServiceLocator serviceLocator = new RemoteServiceLocator(baseUrl);
