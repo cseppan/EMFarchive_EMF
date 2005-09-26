@@ -1,4 +1,5 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.db;
+
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;

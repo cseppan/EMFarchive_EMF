@@ -8,16 +8,12 @@
  */
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.db.DbUpdate;
 
 import java.util.Date;
 
-/**
- * @author Conrad F. D'Cruz
- * 
- */
 public class LoggingServicesTest extends ServicesTestCase {
 
     private LoggingServices service;
@@ -27,16 +23,21 @@ public class LoggingServicesTest extends ServicesTestCase {
         service = locator.getLoggingServices();
     }
 
-    public void testInsert() throws EmfException {
-        AccessLog al = new AccessLog();
-        al.setDatasetid(1);
-        al.setDescription("FOO BAR");
-        al.setFolderPath("somepath");
-        al.setTimestamp(new Date());
-        al.setUsername("jbond");
-        al.setVersion("v1");
+    public void testInsert() throws Exception {
+        AccessLog log = new AccessLog();
+        int datasetId = 1;
+        log.setDatasetid(datasetId);
+        log.setDescription("FOO BAR");
+        log.setFolderPath("somepath");
+        log.setTimestamp(new Date());
+        log.setUsername("jbond");
+        log.setVersion("v1");
 
-        service.setAccessLog(al);
+        try {
+            service.setAccessLog(log);
+        } finally {
+            new DbUpdate().delete("dataset_access_logs", "dataset_id", datasetId);
+        }
     }
 
 }

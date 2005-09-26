@@ -18,6 +18,7 @@
     <property name="test.dir" value="test" />
     <property name="test.unit.dir" value="${test.dir}/unit" />
     <property name="test.integration.dir" value="${test.dir}/integration" />
+    <property name="test.commons.dir" value="${test.dir}/commons" />
     <property name="test.uat.dir" value="${test.dir}/uat" />
 
     <property name="build.home" value="build/sandbox" />
@@ -127,6 +128,11 @@
     </target>
 
     <target name="compile-tests" depends="clean, init, compile-src">
+        <javac srcdir="${test.commons.dir}"
+               destdir="${build.classes.dir}"
+               classpathref="classpath"
+               debug="on"
+        />
         <javac srcdir="${test.unit.dir}"
                destdir="${build.classes.dir}"
                classpathref="classpath"

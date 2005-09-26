@@ -1,6 +1,4 @@
-package gov.epa.emissions.framework.client.exim;
-
-import gov.epa.emissions.framework.client.DbUpdate;
+package gov.epa.emissions.framework.db;
 
 import java.sql.SQLException;
 

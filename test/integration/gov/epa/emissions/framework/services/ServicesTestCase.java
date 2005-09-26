@@ -1,18 +1,20 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import junit.framework.TestCase;
+
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.SystemConfiguration;
 
-import junit.framework.TestCase;
-
 public abstract class ServicesTestCase extends TestCase {
     protected String baseUrl;
 
-    public ServicesTestCase() {
-        this.baseUrl = "emf.services.url";
+    protected ServiceLocator serviceLocator;
 
+    public ServicesTestCase() {
         CompositeConfiguration config = new CompositeConfiguration();
         config.addConfiguration(new SystemConfiguration());
 
@@ -26,6 +28,7 @@ public abstract class ServicesTestCase extends TestCase {
             throw new RuntimeException("could not read config file - " + configFile);
         }
 
-        this.baseUrl = config.getString(baseUrl);
+        this.baseUrl = config.getString("emf.services.url");
+        this.serviceLocator = new RemoteServiceLocator(baseUrl);
     }
 }

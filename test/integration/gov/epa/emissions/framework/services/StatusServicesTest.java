@@ -8,33 +8,31 @@
  */
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.db.DbUpdate;
 
 import java.util.Date;
 
-/**
- * @author Conrad F. D'Cruz
- * 
- */
 public class StatusServicesTest extends ServicesTestCase {
 
     private StatusServices service;
 
-   protected void setUp() {
-        ServiceLocator locator = new RemoteServiceLocator(super.baseUrl);
-        service = locator.getStatusServices();
+    protected void setUp() {
+        service = super.serviceLocator.getStatusServices();
     }
 
-    public void testInsert() throws EmfException {
-        Status aStat = new Status();
-        aStat.setMessage("import started for file XYZABC");
-        aStat.setMessageType("INFOMATICA");
-        aStat.setTimestamp(new Date());
-        aStat.setUsername("cdcruz");
+    public void testInsert() throws Exception {
+        Status status = new Status();
+        status.setMessage("import started for file XYZABC");
+        status.setMessageType("INFOMATICA");
+        status.setTimestamp(new Date());
+        String username = "cdcruz";
+        status.setUsername(username);
 
-        service.setStatus(aStat);
+        try {
+            service.setStatus(status);
+        } finally {
+            new DbUpdate().deleteAll("statusmessages");
+        }
     }
 
 }

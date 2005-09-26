@@ -3,21 +3,33 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.importer.DatasetTypes;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
+import gov.epa.emissions.framework.db.ExImDbUpdate;
 
 import java.io.File;
 import java.util.Random;
 
-public class ExImServicesTestCase extends ServicesTestCase {
+public class ExImServicesTest extends ServicesTestCase {
 
     protected ExImServices eximService;
 
     private UserServices userService;
 
+    private EmfDataset dataset;
+
     protected void setUp() {
-        RemoteServiceLocator serviceLocator = new RemoteServiceLocator(baseUrl);
         eximService = serviceLocator.getExImServices();
         userService = serviceLocator.getUserServices();
+
+        dataset = new EmfDataset();
+        Random random = new Random();
+        dataset.setName("ORL NonPoint - ExImServicesTest" + random.nextInt());
+        dataset.setCreator("creator");
+    }
+
+    protected void tearDown() throws Exception {
+        ExImDbUpdate dbUpdate = new ExImDbUpdate();
+        dbUpdate.deleteAll("dataset_access_logs");
+        dbUpdate.deleteAll("datasets");
     }
 
     public void testFetchDatasetTypesReturnsFourORLTypes() throws EmfException {
@@ -25,7 +37,7 @@ public class ExImServicesTestCase extends ServicesTestCase {
         assertTrue("Should have atleast 4 ORL types", datasetTypes.length >= 4);
     }
 
-    public void testImportOrlNonPoint() throws EmfException {
+    public void testImportOrlNonPoint() throws Exception {
         DatasetType datasetType = new DatasetType();
         datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
         User user = userService.getUser("emf");
@@ -33,25 +45,16 @@ public class ExImServicesTestCase extends ServicesTestCase {
         File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
         String filename = "arinv.nonpoint.nti99_NC.txt";
 
-        EmfDataset dataset = new EmfDataset();
-        Random random = new Random();// FIXME: drop test data during setup
-        dataset.setName("ORL NonPoint - Test" + random.nextInt());
-        dataset.setCreator("creator");
-
         eximService.startImport(user, repository.getAbsolutePath(), filename, dataset, datasetType);
 
         // FIXME: verify that import is complete
     }
 
-    public void testExportOrlNonPoint() throws EmfException {
+    public void testExportOrlNonPoint() throws Exception {
         DatasetType datasetType = new DatasetType();
         datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
         User user = userService.getUser("emf");
 
-        EmfDataset dataset = new EmfDataset();
-        Random random = new Random();// FIXME: drop test data during setup
-        dataset.setName("ORL NonPoint - Test" + random.nextInt());
-        dataset.setCreator("creator");
         dataset.setDatasetType("ORL Nonpoint Inventory");
         dataset.setDescription("description");
         dataset.setStatus("imported");
@@ -73,7 +76,7 @@ public class ExImServicesTestCase extends ServicesTestCase {
                 "HELLO EMF ACCESSLOGS TESTCASE");
 
         // FIXME: verify the exported file exists
-
+        Thread.sleep(2000);// wait, until the export is complete
     }
 
 }

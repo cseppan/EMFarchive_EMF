@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -42,6 +42,10 @@ public class DbUpdate {
         dataset.addTable(table, "SELECT * from " + table + " WHERE " + name + " ='" + value + "'");
 
         doDelete(dataset);
+    }
+
+    public void delete(String table, String name, int value) throws SQLException, DatabaseUnitException {
+        delete(table, name, value + "");
     }
 
 }

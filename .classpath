@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="test/integration"/>
+	<classpathentry kind="src" path="test/commons"/>
 	<classpathentry kind="src" path="src/client"/>
 	<classpathentry kind="src" path="src/contract"/>
 	<classpathentry kind="src" path="src/services"/>
