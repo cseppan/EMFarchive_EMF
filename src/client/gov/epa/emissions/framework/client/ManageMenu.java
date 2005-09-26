@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.admin.MyProfileWindow;
 import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
 import gov.epa.emissions.framework.client.admin.UpdateUserWindow;
 import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
@@ -31,7 +32,7 @@ public class ManageMenu extends JMenu {
 
     private UserManagerWindow userManagerView;
 
-    private UpdateUserWindow updateUserView;
+    private UpdateUserWindow myProfileView;
 
     private DatasetsBrowserWindow datasetsBrowserView;
 
@@ -61,7 +62,7 @@ public class ManageMenu extends JMenu {
         JMenuItem menuItem = new JMenuItem("My Profile");
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                displayUpdateUser(session);
+                displayMyProfile(session);
             }
         });
 
@@ -112,18 +113,18 @@ public class ManageMenu extends JMenu {
         presenter.display(datasetsBrowserView);
     }
 
-    private void displayUpdateUser(EmfSession session) {
-        if (updateUserView != null) {
-            updateUserView.bringToFront();
+    private void displayMyProfile(EmfSession session) {
+        if (myProfileView != null) {
+            myProfileView.bringToFront();
             return;
         }
 
-        updateUserView = new UpdateUserWindow(session.getUser());
-        windowLayoutManager.add(updateUserView);
-        desktop.add(updateUserView);
+        myProfileView = new MyProfileWindow(session.getUser(), desktop);
+        windowLayoutManager.add(myProfileView);
+        desktop.add(myProfileView);
 
         UpdateUserPresenter presenter = new UpdateUserPresenter(session.getUserServices());
-        presenter.display(updateUserView);
+        presenter.display(myProfileView);
     }
 
     private JMenuItem createDisabledMenuItem(String name) {

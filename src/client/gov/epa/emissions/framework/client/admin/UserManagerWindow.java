@@ -103,8 +103,8 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
 
     private void updateUser(User updateUser) {
         // FIXME: drive this logic via Presenter
-        UpdateUserWindow view = updateUser.equals(user) ? new UpdateUserWindow(updateUser) : new UpdateUserWindow(
-                updateUser, new AddAdminOption());
+        UpdateUserWindow view = updateUser.equals(user) ? new DisposableUpdateUserWindow(updateUser)
+                : new DisposableUpdateUserWindow(updateUser, new AddAdminOption());
 
         getDesktopPane().add(view);
 
