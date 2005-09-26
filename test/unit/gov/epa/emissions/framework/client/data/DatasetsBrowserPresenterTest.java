@@ -3,6 +3,9 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportView;
+import gov.epa.emissions.framework.client.exim.ImportPresenter;
+import gov.epa.emissions.framework.client.exim.ImportPresenterStub;
+import gov.epa.emissions.framework.client.exim.ImportView;
 import gov.epa.emissions.framework.client.meta.MetadataPresenter;
 import gov.epa.emissions.framework.client.meta.MetadataView;
 import gov.epa.emissions.framework.services.DataServices;
@@ -10,7 +13,7 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.WindowLayoutManager;
 
 import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.constraint.IsInstanceOf;
 
 public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
@@ -59,7 +62,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         presenter.doRefresh();
     }
 
-    public void testShouldNotifyViewToDisplayExportViewOnClickOfExportButton() {
+    public void testShouldDisplayExportViewOnClickOfExportButton() {
         EmfDataset dataset1 = new EmfDataset();
         dataset1.setName("name 1");
         EmfDataset[] datasets = new EmfDataset[] { dataset1 };
@@ -72,6 +75,17 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         exportPresenter.expects(once()).method("display").with(eq(exportViewProxy));
 
         presenter.doExport(exportViewProxy, (ExportPresenter) exportPresenter.proxy(), datasets);
+    }
+
+    public void testShouldDisplayImportViewOnClickOfNewButton() throws EmfException {
+        view.expects(once()).method("clearMessage").withNoArguments();
+
+        Mock importView = mock(ImportView.class);
+        Mock importPresenter = mock(ImportPresenterStub.class);
+        ImportView importViewProxy = (ImportView) importView.proxy();
+        importPresenter.expects(once()).method("display").with(eq(importViewProxy));
+
+        presenter.doNew(importViewProxy, (ImportPresenter) importPresenter.proxy());
     }
 
     public void testShouldDisplayInformationalMessageOnClickOfExportButtonIfNoDatasetsAreSelected() {

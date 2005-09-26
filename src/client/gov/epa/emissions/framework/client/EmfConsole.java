@@ -46,7 +46,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         this.serviceLocator = session.getServiceLocator();
 
         this.windowLayoutManager = new DefaultWindowLayoutManager(this);
-        
+
         setProperties();
         setLayout(session);
         showStatus();
@@ -78,7 +78,9 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private void setProperties() {
         super.setSize(new Dimension(900, 700));
+        // FIXME: prompt the user ?
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        super.setResizable(true);
     }
 
     private JMenuBar createMenuBar(EmfSession session, JDesktopPane desktop) {

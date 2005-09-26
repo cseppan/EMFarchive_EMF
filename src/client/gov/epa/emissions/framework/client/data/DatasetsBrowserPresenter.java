@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportView;
+import gov.epa.emissions.framework.client.exim.ImportPresenter;
+import gov.epa.emissions.framework.client.exim.ImportView;
 import gov.epa.emissions.framework.client.meta.MetadataPresenter;
 import gov.epa.emissions.framework.client.meta.MetadataView;
 import gov.epa.emissions.framework.services.DataServices;
@@ -48,7 +50,7 @@ public class DatasetsBrowserPresenter {
     public void doRefresh() throws EmfException {
         // FIXME: fix the type casting
         view.refresh(dataServices.getDatasets());
-        
+
         view.clearMessage();
     }
 
@@ -58,6 +60,12 @@ public class DatasetsBrowserPresenter {
         presenter.display(metadataView);
 
         view.clearMessage();
+    }
+
+    public void doNew(ImportView importView, ImportPresenter importPresenter) throws EmfException {
+        view.clearMessage();
+
+        importPresenter.display(importView);
     }
 
 }

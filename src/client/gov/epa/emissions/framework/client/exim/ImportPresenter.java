@@ -36,6 +36,8 @@ public class ImportPresenter {
         dataset.setCreator(user.getFullName());
         dataset.setName(datasetName);
         dataset.setCreatedDateTime(new Date());
+        dataset.setModifiedDateTime(dataset.getCreatedDateTime());
+        dataset.setAccessedDateTime(dataset.getCreatedDateTime());
 
         // String filepath = directory + File.separator + filename;
         model.startImport(user, directory, filename, dataset, type);

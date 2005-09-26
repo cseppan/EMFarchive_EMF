@@ -6,11 +6,14 @@ import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.exim.DefaultExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
+import gov.epa.emissions.framework.client.exim.ImportPresenter;
+import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.meta.MetadataWindow;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.services.DataServices;
@@ -41,7 +44,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private JPanel layout;
 
-    private SingleLineMessagePanel messagePanel;
+    private MessagePanel messagePanel;
 
     private DatasetsBrowserPresenter presenter;
 
@@ -142,14 +145,34 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
 
-        JButton metadata = new Button("Properties", new AbstractAction() {
+        JButton newDataset = new Button("New", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    doNewDataset();
+                } catch (EmfException e) {
+                    showError("Could not open Import window (for creation of a new dataset)");
+                }
+            }
+        });
+        panel.add(newDataset);
+
+        JButton properties = new Button("Properties", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doShowMetadata();
             }
         });
-        panel.add(metadata);
+        panel.add(properties);
 
         return panel;
+    }
+
+    protected void doNewDataset() throws EmfException {
+        ImportWindow importView = new ImportWindow(session.getExImServices(), desktop);
+        // windowLayoutManager.add(importView); FIXME: needs layout
+        desktop.add(importView);
+
+        ImportPresenter importPresenter = new ImportPresenter(session.getUser(), session.getExImServices());
+        presenter.doNew(importView, importPresenter);
     }
 
     private JPanel createRightControlPanel() {

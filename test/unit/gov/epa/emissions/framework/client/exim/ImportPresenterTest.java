@@ -50,7 +50,10 @@ public class ImportPresenterTest extends MockObjectTestCase {
         Constraint datasetNameConstraint = new HasPropertyWithValue("name", eq(datasetName));
         Constraint datasetCreatorConstraint = new HasPropertyWithValue("creator", eq(user.getFullName()));
         Constraint datasetCreatedDateTimeConstraint = new HasPropertyWithValue("createdDateTime", new IsInstanceOf(Date.class));
-        Constraint datasetConstraints = new And(new And(datasetCreatorConstraint, datasetNameConstraint), datasetCreatedDateTimeConstraint);
+        Constraint datasetAccessedDateTimeConstraint = new HasPropertyWithValue("accessedDateTime", new IsInstanceOf(Date.class));
+        Constraint datasetModifiedDateTimeConstraint = new HasPropertyWithValue("modifiedDateTime", new IsInstanceOf(Date.class));
+        Constraint datasetDateTimeConstraints = new And(new And(datasetCreatedDateTimeConstraint, datasetAccessedDateTimeConstraint), datasetModifiedDateTimeConstraint);
+        Constraint datasetConstraints = new And(new And(datasetCreatorConstraint, datasetNameConstraint), datasetDateTimeConstraints);
         
         String dir = "dir";
         String filename = "filename";

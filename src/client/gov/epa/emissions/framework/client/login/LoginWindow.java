@@ -151,7 +151,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        JLabel forgotPassword = new JLabel("    Forgot your Password ?");
+        JLabel forgotPassword = new JLabel("    Forgot your Password?");
         forgotPassword.setEnabled(false);
         forgotPassword.setToolTipText("To be implemented");
         JPanel forgotPasswordPanel = new JPanel(new BorderLayout());

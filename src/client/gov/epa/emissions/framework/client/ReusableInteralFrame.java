@@ -7,7 +7,7 @@ import javax.swing.JDesktopPane;
 
 public abstract class ReusableInteralFrame extends EmfInternalFrame {
 
-    private JDesktopPane desktop;
+    protected JDesktopPane desktop;
 
     public ReusableInteralFrame(String title, JDesktopPane desktop) {
         super(title);
