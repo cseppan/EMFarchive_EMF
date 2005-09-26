@@ -1,12 +1,11 @@
 package gov.epa.emissions.framework.client.exim;
 
-public interface ExportView {
+import gov.epa.emissions.framework.client.EmfView;
+
+public interface ExportView extends EmfView {
 
     void observe(ExportPresenter presenter);
 
     void setMostRecentUsedFolder(String mostRecentUsedFolder);
 
-    void close();
-
-    void display();
 }

@@ -44,6 +44,8 @@ public class DatasetsBrowserPresenter {
         }
 
         view.clearMessage();
+        windowLayoutManager.add(exportView);
+        
         presenter.display(exportView);
     }
 
@@ -54,17 +56,19 @@ public class DatasetsBrowserPresenter {
         view.clearMessage();
     }
 
+    // TODO: Is this a better style/pattern compared to doNew ?
     public void doShowMetadata(MetadataView metadataView, EmfDataset dataset) {
-        MetadataPresenter presenter = new MetadataPresenter(dataset, dataServices);
-        windowLayoutManager.add(metadataView);
-        presenter.display(metadataView);
-
         view.clearMessage();
+        windowLayoutManager.add(metadataView);
+        
+        MetadataPresenter presenter = new MetadataPresenter(dataset, dataServices);
+        presenter.display(metadataView);
     }
 
     public void doNew(ImportView importView, ImportPresenter importPresenter) throws EmfException {
         view.clearMessage();
-
+        windowLayoutManager.add(importView);
+        
         importPresenter.display(importView);
     }
 

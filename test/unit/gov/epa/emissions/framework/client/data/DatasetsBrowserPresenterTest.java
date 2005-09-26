@@ -74,6 +74,8 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         ExportView exportViewProxy = (ExportView) exportView.proxy();
         exportPresenter.expects(once()).method("display").with(eq(exportViewProxy));
 
+        layout.expects(once()).method("add").with(eq(exportViewProxy));
+
         presenter.doExport(exportViewProxy, (ExportPresenter) exportPresenter.proxy(), datasets);
     }
 
@@ -84,6 +86,8 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         Mock importPresenter = mock(ImportPresenterStub.class);
         ImportView importViewProxy = (ImportView) importView.proxy();
         importPresenter.expects(once()).method("display").with(eq(importViewProxy));
+
+        layout.expects(once()).method("add").with(eq(importViewProxy));
 
         presenter.doNew(importViewProxy, (ImportPresenter) importPresenter.proxy());
     }
