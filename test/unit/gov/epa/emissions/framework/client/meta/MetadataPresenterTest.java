@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -39,14 +40,35 @@ public class MetadataPresenterTest extends MockObjectTestCase {
         presenter.doClose();
     }
 
-    public void testShouldUpdateDatasetUsingDataServicesOnSave() {
+    public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() {
         dataServices.expects(once()).method("updateDataset").with(eq(dataset));
 
         Mock summaryView = mock(SummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
         presenter.add((SummaryTabView) summaryView.proxy());
 
-        presenter.doSave();
+        Mock datasetsBrowser = mock(DatasetsBrowserView.class);
+        EmfDataset[] datasets = new EmfDataset[0];
+        dataServices.stubs().method("getDatasets").will(returnValue(datasets));
+        datasetsBrowser.expects(once()).method("refresh").with(eq(datasets));
+        view.expects(once()).method("close");
+
+        presenter.doSave((DatasetsBrowserView) datasetsBrowser.proxy());
+    }
+
+    public void testShouldDisplayErrorMessageOnDatasetsBrowserIfGettingUpdatedDatasetsFailOnSave() {
+        dataServices.expects(once()).method("updateDataset").with(eq(dataset));
+
+        Mock summaryView = mock(SummaryTabView.class);
+        summaryView.expects(once()).method("updateDataset").with(eq(dataset));
+        presenter.add((SummaryTabView) summaryView.proxy());
+
+        Mock datasetsBrowser = mock(DatasetsBrowserView.class);
+        dataServices.stubs().method("getDatasets").will(throwException(new EmfException("failure")));
+        datasetsBrowser.expects(once()).method("showError").with(
+                eq("Could not refresh Datasets, after updating " + dataset.getName()));
+
+        presenter.doSave((DatasetsBrowserView) datasetsBrowser.proxy());
     }
 
     public void testShouldDisplayErrorMessageOnErrorDuringSave() {
@@ -58,6 +80,6 @@ public class MetadataPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("showError").with(eq("Could not update dataset - " + dataset.getName()));
 
         presenter.add((SummaryTabView) summaryView.proxy());
-        presenter.doSave();
+        presenter.doSave(null);
     }
 }

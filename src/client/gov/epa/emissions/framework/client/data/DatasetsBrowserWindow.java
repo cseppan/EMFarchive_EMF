@@ -193,14 +193,14 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         List datasets = getSelectedDatasets();
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
-            MetadataWindow view = new MetadataWindow(session, parentConsole);
+            MetadataWindow view = new MetadataWindow(session, this, parentConsole);
             getDesktopPane().add(view);
 
             presenter.doShowMetadata(view, (EmfDataset) iter.next());
         }
     }
 
-    private void showError(String message) {
+    public void showError(String message) {
         messagePanel.setError(message);
         refreshLayout();
     }

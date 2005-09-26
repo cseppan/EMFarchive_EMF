@@ -11,5 +11,8 @@ public interface DatasetsBrowserView extends EmfView {
 
     void showMessage(String message);
 
+    void showError(String message);
+
     void clearMessage();
+
 }

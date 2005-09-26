@@ -216,7 +216,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         layoutGenerator.addLabelWidgetPair("Description", scrollPane, panel);
 
         // project
-        project = new TextField("project", 15);
+        project = new TextField("project", dataset.getProject(), 15);
         project.setMaximumSize(new Dimension(300, 15));
 
         layoutGenerator.addLabelWidgetPair("Project", project, panel);
@@ -247,11 +247,12 @@ public class SummaryTab extends JPanel implements SummaryTabView {
     public void updateDataset(EmfDataset dataset) {
         dataset.setName(name.getText());
         dataset.setDescription(description.getText());
+        dataset.setProject(project.getText());
         dataset.setStartDateTime(toDate(startDateTime.getText()));
         dataset.setStopDateTime(toDate(endDateTime.getText()));
         dataset.setTemporalResolution((String) temporalResolutions.getSelectedItem());
         dataset.setRegion(region.getText());
-        // TODO: selected country needs to be captured
+        // FIXME: selected country needs to be captured
         // dataset.setCountry(countries.getSiz);
     }
 

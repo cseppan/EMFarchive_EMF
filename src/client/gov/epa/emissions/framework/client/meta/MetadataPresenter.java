@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -30,13 +31,27 @@ public class MetadataPresenter {
         view.close();
     }
 
-    public void doSave() {
+    public void doSave(DatasetsBrowserView browser) {
         try {
-            summaryTabPresenter.save();
-            dataServices.updateDataset(dataset);
+            updateDataset();
         } catch (EmfException e) {
             view.showError("Could not update dataset - " + dataset.getName());
+            return;
         }
+
+        try {
+            browser.refresh(dataServices.getDatasets());
+        } catch (EmfException e) {
+            browser.showError("Could not refresh Datasets, after updating " + dataset.getName());
+            return;
+        }
+
+        doClose();
+    }
+
+    private void updateDataset() throws EmfException {
+        summaryTabPresenter.save();
+        dataServices.updateDataset(dataset);
     }
 
     public void add(SummaryTabView view) {

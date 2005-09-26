@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.LoggingServices;
 
@@ -29,9 +30,12 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
 
     private EmfSession session;
 
-    public MetadataWindow(EmfSession session, EmfFrame parentConsole) {
+    private DatasetsBrowserView datasetsBrowser;
+
+    public MetadataWindow(EmfSession session, DatasetsBrowserView datasetsBrowser, EmfFrame parentConsole) {
         super("Dataset Properties Editor");
         this.session = session;
+        this.datasetsBrowser = datasetsBrowser;
         this.parentConsole = parentConsole;
 
         super.setSize(new Dimension(700, 485));
@@ -109,7 +113,7 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
 
         Button save = new Button("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                presenter.doSave();
+                presenter.doSave(datasetsBrowser);
             }
         });
         buttonsPanel.add(save);

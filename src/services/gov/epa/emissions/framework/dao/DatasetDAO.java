@@ -81,19 +81,18 @@ public class DatasetDAO {
         return datasets;
     }// getDatasetTypes()
 
-    public static void insertDataset(EmfDataset aDset, Session session) {
+    public static void insertDataset(EmfDataset dataset, Session session) {
         Transaction tx = session.beginTransaction();
-        session.save(aDset);
+        session.save(dataset);
         tx.commit();
     }
 
-    public static void updateDataset(EmfDataset aDset, Session session){
-    	log.debug("updating dataset: " + aDset.getDatasetid());
+    public static void updateDataset(EmfDataset dataset, Session session){
+    	log.debug("updating dataset: " + dataset.getDatasetid());
         Transaction tx = session.beginTransaction();
-        EmfDataset updateDataset = (EmfDataset) session.load(EmfDataset.class,new Long(aDset.getDatasetid()));
-        session.update(aDset);
+        session.update(dataset);
         tx.commit();    	
-    	log.debug("updating dataset: " + aDset.getDatasetid());
+    	log.debug("updating dataset: " + dataset.getDatasetid());
     }
 
 }
