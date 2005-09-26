@@ -21,6 +21,8 @@ public class TestDatasets {
 		EmfDataset aDset = getDataset();
 		System.out.println("READY TO UPDATE: " + aDset.getName());
 		aDset.setName("Busstop");
+		aDset.setProject("YetannuderProject");
+		aDset.setSector("YetAnnuderSector");
 		updateDataset(aDset);
 	}
 

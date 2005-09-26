@@ -13,6 +13,7 @@ package gov.epa.emissions.framework.services.impl;
 import gov.epa.emissions.commons.io.exporter.Exporter;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.AccessLog;
+import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.LoggingServices;
@@ -35,6 +36,7 @@ public class ExportTask implements Runnable {
 
     private User user;
     private File file;
+    private DataServices dataServices = null;
     private StatusServices statusServices = null;
 	private LoggingServices loggingServices = null;
     private EmfDataset dataset;
@@ -55,6 +57,7 @@ public class ExportTask implements Runnable {
 		this.dataset=dataset;
 		this.statusServices=svcHolder.getStatusSvc();
 		this.loggingServices =svcHolder.getLogSvc();
+		this.dataServices = svcHolder.getDataSvc();
 		this.exporter=exporter;
 		this.accesslog=accesslog;
 	}
@@ -69,6 +72,9 @@ public class ExportTask implements Runnable {
             exporter.run( dataset, file);
             //update access logs
             loggingServices.setAccessLog(accesslog);
+            //update dataset
+            dataServices.updateDataset(dataset);
+            //update status message
             setStatus(EMFConstants.END_EXPORT_MESSAGE_Prefix + dataset.getName() + ":" + file.getName());
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + file, e);
