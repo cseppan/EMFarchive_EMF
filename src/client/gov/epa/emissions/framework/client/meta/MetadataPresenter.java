@@ -50,7 +50,7 @@ public class MetadataPresenter {
     }
 
     private void updateDataset() throws EmfException {
-        summaryTabPresenter.save();
+        summaryTabPresenter.doSave();
         dataServices.updateDataset(dataset);
     }
 

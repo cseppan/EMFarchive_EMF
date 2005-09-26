@@ -7,6 +7,8 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
+import java.util.Date;
+
 public class ImportPresenter {
 
     private ImportView view;
@@ -20,7 +22,7 @@ public class ImportPresenter {
         this.model = model;
     }
 
-    public void notifyImport(String directory, String filename, String datasetName, DatasetType type)
+    public void doImport(String directory, String filename, String datasetName, DatasetType type)
             throws EmfException {
         if (datasetName.length() == 0)
             throw new UserException("Dataset Name should be specified");
@@ -33,12 +35,13 @@ public class ImportPresenter {
         EmfDataset dataset = new EmfDataset();
         dataset.setCreator(user.getFullName());
         dataset.setName(datasetName);
+        dataset.setCreatedDateTime(new Date());
 
         // String filepath = directory + File.separator + filename;
         model.startImport(user, directory, filename, dataset, type);
     }
 
-    public void notifyDone() {
+    public void doDone() {
         view.close();
     }
 

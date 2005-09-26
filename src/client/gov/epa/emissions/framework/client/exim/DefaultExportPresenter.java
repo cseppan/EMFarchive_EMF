@@ -5,6 +5,8 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImServices;
 
+import java.util.Date;
+
 public class DefaultExportPresenter implements ExportPresenter {
 
     private ExportView view;
@@ -27,19 +29,21 @@ public class DefaultExportPresenter implements ExportPresenter {
         view.display();
     }
 
-    // FIXME: have two separate, explicit methods for overwrite/no overwrite
-    public void notifyExport(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
+    public void doExport(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
         doExport(datasets, folder, true, purpose);
     }
 
     private void doExport(EmfDataset[] datasets, String folder, boolean overwrite, String purpose) throws EmfException {
+        for (int i = 0; i < datasets.length; i++) {
+            datasets[i].setAccessedDateTime(new Date());
+        }
         session.setMostRecentExportFolder(folder);
 
         ExImServices services = session.getExImServices();
         services.startExport(session.getUser(), datasets, folder, overwrite, purpose);
     }
 
-    public void notifyExportWithoutOverwrite(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
+    public void doExportWithoutOverwrite(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
         doExport(datasets, folder, false, purpose);
     }
 

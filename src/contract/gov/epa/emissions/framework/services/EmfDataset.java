@@ -35,7 +35,8 @@ public class EmfDataset implements Dataset {
     private int year;
 
     private String description;
-    private String status="imported";
+
+    private String status;
 
     private String datasetType;
 
@@ -56,62 +57,63 @@ public class EmfDataset implements Dataset {
     private Map datasources;
 
     private List tables;
+
     private String sector;
+
     private String project;
+
     private Date createdDateTime;
+
     private Date modifiedDateTime;
+
     private Date accessedDateTime;
-    
-	public Date getAccessedDateTime() {
-		return accessedDateTime;
-	}
 
-	public void setAccessedDateTime(Date accessedDateTime) {
-		this.accessedDateTime = accessedDateTime;
-	}
+    public Date getAccessedDateTime() {
+        return accessedDateTime;
+    }
 
-	public Date getCreatedDateTime() {
-		return createdDateTime;
-	}
+    public void setAccessedDateTime(Date accessedDateTime) {
+        this.accessedDateTime = accessedDateTime;
+    }
 
-	public void setCreatedDateTime(Date createdDateTime) {
-		this.createdDateTime = createdDateTime;
-	}
+    public Date getCreatedDateTime() {
+        return createdDateTime;
+    }
 
-	public Date getModifiedDateTime() {
-		return modifiedDateTime;
-	}
+    public void setCreatedDateTime(Date createdDateTime) {
+        this.createdDateTime = createdDateTime;
+    }
 
-	public void setModifiedDateTime(Date modifiedDateTime) {
-		this.modifiedDateTime = modifiedDateTime;
-	}
+    public Date getModifiedDateTime() {
+        return modifiedDateTime;
+    }
 
-	public String getProject() {
-		return project;
-	}
+    public void setModifiedDateTime(Date modifiedDateTime) {
+        this.modifiedDateTime = modifiedDateTime;
+    }
 
-	public void setProject(String project) {
-		this.project = project;
-	}
+    public String getProject() {
+        return project;
+    }
 
-	public String getSector() {
-		return sector;
-	}
+    public void setProject(String project) {
+        this.project = project;
+    }
 
-	public void setSector(String sector) {
-		this.sector = sector;
-	}
+    public String getSector() {
+        return sector;
+    }
 
-	/**
-	 * No argument constructor needed for hibernate
-	 * bean mapping
-	 * 
-	 */
+    public void setSector(String sector) {
+        this.sector = sector;
+    }
+
+    /**
+     * No argument constructor needed for hibernate bean mapping
+     * 
+     */
     public EmfDataset() {
-        tables = new ArrayList();
-        setCreatedDateTime(new Date());
-        setModifiedDateTime(new Date());
-        setAccessedDateTime(new Date());
+        tables = new ArrayList();        
     }
 
     public String getDatasetType() {
@@ -221,7 +223,7 @@ public class EmfDataset implements Dataset {
         return creator;
     }
 
-    //FIXME: should use TemporalResolution type instead
+    // FIXME: should use TemporalResolution type instead
     public String getTemporalResolution() {
         return temporalResolution;
     }
@@ -268,11 +270,11 @@ public class EmfDataset implements Dataset {
         return (name.equals(otherDataset.getName()));
     }
 
-	public String getStatus() {
-		return status;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

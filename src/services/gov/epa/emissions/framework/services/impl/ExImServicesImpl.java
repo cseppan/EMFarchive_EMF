@@ -25,7 +25,6 @@ import gov.epa.emissions.framework.services.User;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -202,12 +201,10 @@ public class ExImServicesImpl implements ExImServices {
                 svcHolder.setStatusSvc(new StatusServicesImpl());
                 svcHolder.setDataSvc(new DataServicesImpl());
                 Exporter exporter = exporterFactory.create(aDataset.getDatasetType());
-                Date lastAccessed = new Date();
-                aDataset.setAccessedDateTime(lastAccessed);
-                AccessLog accesslog = new AccessLog(user.getUsername(), aDataset.getDatasetid(), lastAccessed,
+                AccessLog accesslog = new AccessLog(user.getUsername(), aDataset.getDatasetid(), aDataset.getAccessedDateTime(),
                         "Version 1.0", purpose, dirName);
                 ExportTask eximTask = new ExportTask(user, file, aDataset, svcHolder, accesslog, exporter);
-                new Thread(eximTask).start();
+                threadPool.execute(eximTask);
             }
         } catch (Exception e) {
             log.error("Exception attempting to start export of file to folder: " + dirName, e);
@@ -233,8 +230,6 @@ public class ExImServicesImpl implements ExImServices {
 
         }
         cleanName = sbuf.toString() + ".txt";
-
-        // FIXME: Is Error checking for empty name needed?
 
         return cleanName;
     }

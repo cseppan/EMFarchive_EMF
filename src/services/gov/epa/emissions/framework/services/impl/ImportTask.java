@@ -67,6 +67,7 @@ public class ImportTask implements Runnable {
             importer.run(new File[] { file }, dataset, true);
 
             // if no errors then insert the dataset into the database
+            dataset.setStatus(DatasetStatus.IMPORTED);
             dataServices.insertDataset(dataset);
 
             setStatus(EMFConstants.END_IMPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());

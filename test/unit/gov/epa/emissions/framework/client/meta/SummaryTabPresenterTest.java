@@ -1,21 +1,26 @@
 package gov.epa.emissions.framework.client.meta;
 
+import java.util.Date;
+
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.core.constraint.IsInstanceOf;
 
 public class SummaryTabPresenterTest extends MockObjectTestCase {
 
     public void testUpdateDatasetOnSave() {
-        EmfDataset dataset = new EmfDataset();
-        dataset.setName("dataset");
-        
+        Mock dataset = mock(EmfDataset.class);
+        dataset.expects(once()).method("setModifiedDateTime").with(new IsInstanceOf(Date.class));
+
         Mock view = mock(SummaryTabView.class);
-        view.expects(once()).method("updateDataset").with(eq(dataset));
+        Object datasetProxy = dataset.proxy();
+        view.expects(once()).method("updateDataset").with(eq(datasetProxy));
 
-        SummaryTabPresenter presenter = new SummaryTabPresenter(dataset, (SummaryTabView) view.proxy());
+        SummaryTabPresenter presenter = new SummaryTabPresenter((EmfDataset) datasetProxy, (SummaryTabView) view
+                .proxy());
 
-        presenter.save();
+        presenter.doSave();
     }
 }

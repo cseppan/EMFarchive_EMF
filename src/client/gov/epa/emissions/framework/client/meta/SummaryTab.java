@@ -111,9 +111,9 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Status", new JLabel(dataset.getStatus()), panel);
-        layoutGenerator.addLabelWidgetPair("Last Modified Date", new JLabel(" "), panel);
-        layoutGenerator.addLabelWidgetPair("Last Accessed Date", new JLabel(" "), panel);
-        layoutGenerator.addLabelWidgetPair("Date of Creation", new JLabel(" "), panel);
+        layoutGenerator.addLabelWidgetPair("Last Modified Date", new JLabel(format(dataset.getModifiedDateTime())), panel);
+        layoutGenerator.addLabelWidgetPair("Last Accessed Date", new JLabel(format(dataset.getAccessedDateTime())), panel);
+        layoutGenerator.addLabelWidgetPair("Creation Date", new JLabel(format(dataset.getCreatedDateTime())), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
@@ -121,6 +121,10 @@ public class SummaryTab extends JPanel implements SummaryTabView {
                 10, 10);// xPad, yPad
 
         return panel;
+    }
+
+    private String format(Date date) {
+        return DATE_FORMATTER.format(date);
     }
 
     private JPanel createTimeSpaceSection() {

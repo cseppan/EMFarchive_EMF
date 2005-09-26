@@ -6,11 +6,14 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
+import java.util.Date;
+
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Constraint;
+import org.jmock.core.constraint.IsInstanceOf;
 
-public class ExportPresenterTest extends MockObjectTestCase {
+public class DefaultExportPresenterTest extends MockObjectTestCase {
 
     private Mock session;
 
@@ -31,10 +34,11 @@ public class ExportPresenterTest extends MockObjectTestCase {
         user.setUsername("user");
         user.setFullName("full name");
         String purpose = "HELLO EMF ACCESSLOGS FOR MOCK EXPORT";
-        EmfDataset dataset = new EmfDataset();
-        dataset.setName("dataset test");
-
-        EmfDataset[] datasets = new EmfDataset[] { dataset };
+        
+        Mock dataset = mock(EmfDataset.class);
+        dataset.expects(once()).method("setAccessedDateTime").with(new IsInstanceOf(Date.class));
+        
+        EmfDataset[] datasets = new EmfDataset[] { (EmfDataset) dataset.proxy() };
 
         Mock model = mock(ExImServices.class);
         model.expects(once()).method("startExport").with(
@@ -46,7 +50,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
 
         ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
 
-        presenter.notifyExport(datasets, folder, purpose);
+        presenter.doExport(datasets, folder, purpose);
     }
 
     public void testSendsExportRequestToEximServiceOnExportWithoutOverwrite() throws EmfException {
@@ -69,7 +73,7 @@ public class ExportPresenterTest extends MockObjectTestCase {
 
         ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
 
-        presenter.notifyExportWithoutOverwrite(datasets, folder, description);
+        presenter.doExportWithoutOverwrite(datasets, folder, description);
     }
 
     public void testClosesViewOnDoneExport() {

@@ -161,9 +161,9 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private void doExport() {
         try {
             if (!overwrite.isSelected())
-                presenter.notifyExportWithoutOverwrite(datasets, folder.getText(), purpose.getText());
+                presenter.doExportWithoutOverwrite(datasets, folder.getText(), purpose.getText());
             else
-                presenter.notifyExport(datasets, folder.getText(), purpose.getText());
+                presenter.doExport(datasets, folder.getText(), purpose.getText());
 
             messagePanel.setMessage("Started export. Please monitor the Status window "
                     + "to track your Export request.");

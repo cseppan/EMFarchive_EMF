@@ -150,7 +150,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         JButton done = new Button("Done", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 if (presenter != null)
-                    presenter.notifyDone();
+                    presenter.doDone();
             }
         });
         container.add(done);
@@ -170,7 +170,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     private void doImport() {
         try {
-            presenter.notifyImport(folder.getText(), filename.getText(), name.getText(),
+            presenter.doImport(folder.getText(), filename.getText(), name.getText(),
                     (DatasetType) datasetTypesModel.getSelectedItem());
             String message = "Started import. Please monitor the Status window to track your Import request.";
             messagePanel.setMessage(message);

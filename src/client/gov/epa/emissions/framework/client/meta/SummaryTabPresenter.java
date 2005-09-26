@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
+import java.util.Date;
+
 import gov.epa.emissions.framework.services.EmfDataset;
 
 public class SummaryTabPresenter {
@@ -13,7 +15,8 @@ public class SummaryTabPresenter {
         this.view = view;
     }
 
-    public void save() {
+    public void doSave() {
+        dataset.setModifiedDateTime(new Date());
         view.updateDataset(dataset);
     }
 
