@@ -50,8 +50,6 @@ public class ImportActions {
     }
 
     public void doImport(String type, String name, String filename) {
-        statusActions.clear();
-
         testcase.selectComboBoxItem(importWindow, "datasetTypes", type);
         testcase.setText(importWindow, "name", name);
 
@@ -64,22 +62,19 @@ public class ImportActions {
 
         testcase.click(importWindow, "import");
 
-        confirmImportCompletion(4000);
+        confirmImportCompletion(8000, type, filename);
     }
 
-    private void confirmImportCompletion(long waitTime) {
+    private void confirmImportCompletion(long waitTime, String type, String filename) {
         for (int i = 0; i < waitTime; i += 500) {
-            // FIXME: seems to fail sporadically ?
-            // if (statusActions.hasStarted(type, filename) &&
-            // statusActions.hasCompleted(type, filename))
-            // return;// success
+            if (statusActions.hasStartedImport(type, filename) && statusActions.hasCompletedImport(type, filename))
+                return;// success
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-
         Assert.fail("Did not find any completed status message after polling for " + waitTime + " msecs.");
     }
 

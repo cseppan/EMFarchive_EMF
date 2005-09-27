@@ -38,7 +38,6 @@ public class ImportORLDatasetTest extends UserAcceptanceTestCase {
         assertNotNull(importWindow);
 
         statusActions = new StatusActions(console, this);
-        statusActions.clear();
     }
 
     public void tearDown() throws Exception {
@@ -59,7 +58,7 @@ public class ImportORLDatasetTest extends UserAcceptanceTestCase {
 
     // FIXME: test fails, only as a part of a suite
     public void FIXME_testShouldImportORLNonRoad() throws Exception {
-        doImport(datasetName("ORL Nonroad Inventory"), new OrlImportAction() {
+        doImport(datasetName("ORLNonroadInventory"), new OrlImportAction() {
             public void run(String name) {
                 importActions.importOrlNonRoad(name);
             }
@@ -106,12 +105,12 @@ public class ImportORLDatasetTest extends UserAcceptanceTestCase {
             action.run(name);
             assertEquals(2, statusActions.messageCount());
         } finally {
-            new DbUpdate().delete("datasets", "name", name);
+            new DbUpdate().delete("emf.datasets", "name", name);
         }
     }
 
     private String datasetName(String value) {
-        return value + " UAT - " + new Random().nextInt();
+        return value + new Random().nextInt();
     }
 
     public void testShouldShowErrorMessageIfNameIsUnspecified() throws Exception {

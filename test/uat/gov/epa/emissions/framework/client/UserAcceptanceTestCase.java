@@ -61,6 +61,11 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
         field.setText(value);
     }
 
+    public String getText(Container window, String name) {
+        JTextComponent field = (JTextComponent) findByName(window, name);
+        return field.getText();
+    }
+
     public void assertErrorMessage(Container window, String errorMessage) {
         MessagePanel messagePanel = (MessagePanel) findByName(window, "messagePanel");
         assertEquals(errorMessage, messagePanel.getMessage());
@@ -151,5 +156,6 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
             throw new RuntimeException(e);
         }
     }
+
 
 }

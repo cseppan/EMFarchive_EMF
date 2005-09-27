@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.dbunit.DatabaseUnitException;
+import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.QueryDataSet;
 import org.dbunit.dataset.DefaultDataSet;
@@ -24,7 +25,11 @@ public class DbUpdate {
         Class.forName(config.driver());
         Connection jdbcConnection = DriverManager.getConnection(config.url(), config.username(), config.password());
 
-        return new DatabaseConnection(jdbcConnection);
+        DatabaseConnection dbUnitConnection = new DatabaseConnection(jdbcConnection);
+        DatabaseConfig dbUnitConfig = dbUnitConnection.getConfig();
+        dbUnitConfig.setFeature(DatabaseConfig.FEATURE_QUALIFIED_TABLE_NAMES, true);
+        
+        return dbUnitConnection;
     }
 
     public void deleteAll(String table) throws DatabaseUnitException, SQLException {

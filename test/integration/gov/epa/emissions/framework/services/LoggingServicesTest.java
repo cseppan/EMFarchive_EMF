@@ -36,7 +36,7 @@ public class LoggingServicesTest extends ServicesTestCase {
         try {
             service.setAccessLog(log);
         } finally {
-            new DbUpdate().delete("dataset_access_logs", "dataset_id", datasetId);
+            new DbUpdate().delete("emf.dataset_access_logs", "dataset_id", datasetId);
         }
     }
 

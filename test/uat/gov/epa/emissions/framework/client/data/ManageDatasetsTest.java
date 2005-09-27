@@ -29,7 +29,7 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
             doShouldDisplayImportedDatasets(datasetName);
         } finally {
             DbUpdate update = new DbUpdate();
-            update.delete("datasets", "name", datasetName);
+            update.delete("emf.datasets", "name", datasetName);
         }
     }
 
@@ -67,7 +67,7 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
         try {
             doShouldDisplayExportWindowOnClickOfExport(datasetName);
         } finally {
-            new DbUpdate().delete("datasets", "name", datasetName);
+            new DbUpdate().delete("emf.datasets", "name", datasetName);
         }
     }
 

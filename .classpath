@@ -55,7 +55,7 @@
 	<classpathentry kind="lib" path="lib/dev/commons-configuration-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/dev/commons-lang-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-collections-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/dev/dbunit-2.1.jar"/>
+	<classpathentry sourcepath="C:/Documents and Settings/Administrator/Desktop/dbunit-2.1-src/dbunit-2.1/src/java" kind="lib" path="lib/dev/dbunit-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/dev/jmock/jmock-cglib-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/emissions-commons-0.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/analysis-engine-0.1.1.jar"/>

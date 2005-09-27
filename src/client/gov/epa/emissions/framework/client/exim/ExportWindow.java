@@ -72,12 +72,11 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // datasets
-        JTextArea datasetNames = new JTextArea(2, 45);
+        TextArea datasetNames = new TextArea("datasets", getDatasetsLabel(datasets));
         datasetNames.setLineWrap(false);
         datasetNames.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(datasetNames, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        datasetNames.setText(getDatasetsLabel(datasets));
 
         layoutGenerator.addLabelWidgetPair("Datasets", scrollPane, panel);
 

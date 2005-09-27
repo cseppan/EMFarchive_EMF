@@ -59,7 +59,7 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
         try {
             LogsTab view = new LogsTab(dataset, services, parentConsole);
 
-            // FIXME: activate the presenter on tab-click
+            // FIXME2: activate the presenter on tab-click
             // LogsTabPresenter presenter = new LogsTabPresenter(view, dataset,
             // session.getLoggingServices());
             // presenter.display();

@@ -28,8 +28,8 @@ public class ExImServicesTest extends ServicesTestCase {
 
     protected void tearDown() throws Exception {
         ExImDbUpdate dbUpdate = new ExImDbUpdate();
-        dbUpdate.deleteAll("dataset_access_logs");
-        dbUpdate.deleteAll("datasets");
+        dbUpdate.deleteAll("emf.dataset_access_logs");
+        dbUpdate.deleteAll("emf.datasets");
     }
 
     public void testFetchDatasetTypesReturnsFourORLTypes() throws EmfException {

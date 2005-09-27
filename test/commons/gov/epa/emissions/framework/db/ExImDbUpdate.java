@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.db;
 
 import java.sql.SQLException;
 
+import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.QueryDataSet;
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.ITable;
@@ -17,7 +18,7 @@ public class ExImDbUpdate extends DbUpdate {
         String accessLogId = getAccessLogId(datasetName);
 
         QueryDataSet dataset = new QueryDataSet(connection);
-        dataset.addTable("dataset_access_logs", "SELECT * from dataset_access_logs WHERE access_log_id = "
+        dataset.addTable("dataset_access_logs", "SELECT * from emf.dataset_access_logs WHERE access_log_id = "
                 + accessLogId);
 
         super.doDelete(dataset);
@@ -25,8 +26,9 @@ public class ExImDbUpdate extends DbUpdate {
 
     private String getAccessLogId(String datasetName) throws SQLException, DataSetException {
         QueryDataSet dataset = new QueryDataSet(connection);
-        dataset.addTable("access_logs", "SELECT access_log_id from datasets d, dataset_access_logs l WHERE  d.name='"
-                + datasetName + "' AND l.dataset_id=d.dataset_id");
+        dataset.addTable("access_logs",
+                "SELECT access_log_id from emf.datasets d, emf.dataset_access_logs l WHERE  d.name='" + datasetName
+                        + "' AND l.dataset_id=d.dataset_id");
 
         ITableIterator iter = dataset.iterator();
         iter.next();
@@ -39,7 +41,12 @@ public class ExImDbUpdate extends DbUpdate {
 
     public void deleteDataset(String datasetName) throws Exception {
         deleteDatasetAccessLogs(datasetName);
-        super.delete("datasets", "name", datasetName);
+        super.delete("emf.datasets", "name", datasetName);
+    }
+
+    public void deleteAllDatasets() throws DatabaseUnitException, SQLException {
+        super.deleteAll("emf.dataset_access_logs");
+        super.deleteAll("emf.datasets");
     }
 
 }

@@ -31,7 +31,7 @@ public class StatusServicesTest extends ServicesTestCase {
         try {
             service.setStatus(status);
         } finally {
-            new DbUpdate().deleteAll("statusmessages");
+            new DbUpdate().deleteAll("emf.statusmessages");
         }
     }
 

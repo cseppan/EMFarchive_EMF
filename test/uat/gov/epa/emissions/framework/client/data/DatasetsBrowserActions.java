@@ -89,4 +89,10 @@ public class DatasetsBrowserActions {
         return refresh().getRowCount();
     }
 
+    public ExportWindow export(String datasetName) throws Exception {
+        selectDataset(datasetName);
+        return export();
+
+    }
+
 }

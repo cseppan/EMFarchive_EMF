@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.swing.JTable;
 
+import junit.framework.Assert;
+
 public class StatusActions {
 
     private UserAcceptanceTestCase testcase;
@@ -34,29 +36,49 @@ public class StatusActions {
         return table().getRowCount();
     }
 
-    public List filter(String type) {
+    public List filter(String suffix) {
         JTable table = table();
         List messages = new ArrayList();
         for (int i = 0; i < messageCount(); i++) {
             String message = (String) table.getValueAt(i, 1);
-            if (contains(message, type))
+            if (contains(message, suffix))
                 messages.add(message);
         }
 
         return messages;
     }
 
-    private boolean contains(String message, String type) {
-        return message.indexOf("import for " + type + ":") >= 0;
+    private boolean contains(String message, String suffix) {
+        return message.indexOf(suffix) >= 0;
     }
 
-    public boolean hasStarted(String type, String filename) {
-        List statusMessages = filter(type);
-        return statusMessages.contains("Started import for " + type + ":" + filename);
+    public boolean hasStartedImport(String type, String filename) {
+        return doesContain("Started import for " + type + ":" + filename);
     }
 
-    public boolean hasCompleted(String type, String filename) {
-        List statusMessages = filter(type);
-        return statusMessages.contains("Completed import for " + type + ":" + filename);
+    public boolean hasCompletedImport(String type, String filename) {
+        return doesContain("Completed import for " + type + ":" + filename);
+    }
+
+    private boolean doesContain(String message) {
+        List messages = filter(message);
+        return !messages.isEmpty();
+    }
+
+    public void confirmExportCompletion(long waitTime, String dataset) {
+        for (int i = 0; i < waitTime; i += 500) {
+            if (isExportComplete(dataset))
+                return;// success
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        Assert.fail("Did not find completed status message after polling for " + waitTime + " msecs.");
+    }
+
+    private boolean isExportComplete(String dataset) {
+        return doesContain("Started export for " + dataset) && doesContain("Completed export for " + dataset);
     }
 }
