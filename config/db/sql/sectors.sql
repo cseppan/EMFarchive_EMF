@@ -1,0 +1,14 @@
+insert into sectors values (1, 'Point', 'Point');
+insert into sectors values (2, 'Nonpoint', 'Nonpoint');
+insert into sectors values (3, 'Area','Area');
+insert into sectors values (4, 'Point IPM','Point IPM');
+insert into sectors values (5, 'Point Non-IPM','Point Non-IPM');
+insert into sectors values (6, 'Point Fugitive Dust','Point Fugitive Dust');
+insert into sectors values (7, 'Fire','Fire');
+insert into sectors values (8, 'Average Fire','Average Fire');
+insert into sectors values (9, 'Agricultural','Agricultural');
+insert into sectors values (10, 'Area Fugitive Dust','Area Fugitive Dust');
+insert into sectors values (11, 'Other Area','Other Area');
+insert into sectors values (12, 'Nonroad','Nonroad');
+insert into sectors values (13, 'On Road','On Road');
+insert into sectors values (14, 'Biogenic','Biogenic');

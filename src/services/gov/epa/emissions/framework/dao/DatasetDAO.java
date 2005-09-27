@@ -8,7 +8,9 @@
 package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.Sector;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,6 +31,8 @@ public class DatasetDAO {
     private static Log log = LogFactory.getLog(DatasetDAO.class);
 
     private static final String GET_DATASET_QUERY = "select aDset from EmfDataset as aDset";
+    private static final String GET_COUNTRY_QUERY = "select country from Country as country";
+    private static final String GET_SECTOR_QUERY = "select sector from Sector as sector";
 
     private static final String GET_DATASET_FOR_DATASETNAME_QUERY = "select aDset from EmfDataset as aDset where aDset.name=:datasetname";
 
@@ -77,9 +81,9 @@ public class DatasetDAO {
 
         tx.commit();
         log.info("Total number of datasets retrieved= " + datasets.size());
-        log.debug("End getMessages");
+        log.debug("End getDatasets");
         return datasets;
-    }// getDatasetTypes()
+    }// getDatasets()
 
     public static void insertDataset(EmfDataset dataset, Session session) {
         Transaction tx = session.beginTransaction();
@@ -94,5 +98,45 @@ public class DatasetDAO {
         tx.commit();    	
     	log.debug("updating dataset: " + dataset.getDatasetid());
     }
+
+	public static List getCountries(Session session) {
+        log.debug("In get all Countries with valid session?: " + (session == null));
+        ArrayList countries = new ArrayList();
+
+        Transaction tx = session.beginTransaction();
+        log.debug("The query: " + GET_COUNTRY_QUERY);
+        Query query = session.createQuery(GET_COUNTRY_QUERY);
+
+        Iterator iter = query.iterate();
+        while (iter.hasNext()) {
+            Country cntry = (Country) iter.next();
+            countries.add(cntry);
+        }
+
+        tx.commit();
+        log.info("Total number of countries retrieved= " + countries.size());
+        log.debug("End getSectors");
+        return countries;
+	}
+
+	public static List getSectors(Session session) {
+        log.debug("In get all Sectors with valid session?: " + (session == null));
+        ArrayList sectors = new ArrayList();
+
+        Transaction tx = session.beginTransaction();
+        log.debug("The query: " + GET_SECTOR_QUERY);
+        Query query = session.createQuery(GET_SECTOR_QUERY);
+
+        Iterator iter = query.iterate();
+        while (iter.hasNext()) {
+        	Sector sector = (Sector) iter.next();
+        	sectors.add(sector);
+        }
+
+        tx.commit();
+        log.info("Total number of sectors retrieved= " + sectors.size());
+        log.debug("End getSectors");
+        return sectors;
+	}
 
 }

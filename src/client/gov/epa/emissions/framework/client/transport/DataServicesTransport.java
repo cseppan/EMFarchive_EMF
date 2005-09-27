@@ -12,9 +12,11 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.Sector;
 import gov.epa.emissions.framework.services.User;
 
 import java.net.MalformedURLException;
@@ -58,7 +60,7 @@ public class DataServicesTransport implements DataServices {
     public EmfDataset[] getDatasets() throws EmfException {
         log.debug("Get all dataset types");
 
-        // Call the ExImServices endpoint and acquire the array of all dataset
+        // Call the DataServices endpoint and acquire the array of all dataset
         // types
         // defined in the system
         EmfDataset[] datasets = null;
@@ -223,5 +225,125 @@ public class DataServicesTransport implements DataServices {
         }
 
         log.debug("update a new dataset type object: " + aDset.getName());
+	}
+
+	public Country[] getCountries() throws EmfException {
+        log.debug("Get all countries");
+
+        // Call the DataServices endpoint and acquire the array of all countries
+        // defined in the system
+        Country[] countries = null;
+
+        Service service = new Service();
+        Call call;
+
+        try {
+            call = (Call) service.createCall();
+            call.setTargetEndpointAddress(new java.net.URL(endpoint));
+
+            QName qname1 = new QName(emfSvcsNamespace, "ns1:Country");
+            QName qname2 = new QName(emfSvcsNamespace, "ns1:Countries");
+            QName qname3 = new QName(emfSvcsNamespace, "getCountries");
+
+            call.setOperationName(qname3);
+
+            Class cls1 = Country.class;
+            Class cls2 = Country[].class;
+
+            call.registerTypeMapping(cls1, qname1,
+                    new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),
+                    new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));
+            call.registerTypeMapping(cls2, qname2,
+                    new org.apache.axis.encoding.ser.ArraySerializerFactory(cls2, qname2),
+                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname2));
+
+            registerMappingForTable(call);
+
+            call.setReturnType(qname2);
+
+            Object obj = call.invoke(new Object[] {});
+
+            countries = (Country[]) obj;
+
+        } catch (ServiceException e) {
+            log.error("Error invoking the service", e);
+        } catch (MalformedURLException e) {
+            log.error("Error in format of URL string", e);
+        } catch (AxisFault fault) {
+            log.error("Axis fault details", fault);
+            throw new EmfException(extractMessage(fault.getMessage()));
+        } catch (RemoteException e) {
+            log.error("Error communicating with WS end point", e);
+        }
+        log.debug("Get all countries");
+        return countries;
+    }
+
+	public Sector[] getSectors() throws EmfException {
+
+        log.debug("Get all sectors");
+
+        // Call the DataServices endpoint and acquire the array of all sectors
+        // defined in the system
+        Sector[] sectors = null;
+
+        Service service = new Service();
+        Call call;
+
+        try {
+            call = (Call) service.createCall();
+            call.setTargetEndpointAddress(new java.net.URL(endpoint));
+
+            QName qname1 = new QName(emfSvcsNamespace, "ns1:Sector");
+            QName qname2 = new QName(emfSvcsNamespace, "ns1:Sectors");
+            QName qname3 = new QName(emfSvcsNamespace, "getSectors");
+
+            call.setOperationName(qname3);
+
+            Class cls1 = Sector.class;
+            Class cls2 = Sector[].class;
+
+            call.registerTypeMapping(cls1, qname1,
+                    new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),
+                    new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));
+            call.registerTypeMapping(cls2, qname2,
+                    new org.apache.axis.encoding.ser.ArraySerializerFactory(cls2, qname2),
+                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname2));
+
+            registerMappingForTable(call);
+
+            call.setReturnType(qname2);
+
+            Object obj = call.invoke(new Object[] {});
+
+            sectors = (Sector[]) obj;
+
+        } catch (ServiceException e) {
+            log.error("Error invoking the service", e);
+        } catch (MalformedURLException e) {
+            log.error("Error in format of URL string", e);
+        } catch (AxisFault fault) {
+            log.error("Axis fault details", fault);
+            throw new EmfException(extractMessage(fault.getMessage()));
+        } catch (RemoteException e) {
+            log.error("Error communicating with WS end point", e);
+        }
+        log.debug("Get all sectors");
+        return sectors;
+
+	}
+
+	public void addCountry(String country) throws EmfException {
+
+		//FIXME: REMOVE DUMMY LINES BELOW
+		if (false) throw new EmfException("");
+
+	}
+
+	public void addSector(String sector) throws EmfException {
+
+		//FIXME: REMOVE DUMMY LINES BELOW
+		if (false) throw new EmfException("");
+
 	}
 }

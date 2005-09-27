@@ -10,9 +10,12 @@
 
 package gov.epa.emissions.framework.services.impl;
 
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDAO;
+import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.Sector;
 import gov.epa.emissions.framework.services.User;
 
 import java.util.List;
@@ -55,5 +58,36 @@ public class DataServicesImpl implements DataServices {
         session.flush();
         session.close();
 	}
+
+	public Country[] getCountries() {
+
+        Session session = EMFHibernateUtil.getSession();
+        List countries = DatasetDAO.getCountries(session);
+        session.flush();
+        session.close();
+        return (Country[]) countries.toArray(new Country[countries.size()]);
+	}
+
+	public Sector[] getSectors() {
+        Session session = EMFHibernateUtil.getSession();
+        List sectors = DatasetDAO.getSectors(session);
+        session.flush();
+        session.close();
+        return (Sector[]) sectors.toArray(new Sector[sectors.size()]);
+	}
+
+	public void addCountry(String country) throws EmfException {
+		//FIXME: REMOVE DUMMY LINES BELOW
+		if (false) throw new EmfException("");
+		
+	}
+
+	public void addSector(String sector) throws EmfException {
+		//FIXME: REMOVE DUMMY LINES BELOW
+		if (false) throw new EmfException("");
+		
+	}
+
+
 
 }
