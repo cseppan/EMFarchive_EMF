@@ -28,13 +28,13 @@ import javax.swing.border.TitledBorder;
 
 public class UserProfilePanel extends JPanel {
 
-    private JTextField username;
+    private Widget username;
 
     private JPasswordField password;
 
     private JPasswordField confirmPassword;
 
-    private Widget name;
+    private TextField name;
 
     private JTextField affiliation;
 
@@ -51,25 +51,25 @@ public class UserProfilePanel extends JPanel {
     private User user;
 
     // FIXME: one to many params ?
-    public UserProfilePanel(User user, Widget nameWidget, Action okAction, Action cancelAction,
+    public UserProfilePanel(User user, Widget usernameWidget, Action okAction, Action cancelAction,
             AdminOption adminOption, PopulateUserStrategy populateUserStrategy) {
         this.user = user;
         this.adminOption = adminOption;
         this.populateUserStrategy = populateUserStrategy;
 
-        createLayout(user, nameWidget, okAction, cancelAction, adminOption);
+        createLayout(user, usernameWidget, okAction, cancelAction, adminOption);
         this.setSize(new Dimension(375, 425));
     }
 
-    private void createLayout(User user, Widget nameWidget, Action okAction, Action cancelAction,
+    private void createLayout(User user, Widget usernameWidget, Action okAction, Action cancelAction,
             AdminOption adminOption) {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
         this.add(messagePanel);
-        this.add(createProfilePanel(user, nameWidget, adminOption));
+        this.add(createProfilePanel(user, adminOption));
 
-        this.add(createLoginPanel(user));
+        this.add(createLoginPanel(usernameWidget));
         this.add(createButtonsPanel(okAction, cancelAction));
     }
 
@@ -91,7 +91,7 @@ public class UserProfilePanel extends JPanel {
         return panel;
     }
 
-    private JPanel createLoginPanel(User user) {
+    private JPanel createLoginPanel(Widget usernameWidget) {
         JPanel panel = new JPanel();
         panel.setBorder(createBorder("Login"));
 
@@ -108,8 +108,8 @@ public class UserProfilePanel extends JPanel {
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
 
-        username = new TextField("username", user.getUsername(), 10);
-        valuesPanel.add(username);
+        username = usernameWidget;
+        valuesPanel.add(usernameWidget.element());
         password = new PasswordField("password", 10);
         valuesPanel.add(password);
         confirmPassword = new PasswordField("confirmPassword", 10);
@@ -122,12 +122,12 @@ public class UserProfilePanel extends JPanel {
         return panel;
     }
 
-    private JPanel createProfilePanel(User user, Widget nameWidget, AdminOption adminOption) {
+    private JPanel createProfilePanel(User user, AdminOption adminOption) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(createBorder("Profile"));
 
-        JPanel mandatoryPanel = createManadatoryProfilePanel(user, nameWidget);
+        JPanel mandatoryPanel = createManadatoryProfilePanel(user);
         panel.add(mandatoryPanel);
 
         JPanel optionsPanel = new JPanel();
@@ -137,7 +137,7 @@ public class UserProfilePanel extends JPanel {
         return panel;
     }
 
-    private JPanel createManadatoryProfilePanel(User user, Widget nameWidget) {
+    private JPanel createManadatoryProfilePanel(User user) {
         JPanel panel = new JPanel();
 
         JPanel labelsPanel = new JPanel();
@@ -156,8 +156,8 @@ public class UserProfilePanel extends JPanel {
         JPanel valuesPanel = new JPanel();
         valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
 
-        name = nameWidget;
-        valuesPanel.add(nameWidget.element());
+        name = new TextField("name", user.getFullName(), 15);
+        valuesPanel.add(name);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
 
         affiliation = new TextField("affiliation", user.getAffiliation(), 15);
@@ -186,8 +186,8 @@ public class UserProfilePanel extends JPanel {
     }
 
     protected void populateUser() throws UserException {
-        populateUserStrategy.populate(name.value(), affiliation.getText(), phone.getText(), email.getText(), username
-                .getText(), password.getPassword(), confirmPassword.getPassword());
+        populateUserStrategy.populate(name.getText(), affiliation.getText(), phone.getText(), email.getText(), username
+                .value(), password.getPassword(), confirmPassword.getPassword());
 
         // FIXME: where should we put this ?
         adminOption.setInAdminGroup(user);

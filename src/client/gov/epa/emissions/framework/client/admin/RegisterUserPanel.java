@@ -58,8 +58,8 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
         };
 
         user = new User();
-        Widget name = new TextFieldWidget("name", user.getFullName(), 15);
-        panel = new UserProfilePanel(user, name, okAction, cancelAction, adminOption,
+        Widget username = new TextFieldWidget("username", user.getUsername(), 10);
+        panel = new UserProfilePanel(user, username, okAction, cancelAction, adminOption,
                 new PopulateUserOnRegisterStrategy(user));
         this.add(panel);
     }

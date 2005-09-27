@@ -52,6 +52,16 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         presenter.doDelete(new User[] { matts });
     }
 
+    // FIXME: should display message, if no users are selected for deletion
+    public void FIXME_testShouldDisplayMessageIfNoUsersAreSelectedAndActionIsDelete() throws EmfException {
+        Mock userServices = mock(UserServices.class);
+        User user = new User();
+
+        UserManagerPresenter presenter = new UserManagerPresenter(user, (UserServices) userServices.proxy());
+
+        presenter.doDelete(new User[] {});
+    }
+
     public void testShouldNotDeleteCurrentlyLoggedInUserOnNotifyDelete() throws EmfException {
         User user = new User();
         user.setUsername("joe");

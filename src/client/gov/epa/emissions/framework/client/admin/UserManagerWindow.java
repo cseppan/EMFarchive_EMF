@@ -57,7 +57,7 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
     // FIXME: this class needs to be refactored into smaller components
     public UserManagerWindow(User user, UserServices userServices, JFrame parentConsole, JDesktopPane desktop)
             throws Exception {
-        super("User Management Console", desktop);
+        super("User Manager", desktop);
         this.user = user;
         this.userServices = userServices;
         this.parentConsole = parentConsole;
@@ -208,14 +208,16 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
     }
 
     private void deleteUser() {
-        int option = JOptionPane.showConfirmDialog(null, "Are you sure about deleting user(s)", "Delete User",
-                JOptionPane.YES_NO_OPTION);
-        if (option == 1) {
-            refresh();
+        List users = getSelectedUsers();
+
+        // FIXME: make this an interaction b/w presenter and view
+        if (users.isEmpty()) {
+            showMessage("At least one User needs to be selected for deletion");
             return;
         }
+        if (!promptDelete())
+            return;
 
-        List users = getSelectedUsers();
         try {
             presenter.doDelete((User[]) users.toArray(new User[0]));
         } catch (EmfException e) {
@@ -223,6 +225,17 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
             // TODO: temp, until the HACK is addressed (then, use refresh)
             doSimpleRefresh();
         }
+    }
+
+    private void showMessage(String message) {
+        messagePanel.setMessage(message);
+        doSimpleRefresh();
+    }
+
+    public boolean promptDelete() {
+        int option = JOptionPane.showConfirmDialog(null, "Are you sure about deleting user(s)", "Delete User",
+                JOptionPane.YES_NO_OPTION);
+        return (option == 0);
     }
 
     private void displayRegisterUser() {
@@ -238,6 +251,10 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
 
         RegisterUserPresenter presenter = new RegisterUserPresenter(userServices);
         presenter.display(container.getView());
+
+        // FIXME: should be invoked by the Presenter. Container should implement
+        // the View, and delagate to the underlying panel
+        container.display();
     }
 
     public void observe(UserManagerPresenter presenter) {

@@ -57,13 +57,13 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements EmfVi
             }
         };
 
-        Widget name = new LabelWidget("name", user.getFullName());
-        return createUserProfilePanel(name, saveAction, closeAction, adminOption);
+        Widget username = new LabelWidget("username", user.getUsername());
+        return createUserProfilePanel(username, saveAction, closeAction, adminOption);
     }
 
-    private UserProfilePanel createUserProfilePanel(Widget name, Action saveAction, Action closeAction,
+    private UserProfilePanel createUserProfilePanel(Widget username, Action saveAction, Action closeAction,
             AdminOption adminOption) {
-        UserProfilePanel panel = new UserProfilePanel(user, name, saveAction, closeAction, adminOption,
+        UserProfilePanel panel = new UserProfilePanel(user, username, saveAction, closeAction, adminOption,
                 new PopulateUserOnUpdateStrategy(user));
 
         panel.addEditListener(new KeyAdapter() {
