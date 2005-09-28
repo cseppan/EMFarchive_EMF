@@ -3,9 +3,13 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.services.Country;
+import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.Sector;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -14,26 +18,25 @@ import java.awt.Dimension;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
 import javax.swing.InputVerifier;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 
+//FIXME: super long class..break it up
 public class SummaryTab extends JPanel implements SummaryTabView {
 
     private EmfDataset dataset;
@@ -54,25 +57,25 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private TextArea description;
 
-    private DefaultListModel sectors;
+    private DefaultComboBoxModel sectors;
 
-    private DefaultListModel countries;
+    private DefaultComboBoxModel countries;
 
     private MessagePanel messagePanel;
 
-    public SummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
+    public SummaryTab(EmfDataset dataset, DataServices dataServices, MessagePanel messagePanel) throws EmfException {
         this.dataset = dataset;
         this.messagePanel = messagePanel;
 
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         super.add(createOverviewSection());
-        super.add(createLowerSection());
+        super.add(createLowerSection(dataServices));
     }
 
-    private JPanel createLowerSection() {
+    private JPanel createLowerSection(DataServices dataServices) throws EmfException {
         JPanel lowerPanel = new JPanel(new BorderLayout());
 
-        lowerPanel.add(createTimeSpaceSection(), BorderLayout.LINE_START);
+        lowerPanel.add(createTimeSpaceSection(dataServices), BorderLayout.LINE_START);
         lowerPanel.add(createStatusSection(), BorderLayout.CENTER);
 
         return lowerPanel;
@@ -111,8 +114,10 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Status", new JLabel(dataset.getStatus()), panel);
-        layoutGenerator.addLabelWidgetPair("Last Modified Date", new JLabel(format(dataset.getModifiedDateTime())), panel);
-        layoutGenerator.addLabelWidgetPair("Last Accessed Date", new JLabel(format(dataset.getAccessedDateTime())), panel);
+        layoutGenerator.addLabelWidgetPair("Last Modified Date", new JLabel(format(dataset.getModifiedDateTime())),
+                panel);
+        layoutGenerator.addLabelWidgetPair("Last Accessed Date", new JLabel(format(dataset.getAccessedDateTime())),
+                panel);
         layoutGenerator.addLabelWidgetPair("Creation Date", new JLabel(format(dataset.getCreatedDateTime())), panel);
 
         // Lay out the panel.
@@ -127,7 +132,8 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         return DATE_FORMATTER.format(date);
     }
 
-    private JPanel createTimeSpaceSection() {
+    // FIXME: super-painful layout...split
+    private JPanel createTimeSpaceSection(DataServices dataServices) throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -154,7 +160,6 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         // temporal resolution
         String[] temporalResolutionNames = (String[]) TemporalResolution.NAMES.toArray(new String[0]);
         temporalResolutions = new DefaultComboBoxModel(temporalResolutionNames);
-        // TODO: set the selected
         JComboBox temporalResolutionsCombo = new JComboBox(temporalResolutions);
         temporalResolutionsCombo.setSelectedItem(dataset.getTemporalResolution());
         temporalResolutionsCombo.setName("temporalResolutions");
@@ -162,18 +167,28 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         layoutGenerator.addLabelWidgetPair("Temporal Resolution", temporalResolutionsCombo, panel);
 
         // sectors: TODO: lookup sectors
-        sectors = new DefaultListModel();
-        dumptArrayIntoListModel(new String[] { "TBD", "" }, sectors);
-        layoutGenerator.addLabelWidgetPair("Sectors", createList("sectors", sectors), panel);
+        sectors = new DefaultComboBoxModel(sectorNames(dataset.getSector(), dataServices.getSectors()));
+        JComboBox sectorsCombo = new JComboBox(sectors);
+        sectorsCombo.setSelectedItem(dataset.getSector());
+        sectorsCombo.setName("sectors");
+        sectorsCombo.setEditable(true);
+        sectorsCombo.setPreferredSize(new Dimension(125, 20));
+
+        layoutGenerator.addLabelWidgetPair("Sector", sectorsCombo, panel);
 
         // region
         region = new TextField("region", dataset.getRegion(), 15);
         layoutGenerator.addLabelWidgetPair("Region", region, panel);
 
-        // country - TODO: lookup countries
-        countries = new DefaultListModel();
-        dumptArrayIntoListModel(new String[] { dataset.getCountry(), "" }, countries);
-        layoutGenerator.addLabelWidgetPair("Country", createList("countries", countries), panel);
+        // country
+        countries = new DefaultComboBoxModel(countryNames(dataset.getCountry(), dataServices.getCountries()));
+        JComboBox countriesCombo = new JComboBox(countries);
+        countriesCombo.setSelectedItem(dataset.getCountry());
+        countriesCombo.setName("countries");
+        countriesCombo.setEditable(false);
+        countriesCombo.setPreferredSize(new Dimension(175, 20));
+
+        layoutGenerator.addLabelWidgetPair("Country", countriesCombo, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
@@ -183,22 +198,28 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         return panel;
     }
 
-    private void dumptArrayIntoListModel(String[] elements, DefaultListModel listModel) {
-        for (int i = 0; i < elements.length; i++) {
-            listModel.addElement(elements[i]);
+    private String[] countryNames(String selectedCountry, Country[] countries) {
+        List list = new ArrayList();
+        for (int i = 0; i < countries.length; i++) {
+            list.add(countries[i].getName());
         }
+
+        if (!list.contains(selectedCountry))
+            list.add(selectedCountry);
+
+        return (String[]) list.toArray(new String[0]);
     }
 
-    private JScrollPane createList(String name, ListModel model) {
-        JList list = new JList(model);
-        list.setName(name);
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.setVisibleRowCount(0);
+    private String[] sectorNames(String selectedSector, Sector[] sectors) {
+        List list = new ArrayList();
+        for (int i = 0; i < sectors.length; i++) {
+            list.add(sectors[i].getName());
+        }
 
-        JScrollPane scrollPane = new JScrollPane(list);
-        scrollPane.setPreferredSize(new Dimension(100, 20));
+        if (!list.contains(selectedSector))
+            list.add(selectedSector);
 
-        return scrollPane;
+        return (String[]) list.toArray(new String[0]);
     }
 
     private JPanel createOverviewSection() {
@@ -256,8 +277,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         dataset.setStopDateTime(toDate(endDateTime.getText()));
         dataset.setTemporalResolution((String) temporalResolutions.getSelectedItem());
         dataset.setRegion(region.getText());
-        // FIXME: selected country needs to be captured
-        // dataset.setCountry(countries.getSiz);
+        dataset.setCountry((String) countries.getSelectedItem());
     }
 
     private Date toDate(String text) {

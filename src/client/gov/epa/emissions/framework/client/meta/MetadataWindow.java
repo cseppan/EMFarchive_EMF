@@ -71,12 +71,17 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
 
         return createTab();
     }
+    
+    private JPanel createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
+        try {
+            SummaryTab view = new SummaryTab(dataset, session.getDataServices(), messagePanel);
+            presenter.add(view);
+            return view;
+        } catch (EmfException e) {
+            showError("Could not load Summary Tab. Reason - " + e.getMessage());
+        }
 
-    private SummaryTab createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
-        SummaryTab view = new SummaryTab(dataset, messagePanel);
-        presenter.add(view);
-
-        return view;
+        return createTab();
     }
 
     // TODO: other tabs
