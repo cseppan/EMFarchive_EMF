@@ -16,28 +16,25 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
 
     private DatasetsBrowserActions browserActions;
 
-    public void setUp() {
-        ConsoleActions consoleActions = new ConsoleActions(this);
+    private ConsoleActions consoleActions;
+
+    protected void setUp() {
+        consoleActions = new ConsoleActions(this);
         console = consoleActions.open();
         browserActions = new DatasetsBrowserActions(console, this);
     }
 
-    // FIXME: test fails, only as a part of a suite
-    public void FIXME_testShouldDisplayImportedDatasets() throws Exception {
-        String datasetName = "ORL Nonroad Inventory UAT - " + new Random().nextInt();
-        try {
-            doShouldDisplayImportedDatasets(datasetName);
-        } finally {
-            DbUpdate update = new DbUpdate();
-            update.delete("emf.datasets", "name", datasetName);
-        }
+    protected void tearDown() throws Exception {
+        consoleActions.close();
+        new DbUpdate().deleteAll("emf.datasets");
     }
 
-    private void doShouldDisplayImportedDatasets(String datasetName) throws Exception, InterruptedException {
-        ImportActions importActions = new ImportActions(console, this);
-        importActions.open();
-        importActions.importOrlNonRoad(datasetName);
-        importActions.done();
+    // FIXME:If multiple users try to do an Import simultaneously, EMF runs into
+    // a database synchronization error. Only the first import succeeds, whereas
+    // the rest of them would fail.
+    public void FIXME_testShouldDisplayImportedDatasets() throws Exception {
+        String dataset = "UAT-" + new Random().nextInt();
+        doImport(dataset);
 
         DatasetsBrowserWindow browser = browserActions.open();
         assertNotNull("browser should have been opened", browser);
@@ -45,7 +42,7 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
         JTable table = browserActions.table();
         assertNotNull("datasets table should be displayed", table);
 
-        assertEquals(datasetName, browserActions.cell(browserActions.rowCount() - 1, 2));
+        assertEquals(dataset, browserActions.cell(browserActions.rowCount() - 1, 2));
     }
 
     public void testShouldCloseWindowOnClose() throws Exception {
@@ -61,21 +58,12 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
         fail("Datasets Browser should not be present and displayed on Close");
     }
 
-    // FIXME: test fails, only as a part of a suite
+    // FIXME:If multiple users try to do an Import simultaneously, EMF runs into
+    // a database synchronization error. Only the first import succeeds, whereas
+    // the rest of them would fail.
     public void FIXME_testShouldDisplayExportWindowOnClickOfExportButton() throws Exception {
-        String datasetName = "ORL Nonroad Inventory" + " UAT - " + new Random().nextInt();
-        try {
-            doShouldDisplayExportWindowOnClickOfExport(datasetName);
-        } finally {
-            new DbUpdate().delete("emf.datasets", "name", datasetName);
-        }
-    }
-
-    private void doShouldDisplayExportWindowOnClickOfExport(String datasetName) throws Exception {
-        ImportActions importActions = new ImportActions(console, this);
-        importActions.open();
-        importActions.importOrlNonRoad(datasetName);
-        importActions.done();
+        String datasetName = "UAT-" + new Random().nextInt();
+        doImport(datasetName);
 
         browserActions.open();
 
@@ -83,6 +71,13 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
         browserActions.export();
 
         findByName(console, "exportWindow");
+    }
+
+    private void doImport(String datasetName) throws Exception {
+        ImportActions importActions = new ImportActions(console, this);
+        importActions.open();
+        importActions.importOrlNonRoad(datasetName);
+        importActions.done();
     }
 
 }

@@ -29,8 +29,10 @@ public class ImportORLDatasetTest extends UserAcceptanceTestCase {
 
     private StatusActions statusActions;
 
+    private ConsoleActions consoleActions;
+
     protected void setUp() throws Exception {
-        ConsoleActions consoleActions = new ConsoleActions(this);
+        consoleActions = new ConsoleActions(this);
         console = consoleActions.open();
 
         importActions = new ImportActions(console, this);
@@ -45,6 +47,8 @@ public class ImportORLDatasetTest extends UserAcceptanceTestCase {
 
         JInternalFrame importWindow = importActions.find();
         assertFalse("Import Window should be hidden from view", importWindow.isVisible());
+
+        consoleActions.close();
     }
 
     public void testShouldShowAtleastFourORLDatasetTypesAsOptions() throws Exception {

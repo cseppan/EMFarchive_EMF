@@ -62,7 +62,7 @@ public class ImportActions {
 
         testcase.click(importWindow, "import");
 
-        confirmImportCompletion(8000, type, filename);
+        confirmImportCompletion(12000, type, filename);
     }
 
     private void confirmImportCompletion(long waitTime, String type, String filename) {

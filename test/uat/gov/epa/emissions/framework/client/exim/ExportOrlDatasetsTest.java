@@ -14,8 +14,10 @@ public class ExportOrlDatasetsTest extends UserAcceptanceTestCase {
 
     private DatasetsBrowserActions browserActions;
 
+    private ConsoleActions consoleActions;
+
     public void setUp() throws Exception {
-        ConsoleActions consoleActions = new ConsoleActions(this);
+        consoleActions = new ConsoleActions(this);
         console = consoleActions.open();
 
         browserActions = new DatasetsBrowserActions(console, this);
@@ -23,6 +25,7 @@ public class ExportOrlDatasetsTest extends UserAcceptanceTestCase {
     }
 
     protected void tearDown() throws Exception {
+        consoleActions.close();
         new ExImDbUpdate().deleteAllDatasets();
     }
 

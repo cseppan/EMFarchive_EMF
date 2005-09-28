@@ -15,4 +15,8 @@ public class ConsoleActions {
         return console;
     }
 
+    public void close() {
+        console.close();
+    }
+
 }

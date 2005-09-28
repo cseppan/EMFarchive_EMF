@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.exim.DefaultExportPresenter;
+import gov.epa.emissions.framework.client.exim.DatasetsBrowserAwareImportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
@@ -171,7 +172,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         // windowLayoutManager.add(importView); FIXME: needs layout
         desktop.add(importView);
 
-        ImportPresenter importPresenter = new ImportPresenter(session.getUser(), session.getExImServices());
+        ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session.getUser(), session.getExImServices(),
+                session.getDataServices(), this);
         presenter.doNew(importView, importPresenter);
     }
 

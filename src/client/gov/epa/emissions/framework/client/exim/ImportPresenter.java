@@ -13,17 +13,16 @@ public class ImportPresenter {
 
     private ImportView view;
 
-    private ExImServices model;
+    private ExImServices eximServices;
 
     private User user;
 
-    public ImportPresenter(User user, ExImServices model) {
+    public ImportPresenter(User user, ExImServices eximServices) {
         this.user = user;
-        this.model = model;
+        this.eximServices = eximServices;
     }
 
-    public void doImport(String directory, String filename, String datasetName, DatasetType type)
-            throws EmfException {
+    public void doImport(String directory, String filename, String datasetName, DatasetType type) throws EmfException {
         if (datasetName.length() == 0)
             throw new UserException("Dataset Name should be specified");
         if (directory.length() == 0)
@@ -40,7 +39,7 @@ public class ImportPresenter {
         dataset.setAccessedDateTime(dataset.getCreatedDateTime());
 
         // String filepath = directory + File.separator + filename;
-        model.startImport(user, directory, filename, dataset, type);
+        eximServices.startImport(user, directory, filename, dataset, type);
     }
 
     public void doDone() {
@@ -49,10 +48,10 @@ public class ImportPresenter {
 
     public void display(ImportView view) throws EmfException {
         this.view = view;
-        
+
         view.register(this);
-        view.setDefaultBaseFolder(model.getImportBaseFolder());
-        
+        view.setDefaultBaseFolder(eximServices.getImportBaseFolder());
+
         view.display();
     }
 
