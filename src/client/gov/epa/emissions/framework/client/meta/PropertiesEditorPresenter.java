@@ -5,22 +5,22 @@ import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 
-public class MetadataPresenter {
+public class PropertiesEditorPresenter {
 
     private EmfDataset dataset;
 
-    private MetadataView view;
+    private PropertiesEditorView view;
 
     private DataServices dataServices;
 
     private SummaryTabPresenter summaryTabPresenter;
 
-    public MetadataPresenter(EmfDataset dataset, DataServices dataServices) {
+    public PropertiesEditorPresenter(EmfDataset dataset, DataServices dataServices) {
         this.dataset = dataset;
         this.dataServices = dataServices;
     }
 
-    public void display(MetadataView view) {
+    public void display(PropertiesEditorView view) {
         this.view = view;
         view.observe(this);
 

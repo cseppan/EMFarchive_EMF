@@ -3,9 +3,9 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.framework.client.EmfView;
 import gov.epa.emissions.framework.services.EmfDataset;
 
-public interface MetadataView extends EmfView {
+public interface PropertiesEditorView extends EmfView {
 
-    void observe(MetadataPresenter presenter);
+    void observe(PropertiesEditorPresenter presenter);
 
     void display(EmfDataset dataset);
 

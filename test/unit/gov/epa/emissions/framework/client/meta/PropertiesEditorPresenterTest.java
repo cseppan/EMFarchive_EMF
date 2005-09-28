@@ -9,11 +9,11 @@ import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 import org.jmock.core.stub.ThrowStub;
 
-public class MetadataPresenterTest extends MockObjectTestCase {
+public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
     private Mock view;
 
-    private MetadataPresenter presenter;
+    private PropertiesEditorPresenter presenter;
 
     private EmfDataset dataset;
 
@@ -23,15 +23,15 @@ public class MetadataPresenterTest extends MockObjectTestCase {
         dataset = new EmfDataset();
         dataset.setName("test");
 
-        view = mock(MetadataView.class);
+        view = mock(PropertiesEditorView.class);
 
         dataServices = mock(DataServices.class);
-        presenter = new MetadataPresenter(dataset, (DataServices) dataServices.proxy());
+        presenter = new PropertiesEditorPresenter(dataset, (DataServices) dataServices.proxy());
 
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(eq(dataset));
 
-        presenter.display((MetadataView) view.proxy());
+        presenter.display((PropertiesEditorView) view.proxy());
     }
 
     public void testShouldCloseViewOnNotifyClose() {

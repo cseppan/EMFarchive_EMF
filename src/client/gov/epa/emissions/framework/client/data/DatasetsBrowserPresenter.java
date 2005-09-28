@@ -5,8 +5,8 @@ import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportView;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportView;
-import gov.epa.emissions.framework.client.meta.MetadataPresenter;
-import gov.epa.emissions.framework.client.meta.MetadataView;
+import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
+import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.WindowLayoutManager;
@@ -57,11 +57,11 @@ public class DatasetsBrowserPresenter {
     }
 
     // TODO: Is this a better style/pattern compared to doNew ?
-    public void doShowMetadata(MetadataView metadataView, EmfDataset dataset) {
+    public void doShowMetadata(PropertiesEditorView metadataView, EmfDataset dataset) {
         view.clearMessage();
         windowLayoutManager.add(metadataView);
         
-        MetadataPresenter presenter = new MetadataPresenter(dataset, dataServices);
+        PropertiesEditorPresenter presenter = new PropertiesEditorPresenter(dataset, dataServices);
         presenter.display(metadataView);
     }
 

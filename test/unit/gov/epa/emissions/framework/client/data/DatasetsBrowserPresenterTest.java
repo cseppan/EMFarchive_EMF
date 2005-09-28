@@ -6,8 +6,8 @@ import gov.epa.emissions.framework.client.exim.ExportView;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportPresenterStub;
 import gov.epa.emissions.framework.client.exim.ImportView;
-import gov.epa.emissions.framework.client.meta.MetadataPresenter;
-import gov.epa.emissions.framework.client.meta.MetadataView;
+import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
+import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.WindowLayoutManager;
@@ -106,11 +106,11 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         view.expects(once()).method("clearMessage").withNoArguments();
 
-        Mock metadataView = mock(MetadataView.class);
-        metadataView.expects(once()).method("observe").with(new IsInstanceOf(MetadataPresenter.class));
+        Mock metadataView = mock(PropertiesEditorView.class);
+        metadataView.expects(once()).method("observe").with(new IsInstanceOf(PropertiesEditorPresenter.class));
         metadataView.expects(once()).method("display").with(eq(dataset));
 
-        MetadataView viewProxy = (MetadataView) metadataView.proxy();
+        PropertiesEditorView viewProxy = (PropertiesEditorView) metadataView.proxy();
         layout.expects(once()).method("add").with(eq(viewProxy));
 
         presenter.doShowMetadata(viewProxy, dataset);

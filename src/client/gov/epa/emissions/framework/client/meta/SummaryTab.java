@@ -41,7 +41,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private EmfDataset dataset;
 
-    private final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy    hh:mm:ss");
+    private final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy  HH:mm:ss");
 
     private TextField name;
 

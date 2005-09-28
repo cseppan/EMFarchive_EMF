@@ -20,9 +20,9 @@ import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-public class MetadataWindow extends DisposableInteralFrame implements MetadataView {
+public class PropertiesEditor extends DisposableInteralFrame implements PropertiesEditorView {
 
-    private MetadataPresenter presenter;
+    private PropertiesEditorPresenter presenter;
 
     private MessagePanel messagePanel;
 
@@ -32,7 +32,7 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
 
     private DatasetsBrowserView datasetsBrowser;
 
-    public MetadataWindow(EmfSession session, DatasetsBrowserView datasetsBrowser, EmfFrame parentConsole) {
+    public PropertiesEditor(EmfSession session, DatasetsBrowserView datasetsBrowser, EmfFrame parentConsole) {
         super("Dataset Properties Editor");
         this.session = session;
         this.datasetsBrowser = datasetsBrowser;
@@ -92,6 +92,7 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
     }
 
     public void display(EmfDataset dataset) {
+        super.setTitle("Properties Editor: " + dataset.getName());
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 
@@ -134,7 +135,7 @@ public class MetadataWindow extends DisposableInteralFrame implements MetadataVi
         return buttonsPanel;
     }
 
-    public void observe(MetadataPresenter presenter) {
+    public void observe(PropertiesEditorPresenter presenter) {
         this.presenter = presenter;
     }
 
