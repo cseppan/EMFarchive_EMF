@@ -1,13 +1,13 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.gui.SimpleTableModel;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.LoggingServices;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
 import java.awt.Dimension;
 
@@ -37,9 +37,9 @@ public class LogsTab extends JPanel implements LogsTabView {
     private JScrollPane createSortFilterPane(EmfDataset dataset, LoggingServices loggingServices, EmfFrame parentConsole)
             throws EmfException {
         EmfTableModel model = new EmfTableModel(new AccessLogTableData(dataset, loggingServices));
-        SortFilterSelectModel selectModel = new SortFilterSelectModel(model);
+        SimpleTableModel wrapperModel = new SimpleTableModel(model);
 
-        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
+        SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, wrapperModel);
         panel.getTable().setName("accessLogTable");
 
         JScrollPane scrollPane = new JScrollPane(panel);
