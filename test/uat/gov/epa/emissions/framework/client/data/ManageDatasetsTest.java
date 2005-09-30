@@ -32,7 +32,7 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
     // FIXME:If multiple users try to do an Import simultaneously, EMF runs into
     // a database synchronization error. Only the first import succeeds, whereas
     // the rest of them would fail.
-    public void FIXME_testShouldDisplayImportedDatasets() throws Exception {
+    public void testShouldDisplayImportedDatasets() throws Exception {
         String dataset = "UAT-" + new Random().nextInt();
         doImport(dataset);
 
@@ -58,10 +58,7 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
         fail("Datasets Browser should not be present and displayed on Close");
     }
 
-    // FIXME:If multiple users try to do an Import simultaneously, EMF runs into
-    // a database synchronization error. Only the first import succeeds, whereas
-    // the rest of them would fail.
-    public void FIXME_testShouldDisplayExportWindowOnClickOfExportButton() throws Exception {
+    public void testShouldDisplayExportWindowOnClickOfExportButton() throws Exception {
         String datasetName = "UAT-" + new Random().nextInt();
         doImport(datasetName);
 

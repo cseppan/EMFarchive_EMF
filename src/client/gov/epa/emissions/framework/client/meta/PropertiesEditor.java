@@ -43,6 +43,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     private JTabbedPane createTabbedPane(EmfDataset dataset, MessagePanel messagePanel) {
         JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setName("tabbedPane");
 
         tabbedPane.addTab("Summary", createSummaryTab(dataset, messagePanel));
         tabbedPane.addTab("Data", createTab());
@@ -93,6 +94,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     public void display(EmfDataset dataset) {
         super.setTitle("Properties Editor: " + dataset.getName());
+        super.setName("Properties Editor: " + dataset.getName());
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 

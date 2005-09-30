@@ -189,4 +189,5 @@ public class SpringLayoutGenerator {
         widgetPanel.add(widget, BorderLayout.LINE_START);
         panel.add(widgetPanel);
     }
+
 }

@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.Country;
@@ -41,7 +42,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private EmfDataset dataset;
 
-    private final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy  HH:mm:ss");
+    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy  HH:mm:ss");
 
     private TextField name;
 
@@ -64,6 +65,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
     private MessagePanel messagePanel;
 
     public SummaryTab(EmfDataset dataset, DataServices dataServices, MessagePanel messagePanel) throws EmfException {
+        super.setName("summary");
         this.dataset = dataset;
         this.messagePanel = messagePanel;
 
@@ -113,12 +115,13 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Status", new JLabel(dataset.getStatus()), panel);
-        layoutGenerator.addLabelWidgetPair("Last Modified Date", new JLabel(format(dataset.getModifiedDateTime())),
-                panel);
-        layoutGenerator.addLabelWidgetPair("Last Accessed Date", new JLabel(format(dataset.getAccessedDateTime())),
-                panel);
-        layoutGenerator.addLabelWidgetPair("Creation Date", new JLabel(format(dataset.getCreatedDateTime())), panel);
+        layoutGenerator.addLabelWidgetPair("Status", new Label("status", dataset.getStatus()), panel);
+        layoutGenerator.addLabelWidgetPair("Last Modified Date", new Label("lastModifiedDate", format(dataset
+                .getModifiedDateTime())), panel);
+        layoutGenerator.addLabelWidgetPair("Last Accessed Date", new Label("lastAccessedDate", format(dataset
+                .getAccessedDateTime())), panel);
+        layoutGenerator.addLabelWidgetPair("Creation Date", new Label("creationDate", format(dataset
+                .getCreatedDateTime())), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
@@ -132,7 +135,6 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         return DATE_FORMATTER.format(date);
     }
 
-    // FIXME: super-painful layout...split
     private JPanel createTimeSpaceSection(DataServices dataServices) throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
@@ -166,7 +168,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         temporalResolutionsCombo.setPreferredSize(new Dimension(100, 20));
         layoutGenerator.addLabelWidgetPair("Temporal Resolution", temporalResolutionsCombo, panel);
 
-        // sectors: TODO: lookup sectors
+        // sectors
         sectors = new DefaultComboBoxModel(sectorNames(dataset.getSector(), dataServices.getSectors()));
         JComboBox sectorsCombo = new JComboBox(sectors);
         sectorsCombo.setSelectedItem(dataset.getSector());
@@ -248,10 +250,12 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
         // creator
         JLabel creator = createLeftAlignedLabel(dataset.getCreator());
+        creator.setName("creator");
         layoutGenerator.addLabelWidgetPair("Creator", creator, panel);
 
         // dataset type
         JLabel datasetType = createLeftAlignedLabel(dataset.getDatasetType());
+        datasetType.setName("datasetType");
         layoutGenerator.addLabelWidgetPair("Dataset Type", datasetType, panel);
 
         // Lay out the panel.

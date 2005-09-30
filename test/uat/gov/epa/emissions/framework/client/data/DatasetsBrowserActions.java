@@ -7,6 +7,7 @@ import abbot.tester.JTableTester;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
+import gov.epa.emissions.framework.client.meta.PropertiesEditor;
 
 public class DatasetsBrowserActions {
 
@@ -21,7 +22,7 @@ public class DatasetsBrowserActions {
         this.testcase = testcase;
     }
 
-    public Object cell(int row, int col) throws Exception {
+    public Object cell(int row, int col) {
         return table().getValueAt(row, col);
     }
 
@@ -33,7 +34,7 @@ public class DatasetsBrowserActions {
         return browser;
     }
 
-    public JTable table() throws Exception {
+    public JTable table() {
         return (JTable) testcase.findByName(browser, "datasetsTable");
     }
 
@@ -55,7 +56,7 @@ public class DatasetsBrowserActions {
         }
     }
 
-    public JTable refresh() throws Exception {
+    public JTable refresh() {
         testcase.click(browser, "refresh");
         return table();
     }
@@ -85,14 +86,45 @@ public class DatasetsBrowserActions {
         }
     }
 
-    public int rowCount() throws Exception {
+    public int rowCount() {
         return refresh().getRowCount();
     }
 
     public ExportWindow export(String datasetName) throws Exception {
         selectDataset(datasetName);
         return export();
+    }
 
+    public PropertiesEditor properties(String datasetName) {
+        testcase.click(browser, "properties");
+        return (PropertiesEditor) testcase.findInternalFrame(console, "Properties Editor: " + datasetName);
+    }
+
+    public void refreshUntilDatasetIsListed(String dataset) {
+        for (int i = 0; i < 3000; i += 500) {// loop for 3 secs
+            if (isDatasetListed(dataset))
+                return;
+
+            refresh();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException("could not wait for browser refresh");
+            }// wait for browser refresh
+        }
+    }
+
+    private boolean isDatasetListed(String dataset) {
+        int rowCount = rowCount();
+        for (int i = 0; i < rowCount; i++) {
+            if (datasetName(i).equals(dataset))
+                return true;
+        }
+        return false;
+    }
+
+    private String datasetName(int row) {
+        return (String) cell(row, 2);
     }
 
 }
