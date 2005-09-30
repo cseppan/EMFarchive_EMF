@@ -1,11 +1,12 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 
-public class PropertiesEditorPresenter {
+public class PropertiesEditorPresenter implements ChangeObserver {
 
     private EmfDataset dataset;
 
@@ -14,6 +15,8 @@ public class PropertiesEditorPresenter {
     private DataServices dataServices;
 
     private SummaryTabPresenter summaryTabPresenter;
+
+    private boolean unsavedChanges;
 
     public PropertiesEditorPresenter(EmfDataset dataset, DataServices dataServices) {
         this.dataset = dataset;
@@ -28,6 +31,11 @@ public class PropertiesEditorPresenter {
     }
 
     public void doClose() {
+        if (unsavedChanges) {
+            if (!view.shouldContinueLosingUnsavedChanges())
+                return;
+        }
+
         view.close();
     }
 
@@ -46,6 +54,7 @@ public class PropertiesEditorPresenter {
             return;
         }
 
+        clearChanges();
         doClose();
     }
 
@@ -56,6 +65,15 @@ public class PropertiesEditorPresenter {
 
     public void add(SummaryTabView view) {
         summaryTabPresenter = new SummaryTabPresenter(dataset, view);
+        view.observeChanges(this);
+    }
+
+    private void clearChanges() {
+        unsavedChanges = false;
+    }
+
+    public void onChange() {
+        unsavedChanges = true;
     }
 
 }

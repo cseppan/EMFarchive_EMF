@@ -17,6 +17,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -77,6 +78,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         try {
             SummaryTab view = new SummaryTab(dataset, session.getDataServices(), messagePanel);
             presenter.add(view);
+
             return view;
         } catch (EmfException e) {
             showError("Could not load Summary Tab. Reason - " + e.getMessage());
@@ -145,6 +147,12 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
     public void showError(String message) {
         // TODO: error should go away at some point. when ?
         messagePanel.setError(message);
+    }
+
+    public boolean shouldContinueLosingUnsavedChanges() {
+        int option = JOptionPane.showConfirmDialog(this,
+                "Would you like to Close(without saving and lose the updates)?", "Close", JOptionPane.YES_NO_OPTION);
+        return (option == 0);
     }
 
 }

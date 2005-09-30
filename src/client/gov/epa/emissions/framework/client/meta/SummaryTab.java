@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -16,6 +17,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -64,6 +68,8 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private DefaultComboBoxModel regions;
 
+    private ChangeObserver changeObserver;
+
     public SummaryTab(EmfDataset dataset, DataServices dataServices, MessagePanel messagePanel) throws EmfException {
         super.setName("summary");
         this.dataset = dataset;
@@ -72,6 +78,8 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         super.add(createOverviewSection());
         super.add(createLowerSection(dataServices));
+
+        listenForChanges();
     }
 
     private JPanel createLowerSection(DataServices dataServices) throws EmfException {
@@ -335,6 +343,23 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
         public boolean shouldYieldFocus(JComponent input) {
             return verify(input);
+        }
+    }
+
+    private void listenForChanges() {
+        KeyListener keyListener = new SummaryTabChangesListener();
+        name.addKeyListener(keyListener);
+
+    }
+
+    public void observeChanges(ChangeObserver observer) {
+        this.changeObserver = observer;
+    }
+
+    public class SummaryTabChangesListener extends KeyAdapter {
+        public void keyTyped(KeyEvent e) {
+            if (changeObserver != null)
+                changeObserver.onChange();
         }
     }
 }

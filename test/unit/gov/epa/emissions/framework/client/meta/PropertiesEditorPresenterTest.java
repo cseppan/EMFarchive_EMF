@@ -40,11 +40,37 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         presenter.doClose();
     }
 
+    public void testShouldContinueToCloseIfUserOkaysLosingUnsavedChanges() {
+        view.expects(once()).method("close");
+
+        presenter.onChange();
+        view.expects(once()).method("shouldContinueLosingUnsavedChanges").withNoArguments().will(
+                returnValue(Boolean.TRUE));
+
+        presenter.doClose();
+    }
+
+    public void testShouldNotCloseIfUserSelectsToNotCloseOnUnsavedChanges() {
+        presenter.onChange();
+        view.expects(once()).method("shouldContinueLosingUnsavedChanges").withNoArguments().will(
+                returnValue(Boolean.FALSE));
+
+        presenter.doClose();
+    }
+    
+    public void testShouldAddAsOnChangeListenerToSummaryTabOnAddingSummaryTab() {
+        Mock summaryView = mock(SummaryTabView.class);
+        summaryView.expects(once()).method("observeChanges").with(eq(presenter));
+        
+        presenter.add((SummaryTabView) summaryView.proxy());
+    }
+
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() {
         dataServices.expects(once()).method("updateDataset").with(eq(dataset));
 
         Mock summaryView = mock(SummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
+        summaryView.expects(once()).method("observeChanges").with(eq(presenter));
         presenter.add((SummaryTabView) summaryView.proxy());
 
         Mock datasetsBrowser = mock(DatasetsBrowserView.class);
@@ -55,12 +81,33 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
         presenter.doSave((DatasetsBrowserView) datasetsBrowser.proxy());
     }
+    
+    public void testShouldSaveWithoutPromptingOnSaveIfChangesHaveOccuredInSummaryTab() {
+        dataServices.expects(once()).method("updateDataset").with(eq(dataset));
+        
+        Mock summaryView = mock(SummaryTabView.class);
+        summaryView.expects(once()).method("updateDataset").with(eq(dataset));
+        summaryView.expects(atLeastOnce()).method("observeChanges").with(eq(presenter));
+        presenter.add((SummaryTabView) summaryView.proxy());
+        
+        Mock datasetsBrowser = mock(DatasetsBrowserView.class);
+        EmfDataset[] datasets = new EmfDataset[0];
+        dataServices.stubs().method("getDatasets").will(returnValue(datasets));
+        datasetsBrowser.expects(once()).method("refresh").with(eq(datasets));
+        view.expects(once()).method("close");
+        
+        presenter.add((SummaryTabView) summaryView.proxy());
+        presenter.onChange();
+        
+        presenter.doSave((DatasetsBrowserView) datasetsBrowser.proxy());
+    }
 
     public void testShouldDisplayErrorMessageOnDatasetsBrowserIfGettingUpdatedDatasetsFailOnSave() {
         dataServices.expects(once()).method("updateDataset").with(eq(dataset));
 
         Mock summaryView = mock(SummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
+        summaryView.expects(once()).method("observeChanges").with(eq(presenter));
         presenter.add((SummaryTabView) summaryView.proxy());
 
         Mock datasetsBrowser = mock(DatasetsBrowserView.class);
@@ -74,6 +121,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayErrorMessageOnErrorDuringSave() {
         Mock summaryView = mock(SummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
+        summaryView.expects(once()).method("observeChanges").with(eq(presenter));
 
         dataServices.expects(once()).method("updateDataset").with(eq(dataset)).will(
                 new ThrowStub(new EmfException("Could not save")));

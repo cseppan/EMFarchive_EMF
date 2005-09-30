@@ -96,7 +96,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
     }
 
     public void closeOnConfirmLosingChanges() {
-        int option = JOptionPane.showConfirmDialog(null,
+        int option = JOptionPane.showConfirmDialog(this,
                 "Would you like to Close(without saving and lose the updates)?", "Close", JOptionPane.YES_NO_OPTION);
         if (option == 0)
             close();
