@@ -72,7 +72,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
         return createTab();
     }
-    
+
     private JPanel createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
         try {
             SummaryTab view = new SummaryTab(dataset, session.getDataServices(), messagePanel);
@@ -145,10 +145,6 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
     public void showError(String message) {
         // TODO: error should go away at some point. when ?
         messagePanel.setError(message);
-    }
-
-    public boolean isAlive() {
-        return !super.isClosed();
     }
 
 }

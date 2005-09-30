@@ -26,6 +26,10 @@ public class MyProfileWindow extends UpdateUserWindow {
         super.bringToFront();
     }
 
+    public boolean isAlive() {
+        return true;// never terminates, similar to ReusableInternalFrame
+    }
+
     private void ensurePresenceOnDesktop(JDesktopPane desktop) {
         List componentsList = Arrays.asList(desktop.getAllFrames());
         if (!componentsList.contains(this)) {

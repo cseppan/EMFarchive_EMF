@@ -11,6 +11,4 @@ public interface PropertiesEditorView extends ManagedView {
 
     void showError(String message);
 
-    boolean isAlive();
-
 }

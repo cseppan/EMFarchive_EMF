@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.framework.client.EmfView;
+import gov.epa.emissions.framework.client.ManagedView;
 
-public interface UpdateUserView extends EmfView {
+public interface UpdateUserView extends ManagedView {
 
     void observe(UpdateUserPresenter presenter);
 

@@ -10,4 +10,7 @@ public abstract class DisposableInteralFrame extends EmfInternalFrame {
         super.dispose();
     }
 
+    public boolean isAlive() {
+        return !super.isClosed();
+    }
 }

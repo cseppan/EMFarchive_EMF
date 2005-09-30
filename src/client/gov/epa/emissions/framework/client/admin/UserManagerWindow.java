@@ -104,7 +104,7 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
 
     private void updateUser(User updateUser) {
         UpdateUserView view = getUpdateUserView(updateUser);
-        presenter.doUpdateUser(view);
+        presenter.doUpdateUser(updateUser, view);
     }
 
     public UpdateUserView getUpdateUserView(User updateUser) {

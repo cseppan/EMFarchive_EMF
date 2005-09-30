@@ -68,7 +68,7 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").withNoArguments();
         view.expects(once()).method("promptDelete").withAnyArguments().will(returnValue(Boolean.TRUE));
         view.expects(once()).method("clearMessage").withNoArguments();
-        
+
         return view;
     }
 
@@ -93,7 +93,7 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         presenter.doRegisterNewUser(viewProxy);
     }
 
-    public void testShouldDisplayUpdateUserViewOnDisplayUpdateUser() {
+    public void testShouldDisplayUpdateUserViewOnDisplayUpdateUser() throws UserException {
         Mock updateUserView = mock(UpdateUserView.class);
         updateUserView.expects(once()).method("observe").with(new IsInstanceOf(UpdateUserPresenter.class));
         updateUserView.expects(once()).method("display").withNoArguments();
@@ -104,7 +104,64 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("clearMessage").withNoArguments();
         view.expects(once()).method("refresh").withNoArguments();
 
-        presenter.doUpdateUser(viewProxy);
+        User user = new User();
+        user.setUsername("name");
+
+        presenter.doUpdateUser(user, viewProxy);
+    }
+
+    public void testShouldDisplayTheSameUpdateViewAsPreviouslyDisplayedOnSelectingTheSameUserAndClickingUpdate()
+            throws UserException {
+        User user = new User();
+        user.setUsername("name");
+
+        // 1st attempt
+        Mock updateUserView = mock(UpdateUserView.class);
+        UpdateUserView viewProxy = createUpdateView(updateUserView);
+
+        view.expects(atLeastOnce()).method("clearMessage").withNoArguments();
+        view.expects(once()).method("refresh").withNoArguments();
+
+        presenter.doUpdateUser(user, viewProxy);
+
+        // 2nd attempt
+        updateUserView.stubs().method("isAlive").withNoArguments().will(returnValue(Boolean.TRUE));
+        updateUserView.expects(once()).method("bringToFront").withNoArguments();
+
+        presenter.doUpdateUser(user, viewProxy);
+    }
+
+    public void testShouldDisplayNewUpdateViewIfPreviouslyOpenedUpdateViewIsClosedOnClickingOfUpdateButton()
+            throws UserException {
+        User user = new User();
+        user.setUsername("name");
+
+        // 1st attempt
+        Mock view1 = mock(UpdateUserView.class);
+        UpdateUserView view1Proxy = createUpdateView(view1);
+        
+        view.expects(atLeastOnce()).method("clearMessage").withNoArguments();
+        view.expects(atLeastOnce()).method("refresh").withNoArguments();
+
+        presenter.doUpdateUser(user, view1Proxy);
+
+        // 2nd attempt - view1 is closed, view2 will be displayed
+        view1.stubs().method("isAlive").withNoArguments().will(returnValue(Boolean.FALSE));
+
+        Mock view2 = mock(UpdateUserView.class);
+        UpdateUserView view2Proxy = createUpdateView(view2);
+
+        presenter.doUpdateUser(user, view2Proxy);
+    }
+
+    private UpdateUserView createUpdateView(Mock updateView) {
+        updateView.expects(once()).method("observe").with(new IsInstanceOf(UpdateUserPresenter.class));
+        updateView.expects(once()).method("display").withNoArguments();
+
+        UpdateUserView viewProxy = (UpdateUserView) updateView.proxy();
+        layoutManager.expects(once()).method("add").with(eq(viewProxy));
+        
+        return viewProxy;
     }
 
     public void testShouldDisplayUpdateUserViewForEachUserSelectedOnDisplayUpdateUser() throws UserException {

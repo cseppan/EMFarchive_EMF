@@ -6,4 +6,6 @@ public interface ManagedView extends EmfView {
     void bringToFront();
 
     String getName();
+
+    boolean isAlive();
 }

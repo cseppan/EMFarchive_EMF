@@ -6,6 +6,9 @@ import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 import gov.epa.emissions.framework.ui.WindowLayoutManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserManagerPresenter {
 
     private UserManagerView view;
@@ -16,10 +19,14 @@ public class UserManagerPresenter {
 
     private WindowLayoutManager layoutManager;
 
+    private Map updateViewsMap;
+
     public UserManagerPresenter(User user, UserServices userServices, WindowLayoutManager layoutManager) {
         this.user = user;
         this.userServices = userServices;
         this.layoutManager = layoutManager;
+        
+        updateViewsMap = new HashMap();
     }
 
     public void doCloseView() {
@@ -35,7 +42,7 @@ public class UserManagerPresenter {
 
     public void doDelete(User[] users) throws EmfException {
         view.clearMessage();
-        
+
         if (users.length == 0) {
             view.showMessage("To delete, please select at least one User.");
             return;
@@ -71,14 +78,33 @@ public class UserManagerPresenter {
         view.refresh();
     }
 
-    public void doUpdateUser(UpdateUserView updateUserView) {
+    public void doUpdateUser(User updateUser, UpdateUserView updateUserView) {
         view.clearMessage();
+
+        if (isUpdateUserViewAlive(updateUser)) {
+            updateUserView(updateUser).bringToFront();
+            return;
+        }
+
+        showUpdateUser(updateUser, updateUserView);
+    }
+
+    private boolean isUpdateUserViewAlive(User updateUser) {
+        return updateViewsMap.containsKey(updateUser) && updateUserView(updateUser).isAlive();
+    }
+
+    private UpdateUserView updateUserView(User updateUser) {
+        return (UpdateUserView) updateViewsMap.get(updateUser);
+    }
+
+    private void showUpdateUser(User updateUser, UpdateUserView updateUserView) {
         layoutManager.add(updateUserView);
 
         UpdateUserPresenter updateUserPresenter = new UpdateUserPresenter(userServices);
         updateUserPresenter.display(updateUserView);
 
         view.refresh();
+        updateViewsMap.put(updateUser, updateUserView);
     }
 
     public void doUpdateUsers(User[] users) {
@@ -89,7 +115,7 @@ public class UserManagerPresenter {
 
         for (int i = 0; i < users.length; i++) {
             UpdateUserView updateUserView = view.getUpdateUserView(users[i]);
-            doUpdateUser(updateUserView);
+            doUpdateUser(users[i], updateUserView);
         }
     }
 

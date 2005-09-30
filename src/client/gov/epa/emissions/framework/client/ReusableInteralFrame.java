@@ -29,4 +29,8 @@ public abstract class ReusableInteralFrame extends EmfInternalFrame {
             desktop.add(this);
         }
     }
+
+    public boolean isAlive() {
+        return true;// never terminate, until the application does
+    }
 }
