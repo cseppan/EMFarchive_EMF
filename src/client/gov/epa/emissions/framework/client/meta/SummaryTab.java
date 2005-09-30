@@ -17,6 +17,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -76,16 +78,18 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         this.messagePanel = messagePanel;
 
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        super.add(createOverviewSection());
-        super.add(createLowerSection(dataServices));
+        SummaryTabComboBoxChangesListener comboxBoxListener = new SummaryTabComboBoxChangesListener();
+        super.add(createOverviewSection(comboxBoxListener));
+        super.add(createLowerSection(dataServices, comboxBoxListener));
 
-        listenForChanges();
+        listenForKeyEvents(new SummaryTabKeyListener());
     }
 
-    private JPanel createLowerSection(DataServices dataServices) throws EmfException {
+    private JPanel createLowerSection(DataServices dataServices, SummaryTabComboBoxChangesListener comboxBoxListener)
+            throws EmfException {
         JPanel lowerPanel = new JPanel(new BorderLayout());
 
-        lowerPanel.add(createTimeSpaceSection(dataServices), BorderLayout.LINE_START);
+        lowerPanel.add(createTimeSpaceSection(dataServices, comboxBoxListener), BorderLayout.LINE_START);
         lowerPanel.add(createStatusSection(), BorderLayout.CENTER);
 
         return lowerPanel;
@@ -143,7 +147,8 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         return DATE_FORMATTER.format(date);
     }
 
-    private JPanel createTimeSpaceSection(DataServices dataServices) throws EmfException {
+    private JPanel createTimeSpaceSection(DataServices dataServices, SummaryTabComboBoxChangesListener comboxBoxListener)
+            throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -174,6 +179,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         temporalResolutionsCombo.setSelectedItem(dataset.getTemporalResolution());
         temporalResolutionsCombo.setName("temporalResolutions");
         temporalResolutionsCombo.setPreferredSize(new Dimension(100, 20));
+        temporalResolutionsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Temporal Resolution", temporalResolutionsCombo, panel);
 
         // sectors
@@ -183,7 +189,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         sectorsCombo.setName("sectors");
         sectorsCombo.setEditable(true);
         sectorsCombo.setPreferredSize(new Dimension(125, 20));
-
+        sectorsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Sector", sectorsCombo, panel);
 
         // region
@@ -194,6 +200,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         regionsCombo.setName("regions");
         regionsCombo.setEditable(true);
         regionsCombo.setPreferredSize(new Dimension(125, 20));
+        regionsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Region", regionsCombo, panel);
 
         // country
@@ -202,6 +209,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         countriesCombo.setSelectedItem(dataset.getCountry());
         countriesCombo.setName("countries");
         countriesCombo.setEditable(false);
+        countriesCombo.addItemListener(comboxBoxListener);
         countriesCombo.setPreferredSize(new Dimension(175, 20));
 
         layoutGenerator.addLabelWidgetPair("Country", countriesCombo, panel);
@@ -238,7 +246,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         return (String[]) list.toArray(new String[0]);
     }
 
-    private JPanel createOverviewSection() {
+    private JPanel createOverviewSection(SummaryTabComboBoxChangesListener comboxBoxListener) {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -264,6 +272,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         projectsCombo.setName("projects");
         projectsCombo.setEditable(true);
         projectsCombo.setPreferredSize(new Dimension(125, 20));
+        projectsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Project", projectsCombo, panel);
 
         // creator
@@ -346,20 +355,29 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         }
     }
 
-    private void listenForChanges() {
-        KeyListener keyListener = new SummaryTabChangesListener();
+    private void listenForKeyEvents(KeyListener keyListener) {
         name.addKeyListener(keyListener);
-
+        description.addKeyListener(keyListener);
+        startDateTime.addKeyListener(keyListener);
+        endDateTime.addKeyListener(keyListener);
     }
 
     public void observeChanges(ChangeObserver observer) {
         this.changeObserver = observer;
     }
 
-    public class SummaryTabChangesListener extends KeyAdapter {
+    public class SummaryTabKeyListener extends KeyAdapter {
         public void keyTyped(KeyEvent e) {
             if (changeObserver != null)
                 changeObserver.onChange();
         }
     }
+
+    public class SummaryTabComboBoxChangesListener implements ItemListener {
+        public void itemStateChanged(ItemEvent e) {
+            if (changeObserver != null)
+                changeObserver.onChange();
+        }
+    }
+
 }
