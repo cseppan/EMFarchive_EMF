@@ -38,10 +38,6 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView {
             onCancelStrategy.execute(presenter);
     }
 
-    public RegisterUserView getView() {
-        return view;
-    }
-
     public void observe(RegisterUserPresenter presenter) {
         view.observe(presenter);
     }

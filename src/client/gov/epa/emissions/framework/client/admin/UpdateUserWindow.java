@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.gui.LabelWidget;
 import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
-import gov.epa.emissions.framework.client.EmfView;
 import gov.epa.emissions.framework.services.User;
 
 import java.awt.event.ActionEvent;
@@ -16,7 +15,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public abstract class UpdateUserWindow extends EmfInternalFrame implements EmfView, UpdateUserView {
+public abstract class UpdateUserWindow extends EmfInternalFrame implements UpdateUserView {
 
     private UpdateUserPresenter presenter;
 

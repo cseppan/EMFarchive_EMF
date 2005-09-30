@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.admin;
 
-public interface UpdateUserView {
+import gov.epa.emissions.framework.client.EmfView;
+
+public interface UpdateUserView extends EmfView {
 
     void observe(UpdateUserPresenter presenter);
 
@@ -10,7 +12,4 @@ public interface UpdateUserView {
      */
     void closeOnConfirmLosingChanges();
 
-    void close();
-
-    void display();
 }

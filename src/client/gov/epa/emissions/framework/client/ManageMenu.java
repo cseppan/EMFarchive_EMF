@@ -108,7 +108,7 @@ public class ManageMenu extends JMenu {
         windowLayoutManager.add(datasetsBrowserView);
         desktop.add(datasetsBrowserView);
 
-        DefaultWindowLayoutManager browserLayout = new DefaultWindowLayoutManager(datasetsBrowserView);
+        WindowLayoutManager browserLayout = new DefaultWindowLayoutManager(datasetsBrowserView);
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session.getDataServices(), browserLayout);
         presenter.display(datasetsBrowserView);
     }
@@ -142,10 +142,12 @@ public class ManageMenu extends JMenu {
 
         try {
             UserServices userServices = session.getUserServices();
+
             userManagerView = new UserManagerWindow(session.getUser(), userServices, parent, desktop);
             desktop.add(userManagerView);
 
-            UserManagerPresenter presenter = new UserManagerPresenter(session.getUser(), userServices);
+            WindowLayoutManager layoutManager = new DefaultWindowLayoutManager(userManagerView);
+            UserManagerPresenter presenter = new UserManagerPresenter(session.getUser(), userServices, layoutManager);
             presenter.display(userManagerView);
         } catch (Exception e) {
             // TODO: error handling

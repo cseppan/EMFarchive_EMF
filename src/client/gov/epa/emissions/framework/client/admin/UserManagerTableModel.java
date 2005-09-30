@@ -31,7 +31,6 @@ public class UserManagerTableModel extends AbstractTableModel implements Refresh
 
     public void refresh() {
         this.createRows(this.userAdmin);
-        super.fireTableDataChanged();
     }
 
     private void createRows(UserServices admin) {

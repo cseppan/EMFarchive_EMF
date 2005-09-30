@@ -13,13 +13,13 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JPanel;
 
-public class RegisterUserPanel extends JPanel implements RegisterUserView {
+public class RegisterUserPanel extends JPanel {
 
     private RegisterUserPresenter presenter;
 
     private PostRegisterStrategy postRegisterStrategy;
 
-    private EmfView parent;
+    private EmfView container;
 
     protected JPanel profileValuesPanel;
 
@@ -38,7 +38,7 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
             EmfView parent, AdminOption adminOption) {
         this.postRegisterStrategy = postRegisterStrategy;
         this.cancelStrategy = cancelStrategy;
-        this.parent = parent;
+        this.container = parent;
 
         createLayout(adminOption);
 
@@ -75,15 +75,11 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
             return;
         }
 
-        close();
+        container.close();
     }
 
     public void refresh() {
         this.validate();
-    }
-
-    public void close() {
-        parent.close();
     }
 
     public void observe(RegisterUserPresenter presenter) {
@@ -92,10 +88,6 @@ public class RegisterUserPanel extends JPanel implements RegisterUserView {
 
     public RegisterUserPresenter getPresenter() {
         return presenter;
-    }
-
-    public void display() {
-        super.setVisible(true);
     }
 
 }

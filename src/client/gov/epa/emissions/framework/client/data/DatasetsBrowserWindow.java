@@ -172,8 +172,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         // windowLayoutManager.add(importView); FIXME: needs layout
         desktop.add(importView);
 
-        ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session.getUser(), session.getExImServices(),
-                session.getDataServices(), this);
+        ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session.getUser(), session
+                .getExImServices(), session.getDataServices(), this);
         presenter.doNew(importView, importPresenter);
     }
 
@@ -219,7 +219,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
             PropertiesEditor view = new PropertiesEditor(session, this, parentConsole);
-            getDesktopPane().add(view);
+            desktop.add(view);
 
             presenter.doShowMetadata(view, (EmfDataset) iter.next());
         }
@@ -227,10 +227,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     public void showError(String message) {
         messagePanel.setError(message);
-        refreshLayout();
+        redoLayout();
     }
 
-    public void refreshLayout() {
+    private void redoLayout() {
         super.validate();
     }
 
@@ -253,17 +253,17 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
         createLayout(layout, parentConsole);
 
-        this.refreshLayout();
+        this.redoLayout();
     }
 
     public void showMessage(String message) {
         messagePanel.setMessage(message);
-        refreshLayout();
+        redoLayout();
     }
 
     public void clearMessage() {
         messagePanel.clear();
-        refreshLayout();
+        redoLayout();
     }
 
 }

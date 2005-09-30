@@ -1,10 +1,9 @@
 package gov.epa.emissions.framework.client.admin;
 
-public interface RegisterUserView {
+import gov.epa.emissions.framework.client.EmfView;
 
-    void close();
+public interface RegisterUserView extends EmfView {
 
     void observe(RegisterUserPresenter presenter);
 
-    void display();
 }

@@ -18,7 +18,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -40,8 +39,6 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
 
     private UserManagerTableModel model;
 
-    private UserServices userServices;
-
     private JPanel layout;
 
     private MessagePanel messagePanel;
@@ -59,7 +56,6 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
             throws Exception {
         super("User Manager", desktop);
         this.user = user;
-        this.userServices = userServices;
         this.parentConsole = parentConsole;
         this.desktop = desktop;
 
@@ -101,12 +97,20 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         });
     }
 
+    private void updateUsers() {
+        List users = getSelectedUsers();
+        presenter.doUpdateUsers((User[]) users.toArray(new User[0]));
+    }
+
     private void updateUser(User updateUser) {
-        // FIXME: drive this logic via Presenter
+        UpdateUserView view = getUpdateUserView(updateUser);
+        presenter.doUpdateUser(view);
+    }
+
+    public UpdateUserView getUpdateUserView(User updateUser) {
         UpdateUserWindow view = updateUser.equals(user) ? new DisposableUpdateUserWindow(updateUser)
                 : new DisposableUpdateUserWindow(updateUser, new AddAdminOption());
-
-        getDesktopPane().add(view);
+        desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosed(InternalFrameEvent event) {
@@ -114,8 +118,7 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
             }
         });
 
-        UpdateUserPresenter presenter = new UpdateUserPresenter(userServices);
-        presenter.display(view);
+        return view;
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
@@ -137,9 +140,7 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                if (presenter != null) {
-                    presenter.doCloseView();
-                }
+                presenter.doCloseView();
             }
         });
         closePanel.add(closeButton);
@@ -157,7 +158,6 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         JButton newButton = new JButton("New");
         newButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                // FIXME: should be notifying the Presenter
                 displayRegisterUser();
             }
         });
@@ -165,7 +165,7 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         JButton deleteButton = new JButton("Delete");
         deleteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                deleteUser();
+                deleteUsers();
             }
         });
 
@@ -185,14 +185,6 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         return crudPanel;
     }
 
-    private void updateUsers() {
-        List users = getSelectedUsers();
-        for (Iterator iter = users.iterator(); iter.hasNext();) {
-            User user = (User) iter.next();
-            updateUser(user);
-        }
-    }
-
     // FIXME: if no users are selected, add appropriate behavior to Presenter
     private List getSelectedUsers() {
         List users = new ArrayList();
@@ -207,17 +199,8 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         return users;
     }
 
-    private void deleteUser() {
+    private void deleteUsers() {
         List users = getSelectedUsers();
-
-        // FIXME: make this an interaction b/w presenter and view
-        if (users.isEmpty()) {
-            showMessage("At least one User needs to be selected for deletion");
-            return;
-        }
-        if (!promptDelete())
-            return;
-
         try {
             presenter.doDelete((User[]) users.toArray(new User[0]));
         } catch (EmfException e) {
@@ -227,34 +210,37 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         }
     }
 
-    private void showMessage(String message) {
+    public void showMessage(String message) {
         messagePanel.setMessage(message);
         doSimpleRefresh();
     }
 
-    public boolean promptDelete() {
-        int option = JOptionPane.showConfirmDialog(null, "Are you sure about deleting user(s)", "Delete User",
-                JOptionPane.YES_NO_OPTION);
+    public boolean promptDelete(User[] users) {
+        StringBuffer buffer = new StringBuffer();
+        for (int i = 0; i < users.length; i++) {
+            buffer.append("'" + users[i].getUsername() + "'");
+            if (i + 1 < users.length)
+                buffer.append(", ");
+        }
+
+        int option = JOptionPane.showConfirmDialog(this, "Are you sure about deleting user(s) - " + buffer.toString(),
+                "Delete User", JOptionPane.YES_NO_OPTION);
         return (option == 0);
     }
 
     private void displayRegisterUser() {
-        RegisterUserInternalFrame container = new RegisterUserInternalFrame(new NoOpPostRegisterStrategy(), desktop);
+        RegisterUserInternalFrame registerUserView = new RegisterUserInternalFrame(new NoOpPostRegisterStrategy(),
+                desktop);
+        desktop.add(registerUserView);
 
-        getDesktopPane().add(container);
-
-        container.addInternalFrameListener(new InternalFrameAdapter() {
+        // FIXME: should be notifying the Presenter
+        registerUserView.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosed(InternalFrameEvent event) {
                 refresh();
             }
         });
 
-        RegisterUserPresenter presenter = new RegisterUserPresenter(userServices);
-        presenter.display(container.getView());
-
-        // FIXME: should be invoked by the Presenter. Container should implement
-        // the View, and delagate to the underlying panel
-        container.display();
+        presenter.doRegisterNewUser(registerUserView);
     }
 
     public void observe(UserManagerPresenter presenter) {
@@ -262,20 +248,26 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
     }
 
     public void refresh() {
+        model.refresh();
         selectModel.refresh();
         // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
         createLayout(parentConsole);
-        refreshLayout();
+        redoLayout();
     }
 
-    private void refreshLayout() {
+    private void redoLayout() {
         super.validate();
     }
 
     private void doSimpleRefresh() {
         model.refresh();
         selectModel.refresh();
-        refreshLayout();
+        redoLayout();
+    }
+
+    public void clearMessage() {
+        messagePanel.clear();
+        redoLayout();
     }
 
 }

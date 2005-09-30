@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.ui.DefaultWindowLayoutManager;
+import gov.epa.emissions.framework.ui.WindowLayoutManager;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -21,12 +23,13 @@ public class UserManagerWindowLauncher {
         JFrame frame = new JFrame();
 
         JDesktopPane desktop = new JDesktopPane();
-        UserManagerWindow console = new UserManagerWindow(null, userAdmin, frame, desktop);
+        UserManagerWindow view = new UserManagerWindow(null, userAdmin, frame, desktop);
 
-        UserManagerPresenter presenter = new UserManagerPresenter(null, userAdmin);
-        presenter.display(console);
+        WindowLayoutManager layoutManager = new DefaultWindowLayoutManager(view);
+        UserManagerPresenter presenter = new UserManagerPresenter(null, userAdmin, layoutManager);
+        presenter.display(view);
 
-        launcher.addAsInternalFrame(console, frame, desktop);
+        launcher.addAsInternalFrame(view, frame, desktop);
 
         frame.setSize(new Dimension(800, 600));
         frame.setLocation(new Point(400, 200));

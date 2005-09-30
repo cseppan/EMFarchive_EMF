@@ -1,12 +1,19 @@
 package gov.epa.emissions.framework.client.admin;
 
-public interface UserManagerView {
+import gov.epa.emissions.framework.client.EmfView;
+import gov.epa.emissions.framework.services.User;
+
+public interface UserManagerView extends EmfView {
 
     void observe(UserManagerPresenter presenter);
 
-    void close();
-
     void refresh();
 
-    void display();
+    void showMessage(String message);
+
+    void clearMessage();
+
+    boolean promptDelete(User[] users);
+
+    UpdateUserView getUpdateUserView(User user);
 }

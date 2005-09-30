@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.client.ReusableInteralFrame;
 
 import javax.swing.JDesktopPane;
 
-public class RegisterUserInternalFrame extends ReusableInteralFrame {
+public class RegisterUserInternalFrame extends ReusableInteralFrame implements RegisterUserView {
 
     private RegisterUserPanel view;
 
@@ -17,8 +17,8 @@ public class RegisterUserInternalFrame extends ReusableInteralFrame {
         super.getContentPane().add(view);
     }
 
-    public RegisterUserView getView() {
-        return view;
+    public void observe(RegisterUserPresenter presenter) {
+        view.observe(presenter);
     }
 
 }
