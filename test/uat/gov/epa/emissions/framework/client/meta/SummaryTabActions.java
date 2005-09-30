@@ -32,7 +32,7 @@ public class SummaryTabActions {
     }
 
     public String project() {
-        return textField("project");
+        return selectedComboBoxItem("projects");
     }
 
     public String datasetType() {
@@ -78,7 +78,7 @@ public class SummaryTabActions {
     }
 
     public String region() {
-        return textField("region");
+        return selectedComboBoxItem("regions");
     }
 
     private String textField(String widgetName) {

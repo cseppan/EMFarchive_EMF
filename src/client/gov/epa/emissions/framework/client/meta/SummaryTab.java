@@ -46,15 +46,11 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private TextField name;
 
-    private TextField project;
-
     private JFormattedTextField startDateTime;
 
     private FormattedTextField endDateTime;
 
     private DefaultComboBoxModel temporalResolutions;
-
-    private TextField region;
 
     private TextArea description;
 
@@ -63,6 +59,10 @@ public class SummaryTab extends JPanel implements SummaryTabView {
     private DefaultComboBoxModel countries;
 
     private MessagePanel messagePanel;
+
+    private DefaultComboBoxModel projects;
+
+    private DefaultComboBoxModel regions;
 
     public SummaryTab(EmfDataset dataset, DataServices dataServices, MessagePanel messagePanel) throws EmfException {
         super.setName("summary");
@@ -179,8 +179,14 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         layoutGenerator.addLabelWidgetPair("Sector", sectorsCombo, panel);
 
         // region
-        region = new TextField("region", dataset.getRegion(), 15);
-        layoutGenerator.addLabelWidgetPair("Region", region, panel);
+        String[] regionNames = new String[] { dataset.getRegion() };
+        regions = new DefaultComboBoxModel(regionNames);
+        JComboBox regionsCombo = new JComboBox(regions);
+        regionsCombo.setSelectedItem(dataset.getRegion());
+        regionsCombo.setName("regions");
+        regionsCombo.setEditable(true);
+        regionsCombo.setPreferredSize(new Dimension(125, 20));
+        layoutGenerator.addLabelWidgetPair("Region", regionsCombo, panel);
 
         // country
         countries = new DefaultComboBoxModel(countryNames(dataset.getCountry(), dataServices.getCountries()));
@@ -242,11 +248,15 @@ public class SummaryTab extends JPanel implements SummaryTabView {
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         layoutGenerator.addLabelWidgetPair("Description", scrollPane, panel);
 
-        // project
-        project = new TextField("project", dataset.getProject(), 15);
-        project.setMaximumSize(new Dimension(300, 15));
-
-        layoutGenerator.addLabelWidgetPair("Project", project, panel);
+        // project - TODO: look up all projects
+        String[] projectNames = new String[] { dataset.getProject() };
+        projects = new DefaultComboBoxModel(projectNames);
+        JComboBox projectsCombo = new JComboBox(projects);
+        projectsCombo.setSelectedItem(dataset.getProject());
+        projectsCombo.setName("projects");
+        projectsCombo.setEditable(true);
+        projectsCombo.setPreferredSize(new Dimension(125, 20));
+        layoutGenerator.addLabelWidgetPair("Project", projectsCombo, panel);
 
         // creator
         JLabel creator = createLeftAlignedLabel(dataset.getCreator());
@@ -276,11 +286,11 @@ public class SummaryTab extends JPanel implements SummaryTabView {
     public void updateDataset(EmfDataset dataset) {
         dataset.setName(name.getText());
         dataset.setDescription(description.getText());
-        dataset.setProject(project.getText());
+        dataset.setProject((String) projects.getSelectedItem());
         dataset.setStartDateTime(toDate(startDateTime.getText()));
         dataset.setStopDateTime(toDate(endDateTime.getText()));
         dataset.setTemporalResolution((String) temporalResolutions.getSelectedItem());
-        dataset.setRegion(region.getText());
+        dataset.setRegion((String) regions.getSelectedItem());
         dataset.setCountry((String) countries.getSelectedItem());
     }
 

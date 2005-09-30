@@ -64,7 +64,7 @@ public class PropertiesEditorTest extends UserAcceptanceTestCase {
         assertEquals(dataset, tabActions.name());
         String description = tabActions.description();
         assertTrue(description.startsWith("Created from file EMSHAP99d.txt provided by M. Strum in September 2002."));
-        assertEquals("", tabActions.project());
+        assertNull(tabActions.project());
         assertEquals("EMF", tabActions.creator());
         assertEquals("ORL Nonroad Inventory", tabActions.datasetType());
 
