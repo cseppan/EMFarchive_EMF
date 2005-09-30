@@ -100,7 +100,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         presenter.doExport(null, null, datasets);
     }
 
-    public void testShouldDisplayMetadataViewOnClickOfMetadataButton() {
+    public void testShouldDisplayPropertiesEditorOnClickOfPropertiesButton() {
         EmfDataset dataset = new EmfDataset();
         dataset.setName("name");
 
@@ -113,6 +113,57 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         PropertiesEditorView viewProxy = (PropertiesEditorView) metadataView.proxy();
         layout.expects(once()).method("add").with(eq(viewProxy));
 
-        presenter.doShowMetadata(viewProxy, dataset);
+        presenter.doShowProperties(viewProxy, dataset);
+    }
+
+    public void testShouldDisplayTheSamePropertiesEditorAsPreviouslyDisplayedOnSelectingTheSameDatasetAndClickingProperties() {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("name");
+
+        view.expects(atLeastOnce()).method("clearMessage").withNoArguments();
+
+        Mock propertiesEditorView = mock(PropertiesEditorView.class);
+        propertiesEditorView.expects(once()).method("observe").with(new IsInstanceOf(PropertiesEditorPresenter.class));
+        propertiesEditorView.expects(once()).method("display").with(eq(dataset));
+
+        PropertiesEditorView viewProxy = (PropertiesEditorView) propertiesEditorView.proxy();
+        layout.expects(once()).method("add").with(eq(viewProxy));
+
+        // 1st display
+        presenter.doShowProperties(viewProxy, dataset);
+
+        // 2nd attempt
+        propertiesEditorView.stubs().method("isAlive").withNoArguments().will(returnValue(Boolean.TRUE));
+        propertiesEditorView.expects(once()).method("bringToFront").withNoArguments();
+        presenter.doShowProperties(viewProxy, dataset);
+    }
+
+    public void testShouldDisplayNewPropertiesEditorIfPreviouslyOpenedEditorIsClosedOnClickingOfPropertiesButton() {
+        view.expects(atLeastOnce()).method("clearMessage").withNoArguments();
+
+        // 1st attempt
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("name");
+
+        Mock view1 = mock(PropertiesEditorView.class);
+        view1.expects(once()).method("observe").with(new IsInstanceOf(PropertiesEditorPresenter.class));
+        view1.expects(once()).method("display").with(eq(dataset));
+
+        PropertiesEditorView view1Proxy = (PropertiesEditorView) view1.proxy();
+        layout.expects(once()).method("add").with(eq(view1Proxy));
+
+        presenter.doShowProperties(view1Proxy, dataset);
+
+        // 2nd attempt - view1 is closed, view2 will be displayed
+        view1.stubs().method("isAlive").withNoArguments().will(returnValue(Boolean.FALSE));
+
+        Mock view2 = mock(PropertiesEditorView.class);
+        view2.expects(once()).method("observe").with(new IsInstanceOf(PropertiesEditorPresenter.class));
+        view2.expects(once()).method("display").with(eq(dataset));
+
+        PropertiesEditorView view2Proxy = (PropertiesEditorView) view2.proxy();
+        layout.expects(once()).method("add").with(eq(view2Proxy));
+
+        presenter.doShowProperties(view2Proxy, dataset);
     }
 }

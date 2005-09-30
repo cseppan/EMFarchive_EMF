@@ -7,7 +7,7 @@ import java.beans.PropertyVetoException;
 
 import javax.swing.JInternalFrame;
 
-public abstract class EmfInternalFrame extends JInternalFrame implements EmfView, ManagedView {
+public abstract class EmfInternalFrame extends JInternalFrame implements ManagedView {
 
     public EmfInternalFrame(String title) {
         super(title, true, // resizable

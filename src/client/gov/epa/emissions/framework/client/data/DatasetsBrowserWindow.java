@@ -221,7 +221,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             PropertiesEditor view = new PropertiesEditor(session, this, parentConsole);
             desktop.add(view);
 
-            presenter.doShowMetadata(view, (EmfDataset) iter.next());
+            presenter.doShowProperties(view, (EmfDataset) iter.next());
         }
     }
 

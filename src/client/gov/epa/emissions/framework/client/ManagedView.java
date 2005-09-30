@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client;
 
-
-public interface ManagedView {
+public interface ManagedView extends EmfView {
     String getTitle();
 
     void bringToFront();

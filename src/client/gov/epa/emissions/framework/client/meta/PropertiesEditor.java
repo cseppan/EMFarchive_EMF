@@ -147,4 +147,8 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         messagePanel.setError(message);
     }
 
+    public boolean isAlive() {
+        return !super.isClosed();
+    }
+
 }

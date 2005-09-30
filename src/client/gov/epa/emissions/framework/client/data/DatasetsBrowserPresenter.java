@@ -11,6 +11,9 @@ import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.WindowLayoutManager;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DatasetsBrowserPresenter {
 
     private DatasetsBrowserView view;
@@ -19,9 +22,12 @@ public class DatasetsBrowserPresenter {
 
     private DataServices dataServices;
 
+    private Map editorsMap;
+
     public DatasetsBrowserPresenter(DataServices dataServices, WindowLayoutManager windowLayoutManager) {
         this.dataServices = dataServices;
         this.windowLayoutManager = windowLayoutManager;
+        editorsMap = new HashMap();
     }
 
     public void display(DatasetsBrowserView view) {
@@ -45,7 +51,7 @@ public class DatasetsBrowserPresenter {
 
         view.clearMessage();
         windowLayoutManager.add(exportView);
-        
+
         presenter.display(exportView);
     }
 
@@ -57,18 +63,37 @@ public class DatasetsBrowserPresenter {
     }
 
     // TODO: Is this a better style/pattern compared to doNew ?
-    public void doShowMetadata(PropertiesEditorView metadataView, EmfDataset dataset) {
+    public void doShowProperties(PropertiesEditorView propertiesEditorView, EmfDataset dataset) {
         view.clearMessage();
-        windowLayoutManager.add(metadataView);
-        
+        if (isPropertiesEditorAlive(dataset)) {
+            propertiesEditor(dataset).bringToFront();
+            return;
+        }
+
+        showPropertiesEditor(propertiesEditorView, dataset);
+    }
+
+    private boolean isPropertiesEditorAlive(EmfDataset dataset) {
+        return editorsMap.containsKey(dataset) && propertiesEditor(dataset).isAlive();
+    }
+
+    private PropertiesEditorView propertiesEditor(EmfDataset dataset) {
+        return (PropertiesEditorView) editorsMap.get(dataset);
+    }
+
+    private void showPropertiesEditor(PropertiesEditorView propertiesEditorView, EmfDataset dataset) {
+        windowLayoutManager.add(propertiesEditorView);
+
         PropertiesEditorPresenter presenter = new PropertiesEditorPresenter(dataset, dataServices);
-        presenter.display(metadataView);
+        presenter.display(propertiesEditorView);
+
+        editorsMap.put(dataset, propertiesEditorView);
     }
 
     public void doNew(ImportView importView, ImportPresenter importPresenter) throws EmfException {
         view.clearMessage();
         windowLayoutManager.add(importView);
-        
+
         importPresenter.display(importView);
     }
 
