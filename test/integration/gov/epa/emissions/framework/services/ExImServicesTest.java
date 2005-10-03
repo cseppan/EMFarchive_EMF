@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.importer.DatasetTypes;
+import gov.epa.emissions.commons.io.importer.ORLDatasetTypes;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
 
@@ -39,7 +39,7 @@ public class ExImServicesTest extends ServicesTestCase {
 
     public void testImportOrlNonPoint() throws Exception {
         DatasetType datasetType = new DatasetType();
-        datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
+        datasetType.setName(ORLDatasetTypes.NONPOINT.getName());
         User user = userService.getUser("emf");
 
         File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
@@ -52,7 +52,7 @@ public class ExImServicesTest extends ServicesTestCase {
 
     public void testExportOrlNonPoint() throws Exception {
         DatasetType datasetType = new DatasetType();
-        datasetType.setName(DatasetTypes.ORL_AREA_NONPOINT_TOXICS);
+        datasetType.setName(ORLDatasetTypes.NONPOINT.getName());
         User user = userService.getUser("emf");
 
         dataset.setDatasetType("ORL Nonpoint Inventory");

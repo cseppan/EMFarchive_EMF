@@ -163,7 +163,7 @@ public class EmfDataset implements Dataset {
     public Table getTable(String tableType) {
         for (Iterator iter = tables.iterator(); iter.hasNext();) {
             Table element = (Table) iter.next();
-            if (element.getTableType().equals(tableType))
+            if (element.getType().equals(tableType))
                 return element;
         }
 
@@ -176,7 +176,7 @@ public class EmfDataset implements Dataset {
 
         for (Iterator iter = tables.iterator(); iter.hasNext();) {
             Table element = (Table) iter.next();
-            tablesMap.put(element.getTableType(), element.getTableName());
+            tablesMap.put(element.getType(), element.getName());
         }
 
         return tablesMap;
@@ -211,7 +211,7 @@ public class EmfDataset implements Dataset {
 
         for (Iterator iter = tablesMap.keySet().iterator(); iter.hasNext();) {
             String tableType = (String) iter.next();
-            tables.add(new Table(tableType, (String) tablesMap.get(tableType)));
+            tables.add(new Table((String) tablesMap.get(tableType), tableType));
         }
     }
 
