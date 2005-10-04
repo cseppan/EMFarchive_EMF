@@ -29,9 +29,6 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
         new DbUpdate().deleteAll("emf.datasets");
     }
 
-    // FIXME:If multiple users try to do an Import simultaneously, EMF runs into
-    // a database synchronization error. Only the first import succeeds, whereas
-    // the rest of them would fail.
     public void testShouldDisplayImportedDatasets() throws Exception {
         String dataset = "UAT-" + new Random().nextInt();
         doImport(dataset);

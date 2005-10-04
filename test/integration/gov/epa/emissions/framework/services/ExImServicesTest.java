@@ -16,7 +16,11 @@ public class ExImServicesTest extends ServicesTestCase {
 
     private EmfDataset dataset;
 
+    private ORLDatasetTypes types;
+
     protected void setUp() {
+        this.types = new ORLDatasetTypes();
+
         eximService = serviceLocator.getExImServices();
         userService = serviceLocator.getUserServices();
 
@@ -39,7 +43,7 @@ public class ExImServicesTest extends ServicesTestCase {
 
     public void testImportOrlNonPoint() throws Exception {
         DatasetType datasetType = new DatasetType();
-        datasetType.setName(ORLDatasetTypes.NONPOINT.getName());
+        datasetType.setName(types.nonPoint().getName());
         User user = userService.getUser("emf");
 
         File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
@@ -51,8 +55,7 @@ public class ExImServicesTest extends ServicesTestCase {
     }
 
     public void testExportOrlNonPoint() throws Exception {
-        DatasetType datasetType = new DatasetType();
-        datasetType.setName(ORLDatasetTypes.NONPOINT.getName());
+        DatasetType datasetType = types.nonPoint();
         User user = userService.getUser("emf");
 
         dataset.setDatasetType("ORL Nonpoint Inventory");

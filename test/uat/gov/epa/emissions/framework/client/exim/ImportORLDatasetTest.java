@@ -60,8 +60,7 @@ public class ImportORLDatasetTest extends UserAcceptanceTestCase {
         assertTrue("Should have atleast 4 ORL types", model.getSize() >= 4);
     }
 
-    // FIXME: test fails, only as a part of a suite
-    public void FIXME_testShouldImportORLNonRoad() throws Exception {
+    public void testShouldImportORLNonRoad() throws Exception {
         doImport(datasetName("ORLNonroadInventory"), new OrlImportAction() {
             public void run(String name) {
                 importActions.importOrlNonRoad(name);
@@ -69,8 +68,7 @@ public class ImportORLDatasetTest extends UserAcceptanceTestCase {
         });
     }
 
-    // FIXME: test fails, only as a part of a suite
-    public void FIXME_testShouldImportORLNonPoint() throws Exception {
+    public void testShouldImportORLNonPoint() throws Exception {
         doImport(datasetName("ORL NonPoint Inventory"), new OrlImportAction() {
             public void run(String name) {
                 importActions.importOrlNonPoint(name);
@@ -78,8 +76,7 @@ public class ImportORLDatasetTest extends UserAcceptanceTestCase {
         });
     }
 
-    // FIXME: test fails, only as a part of a suite
-    public void FIXME_testShouldImportORLPoint() throws Exception {
+    public void testShouldImportORLPoint() throws Exception {
         doImport(datasetName("ORL Point Inventory"), new OrlImportAction() {
             public void run(String name) {
                 importActions.importOrlPoint(name);
@@ -87,8 +84,7 @@ public class ImportORLDatasetTest extends UserAcceptanceTestCase {
         });
     }
 
-    // FIXME: test fails, only as a part of a suite
-    public void FIXME_testShouldImportORLOnRoadMobile() throws Exception {
+    public void testShouldImportORLOnRoadMobile() throws Exception {
         doImport(datasetName("ORL Onroad Inventory"), new OrlImportAction() {
             public void run(String name) {
                 importActions.importOrlOnRoadMobile(name);

@@ -54,8 +54,6 @@ public class EmfDataset implements Dataset {
 
     private Date endDateTime;
 
-    private Map datasources;
-
     private List tables;
 
     private String sector;
@@ -190,10 +188,6 @@ public class EmfDataset implements Dataset {
         tables.add(table);
     }
 
-    public void setDataSources(Map dataSources) {
-        this.datasources = dataSources;// table type -> filepath mapping
-    }
-
     public String getCountry() {
         return country;
     }
@@ -236,8 +230,8 @@ public class EmfDataset implements Dataset {
         return endDateTime;
     }
 
-    public Map getDataSources() {
-        return datasources;
+    public List getDataSources() {
+        return null;
     }
 
     public long getDatasetid() {
@@ -276,5 +270,15 @@ public class EmfDataset implements Dataset {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public void setDataSourcesNames(Map datasourcesNames) {
+    }
+
+    public Map getDataSourcesNames() {
+        return null;
+    }
+
+    public void setDataSources(List datasources) {
     }
 }

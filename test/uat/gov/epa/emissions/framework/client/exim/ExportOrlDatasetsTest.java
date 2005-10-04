@@ -35,8 +35,7 @@ public class ExportOrlDatasetsTest extends UserAcceptanceTestCase {
         exportOrlNonRoad(datasetName);
     }
 
-    // FIXME: test fails as part of test suite
-    public void FIXME_testShouldFailToExportIfOverwriteIsUncheckedAndFileAlreadyExists() throws Exception {
+    public void testShouldFailToExportIfOverwriteIsUncheckedAndFileAlreadyExists() throws Exception {
         String datasetName = "Test" + new Random().nextInt();
         importOrlNonRoad(datasetName);
         exportOrlNonRoad(datasetName);
@@ -55,8 +54,7 @@ public class ExportOrlDatasetsTest extends UserAcceptanceTestCase {
         exportActions.assertErrorMessage("Cannot export to existing file.  Choose overwrite option");
     }
 
-    // FIXME: test fails as part of test suite
-    public void FIXME_testShouldExportMultipleSelectedDatasetsToFilesOnClickOfExportButton() throws Exception {
+    public void testShouldExportMultipleSelectedDatasetsToFilesOnClickOfExportButton() throws Exception {
         String dataset1 = "Test" + new Random().nextInt();
         String dataset2 = "Test" + new Random().nextInt();
         String folder = System.getProperty("java.io.tmpdir");
