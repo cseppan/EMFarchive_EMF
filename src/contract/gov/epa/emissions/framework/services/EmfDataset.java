@@ -273,13 +273,6 @@ public class EmfDataset implements Dataset {
         this.status = status;
     }
 
-    public void setDataSourcesNames(Map datasourcesNames) {
-    }
-
-    public Map getDataSourcesNames() {
-        return null;
-    }
-
     public void setDataSources(List datasources) {
     }
 }

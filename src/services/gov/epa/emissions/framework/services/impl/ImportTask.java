@@ -11,8 +11,8 @@ package gov.epa.emissions.framework.services.impl;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.commons.io.importer.Importer;
+import gov.epa.emissions.commons.io.importer.ORLTableType;
 import gov.epa.emissions.commons.io.importer.ORLTableTypes;
-import gov.epa.emissions.commons.io.importer.TableType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EMFConstants;
@@ -45,7 +45,8 @@ public class ImportTask implements Runnable {
 
     private EmfDataset dataset;
 
-    public ImportTask(User user, File file, EmfDataset dataset, DatasetType datasetType, ServicesHolder svcHolder, Importer importer) {
+    public ImportTask(User user, File file, EmfDataset dataset, DatasetType datasetType, ServicesHolder svcHolder,
+            Importer importer) {
         this.user = user;
         this.file = file;
         this.dataset = dataset;
@@ -91,8 +92,8 @@ public class ImportTask implements Runnable {
         dataset.setDatasetType(datasetType.getName());
 
         ORLTableTypes tableTypes = new ORLTableTypes();
-        TableType tableType = tableTypes.type(dataset.getDatasetType());
-        dataset.addTable(new Table(tablename, tableType.baseTypes()[0]));
+        ORLTableType tableType = tableTypes.type(dataset.getDatasetType());
+        dataset.addTable(new Table(tablename, tableType.baseType()));
     }
 
     private void setStartStatus() throws EmfException {
