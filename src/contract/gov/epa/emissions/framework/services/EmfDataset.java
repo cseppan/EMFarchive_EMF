@@ -111,7 +111,7 @@ public class EmfDataset implements Dataset {
      * 
      */
     public EmfDataset() {
-        tables = new ArrayList();        
+        tables = new ArrayList();
     }
 
     public String getDatasetType() {
@@ -180,6 +180,7 @@ public class EmfDataset implements Dataset {
         return tablesMap;
     }
 
+    // FIXME: needs to be a DatasetType object
     public void setDatasetType(String datasetType) {
         this.datasetType = datasetType;
     }
