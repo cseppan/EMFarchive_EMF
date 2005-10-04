@@ -16,7 +16,7 @@ public class ImporterFactory {
 	public Importer create(DatasetType datasetType) {
 		// FIXME: Get the specific type of importer for the filetype. Use a
 		// Factory pattern
-		return new BaseORLImporter(dbServer, false, true);
+		return new BaseORLImporter(dbServer, true);
 	}
 
 }
