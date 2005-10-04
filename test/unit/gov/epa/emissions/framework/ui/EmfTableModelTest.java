@@ -62,7 +62,7 @@ public class EmfTableModelTest extends MockObjectTestCase {
 
     public void testShouldReturnUserAttributesAtSpecifiedIndex() {
         assertEquals(dataset1.getName(), model.getValueAt(0, 0));
-        assertEquals(dataset1.getDatasetType(), model.getValueAt(0, 1));
+        assertEquals(dataset1.getDatasetTypeName(), model.getValueAt(0, 1));
         assertEquals(dataset1.getStatus(), model.getValueAt(0, 2));
         assertEquals(dataset1.getCreator(), model.getValueAt(0, 3));
         assertEquals(dataset1.getRegion(), model.getValueAt(0, 4));

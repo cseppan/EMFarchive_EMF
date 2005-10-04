@@ -89,10 +89,10 @@ public class ImportTask implements Runnable {
         String filename = file.getName();
         String tablename = filename.substring(0, filename.length() - 4).replace('.', '_');
 
-        dataset.setDatasetType(datasetType.getName());
+        dataset.setDatasetTypeName(datasetType.getName());
 
         ORLTableTypes tableTypes = new ORLTableTypes();
-        ORLTableType tableType = tableTypes.type(dataset.getDatasetType());
+        ORLTableType tableType = tableTypes.type(dataset.getDatasetTypeName());
         dataset.addTable(new Table(tablename, tableType.baseType()));
     }
 

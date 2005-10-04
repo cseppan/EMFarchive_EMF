@@ -200,7 +200,7 @@ public class ExImServicesImpl implements ExImServices {
                 svcHolder.setLogSvc(new LoggingServicesImpl());
                 svcHolder.setStatusSvc(new StatusServicesImpl());
                 svcHolder.setDataSvc(new DataServicesImpl());
-                Exporter exporter = exporterFactory.create(aDataset.getDatasetType());
+                Exporter exporter = exporterFactory.create(aDataset.getDatasetTypeName());
                 AccessLog accesslog = new AccessLog(user.getUsername(), aDataset.getDatasetid(), aDataset.getAccessedDateTime(),
                         "Version 1.0", purpose, dirName);
                 ExportTask eximTask = new ExportTask(user, file, aDataset, svcHolder, accesslog, exporter);

@@ -11,7 +11,11 @@
   <property name="name"					column="name"					type="java.lang.String"		not-null="true"/>
   <property name="creator"				column="creator"				type="java.lang.String"		not-null="true"/>
   <property name="status"				column="status"					type="java.lang.String"		not-null="true"/>
-  <property name="datasetType"			column="datasettype"			type="java.lang.String"		not-null="true"/>
+  <many-to-one 
+            name="datasetType" 
+            class="gov.epa.emissions.commons.io.DatasetType"
+            column="dataset_type"
+   />       
   <property name="units"				column="units"					type="java.lang.String"		not-null="false"/>
   <property name="region"				column="region"					type="java.lang.String"		not-null="false"/>
   <property name="year"					column="year"					type="integer"				not-null="false"/>

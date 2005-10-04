@@ -11,6 +11,7 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.Dataset;
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Table;
 
 import java.util.ArrayList;
@@ -25,8 +26,6 @@ import java.util.Map;
  * 
  */
 public class EmfDataset implements Dataset {
-    // TODO: how are these unused variables accessed ?
-
     // unique id needed for hibernate persistence
     private long datasetid;
 
@@ -38,7 +37,7 @@ public class EmfDataset implements Dataset {
 
     private String status;
 
-    private String datasetType;
+    private String datasetTypeName;
 
     private String region;
 
@@ -65,6 +64,8 @@ public class EmfDataset implements Dataset {
     private Date modifiedDateTime;
 
     private Date accessedDateTime;
+
+    private DatasetType datasetType;
 
     public Date getAccessedDateTime() {
         return accessedDateTime;
@@ -114,7 +115,11 @@ public class EmfDataset implements Dataset {
         tables = new ArrayList();
     }
 
-    public String getDatasetType() {
+    public String getDatasetTypeName() {
+        return datasetTypeName;
+    }
+
+    public DatasetType getDatasetType() {
         return datasetType;
     }
 
@@ -180,8 +185,11 @@ public class EmfDataset implements Dataset {
         return tablesMap;
     }
 
-    // FIXME: needs to be a DatasetType object
-    public void setDatasetType(String datasetType) {
+    public void setDatasetTypeName(String datasetType) {
+        this.datasetTypeName = datasetType;
+    }
+
+    public void setDatasetType(DatasetType datasetType) {
         this.datasetType = datasetType;
     }
 

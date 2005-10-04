@@ -281,7 +281,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         layoutGenerator.addLabelWidgetPair("Creator", creator, panel);
 
         // dataset type
-        JLabel datasetType = createLeftAlignedLabel(dataset.getDatasetType());
+        JLabel datasetType = createLeftAlignedLabel(dataset.getDatasetTypeName());
         datasetType.setName("datasetType");
         layoutGenerator.addLabelWidgetPair("Dataset Type", datasetType, panel);
 

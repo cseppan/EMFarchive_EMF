@@ -58,7 +58,7 @@ public class ExImServicesTest extends ServicesTestCase {
         DatasetType datasetType = types.nonPoint();
         User user = userService.getUser("emf");
 
-        dataset.setDatasetType("ORL Nonpoint Inventory");
+        dataset.setDatasetTypeName("ORL Nonpoint Inventory");
         dataset.setDescription("description");
         dataset.setStatus("imported");
 

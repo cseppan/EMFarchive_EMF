@@ -66,7 +66,7 @@ public class ExportTask implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
     public void run() {
-        log.info("starting export - file: " + file.getName() + " of type: " + dataset.getDatasetType());
+        log.info("starting export - file: " + file.getName() + " of type: " + dataset.getDatasetTypeName());
         try {
             setStartStatus();
             exporter.run( dataset, file);

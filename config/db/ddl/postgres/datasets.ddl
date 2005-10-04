@@ -10,7 +10,7 @@ CREATE TABLE datasets
   name varchar(255) NOT NULL,
   creator varchar(255) NOT NULL,
   status varchar(255) NOT NULL,
-  datasettype varchar(255) NOT NULL,
+  dataset_type integer,
   units varchar(255),
   region varchar(255),
   "year" int4 NOT NULL DEFAULT 0,
