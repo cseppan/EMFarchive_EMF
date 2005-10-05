@@ -10,6 +10,7 @@
 
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Country;
@@ -29,6 +30,8 @@ import javax.xml.rpc.ServiceException;
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
+import org.apache.axis.encoding.ser.BeanDeserializerFactory;
+import org.apache.axis.encoding.ser.BeanSerializerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -75,18 +78,19 @@ public class DataServicesTransport implements DataServices {
             QName qname1 = new QName(emfSvcsNamespace, "ns1:EmfDataset");
             QName qname2 = new QName(emfSvcsNamespace, "ns1:EmfDatasets");
             QName qname3 = new QName(emfSvcsNamespace, "getDatasets");
+            QName datasetTypeQName = new QName(emfSvcsNamespace, "ns1:DatasetType");
 
             call.setOperationName(qname3);
 
             Class cls1 = EmfDataset.class;
             Class cls2 = EmfDataset[].class;
 
-            call.registerTypeMapping(cls1, qname1,
-                    new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),
-                    new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));
+            call.registerTypeMapping(cls1, qname1, new BeanSerializerFactory(cls1, qname1),
+                    new BeanDeserializerFactory(cls1, qname1));
             call.registerTypeMapping(cls2, qname2,
                     new org.apache.axis.encoding.ser.ArraySerializerFactory(cls2, qname2),
                     new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname2));
+            registerMapping(call, datasetTypeQName, DatasetType.class);
 
             registerMappingForTable(call);
 
@@ -110,6 +114,12 @@ public class DataServicesTransport implements DataServices {
         return datasets;
     }
 
+    private void registerMapping(Call call, QName datasetTypeQName, Class clazz) {
+        call.registerTypeMapping(clazz, datasetTypeQName,
+                new BeanSerializerFactory(DatasetType.class, datasetTypeQName), new BeanDeserializerFactory(clazz,
+                        datasetTypeQName));
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -125,42 +135,44 @@ public class DataServicesTransport implements DataServices {
      * 
      * @see gov.epa.emissions.framework.services.DataServices#insertDataset(gov.epa.emissions.commons.io.Dataset)
      */
-    public void insertDataset(EmfDataset aDataset) throws EmfException {
-        log.debug("insert a new dataset type object: " + aDataset.getName());
-        Service service = new Service();
-        Call call;
-        try {
-            call = (Call) service.createCall();
-            call.setTargetEndpointAddress(new java.net.URL(endpoint));
-
-            QName qname2 = new QName(emfSvcsNamespace, "ns1:EmfDataset");
-            QName qname3 = new QName(emfSvcsNamespace, "insertDataset");
-
-            call.setOperationName(qname3);
-
-            call.registerTypeMapping(EmfDataset.class, qname2, new org.apache.axis.encoding.ser.BeanSerializerFactory(
-                    EmfDataset.class, qname2), new org.apache.axis.encoding.ser.BeanDeserializerFactory(
-                    EmfDataset.class, qname2));
-
-            registerMappingForTable(call);
-
-            call.addParameter("dataset", qname2, ParameterMode.IN);
-
-            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
-            call.invoke(new Object[] { aDataset });
-
-        } catch (ServiceException e) {
-            log.error("Error invoking the service", e);
-        } catch (MalformedURLException e) {
-            log.error("Error in format of URL string", e);
-        } catch (AxisFault fault) {
-            log.error("Axis Fault details", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
-        } catch (RemoteException e) {
-            log.error("Error communicating with WS end point", e);
-        }
-
-        log.debug("insert a new dataset type object: " + aDataset.getName());
+    public void insertDataset(EmfDataset aDataset) {
+        // log.debug("insert a new dataset type object: " + aDataset.getName());
+        // Service service = new Service();
+        // Call call;
+        // try {
+        // call = (Call) service.createCall();
+        // call.setTargetEndpointAddress(new java.net.URL(endpoint));
+        //
+        // QName qname2 = new QName(emfSvcsNamespace, "ns1:EmfDataset");
+        // QName qname3 = new QName(emfSvcsNamespace, "insertDataset");
+        //
+        // call.setOperationName(qname3);
+        //
+        // call.registerTypeMapping(EmfDataset.class, qname2, new
+        // org.apache.axis.encoding.ser.BeanSerializerFactory(
+        // EmfDataset.class, qname2), new
+        // org.apache.axis.encoding.ser.BeanDeserializerFactory(
+        // EmfDataset.class, qname2));
+        //
+        // registerMappingForTable(call);
+        //
+        // call.addParameter("dataset", qname2, ParameterMode.IN);
+        //
+        // call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+        // call.invoke(new Object[] { aDataset });
+        //
+        // } catch (ServiceException e) {
+        // log.error("Error invoking the service", e);
+        // } catch (MalformedURLException e) {
+        // log.error("Error in format of URL string", e);
+        // } catch (AxisFault fault) {
+        // log.error("Axis Fault details", fault);
+        // throw new EmfException(extractMessage(fault.getMessage()));
+        // } catch (RemoteException e) {
+        // log.error("Error communicating with WS end point", e);
+        // }
+        //
+        // log.debug("insert a new dataset type object: " + aDataset.getName());
 
     }
 
@@ -189,7 +201,7 @@ public class DataServicesTransport implements DataServices {
         return message;
     }
 
-	public void updateDataset(EmfDataset aDset) throws EmfException {
+    public void updateDataset(EmfDataset aDset) throws EmfException {
         log.debug("update a new dataset type object: " + aDset.getName());
         Service service = new Service();
         Call call;
@@ -199,13 +211,14 @@ public class DataServicesTransport implements DataServices {
 
             QName qname2 = new QName(emfSvcsNamespace, "ns1:EmfDataset");
             QName qname3 = new QName(emfSvcsNamespace, "updateDataset");
+            QName datasetTypeQName = new QName(emfSvcsNamespace, "ns1:DatasetType");
 
             call.setOperationName(qname3);
 
             call.registerTypeMapping(EmfDataset.class, qname2, new org.apache.axis.encoding.ser.BeanSerializerFactory(
                     EmfDataset.class, qname2), new org.apache.axis.encoding.ser.BeanDeserializerFactory(
                     EmfDataset.class, qname2));
-
+            registerMapping(call, datasetTypeQName, DatasetType.class);
             registerMappingForTable(call);
 
             call.addParameter("dataset", qname2, ParameterMode.IN);
@@ -225,9 +238,9 @@ public class DataServicesTransport implements DataServices {
         }
 
         log.debug("update a new dataset type object: " + aDset.getName());
-	}
+    }
 
-	public Country[] getCountries() throws EmfException {
+    public Country[] getCountries() throws EmfException {
         log.debug("Get all countries");
 
         // Call the DataServices endpoint and acquire the array of all countries
@@ -279,7 +292,7 @@ public class DataServicesTransport implements DataServices {
         return countries;
     }
 
-	public Sector[] getSectors() throws EmfException {
+    public Sector[] getSectors() throws EmfException {
 
         log.debug("Get all sectors");
 
@@ -331,19 +344,13 @@ public class DataServicesTransport implements DataServices {
         log.debug("Get all sectors");
         return sectors;
 
-	}
+    }
 
-	public void addCountry(String country) throws EmfException {
+    public void addCountry(String country) {
+        // TODO: Implementation pending
+    }
 
-		//FIXME: REMOVE DUMMY LINES BELOW
-		if (false) throw new EmfException("");
-
-	}
-
-	public void addSector(String sector) throws EmfException {
-
-		//FIXME: REMOVE DUMMY LINES BELOW
-		if (false) throw new EmfException("");
-
-	}
+    public void addSector(String sector) {
+        // TODO: Implementation pending
+    }
 }

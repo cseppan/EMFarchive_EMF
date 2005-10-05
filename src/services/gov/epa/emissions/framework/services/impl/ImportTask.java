@@ -8,7 +8,6 @@
  */
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ORLTableType;
@@ -39,26 +38,22 @@ public class ImportTask implements Runnable {
 
     private DataServices dataServices = null;
 
-    private DatasetType datasetType;
-
     private Importer importer;
 
     private EmfDataset dataset;
 
-    public ImportTask(User user, File file, EmfDataset dataset, DatasetType datasetType, ServicesHolder svcHolder,
-            Importer importer) {
+    public ImportTask(User user, File file, EmfDataset dataset, ServicesHolder svcHolder, Importer importer) {
         this.user = user;
         this.file = file;
         this.dataset = dataset;
         this.dataServices = svcHolder.getDataSvc();
         this.statusServices = svcHolder.getStatusSvc();
-        this.datasetType = datasetType;
 
         this.importer = importer;
     }
 
     public void run() {
-        log.info("starting import - file: " + file.getName() + " of type: " + datasetType.getName());
+        log.info("starting import - file: " + file.getName() + " of type: " + dataset.getDatasetTypeName());
 
         try {
             setStartStatus();
@@ -71,7 +66,7 @@ public class ImportTask implements Runnable {
             dataset.setStatus(DatasetStatus.IMPORTED);
             dataServices.insertDataset(dataset);
 
-            setStatus(EMFConstants.END_IMPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
+            setStatus(EMFConstants.END_IMPORT_MESSAGE_Prefix + dataset.getDatasetTypeName() + ":" + file.getName());
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + file, e);
             try {
@@ -81,7 +76,7 @@ public class ImportTask implements Runnable {
             }
         }
 
-        log.info("importing of file: " + file.getName() + " of type: " + datasetType.getName() + " complete");
+        log.info("importing of file: " + file.getName() + " of type: " + dataset.getDatasetTypeName() + " complete");
     }
 
     private void updateOrlDataset(EmfDataset dataset) {
@@ -89,15 +84,15 @@ public class ImportTask implements Runnable {
         String filename = file.getName();
         String tablename = filename.substring(0, filename.length() - 4).replace('.', '_');
 
-        dataset.setDatasetTypeName(datasetType.getName());
+        dataset.setDatasetType(dataset.getDatasetType());
 
         ORLTableTypes tableTypes = new ORLTableTypes();
-        ORLTableType tableType = tableTypes.type(dataset.getDatasetTypeName());
+        ORLTableType tableType = tableTypes.type(dataset.getDatasetType());
         dataset.addTable(new Table(tablename, tableType.baseType()));
     }
 
     private void setStartStatus() throws EmfException {
-        setStatus(EMFConstants.START_IMPORT_MESSAGE_Prefix + datasetType.getName() + ":" + file.getName());
+        setStatus(EMFConstants.START_IMPORT_MESSAGE_Prefix + dataset.getDatasetTypeName() + ":" + file.getName());
     }
 
     private void setStatus(String message) throws EmfException {

@@ -33,8 +33,7 @@ public class ExImServicesTest extends ServicesTestCase {
 
     protected void tearDown() throws Exception {
         ExImDbUpdate dbUpdate = new ExImDbUpdate();
-        dbUpdate.deleteAll("emf.dataset_access_logs");
-        dbUpdate.deleteAll("emf.datasets");
+        dbUpdate.deleteAllDatasets();
     }
 
     public void testFetchDatasetTypesReturnsFourORLTypes() throws EmfException {
@@ -44,12 +43,13 @@ public class ExImServicesTest extends ServicesTestCase {
 
     public void testImportOrlNonPoint() throws Exception {
         DatasetType datasetType = types.nonPoint();
+        dataset.setDatasetType(datasetType);
         User user = userService.getUser("emf");
 
         File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
         String filename = "arinv.nonpoint.nti99_NC.txt";
 
-        eximService.startImport(user, repository.getAbsolutePath(), filename, dataset, datasetType);
+        eximService.startImport(user, repository.getAbsolutePath(), filename, dataset);
 
         // FIXME: verify that import is complete
     }
@@ -58,14 +58,14 @@ public class ExImServicesTest extends ServicesTestCase {
         DatasetType datasetType = types.nonPoint();
         User user = userService.getUser("emf");
 
-        dataset.setDatasetTypeName("ORL Nonpoint Inventory");
+        dataset.setDatasetType(datasetType);
         dataset.setDescription("description");
         dataset.setStatus("imported");
 
         // import
         File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
         String filename = "arinv.nonpoint.nti99_NC.txt";
-        eximService.startImport(user, repository.getAbsolutePath(), filename, dataset, datasetType);
+        eximService.startImport(user, repository.getAbsolutePath(), filename, dataset);
 
         // FIXME: verify that import is complete
 

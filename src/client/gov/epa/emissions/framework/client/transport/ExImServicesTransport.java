@@ -77,10 +77,9 @@ public class ExImServicesTransport implements ExImServices {
      * @see gov.epa.emissions.framework.commons.ExImServices#startImport(gov.epa.emissions.framework.commons.User,
      *      java.lang.String, gov.epa.emissions.framework.commons.DatasetType)
      */
-    public void startImport(User user, String folderPath, String fileName, EmfDataset dataset, DatasetType datasetType)
-            throws EmfException {
+    public void startImport(User user, String folderPath, String fileName, EmfDataset dataset) throws EmfException {
         log.debug("Begin import file for user:filename:datasettype:: " + user.getUsername() + " :: " + fileName
-                + " :: " + datasetType.getName());
+                + " :: " + dataset.getDatasetTypeName());
         Service service = new Service();
         Call call;
 
@@ -105,11 +104,10 @@ public class ExImServicesTransport implements ExImServices {
             call.addParameter("folderpath", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
             call.addParameter("filename", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
             call.addParameter("dataset", datasetQName, ParameterMode.IN);
-            call.addParameter("datasettype", datasetTypeQName, ParameterMode.IN);
 
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
 
-            call.invoke(new Object[] { user, folderPath, fileName, dataset, datasetType });
+            call.invoke(new Object[] { user, folderPath, fileName, dataset });
 
         } catch (ServiceException e) {
             log.error("Error invoking the service", e);
@@ -123,7 +121,7 @@ public class ExImServicesTransport implements ExImServices {
         }
 
         log.debug("Begin import file for user:filename:datasettype:: " + user.getUsername() + " :: " + fileName
-                + " :: " + datasetType.getName());
+                + " :: " + dataset.getDatasetTypeName());
 
     }
 
@@ -243,6 +241,7 @@ public class ExImServicesTransport implements ExImServices {
             QName datasetsQName = new QName(emfSvcsNamespace, "ns1:EmfDatasets");
             QName operationQName = new QName(emfSvcsNamespace, "startExport");
             QName tableQName = new QName(emfSvcsNamespace, "ns1:Table");
+            QName datasetTypeQName = new QName(emfSvcsNamespace, "ns1:DatasetType");
 
             call.setOperationName(operationQName);
             registerMapping(call, userQName, gov.epa.emissions.framework.services.User.class);
@@ -252,6 +251,7 @@ public class ExImServicesTransport implements ExImServices {
                     new org.apache.axis.encoding.ser.ArraySerializerFactory(EmfDataset[].class, datasetsQName),
                     new org.apache.axis.encoding.ser.ArrayDeserializerFactory(datasetsQName));
 
+            registerMapping(call, datasetTypeQName, DatasetType.class);
             registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
 
             call.addParameter("user", userQName, ParameterMode.IN);

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.ui;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class EmfTableModelTest extends MockObjectTestCase {
 
         dataset1 = new EmfDataset();
         dataset1.setName("name1");
+        dataset1.setDatasetType(new DatasetType("name1"));
         dataset1.setStatus("whatever-status");
         dataset1.setCreator("creator1");
         dataset1.setRegion("region1");
@@ -32,6 +34,7 @@ public class EmfTableModelTest extends MockObjectTestCase {
 
         dataset2 = new EmfDataset();
         dataset2.setName("name1");
+        dataset2.setDatasetType(new DatasetType("name2"));
         dataset2.setStatus("whatever-status");
         dataset2.setCreator("creator1");
         dataset2.setRegion("region1");

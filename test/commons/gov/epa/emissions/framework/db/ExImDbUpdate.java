@@ -46,6 +46,7 @@ public class ExImDbUpdate extends DbUpdate {
 
     public void deleteAllDatasets() throws DatabaseUnitException, SQLException {
         super.deleteAll("emf.dataset_access_logs");
+        super.deleteAll("emf.datasettables");
         super.deleteAll("emf.datasets");
     }
 

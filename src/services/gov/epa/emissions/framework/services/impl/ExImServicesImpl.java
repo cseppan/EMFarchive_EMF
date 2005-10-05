@@ -158,7 +158,7 @@ public class ExImServicesImpl implements ExImServices {
      *      java.lang.String, gov.epa.emissions.commons.io.EmfDataset,
      *      gov.epa.emissions.commons.io.DatasetType)
      */
-    public void startImport(User user, String folderPath, String fileName, EmfDataset dataset, DatasetType datasetType)
+    public void startImport(User user, String folderPath, String fileName, EmfDataset dataset)
             throws EmfException {
         log.debug("In ExImServicesImpl:startImport START");
 
@@ -170,8 +170,8 @@ public class ExImServicesImpl implements ExImServices {
             svcHolder.setDataSvc(new DataServicesImpl());
             svcHolder.setStatusSvc(new StatusServicesImpl());
 
-            Importer importer = importerFactory.create(datasetType);
-            ImportTask eximTask = new ImportTask(user, file, dataset, datasetType, svcHolder, importer);
+            Importer importer = importerFactory.create(dataset.getDatasetType());
+            ImportTask eximTask = new ImportTask(user, file, dataset, svcHolder, importer);
 
             threadPool.execute(eximTask);
         } catch (Exception e) {

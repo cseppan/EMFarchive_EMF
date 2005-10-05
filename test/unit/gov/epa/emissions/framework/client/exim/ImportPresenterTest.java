@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
@@ -40,27 +41,33 @@ public class ImportPresenterTest extends MockObjectTestCase {
     }
 
     public void testSendsImportRequestToEximServiceOnImport() throws EmfException {
-        DatasetType type = new DatasetType("ORL NonRoad");
-
-        User user = new User();
+	    DatasetType type = new DatasetType("ORL NonRoad");
+		
+		User user = new User();
         user.setUsername("user");
         user.setFullName("full name");
 
         String datasetName = "dataset name";
         Constraint datasetNameConstraint = new HasPropertyWithValue("name", eq(datasetName));
         Constraint datasetCreatorConstraint = new HasPropertyWithValue("creator", eq(user.getFullName()));
-        Constraint datasetCreatedDateTimeConstraint = new HasPropertyWithValue("createdDateTime", new IsInstanceOf(Date.class));
-        Constraint datasetAccessedDateTimeConstraint = new HasPropertyWithValue("accessedDateTime", new IsInstanceOf(Date.class));
-        Constraint datasetModifiedDateTimeConstraint = new HasPropertyWithValue("modifiedDateTime", new IsInstanceOf(Date.class));
-        Constraint datasetDateTimeConstraints = new And(new And(datasetCreatedDateTimeConstraint, datasetAccessedDateTimeConstraint), datasetModifiedDateTimeConstraint);
-        Constraint datasetConstraints = new And(new And(datasetCreatorConstraint, datasetNameConstraint), datasetDateTimeConstraints);
-        
+        Constraint datasetCreatedDateTimeConstraint = new HasPropertyWithValue("createdDateTime", new IsInstanceOf(
+                Date.class));
+        Constraint datasetAccessedDateTimeConstraint = new HasPropertyWithValue("accessedDateTime", new IsInstanceOf(
+                Date.class));
+        Constraint datasetModifiedDateTimeConstraint = new HasPropertyWithValue("modifiedDateTime", new IsInstanceOf(
+                Date.class));
+        Constraint datasetDateTimeConstraints = new And(new And(datasetCreatedDateTimeConstraint,
+                datasetAccessedDateTimeConstraint), datasetModifiedDateTimeConstraint);
+        Constraint datasetConstraints = new And(new And(datasetCreatorConstraint, datasetNameConstraint),
+                datasetDateTimeConstraints);
+        datasetConstraints = new And(new IsInstanceOf(EmfDataset.class), datasetConstraints);
+
         String dir = "dir";
         String filename = "filename";
 
         Mock model = mock(ExImServices.class);
 
-        Constraint[] constraints = new Constraint[] { eq(user), eq(dir), eq(filename), datasetConstraints, eq(type) };
+        Constraint[] constraints = new Constraint[] { eq(user), eq(dir), eq(filename), datasetConstraints };
         model.expects(once()).method("startImport").with(constraints);
 
         ImportPresenter presenter = new ImportPresenter(user, (ExImServices) model.proxy());

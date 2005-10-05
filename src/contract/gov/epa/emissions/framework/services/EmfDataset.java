@@ -37,8 +37,6 @@ public class EmfDataset implements Dataset {
 
     private String status;
 
-    private String datasetTypeName;
-
     private String region;
 
     private String country = "US";
@@ -116,7 +114,7 @@ public class EmfDataset implements Dataset {
     }
 
     public String getDatasetTypeName() {
-        return datasetTypeName;
+        return datasetType.getName();
     }
 
     public DatasetType getDatasetType() {
@@ -183,10 +181,6 @@ public class EmfDataset implements Dataset {
         }
 
         return tablesMap;
-    }
-
-    public void setDatasetTypeName(String datasetType) {
-        this.datasetTypeName = datasetType;
     }
 
     public void setDatasetType(DatasetType datasetType) {

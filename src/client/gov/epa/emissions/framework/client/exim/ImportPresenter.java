@@ -33,13 +33,13 @@ public class ImportPresenter {
 
         EmfDataset dataset = new EmfDataset();
         dataset.setCreator(user.getFullName());
+        dataset.setDatasetType(type);
         dataset.setName(datasetName);
         dataset.setCreatedDateTime(new Date());
         dataset.setModifiedDateTime(dataset.getCreatedDateTime());
         dataset.setAccessedDateTime(dataset.getCreatedDateTime());
 
-        // String filepath = directory + File.separator + filename;
-        eximServices.startImport(user, directory, filename, dataset, type);
+        eximServices.startImport(user, directory, filename, dataset);
     }
 
     public void doDone() {
