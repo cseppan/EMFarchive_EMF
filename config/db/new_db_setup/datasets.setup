@@ -1,24 +1,61 @@
----- Create Table
-CREATE TABLE emf.datasettypes
+--- Table: emf.datasets
+CREATE TABLE datasets
 (
-  dataset_type_id serial UNIQUE NOT NULL,
+  dataset_id serial NOT NULL,
   name varchar(255) NOT NULL,
-  description text NOT NULL,
-  minfiles integer NOT NULL DEFAULT 0,
-  maxfiles integer NOT NULL DEFAULT 0,
-  min_columns integer NOT NULL DEFAULT 0,
-  max_columns integer NOT NULL DEFAULT 0
+  creator varchar(255) NOT NULL,
+  status varchar(255) NOT NULL,
+  dataset_type integer,
+  units varchar(255),
+  region varchar(255),
+  "year" int4 NOT NULL DEFAULT 0,
+  country varchar(255),
+  temporal_resolution varchar(255),
+  start_date_time timestamp,
+  stop_date_time timestamp,
+  description text,
+  sector varchar(255),
+  project varchar(255),
+  created_date_time timestamp,
+  modified_date_time timestamp,
+  accessed_date_time timestamp,
+  CONSTRAINT datasets_pkey PRIMARY KEY (dataset_id),
+  CONSTRAINT datasets_name_key UNIQUE (name)
 ) 
 WITHOUT OIDS;
-ALTER TABLE emf.datasettypes OWNER TO emf;
-
-
----- Load Data
-delete from emf.datasettypes;
-insert into emf.datasettypes values(1,'ORL Nonpoint Inventory','ORL Nonpoint Inventory', '1', '1', 8, 12);
-insert into emf.datasettypes values(2,'ORL Nonroad Inventory','ORL Nonroad Inventory', '1', '1', 4, 8);
-insert into emf.datasettypes values(3,'ORL Onroad Inventory','ORL Onroad Inventory', '1', '1', 4, 5);
-insert into emf.datasettypes values(4,'ORL Point Inventory','ORL Point Inventory', '1', '1', 23, 28);
+ALTER TABLE datasets OWNER TO emf;
 
 
 
+--- Table: emf.datasettables
+CREATE TABLE datasettables
+(
+  dataset_id int4 NOT NULL,
+  table_type varchar(255) NOT NULL,
+  table_name varchar(255) NOT NULL,
+  CONSTRAINT dataset_tables_to_datasets FOREIGN KEY (dataset_id)
+      REFERENCES datasets (dataset_id)
+) 
+WITHOUT OIDS;
+ALTER TABLE datasettables OWNER TO emf;
+
+
+
+
+--- Table: dataset_access_logs
+CREATE TABLE dataset_access_logs
+(
+  access_log_id serial NOT NULL,
+  dataset_id int4 REFERENCES datasets (dataset_id) NOT NULL,
+  username varchar(255) REFERENCES users (user_name) NOT NULL,
+  date timestamp NOT NULL,
+  version varchar(128) NOT NULL,
+  description text NOT NULL,
+  "location" varchar(255) NOT NULL,
+  CONSTRAINT dataset_access_logs_access_log_id_key UNIQUE (access_log_id),
+  CONSTRAINT dataset_access_logs_pkey PRIMARY KEY (access_log_id),
+  CONSTRAINT dataset_access_logs_to_datasets FOREIGN KEY (dataset_id)
+      REFERENCES datasets (dataset_id)
+) 
+WITHOUT OIDS;
+ALTER TABLE dataset_access_logs OWNER TO emf;
