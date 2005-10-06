@@ -9,6 +9,7 @@
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.Table;
+import gov.epa.emissions.commons.io.importer.DefaultORLDatasetTypesFactory;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ORLTableType;
 import gov.epa.emissions.commons.io.importer.ORLTableTypes;
@@ -86,9 +87,9 @@ public class ImportTask implements Runnable {
 
         dataset.setDatasetType(dataset.getDatasetType());
 
-        ORLTableTypes tableTypes = new ORLTableTypes();
+        ORLTableTypes tableTypes = new ORLTableTypes(new DefaultORLDatasetTypesFactory());
         ORLTableType tableType = tableTypes.type(dataset.getDatasetType());
-        dataset.addTable(new Table(tablename, tableType.baseType()));
+        dataset.addTable(new Table(tablename, tableType.base()));
     }
 
     private void setStartStatus() throws EmfException {

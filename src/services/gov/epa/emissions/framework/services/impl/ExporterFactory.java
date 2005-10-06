@@ -13,22 +13,23 @@ package gov.epa.emissions.framework.services.impl;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.exporter.Exporter;
 import gov.epa.emissions.commons.io.exporter.orl.ORLExporter;
+import gov.epa.emissions.commons.io.importer.DefaultORLDatasetTypesFactory;
 
 /**
  * @author Conrad F. D'Cruz
- *
+ * 
  */
 public class ExporterFactory {
 
-	private DbServer dbServer;
+    private DbServer dbServer;
 
-	public ExporterFactory(DbServer dbServer) {
-		this.dbServer = dbServer;
-	}
+    public ExporterFactory(DbServer dbServer) {
+        this.dbServer = dbServer;
+    }
 
-	public Exporter create(String datasetType) {
-		// FIXME: Get the specific type of importer for the filetype. Use a
-		// Factory pattern
-		return ORLExporter.create(dbServer);
-	}
+    public Exporter create(String datasetType) {
+        // FIXME: Get the specific type of importer for the filetype. Use a
+        // Factory pattern
+        return ORLExporter.create(dbServer, new DefaultORLDatasetTypesFactory());
+    }
 }
