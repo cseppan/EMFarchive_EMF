@@ -22,7 +22,9 @@ import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,7 +35,7 @@ public class ImportTask implements Runnable {
 
     private User user;
 
-    private File file;
+    private File[] files;
 
     private StatusServices statusServices = null;
 
@@ -43,9 +45,12 @@ public class ImportTask implements Runnable {
 
     private EmfDataset dataset;
 
-    public ImportTask(User user, File file, EmfDataset dataset, ServicesHolder svcHolder, Importer importer) {
+	private String fileName;
+
+    public ImportTask(User user, File[] files, String fileName, EmfDataset dataset, ServicesHolder svcHolder, Importer importer) {
         this.user = user;
-        this.file = file;
+        this.files = files;
+        this.fileName = fileName;
         this.dataset = dataset;
         this.dataServices = svcHolder.getDataSvc();
         this.statusServices = svcHolder.getStatusSvc();
@@ -54,38 +59,53 @@ public class ImportTask implements Runnable {
     }
 
     public void run() {
-        log.info("starting import - file: " + file.getName() + " of type: " + dataset.getDatasetTypeName());
+        log.info("starting import - file: " + fileName + " of type: " + dataset.getDatasetTypeName());
 
         try {
             setStartStatus();
 
-            updateOrlDataset(dataset);
+            if (dataset.getDatasetTypeName().indexOf("ORL")>=0){
+            	log.debug("updating ORL dataset");
+            	updateOrlDataset(dataset,files);
+            }else{
+            	log.debug("updating non-ORL dataset");
+            	updateExternalDataset(dataset,files);
+            }
 
-            importer.run(new File[] { file }, dataset, true);
+            importer.run(files, dataset, true);
 
             // if no errors then insert the dataset into the database
             dataset.setStatus(DatasetStatus.IMPORTED);
             dataServices.insertDataset(dataset);
 
-            setStatus(EMFConstants.END_IMPORT_MESSAGE_Prefix + dataset.getDatasetTypeName() + ":" + file.getName());
+            setStatus(EMFConstants.END_IMPORT_MESSAGE_Prefix + dataset.getDatasetTypeName() + ":" + fileName);
         } catch (Exception e) {
-            log.error("Problem on attempting to run ExIm on file : " + file, e);
+            log.error("Problem on attempting to run ExIm on file : " + fileName, e);
             try {
                 setStatus("Import failure. Reason: " + e.getMessage());
             } catch (EmfException e1) {
-                log.error("Problem attempting to post 'end status' using Status Service for file : " + file, e1);
+                log.error("Problem attempting to post 'end status' using Status Service for file : " + fileName, e1);
             }
         }
 
-        log.info("importing of file: " + file.getName() + " of type: " + dataset.getDatasetTypeName() + " complete");
+        log.info("importing of file: " + fileName + " of type: " + dataset.getDatasetTypeName() + " complete");
     }
 
-    private void updateOrlDataset(EmfDataset dataset) {
+    private void updateExternalDataset(EmfDataset dataset, File[] files) {
+    	List fileNames = new ArrayList();
+    	for (int i=0; i<files.length;i++){
+    		fileNames.add(files[i].getAbsolutePath());
+    	}
+    	dataset.setDatasources(fileNames);
+	}
+
+	private void updateOrlDataset(EmfDataset dataset, File[] files) {
         // FIXME: why hard code the table type ?
-        String filename = file.getName();
+        String filename = files[0].getName();
         String tablename = filename.substring(0, filename.length() - 4).replace('.', '_');
 
-        dataset.setDatasetType(dataset.getDatasetType());
+        //FIXME: What the heck is this next line?
+        //dataset.setDatasetType(dataset.getDatasetType());
 
         ORLTableTypes tableTypes = new ORLTableTypes(new DefaultORLDatasetTypesFactory());
         ORLTableType tableType = tableTypes.type(dataset.getDatasetType());
@@ -93,7 +113,7 @@ public class ImportTask implements Runnable {
     }
 
     private void setStartStatus() throws EmfException {
-        setStatus(EMFConstants.START_IMPORT_MESSAGE_Prefix + dataset.getDatasetTypeName() + ":" + file.getName());
+        setStatus(EMFConstants.START_IMPORT_MESSAGE_Prefix + dataset.getDatasetTypeName() + ":" + files[0].getName());
     }
 
     private void setStatus(String message) throws EmfException {

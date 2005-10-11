@@ -63,6 +63,8 @@ public class EmfDataset implements Dataset {
 
     private Date accessedDateTime;
 
+    private List datasources;
+    
     private DatasetType datasetType;
 
     public Date getAccessedDateTime() {
@@ -233,9 +235,6 @@ public class EmfDataset implements Dataset {
         return endDateTime;
     }
 
-    public List getDataSources() {
-        return null;
-    }
 
     public long getDatasetid() {
         return datasetid;
@@ -275,6 +274,29 @@ public class EmfDataset implements Dataset {
         this.status = status;
     }
 
-    public void setDataSources(List datasources) {
+
+    public List getDatasources() {
+    	return this.datasources;
     }
+
+    public void setDatasources(List datasources) {
+    	this.datasources=datasources;
+    }
+
+	public void setDatasetType(String datasetType) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setDataSourcesNames(Map datasourcesNames) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public Map getDataSourcesNames() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+    
+    
 }

@@ -26,13 +26,18 @@
   <property name="description"			column="description"			type="java.lang.String"		not-null="false"/>
   <property name="sector"				column="sector"					type="java.lang.String"		not-null="false"/>
   <property name="project"				column="project"				type="java.lang.String"		not-null="false"/>
-  <property name="createdDateTime"			column="created_date_time" 		type="java.util.Date"		not-null="false"	length="4"/>
-  <property name="modifiedDateTime"			column="modified_date_time" 		type="java.util.Date"		not-null="false"	length="4"/>
-  <property name="accessedDateTime"			column="accessed_date_time" 		type="java.util.Date"		not-null="false"	length="4"/>        
+  <property name="createdDateTime"		column="created_date_time" 		type="java.util.Date"		not-null="false"	length="4"/>
+  <property name="modifiedDateTime"		column="modified_date_time" 	type="java.util.Date"		not-null="false"	length="4"/>
+  <property name="accessedDateTime"		column="accessed_date_time" 	type="java.util.Date"		not-null="false"	length="4"/>        
   <map name="tablesMap" table="DATASETTABLES" lazy="false">
     <key column="DATASET_ID"/>
-    <index column="TABLE_TYPE" type="string"/>
+    <index column="TABLE_TYPE" type="string" />
     <element column="TABLE_NAME" type="string"/>
   </map>
+  <list name="datasources" table="datasources" lazy="false">
+    <key column="DATASET_ID"/>
+    <list-index column="ds_id" base="1"/>
+    <element column="data_source" type="string"/>
+  </list>
 </class>
 </hibernate-mapping>

@@ -163,21 +163,32 @@ public class ExImServicesImpl implements ExImServices {
         log.debug("In ExImServicesImpl:startImport START");
 
         try {
-            File path = validatePath(folderPath);
-            File file = validateFile(path, fileName);
+        	File path = validatePath(folderPath);
+
             validateDatasetName(dataset);
             ServicesHolder svcHolder = new ServicesHolder();
             svcHolder.setDataSvc(new DataServicesImpl());
             svcHolder.setStatusSvc(new StatusServicesImpl());
 
             Importer importer = importerFactory.create(dataset.getDatasetType());
-            ImportTask eximTask = new ImportTask(user, file, dataset, svcHolder, importer);
+            log.debug("%%%%%%%%%%%%  before precondition");
+            log.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+            log.debug("$$$ Path: " + path.getAbsolutePath());
+            log.debug("$$$ Filename: " + fileName);
+            log.debug("$$$ DatasetType: " + dataset.getDatasetType().getName());
+            log.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+            File[] files = importer.preCondition(path, fileName, dataset.getDatasetType());
+            log.debug("%%%%%%%%%%%%  after precondition");
+            ImportTask eximTask = new ImportTask(user, files, fileName, dataset, svcHolder, importer);
+//           ImportTask eximTask = new ImportTask(user, file, dataset, svcHolder, importer);
+
 
             threadPool.execute(eximTask);
         } catch (Exception e) {
             log.error("Exception attempting to start import of file: " + fileName, e);
             throw new EmfException(e.getMessage());
         }
+
 
         log.debug("In ExImServicesImpl:startImport END");
     }
