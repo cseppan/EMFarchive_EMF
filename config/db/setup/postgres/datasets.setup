@@ -1,4 +1,8 @@
---- Table: emf.datasets
+--- Table: datasets
+DROP TABLE datasets CASCADE;
+DELETE FROM DATASET_ACCESS_LOGS;
+DELETE FROM DATASETTABLES;
+
 CREATE TABLE datasets
 (
   dataset_id serial NOT NULL,
@@ -25,9 +29,18 @@ CREATE TABLE datasets
 WITHOUT OIDS;
 ALTER TABLE datasets OWNER TO emf;
 
+-- Sequence: datasets_dataset_id_seq
+CREATE SEQUENCE datasets_dataset_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 1
+  CACHE 1;
+ALTER TABLE datasets_dataset_id_seq OWNER TO emf;
 
 
---- Table: emf.datasettables
+------------------------------------------------------------
+--- Table: datasettables
 CREATE TABLE datasettables
 (
   dataset_id int4 NOT NULL,
@@ -41,7 +54,7 @@ ALTER TABLE datasettables OWNER TO emf;
 
 
 
-
+----------------------------------------------------------------
 --- Table: dataset_access_logs
 CREATE TABLE dataset_access_logs
 (

@@ -13,6 +13,7 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Table;
+import gov.epa.emissions.commons.io.importer.InternalSource;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,6 +68,13 @@ public class EmfDataset implements Dataset {
     
     private DatasetType datasetType;
 
+    private List internalSources;
+
+    public EmfDataset() {
+        tables = new ArrayList();
+        internalSources = new ArrayList();
+    }
+
     public Date getAccessedDateTime() {
         return accessedDateTime;
     }
@@ -105,14 +113,6 @@ public class EmfDataset implements Dataset {
 
     public void setSector(String sector) {
         this.sector = sector;
-    }
-
-    /**
-     * No argument constructor needed for hibernate bean mapping
-     * 
-     */
-    public EmfDataset() {
-        tables = new ArrayList();
     }
 
     public String getDatasetTypeName() {
@@ -297,6 +297,18 @@ public class EmfDataset implements Dataset {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    public List getInternalSources() {
+        return internalSources;
+    }
+
+    public void setInternalSources(List internalsources) {
+        this.internalSources = internalsources;
+    }
+
+    public void addInternalSource(InternalSource source) {
+        internalSources.add(source);
+    }
     
     
 }
