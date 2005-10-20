@@ -18,11 +18,11 @@ public class LogsTabPresenter {
         this.services = services;
     }
 
-    public void display() throws EmfException {
+    public void doDisplay() throws EmfException {
         view.display(services.getAccessLogs(dataset.getDatasetid()));
     }
 
-    public void save() {
+    public void doSave() {
         // No Op
     }
 

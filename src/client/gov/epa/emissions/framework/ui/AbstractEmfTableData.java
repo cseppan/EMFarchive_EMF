@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.ui;
 
-import gov.epa.emissions.framework.client.exim.Row;
 
 import java.util.ArrayList;
 import java.util.List;

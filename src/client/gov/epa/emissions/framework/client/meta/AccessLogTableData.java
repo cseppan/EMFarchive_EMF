@@ -1,11 +1,8 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.exim.Row;
 import gov.epa.emissions.framework.services.AccessLog;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.LoggingServices;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
+import gov.epa.emissions.framework.ui.Row;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +11,8 @@ public class AccessLogTableData extends AbstractEmfTableData {
 
     private List rows;
 
-    public AccessLogTableData(EmfDataset dataset, LoggingServices services) throws EmfException {
-        // TODO: should use lazy load ?
-        this.rows = createRows(services.getAccessLogs(dataset.getDatasetid()));
+    public AccessLogTableData(AccessLog[] logs) {
+        this.rows = createRows(logs);
     }
 
     public String[] columns() {

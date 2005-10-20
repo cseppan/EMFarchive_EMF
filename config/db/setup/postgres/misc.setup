@@ -30,8 +30,8 @@ ALTER TABLE emf_properties OWNER TO emf;
 --- TODO: PLEASE SPECIFY CUSTOM PROPERTIES BASED ON YOUR ENVIRONMENT
 delete from emf_properties;
 insert into emf_properties values (1,'emf.data.root.folder','C:\\UNC_CEP\\emf_data');
-insert into emf_properties values (2,'emf.data.import.folder','C:\\UNC_CEP\\emf_data\\import');
-insert into emf_properties values (3,'emf.data.export.folder','C:\\UNC_CEP\\emf_data\\export');
+insert into emf_properties values (2,'emf.data.import.folder','');
+insert into emf_properties values (3,'emf.data.export.folder','');
 
 
 

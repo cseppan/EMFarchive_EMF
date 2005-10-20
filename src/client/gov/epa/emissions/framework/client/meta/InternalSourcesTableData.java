@@ -1,0 +1,57 @@
+package gov.epa.emissions.framework.client.meta;
+
+import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.framework.ui.AbstractEmfTableData;
+import gov.epa.emissions.framework.ui.Row;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class InternalSourcesTableData extends AbstractEmfTableData {
+
+    private List rows;
+
+    public InternalSourcesTableData(InternalSource[] internalSources) {
+        this.rows = createRows(internalSources);
+    }
+
+    public String[] columns() {
+        return new String[] { "Table", "Type", "Table Columns", "Source", "Size" };
+    }
+
+    public List rows() {
+        return rows;
+    }
+
+    public boolean isEditable(int col) {
+        return false;
+    }
+
+    private List createRows(InternalSource[] sources) {
+        List rows = new ArrayList();
+
+        // TODO: what about size ?
+        for (int i = 0; i < sources.length; i++) {
+            InternalSource element = sources[i];
+            Object[] values = { element.getTable(), element.getType(), concat(element.getCols()), element.getSource(),
+                    new Long(element.getSourceSize()) };
+
+            Row row = new Row(element, values);
+            rows.add(row);
+        }
+
+        return rows;
+    }
+
+    private String concat(String[] cols) {
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < cols.length; i++) {
+            buf.append(cols[i]);
+            if (i + 1 < cols.length)
+                buf.append(", ");
+        }
+
+        return buf.toString();
+    }
+
+}

@@ -37,7 +37,7 @@
     <element column="TABLE_NAME" type="string"/>
   </map>
 
-  <array name="internalSources" table="internal_sources" lazy="false">
+  <array name="internalSources" table="internal_sources">
     <key column="dataset_id"/>
     <list-index column="list_index"/>
     <composite-element class="gov.epa.emissions.commons.io.InternalSource">

@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import gov.epa.emissions.framework.client.exim.Row;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 public class EmfDatasetTableData extends AbstractEmfTableData {

@@ -9,7 +9,6 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.LoggingServices;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -47,31 +46,14 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         tabbedPane.setName("tabbedPane");
 
         tabbedPane.addTab("Summary", createSummaryTab(dataset, messagePanel));
-        tabbedPane.addTab("Data", createTab());
+        tabbedPane.addTab("Data", createDataTab(dataset, parentConsole));
         tabbedPane.addTab("Keywords", createTab());
-        tabbedPane.addTab("Logs", createLogsTab(dataset, session.getLoggingServices(), parentConsole));
+        tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
         tabbedPane.addTab("Info", createTab());
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         return tabbedPane;
-    }
-
-    private JPanel createLogsTab(EmfDataset dataset, LoggingServices services, EmfFrame parentConsole) {
-        try {
-            LogsTab view = new LogsTab(dataset, services, parentConsole);
-
-            // FIXME2: activate the presenter on tab-click
-            // LogsTabPresenter presenter = new LogsTabPresenter(view, dataset,
-            // session.getLoggingServices());
-            // presenter.display();
-
-            return view;
-        } catch (EmfException e) {
-            messagePanel.setError("could not load Logs tab. Failed communication with remote Logging Services.");
-        }
-
-        return createTab();
     }
 
     private JPanel createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
@@ -82,6 +64,30 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
             return view;
         } catch (EmfException e) {
             showError("Could not load Summary Tab. Reason - " + e.getMessage());
+        }
+
+        return createTab();
+    }
+
+    private JPanel createDataTab(EmfDataset dataset, EmfFrame parentConsole) {
+        DataTab view = new DataTab(parentConsole);
+        DataTabPresenter presenter = new DataTabPresenter(view, dataset);
+        presenter.doDisplay();
+
+        return view;
+    }
+
+    private JPanel createLogsTab(EmfDataset dataset, EmfFrame parentConsole) {
+        try {
+            LogsTab view = new LogsTab(parentConsole);
+
+            // FIXME: activate the presenter on tab-click
+            LogsTabPresenter presenter = new LogsTabPresenter(view, dataset, session.getLoggingServices());
+            presenter.doDisplay();
+
+            return view;
+        } catch (EmfException e) {
+            messagePanel.setError("could not load Logs tab. Failed communication with remote Logging Services.");
         }
 
         return createTab();

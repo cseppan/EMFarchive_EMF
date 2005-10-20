@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.ui;
 
 import gov.epa.emissions.commons.gui.RefreshableTableModel;
 import gov.epa.emissions.commons.gui.TableHeader;
-import gov.epa.emissions.framework.client.exim.Row;
 
 import java.util.List;
 

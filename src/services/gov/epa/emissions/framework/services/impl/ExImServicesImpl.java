@@ -80,8 +80,8 @@ public class ExImServicesImpl implements ExImServices {
 
         importerFactory = new ImporterFactory(dbServer);
         exporterFactory = new ExporterFactory(dbServer);
-        
-        //TODO: thread pooling policy
+
+        // TODO: thread pooling policy
         threadPool = new PooledExecutor(new BoundedBuffer(10), 20);
         threadPool.setMinimumPoolSize(3);
     }
@@ -94,7 +94,6 @@ public class ExImServicesImpl implements ExImServices {
         log.debug("In ExImServicesImpl:getBaseDirectoryProperty END");
         session.flush();
         session.close();
-        
         return propvalue;
     }
 
@@ -113,20 +112,6 @@ public class ExImServicesImpl implements ExImServices {
 
         return file;
     }
-
-// FIXME:  REMOVE AFTER DEBUG
-//    private File validateFile(File folder, String fileName) throws EmfException {
-//        log.debug("check if file exists " + fileName);
-//        File file = new File(folder, fileName);
-//
-//        if (!file.exists() || !file.isFile()) {
-//            log.error("File " + file.getAbsolutePath() + " not found");
-//            throw new EmfException("File not found");
-//        }
-//        log.debug("check if file exists " + fileName);
-//
-//        return file;
-//    }
 
     private File validatePath(String folderPath) throws EmfException {
         log.debug("check if folder exists " + folderPath);
@@ -165,7 +150,7 @@ public class ExImServicesImpl implements ExImServices {
         log.debug("In ExImServicesImpl:startImport START for: " + dataset.getDatasetid() + " " + dataset.getName());
 
         try {
-        	File path = validatePath(folderPath);
+            File path = validatePath(folderPath);
 
             validateDatasetName(dataset);
             ServicesHolder svcHolder = new ServicesHolder();
@@ -189,7 +174,6 @@ public class ExImServicesImpl implements ExImServices {
             throw new EmfException(e.getMessage());
         }
 
-
         log.debug("In ExImServicesImpl:startImport END");
     }
 
@@ -212,8 +196,8 @@ public class ExImServicesImpl implements ExImServices {
                 svcHolder.setStatusSvc(new StatusServicesImpl());
                 svcHolder.setDataSvc(new DataServicesImpl());
                 Exporter exporter = exporterFactory.create(aDataset.getDatasetTypeName());
-                AccessLog accesslog = new AccessLog(user.getUsername(), aDataset.getDatasetid(), aDataset.getAccessedDateTime(),
-                        "Version 1.0", purpose, dirName);
+                AccessLog accesslog = new AccessLog(user.getUsername(), aDataset.getDatasetid(), aDataset
+                        .getAccessedDateTime(), "Version 1.0", purpose, dirName);
                 ExportTask eximTask = new ExportTask(user, file, aDataset, svcHolder, accesslog, exporter);
                 threadPool.execute(eximTask);
             }

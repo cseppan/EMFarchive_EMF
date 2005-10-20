@@ -1,30 +1,19 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.AccessLog;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.LoggingServices;
 
 import java.util.List;
 
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import junit.framework.TestCase;
 
-public class AccessLogTableDataTest extends MockObjectTestCase {
+public class AccessLogTableDataTest extends TestCase {
 
     private AccessLogTableData data;
 
-    private EmfDataset dataset;
-
-    protected void setUp() throws EmfException {
-        dataset = new EmfDataset();
-        dataset.setDatasetid(1);
-
-        Mock services = mock(LoggingServices.class);
+    protected void setUp() {
         AccessLog[] logs = new AccessLog[] { new AccessLog(), new AccessLog() };
-        services.stubs().method("getAccessLogs").with(eq(dataset.getDatasetid())).will(returnValue(logs));
 
-        data = new AccessLogTableData(dataset, (LoggingServices) services.proxy());
+        data = new AccessLogTableData(logs);
     }
 
     public void testShouldHaveFiveColumns() {
@@ -41,6 +30,7 @@ public class AccessLogTableDataTest extends MockObjectTestCase {
         assertFalse("All cells should be uneditable", data.isEditable(0));
         assertFalse("All cells should be uneditable", data.isEditable(1));
         assertFalse("All cells should be uneditable", data.isEditable(2));
+        assertFalse("All cells should be uneditable", data.isEditable(3));
         assertFalse("All cells should be uneditable", data.isEditable(4));
     }
 
@@ -50,18 +40,15 @@ public class AccessLogTableDataTest extends MockObjectTestCase {
         assertEquals(2, rows.size());
     }
 
-    public void testShouldReturnARowRepresentingAnAccessLogEntry() throws EmfException {
+    public void testShouldReturnARowRepresentingAnAccessLogEntry() {
         AccessLog log1 = new AccessLog();
         log1.setUsername("user1");
-        
+
         AccessLog log2 = new AccessLog();
         AccessLog[] logs = new AccessLog[] { log1, log2 };
 
-        Mock services = mock(LoggingServices.class);
-        services.stubs().method("getAccessLogs").with(eq(dataset.getDatasetid())).will(returnValue(logs));
+        data = new AccessLogTableData(logs);
 
-        data = new AccessLogTableData(dataset, (LoggingServices) services.proxy());
-        
         assertEquals(log1, data.element(0));
         assertEquals(log2, data.element(1));
     }

@@ -12,7 +12,6 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.LoggingServices;
-import gov.epa.emissions.framework.services.Status;
 
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
@@ -35,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class LoggingServicesTransport implements LoggingServices {
     private static Log log = LogFactory.getLog(LoggingServicesTransport.class);
+
     private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
     private static String endpoint = "";
@@ -69,25 +69,15 @@ public class LoggingServicesTransport implements LoggingServices {
         return message;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.commons.EMFStatus#getMessages(java.lang.String,
-     *      java.lang.String)
-     */
-    public Status[] getMessages(String userName, String type) {
-        // FIXME: CONRAD Complete this method
-        return null;
+    // FIXME: THIS IS NOT NEEDED ON THE FRONTEND
+    // LEAVE IN FOR NOW UNTIL REFACTOR
+    public void setAccessLog(AccessLog accesslog) throws EmfException {
+        // TODO Auto-generated method stub
+        if (false)
+            throw new EmfException("BOGUS");
     }
 
-    //FIXME:  THIS IS NOT NEEDED ON THE FRONTEND
-    //LEAVE IN FOR NOW UNTIL REFACTOR
-	public void setAccessLog(AccessLog accesslog) throws EmfException {
-		// TODO Auto-generated method stub
-		if(false)throw new EmfException("BOGUS");
-	}
-
-	public AccessLog[] getAccessLogs(long datasetid) throws EmfException {
+    public AccessLog[] getAccessLogs(long datasetid) throws EmfException {
         log.debug("Getting all access logs for dataset: " + datasetid);
         AccessLog[] allLogs = null;
 
@@ -133,6 +123,6 @@ public class LoggingServicesTransport implements LoggingServices {
 
         log.debug("Getting all access logs for dataset: " + datasetid + " total= " + allLogs.length);
         return allLogs;
-	}
+    }
 
 }
