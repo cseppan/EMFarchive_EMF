@@ -229,7 +229,9 @@
 
     <!-- All tests -->
     <target name="all-dev-tests" depends="unit-tests, integration-tests" />
-    <target name="all-tests" depends="unit-tests, integration-tests, uat-tests" />
+    <target name="all-tests"
+            depends="unit-tests, integration-tests, uat-tests"
+    />
     <target name="run-uat"
             description="Deploys application to Tomcat, runs all UAT tests, and stops Tomcat"
     >
@@ -252,7 +254,7 @@
             <param name="tests-target" value="all-dev-tests" />
         </antcall>
     </target>
-    
+
     <target name="moksha"
             description="Deploys application to Tomcat, runs ALL tests, and stops Tomcat"
     >
@@ -348,6 +350,7 @@
 
     <target name="redeploy"
             depends="tomcat-stop, simple-deploy, tomcat-start"
+            description="Stops Tomcat, deploys EMF, and starts Tomcat"
     />
 
     <target name="tomcat-start">

@@ -158,15 +158,11 @@ public class ExImServicesImpl implements ExImServices {
             svcHolder.setStatusSvc(new StatusServicesImpl());
 
             Importer importer = importerFactory.create(dataset.getDatasetType());
-            log.debug("%%%%%%%%%%%%  before precondition");
-            log.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
             log.debug("$$$ Path: " + path.getAbsolutePath());
             log.debug("$$$ Filename: " + fileName);
             log.debug("$$$ DatasetType: " + dataset.getDatasetType().getName());
-            log.debug("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-            File[] files = importer.preCondition(path, fileName, dataset.getDatasetType());
-            log.debug("%%%%%%%%%%%%  after precondition");
-            ImportTask eximTask = new ImportTask(user, files, fileName, dataset, svcHolder, importer);
+            importer.preCondition(path, fileName);
+            ImportTask eximTask = new ImportTask(user, fileName, dataset, svcHolder, importer);
 
             threadPool.execute(eximTask);
         } catch (Exception e) {
