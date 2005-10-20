@@ -19,6 +19,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -48,93 +49,141 @@ public class DatasetDAO {
      */
     public static boolean isDatasetNameUsed(String datasetName, Session session) {
         boolean dsNameExists = false;
+		Transaction tx = null;
 
-        Transaction tx = session.beginTransaction();
+        try {
+			tx = session.beginTransaction();
 
-        Query query = session.createQuery(GET_DATASET_FOR_DATASETNAME_QUERY);
-        query.setParameter("datasetname", datasetName, Hibernate.STRING);
+			Query query = session.createQuery(GET_DATASET_FOR_DATASETNAME_QUERY);
+			query.setParameter("datasetname", datasetName, Hibernate.STRING);
 
-        Iterator iter = query.iterate();
-        while (iter.hasNext()) {
-            dsNameExists = true;
-            break;
-        }
+			Iterator iter = query.iterate();
+			while (iter.hasNext()) {
+			    dsNameExists = true;
+			    break;
+			}
 
-        tx.commit();
+			tx.commit();
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+		}
 
         return dsNameExists;
     }// getDataset
 
     public static List getDatasets(Session session) {
         log.debug("In get all Datasets with valid session?: " + (session == null));
-        ArrayList datasets = new ArrayList();
+        ArrayList datasets = null;
 
-        Transaction tx = session.beginTransaction();
-        log.debug("The query: " + GET_DATASET_QUERY);
-        Query query = session.createQuery(GET_DATASET_QUERY);
+		Transaction tx = null;
 
-        Iterator iter = query.iterate();
-        while (iter.hasNext()) {
-            EmfDataset aDset = (EmfDataset) iter.next();
-            datasets.add(aDset);
-        }
+        try {
+			datasets = new ArrayList();
 
-        tx.commit();
-        log.info("Total number of datasets retrieved= " + datasets.size());
+			tx = session.beginTransaction();
+			log.debug("The query: " + GET_DATASET_QUERY);
+			Query query = session.createQuery(GET_DATASET_QUERY);
+
+			Iterator iter = query.iterate();
+			while (iter.hasNext()) {
+			    EmfDataset aDset = (EmfDataset) iter.next();
+			    datasets.add(aDset);
+			}
+	        log.info("Total number of datasets retrieved= " + datasets.size());
+
+			tx.commit();
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+		}
         log.debug("End getDatasets");
         return datasets;
     }// getDatasets()
 
     public static void insertDataset(EmfDataset dataset, Session session) {
-        Transaction tx = session.beginTransaction();
-        session.save(dataset);
-        tx.commit();
+        Transaction tx = null;
+        
+        try {
+			tx = session.beginTransaction();
+			session.save(dataset);
+			tx.commit();
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+		}
     }
 
     public static void updateDataset(EmfDataset dataset, Session session){
     	log.debug("updating dataset: " + dataset.getDatasetid());
-        Transaction tx = session.beginTransaction();
-        session.update(dataset);
-        tx.commit();    	
-    	log.debug("updating dataset: " + dataset.getDatasetid());
+        Transaction tx = null;
+        
+        try {
+			tx = session.beginTransaction();
+			session.update(dataset);
+			tx.commit();    	
+			log.debug("updating dataset: " + dataset.getDatasetid());
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+		}
     }
 
 	public static List getCountries(Session session) {
         log.debug("In get all Countries with valid session?: " + (session == null));
-        ArrayList countries = new ArrayList();
+        ArrayList countries = null;
 
-        Transaction tx = session.beginTransaction();
-        log.debug("The query: " + GET_COUNTRY_QUERY);
-        Query query = session.createQuery(GET_COUNTRY_QUERY);
+        Transaction tx=null;
+        
+        try {
+			tx = session.beginTransaction();        
+			countries= new ArrayList();
+			log.debug("The query: " + GET_COUNTRY_QUERY);
+			Query query = session.createQuery(GET_COUNTRY_QUERY);
 
-        Iterator iter = query.iterate();
-        while (iter.hasNext()) {
-            Country cntry = (Country) iter.next();
-            countries.add(cntry);
-        }
+			Iterator iter = query.iterate();
+			while (iter.hasNext()) {
+			    Country cntry = (Country) iter.next();
+			    countries.add(cntry);
+			}
 
-        tx.commit();
-        log.info("Total number of countries retrieved= " + countries.size());
-        log.debug("End getSectors");
+			tx.commit();
+			log.info("Total number of countries retrieved= " + countries.size());
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+		}
+        
+		log.debug("End getSectors");
+        
         return countries;
 	}
 
 	public static List getSectors(Session session) {
         log.debug("In get all Sectors with valid session?: " + (session == null));
         ArrayList sectors = new ArrayList();
+        Transaction tx = null;
 
-        Transaction tx = session.beginTransaction();
-        log.debug("The query: " + GET_SECTOR_QUERY);
-        Query query = session.createQuery(GET_SECTOR_QUERY);
+        try {
+			tx = session.beginTransaction();
+			sectors = new ArrayList();
 
-        Iterator iter = query.iterate();
-        while (iter.hasNext()) {
-        	Sector sector = (Sector) iter.next();
-        	sectors.add(sector);
-        }
+			log.debug("The query: " + GET_SECTOR_QUERY);
+			Query query = session.createQuery(GET_SECTOR_QUERY);
 
-        tx.commit();
-        log.info("Total number of sectors retrieved= " + sectors.size());
+			Iterator iter = query.iterate();
+			while (iter.hasNext()) {
+				Sector sector = (Sector) iter.next();
+				sectors.add(sector);
+			}
+
+			tx.commit();
+			log.info("Total number of sectors retrieved= " + sectors.size());
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+		}
+        
         log.debug("End getSectors");
         return sectors;
 	}

@@ -38,4 +38,12 @@ public final class EMFConstants {
     //public static final String EMF_REPOSITORIES = "emf_repositories.mount";
     public static final String EMF_REFERENCE_SCHEMA="reference";
     public static final String EMF_EMISSIONS_SCHEMA="emissions";
+    
+    //DatasetType Names constants
+    public static final String DATASETTYPE_NAME_ORL="ORL";
+    public static final String DATASETTYPE_NAME_SHAPEFILES="Shapefile";
+    public static final String DATASETTYPE_NAME_EXTERNALFILES="External";
+    public static final String DATASETTYPE_NAME_METEOROLOGYFILES="Meteorology";
+    public static final String DATASETTYPE_NAME_MODELREADYEMISSIONSFILES="Model Ready Emissions";
+    
 }

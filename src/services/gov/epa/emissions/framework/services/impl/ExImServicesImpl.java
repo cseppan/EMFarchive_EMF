@@ -94,6 +94,7 @@ public class ExImServicesImpl implements ExImServices {
         log.debug("In ExImServicesImpl:getBaseDirectoryProperty END");
         session.flush();
         session.close();
+        
         return propvalue;
     }
 
@@ -113,18 +114,19 @@ public class ExImServicesImpl implements ExImServices {
         return file;
     }
 
-    private File validateFile(File folder, String fileName) throws EmfException {
-        log.debug("check if file exists " + fileName);
-        File file = new File(folder, fileName);
-
-        if (!file.exists() || !file.isFile()) {
-            log.error("File " + file.getAbsolutePath() + " not found");
-            throw new EmfException("File not found");
-        }
-        log.debug("check if file exists " + fileName);
-
-        return file;
-    }
+// FIXME:  REMOVE AFTER DEBUG
+//    private File validateFile(File folder, String fileName) throws EmfException {
+//        log.debug("check if file exists " + fileName);
+//        File file = new File(folder, fileName);
+//
+//        if (!file.exists() || !file.isFile()) {
+//            log.error("File " + file.getAbsolutePath() + " not found");
+//            throw new EmfException("File not found");
+//        }
+//        log.debug("check if file exists " + fileName);
+//
+//        return file;
+//    }
 
     private File validatePath(String folderPath) throws EmfException {
         log.debug("check if folder exists " + folderPath);
@@ -160,7 +162,7 @@ public class ExImServicesImpl implements ExImServices {
      */
     public void startImport(User user, String folderPath, String fileName, EmfDataset dataset)
             throws EmfException {
-        log.debug("In ExImServicesImpl:startImport START");
+        log.debug("In ExImServicesImpl:startImport START for: " + dataset.getDatasetid() + " " + dataset.getName());
 
         try {
         	File path = validatePath(folderPath);
@@ -180,8 +182,6 @@ public class ExImServicesImpl implements ExImServices {
             File[] files = importer.preCondition(path, fileName, dataset.getDatasetType());
             log.debug("%%%%%%%%%%%%  after precondition");
             ImportTask eximTask = new ImportTask(user, files, fileName, dataset, svcHolder, importer);
-//           ImportTask eximTask = new ImportTask(user, file, dataset, svcHolder, importer);
-
 
             threadPool.execute(eximTask);
         } catch (Exception e) {

@@ -11,11 +11,12 @@
   <property name="name"					column="name"					type="java.lang.String"		not-null="true"/>
   <property name="creator"				column="creator"				type="java.lang.String"		not-null="true"/>
   <property name="status"				column="status"					type="java.lang.String"		not-null="true"/>
+
   <many-to-one lazy="false"
             name="datasetType" 
             class="gov.epa.emissions.commons.io.DatasetType"
-            column="dataset_type"
-   />       
+            column="dataset_type" /> 
+                  
   <property name="units"				column="units"					type="java.lang.String"		not-null="false"/>
   <property name="region"				column="region"					type="java.lang.String"		not-null="false"/>
   <property name="year"					column="year"					type="integer"				not-null="false"/>
@@ -29,15 +30,32 @@
   <property name="createdDateTime"		column="created_date_time" 		type="java.util.Date"		not-null="false"	length="4"/>
   <property name="modifiedDateTime"		column="modified_date_time" 	type="java.util.Date"		not-null="false"	length="4"/>
   <property name="accessedDateTime"		column="accessed_date_time" 	type="java.util.Date"		not-null="false"	length="4"/>        
+
   <map name="tablesMap" table="DATASETTABLES" lazy="false">
     <key column="DATASET_ID"/>
     <index column="TABLE_TYPE" type="string" />
     <element column="TABLE_NAME" type="string"/>
   </map>
-  <list name="datasources" table="datasources" lazy="false">
-    <key column="DATASET_ID"/>
-    <list-index column="ds_id" base="1"/>
-    <element column="data_source" type="string"/>
-  </list>
+
+  <array name="internalSources" table="internal_sources" lazy="false">
+    <key column="dataset_id"/>
+    <list-index column="list_index"/>
+    <composite-element class="gov.epa.emissions.commons.io.InternalSource">
+		<property name="table"			column="table_name"						not-null="true"/>
+		<property name="type"			column="table_type"						not-null="true"/>
+		<property name="columns"		column="table_columns"					not-null="true"/>
+		<property name="source"			column="data_source"					not-null="true"/>
+		<property name="sourceSize"		column="file_size" 		type="integer"	not-null="true"	length="4"/>    
+    </composite-element>
+  </array>
+
+  <array name="externalSources" table="external_sources">
+    <key column="dataset_id"/>
+    <list-index column="list_index"/>
+    <composite-element class="gov.epa.emissions.commons.io.ExternalSource">
+		<property name="datasource"	column="data_source" not-null="true"/>
+    </composite-element>
+  </array>
+
 </class>
 </hibernate-mapping>

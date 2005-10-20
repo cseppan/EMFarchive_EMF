@@ -8,6 +8,7 @@
  */
 package gov.epa.emissions.framework.services.impl;
 
+import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.commons.io.importer.DefaultORLDatasetTypesFactory;
 import gov.epa.emissions.commons.io.importer.Importer;
@@ -22,9 +23,7 @@ import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,9 +66,6 @@ public class ImportTask implements Runnable {
             if (dataset.getDatasetTypeName().indexOf("ORL")>=0){
             	log.debug("updating ORL dataset");
             	updateOrlDataset(dataset,files);
-            }else{
-            	log.debug("updating non-ORL dataset");
-            	updateExternalDataset(dataset,files);
             }
 
             importer.run(files, dataset, true);
@@ -91,25 +87,24 @@ public class ImportTask implements Runnable {
         log.info("importing of file: " + fileName + " of type: " + dataset.getDatasetTypeName() + " complete");
     }
 
-    private void updateExternalDataset(EmfDataset dataset, File[] files) {
-    	List fileNames = new ArrayList();
-    	for (int i=0; i<files.length;i++){
-    		fileNames.add(files[i].getAbsolutePath());
-    	}
-    	dataset.setDatasources(fileNames);
-	}
-
 	private void updateOrlDataset(EmfDataset dataset, File[] files) {
         // FIXME: why hard code the table type ?
         String filename = files[0].getName();
         String tablename = filename.substring(0, filename.length() - 4).replace('.', '_');
 
-        //FIXME: What the heck is this next line?
+        //FIXME: What the heck is this next line?  Did it come in through refactoring/change?
         //dataset.setDatasetType(dataset.getDatasetType());
 
         ORLTableTypes tableTypes = new ORLTableTypes(new DefaultORLDatasetTypesFactory());
         ORLTableType tableType = tableTypes.type(dataset.getDatasetType());
         dataset.addTable(new Table(tablename, tableType.base()));
+        
+        //Need to add data to the InternalSource object for each file?
+        InternalSource is = null;
+        if (files.length>0){
+        	is = new InternalSource();
+        	
+        }
     }
 
     private void setStartStatus() throws EmfException {

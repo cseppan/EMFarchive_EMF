@@ -55,6 +55,8 @@
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Table" qname="ns1:Table" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.InternalSource" qname="ns1:InternalSource" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.ExternalSource" qname="ns1:ExternalSource" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
  </service>
 
  <service name="gov.epa.emf.services.DataServices" provider="java:RPC" style="RPC" use="encoded">
@@ -68,6 +70,8 @@
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Dataset" qname="ns1:Dataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Table" qname="ns1:Table" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.InternalSource" qname="ns1:InternalSource" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.ExternalSource" qname="ns1:ExternalSource" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
  </service>
 
  <arrayMapping qname="ns1:Users" xmlns:ns1="urn:gov.epa.services.EmfServices"
@@ -109,6 +113,17 @@
              languageSpecificType="java:gov.epa.emissions.framework.services.Sector[]"
 			 innerType="ns1:Sector" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
+
+ <arrayMapping qname="ns1:InternalSources" xmlns:ns1="urn:gov.epa.services.EmfServices"
+             languageSpecificType="java:gov.epa.emissions.commons.io.InternalSource[]"
+			 innerType="ns1:InternalSource" 
+             encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
+
+ <arrayMapping qname="ns1:ExternalSources" xmlns:ns1="urn:gov.epa.services.EmfServices"
+             languageSpecificType="java:gov.epa.emissions.commons.io.ExternalSource[]"
+			 innerType="ns1:ExternalSource" 
+             encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
+
              
  <transport name="http">
   <requestFlow>

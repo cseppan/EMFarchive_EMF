@@ -25,6 +25,8 @@ import javax.xml.rpc.ServiceException;
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
+import org.apache.axis.encoding.ser.BeanDeserializerFactory;
+import org.apache.axis.encoding.ser.BeanSerializerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -92,6 +94,10 @@ public class ExImServicesTransport implements ExImServices {
             QName datasetQName = new QName(emfSvcsNamespace, "ns1:EmfDataset");
             QName operationQName = new QName(emfSvcsNamespace, "startImport");
             QName tableQName = new QName(emfSvcsNamespace, "ns1:Table");
+            QName internalSourceQName = new QName(emfSvcsNamespace, "ns1:InternalSource");
+            QName externalSourceQName = new QName(emfSvcsNamespace, "ns1:ExternalSource");
+            QName internalSourcesQName = new QName(emfSvcsNamespace, "ns1:InternalSources");
+            QName externalSourcesQName = new QName(emfSvcsNamespace, "ns1:ExternalSources");
 
             call.setOperationName(operationQName);
 
@@ -99,6 +105,10 @@ public class ExImServicesTransport implements ExImServices {
             registerMapping(call, datasetTypeQName, DatasetType.class);
             registerMapping(call, datasetQName, EmfDataset.class);
             registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
+            registerBeanMapping(call, internalSourceQName, gov.epa.emissions.commons.io.InternalSource.class);
+            registerBeanMapping(call, externalSourceQName, gov.epa.emissions.commons.io.ExternalSource.class);
+            registerArrayMapping(call, gov.epa.emissions.commons.io.ExternalSource[].class,externalSourcesQName);
+            registerArrayMapping(call, gov.epa.emissions.commons.io.InternalSource[].class,internalSourcesQName);
 
             call.addParameter("user", userQName, ParameterMode.IN);
             call.addParameter("folderpath", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
@@ -242,6 +252,10 @@ public class ExImServicesTransport implements ExImServices {
             QName operationQName = new QName(emfSvcsNamespace, "startExport");
             QName tableQName = new QName(emfSvcsNamespace, "ns1:Table");
             QName datasetTypeQName = new QName(emfSvcsNamespace, "ns1:DatasetType");
+            QName internalSourceQName = new QName(emfSvcsNamespace, "ns1:InternalSource");
+            QName externalSourceQName = new QName(emfSvcsNamespace, "ns1:ExternalSource");
+            QName internalSourcesQName = new QName(emfSvcsNamespace, "ns1:InternalSources");
+            QName externalSourcesQName = new QName(emfSvcsNamespace, "ns1:ExternalSources");
 
             call.setOperationName(operationQName);
             registerMapping(call, userQName, gov.epa.emissions.framework.services.User.class);
@@ -253,6 +267,10 @@ public class ExImServicesTransport implements ExImServices {
 
             registerMapping(call, datasetTypeQName, DatasetType.class);
             registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
+            registerBeanMapping(call, internalSourceQName, gov.epa.emissions.commons.io.InternalSource.class);
+            registerBeanMapping(call, externalSourceQName, gov.epa.emissions.commons.io.ExternalSource.class);
+            registerArrayMapping(call, gov.epa.emissions.commons.io.ExternalSource[].class,externalSourcesQName);
+            registerArrayMapping(call, gov.epa.emissions.commons.io.InternalSource[].class,internalSourcesQName);
 
             call.addParameter("user", userQName, ParameterMode.IN);
             call.addParameter("datasets", datasetsQName, ParameterMode.IN);
@@ -278,9 +296,20 @@ public class ExImServicesTransport implements ExImServices {
         log.debug("Begin export of files for user");
     }
 
+    private void registerBeanMapping(Call call, QName beanQName, Class cls) {
+        call.registerTypeMapping(cls, beanQName, new BeanSerializerFactory(cls, beanQName),
+                new BeanDeserializerFactory(cls, beanQName));		
+	}
+
     private void registerMapping(Call call, QName emfQName, Class emfClass) {
         call.registerTypeMapping(emfClass, emfQName, new org.apache.axis.encoding.ser.BeanSerializerFactory(emfClass,
                 emfQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(emfClass, emfQName));
+    }
+
+    private void registerArrayMapping(Call call, Class cls, QName qname){
+        call.registerTypeMapping(cls, qname,
+                new org.apache.axis.encoding.ser.ArraySerializerFactory(cls, qname),
+                new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname));
     }
 
     public String getImportBaseFolder() throws EmfException {

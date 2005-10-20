@@ -11,6 +11,8 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.ExternalSource;
+import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Country;
@@ -61,7 +63,7 @@ public class DataServicesTransport implements DataServices {
      * @see gov.epa.emissions.framework.services.DataServices#getDatasets()
      */
     public EmfDataset[] getDatasets() throws EmfException {
-        log.debug("Get all dataset types");
+        log.debug("Get all datasets");
 
         // Call the DataServices endpoint and acquire the array of all dataset
         // types
@@ -79,6 +81,11 @@ public class DataServicesTransport implements DataServices {
             QName qname2 = new QName(emfSvcsNamespace, "ns1:EmfDatasets");
             QName qname3 = new QName(emfSvcsNamespace, "getDatasets");
             QName datasetTypeQName = new QName(emfSvcsNamespace, "ns1:DatasetType");
+            QName internalSourceQName = new QName(emfSvcsNamespace, "ns1:InternalSource");
+            QName externalSourceQName = new QName(emfSvcsNamespace, "ns1:ExternalSource");
+            QName internalSourcesQName = new QName(emfSvcsNamespace, "ns1:InternalSources");
+            QName externalSourcesQName = new QName(emfSvcsNamespace, "ns1:ExternalSources");
+            
 
             call.setOperationName(qname3);
 
@@ -93,6 +100,10 @@ public class DataServicesTransport implements DataServices {
             registerMapping(call, datasetTypeQName, DatasetType.class);
 
             registerMappingForTable(call);
+            registerBeanMapping(call, internalSourceQName, InternalSource.class);
+            registerBeanMapping(call, externalSourceQName, ExternalSource.class);
+            registerArrayMapping(call, ExternalSource[].class,externalSourcesQName);
+            registerArrayMapping(call, InternalSource[].class,internalSourcesQName);
 
             call.setReturnType(qname2);
 
@@ -114,7 +125,13 @@ public class DataServicesTransport implements DataServices {
         return datasets;
     }
 
-    private void registerMapping(Call call, QName datasetTypeQName, Class clazz) {
+    private void registerBeanMapping(Call call, QName beanQName, Class cls) {
+        call.registerTypeMapping(cls, beanQName, new BeanSerializerFactory(cls, beanQName),
+                new BeanDeserializerFactory(cls, beanQName));
+		
+	}
+
+	private void registerMapping(Call call, QName datasetTypeQName, Class clazz) {
         call.registerTypeMapping(clazz, datasetTypeQName,
                 new BeanSerializerFactory(DatasetType.class, datasetTypeQName), new BeanDeserializerFactory(clazz,
                         datasetTypeQName));
@@ -183,9 +200,15 @@ public class DataServicesTransport implements DataServices {
                 tableQName));
     }
 
+    private void registerArrayMapping(Call call, Class cls, QName qname){
+        call.registerTypeMapping(cls, qname,
+                new org.apache.axis.encoding.ser.ArraySerializerFactory(cls, qname),
+                new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname));
+    }
+    
     /**
      * 
-     * This utility method extracts the significat message from the Axis Fault
+     * This utility method extracts the significant message from the Axis Fault
      * 
      * @param faultReason
      * @return
@@ -212,6 +235,10 @@ public class DataServicesTransport implements DataServices {
             QName qname2 = new QName(emfSvcsNamespace, "ns1:EmfDataset");
             QName qname3 = new QName(emfSvcsNamespace, "updateDataset");
             QName datasetTypeQName = new QName(emfSvcsNamespace, "ns1:DatasetType");
+            QName internalSourceQName = new QName(emfSvcsNamespace, "ns1:InternalSource");
+            QName externalSourceQName = new QName(emfSvcsNamespace, "ns1:ExternalSource");
+            QName internalSourcesQName = new QName(emfSvcsNamespace, "ns1:InternalSources");
+            QName externalSourcesQName = new QName(emfSvcsNamespace, "ns1:ExternalSources");
 
             call.setOperationName(qname3);
 
@@ -220,6 +247,10 @@ public class DataServicesTransport implements DataServices {
                     EmfDataset.class, qname2));
             registerMapping(call, datasetTypeQName, DatasetType.class);
             registerMappingForTable(call);
+            registerBeanMapping(call, internalSourceQName, gov.epa.emissions.commons.io.InternalSource.class);
+            registerBeanMapping(call, externalSourceQName, gov.epa.emissions.commons.io.ExternalSource.class);
+            registerArrayMapping(call, gov.epa.emissions.commons.io.ExternalSource[].class,externalSourcesQName);
+            registerArrayMapping(call, gov.epa.emissions.commons.io.InternalSource[].class,internalSourcesQName);
 
             call.addParameter("dataset", qname2, ParameterMode.IN);
 
