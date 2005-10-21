@@ -47,7 +47,7 @@ public class InternalSourcesTableData extends AbstractEmfTableData {
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < cols.length; i++) {
             buf.append(cols[i]);
-            if (i + 1 < cols.length)
+            if ((i + 1) < cols.length)
                 buf.append(", ");
         }
 

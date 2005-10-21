@@ -54,7 +54,6 @@ public class DataServicesTransport implements DataServices {
 
     public DataServicesTransport(String endpt) {
         endpoint = endpt;
-        log.info("ENDPOINT: " + endpoint);
     }
 
     /*
