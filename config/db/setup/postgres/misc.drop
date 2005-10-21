@@ -1,0 +1,6 @@
+--- Status Messages
+DROP TABLE statusmessages;
+
+--- Properties
+DROP TABLE emf_properties;
+

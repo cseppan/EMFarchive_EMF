@@ -1,0 +1,5 @@
+---- External Sources
+DROP TABLE external_sources;
+
+---- Internal Sources
+DROP TABLE internal_sources;

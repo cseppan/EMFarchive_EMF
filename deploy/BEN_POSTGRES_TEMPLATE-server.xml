@@ -428,7 +428,7 @@
         </parameter>	
 	    <parameter>
 	      <name>url</name>
-	      <value>jdbc:postgresql://152.2.72.90:5432/EMF.raghu?autoReconnect=true</value>
+	      <value>jdbc:postgresql://localhost:5432/EMF?autoReconnect=true</value>
 	    </parameter>
 	  </ResourceParams>
 	</Context>

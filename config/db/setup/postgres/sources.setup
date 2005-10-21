@@ -1,6 +1,4 @@
 ---- External Sources
-DROP TABLE external_sources;
-
 CREATE TABLE external_sources
 (
   dataset_id int4 NOT NULL,
@@ -12,8 +10,6 @@ WITHOUT OIDS;
 ALTER TABLE external_sources OWNER TO emf;
 
 ---- Internal Sources
-DROP TABLE internal_sources;
-
 CREATE TABLE internal_sources
 (
   dataset_id int4 NOT NULL,

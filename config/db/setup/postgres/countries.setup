@@ -1,6 +1,3 @@
-DROP SEQUENCE countries_id_seq;
-DROP TABLE countries;
-
 CREATE SEQUENCE countries_id_seq
   INCREMENT 1
   MINVALUE 1
