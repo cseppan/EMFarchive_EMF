@@ -14,13 +14,20 @@ import gov.epa.emissions.framework.EmfException;
  */
 public interface DataServices {
 
-	public EmfDataset[] getDatasets() throws EmfException;
-	public EmfDataset[] getDatasets(User user) throws EmfException;
-	public void insertDataset(EmfDataset aDataset) throws EmfException;
-	public void updateDataset(EmfDataset aDset) throws EmfException;
-	public Country[] getCountries() throws EmfException;
-	public Sector[] getSectors() throws EmfException;
-	public void addCountry(String country) throws EmfException;
-	public void addSector(String sector) throws EmfException;
+	// Datasets
+	EmfDataset[] getDatasets() throws EmfException;
+	EmfDataset[] getDatasets(User user) throws EmfException;
+	void insertDataset(EmfDataset aDataset) throws EmfException;
+	void updateDataset(EmfDataset aDset) throws EmfException;
+	
+	//Countries
+	Country[] getCountries() throws EmfException;
+	void addCountry(Country country) throws EmfException;
+	void updateCountry(Country country) throws EmfException;
+
+	//Sectors
+	Sector[] getSectors() throws EmfException;
+	void addSector(Sector sector) throws EmfException;
+	void updateSector(Sector sector) throws EmfException;
 	
 }

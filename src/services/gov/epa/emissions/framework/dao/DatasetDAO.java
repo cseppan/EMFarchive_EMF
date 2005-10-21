@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Sector;
+import gov.epa.emissions.framework.services.User;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -186,6 +187,70 @@ public class DatasetDAO {
         
         log.debug("End getSectors");
         return sectors;
+	}
+
+	public static void updateSector(Sector sector, Session session) {
+    	log.debug("updating sector: " + sector.getId());
+        Transaction tx = null;
+        
+        try {
+			tx = session.beginTransaction();
+			session.update(sector);
+			tx.commit();    	
+			log.debug("updating sector: " + sector.getId());
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+		}
+	}
+
+	public static void updateCountry(Country country, Session session) {
+    	log.debug("updating country: " + country.getId());
+        Transaction tx = null;
+        
+        try {
+			tx = session.beginTransaction();
+			session.update(country);
+			tx.commit();    	
+			log.debug("updating country: " + country.getId());
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+		}
+	}
+
+	public static List getDatasets(User user, Session session) {
+		//FIXME:  Which user object is this? Current user?  creator?
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static void insertCountry(Country country, Session session) {
+        Transaction tx = null;
+        
+        try {
+			tx = session.beginTransaction();
+			session.save(country);
+			tx.commit();
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+		}
+		
+	}
+
+	public static void insertSector(Sector sector, Session session) {
+        Transaction tx = null;
+        
+        try {
+			tx = session.beginTransaction();
+			session.save(sector);
+			tx.commit();
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+		}
+		
 	}
 
 }

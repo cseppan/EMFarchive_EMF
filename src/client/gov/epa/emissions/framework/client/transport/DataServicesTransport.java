@@ -224,7 +224,7 @@ public class DataServicesTransport implements DataServices {
     }
 
     public void updateDataset(EmfDataset aDset) throws EmfException {
-        log.debug("update a new dataset type object: " + aDset.getName());
+        log.debug("update a dataset object: " + aDset.getName());
         Service service = new Service();
         Call call;
         try {
@@ -376,11 +376,160 @@ public class DataServicesTransport implements DataServices {
 
     }
 
-    public void addCountry(String country) {
-        // TODO: Implementation pending
-    }
+	public void addCountry(Country country) throws EmfException {
+         log.debug("insert a new country object: " + country.getName());
+         Service service = new Service();
+         Call call;
+         try {
+	         call = (Call) service.createCall();
+	         call.setTargetEndpointAddress(new java.net.URL(endpoint));
+	        
+	         QName qname2 = new QName(emfSvcsNamespace, "ns1:Country");
+	         QName qname3 = new QName(emfSvcsNamespace, "addCountry");
+	        
+	         call.setOperationName(qname3);
+	        
+	         call.registerTypeMapping(Country.class, qname2, new
+	         org.apache.axis.encoding.ser.BeanSerializerFactory(
+	        		 Country.class, qname2), new
+	         org.apache.axis.encoding.ser.BeanDeserializerFactory(
+	        		 Country.class, qname2));
+	        	        
+	         call.addParameter("country", qname2, ParameterMode.IN);
+	        
+	         call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+	         call.invoke(new Object[] { country });
+        
+         } catch (ServiceException e) {
+         log.error("Error invoking the service", e);
+         } catch (MalformedURLException e) {
+         log.error("Error in format of URL string", e);
+         } catch (AxisFault fault) {
+         log.error("Axis Fault details", fault);
+         throw new EmfException(extractMessage(fault.getMessage()));
+         } catch (RemoteException e) {
+         log.error("Error communicating with WS end point", e);
+         }
+        
+         log.debug("insert a new country type object: " + country.getName());
+	}
 
-    public void addSector(String sector) {
-        // TODO: Implementation pending
-    }
+	public void updateCountry(Country country) throws EmfException {
+		
+      log.debug("update a country object: " + country.getName());
+      Service service = new Service();
+      Call call;
+      try {
+          call = (Call) service.createCall();
+          call.setTargetEndpointAddress(new java.net.URL(endpoint));
+
+          QName qname2 = new QName(emfSvcsNamespace, "ns1:Country");
+          QName qname3 = new QName(emfSvcsNamespace, "updateCountry");
+
+          call.setOperationName(qname3);
+
+          call.registerTypeMapping(Country.class, qname2, new
+	    	         org.apache.axis.encoding.ser.BeanSerializerFactory(
+	    	        		 Country.class, qname2), new
+	    	         org.apache.axis.encoding.ser.BeanDeserializerFactory(
+	    	        		 Country.class, qname2));
+
+          call.addParameter("country", qname2, ParameterMode.IN);
+
+          call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+          call.invoke(new Object[] { country });
+
+      } catch (ServiceException e) {
+          log.error("Error invoking the service", e);
+      } catch (MalformedURLException e) {
+          log.error("Error in format of URL string", e);
+      } catch (AxisFault fault) {
+          log.error("Axis Fault details", fault);
+          throw new EmfException(extractMessage(fault.getMessage()));
+      } catch (RemoteException e) {
+          log.error("Error communicating with WS end point", e);
+      }
+
+      log.debug("update a country object: " + country.getName());
+
+	}
+
+	public void addSector(Sector sector) throws EmfException {
+        log.debug("insert a new sector object: " + sector.getName());
+        Service service = new Service();
+        Call call;
+        try {
+	         call = (Call) service.createCall();
+	         call.setTargetEndpointAddress(new java.net.URL(endpoint));
+	        
+	         QName qname2 = new QName(emfSvcsNamespace, "ns1:Sector");
+	         QName qname3 = new QName(emfSvcsNamespace, "addSector");
+	        
+	         call.setOperationName(qname3);
+	        
+	         call.registerTypeMapping(Sector.class, qname2, new
+	         org.apache.axis.encoding.ser.BeanSerializerFactory(
+	        		 Sector.class, qname2), new
+	         org.apache.axis.encoding.ser.BeanDeserializerFactory(
+	        		 Sector.class, qname2));
+	        	        
+	         call.addParameter("sector", qname2, ParameterMode.IN);
+	        
+	         call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+	         call.invoke(new Object[] { sector });
+       
+        } catch (ServiceException e) {
+        log.error("Error invoking the service", e);
+        } catch (MalformedURLException e) {
+        log.error("Error in format of URL string", e);
+        } catch (AxisFault fault) {
+        log.error("Axis Fault details", fault);
+        throw new EmfException(extractMessage(fault.getMessage()));
+        } catch (RemoteException e) {
+        log.error("Error communicating with WS end point", e);
+        }
+       
+        log.debug("insert a new sector type object: " + sector.getName());
+		
+	}
+
+	public void updateSector(Sector sector) throws EmfException {
+		
+	      log.debug("update a sector object: " + sector.getName());
+	      Service service = new Service();
+	      Call call;
+	      try {
+	          call = (Call) service.createCall();
+	          call.setTargetEndpointAddress(new java.net.URL(endpoint));
+
+	          QName qname2 = new QName(emfSvcsNamespace, "ns1:Sector");
+	          QName qname3 = new QName(emfSvcsNamespace, "updateSector");
+
+	          call.setOperationName(qname3);
+
+	          call.registerTypeMapping(Sector.class, qname2, new
+		    	         org.apache.axis.encoding.ser.BeanSerializerFactory(
+		    	        		 Sector.class, qname2), new
+		    	         org.apache.axis.encoding.ser.BeanDeserializerFactory(
+		    	        		 Sector.class, qname2));
+
+	          call.addParameter("sector", qname2, ParameterMode.IN);
+
+	          call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+	          call.invoke(new Object[] { sector });
+
+	      } catch (ServiceException e) {
+	          log.error("Error invoking the service", e);
+	      } catch (MalformedURLException e) {
+	          log.error("Error in format of URL string", e);
+	      } catch (AxisFault fault) {
+	          log.error("Axis Fault details", fault);
+	          throw new EmfException(extractMessage(fault.getMessage()));
+	      } catch (RemoteException e) {
+	          log.error("Error communicating with WS end point", e);
+	      }
+
+	      log.debug("update a sector object: " + sector.getName());
+
+	}
 }
