@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.InternalSource;
-import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;
@@ -12,12 +11,7 @@ public class InternalSourcesTableDataTest extends MockObjectTestCase {
 
     private InternalSourcesTableData data;
 
-    private EmfDataset dataset;
-
     protected void setUp() {
-        dataset = new EmfDataset();
-        dataset.setDatasetid(1);
-
         InternalSource source1 = new InternalSource();
         source1.setCols(new String[0]);
 

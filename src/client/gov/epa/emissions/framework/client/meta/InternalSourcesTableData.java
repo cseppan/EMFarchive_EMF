@@ -30,7 +30,6 @@ public class InternalSourcesTableData extends AbstractEmfTableData {
     private List createRows(InternalSource[] sources) {
         List rows = new ArrayList();
 
-        // TODO: what about size ?
         for (int i = 0; i < sources.length; i++) {
             InternalSource element = sources[i];
             Object[] values = { element.getTable(), element.getType(), concat(element.getCols()), element.getSource(),
