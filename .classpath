@@ -62,6 +62,5 @@
 	<classpathentry kind="lib" path="lib/concurrent.jar"/>
 	<classpathentry kind="lib" path="lib/dev/jmock/jmock-SNAPSHOT-09262005.jar"/>
 	<classpathentry kind="lib" path="lib/emissions-commons-0.1.2x.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Commons"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>
