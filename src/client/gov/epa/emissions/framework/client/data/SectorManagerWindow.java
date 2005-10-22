@@ -19,97 +19,96 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class SectorManagerWindow extends ReusableInteralFrame implements
-		SectorManagerView {
+public class SectorManagerWindow extends ReusableInteralFrame implements SectorManagerView {
 
-	private SectorManagerPresenter presenter;
+    private SectorManagerPresenter presenter;
 
-	private SortFilterSelectModel selectModel;
+    private SortFilterSelectModel selectModel;
 
-	private EmfTableModel model;
+    private EmfTableModel model;
 
-	private JPanel layout;
+    private JPanel layout;
 
-	private MessagePanel messagePanel;
+    private MessagePanel messagePanel;
 
-	private JFrame parentConsole;
+    private JFrame parentConsole;
 
-	private SortFilterSelectionPanel sortFilterSelectPanel;
+    private SortFilterSelectionPanel sortFilterSelectPanel;
 
-	// FIXME: this class needs to be refactored into smaller components
-	public SectorManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
-		super("Sector Manager", desktop);
-		this.parentConsole = parentConsole;
-		this.desktop = desktop;
+    // FIXME: this class needs to be refactored into smaller components
+    public SectorManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
+        super("Sector Manager", desktop);
+        this.parentConsole = parentConsole;
+        this.desktop = desktop;
 
-		layout = new JPanel();
-		this.getContentPane().add(layout);
-	}
+        layout = new JPanel();
+        this.getContentPane().add(layout);
+    }
 
-	public void clearMessage() {
-		messagePanel.clear();
-		redoLayout();
-	}
+    public void clearMessage() {
+        messagePanel.clear();
+        redoLayout();
+    }
 
-	public void display(Sector[] sectors) {
-		model = new EmfTableModel(new SectorsTableData(sectors));
-		selectModel = new SortFilterSelectModel(model);
+    public void display(Sector[] sectors) {
+        model = new EmfTableModel(new SectorsTableData(sectors));
+        selectModel = new SortFilterSelectModel(model);
 
-		createLayout(parentConsole);
-	}
+        createLayout(parentConsole);
+        super.display();
+    }
 
-	public void observe(SectorManagerPresenter presenter) {
-		this.presenter = presenter;
-	}
+    public void observe(SectorManagerPresenter presenter) {
+        this.presenter = presenter;
+    }
 
-	private void createLayout(JFrame parentConsole) {
-		layout.removeAll();
-		sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole,
-				selectModel);
-		createLayout(layout, sortFilterSelectPanel);
+    private void createLayout(JFrame parentConsole) {
+        layout.removeAll();
+        sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
+        createLayout(layout, sortFilterSelectPanel);
 
-		this.setSize(new Dimension(550, 300));
-	}
+        this.setSize(new Dimension(550, 300));
+    }
 
-	private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
-		layout.setLayout(new BorderLayout());
+    private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
+        layout.setLayout(new BorderLayout());
 
-		JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
-		sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
+        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
+        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
 
-		messagePanel = new SingleLineMessagePanel();
-		layout.add(messagePanel, BorderLayout.NORTH);
-		layout.add(scrollPane, BorderLayout.CENTER);
-		layout.add(createControlPanel(), BorderLayout.SOUTH);
-	}
+        messagePanel = new SingleLineMessagePanel();
+        layout.add(messagePanel, BorderLayout.NORTH);
+        layout.add(scrollPane, BorderLayout.CENTER);
+        layout.add(createControlPanel(), BorderLayout.SOUTH);
+    }
 
-	private JPanel createControlPanel() {
-		JPanel crudPanel = createCrudPanel();
+    private JPanel createControlPanel() {
+        JPanel crudPanel = createCrudPanel();
 
-		JPanel closePanel = new JPanel();
-		JButton closeButton = new JButton("Close");
-		closeButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
-				// presenter.doCloseView();
-			}
-		});
-		closePanel.add(closeButton);
+        JPanel closePanel = new JPanel();
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                presenter.doClose();
+            }
+        });
+        closePanel.add(closeButton);
 
-		JPanel controlPanel = new JPanel();
-		controlPanel.setLayout(new BorderLayout());
+        JPanel controlPanel = new JPanel();
+        controlPanel.setLayout(new BorderLayout());
 
-		controlPanel.add(crudPanel, BorderLayout.WEST);
-		controlPanel.add(closePanel, BorderLayout.EAST);
+        controlPanel.add(crudPanel, BorderLayout.WEST);
+        controlPanel.add(closePanel, BorderLayout.EAST);
 
-		return controlPanel;
-	}
+        return controlPanel;
+    }
 
-	private JPanel createCrudPanel() {
-		return new JPanel();
-	}
+    private JPanel createCrudPanel() {
+        return new JPanel();
+    }
 
-	private void redoLayout() {
-		super.validate();
-	}
+    private void redoLayout() {
+        super.validate();
+    }
 
 }

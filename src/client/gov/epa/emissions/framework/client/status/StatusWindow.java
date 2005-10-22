@@ -42,9 +42,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         super.setContentPane(createLayout());
 
         super.setClosable(false);
-        super.setIconifiable(true);
         super.setMaximizable(false);
-        super.setResizable(true);
     }
 
     private JPanel createLayout() {

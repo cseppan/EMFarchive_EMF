@@ -5,16 +5,22 @@ import gov.epa.emissions.framework.services.DataServices;
 
 public class SectorManagerPresenter {
 
-	private SectorManagerView view;
-	private DataServices services;
+    private SectorManagerView view;
 
-	public SectorManagerPresenter(SectorManagerView view, DataServices services) {
-		this.view = view;
-		this.services = services;
-	}
+    private DataServices services;
 
-	public void doDisplay() throws EmfException {
-		view.display(services.getSectors());
-	}
+    public SectorManagerPresenter(SectorManagerView view, DataServices services) {
+        this.view = view;
+        this.services = services;
+    }
+
+    public void doDisplay() throws EmfException {
+        view.observe(this);
+        view.display(services.getSectors());
+    }
+
+    public void doClose() {
+        view.close();
+    }
 
 }
