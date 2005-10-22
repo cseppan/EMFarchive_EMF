@@ -8,6 +8,9 @@ import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
 import gov.epa.emissions.framework.client.admin.UserManagerWindow;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserPresenter;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserWindow;
+import gov.epa.emissions.framework.client.data.SectorManagerPresenter;
+import gov.epa.emissions.framework.client.data.SectorManagerWindow;
+import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 import gov.epa.emissions.framework.ui.DefaultWindowLayoutManager;
@@ -51,7 +54,7 @@ public class ManageMenu extends JMenu {
 
         super.add(createDatasets(parent, messagePanel));
         super.add(createDisabledMenuItem("Dataset Types"));
-        super.add(createDisabledMenuItem("Sectors"));
+        super.add(createSectors(session.getDataServices(), parent, messagePanel));
         super.addSeparator();
 
         addUsers(session.getUser());
@@ -96,6 +99,30 @@ public class ManageMenu extends JMenu {
         });
 
         return menuItem;
+    }
+
+    private JMenuItem createSectors(final DataServices dataServices, final EmfFrame parent,
+            final MessagePanel messagePanel) {
+        JMenuItem menuItem = new JMenuItem("Sectors");
+        menuItem.setName("sectors");
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    displaySectors(dataServices, parent);
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+        });
+
+        return menuItem;
+    }
+
+    protected void displaySectors(DataServices dataServices, EmfFrame parent) throws EmfException {
+        SectorManagerWindow view = new SectorManagerWindow(parent, desktop);
+        SectorManagerPresenter presenter = new SectorManagerPresenter(view, dataServices);
+
+        presenter.doDisplay();
     }
 
     private void displayDatasets(EmfFrame parent) throws EmfException {
