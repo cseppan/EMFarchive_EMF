@@ -35,7 +35,6 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
 
     private SortFilterSelectionPanel sortFilterSelectPanel;
 
-    // FIXME: this class needs to be refactored into smaller components
     public SectorManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
         super("Sector Manager", desktop);
         this.parentConsole = parentConsole;
@@ -43,11 +42,6 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
 
         layout = new JPanel();
         this.getContentPane().add(layout);
-    }
-
-    public void clearMessage() {
-        messagePanel.clear();
-        redoLayout();
     }
 
     public void display(Sector[] sectors) {
@@ -67,7 +61,7 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
         sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         createLayout(layout, sortFilterSelectPanel);
 
-        this.setSize(new Dimension(550, 300));
+        this.setSize(new Dimension(400, 300));
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
@@ -105,10 +99,6 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
 
     private JPanel createCrudPanel() {
         return new JPanel();
-    }
-
-    private void redoLayout() {
-        super.validate();
     }
 
 }

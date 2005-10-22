@@ -37,7 +37,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();
 
-        presenter.display((DatasetsBrowserView) view.proxy());
+        presenter.doDisplay((DatasetsBrowserView) view.proxy());
     }
 
     public void testShouldCloseViewOnClickOfCloseButton() {
@@ -57,7 +57,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").withNoArguments();
         view.expects(once()).method("clearMessage").withNoArguments();
 
-        presenter.display((DatasetsBrowserView) view.proxy());
+        presenter.doDisplay((DatasetsBrowserView) view.proxy());
 
         presenter.doRefresh();
     }

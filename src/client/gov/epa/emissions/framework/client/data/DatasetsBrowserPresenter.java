@@ -30,7 +30,7 @@ public class DatasetsBrowserPresenter {
         editorsMap = new HashMap();
     }
 
-    public void display(DatasetsBrowserView view) {
+    public void doDisplay(DatasetsBrowserView view) {
         this.view = view;
         view.observe(this);
 

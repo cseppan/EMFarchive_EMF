@@ -41,6 +41,8 @@ public class ManageMenu extends JMenu {
 
     private WindowLayoutManager windowLayoutManager;
 
+    private SectorManagerWindow sectorManagerView;
+
     // FIXME: where's the associated Presenter ?
     public ManageMenu(EmfSession session, EmfFrame parent, JDesktopPane desktop, MessagePanel messagePanel,
             WindowLayoutManager windowLayoutManager) {
@@ -119,9 +121,17 @@ public class ManageMenu extends JMenu {
     }
 
     protected void displaySectors(DataServices dataServices, EmfFrame parent) throws EmfException {
-        SectorManagerWindow view = new SectorManagerWindow(parent, desktop);
-        SectorManagerPresenter presenter = new SectorManagerPresenter(view, dataServices);
+        // FIXME: cull out the pattern - singleton
+        if (sectorManagerView != null) {
+            sectorManagerView.bringToFront();
+            return;
+        }
 
+        sectorManagerView = new SectorManagerWindow(parent, desktop);
+        windowLayoutManager.add(sectorManagerView);
+        desktop.add(sectorManagerView);
+        
+        SectorManagerPresenter presenter = new SectorManagerPresenter(sectorManagerView, dataServices);
         presenter.doDisplay();
     }
 
@@ -137,7 +147,7 @@ public class ManageMenu extends JMenu {
 
         WindowLayoutManager browserLayout = new DefaultWindowLayoutManager(datasetsBrowserView);
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session.getDataServices(), browserLayout);
-        presenter.display(datasetsBrowserView);
+        presenter.doDisplay(datasetsBrowserView);
     }
 
     private void displayMyProfile(EmfSession session) {
