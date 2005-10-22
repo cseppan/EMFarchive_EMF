@@ -2,10 +2,10 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.services.Sector;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
@@ -19,9 +19,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class SectorManagerWindow extends ReusableInteralFrame implements SectorManagerView {
+//FIXME: very similar to SectorsManager. Refactor ?
+public class DatasetTypesManagerWindow extends ReusableInteralFrame implements DatasetTypesManagerView {
 
-    private SectorManagerPresenter presenter;
+    private DatasetTypesManagerPresenter presenter;
 
     private SortFilterSelectModel selectModel;
 
@@ -35,8 +36,8 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
 
     private SortFilterSelectionPanel sortFilterSelectPanel;
 
-    public SectorManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
-        super("Sectors Manager", desktop);
+    public DatasetTypesManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
+        super("DatasetTypes Manager", desktop);
         this.parentConsole = parentConsole;
         this.desktop = desktop;
 
@@ -44,15 +45,15 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
         this.getContentPane().add(layout);
     }
 
-    public void display(Sector[] sectors) {
-        model = new EmfTableModel(new SectorsTableData(sectors));
+    public void display(DatasetType[] types) {
+        model = new EmfTableModel(new DatasetTypesTableData(types));
         selectModel = new SortFilterSelectModel(model);
 
         createLayout(parentConsole);
         super.display();
     }
 
-    public void observe(SectorManagerPresenter presenter) {
+    public void observe(DatasetTypesManagerPresenter presenter) {
         this.presenter = presenter;
     }
 
@@ -61,7 +62,7 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
         sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         createLayout(layout, sortFilterSelectPanel);
 
-        this.setSize(new Dimension(400, 300));
+        this.setSize(new Dimension(600, 300));
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {

@@ -30,7 +30,7 @@ public class SectorsTableDataTest extends TestCase {
 		assertEquals("Description", columns[1]);
 	}
 
-	public void testAllColumnsShouldBeUneditable() {
+	public void testAllColumnsShouldBeEditable() {
 		assertTrue("All cells should be uneditable", data.isEditable(0));
 		assertTrue("All cells should be uneditable", data.isEditable(1));
 	}

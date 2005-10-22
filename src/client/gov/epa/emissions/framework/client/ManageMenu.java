@@ -6,6 +6,8 @@ import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
 import gov.epa.emissions.framework.client.admin.UpdateUserWindow;
 import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
 import gov.epa.emissions.framework.client.admin.UserManagerWindow;
+import gov.epa.emissions.framework.client.data.DatasetTypesManagerPresenter;
+import gov.epa.emissions.framework.client.data.DatasetTypesManagerWindow;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserPresenter;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.client.data.SectorManagerPresenter;
@@ -43,6 +45,8 @@ public class ManageMenu extends JMenu {
 
     private SectorManagerWindow sectorManagerView;
 
+    private DatasetTypesManagerWindow datasetTypesManagerView;
+
     // FIXME: where's the associated Presenter ?
     public ManageMenu(EmfSession session, EmfFrame parent, JDesktopPane desktop, MessagePanel messagePanel,
             WindowLayoutManager windowLayoutManager) {
@@ -55,7 +59,7 @@ public class ManageMenu extends JMenu {
         this.windowLayoutManager = windowLayoutManager;
 
         super.add(createDatasets(parent, messagePanel));
-        super.add(createDisabledMenuItem("Dataset Types"));
+        super.add(createDatasetTypes(session.getDataServices(), parent, messagePanel));
         super.add(createSectors(session.getDataServices(), parent, messagePanel));
         super.addSeparator();
 
@@ -103,6 +107,24 @@ public class ManageMenu extends JMenu {
         return menuItem;
     }
 
+    // FIXME: each of the menu-item and it's handles are similar. Refactor ?
+    private JMenuItem createDatasetTypes(final DataServices dataServices, final EmfFrame parent,
+            final MessagePanel messagePanel) {
+        JMenuItem menuItem = new JMenuItem("Dataset Types");
+        menuItem.setName("datasetTypes");
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    displayDatasetTypes(dataServices, parent);
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+        });
+
+        return menuItem;
+    }
+
     private JMenuItem createSectors(final DataServices dataServices, final EmfFrame parent,
             final MessagePanel messagePanel) {
         JMenuItem menuItem = new JMenuItem("Sectors");
@@ -120,6 +142,21 @@ public class ManageMenu extends JMenu {
         return menuItem;
     }
 
+    protected void displayDatasetTypes(DataServices dataServices, EmfFrame parent) throws EmfException {
+        // FIXME: cull out the pattern - singleton
+        if (datasetTypesManagerView != null) {
+            datasetTypesManagerView.bringToFront();
+            return;
+        }
+
+        datasetTypesManagerView = new DatasetTypesManagerWindow(parent, desktop);
+        windowLayoutManager.add(datasetTypesManagerView);
+        desktop.add(datasetTypesManagerView);
+
+        DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(datasetTypesManagerView, dataServices);
+        presenter.doDisplay();
+    }
+
     protected void displaySectors(DataServices dataServices, EmfFrame parent) throws EmfException {
         // FIXME: cull out the pattern - singleton
         if (sectorManagerView != null) {
@@ -130,7 +167,7 @@ public class ManageMenu extends JMenu {
         sectorManagerView = new SectorManagerWindow(parent, desktop);
         windowLayoutManager.add(sectorManagerView);
         desktop.add(sectorManagerView);
-        
+
         SectorManagerPresenter presenter = new SectorManagerPresenter(sectorManagerView, dataServices);
         presenter.doDisplay();
     }
@@ -162,13 +199,6 @@ public class ManageMenu extends JMenu {
 
         UpdateUserPresenter presenter = new UpdateUserPresenter(session.getUserServices());
         presenter.display(myProfileView);
-    }
-
-    private JMenuItem createDisabledMenuItem(String name) {
-        JMenuItem menuItem = new JMenuItem(name);
-        menuItem.setEnabled(false);
-
-        return menuItem;
     }
 
     public void displayUserManager() {

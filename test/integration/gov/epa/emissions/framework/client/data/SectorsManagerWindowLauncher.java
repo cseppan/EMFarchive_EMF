@@ -1,17 +1,11 @@
 package gov.epa.emissions.framework.client.data;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
-import gov.epa.emissions.framework.client.admin.UserServicesStub;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.Sector;
-import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
 
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -20,10 +14,10 @@ import org.jmock.Mock;
 import org.jmock.core.constraint.IsEqual;
 import org.jmock.core.stub.ReturnStub;
 
-public class SectorManagerWindowLauncher {
+public class SectorsManagerWindowLauncher {
 
     public static void main(String[] args) throws Exception {
-        SectorManagerWindowLauncher launcher = new SectorManagerWindowLauncher();
+        SectorsManagerWindowLauncher launcher = new SectorsManagerWindowLauncher();
 
         JFrame frame = new JFrame();
         JDesktopPane desktop = new JDesktopPane();
@@ -53,25 +47,4 @@ public class SectorManagerWindowLauncher {
         frame.setContentPane(desktop);
     }
 
-    private UserServices createUserAdmin() throws EmfException {
-        List users = new ArrayList();
-
-        users.add(createUser("joe", "Joe Fullman", "joef@zukoswky.com", false));
-        users.add(createUser("mary", "Mary Joe", "mary@wonderful.net", true));
-        users.add(createUser("kevin", "Kevin Spacey", "kevin@spacey.com", false));
-
-        UserServices userAdmin = new UserServicesStub(users);
-
-        return userAdmin;
-    }
-
-    private User createUser(String username, String name, String email, boolean isAdmin) throws EmfException {
-        User user = new User();
-        user.setUsername(username);
-        user.setFullName(name);
-        user.setEmail(email);
-        user.setInAdminGroup(isAdmin);
-
-        return user;
-    }
 }
