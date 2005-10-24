@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -30,30 +31,62 @@ public class DatasetTypesDAO {
     private static final String GET_DATASETTYPE_QUERY = "select dst from DatasetType as dst";
 
     public static List getDatasetTypes(Session session) {
-        log.debug("In getMessages");
-        ArrayList datasetTypes = new ArrayList();
+        log.debug("In getDatasetTypes");
+        Transaction tx = null;
+        ArrayList datasetTypes = null;
+		try {
+			datasetTypes = new ArrayList();
 
-        Transaction tx = session.beginTransaction();
+			tx = session.beginTransaction();
 
-        Query query = session.createQuery(GET_DATASETTYPE_QUERY);
+			Query query = session.createQuery(GET_DATASETTYPE_QUERY);
 
-        Iterator iter = query.iterate();
-        while (iter.hasNext()) {
-            DatasetType aDst = (DatasetType) iter.next();
-            datasetTypes.add(aDst);
-        }
+			Iterator iter = query.iterate();
+			while (iter.hasNext()) {
+			    DatasetType aDst = (DatasetType) iter.next();
+			    datasetTypes.add(aDst);
+			}
 
-        tx.commit();
-        log.debug("End getMessages");
+			tx.commit();
+			log.debug("End getDatasetTypes");
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+			throw e;
+		}
         return datasetTypes;
     }// getDatasetTypes()
 
     public static void insertDatasetType(DatasetType aDst, Session session) {
-        log.debug("inserting datatype into database");
-        Transaction tx = session.beginTransaction();
-        session.save(aDst);
-        tx.commit();
-        log.debug("inserting datatype into database");
+		log.debug("inserting datatype into database");
+        Transaction tx = null;
+
+    	try {
+			tx = session.beginTransaction();
+			session.save(aDst);
+			tx.commit();
+			log.debug("inserting datatype into database");
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+			throw e;
+		}
+    }
+
+    public static void updateDatasetType(DatasetType datasetType, Session session){
+    	log.debug("updating datasetType: " + datasetType.getDatasettypeid());
+        Transaction tx = null;
+        
+        try {
+			tx = session.beginTransaction();
+			session.update(datasetType);
+			tx.commit();    	
+			log.debug("updating dataset Type: " + datasetType.getName());
+		} catch (HibernateException e) {
+			log.error(e);
+			tx.rollback();
+			throw e;
+		}
     }
 
 }

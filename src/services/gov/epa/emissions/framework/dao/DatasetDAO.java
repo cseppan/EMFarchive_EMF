@@ -68,6 +68,7 @@ public class DatasetDAO {
 		} catch (HibernateException e) {
 			log.error(e);
 			tx.rollback();
+			throw e;
 		}
 
         return dsNameExists;
@@ -97,6 +98,7 @@ public class DatasetDAO {
 		} catch (HibernateException e) {
 			log.error(e);
 			tx.rollback();
+			throw e;
 		}
         log.debug("End getDatasets");
         return datasets;
@@ -112,6 +114,7 @@ public class DatasetDAO {
 		} catch (HibernateException e) {
 			log.error(e);
 			tx.rollback();
+			throw e;
 		}
     }
 
@@ -127,6 +130,7 @@ public class DatasetDAO {
 		} catch (HibernateException e) {
 			log.error(e);
 			tx.rollback();
+			throw e;
 		}
     }
 
@@ -153,6 +157,7 @@ public class DatasetDAO {
 		} catch (HibernateException e) {
 			log.error(e);
 			tx.rollback();
+			throw e;
 		}
         
 		log.debug("End getSectors");
@@ -183,6 +188,7 @@ public class DatasetDAO {
 		} catch (HibernateException e) {
 			log.error(e);
 			tx.rollback();
+			throw e;
 		}
         
         log.debug("End getSectors");
@@ -201,6 +207,7 @@ public class DatasetDAO {
 		} catch (HibernateException e) {
 			log.error(e);
 			tx.rollback();
+			throw e;
 		}
 	}
 
@@ -216,6 +223,7 @@ public class DatasetDAO {
 		} catch (HibernateException e) {
 			log.error(e);
 			tx.rollback();
+			throw e;
 		}
 	}
 
@@ -235,6 +243,7 @@ public class DatasetDAO {
 		} catch (HibernateException e) {
 			log.error(e);
 			tx.rollback();
+			throw e;
 		}
 		
 	}
@@ -249,6 +258,7 @@ public class DatasetDAO {
 		} catch (HibernateException e) {
 			log.error(e);
 			tx.rollback();
+			throw e;
 		}
 		
 	}

@@ -1,20 +1,30 @@
 ---- DatasetTypes
+DROP TABLE DATASETTYPES;
+DROP SEQUENCE datasettypes_dataset_type_id_seq;
 
----- Create Table
-CREATE TABLE emf.datasettypes
+CREATE SEQUENCE datasettypes_dataset_type_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 200
+  CACHE 1;
+ALTER TABLE datasettypes_dataset_type_id_seq OWNER TO emf;
+
+
+CREATE TABLE datasettypes
 (
-  dataset_type_id serial UNIQUE NOT NULL,
+  dataset_type_id int4 NOT NULL DEFAULT nextval('emf.datasettypes_dataset_type_id_seq'::text),
   name varchar(255) NOT NULL,
   description text NOT NULL,
-  minfiles integer NOT NULL DEFAULT 0,
-  maxfiles integer NOT NULL DEFAULT 0,
-  min_columns integer NOT NULL DEFAULT 0,
-  max_columns integer NOT NULL DEFAULT 0,
-  external bool NOT NULL DEFAULT false
+  minfiles int4 NOT NULL DEFAULT 0,
+  maxfiles int4 NOT NULL DEFAULT 0,
+  min_columns int4 NOT NULL DEFAULT 0,
+  max_columns int4 NOT NULL DEFAULT 0,
+  "external" bool NOT NULL DEFAULT false,
+  CONSTRAINT datasettypes_dataset_type_id_key UNIQUE (dataset_type_id)
 ) 
 WITHOUT OIDS;
-ALTER TABLE emf.datasettypes OWNER TO emf;
-
+ALTER TABLE datasettypes OWNER TO emf;
 
 ---- Load Data
 delete from emf.datasettypes;
@@ -25,4 +35,6 @@ insert into emf.datasettypes values(4,'ORL Point Inventory','ORL Point Inventory
 insert into emf.datasettypes values(5,'Shapefile','Shape files', '3', '-1','-1','-1', true);
 insert into emf.datasettypes values(6,'Externalfile','External files', '1', '-1','-1','-1', true);
 insert into emf.datasettypes values(7,'Meteorologyfile','Meteorology files', '1', '-1','-1','-1', true);
+insert into emf.datasettypes values(8,'ModelReadyEmissions','Model Ready Emissions files', '1', '-1','-1','-1', true);
+
 
