@@ -10,6 +10,16 @@
  	</id>
 	<property name="name"			column="name"			type="java.lang.String"		not-null="true"/>
 	<property name="description" 	column="description"	type="java.lang.String"		not-null="false"/>
+	
+	<array name="sectorCriteria" table="sectorcriteria">
+    <key column="sector_id"/>
+    <list-index column="list_index"/>
+    <composite-element class="gov.epa.emissions.commons.io.SectorCriteria">
+		<property name="type"		column="type" 		not-null="true"/>
+		<property name="criteria"	column="criteria" 	not-null="true"/>
+    </composite-element>
+  </array>
+	
   </class> 
 </hibernate-mapping>  
 

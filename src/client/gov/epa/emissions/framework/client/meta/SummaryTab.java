@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ChangeObserver;
@@ -11,7 +12,6 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.Sector;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

@@ -73,7 +73,8 @@
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.DatasetType" qname="ns1:DatasetType" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.Country" qname="ns1:Country" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.Sector" qname="ns1:Sector" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Sector" qname="ns1:Sector" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.SectorCriteria" qname="ns1:SectorCriteria" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Dataset" qname="ns1:Dataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Table" qname="ns1:Table" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
@@ -84,6 +85,11 @@
  <arrayMapping qname="ns1:Users" xmlns:ns1="urn:gov.epa.services.EmfServices"
              languageSpecificType="java:gov.epa.emissions.framework.services.User[]"
 			 innerType="ns1:User" 
+             encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
+
+ <arrayMapping qname="ns1:SectorCriterias" xmlns:ns1="urn:gov.epa.services.EmfServices"
+             languageSpecificType="java:gov.epa.emissions.commons.io.SectorCriteria[]"
+			 innerType="ns1:SectorCriteria" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
 
  <arrayMapping qname="ns1:AllStatus" xmlns:ns1="urn:gov.epa.services.EmfServices"
@@ -117,7 +123,7 @@
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
 
  <arrayMapping qname="ns1:Sectors" xmlns:ns1="urn:gov.epa.services.EmfServices"
-             languageSpecificType="java:gov.epa.emissions.framework.services.Sector[]"
+             languageSpecificType="java:gov.epa.emissions.commons.io.Sector[]"
 			 innerType="ns1:Sector" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
 

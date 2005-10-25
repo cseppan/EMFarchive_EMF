@@ -11,12 +11,12 @@
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDAO;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.Sector;
 import gov.epa.emissions.framework.services.User;
 
 import java.util.List;

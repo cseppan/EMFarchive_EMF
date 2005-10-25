@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.services.DataServices;
-import gov.epa.emissions.framework.services.Sector;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;

@@ -16,6 +16,19 @@ CREATE TABLE sectors
 WITHOUT OIDS;
 ALTER TABLE sectors OWNER TO emf;
 
+CREATE TABLE sectorcriteria
+(
+  id serial NOT NULL,
+  sector_id int4 NOT NULL,
+  list_index int4,
+  type varchar(255) NOT NULL,
+  criteria text,
+  CONSTRAINT sector_criteria_to_sectors FOREIGN KEY (sector_id) REFERENCES sectors (id) ON UPDATE CASCADE ON DELETE CASCADE
+) 
+WITHOUT OIDS;
+ALTER TABLE datasets OWNER TO emf;
+
+
 
 insert into sectors values (1, 'Point', 'Point');
 insert into sectors values (2, 'Nonpoint', 'Nonpoint');

@@ -7,10 +7,10 @@
 
 package gov.epa.emissions.framework.dao;
 
+import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.Sector;
 import gov.epa.emissions.framework.services.User;
 
 import java.util.ArrayList;

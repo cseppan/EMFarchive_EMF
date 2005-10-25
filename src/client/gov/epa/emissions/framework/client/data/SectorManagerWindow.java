@@ -2,10 +2,10 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.services.Sector;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
