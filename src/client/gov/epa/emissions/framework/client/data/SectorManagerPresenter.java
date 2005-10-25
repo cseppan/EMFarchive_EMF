@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataServices;
 
@@ -21,6 +22,11 @@ public class SectorManagerPresenter {
 
     public void doClose() {
         view.close();
+    }
+
+    public void doUpdateSector(Sector sector, UpdateSectorView updateSectorView) {
+        UpdateSectorPresenter p = new UpdateSectorPresenter(updateSectorView, sector, services);
+        p.doDisplay();
     }
 
 }

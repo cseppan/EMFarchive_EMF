@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.DataServices;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
+import org.jmock.core.constraint.IsInstanceOf;
 
 public class SectorManagerPresenterTest extends MockObjectTestCase {
 
@@ -32,4 +33,18 @@ public class SectorManagerPresenterTest extends MockObjectTestCase {
 
         p.doClose();
     }
+
+    public void testShouldDisplayUpdateSectorViewOnUpdate() throws Exception {
+        Mock view = mock(SectorManagerView.class);
+
+        Sector sector = new Sector();
+
+        Mock updateSectorView = mock(UpdateSectorView.class);
+        updateSectorView.expects(once()).method("observe").with(new IsInstanceOf(UpdateSectorPresenter.class));
+        updateSectorView.expects(once()).method("display").with(same(sector));
+
+        SectorManagerPresenter p = new SectorManagerPresenter((SectorManagerView) view.proxy(), null);
+        p.doUpdateSector(sector, (UpdateSectorView)updateSectorView.proxy());
+    }
+
 }
