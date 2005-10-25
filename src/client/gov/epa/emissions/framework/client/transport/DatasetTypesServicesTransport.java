@@ -30,16 +30,13 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Conrad F. D'Cruz
- * 
- * This class implements the methods specified in the UserAdmin interface
- * 
  */
 public class DatasetTypesServicesTransport implements DatasetTypesServices {
     private static Log log = LogFactory.getLog(DatasetTypesServicesTransport.class);
 
     private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
-    private static String endpoint = "";
+    private String endpoint;
 
     /**
      * 
@@ -73,20 +70,18 @@ public class DatasetTypesServicesTransport implements DatasetTypesServices {
 
     private void registerBeanMapping(Call call, QName beanQName, Class cls) {
         call.registerTypeMapping(cls, beanQName, new BeanSerializerFactory(cls, beanQName),
-                new BeanDeserializerFactory(cls, beanQName));		
-	}
+                new BeanDeserializerFactory(cls, beanQName));
+    }
 
     private void registerMapping(Call call, QName emfQName, Class emfClass) {
         call.registerTypeMapping(emfClass, emfQName, new org.apache.axis.encoding.ser.BeanSerializerFactory(emfClass,
                 emfQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(emfClass, emfQName));
     }
 
-    private void registerArrayMapping(Call call, Class cls, QName qname){
-        call.registerTypeMapping(cls, qname,
-                new org.apache.axis.encoding.ser.ArraySerializerFactory(cls, qname),
+    private void registerArrayMapping(Call call, Class cls, QName qname) {
+        call.registerTypeMapping(cls, qname, new org.apache.axis.encoding.ser.ArraySerializerFactory(cls, qname),
                 new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname));
     }
-
 
     public DatasetType[] getDatasetTypes() throws EmfException {
         log.debug("Get all dataset types");

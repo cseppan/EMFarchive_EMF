@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DatasetTypesServices;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.LoggingServices;
 import gov.epa.emissions.framework.services.User;
@@ -52,5 +53,9 @@ public class DefaultEmfSession implements EmfSession {
 
     public LoggingServices getLoggingServices() {
         return serviceLocator.getLoggingServices();
+    }
+
+    public DatasetTypesServices getDatasetTypesServices() {
+        return serviceLocator.getDatasetTypesServices();
     }
 }

@@ -557,19 +557,4 @@ public class DataServicesTransport implements DataServices {
         log.debug("update a sector object: " + sector.getName());
 
     }
-
-    public DatasetType[] getDatasetTypes() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void insertDatasetType(DatasetType datasetType) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void updateDatasetType(DatasetType datasetType) {
-        // TODO Auto-generated method stub
-
-    }
 }

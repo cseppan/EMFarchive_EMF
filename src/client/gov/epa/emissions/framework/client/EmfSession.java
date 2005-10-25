@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DatasetTypesServices;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.LoggingServices;
 import gov.epa.emissions.framework.services.User;
@@ -9,20 +10,22 @@ import gov.epa.emissions.framework.services.UserServices;
 
 public interface EmfSession {
 
-    public ServiceLocator getServiceLocator();
+    ServiceLocator getServiceLocator();
 
-    public User getUser();
+    User getUser();
 
-    public ExImServices getExImServices();
+    ExImServices getExImServices();
 
-    public DataServices getDataServices();
+    DataServices getDataServices();
 
-    public String getMostRecentExportFolder();
+    String getMostRecentExportFolder();
 
-    public void setMostRecentExportFolder(String mostRecentExportFolder);
+    void setMostRecentExportFolder(String mostRecentExportFolder);
 
-    public UserServices getUserServices();
+    UserServices getUserServices();
 
-    public LoggingServices getLoggingServices();
+    LoggingServices getLoggingServices();
+
+    DatasetTypesServices getDatasetTypesServices();
 
 }

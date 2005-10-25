@@ -5,9 +5,8 @@ import gov.epa.emissions.framework.EmfException;
 
 public interface DatasetTypesServices extends EMFServices {
 
-    public DatasetType[] getDatasetTypes() throws EmfException;
-    public void insertDatasetType(DatasetType datasetType) throws EmfException;
-    public void updateDatasetType(DatasetType datasetType) throws EmfException;
-    
+    DatasetType[] getDatasetTypes() throws EmfException;
+    void insertDatasetType(DatasetType datasetType) throws EmfException;
+    void updateDatasetType(DatasetType datasetType) throws EmfException;
 
 }

@@ -10,7 +10,6 @@
 
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDAO;
@@ -166,21 +165,6 @@ public class DataServicesImpl implements DataServices {
             throw new EmfException("Error communicating with the server");
         }
         return (Sector[]) sectors.toArray(new Sector[sectors.size()]);
-    }
-
-    public DatasetType[] getDatasetTypes() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void insertDatasetType(DatasetType datasetType) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void updateDatasetType(DatasetType datasetType) {
-        // TODO Auto-generated method stub
-
     }
 
 }

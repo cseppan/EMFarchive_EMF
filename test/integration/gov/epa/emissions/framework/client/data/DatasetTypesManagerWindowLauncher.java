@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DatasetTypesServices;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -24,10 +24,10 @@ public class DatasetTypesManagerWindowLauncher {
 
         DatasetTypesManagerWindow view = new DatasetTypesManagerWindow(frame, desktop);
         DatasetType[] types = { new DatasetType(), new DatasetType() };
-        Mock dataServices = new Mock(DataServices.class);
-        dataServices.stubs().method(new IsEqual("getDatasetTypes")).will(new ReturnStub(types));
+        Mock services = new Mock(DatasetTypesServices.class);
+        services.stubs().method(new IsEqual("getDatasetTypes")).will(new ReturnStub(types));
 
-        DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(view, (DataServices) dataServices
+        DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(view, (DatasetTypesServices) services
                 .proxy());
 
         launcher.addAsInternalFrame(view, frame, desktop);

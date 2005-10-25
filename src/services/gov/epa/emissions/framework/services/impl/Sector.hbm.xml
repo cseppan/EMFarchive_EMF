@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping> 
-  <class name="gov.epa.emissions.framework.services.Sector" table="sectors"> 
+  <class name="gov.epa.emissions.commons.io.Sector" table="sectors"> 
  	<id name="id" type="long" column="id">
 	  <generator class="identity"/>
  	</id>

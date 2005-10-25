@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.client.data.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.client.data.SectorManagerPresenter;
 import gov.epa.emissions.framework.client.data.SectorManagerWindow;
 import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DatasetTypesServices;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
 import gov.epa.emissions.framework.ui.DefaultWindowLayoutManager;
@@ -59,7 +60,7 @@ public class ManageMenu extends JMenu {
         this.windowLayoutManager = windowLayoutManager;
 
         super.add(createDatasets(parent, messagePanel));
-        super.add(createDatasetTypes(session.getDataServices(), parent, messagePanel));
+        super.add(createDatasetTypes(session.getDatasetTypesServices(), parent, messagePanel));
         super.add(createSectors(session.getDataServices(), parent, messagePanel));
         super.addSeparator();
 
@@ -108,14 +109,14 @@ public class ManageMenu extends JMenu {
     }
 
     // FIXME: each of the menu-item and it's handles are similar. Refactor ?
-    private JMenuItem createDatasetTypes(final DataServices dataServices, final EmfFrame parent,
+    private JMenuItem createDatasetTypes(final DatasetTypesServices services, final EmfFrame parent,
             final MessagePanel messagePanel) {
         JMenuItem menuItem = new JMenuItem("Dataset Types");
         menuItem.setName("datasetTypes");
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    displayDatasetTypes(dataServices, parent);
+                    displayDatasetTypes(services, parent);
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
                 }
@@ -142,7 +143,7 @@ public class ManageMenu extends JMenu {
         return menuItem;
     }
 
-    protected void displayDatasetTypes(DataServices dataServices, EmfFrame parent) throws EmfException {
+    protected void displayDatasetTypes(DatasetTypesServices services, EmfFrame parent) throws EmfException {
         // FIXME: cull out the pattern - singleton
         if (datasetTypesManagerView != null) {
             datasetTypesManagerView.bringToFront();
@@ -153,7 +154,7 @@ public class ManageMenu extends JMenu {
         windowLayoutManager.add(datasetTypesManagerView);
         desktop.add(datasetTypesManagerView);
 
-        DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(datasetTypesManagerView, dataServices);
+        DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(datasetTypesManagerView, services);
         presenter.doDisplay();
     }
 
