@@ -23,7 +23,9 @@ public class SectorsManagerWindowLauncher {
         JDesktopPane desktop = new JDesktopPane();
 
         SectorManagerWindow view = new SectorManagerWindow(frame, desktop);
-        Sector[] sectors = { new Sector(), new Sector() };
+        Sector sector1 = new Sector("desc1", "name1");
+        Sector sector2 = new Sector("desc2", "name2");
+        Sector[] sectors = { sector1, sector2 };
         Mock dataServices = new Mock(DataServices.class);
         dataServices.stubs().method(new IsEqual("getSectors")).will(new ReturnStub(sectors));
 

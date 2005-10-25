@@ -10,15 +10,22 @@ import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
+//FIXME: look at the common design b/w this and UserManagerWindow. Refactor ?
 public class SectorManagerWindow extends ReusableInteralFrame implements SectorManagerView {
 
     private SectorManagerPresenter presenter;
@@ -98,7 +105,68 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
     }
 
     private JPanel createCrudPanel() {
-        return new JPanel();
+        JButton updateButton = new JButton("Update");
+        updateButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                updateSectors();
+            }
+        });
+
+        JPanel crudPanel = new JPanel();
+        crudPanel.setLayout(new FlowLayout());
+        crudPanel.add(updateButton);
+
+        return crudPanel;
     }
 
+    protected void updateSectors() {
+        List sectors = selected();
+        //TODO: move it into Presenter - look at UserManagerWindow
+        for (Iterator iter = sectors.iterator(); iter.hasNext();) {
+            Sector sector = (Sector) iter.next();
+            presenter.doUpdateSector(sector, updateSectorView());
+        }
+    }
+
+    // generic. Could be moved into 'SortFilterSelectModel' ? - FIXME
+    private List selected() {
+        List elements = new ArrayList();
+
+        int[] selected = selectModel.getSelectedIndexes();
+        if (selected.length == 0)
+            return elements;
+        for (int i = 0; i < selected.length; i++) {
+            elements.add(model.element(selected[i]));
+        }
+
+        return elements;
+    }
+
+    // FIXME: this table refresh sequence applies to every CRUD panel. Refactor
+    private UpdateSectorView updateSectorView() {
+        UpdateSectorWindow view = new UpdateSectorWindow();
+        desktop.add(view);
+
+        view.addInternalFrameListener(new InternalFrameAdapter() {
+            public void internalFrameClosed(InternalFrameEvent event) {
+                doSimpleRefresh();
+            }
+        });
+
+        return view;
+    }
+
+    // FIXME: this table refresh sequence applies to every SortFilterTableModel.
+    // Refactor
+    private void redoLayout() {
+        super.validate();
+    }
+
+    // FIXME: this table refresh sequence applies to every SortFilterTableModel.
+    // Refactor
+    private void doSimpleRefresh() {
+        model.refresh();
+        selectModel.refresh();
+        redoLayout();
+    }
 }
