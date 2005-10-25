@@ -23,8 +23,6 @@ import javax.xml.rpc.ServiceException;
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
-import org.apache.axis.encoding.ser.BeanDeserializerFactory;
-import org.apache.axis.encoding.ser.BeanSerializerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -66,21 +64,6 @@ public class DatasetTypesServicesTransport implements DatasetTypesServices {
 
         log.debug("Extracting significant message from Axis fault");
         return message;
-    }
-
-    private void registerBeanMapping(Call call, QName beanQName, Class cls) {
-        call.registerTypeMapping(cls, beanQName, new BeanSerializerFactory(cls, beanQName),
-                new BeanDeserializerFactory(cls, beanQName));
-    }
-
-    private void registerMapping(Call call, QName emfQName, Class emfClass) {
-        call.registerTypeMapping(emfClass, emfQName, new org.apache.axis.encoding.ser.BeanSerializerFactory(emfClass,
-                emfQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(emfClass, emfQName));
-    }
-
-    private void registerArrayMapping(Call call, Class cls, QName qname) {
-        call.registerTypeMapping(cls, qname, new org.apache.axis.encoding.ser.ArraySerializerFactory(cls, qname),
-                new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname));
     }
 
     public DatasetType[] getDatasetTypes() throws EmfException {

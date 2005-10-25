@@ -10,12 +10,10 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
-import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.exporter.Exporter;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDAO;
-import gov.epa.emissions.framework.dao.DatasetTypesDAO;
 import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.EMFConstants;
@@ -25,7 +23,6 @@ import gov.epa.emissions.framework.services.User;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.naming.Context;
@@ -223,35 +220,6 @@ public class ExImServicesImpl implements ExImServices {
         cleanName = sbuf.toString() + ".txt";
 
         return cleanName;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.services.ExImServices#getDatasetTypes()
-     */
-    public DatasetType[] getDatasetTypes() {
-        log.debug("In ExImServicesImpl:getDatasetTypes START");
-
-        // Session session = HibernateUtils.currentSession();
-        Session session = EMFHibernateUtil.getSession();
-        List datasettypes = DatasetTypesDAO.getDatasetTypes(session);
-        log.debug("In ExImServicesImpl:getDatasetTypes END");
-        session.flush();
-        session.close();
-        return (DatasetType[]) datasettypes.toArray(new DatasetType[datasettypes.size()]);
-    }
-
-    public void insertDatasetType(DatasetType aDst) {
-        log.debug("In ExImServicesImpl:insertDatasetType START");
-
-        // Session session = HibernateUtils.currentSession();
-        Session session = EMFHibernateUtil.getSession();
-        DatasetTypesDAO.insertDatasetType(aDst, session);
-        session.flush();
-        session.close();
-        log.debug("In ExImServicesImpl:insertDatasetType END");
-
     }
 
     public String getImportBaseFolder() {

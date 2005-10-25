@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.importer.DefaultORLDatasetTypesFactory;
 import gov.epa.emissions.commons.io.importer.ORLDatasetTypesFactory;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
 
 import java.io.File;
@@ -34,11 +33,6 @@ public class ExImServicesTest extends ServicesTestCase {
     protected void tearDown() throws Exception {
         ExImDbUpdate dbUpdate = new ExImDbUpdate();
         dbUpdate.deleteAllDatasets();
-    }
-
-    public void testFetchDatasetTypesReturnsFourORLTypes() throws EmfException {
-        DatasetType[] datasetTypes = eximService.getDatasetTypes();
-        assertTrue("Should have atleast 4 ORL types", datasetTypes.length >= 4);
     }
 
     public void testImportOrlNonPoint() throws Exception {

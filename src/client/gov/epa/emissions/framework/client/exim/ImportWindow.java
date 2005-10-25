@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.DatasetTypesServices;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -39,14 +39,14 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     private DefaultComboBoxModel datasetTypesModel;
 
-    private ExImServices eximServices;
+    private DatasetTypesServices datasetTypesService;
 
     private JTextField folder;
 
-    public ImportWindow(ExImServices eximServices, JDesktopPane desktop) throws EmfException {
+    public ImportWindow(DatasetTypesServices eximServices, JDesktopPane desktop) throws EmfException {
         super("Import Dataset", desktop);
         super.setName("importWindow");
-        this.eximServices = eximServices;
+        this.datasetTypesService = eximServices;
 
         setSize(new Dimension(600, 275));
 
@@ -82,7 +82,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         GridLayout valuesLayoutManager = new GridLayout(4, 1);
         valuesLayoutManager.setVgap(10);
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
-        datasetTypesModel = new DefaultComboBoxModel(eximServices.getDatasetTypes());
+        datasetTypesModel = new DefaultComboBoxModel(datasetTypesService.getDatasetTypes());
         JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
         datasetTypesComboBox.setName("datasetTypes");
         valuesPanel.add(datasetTypesComboBox);

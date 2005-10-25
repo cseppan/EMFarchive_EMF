@@ -94,7 +94,7 @@ public class FileMenu extends JMenu {
         ServiceLocator serviceLocator = session.getServiceLocator();
         ExImServices eximServices = serviceLocator.getExImServices();
 
-        importView = new ImportWindow(eximServices, desktop);
+        importView = new ImportWindow(serviceLocator.getDatasetTypesServices(), desktop);
         windowLayoutManager.add(importView);
         desktop.add(importView);
 
