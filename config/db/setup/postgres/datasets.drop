@@ -1,4 +1,0 @@
---- Table: emf.datasets
-DROP TABLE datasets CASCADE;
-DROP TABLE datasettables CASCADE;
-DROP TABLE dataset_access_logs CASCADE;

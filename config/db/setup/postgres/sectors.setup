@@ -1,3 +1,8 @@
+---- Sectors
+
+DROP SEQUENCE sectors_id_seq;
+DROP TABLE sectors CASCADE;
+
 CREATE SEQUENCE sectors_id_seq
   INCREMENT 1
   MINVALUE 1
@@ -16,6 +21,7 @@ CREATE TABLE sectors
 WITHOUT OIDS;
 ALTER TABLE sectors OWNER TO emf;
 
+DROP TABLE sectorcriteria;
 CREATE TABLE sectorcriteria
 (
   id serial NOT NULL,
@@ -29,7 +35,7 @@ WITHOUT OIDS;
 ALTER TABLE datasets OWNER TO emf;
 
 
-
+---- Sectors data
 insert into sectors values (1, 'Point', 'Point');
 insert into sectors values (2, 'Nonpoint', 'Nonpoint');
 insert into sectors values (3, 'Area','Area');

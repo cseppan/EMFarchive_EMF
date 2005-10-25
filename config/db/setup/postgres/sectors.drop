@@ -1,2 +1,0 @@
-DROP SEQUENCE sectors_id_seq;
-DROP TABLE sectors;

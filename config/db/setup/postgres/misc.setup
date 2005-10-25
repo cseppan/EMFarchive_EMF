@@ -1,4 +1,6 @@
 --- Status Messages
+DROP TABLE statusmessages;
+
 CREATE TABLE statusmessages
 (
   status_id serial NOT NULL,
@@ -14,7 +16,11 @@ ALTER TABLE statusmessages OWNER TO emf;
 
 
 
+
+
 --- Properties
+DROP TABLE emf_properties;
+
 CREATE TABLE emf_properties
 (
   prop_id serial unique NOT NULL,
