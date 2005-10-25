@@ -11,6 +11,8 @@
 package gov.epa.emissions.framework.services;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class holds the name and description of an EMF Sector
@@ -22,6 +24,7 @@ public class Sector implements Serializable {
 	private long id;
 	private String name;
 	private String description;
+    private List sectorCriteria;
 	
 	/**
 	 * 
@@ -59,5 +62,24 @@ public class Sector implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+    /**
+     * @return Returns the sectorCriteria.
+     */
+    public SectorCriteria[] getSectorCriteria() {
+        return (SectorCriteria[])this.sectorCriteria.toArray(new SectorCriteria[0]);
+    }
+
+    /**
+     * @param sectorCriteria The sectorCriteria to set.
+     */
+    public void setSectorCriteria(SectorCriteria[] sectorCriteria) {
+        this.sectorCriteria.clear();
+        this.sectorCriteria.addAll(Arrays.asList(sectorCriteria));
+    }
+
+    public void addSectorCriteria(SectorCriteria criteria) {
+        this.sectorCriteria.add(criteria);
+    }
 
 }
