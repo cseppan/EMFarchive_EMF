@@ -509,7 +509,6 @@ public class DataServicesTransport implements DataServices {
     }
 
     public void updateSector(Sector sector) throws EmfException {
-
         log.debug("update a sector object: " + sector.getName());
         Service service = new Service();
         Call call;

@@ -23,7 +23,7 @@ public class SectorsTableDataTest extends TestCase {
 		data = new SectorsTableData(new Sector[] { sector1, sector2 });
 	}
 
-	public void testShouldHaveFiveColumns() {
+	public void testShouldHaveTwoColumns() {
 		String[] columns = data.columns();
 		assertEquals(2, columns.length);
 		assertEquals("Name", columns[0]);
