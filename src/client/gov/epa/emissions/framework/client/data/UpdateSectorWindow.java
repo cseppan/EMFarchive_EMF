@@ -56,6 +56,7 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
         layout.add(createInputPanel(sector));
+        layout.add(createCriteriaPanel(sector));
         layout.add(createButtonsPanel(sector));
     }
 
@@ -73,6 +74,12 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
+
+        return panel;
+    }
+
+    private JPanel createCriteriaPanel(Sector sector) {
+        JPanel panel = new JPanel();
 
         return panel;
     }

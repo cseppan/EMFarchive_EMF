@@ -524,16 +524,9 @@ public class DataServicesTransport implements DataServices {
 
             call.setOperationName(updateSectorQName);
 
-            call.registerTypeMapping(Sector.class, sectorQName,
-                    new org.apache.axis.encoding.ser.ArraySerializerFactory(Sector.class, sectorQName),
-                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(sectorQName));
-            call.registerTypeMapping(SectorCriteria.class, sectorCriteriaQName,
-                    new org.apache.axis.encoding.ser.ArraySerializerFactory(SectorCriteria.class, sectorCriteriaQName),
-                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(sectorCriteriaQName));
-            call.registerTypeMapping(SectorCriteria[].class, sectorCriteriaArrayQName,
-                    new org.apache.axis.encoding.ser.ArraySerializerFactory(SectorCriteria[].class,
-                            sectorCriteriaArrayQName), new org.apache.axis.encoding.ser.ArrayDeserializerFactory(
-                            sectorCriteriaArrayQName));
+            registerBeanMapping(call, sectorQName, Sector.class);
+            registerBeanMapping(call, sectorCriteriaQName, SectorCriteria.class);
+            registerArrayMapping(call, SectorCriteria[].class, sectorCriteriaArrayQName);
 
             call.addParameter("sector", sectorQName, ParameterMode.IN);
 
