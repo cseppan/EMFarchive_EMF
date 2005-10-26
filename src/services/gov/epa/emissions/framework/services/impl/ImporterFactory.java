@@ -47,13 +47,13 @@ public class ImporterFactory {
         SqlDataTypes dataType = dbServer.getDataType();
 
         if (datasetType.getName().equals("ORL Nonpoint Inventory"))
-            return new ORLNonPointImporter(emissions);
+            return new ORLNonPointImporter(emissions, dataType);
         if (datasetType.getName().equals("ORL Nonroad Inventory"))
-            return new ORLNonRoadImporter(emissions);
+            return new ORLNonRoadImporter(emissions, dataType);
         if (datasetType.getName().equals("ORL Onroad Inventory"))
-            return new ORLOnRoadImporter(emissions);
+            return new ORLOnRoadImporter(emissions, dataType);
         if (datasetType.getName().equals("ORL Point Inventory"))
-            return new ORLPointImporter(emissions);
+            return new ORLPointImporter(emissions, dataType);
 
         
         throw new RuntimeException("Dataset Type - " + datasetType.getName() + " unsupported");
