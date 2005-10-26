@@ -517,28 +517,25 @@ public class DataServicesTransport implements DataServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
-            QName qname2 = new QName(emfSvcsNamespace, "ns1:Sector");
-            QName qname3 = new QName(emfSvcsNamespace, "updateSector");
-            QName qname4 = new QName(emfSvcsNamespace, "ns1:SectorCriteria");
-            QName qname5 = new QName(emfSvcsNamespace, "ns1:SectorCriterias");
+            QName sectorQName = new QName(emfSvcsNamespace, "ns1:Sector");
+            QName updateSectorQName = new QName(emfSvcsNamespace, "updateSector");
+            QName sectorCriteriaQName = new QName(emfSvcsNamespace, "ns1:SectorCriteria");
+            QName sectorCriteriaArrayQName = new QName(emfSvcsNamespace, "ns1:SectorCriterias");
 
-            call.setOperationName(qname3);
+            call.setOperationName(updateSectorQName);
 
-            Class cls2 = Sector.class;
-            Class cls4 = SectorCriteria.class;
-            Class cls5 = SectorCriteria[].class;
+            call.registerTypeMapping(Sector.class, sectorQName,
+                    new org.apache.axis.encoding.ser.ArraySerializerFactory(Sector.class, sectorQName),
+                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(sectorQName));
+            call.registerTypeMapping(SectorCriteria.class, sectorCriteriaQName,
+                    new org.apache.axis.encoding.ser.ArraySerializerFactory(SectorCriteria.class, sectorCriteriaQName),
+                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(sectorCriteriaQName));
+            call.registerTypeMapping(SectorCriteria[].class, sectorCriteriaArrayQName,
+                    new org.apache.axis.encoding.ser.ArraySerializerFactory(SectorCriteria[].class,
+                            sectorCriteriaArrayQName), new org.apache.axis.encoding.ser.ArrayDeserializerFactory(
+                            sectorCriteriaArrayQName));
 
-            call.registerTypeMapping(cls2, qname2,
-                    new org.apache.axis.encoding.ser.ArraySerializerFactory(cls2, qname2),
-                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname2));
-            call.registerTypeMapping(cls4, qname4,
-                    new org.apache.axis.encoding.ser.ArraySerializerFactory(cls4, qname4),
-                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname4));
-            call.registerTypeMapping(cls5, qname5,
-                    new org.apache.axis.encoding.ser.ArraySerializerFactory(cls5, qname5),
-                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname5));
-
-            call.addParameter("sector", qname2, ParameterMode.IN);
+            call.addParameter("sector", sectorQName, ParameterMode.IN);
 
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
             call.invoke(new Object[] { sector });
