@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.ui.AbstractEmfTableData;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class SectorCriteriaTableData extends AbstractEmfTableData {
@@ -28,15 +29,29 @@ public class SectorCriteriaTableData extends AbstractEmfTableData {
 
     private List createRows(SectorCriteria[] criteria) {
         List rows = new ArrayList();
-
-        for (int i = 0; i < criteria.length; i++) {
-            SectorCriteria element = criteria[i];
-            Object[] values = { element.getType(), element.getCriteria() };
-
-            Row row = new Row(element, values);
-            rows.add(row);
-        }
+        for (int i = 0; i < criteria.length; i++)
+            rows.add(row(criteria[i]));
 
         return rows;
+    }
+
+    public void remove(SectorCriteria criterion) {
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            Row row = (Row) iter.next();
+            SectorCriteria element = (SectorCriteria) row.record();
+            if (element.equals(criterion)) {
+                rows.remove(row);
+                return;
+            }
+        }
+    }
+
+    public void add(SectorCriteria criterion) {
+        rows.add(row(criterion));
+    }
+
+    private Row row(SectorCriteria criterion) {
+        Object[] values = new Object[] { criterion.getType(), criterion.getCriteria() };
+        return new Row(criterion, values);
     }
 }

@@ -13,10 +13,12 @@ public class SectorCriteriaTableDataTest extends TestCase {
 
     protected void setUp() {
         SectorCriteria element1 = new SectorCriteria();
+        element1.setId(1);
         element1.setType("type1");
         element1.setCriteria("criterion1");
 
         SectorCriteria element2 = new SectorCriteria();
+        element2.setId(2);
         element2.setType("type2");
         element2.setCriteria("criterion2");
 
@@ -58,13 +60,29 @@ public class SectorCriteriaTableDataTest extends TestCase {
         element2.setType("type2");
         element2.setCriteria("criterion2");
 
-        data = new SectorCriteriaTableData(new SectorCriteria[] { element1, element2 });
+        SectorCriteriaTableData data = new SectorCriteriaTableData(new SectorCriteria[] { element1, element2 });
 
         assertEquals(element1, data.element(0));
         assertEquals(element2, data.element(1));
     }
-    
+
     public void testShouldRemoveCriterionOnRemove() {
+        SectorCriteria criterion = new SectorCriteria();
+        criterion.setId(2);
+
+        data.remove(criterion);
+        assertEquals(1, data.rows().size());
         
+        data.remove(new SectorCriteria());
+        assertEquals(1, data.rows().size());
+    }
+    
+    public void testShouldAddCriterionOnAdd() {
+        SectorCriteria criterion = new SectorCriteria();
+        criterion.setId(3);
+        
+        data.add(criterion);
+        
+        assertEquals(3, data.rows().size());
     }
 }
