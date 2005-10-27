@@ -74,10 +74,7 @@ public class SectorCriteriaTableDataTest extends TestCase {
     }
 
     public void testShouldRemoveCriterionOnRemove() {
-        SectorCriteria criterion = new SectorCriteria();
-        criterion.setId(2);
-
-        data.remove(criterion);
+        data.remove(criterion1);
         assertEquals(1, data.rows().size());
 
         data.remove(new SectorCriteria());

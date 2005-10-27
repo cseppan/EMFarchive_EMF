@@ -36,4 +36,8 @@ public class ViewableRow implements Row {
         return record;
     }
 
+    public void setValueAt(Object value, int column) {
+        // No Op
+    }
+
 }

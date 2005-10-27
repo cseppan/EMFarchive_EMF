@@ -44,7 +44,7 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
 
-        super.setSize(new Dimension(400, 300));
+        super.setSize(new Dimension(400, 400));
     }
 
     public void observe(UpdateSectorPresenter presenter) {

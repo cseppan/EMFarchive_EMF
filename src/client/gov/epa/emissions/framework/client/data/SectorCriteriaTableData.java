@@ -39,7 +39,8 @@ public class SectorCriteriaTableData extends AbstractEmfTableData {
     public void remove(SectorCriteria criterion) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            if (row.source().equals(criterion)) {
+            SectorCriteria source = (SectorCriteria) row.source();
+            if (source == criterion) {
                 rows.remove(row);
                 return;
             }
@@ -60,7 +61,7 @@ public class SectorCriteriaTableData extends AbstractEmfTableData {
             return;
 
         EditableRow editableRow = (EditableRow) rows.get(row);
-        editableRow.setValueAt(col, value);
+        editableRow.setValueAt(value, col);
     }
 
     public SectorCriteria[] getSelected() {
@@ -74,5 +75,10 @@ public class SectorCriteriaTableData extends AbstractEmfTableData {
         }
 
         return (SectorCriteria[]) selected.toArray(new SectorCriteria[0]);
+    }
+
+    public void remove(SectorCriteria[] criteria) {
+        for (int i = 0; i < criteria.length; i++)
+            remove(criteria[i]);
     }
 }

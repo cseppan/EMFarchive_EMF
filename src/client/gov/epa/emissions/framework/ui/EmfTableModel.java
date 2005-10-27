@@ -37,7 +37,15 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
 
     public void refresh() {
         this.rows = tableData.rows();
+        this.header = new TableHeader(tableData.columns());
+
         super.fireTableDataChanged();
+    }
+
+    // FIXME: how does this differ from refresh() ?
+    public void refresh(EmfTableData tableData) {
+        this.tableData = tableData;
+        refresh();
     }
 
     public boolean isCellEditable(int row, int col) {
@@ -48,23 +56,17 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
         return tableData.element(row);
     }
 
-    // FIXME: TBT (to be tested)
     public List elements(int[] selected) {
         return tableData.elements(selected);
     }
 
-    // FIXME: how does this differ from refresh() ?
-    public void refresh(EmfTableData tableData) {
-        this.tableData = tableData;
-        this.header = new TableHeader(tableData.columns());
-        refresh();
-    }
-
-    public Class getColumnClass(int index) {
-        return getValueAt(0, index).getClass();
+    public Class getColumnClass(int col) {
+        return getValueAt(0, col).getClass();
     }
 
     public void setValueAt(Object value, int row, int col) {
+        Row rowObj = (Row) rows.get(row);
+        rowObj.setValueAt(value, col);
     }
 
 }

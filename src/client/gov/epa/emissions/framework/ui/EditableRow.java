@@ -43,7 +43,7 @@ public class EditableRow implements Row {
         return rowSource;
     }
 
-    public void setValueAt(int column, Object val) {
+    public void setValueAt(Object val, int column) {
         rowSource.setValueAt(column, val);
         columns(rowSource);
     }

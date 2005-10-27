@@ -6,11 +6,10 @@ import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -55,28 +54,38 @@ public class SectorCriteriaPanel extends JPanel {
     private JPanel buttonsPanel(final SectorCriteriaTableData tableData) {
         JPanel container = new JPanel();
 
-        JButton addButton = new JButton("Add");
-        addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                tableData.add(new SectorCriteria());
-                tableModel.refresh();
+        Label add = new Label("Add", "<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Add</a></html>");
+        add.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent event) {
+                SectorCriteria criterion = new SectorCriteria();
+                criterion.setType("");
+                criterion.setCriteria("");
 
-                SectorCriteriaPanel.this.revalidate();
+                tableData.add(criterion);
+                refresh();
             }
         });
-        container.add(addButton);
+        container.add(add);
 
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+        Label remove = new Label("Remove", "<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Remove</a></html>");
+        remove.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent event) {
+                SectorCriteria[] selected = tableData.getSelected();
+                tableData.remove(selected);
+                refresh();
             }
         });
-        container.add(deleteButton);
+        container.add(remove);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.EAST);
 
         return panel;
+    }
+
+    private void refresh() {
+        tableModel.refresh();
+        super.revalidate();
     }
 
 }

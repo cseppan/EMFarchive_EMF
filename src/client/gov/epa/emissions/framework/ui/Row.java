@@ -6,4 +6,6 @@ public interface Row {
 
     Object source();
 
+    void setValueAt(Object value, int column);
+
 }
