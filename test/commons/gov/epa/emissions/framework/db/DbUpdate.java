@@ -18,7 +18,11 @@ public class DbUpdate {
     protected DatabaseConnection connection;
 
     public DbUpdate() throws Exception {
-        connection = connection(new Config("test/uat/uat.conf"));
+        this(new Config("test/uat/uat.conf"));
+    }
+    
+    public DbUpdate(Config config) throws Exception {
+        connection = connection(config);
     }
 
     private DatabaseConnection connection(Config config) throws Exception {
