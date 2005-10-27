@@ -25,7 +25,6 @@ import gov.epa.emissions.framework.services.User;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.rmi.RemoteException;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
@@ -54,45 +53,19 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            QName qname1 = qname("ns1:EmfDataset");
-            QName qname2 = qname("ns1:EmfDatasets");
-            QName qname3 = qname("getDatasets");
-            QName datasetTypeQName = qname("ns1:DatasetType");
-            QName internalSourceQName = qname("ns1:InternalSource");
-            QName externalSourceQName = qname("ns1:ExternalSource");
-            QName internalSourcesQName = qname("ns1:InternalSources");
-            QName externalSourcesQName = qname("ns1:ExternalSources");
+            registerDatasetMappings(call);
+            call.setOperationName(qname("getDatasets"));
+            QName datasetsQName = qname("ns1:EmfDatasets");
+            call.setReturnType(datasetsQName);
 
-            call.setOperationName(qname3);
-
-            Class cls1 = EmfDataset.class;
-            Class cls2 = EmfDataset[].class;
-
-            call.registerTypeMapping(cls1, qname1, new BeanSerializerFactory(cls1, qname1),
-                    new BeanDeserializerFactory(cls1, qname1));
-            call.registerTypeMapping(cls2, qname2, new ArraySerializerFactory(cls2, qname2),
-                    new ArrayDeserializerFactory(qname2));
-            registerBeanMapping(call, DatasetType.class, datasetTypeQName);
-
-            registerMappingForTable(call);
-            registerBeanMapping(call, InternalSource.class, internalSourceQName);
-            registerBeanMapping(call, ExternalSource.class, externalSourceQName);
-            registerArrayMapping(call, ExternalSource[].class, externalSourcesQName);
-            registerArrayMapping(call, InternalSource[].class, internalSourcesQName);
-
-            call.setReturnType(qname2);
-
-            Object obj = call.invoke(new Object[] {});
-
-            return (EmfDataset[]) obj;
-
+            return (EmfDataset[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {
-            log.error("Axis Fault details", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
+            throwExceptionOnAxisFault("Failed to fetch Datasets", fault);
         } catch (Exception e) {
-            log.error("Failed to fetch Datasets", e);
-            throw new EmfException("Failed to fetch Datasets", e.getMessage(), e);
+            throwExceptionDueToServiceErrors("Failed to fetch Datasets", e);
         }
+
+        return null;
     }
 
     public EmfDataset[] getDatasets(User user) {
@@ -102,83 +75,38 @@ public class DataServicesTransport implements DataServices {
     public void insertDataset(EmfDataset aDataset) {
     }
 
-    /**
-     * 
-     * This utility method extracts the significant message from the Axis Fault
-     * 
-     * @param faultReason
-     * @return
-     */
-    private String extractMessage(String faultReason) {
-        return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
-    }
-
-    public void updateDataset(EmfDataset aDset) throws EmfException {
+    public void updateDataset(EmfDataset dataset) throws EmfException {
         try {
             Call call = call();
 
-            QName qname2 = qname("ns1:EmfDataset");
-            QName qname3 = qname("updateDataset");
-            QName datasetTypeQName = qname("ns1:DatasetType");
-            QName internalSourceQName = qname("ns1:InternalSource");
-            QName externalSourceQName = qname("ns1:ExternalSource");
-            QName internalSourcesQName = qname("ns1:InternalSources");
-            QName externalSourcesQName = qname("ns1:ExternalSources");
-
-            call.setOperationName(qname3);
-
-            call.registerTypeMapping(EmfDataset.class, qname2, new BeanSerializerFactory(EmfDataset.class, qname2),
-                    new BeanDeserializerFactory(EmfDataset.class, qname2));
-            registerBeanMapping(call, DatasetType.class, datasetTypeQName);
-            registerMappingForTable(call);
-            registerBeanMapping(call, InternalSource.class, internalSourceQName);
-            registerBeanMapping(call, ExternalSource.class, externalSourceQName);
-            registerArrayMapping(call, ExternalSource[].class, externalSourcesQName);
-            registerArrayMapping(call, InternalSource[].class, internalSourcesQName);
-
-            call.addParameter("dataset", qname2, ParameterMode.IN);
-
+            registerDatasetMappings(call);
+            call.setOperationName(qname("updateDataset"));
+            call.addParameter("dataset", qname("ns1:EmfDataset"), ParameterMode.IN);
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
-            call.invoke(new Object[] { aDset });
 
-        } catch (ServiceException e) {
-            log.error("Error invoking the service", e);
-        } catch (MalformedURLException e) {
-            log.error("Error in format of URL string", e);
+            call.invoke(new Object[] { dataset });
         } catch (AxisFault fault) {
-            log.error("Axis Fault details", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
-        } catch (RemoteException e) {
-            log.error("Error communicating with WS end point", e);
+            throwExceptionOnAxisFault("Failed to update Dataset: " + dataset.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to update Dataset: " + dataset.getName(), e);
         }
     }
 
     public void addCountry(Country country) throws EmfException {
+
         try {
             Call call = call();
 
-            QName qname2 = qname("ns1:Country");
-            QName qname3 = qname("addCountry");
-
-            call.setOperationName(qname3);
-
-            call.registerTypeMapping(Country.class, qname2, new BeanSerializerFactory(Country.class, qname2),
-                    new BeanDeserializerFactory(Country.class, qname2));
-
-            call.addParameter("country", qname2, ParameterMode.IN);
-
+            registerCountryMappings(call);
+            call.setOperationName(qname("addCountry"));
+            call.addParameter("country", qname("ns1:Country"), ParameterMode.IN);
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
-            call.invoke(new Object[] { country });
 
-        } catch (ServiceException e) {
-            log.error("Error invoking the service", e);
-        } catch (MalformedURLException e) {
-            log.error("Error in format of URL string", e);
+            call.invoke(new Object[] { country });
         } catch (AxisFault fault) {
-            log.error("Axis Fault details", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
-        } catch (RemoteException e) {
-            log.error("Error communicating with WS end point", e);
+            throwExceptionOnAxisFault("Failed to add country: " + country.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to add country: " + country.getName(), e);
         }
     }
 
@@ -186,28 +114,16 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            QName qname2 = qname("ns1:Country");
-            QName qname3 = qname("updateCountry");
-
-            call.setOperationName(qname3);
-
-            call.registerTypeMapping(Country.class, qname2, new BeanSerializerFactory(Country.class, qname2),
-                    new BeanDeserializerFactory(Country.class, qname2));
-
-            call.addParameter("country", qname2, ParameterMode.IN);
-
+            registerCountryMappings(call);
+            call.setOperationName(qname("updateCountry"));
+            call.addParameter("country", qname("ns1:Country"), ParameterMode.IN);
             call.setReturnType(org.apache.axis.Constants.XSD_ANY);
-            call.invoke(new Object[] { country });
 
-        } catch (ServiceException e) {
-            log.error("Error invoking the service", e);
-        } catch (MalformedURLException e) {
-            log.error("Error in format of URL string", e);
+            call.invoke(new Object[] { country });
         } catch (AxisFault fault) {
-            log.error("Axis Fault details", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
-        } catch (RemoteException e) {
-            log.error("Error communicating with WS end point", e);
+            throwExceptionOnAxisFault("Failed to update country: " + country.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to update country: " + country.getName(), e);
         }
     }
 
@@ -215,37 +131,24 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            QName qname1 = qname("ns1:Country");
-            QName qname2 = qname("ns1:Countries");
-            QName qname3 = qname("getCountries");
-
-            call.setOperationName(qname3);
-
-            Class cls1 = Country.class;
-            Class cls2 = Country[].class;
-
-            call.registerTypeMapping(cls1, qname1, new BeanSerializerFactory(cls1, qname1),
-                    new BeanDeserializerFactory(cls1, qname1));
-            call.registerTypeMapping(cls2, qname2, new ArraySerializerFactory(cls2, qname2),
-                    new ArrayDeserializerFactory(qname2));
-
-            registerMappingForTable(call);
-
-            call.setReturnType(qname2);
+            registerCountryMappings(call);
+            call.setOperationName(qname("getCountries"));
+            call.setReturnType(qname("ns1:Countries"));
 
             return (Country[]) call.invoke(new Object[] {});
-        } catch (ServiceException e) {
-            log.error("Error invoking the service", e);
-        } catch (MalformedURLException e) {
-            log.error("Error in format of URL string", e);
         } catch (AxisFault fault) {
-            log.error("Axis fault details", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
-        } catch (RemoteException e) {
-            log.error("Error communicating with WS end point", e);
+            throwExceptionOnAxisFault("Failed to fetch countries", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to fetch countries", e);
         }
 
         return null;
+    }
+
+    private void registerCountryMappings(Call call) {
+        registerBeanMapping(call, Country.class, qname("ns1:Country"));
+        registerArrayMapping(call, Country[].class, qname("ns1:Countries"));
+        registerMappingForTable(call);
     }
 
     public Sector[] getSectors() throws EmfException {
@@ -258,12 +161,12 @@ public class DataServicesTransport implements DataServices {
 
             return (Sector[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {
-            log.error("Could not fetch Sectors", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
+            throwExceptionOnAxisFault("Could not fetch Sectors", fault);
         } catch (Exception e) {
-            log.error("Could not fetch Sectors", e);
-            throw new EmfException("Could not fetch Sectors", e.getMessage(), e);
+            throwExceptionDueToServiceErrors("Could not fetch Sectors", e);
         }
+
+        return null;
     }
 
     public void updateSector(Sector sector) throws EmfException {
@@ -277,11 +180,9 @@ public class DataServicesTransport implements DataServices {
 
             call.invoke(new Object[] { sector });
         } catch (AxisFault fault) {
-            log.error("Could not update Sector: " + sector.getName(), fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
+            throwExceptionOnAxisFault("Could not update Sector: " + sector.getName(), fault);
         } catch (Exception e) {
-            log.error("Could not update Sector: " + sector.getName(), e);
-            throw new EmfException("Could not update Sector: " + sector.getName(), e.getMessage(), e);
+            throwExceptionDueToServiceErrors("Could not update Sector: " + sector.getName(), e);
         }
     }
 
@@ -296,16 +197,30 @@ public class DataServicesTransport implements DataServices {
 
             call.invoke(new Object[] { sector });
         } catch (AxisFault fault) {
-            log.error("Could not add Sector: " + sector.getName(), fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
+            throwExceptionOnAxisFault("Could not add Sector: " + sector.getName(), fault);
         } catch (Exception e) {
-            log.error("Could not add Sector: " + sector.getName(), e);
-            throw new EmfException("Could not add Sector: " + sector.getName(), e.getMessage(), e);
+            throwExceptionDueToServiceErrors("Could not add Sector: " + sector.getName(), e);
         }
+    }
+
+    private String extractMessage(String faultReason) {
+        return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
     }
 
     private QName qname(String name) {
         return new QName(EMFConstants.emfServicesNamespace, name);
+    }
+
+    private void registerDatasetMappings(Call call) {
+        registerBeanMapping(call, EmfDataset.class, qname("ns1:EmfDataset"));
+        registerArrayMapping(call, EmfDataset[].class, qname("ns1:EmfDatasets"));
+        registerBeanMapping(call, DatasetType.class, qname("ns1:DatasetType"));
+
+        registerMappingForTable(call);
+        registerBeanMapping(call, InternalSource.class, qname("ns1:InternalSource"));
+        registerBeanMapping(call, ExternalSource.class, qname("ns1:ExternalSource"));
+        registerArrayMapping(call, ExternalSource[].class, qname("ns1:ExternalSources"));
+        registerArrayMapping(call, InternalSource[].class, qname("ns1:InternalSources"));
     }
 
     private void registerSectorMappings(Call call) {
@@ -332,8 +247,7 @@ public class DataServicesTransport implements DataServices {
 
     private void registerMappingForTable(Call call) {
         QName tableQName = qname("ns1:Table");
-        call.registerTypeMapping(Table.class, tableQName, new BeanSerializerFactory(Table.class, tableQName),
-                new BeanDeserializerFactory(Table.class, tableQName));
+        registerBeanMapping(call, Table.class, tableQName);
     }
 
     private void registerArrayMapping(Call call, Class cls, QName qname) {
@@ -341,4 +255,13 @@ public class DataServicesTransport implements DataServices {
                 new ArrayDeserializerFactory(qname));
     }
 
+    private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {
+        log.error(message, e);
+        throw new EmfException(message, e.getMessage(), e);
+    }
+
+    private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
+        log.error(message, fault);
+        throw new EmfException(extractMessage(fault.getMessage()));
+    }
 }
