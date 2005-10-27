@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
+import gov.epa.emissions.framework.ui.ViewableRow;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class DatasetTypesTableData extends AbstractEmfTableData {
                     new Integer(element.getMaxfiles()), new Integer(element.getMinColumns()),
                     new Integer(element.getMaxColumns()) };
 
-            Row row = new Row(element, values);
+            Row row = new ViewableRow(element, values);
             rows.add(row);
         }
 

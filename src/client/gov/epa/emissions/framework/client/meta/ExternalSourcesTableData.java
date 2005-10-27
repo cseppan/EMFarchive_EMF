@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.ExternalSource;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
+import gov.epa.emissions.framework.ui.ViewableRow;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class ExternalSourcesTableData extends AbstractEmfTableData {
 		for (int i = 0; i < sources.length; i++) {
 			Object[] values = { sources[i].getDatasource() };
 
-			Row row = new Row(sources[i], values);
+			Row row = new ViewableRow(sources[i], values);
 			rows.add(row);
 		}
 

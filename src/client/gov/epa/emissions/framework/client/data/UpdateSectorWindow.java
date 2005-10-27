@@ -87,7 +87,7 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
 
     private JPanel createCriteriaPanel(Sector sector) {
         criteriaTableData = new SectorCriteriaTableData(sector.getSectorCriteria());
-        CriteriaPanel panel = new CriteriaPanel(criteriaTableData);
+        SectorCriteriaPanel panel = new SectorCriteriaPanel(criteriaTableData);
         panel.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY));
 
         return panel;

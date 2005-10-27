@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
+import gov.epa.emissions.framework.ui.ViewableRow;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class SectorsTableData extends AbstractEmfTableData {
 			Sector element = sectors[i];
 			Object[] values = { element.getName(), element.getDescription() };
 
-			Row row = new Row(element, values);
+			Row row = new ViewableRow(element, values);
 			rows.add(row);
 		}
 

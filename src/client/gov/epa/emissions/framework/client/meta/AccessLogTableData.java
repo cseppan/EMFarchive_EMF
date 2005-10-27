@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
+import gov.epa.emissions.framework.ui.ViewableRow;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class AccessLogTableData extends AbstractEmfTableData {
             Object[] values = { log.getUsername(), log.getTimestamp(), log.getVersion(), log.getDescription(),
                     log.getFolderPath() };
 
-            Row row = new Row(log, values);
+            Row row = new ViewableRow(log, values);
             rows.add(row);
         }
 

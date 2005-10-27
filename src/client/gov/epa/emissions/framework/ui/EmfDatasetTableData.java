@@ -29,7 +29,7 @@ public class EmfDatasetTableData extends AbstractEmfTableData {
             Object[] values = { dataset.getName(), dataset.getDatasetTypeName(), dataset.getStatus(), dataset.getCreator(),
                     dataset.getRegion(), dataset.getStartDateTime(), dataset.getStopDateTime() };
 
-            Row row = new Row(dataset, values);
+            Row row = new ViewableRow(dataset, values);
             rows.add(row);
         }
 

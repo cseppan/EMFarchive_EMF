@@ -85,4 +85,5 @@ public class EmfTableModelTest extends MockObjectTestCase {
         assertEquals(dataset1, model.element(0));
         assertEquals(dataset2, model.element(1));
     }
+    
 }

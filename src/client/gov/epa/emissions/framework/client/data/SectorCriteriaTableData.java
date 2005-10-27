@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.SectorCriteria;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
-import gov.epa.emissions.framework.ui.Row;
+import gov.epa.emissions.framework.ui.EditableRow;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,7 +16,7 @@ public class SectorCriteriaTableData extends AbstractEmfTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Type", "Criterion" };
+        return new String[] { "Select", "Type", "Criterion" };
     }
 
     public List rows() {
@@ -37,7 +37,7 @@ public class SectorCriteriaTableData extends AbstractEmfTableData {
 
     public void remove(SectorCriteria criterion) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            Row row = (Row) iter.next();
+            EditableRow row = (EditableRow) iter.next();
             SectorCriteria element = (SectorCriteria) row.record();
             if (element.equals(criterion)) {
                 rows.remove(row);
@@ -50,8 +50,18 @@ public class SectorCriteriaTableData extends AbstractEmfTableData {
         rows.add(row(criterion));
     }
 
-    private Row row(SectorCriteria criterion) {
-        Object[] values = new Object[] { criterion.getType(), criterion.getCriteria() };
-        return new Row(criterion, values);
+    private EditableRow row(SectorCriteria criterion) {
+        Object[] values = new Object[] { Boolean.FALSE, criterion.getType(), criterion.getCriteria() };
+        return new EditableRow(criterion, values);
     }
+
+    public void setValueAt(Object value, int row, int col) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public SectorCriteria[] getSelected() {
+        return null;
+    }
+
 }
