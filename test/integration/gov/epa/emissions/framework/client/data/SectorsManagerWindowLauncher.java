@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Sector;
+import gov.epa.emissions.commons.io.SectorCriteria;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.services.DataServices;
 
@@ -24,8 +25,15 @@ public class SectorsManagerWindowLauncher {
 
         SectorManagerWindow view = new SectorManagerWindow(frame, desktop);
         Sector sector1 = new Sector("desc1", "name1");
+        SectorCriteria criteria = new SectorCriteria();
+        criteria.setType("type1");
+        criteria.setCriteria("crit1");
+        sector1.addSectorCriteria(criteria);
+        
         Sector sector2 = new Sector("desc2", "name2");
+        sector2.addSectorCriteria(criteria);
         Sector[] sectors = { sector1, sector2 };
+        
         Mock dataServices = new Mock(DataServices.class);
         dataServices.stubs().method(new IsEqual("getSectors")).will(new ReturnStub(sectors));
 

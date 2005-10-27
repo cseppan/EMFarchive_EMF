@@ -17,50 +17,48 @@ import javax.swing.JScrollPane;
 //FIXME: very similar to LogsTab (uneditable table displays). Refactor ?
 public class DataTab extends JPanel implements DataTabView {
 
-	private EmfFrame parentConsole;
+    private EmfFrame parentConsole;
 
-	public DataTab(EmfFrame parentConsole) {
-		super.setName("logsTab");
-		this.parentConsole = parentConsole;
+    public DataTab(EmfFrame parentConsole) {
+        super.setName("logsTab");
+        this.parentConsole = parentConsole;
 
-		super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-	}
+        super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    }
 
-	public void displayInternalSources(InternalSource[] sources) {
-		displaySources(new InternalSourcesTableData(sources));
-	}
+    public void displayInternalSources(InternalSource[] sources) {
+        displaySources(new InternalSourcesTableData(sources));
+    }
 
-	public void displayExternalSources(ExternalSource[] sources) {
-		displaySources(new ExternalSourcesTableData(sources));
-	}
+    public void displayExternalSources(ExternalSource[] sources) {
+        displaySources(new ExternalSourcesTableData(sources));
+    }
 
-	private void displaySources(EmfTableData tableData) {
-		super.removeAll();
-		super.add(createLayout(tableData, parentConsole));
-	}
+    private void displaySources(EmfTableData tableData) {
+        super.removeAll();
+        super.add(createLayout(tableData, parentConsole));
+    }
 
-	private JPanel createLayout(EmfTableData tableData, EmfFrame parentConsole) {
-		JPanel layout = new JPanel();
-		layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
+    private JPanel createLayout(EmfTableData tableData, EmfFrame parentConsole) {
+        JPanel layout = new JPanel();
+        layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
 
-		layout.add(createSortFilterPane(tableData, parentConsole));
+        layout.add(createSortFilterPane(tableData, parentConsole));
 
-		return layout;
-	}
+        return layout;
+    }
 
-	private JScrollPane createSortFilterPane(EmfTableData tableData,
-			EmfFrame parentConsole) {
-		EmfTableModel model = new EmfTableModel(tableData);
-		SimpleTableModel wrapperModel = new SimpleTableModel(model);
+    private JScrollPane createSortFilterPane(EmfTableData tableData, EmfFrame parentConsole) {
+        EmfTableModel model = new EmfTableModel(tableData);
+        SimpleTableModel wrapperModel = new SimpleTableModel(model);
 
-		SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole,
-				wrapperModel);
-		panel.getTable().setName("sourcesTable");
+        SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, wrapperModel);
+        panel.getTable().setName("sourcesTable");
 
-		JScrollPane scrollPane = new JScrollPane(panel);
-		panel.setPreferredSize(new Dimension(450, 60));
+        JScrollPane scrollPane = new JScrollPane(panel);
+        panel.setPreferredSize(new Dimension(450, 60));
 
-		return scrollPane;
-	}
+        return scrollPane;
+    }
 
 }

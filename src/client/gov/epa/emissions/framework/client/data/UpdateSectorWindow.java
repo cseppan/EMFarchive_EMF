@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.Sector;
@@ -10,12 +11,15 @@ import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -31,13 +35,16 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
 
     private TextArea description;
 
+    private SectorCriteriaTableData criteriaTableData;
+
     public UpdateSectorWindow() {
         super("Update Sector");
 
         layout = new JPanel();
+        layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
 
-        super.setSize(new Dimension(400, 200));
+        super.setSize(new Dimension(400, 300));
     }
 
     public void observe(UpdateSectorPresenter presenter) {
@@ -68,7 +75,7 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
         description = new TextArea("description", sector.getDescription(), 25);
-        layoutGenerator.addLabelWidgetPair("Description", description, panel);
+        layoutGenerator.addLabelWidgetPair("Description", new ScrollableTextArea(description), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
@@ -79,7 +86,9 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
     }
 
     private JPanel createCriteriaPanel(Sector sector) {
-        JPanel panel = new JPanel();
+        criteriaTableData = new SectorCriteriaTableData(sector.getSectorCriteria());
+        CriteriaPanel panel = new CriteriaPanel(criteriaTableData);
+        panel.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY));
 
         return panel;
     }

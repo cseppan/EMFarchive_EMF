@@ -32,7 +32,7 @@ CREATE TABLE sectorcriteria
   CONSTRAINT sector_criteria_to_sectors FOREIGN KEY (sector_id) REFERENCES sectors (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
-ALTER TABLE datasets OWNER TO emf;
+ALTER TABLE sectorcriteria OWNER TO emf;
 
 
 ---- Sectors data
