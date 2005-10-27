@@ -65,7 +65,6 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
     }
 
     public void setValueAt(Object value, int row, int col) {
-        // TODO:
     }
 
 }

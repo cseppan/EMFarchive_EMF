@@ -1,15 +1,13 @@
 package gov.epa.emissions.framework.ui;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
-//FIXME: TBT
 public abstract class AbstractEmfTableData implements EmfTableData {
 
     public Object element(int row) {
         Row rowObj = (Row) rows().get(row);
-        return rowObj.record();
+        return rowObj.source();
     }
 
     public List elements(int[] rows) {

@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.io.SectorCriteria;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
+import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,8 +39,7 @@ public class SectorCriteriaTableData extends AbstractEmfTableData {
     public void remove(SectorCriteria criterion) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            SectorCriteria element = (SectorCriteria) row.record();
-            if (element.equals(criterion)) {
+            if (row.source().equals(criterion)) {
                 rows.remove(row);
                 return;
             }
@@ -51,17 +51,28 @@ public class SectorCriteriaTableData extends AbstractEmfTableData {
     }
 
     private EditableRow row(SectorCriteria criterion) {
-        Object[] values = new Object[] { Boolean.FALSE, criterion.getType(), criterion.getCriteria() };
-        return new EditableRow(criterion, values);
+        RowSource source = new SectorCriterionRowSource(criterion);
+        return new EditableRow(source);
     }
 
     public void setValueAt(Object value, int row, int col) {
-        // TODO Auto-generated method stub
+        if (!isEditable(col))
+            return;
 
+        EditableRow editableRow = (EditableRow) rows.get(row);
+        editableRow.setValueAt(col, value);
     }
 
     public SectorCriteria[] getSelected() {
-        return null;
-    }
+        List selected = new ArrayList();
 
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            EditableRow row = (EditableRow) iter.next();
+            SectorCriterionRowSource rowSource = (SectorCriterionRowSource) row.rowSource();
+            if (rowSource.isSelected())
+                selected.add(rowSource.source());
+        }
+
+        return (SectorCriteria[]) selected.toArray(new SectorCriteria[0]);
+    }
 }

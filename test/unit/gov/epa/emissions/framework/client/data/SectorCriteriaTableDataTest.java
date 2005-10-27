@@ -93,7 +93,7 @@ public class SectorCriteriaTableDataTest extends TestCase {
         assertEquals(3, data.rows().size());
     }
 
-    public void FIXME_testShouldCheckSelectionOnChoosingSelect() {
+    public void testShouldCheckSelectionOnChoosingSelect() {
         data.setValueAt(Boolean.TRUE, 0, 0);
 
         SectorCriteria[] selected = data.getSelected();

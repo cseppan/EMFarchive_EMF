@@ -6,12 +6,17 @@ import java.util.Map;
 public class EditableRow implements Row {
     private Map columns;
 
-    private Object record;
+    private RowSource rowSource;
 
-    public EditableRow(Object record, Object[] values) {
-        this.record = record;
+    public EditableRow(RowSource rowSource) {
+        this.rowSource = rowSource;
+        columns(rowSource);
+    }
 
+    private void columns(RowSource source) {
         columns = new HashMap();
+
+        Object[] values = source.values();
         for (int i = 0; i < values.length; i++) {
             columns.put(new Integer(i), new Column(values[i]));
         }
@@ -30,8 +35,17 @@ public class EditableRow implements Row {
         }
     }
 
-    public Object record() {
-        return record;
+    public Object source() {
+        return rowSource.source();
+    }
+
+    public RowSource rowSource() {
+        return rowSource;
+    }
+
+    public void setValueAt(int column, Object val) {
+        rowSource.setValueAt(column, val);
+        columns(rowSource);
     }
 
 }

@@ -32,7 +32,7 @@ public class ViewableRow implements Row {
 
     }
 
-    public Object record() {
+    public Object source() {
         return record;
     }
 

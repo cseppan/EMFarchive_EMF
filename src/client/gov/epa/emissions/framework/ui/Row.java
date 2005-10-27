@@ -4,6 +4,6 @@ public interface Row {
 
     Object getValueAt(int column);
 
-    Object record();
+    Object source();
 
 }
