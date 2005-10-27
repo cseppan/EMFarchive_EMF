@@ -90,6 +90,19 @@ public class SectorCriteriaTableDataTest extends TestCase {
         assertEquals(3, data.rows().size());
     }
 
+    public void testShouldReturnCurrentlyHeldSectorCriteria() {
+        SectorCriteria criterion = new SectorCriteria();
+        criterion.setId(3);
+
+        data.add(criterion);
+
+        SectorCriteria[] sources = data.sources();
+        assertEquals(3, sources.length);
+        assertEquals(criterion1, sources[0]);
+        assertEquals(criterion2, sources[1]);
+        assertEquals(criterion, sources[2]);
+    }
+
     public void testShouldCheckSelectionOnChoosingSelect() {
         data.setValueAt(Boolean.TRUE, 0, 0);
 

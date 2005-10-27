@@ -23,21 +23,23 @@ public class UpdateSectorPresenterTest extends MockObjectTestCase {
 
     public void testShouldCloseViewOnClose() {
         Sector s = new Sector();
-
         Mock view = mock(UpdateSectorView.class);
+        view.expects(once()).method("close");
 
         UpdateSectorPresenter presenter = new UpdateSectorPresenter((UpdateSectorView) view.proxy(), s, null);
-        view.expects(once()).method("close");
 
         presenter.doClose();
     }
 
-    public void testShouldUpdateSectorOnSave() throws EmfException {
+    public void testShouldUpdateSectorAndCloseOnSave() throws EmfException {
         Sector s = new Sector();
         Mock services = mock(DataServices.class);
         services.expects(once()).method("updateSector").with(same(s));
 
-        UpdateSectorPresenter presenter = new UpdateSectorPresenter(null, s, (DataServices) services.proxy());
+        Mock view = mock(UpdateSectorView.class);
+        view.expects(once()).method("close");
+        UpdateSectorPresenter presenter = new UpdateSectorPresenter((UpdateSectorView) view.proxy(), s,
+                (DataServices) services.proxy());
 
         presenter.doSave();
     }

@@ -11,7 +11,6 @@ import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -22,6 +21,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+import javax.swing.border.EtchedBorder;
 
 public class UpdateSectorWindow extends DisposableInteralFrame implements UpdateSectorView {
 
@@ -88,7 +88,7 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
     private JPanel createCriteriaPanel(Sector sector) {
         criteriaTableData = new SectorCriteriaTableData(sector.getSectorCriteria());
         SectorCriteriaPanel panel = new SectorCriteriaPanel(criteriaTableData);
-        panel.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.GRAY));
+        panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 
         return panel;
     }
@@ -117,7 +117,7 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
             public void actionPerformed(ActionEvent event) {
                 sector.setName(name.getText());
                 sector.setDescription(description.getText());
-
+                sector.setSectorCriteria(criteriaTableData.sources());
                 try {
                     presenter.doSave();
                 } catch (EmfException e) {

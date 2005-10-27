@@ -29,6 +29,7 @@ public class UpdateSectorPresenter {
 
     public void doSave() throws EmfException {
         services.updateSector(sector);
+        doClose();
     }
 
 }

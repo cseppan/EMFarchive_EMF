@@ -42,7 +42,6 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
         super.fireTableDataChanged();
     }
 
-    // FIXME: how does this differ from refresh() ?
     public void refresh(EmfTableData tableData) {
         this.tableData = tableData;
         refresh();

@@ -81,4 +81,20 @@ public class SectorCriteriaTableData extends AbstractEmfTableData {
         for (int i = 0; i < criteria.length; i++)
             remove(criteria[i]);
     }
+
+    public SectorCriteria[] sources() {
+        List sources = sourcesList();
+        return (SectorCriteria[]) sources.toArray(new SectorCriteria[0]);
+    }
+
+    private List sourcesList() {
+        List sources = new ArrayList();
+
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            EditableRow row = (EditableRow) iter.next();
+            SectorCriterionRowSource rowSource = (SectorCriterionRowSource) row.rowSource();
+            sources.add(rowSource.source());
+        }
+        return sources;
+    }
 }

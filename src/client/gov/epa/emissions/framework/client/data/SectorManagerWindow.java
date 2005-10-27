@@ -68,7 +68,7 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
         sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         createLayout(layout, sortFilterSelectPanel);
 
-        this.setSize(new Dimension(400, 300));
+        this.setSize(new Dimension(475, 300));
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {

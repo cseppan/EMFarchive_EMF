@@ -33,6 +33,8 @@ import javax.xml.rpc.ServiceException;
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
+import org.apache.axis.encoding.ser.ArrayDeserializerFactory;
+import org.apache.axis.encoding.ser.ArraySerializerFactory;
 import org.apache.axis.encoding.ser.BeanDeserializerFactory;
 import org.apache.axis.encoding.ser.BeanSerializerFactory;
 import org.apache.commons.logging.Log;
@@ -336,35 +338,25 @@ public class DataServicesTransport implements DataServices {
             call = (Call) service.createCall();
             call.setTargetEndpointAddress(new java.net.URL(endpoint));
 
-            QName qname1 = new QName(emfSvcsNamespace, "ns1:Sector");
-            QName qname2 = new QName(emfSvcsNamespace, "ns1:Sectors");
-            QName opName = new QName(emfSvcsNamespace, "getSectors");
-            QName qname4 = new QName(emfSvcsNamespace, "ns1:SectorCriteria");
-            QName qname5 = new QName(emfSvcsNamespace, "ns1:SectorCriterias");
+            QName sectorsQName = new QName(emfSvcsNamespace, "ns1:Sectors");
+            QName opQName = new QName(emfSvcsNamespace, "getSectors");
+            QName criterionQName = new QName(emfSvcsNamespace, "ns1:SectorCriteria");
+            QName criteriaQName = new QName(emfSvcsNamespace, "ns1:SectorCriterias");
 
-            call.setOperationName(opName);
+            call.setOperationName(opQName);
 
-            Class cls1 = Sector.class;
-            Class cls2 = Sector[].class;
-            Class cls4 = SectorCriteria.class;
-            Class cls5 = SectorCriteria[].class;
-
-            call.registerTypeMapping(cls1, qname1,
-                    new org.apache.axis.encoding.ser.BeanSerializerFactory(cls1, qname1),
-                    new org.apache.axis.encoding.ser.BeanDeserializerFactory(cls1, qname1));
-            call.registerTypeMapping(cls2, qname2,
-                    new org.apache.axis.encoding.ser.ArraySerializerFactory(cls2, qname2),
-                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname2));
-            call.registerTypeMapping(cls4, qname4,
-                    new org.apache.axis.encoding.ser.ArraySerializerFactory(cls4, qname4),
-                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname4));
-            call.registerTypeMapping(cls5, qname5,
-                    new org.apache.axis.encoding.ser.ArraySerializerFactory(cls5, qname5),
-                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname5));
+            call.registerTypeMapping(Sector.class, new QName(emfSvcsNamespace, "ns1:Sector"),
+                    new BeanSerializerFactory(Sector.class, new QName(emfSvcsNamespace, "ns1:Sector")),
+                    new BeanDeserializerFactory(Sector.class, new QName(emfSvcsNamespace, "ns1:Sector")));
+            call.registerTypeMapping(Sector[].class, sectorsQName, new ArraySerializerFactory(Sector[].class,
+                    sectorsQName), new ArrayDeserializerFactory(sectorsQName));
+            registerBeanMapping(call, criterionQName, SectorCriteria.class);
+            call.registerTypeMapping(SectorCriteria[].class, criteriaQName, new ArraySerializerFactory(
+                    SectorCriteria[].class, criteriaQName), new ArrayDeserializerFactory(criteriaQName));
 
             registerMappingForTable(call);
 
-            call.setReturnType(qname2);
+            call.setReturnType(sectorsQName);
 
             Object obj = call.invoke(new Object[] {});
 
