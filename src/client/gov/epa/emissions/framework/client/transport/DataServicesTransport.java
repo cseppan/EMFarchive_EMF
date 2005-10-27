@@ -10,33 +10,23 @@
 
 package gov.epa.emissions.framework.client.transport;
 
-import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.ExternalSource;
-import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.io.Sector;
-import gov.epa.emissions.commons.io.SectorCriteria;
-import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataServices;
-import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.User;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 import javax.xml.rpc.ServiceException;
 
 import org.apache.axis.AxisFault;
+import org.apache.axis.Constants;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
-import org.apache.axis.encoding.ser.ArrayDeserializerFactory;
-import org.apache.axis.encoding.ser.ArraySerializerFactory;
-import org.apache.axis.encoding.ser.BeanDeserializerFactory;
-import org.apache.axis.encoding.ser.BeanSerializerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,18 +35,21 @@ public class DataServicesTransport implements DataServices {
 
     private String endpoint;
 
-    public DataServicesTransport(String endpt) {
-        endpoint = endpt;
+    private Mapper mapper;
+
+    public DataServicesTransport(String endPoint) {
+        endpoint = endPoint;
+        mapper = new Mapper();
     }
 
     public EmfDataset[] getDatasets() throws EmfException {
         try {
             Call call = call();
 
-            registerDatasetMappings(call);
-            call.setOperationName(qname("getDatasets"));
-            QName datasetsQName = qname("ns1:EmfDatasets");
-            call.setReturnType(datasetsQName);
+            DatasetMappings datasetMappings = new DatasetMappings();
+            datasetMappings.register(call);
+            call.setOperationName(mapper.qname("getDatasets"));
+            call.setReturnType(datasetMappings.datasets());
 
             return (EmfDataset[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {
@@ -79,10 +72,11 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            registerDatasetMappings(call);
-            call.setOperationName(qname("updateDataset"));
-            call.addParameter("dataset", qname("ns1:EmfDataset"), ParameterMode.IN);
-            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+            DatasetMappings datasetMappings = new DatasetMappings();
+            datasetMappings.register(call);
+            call.setOperationName(mapper.qname("updateDataset"));
+            call.addParameter("dataset", datasetMappings.dataset(), ParameterMode.IN);
+            call.setReturnType(Constants.XSD_ANY);
 
             call.invoke(new Object[] { dataset });
         } catch (AxisFault fault) {
@@ -97,10 +91,11 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            registerCountryMappings(call);
-            call.setOperationName(qname("addCountry"));
-            call.addParameter("country", qname("ns1:Country"), ParameterMode.IN);
-            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+            CountryMappings countryMappings = new CountryMappings();
+            countryMappings.register(call);
+            call.setOperationName(mapper.qname("addCountry"));
+            call.addParameter("country", countryMappings.country(), ParameterMode.IN);
+            call.setReturnType(Constants.XSD_ANY);
 
             call.invoke(new Object[] { country });
         } catch (AxisFault fault) {
@@ -114,10 +109,11 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            registerCountryMappings(call);
-            call.setOperationName(qname("updateCountry"));
-            call.addParameter("country", qname("ns1:Country"), ParameterMode.IN);
-            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+            CountryMappings countryMappings = new CountryMappings();
+            countryMappings.register(call);
+            call.setOperationName(mapper.qname("updateCountry"));
+            call.addParameter("country", countryMappings.country(), ParameterMode.IN);
+            call.setReturnType(Constants.XSD_ANY);
 
             call.invoke(new Object[] { country });
         } catch (AxisFault fault) {
@@ -131,9 +127,10 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            registerCountryMappings(call);
-            call.setOperationName(qname("getCountries"));
-            call.setReturnType(qname("ns1:Countries"));
+            CountryMappings countryMappings = new CountryMappings();
+            countryMappings.register(call);
+            call.setOperationName(mapper.qname("getCountries"));
+            call.setReturnType(countryMappings.countries());
 
             return (Country[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {
@@ -145,19 +142,14 @@ public class DataServicesTransport implements DataServices {
         return null;
     }
 
-    private void registerCountryMappings(Call call) {
-        registerBeanMapping(call, Country.class, qname("ns1:Country"));
-        registerArrayMapping(call, Country[].class, qname("ns1:Countries"));
-        registerMappingForTable(call);
-    }
-
     public Sector[] getSectors() throws EmfException {
         try {
             Call call = call();
 
-            registerSectorMappings(call);
-            call.setOperationName(qname("getSectors"));
-            call.setReturnType(qname("ns1:Sectors"));
+            SectorMappings sectorMappings = new SectorMappings();
+            sectorMappings.register(call);
+            call.setOperationName(mapper.qname("getSectors"));
+            call.setReturnType(sectorMappings.sectors());
 
             return (Sector[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {
@@ -173,10 +165,11 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            registerSectorMappings(call);
-            call.setOperationName(qname("updateSector"));
-            call.addParameter("sector", qname("ns1:Sector"), ParameterMode.IN);
-            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+            SectorMappings sectorMappings = new SectorMappings();
+            sectorMappings.register(call);
+            call.setOperationName(mapper.qname("updateSector"));
+            call.addParameter("sector", sectorMappings.sector(), ParameterMode.IN);
+            call.setReturnType(Constants.XSD_ANY);
 
             call.invoke(new Object[] { sector });
         } catch (AxisFault fault) {
@@ -190,10 +183,11 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            registerSectorMappings(call);
-            call.setOperationName(qname("addSector"));
-            call.addParameter("sector", qname("ns1:Sector"), ParameterMode.IN);
-            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+            SectorMappings sectorMappings = new SectorMappings();
+            sectorMappings.register(call);
+            call.setOperationName(mapper.qname("addSector"));
+            call.addParameter("sector", sectorMappings.sector(), ParameterMode.IN);
+            call.setReturnType(Constants.XSD_ANY);
 
             call.invoke(new Object[] { sector });
         } catch (AxisFault fault) {
@@ -207,52 +201,12 @@ public class DataServicesTransport implements DataServices {
         return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
     }
 
-    private QName qname(String name) {
-        return new QName(EMFConstants.emfServicesNamespace, name);
-    }
-
-    private void registerDatasetMappings(Call call) {
-        registerBeanMapping(call, EmfDataset.class, qname("ns1:EmfDataset"));
-        registerArrayMapping(call, EmfDataset[].class, qname("ns1:EmfDatasets"));
-        registerBeanMapping(call, DatasetType.class, qname("ns1:DatasetType"));
-
-        registerMappingForTable(call);
-        registerBeanMapping(call, InternalSource.class, qname("ns1:InternalSource"));
-        registerBeanMapping(call, ExternalSource.class, qname("ns1:ExternalSource"));
-        registerArrayMapping(call, ExternalSource[].class, qname("ns1:ExternalSources"));
-        registerArrayMapping(call, InternalSource[].class, qname("ns1:InternalSources"));
-    }
-
-    private void registerSectorMappings(Call call) {
-        registerBeanMapping(call, Sector.class, qname("ns1:Sector"));
-        registerArrayMapping(call, Sector[].class, qname("ns1:Sectors"));
-        registerBeanMapping(call, SectorCriteria.class, qname("ns1:SectorCriteria"));
-        registerArrayMapping(call, SectorCriteria[].class, qname("ns1:SectorCriterias"));
-        registerMappingForTable(call);
-    }
-
     private Call call() throws ServiceException, MalformedURLException {
         Service service = new Service();
         Call call = (Call) service.createCall();
         call.setTargetEndpointAddress(new URL(endpoint));
 
         return call;
-    }
-
-    private void registerBeanMapping(Call call, Class clazz, QName beanQName) {
-        call.registerTypeMapping(clazz, beanQName, new BeanSerializerFactory(clazz, beanQName),
-                new BeanDeserializerFactory(clazz, beanQName));
-
-    }
-
-    private void registerMappingForTable(Call call) {
-        QName tableQName = qname("ns1:Table");
-        registerBeanMapping(call, Table.class, tableQName);
-    }
-
-    private void registerArrayMapping(Call call, Class cls, QName qname) {
-        call.registerTypeMapping(cls, qname, new ArraySerializerFactory(cls, qname),
-                new ArrayDeserializerFactory(qname));
     }
 
     private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {
