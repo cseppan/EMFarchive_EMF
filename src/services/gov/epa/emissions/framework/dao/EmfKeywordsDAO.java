@@ -8,14 +8,12 @@
  */
 package gov.epa.emissions.framework.dao;
 
-import gov.epa.emissions.framework.services.EmfProperty;
-
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Hibernate;
-import org.hibernate.Query;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -26,27 +24,27 @@ import org.hibernate.Transaction;
 public class EmfKeywordsDAO {
     private static Log log = LogFactory.getLog(EmfKeywordsDAO.class);
 
-    private static final String GET_EMF_PROPERTY_QUERY = "select prop from EmfProperty as prop where prop.propertyname=:propertyname";
+    private static final String GET_EMF_PROPERTY_QUERY = "from EmfKeywords as kw";
 
-    // FIXME: Verify if exception needs to be thrown/caught here
-    public static String getEmfPropertyValue(String propertyname, Session session) {
-        log.debug("In get property for " + propertyname);
-        String propertyvalue = null;
+    public static List getEmfKeywords(Session session){
+        log.debug("In get emf keywords for datasetid= ");
+        Transaction tx=null;
         
-        Transaction tx = session.beginTransaction();
+        ArrayList allKeywords = null;
+        try {
+            allKeywords = new ArrayList();
 
-        Query query = session.createQuery(GET_EMF_PROPERTY_QUERY);
-        query.setParameter("propertyname", propertyname, Hibernate.STRING);
+            tx = session.beginTransaction();
 
-        Iterator iter = query.iterate();
-        while (iter.hasNext()) {
-        	EmfProperty emfProp = (EmfProperty) iter.next();
-        	propertyvalue = emfProp.getPropertyvalue();
+            allKeywords = (ArrayList)session.createQuery(GET_EMF_PROPERTY_QUERY);
+            tx.commit();
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
         }
-
-        tx.commit();
-        log.debug("End get property value for " + propertyname + " = " + propertyvalue);
-        return propertyvalue;
+        log.debug("after call to allkeywords: size of list= " + allKeywords.size());        
+        return allKeywords;
     }
 
 }

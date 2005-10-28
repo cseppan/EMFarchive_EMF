@@ -17,6 +17,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -38,19 +39,27 @@ public class StatusDAO {
         deleteMessages(userName, session);
         ArrayList allStatus = new ArrayList();
 
-        Transaction tx = session.beginTransaction();
+        Transaction tx = null;
 
-        Query query = session.createQuery(GET_STATUS_QUERY);
-        query.setParameter("username", userName, Hibernate.STRING);
+        try {
+            tx = session.beginTransaction();
 
-        Iterator iter = query.iterate();
-        while (iter.hasNext()) {
-            Status aStatus = (Status) iter.next();
-            aStatus.setMsgRead();
-            allStatus.add(aStatus);
+            Query query = session.createQuery(GET_STATUS_QUERY);
+            query.setParameter("username", userName, Hibernate.STRING);
+
+            Iterator iter = query.iterate();
+            while (iter.hasNext()) {
+                Status aStatus = (Status) iter.next();
+                aStatus.setMsgRead();
+                allStatus.add(aStatus);
+            }
+
+            tx.commit();
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
         }
-
-        tx.commit();
         log.debug("End getMessages");
         return allStatus;
     }// getMessages(uname)
@@ -58,27 +67,42 @@ public class StatusDAO {
     // FIXME: Verify if exception needs to be thrown/caught here
     public static void insertStatusMessage(Status status, Session session) {
         log.debug("StatusDAO: insertStatusMessage: " + status.getUsername() + "\n" + session.toString());
-        Transaction tx = session.beginTransaction();
-        log.debug("StatusDAO: insertStatusMessage before session.save");
-        session.save(status);
-        tx.commit();
+        Transaction tx = null;
+        
+        try {
+            tx = session.beginTransaction();
+            log.debug("StatusDAO: insertStatusMessage before session.save");
+            session.save(status);
+            tx.commit();
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
+        }
         log.debug("StatusDAO: insertStatusMessage after session.save");
     }
 
     // FIXME: Verify if exception needs to be thrown/caught here
     private static void deleteMessages(String userName, Session session) {
         log.debug("In deleteMessages");
+        Transaction tx = null;
 
-        Query query = session.createQuery(GET_READ_STATUS_QUERY);
-        query.setParameter("username", userName, Hibernate.STRING);
-        Transaction tx = session.beginTransaction();
+        try {
+            Query query = session.createQuery(GET_READ_STATUS_QUERY);
+            query.setParameter("username", userName, Hibernate.STRING);
+            tx = session.beginTransaction();
 
-        Iterator iter = query.iterate();
-        while (iter.hasNext()) {
-            Status aStatus = (Status) iter.next();
-            session.delete(aStatus);
+            Iterator iter = query.iterate();
+            while (iter.hasNext()) {
+                Status aStatus = (Status) iter.next();
+                session.delete(aStatus);
+            }
+            tx.commit();
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
         }
-        tx.commit();
         log.debug("End deleteMessages");
 
     }// deleteMessages
@@ -89,19 +113,26 @@ public class StatusDAO {
         log.debug("In getMessages");
         deleteMessages(userName, session);
         ArrayList allStatus = new ArrayList();
+        Transaction tx = null;
 
-        Transaction tx = session.beginTransaction();
+        try {
+            tx = session.beginTransaction();
 
-        Query query = session.createQuery(GET_STATUS_QUERY);
-        query.setParameter("username", userName, Hibernate.STRING);
+            Query query = session.createQuery(GET_STATUS_QUERY);
+            query.setParameter("username", userName, Hibernate.STRING);
 
-        Iterator iter = query.iterate();
-        while (iter.hasNext()) {
-            Status aStatus = (Status) iter.next();
-            aStatus.setMsgRead();
-            allStatus.add(aStatus);
+            Iterator iter = query.iterate();
+            while (iter.hasNext()) {
+                Status aStatus = (Status) iter.next();
+                aStatus.setMsgRead();
+                allStatus.add(aStatus);
+            }
+            tx.commit();
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
         }
-        tx.commit();
         log.debug("End getMessages");
         return allStatus;
     }
