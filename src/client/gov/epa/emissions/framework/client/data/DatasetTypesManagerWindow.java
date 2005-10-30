@@ -57,6 +57,10 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         this.presenter = presenter;
     }
 
+    public void refresh() {
+        // TODO Auto-generated method stub
+    }
+
     private void createLayout(JFrame parentConsole) {
         layout.removeAll();
         sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);

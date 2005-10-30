@@ -7,4 +7,6 @@ public interface DatasetTypesManagerView extends ManagedView {
     void observe(DatasetTypesManagerPresenter presenter);
 
     void display(DatasetType[] types);
+
+    void refresh();
 }
