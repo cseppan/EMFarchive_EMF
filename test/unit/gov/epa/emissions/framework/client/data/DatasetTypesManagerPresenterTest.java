@@ -11,14 +11,15 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayViewOnDisplay() throws Exception {
         DatasetType[] types = { new DatasetType("name1"), new DatasetType("name2") };
 
-        Mock view = mock(DatasetTypesManagerView.class);
-        view.expects(once()).method("display").with(eq(types));
-
         Mock service = mock(DatasetTypesServices.class);
         service.stubs().method("getDatasetTypes").withNoArguments().will(returnValue(types));
+        DatasetTypesServices servicesProxy = (DatasetTypesServices) service.proxy();
+
+        Mock view = mock(DatasetTypesManagerView.class);
+        view.expects(once()).method("display").with(same(servicesProxy));
 
         DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(),
-                (DatasetTypesServices) service.proxy());
+                servicesProxy);
         view.expects(once()).method("observe").with(eq(p));
 
         p.doDisplay();

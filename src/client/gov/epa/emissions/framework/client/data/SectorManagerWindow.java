@@ -83,8 +83,6 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
     }
 
     private void doLayout(Sector[] sectors) {
-        layout.removeAll();
-
         model = new EmfTableModel(new SectorsTableData(sectors));
         selectModel = new SortFilterSelectModel(model);
         SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
@@ -93,6 +91,7 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
+        layout.removeAll();
         layout.setLayout(new BorderLayout());
 
         JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);

@@ -16,7 +16,7 @@ public class DatasetTypesManagerPresenter {
 
     public void doDisplay() throws EmfException {
         view.observe(this);
-        view.display(services.getDatasetTypes());
+        view.display(services);
     }
 
     public void doClose() {

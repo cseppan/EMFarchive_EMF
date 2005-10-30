@@ -3,9 +3,11 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.services.DatasetTypesServices;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
@@ -34,7 +36,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     private JFrame parentConsole;
 
-    private SortFilterSelectionPanel sortFilterSelectPanel;
+    private DatasetTypesServices services;
 
     public DatasetTypesManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
         super("DatasetTypes Manager", desktop);
@@ -43,14 +45,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
         layout = new JPanel();
         this.getContentPane().add(layout);
-    }
-
-    public void display(DatasetType[] types) {
-        model = new EmfTableModel(new DatasetTypesTableData(types));
-        selectModel = new SortFilterSelectModel(model);
-
-        createLayout(parentConsole);
-        super.display();
+        this.setSize(new Dimension(600, 300));
     }
 
     public void observe(DatasetTypesManagerPresenter presenter) {
@@ -58,18 +53,32 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     public void refresh() {
-        // TODO Auto-generated method stub
+        try {
+            doLayout(services.getDatasetTypes());
+        } catch (EmfException e) {
+            messagePanel.setError("Could not refresh. Problem communicating with remote services.");
+        }
+
+        super.refreshLayout();
     }
 
-    private void createLayout(JFrame parentConsole) {
-        layout.removeAll();
-        sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        createLayout(layout, sortFilterSelectPanel);
+    public void display(DatasetTypesServices services) throws EmfException {
+        this.services = services;
 
-        this.setSize(new Dimension(600, 300));
+        doLayout(services.getDatasetTypes());
+        super.display();
+    }
+
+    private void doLayout(DatasetType[] types) {
+        model = new EmfTableModel(new DatasetTypesTableData(types));
+        selectModel = new SortFilterSelectModel(model);
+        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
+
+        createLayout(layout, sortFilterSelectPanel);
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
+        layout.removeAll();
         layout.setLayout(new BorderLayout());
 
         JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
