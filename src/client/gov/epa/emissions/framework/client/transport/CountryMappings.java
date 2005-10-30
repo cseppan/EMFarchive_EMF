@@ -28,4 +28,8 @@ public class CountryMappings {
         return mapper.qname("ns1:Country");
     }
 
+    public QName qname(String name) {
+        return mapper.qname(name);
+    }
+
 }

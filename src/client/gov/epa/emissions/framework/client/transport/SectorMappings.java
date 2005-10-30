@@ -16,19 +16,23 @@ public class SectorMappings {
     }
 
     public void register(Call call) {
-        mapper.registerBeanMapping(call, Sector.class, mapper.qname("ns1:Sector"));
-        mapper.registerArrayMapping(call, Sector[].class, mapper.qname("ns1:Sectors"));
-        mapper.registerBeanMapping(call, SectorCriteria.class, mapper.qname("ns1:SectorCriteria"));
-        mapper.registerArrayMapping(call, SectorCriteria[].class, mapper.qname("ns1:SectorCriterias"));
+        mapper.registerBeanMapping(call, Sector.class, sector());
+        mapper.registerArrayMapping(call, Sector[].class, sectors());
+        mapper.registerBeanMapping(call, SectorCriteria.class, qname("ns1:SectorCriteria"));
+        mapper.registerArrayMapping(call, SectorCriteria[].class, qname("ns1:SectorCriterias"));
         mapper.registerMappingForTable(call);
     }
 
+    public QName qname(String name) {
+        return mapper.qname(name);
+    }
+
     public QName sector() {
-        return mapper.qname("ns1:Sector");
+        return qname("ns1:Sector");
     }
 
     public QName sectors() {
-        return mapper.qname("ns1:Sectors");
+        return qname("ns1:Sectors");
     }
 
 }

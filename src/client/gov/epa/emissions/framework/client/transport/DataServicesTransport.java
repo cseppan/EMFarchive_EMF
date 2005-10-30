@@ -1,13 +1,3 @@
-/*
- * Creation on Aug 29, 2005
- * Eclipse Project Name: EMF
- * File Name: DataServicesTransport.java
- * Author: Conrad F. D'Cruz
- */
-/**
- * 
- */
-
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.io.Sector;
@@ -17,11 +7,9 @@ import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.User;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.xml.rpc.ParameterMode;
-import javax.xml.rpc.ServiceException;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.Constants;
@@ -35,21 +23,18 @@ public class DataServicesTransport implements DataServices {
 
     private String endpoint;
 
-    private Mapper mapper;
-
     public DataServicesTransport(String endPoint) {
         endpoint = endPoint;
-        mapper = new Mapper();
     }
 
     public EmfDataset[] getDatasets() throws EmfException {
         try {
             Call call = call();
 
-            DatasetMappings datasetMappings = new DatasetMappings();
-            datasetMappings.register(call);
-            call.setOperationName(mapper.qname("getDatasets"));
-            call.setReturnType(datasetMappings.datasets());
+            DatasetMappings mappings = new DatasetMappings();
+            mappings.register(call);
+            call.setOperationName(mappings.qname("getDatasets"));
+            call.setReturnType(mappings.datasets());
 
             return (EmfDataset[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {
@@ -72,10 +57,10 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            DatasetMappings datasetMappings = new DatasetMappings();
-            datasetMappings.register(call);
-            call.setOperationName(mapper.qname("updateDataset"));
-            call.addParameter("dataset", datasetMappings.dataset(), ParameterMode.IN);
+            DatasetMappings mappings = new DatasetMappings();
+            mappings.register(call);
+            call.setOperationName(mappings.qname("updateDataset"));
+            call.addParameter("dataset", mappings.dataset(), ParameterMode.IN);
             call.setReturnType(Constants.XSD_ANY);
 
             call.invoke(new Object[] { dataset });
@@ -91,10 +76,10 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            CountryMappings countryMappings = new CountryMappings();
-            countryMappings.register(call);
-            call.setOperationName(mapper.qname("addCountry"));
-            call.addParameter("country", countryMappings.country(), ParameterMode.IN);
+            CountryMappings mappings = new CountryMappings();
+            mappings.register(call);
+            call.setOperationName(mappings.qname("addCountry"));
+            call.addParameter("country", mappings.country(), ParameterMode.IN);
             call.setReturnType(Constants.XSD_ANY);
 
             call.invoke(new Object[] { country });
@@ -109,10 +94,10 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            CountryMappings countryMappings = new CountryMappings();
-            countryMappings.register(call);
-            call.setOperationName(mapper.qname("updateCountry"));
-            call.addParameter("country", countryMappings.country(), ParameterMode.IN);
+            CountryMappings mappings = new CountryMappings();
+            mappings.register(call);
+            call.setOperationName(mappings.qname("updateCountry"));
+            call.addParameter("country", mappings.country(), ParameterMode.IN);
             call.setReturnType(Constants.XSD_ANY);
 
             call.invoke(new Object[] { country });
@@ -127,10 +112,10 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            CountryMappings countryMappings = new CountryMappings();
-            countryMappings.register(call);
-            call.setOperationName(mapper.qname("getCountries"));
-            call.setReturnType(countryMappings.countries());
+            CountryMappings mappings = new CountryMappings();
+            mappings.register(call);
+            call.setOperationName(mappings.qname("getCountries"));
+            call.setReturnType(mappings.countries());
 
             return (Country[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {
@@ -146,10 +131,10 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            SectorMappings sectorMappings = new SectorMappings();
-            sectorMappings.register(call);
-            call.setOperationName(mapper.qname("getSectors"));
-            call.setReturnType(sectorMappings.sectors());
+            SectorMappings mappings = new SectorMappings();
+            mappings.register(call);
+            call.setOperationName(mappings.qname("getSectors"));
+            call.setReturnType(mappings.sectors());
 
             return (Sector[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {
@@ -165,10 +150,10 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            SectorMappings sectorMappings = new SectorMappings();
-            sectorMappings.register(call);
-            call.setOperationName(mapper.qname("updateSector"));
-            call.addParameter("sector", sectorMappings.sector(), ParameterMode.IN);
+            SectorMappings mappings = new SectorMappings();
+            mappings.register(call);
+            call.setOperationName(mappings.qname("updateSector"));
+            call.addParameter("sector", mappings.sector(), ParameterMode.IN);
             call.setReturnType(Constants.XSD_ANY);
 
             call.invoke(new Object[] { sector });
@@ -183,10 +168,10 @@ public class DataServicesTransport implements DataServices {
         try {
             Call call = call();
 
-            SectorMappings sectorMappings = new SectorMappings();
-            sectorMappings.register(call);
-            call.setOperationName(mapper.qname("addSector"));
-            call.addParameter("sector", sectorMappings.sector(), ParameterMode.IN);
+            SectorMappings mappings = new SectorMappings();
+            mappings.register(call);
+            call.setOperationName(mappings.qname("addSector"));
+            call.addParameter("sector", mappings.sector(), ParameterMode.IN);
             call.setReturnType(Constants.XSD_ANY);
 
             call.invoke(new Object[] { sector });
@@ -201,7 +186,7 @@ public class DataServicesTransport implements DataServices {
         return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
     }
 
-    private Call call() throws ServiceException, MalformedURLException {
+    private Call call() throws Exception {
         Service service = new Service();
         Call call = (Call) service.createCall();
         call.setTargetEndpointAddress(new URL(endpoint));
