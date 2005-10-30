@@ -2,20 +2,16 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.db.Config;
 import gov.epa.emissions.framework.db.DbUpdate;
 import gov.epa.emissions.framework.services.DataServices;
-import junit.framework.TestCase;
+import gov.epa.emissions.framework.services.WebServicesIntegrationTestCase;
 
-public class DataServicesTest extends TestCase {
+public class DataServicesTest extends WebServicesIntegrationTestCase {
 
     private DataServices services;
 
     protected void setUp() {
-        String baseUrl = "http://localhost:8080/emf/services";
-        ServiceLocator serviceLocator = new RemoteServiceLocator(baseUrl);
         services = serviceLocator.getDataServices();
     }
 

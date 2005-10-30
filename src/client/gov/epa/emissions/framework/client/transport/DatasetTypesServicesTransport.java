@@ -36,9 +36,6 @@ public class DatasetTypesServicesTransport implements DatasetTypesServices {
 
     private String endpoint;
 
-    /**
-     * 
-     */
     public DatasetTypesServicesTransport() {
         super();
     }

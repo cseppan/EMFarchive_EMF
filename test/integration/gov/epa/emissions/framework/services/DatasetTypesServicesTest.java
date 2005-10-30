@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.db.ExImDbUpdate;
 
 import java.util.Random;
 
-public class DatasetTypesServicesTest extends ServicesTestCase {
+public class DatasetTypesServicesTest extends WebServicesIntegrationTestCase {
 
     protected DatasetTypesServices services;
 

@@ -14,7 +14,7 @@ import gov.epa.emissions.framework.db.DbUpdate;
 
 import java.util.Date;
 
-public class LoggingServicesTest extends ServicesTestCase {
+public class LoggingServicesTest extends WebServicesIntegrationTestCase {
 
     private LoggingServices service;
 

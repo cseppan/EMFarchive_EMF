@@ -1,19 +1,15 @@
 package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.PasswordService;
+import gov.epa.emissions.framework.services.WebServicesIntegrationTestCase;
 import gov.epa.emissions.framework.services.UserServices;
-import junit.framework.TestCase;
 
-public class AuthenticateTest extends TestCase {
+public class AuthenticateTest extends WebServicesIntegrationTestCase {
 
 	private UserServices emfUserAdmin;
 
 	protected void setUp() {
-		String baseUrl = "http://localhost:8080/emf/services";
-		ServiceLocator serviceLocator = new RemoteServiceLocator(baseUrl);
 		emfUserAdmin = serviceLocator.getUserServices();
 	}
 

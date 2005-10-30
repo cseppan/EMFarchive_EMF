@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.db.ExImDbUpdate;
 import java.io.File;
 import java.util.Random;
 
-public class ExImServicesTest extends ServicesTestCase {
+public class ExImServicesTest extends WebServicesIntegrationTestCase {
 
     protected ExImServices eximService;
 

@@ -12,7 +12,7 @@ import gov.epa.emissions.framework.db.DbUpdate;
 
 import java.util.Date;
 
-public class StatusServicesTest extends ServicesTestCase {
+public class StatusServicesTest extends WebServicesIntegrationTestCase {
 
     private StatusServices service;
 

@@ -9,12 +9,12 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.SystemConfiguration;
 
-public abstract class ServicesTestCase extends TestCase {
+public abstract class WebServicesIntegrationTestCase extends TestCase {
     protected String baseUrl;
 
     protected ServiceLocator serviceLocator;
 
-    public ServicesTestCase() {
+    public WebServicesIntegrationTestCase() {
         CompositeConfiguration config = new CompositeConfiguration();
         config.addConfiguration(new SystemConfiguration());
 
