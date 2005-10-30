@@ -38,4 +38,8 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     public void setPosition(Position position) {
         super.setLocation(new Point(position.x(), position.y()));
     }
+
+    public void refreshLayout() {
+        super.validate();
+    }
 }

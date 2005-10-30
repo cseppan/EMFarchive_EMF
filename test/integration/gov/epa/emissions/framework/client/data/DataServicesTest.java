@@ -38,7 +38,6 @@ public class DataServicesTest extends TestCase {
             DbUpdate update = new DbUpdate(new Config("test/integration/integration.conf"));
             update.delete("emf.sectors", "id", sector.getId()+"");
         }
-
     }
 
     private Sector find(Sector[] sectors, String name) {

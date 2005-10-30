@@ -37,9 +37,12 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
 
     private SectorCriteriaTableData criteriaTableData;
 
-    public UpdateSectorWindow() {
+    private SectorManagerView sectorManager;
+
+    public UpdateSectorWindow(SectorManagerView sectorManager) {
         super("Update Sector");
 
+        this.sectorManager = sectorManager;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -119,7 +122,7 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
                 sector.setDescription(description.getText());
                 sector.setSectorCriteria(criteriaTableData.sources());
                 try {
-                    presenter.doSave();
+                    presenter.doSave(sectorManager);
                 } catch (EmfException e) {
                     messagePanel.setError("Could not save. Reason: " + e.getMessage());
                 }

@@ -33,4 +33,5 @@ public abstract class ReusableInteralFrame extends EmfInternalFrame {
     public boolean isAlive() {
         return true;// never terminate, until the application does
     }
+
 }

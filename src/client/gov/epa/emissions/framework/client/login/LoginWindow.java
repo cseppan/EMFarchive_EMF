@@ -106,7 +106,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
         try {
             User user = presenter.doLogin(username.getText(), new String(password.getPassword()));
             messagePanel.clear();
-            refresh();
+            super.refreshLayout();
             launchConsole(user);
             close();
         } catch (EmfException e) {
@@ -187,10 +187,6 @@ public class LoginWindow extends EmfFrame implements LoginView {
 
         RegisterUserPresenter presenter = new RegisterUserPresenter(serviceLocator.getUserServices());
         presenter.display(view);
-    }
-
-    private void refresh() {
-        super.validate();
     }
 
     public void observe(LoginPresenter presenter) {

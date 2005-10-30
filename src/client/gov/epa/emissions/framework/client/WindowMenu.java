@@ -25,10 +25,10 @@ public class WindowMenu extends JMenu implements WindowMenuView {
         menuItems.add(menuItem);
 
         super.add(menuItem);
-        refresh();
+        refreshLayout();
     }
 
-    private void refresh() {
+    private void refreshLayout() {
         super.validate();
     }
 

@@ -17,7 +17,7 @@ public class SectorManagerPresenter {
 
     public void doDisplay() throws EmfException {
         view.observe(this);
-        view.display(services.getSectors());
+        view.display(services);
     }
 
     public void doClose() {

@@ -3,9 +3,11 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.io.Sector;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
@@ -40,7 +42,7 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
 
     private JFrame parentConsole;
 
-    private SortFilterSelectionPanel sortFilterSelectPanel;
+    private DataServices dataServices;
 
     public SectorManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
         super("Sectors Manager", desktop);
@@ -49,26 +51,45 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
 
         layout = new JPanel();
         this.getContentPane().add(layout);
-    }
-
-    public void display(Sector[] sectors) {
-        model = new EmfTableModel(new SectorsTableData(sectors));
-        selectModel = new SortFilterSelectModel(model);
-
-        createLayout(parentConsole);
-        super.display();
+        this.setSize(new Dimension(475, 300));
     }
 
     public void observe(SectorManagerPresenter presenter) {
         this.presenter = presenter;
     }
 
-    private void createLayout(JFrame parentConsole) {
-        layout.removeAll();
-        sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        createLayout(layout, sortFilterSelectPanel);
+    public void display(DataServices dataServices) throws EmfException {
+        this.dataServices = dataServices;
+        doLayout(dataServices.getSectors());
+        super.display();
+    }
 
-        this.setSize(new Dimension(475, 300));
+    public void refresh() {
+        try {
+            doLayout(dataServices.getSectors());
+        } catch (EmfException e) {
+            messagePanel.setError("Could not refresh. Problem communicating with remote services.");
+        }
+
+        super.refreshLayout();
+    }
+
+    // FIXME: this table refresh sequence applies to every SortFilterTableModel.
+    // Refactor
+    private void doTableRefresh() {
+        model.refresh();
+        selectModel.refresh();
+        super.refreshLayout();
+    }
+
+    private void doLayout(Sector[] sectors) {
+        layout.removeAll();
+
+        model = new EmfTableModel(new SectorsTableData(sectors));
+        selectModel = new SortFilterSelectModel(model);
+        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
+
+        createLayout(layout, sortFilterSelectPanel);
     }
 
     private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
@@ -119,9 +140,9 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
         return crudPanel;
     }
 
-    protected void updateSectors() {
+    private void updateSectors() {
         List sectors = selected();
-        //TODO: move it into Presenter - look at UserManagerWindow
+        // TODO: move it into Presenter - look at UserManagerWindow
         for (Iterator iter = sectors.iterator(); iter.hasNext();) {
             Sector sector = (Sector) iter.next();
             presenter.doUpdateSector(sector, updateSectorView());
@@ -144,29 +165,16 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
 
     // FIXME: this table refresh sequence applies to every CRUD panel. Refactor
     private UpdateSectorView updateSectorView() {
-        UpdateSectorWindow view = new UpdateSectorWindow();
+        UpdateSectorWindow view = new UpdateSectorWindow(this);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosed(InternalFrameEvent event) {
-                doSimpleRefresh();
+                doTableRefresh();
             }
         });
 
         return view;
     }
 
-    // FIXME: this table refresh sequence applies to every SortFilterTableModel.
-    // Refactor
-    private void redoLayout() {
-        super.validate();
-    }
-
-    // FIXME: this table refresh sequence applies to every SortFilterTableModel.
-    // Refactor
-    private void doSimpleRefresh() {
-        model.refresh();
-        selectModel.refresh();
-        redoLayout();
-    }
 }

@@ -37,6 +37,8 @@ ALTER TABLE sectorcriteria OWNER TO emf;
 
 
 ---- Sectors data
+DELETE FROM Sectors;
+
 insert into sectors values (1, 'Point', 'Point');
 insert into sectors values (2, 'Nonpoint', 'Nonpoint');
 insert into sectors values (3, 'Area','Area');

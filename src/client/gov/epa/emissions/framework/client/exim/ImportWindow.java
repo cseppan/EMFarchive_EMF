@@ -164,14 +164,10 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         this.presenter = presenter;
     }
 
-    private void refresh() {
-        super.validate();
-    }
-
     private void doImport() {
         try {
-            presenter.doImport(folder.getText(), filename.getText(), name.getText(),
-                    (DatasetType) datasetTypesModel.getSelectedItem());
+            presenter.doImport(folder.getText(), filename.getText(), name.getText(), (DatasetType) datasetTypesModel
+                    .getSelectedItem());
             String message = "Started import. Please monitor the Status window to track your Import request.";
             messagePanel.setMessage(message);
         } catch (EmfException e) {
@@ -181,7 +177,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     public void clearMessagePanel() {
         messagePanel.clear();
-        refresh();
+        super.refreshLayout();
     }
 
     public void setDefaultBaseFolder(String folder) {

@@ -12,14 +12,14 @@ public class SectorManagerPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayViewOnDisplay() throws Exception {
         Sector[] sectors = { new Sector(), new Sector() };
 
-        Mock view = mock(SectorManagerView.class);
-        view.expects(once()).method("display").with(eq(sectors));
-
         Mock service = mock(DataServices.class);
         service.stubs().method("getSectors").withNoArguments().will(returnValue(sectors));
-
-        SectorManagerPresenter p = new SectorManagerPresenter((SectorManagerView) view.proxy(), (DataServices) service
-                .proxy());
+        DataServices servicesProxy = (DataServices) service.proxy();
+        
+        Mock view = mock(SectorManagerView.class);
+        view.expects(once()).method("display").with(same(servicesProxy));
+        
+        SectorManagerPresenter p = new SectorManagerPresenter((SectorManagerView) view.proxy(), servicesProxy);
         view.expects(once()).method("observe").with(eq(p));
 
         p.doDisplay();
@@ -44,7 +44,7 @@ public class SectorManagerPresenterTest extends MockObjectTestCase {
         updateSectorView.expects(once()).method("display").with(same(sector));
 
         SectorManagerPresenter p = new SectorManagerPresenter((SectorManagerView) view.proxy(), null);
-        p.doUpdateSector(sector, (UpdateSectorView)updateSectorView.proxy());
+        p.doUpdateSector(sector, (UpdateSectorView) updateSectorView.proxy());
     }
 
 }

@@ -252,22 +252,18 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         selectModel.refresh();
         // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
         createLayout(parentConsole);
-        redoLayout();
-    }
-
-    private void redoLayout() {
-        super.validate();
+        super.refreshLayout();
     }
 
     private void doSimpleRefresh() {
         model.refresh();
         selectModel.refresh();
-        redoLayout();
+        super.refreshLayout();
     }
 
     public void clearMessage() {
         messagePanel.clear();
-        redoLayout();
+        super.refreshLayout();
     }
 
 }

@@ -35,4 +35,7 @@ public class EmfFrame extends JFrame implements EmfView {
         this.setVisible(true);
     }
 
+    public void refreshLayout() {
+        super.validate();
+    }
 }

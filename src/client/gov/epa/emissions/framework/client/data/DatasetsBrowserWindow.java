@@ -227,11 +227,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     public void showError(String message) {
         messagePanel.setError(message);
-        redoLayout();
-    }
-
-    private void redoLayout() {
-        super.validate();
+        super.refreshLayout();
     }
 
     public void observe(DatasetsBrowserPresenter presenter) {
@@ -252,18 +248,17 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
         createLayout(layout, parentConsole);
-
-        this.redoLayout();
+        super.refreshLayout();
     }
 
     public void showMessage(String message) {
         messagePanel.setMessage(message);
-        redoLayout();
+        super.refreshLayout();
     }
 
     public void clearMessage() {
         messagePanel.clear();
-        redoLayout();
+        super.refreshLayout();
     }
 
 }
