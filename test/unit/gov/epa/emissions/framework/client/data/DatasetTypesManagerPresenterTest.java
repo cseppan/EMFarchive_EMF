@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.DatasetTypesServices;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
+import org.jmock.core.constraint.IsInstanceOf;
 
 public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
 
@@ -32,5 +33,18 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(), null);
 
         p.doClose();
+    }
+
+    public void testShouldDisplayUpdateViewOnUpdate() throws Exception {
+        Mock view = mock(DatasetTypesManagerView.class);
+
+        DatasetType type = new DatasetType();
+
+        Mock updateView = mock(UpdateDatasetTypeView.class);
+        updateView.expects(once()).method("observe").with(new IsInstanceOf(UpdateDatasetTypePresenter.class));
+        updateView.expects(once()).method("display").with(same(type));
+
+        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(), null);
+        p.doUpdate(type, (UpdateDatasetTypeView) updateView.proxy());
     }
 }

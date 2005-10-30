@@ -12,14 +12,20 @@ import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 //FIXME: very similar to SectorsManager. Refactor ?
 public class DatasetTypesManagerWindow extends ReusableInteralFrame implements DatasetTypesManagerView {
@@ -112,7 +118,60 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private JPanel createCrudPanel() {
-        return new JPanel();
+        JButton updateButton = new JButton("Update");
+        updateButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                updateDatasetTypes();
+            }
+        });
+
+        JPanel crudPanel = new JPanel();
+        crudPanel.setLayout(new FlowLayout());
+        crudPanel.add(updateButton);
+
+        return crudPanel;
     }
 
+    private void updateDatasetTypes() {
+        List sectors = selected();
+        for (Iterator iter = sectors.iterator(); iter.hasNext();) {
+            DatasetType type = (DatasetType) iter.next();
+            presenter.doUpdate(type, updateView());
+        }
+    }
+
+    // generic. Could be moved into 'SortFilterSelectModel' ? - FIXME
+    private List selected() {
+        List elements = new ArrayList();
+
+        int[] selected = selectModel.getSelectedIndexes();
+        if (selected.length == 0)
+            return elements;
+        for (int i = 0; i < selected.length; i++) {
+            elements.add(model.element(selected[i]));
+        }
+
+        return elements;
+    }
+
+    private UpdateDatasetTypeView updateView() {
+        UpdateDatasetTypeWindow view = new UpdateDatasetTypeWindow(this);
+        desktop.add(view);
+
+        view.addInternalFrameListener(new InternalFrameAdapter() {
+            public void internalFrameClosed(InternalFrameEvent event) {
+                doTableRefresh();
+            }
+        });
+
+        return view;
+    }
+
+    // FIXME: this table refresh sequence applies to every SortFilterTableModel.
+    // Refactor
+    private void doTableRefresh() {
+        model.refresh();
+        selectModel.refresh();
+        super.refreshLayout();
+    }
 }

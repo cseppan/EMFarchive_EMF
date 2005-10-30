@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DatasetTypesServices;
 
@@ -23,4 +24,8 @@ public class DatasetTypesManagerPresenter {
         view.close();
     }
 
+    public void doUpdate(DatasetType type, UpdateDatasetTypeView updateView) {
+        UpdateDatasetTypePresenter p = new UpdateDatasetTypePresenter(updateView, type, services);
+        p.doDisplay();
+    }
 }
