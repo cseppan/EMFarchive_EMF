@@ -38,9 +38,9 @@ public class SectorCriteriaTableDataTest extends TestCase {
     }
 
     public void testAllColumnsShouldBeEditable() {
-        assertTrue("All cells should be uneditable", data.isEditable(0));
-        assertTrue("All cells should be uneditable", data.isEditable(1));
-        assertTrue("All cells should be uneditable", data.isEditable(2));
+        assertTrue("All cells should be editable", data.isEditable(0));
+        assertTrue("All cells should be editable", data.isEditable(1));
+        assertTrue("All cells should be editable", data.isEditable(2));
     }
 
     public void testShouldReturnTheRowsCorrespondingToTotalCount() {
