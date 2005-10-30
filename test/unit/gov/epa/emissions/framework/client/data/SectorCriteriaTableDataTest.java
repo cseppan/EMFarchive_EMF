@@ -81,6 +81,15 @@ public class SectorCriteriaTableDataTest extends TestCase {
         assertEquals(1, data.rows().size());
     }
 
+    public void testShouldRemoveSelectedOnRemove() {
+        assertEquals(2, data.rows().size());
+
+        data.setValueAt(Boolean.TRUE, 0, 0);
+        data.removeSelected();
+
+        assertEquals(1, data.rows().size());
+    }
+
     public void testShouldAddCriterionOnAdd() {
         SectorCriteria criterion = new SectorCriteria();
         criterion.setId(3);
@@ -88,6 +97,17 @@ public class SectorCriteriaTableDataTest extends TestCase {
         data.add(criterion);
 
         assertEquals(3, data.rows().size());
+    }
+
+    public void testShouldAddBlankEntry() {
+        data.addBlankRow();
+
+        List rows = data.rows();
+        assertEquals(3, rows.size());
+        Row blankRow = (Row) rows.get(2);
+        SectorCriteria blankSource = ((SectorCriteria) blankRow.source());
+        assertEquals("", blankSource.getType());
+        assertEquals("", blankSource.getCriteria());
     }
 
     public void testShouldReturnCurrentlyHeldSectorCriteria() {
@@ -103,11 +123,4 @@ public class SectorCriteriaTableDataTest extends TestCase {
         assertEquals(criterion, sources[2]);
     }
 
-    public void testShouldCheckSelectionOnChoosingSelect() {
-        data.setValueAt(Boolean.TRUE, 0, 0);
-
-        SectorCriteria[] selected = data.getSelected();
-        assertEquals(1, selected.length);
-        assertEquals(criterion1, selected[0]);
-    }
 }

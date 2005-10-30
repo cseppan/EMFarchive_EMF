@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
-import gov.epa.emissions.commons.io.Sector;
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
@@ -23,9 +23,9 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.border.EtchedBorder;
 
-public class UpdateSectorWindow extends DisposableInteralFrame implements UpdateSectorView {
+public class UpdateDatasetTypeWindow extends DisposableInteralFrame implements UpdateDatasetTypeView {
 
-    private UpdateSectorPresenter presenter;
+    private UpdateDatasetTypePresenter presenter;
 
     private JPanel layout;
 
@@ -35,14 +35,14 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
 
     private TextArea description;
 
-    private SectorCriteriaTableData criteriaTableData;
+    private DatasetTypeKeywordsTableData keywordsTableData;
 
-    private SectorManagerView sectorManager;
+    private DatasetTypesManagerView manager;
 
-    public UpdateSectorWindow(SectorManagerView sectorManager) {
-        super("Update Sector");
+    public UpdateDatasetTypeWindow(DatasetTypesManagerView manager) {
+        super("Update DatasetType");
 
-        this.sectorManager = sectorManager;
+        this.manager = manager;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -50,34 +50,34 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
         super.setSize(new Dimension(400, 400));
     }
 
-    public void observe(UpdateSectorPresenter presenter) {
+    public void observe(UpdateDatasetTypePresenter presenter) {
         this.presenter = presenter;
     }
 
-    public void display(Sector sector) {
+    public void display(DatasetType type) {
         layout.removeAll();
-        doLayout(layout, sector);
+        doLayout(layout, type);
 
         super.display();
     }
 
     // FIXME: CRUD panel. Refactor to use in DatasetTypes Manager
-    private void doLayout(JPanel layout, Sector sector) {
+    private void doLayout(JPanel layout, DatasetType type) {
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
-        layout.add(createInputPanel(sector));
-        layout.add(createCriteriaPanel(sector));
-        layout.add(createButtonsPanel(sector));
+        layout.add(createInputPanel(type));
+        layout.add(createKeywordsPanel(type));
+        layout.add(createButtonsPanel(type));
     }
 
-    private JPanel createInputPanel(Sector sector) {
+    private JPanel createInputPanel(DatasetType type) {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        name = new TextField("name", sector.getName(), 20);
+        name = new TextField("name", type.getName(), 20);
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
-        description = new TextArea("description", sector.getDescription(), 25);
+        description = new TextArea("description", type.getDescription(), 25);
         layoutGenerator.addLabelWidgetPair("Description", new ScrollableTextArea(description), panel);
 
         // Lay out the panel.
@@ -88,15 +88,15 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
         return panel;
     }
 
-    private JPanel createCriteriaPanel(Sector sector) {
-        criteriaTableData = new SectorCriteriaTableData(sector.getSectorCriteria());
-        ListPanel panel = new ListPanel("Criteria", criteriaTableData);
+    private JPanel createKeywordsPanel(DatasetType type) {
+        keywordsTableData = new DatasetTypeKeywordsTableData(type.getKeywords());
+        ListPanel panel = new ListPanel("Keywords", keywordsTableData);
         panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 
         return panel;
     }
 
-    private JPanel createButtonsPanel(Sector sector) {
+    private JPanel createButtonsPanel(DatasetType type) {
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel();
@@ -105,7 +105,7 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button saveButton = new Button("Save", saveAction(sector));
+        Button saveButton = new Button("Save", saveAction(type));
         container.add(saveButton);
         container.add(new Button("Close", closeAction()));
         getRootPane().setDefaultButton(saveButton);
@@ -115,14 +115,14 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
         return panel;
     }
 
-    private Action saveAction(final Sector sector) {
+    private Action saveAction(final DatasetType type) {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                sector.setName(name.getText());
-                sector.setDescription(description.getText());
-                sector.setSectorCriteria(criteriaTableData.sources());
+                type.setName(name.getText());
+                type.setDescription(description.getText());
+                type.setKeywords(keywordsTableData.sources());
                 try {
-                    presenter.doSave(sectorManager);
+                    presenter.doSave(manager);
                 } catch (EmfException e) {
                     messagePanel.setError("Could not save. Reason: " + e.getMessage());
                 }

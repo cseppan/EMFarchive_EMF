@@ -69,11 +69,4 @@ public class DatasetTypeKeywordsTableDataTest extends TestCase {
         assertEquals("keyword3", sources[2]);
     }
 
-    public void testShouldCheckSelectionOnChoosingSelect() {
-        data.setValueAt(Boolean.TRUE, 0, 0);
-
-        String[] selected = data.getSelected();
-        assertEquals(1, selected.length);
-        assertEquals("keyword1", selected[0]);
-    }
 }

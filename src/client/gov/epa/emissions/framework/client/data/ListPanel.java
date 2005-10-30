@@ -1,8 +1,9 @@
 package gov.epa.emissions.framework.client.data;
 
-import gov.epa.emissions.commons.io.SectorCriteria;
 import gov.epa.emissions.framework.client.Label;
+import gov.epa.emissions.framework.ui.EmfTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.SelectableEmfTableData;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -14,35 +15,35 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-public class SectorCriteriaPanel extends JPanel {
+public class ListPanel extends JPanel {
 
     private EmfTableModel tableModel;
 
-    public SectorCriteriaPanel(SectorCriteriaTableData tableData) {
-        super.add(doLayout(tableData));
+    public ListPanel(String label, SelectableEmfTableData tableData) {
+        super.add(doLayout(label, tableData));
     }
 
-    private JPanel doLayout(SectorCriteriaTableData tableData) {
+    private JPanel doLayout(String label, SelectableEmfTableData tableData) {
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
-        container.add(labelPanel());
+        container.add(labelPanel(label));
         container.add(table(tableData));
         container.add(buttonsPanel(tableData));
 
         return container;
     }
 
-    private JPanel labelPanel() {
+    private JPanel labelPanel(String name) {
         JPanel panel = new JPanel(new BorderLayout());
 
-        Label label = new Label("Criteria");
+        Label label = new Label(name);
         panel.add(label, BorderLayout.WEST);
 
         return panel;
     }
 
-    private JScrollPane table(SectorCriteriaTableData tableData) {
+    private JScrollPane table(EmfTableData tableData) {
         tableModel = new EmfTableModel(tableData);
 
         JTable table = new JTable(tableModel);
@@ -51,17 +52,13 @@ public class SectorCriteriaPanel extends JPanel {
         return new JScrollPane(table);
     }
 
-    private JPanel buttonsPanel(final SectorCriteriaTableData tableData) {
+    private JPanel buttonsPanel(final SelectableEmfTableData tableData) {
         JPanel container = new JPanel();
 
         Label add = new Label("Add", "<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Add</a></html>");
         add.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event) {
-                SectorCriteria criterion = new SectorCriteria();
-                criterion.setType("");
-                criterion.setCriteria("");
-
-                tableData.add(criterion);
+                tableData.addBlankRow();
                 refresh();
             }
         });
@@ -70,8 +67,7 @@ public class SectorCriteriaPanel extends JPanel {
         Label remove = new Label("Remove", "<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Remove</a></html>");
         remove.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event) {
-                SectorCriteria[] selected = tableData.getSelected();
-                tableData.remove(selected);
+                tableData.removeSelected();
                 refresh();
             }
         });

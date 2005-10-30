@@ -15,7 +15,7 @@ public class SectorCriteriaPanelLauncher {
         criteria.setCriteria("crit1");
 
         SectorCriteriaTableData tableData = new SectorCriteriaTableData(new SectorCriteria[] { criteria });
-        SectorCriteriaPanel panel = new SectorCriteriaPanel(tableData);
+        ListPanel panel = new ListPanel("Criteria", tableData);
 
         JFrame frame = new JFrame();
         frame.getContentPane().add(panel);

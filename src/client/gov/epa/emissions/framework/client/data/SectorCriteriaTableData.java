@@ -4,12 +4,13 @@ import gov.epa.emissions.commons.io.SectorCriteria;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
+import gov.epa.emissions.framework.ui.SelectableEmfTableData;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SectorCriteriaTableData extends AbstractEmfTableData {
+public class SectorCriteriaTableData extends AbstractEmfTableData implements SelectableEmfTableData {
     private List rows;
 
     public SectorCriteriaTableData(SectorCriteria[] criteria) {
@@ -64,7 +65,7 @@ public class SectorCriteriaTableData extends AbstractEmfTableData {
         editableRow.setValueAt(value, col);
     }
 
-    public SectorCriteria[] getSelected() {
+    private SectorCriteria[] getSelected() {
         List selected = new ArrayList();
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
@@ -96,5 +97,17 @@ public class SectorCriteriaTableData extends AbstractEmfTableData {
             sources.add(rowSource.source());
         }
         return sources;
+    }
+
+    public void addBlankRow() {
+        SectorCriteria sectorCriteria = new SectorCriteria();
+        sectorCriteria.setType("");
+        sectorCriteria.setCriteria("");
+
+        add(sectorCriteria);
+    }
+
+    public void removeSelected() {
+        remove(getSelected());
     }
 }
