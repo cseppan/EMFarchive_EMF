@@ -27,8 +27,10 @@ public class DatasetTypesManagerWindowLauncher {
         DatasetTypesManagerWindow view = new DatasetTypesManagerWindow(frame, desktop);
         DatasetType type1 = new DatasetType();
         type1.setName("type1");
+        type1.setKeywords(new String[]{"1", "2", "3"});
         DatasetType type2 = new DatasetType();
         type2.setName("type2");
+        type2.setKeywords(new String[]{"11", "12", "13"});
         
         DatasetType[] types = { type1, type2 };
         Mock services = new Mock(DatasetTypesServices.class);

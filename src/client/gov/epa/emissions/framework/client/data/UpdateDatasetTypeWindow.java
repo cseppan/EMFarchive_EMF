@@ -90,7 +90,7 @@ public class UpdateDatasetTypeWindow extends DisposableInteralFrame implements U
 
     private JPanel createKeywordsPanel(DatasetType type) {
         keywordsTableData = new DatasetTypeKeywordsTableData(type.getKeywords());
-        ListPanel panel = new ListPanel("Keywords", keywordsTableData);
+        JPanel panel = new DatasetTypeKeywordsPanel(type, keywordsTableData);
         panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 
         return panel;

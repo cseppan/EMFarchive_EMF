@@ -14,10 +14,16 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 public class ListPanel extends JPanel {
 
     private EmfTableModel tableModel;
+
+    private JTable table;
 
     public ListPanel(String label, SelectableEmfTableData tableData) {
         super.add(doLayout(label, tableData));
@@ -46,7 +52,7 @@ public class ListPanel extends JPanel {
     private JScrollPane table(EmfTableData tableData) {
         tableModel = new EmfTableModel(tableData);
 
-        JTable table = new JTable(tableModel);
+        table = new JTable(tableModel);
         table.setPreferredScrollableViewportSize(new Dimension(300, 100));
 
         return new JScrollPane(table);
@@ -82,6 +88,16 @@ public class ListPanel extends JPanel {
     private void refresh() {
         tableModel.refresh();
         super.revalidate();
+    }
+
+    public void setColumnEditor(TableCellEditor editor, int columnIndex, String toolTip) {
+        TableColumnModel colModel = table.getColumnModel();
+        TableColumn col = colModel.getColumn(columnIndex);
+        col.setCellEditor(editor);
+
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+        renderer.setToolTipText(toolTip);
+        col.setCellRenderer(renderer);
     }
 
 }

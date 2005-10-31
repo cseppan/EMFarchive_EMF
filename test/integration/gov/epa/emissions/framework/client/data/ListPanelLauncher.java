@@ -6,8 +6,9 @@ import java.awt.Dimension;
 import java.awt.Point;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
-public class SectorCriteriaPanelLauncher {
+public class ListPanelLauncher {
 
     public static void main(String[] args) throws Exception {
         SectorCriteria criteria = new SectorCriteria();
@@ -15,7 +16,7 @@ public class SectorCriteriaPanelLauncher {
         criteria.setCriteria("crit1");
 
         SectorCriteriaTableData tableData = new SectorCriteriaTableData(new SectorCriteria[] { criteria });
-        ListPanel panel = new ListPanel("Criteria", tableData);
+        JPanel panel = new SectorCriteriaPanel("Criteria", tableData);
 
         JFrame frame = new JFrame();
         frame.getContentPane().add(panel);
