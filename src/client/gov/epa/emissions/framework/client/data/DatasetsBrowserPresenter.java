@@ -19,9 +19,9 @@ public class DatasetsBrowserPresenter {
 
     private DataServices dataServices;
 
-    public DatasetsBrowserPresenter(DataServices dataServices, ViewLayout windowLayoutManager) {
+    public DatasetsBrowserPresenter(DataServices dataServices, ViewLayout viewLayout) {
         this.dataServices = dataServices;
-        this.viewLayout = windowLayoutManager;
+        this.viewLayout = viewLayout;
     }
 
     public void doDisplay(DatasetsBrowserView view) {

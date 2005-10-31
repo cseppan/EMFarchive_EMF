@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.io.SectorCriteria;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.ui.DefaultViewLayout;
+import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -29,15 +31,17 @@ public class SectorsManagerWindowLauncher {
         criteria.setType("type1");
         criteria.setCriteria("crit1");
         sector1.addSectorCriteria(criteria);
-        
+
         Sector sector2 = new Sector("desc2", "name2");
         sector2.addSectorCriteria(criteria);
         Sector[] sectors = { sector1, sector2 };
-        
+
         Mock dataServices = new Mock(DataServices.class);
         dataServices.stubs().method(new IsEqual("getSectors")).will(new ReturnStub(sectors));
 
-        SectorsManagerPresenter presenter = new SectorsManagerPresenter(view, (DataServices) dataServices.proxy());
+        ViewLayout viewLayout = new DefaultViewLayout(view);
+        SectorsManagerPresenter presenter = new SectorsManagerPresenter(view, (DataServices) dataServices.proxy(),
+                viewLayout);
 
         launcher.addAsInternalFrame(view, frame, desktop);
 

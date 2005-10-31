@@ -37,9 +37,9 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
 
     private SectorCriteriaTableData criteriaTableData;
 
-    private SectorManagerView sectorManager;
+    private SectorsManagerView sectorManager;
 
-    public UpdateSectorWindow(SectorManagerView sectorManager) {
+    public UpdateSectorWindow(SectorsManagerView sectorManager) {
         super("Update Sector");
 
         this.sectorManager = sectorManager;

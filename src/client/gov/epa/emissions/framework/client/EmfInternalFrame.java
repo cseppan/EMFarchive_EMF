@@ -19,6 +19,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     public void bringToFront() {
         super.toFront();
         try {
+            super.setSelected(true);
             super.setIcon(false);
         } catch (PropertyVetoException e) {
             throw new RuntimeException("could not bring the window - " + super.getTitle() + " to front of the desktop");

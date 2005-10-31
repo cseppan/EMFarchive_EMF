@@ -28,7 +28,7 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 //FIXME: look at the common design b/w this and UserManagerWindow. Refactor ?
-public class SectorsManagerWindow extends ReusableInteralFrame implements SectorManagerView {
+public class SectorsManagerWindow extends ReusableInteralFrame implements SectorsManagerView {
 
     private SectorsManagerPresenter presenter;
 
@@ -144,7 +144,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
         // TODO: move it into Presenter - look at UserManagerWindow
         for (Iterator iter = sectors.iterator(); iter.hasNext();) {
             Sector sector = (Sector) iter.next();
-            presenter.doUpdateSector(sector, updateSectorView());
+            presenter.doUpdate(sector, updateSectorView());
         }
     }
 

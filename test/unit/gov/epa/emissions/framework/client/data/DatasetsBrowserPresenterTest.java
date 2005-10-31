@@ -74,7 +74,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         ExportView exportViewProxy = (ExportView) exportView.proxy();
         exportPresenter.expects(once()).method("display").with(eq(exportViewProxy));
 
-        layout.expects(once()).method("add").with(eq(exportViewProxy), new IsInstanceOf(String.class));
+        layout.expects(once()).method("add").with(eq(exportViewProxy), new IsInstanceOf(Object.class));
 
         presenter.doExport(exportViewProxy, (ExportPresenter) exportPresenter.proxy(), datasets);
     }

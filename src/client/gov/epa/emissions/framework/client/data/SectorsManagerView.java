@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ManagedView;
 import gov.epa.emissions.framework.services.DataServices;
 
-public interface SectorManagerView extends ManagedView {
+public interface SectorsManagerView extends ManagedView {
     void observe(SectorsManagerPresenter presenter);
 
     void display(DataServices dataServices) throws EmfException;

@@ -37,8 +37,6 @@ public class ManageMenu extends JMenu {
 
     private ViewLayout viewLayout;
 
-    private SectorsManagerWindow sectorManagerView;
-
     private DatasetTypesManagerWindow datasetTypesManagerView;
 
     // FIXME: where's the associated Presenter ?
@@ -152,11 +150,12 @@ public class ManageMenu extends JMenu {
         if (viewLayout.activate("Sectors Manager"))
             return;
 
-        sectorManagerView = new SectorsManagerWindow(parent, desktop);
-        viewLayout.add(sectorManagerView, "Sectors Manager");
-        desktop.add(sectorManagerView);
+        SectorsManagerWindow view = new SectorsManagerWindow(parent, desktop);
+        viewLayout.add(view, "Sectors Manager");
+        desktop.add(view);
 
-        SectorsManagerPresenter presenter = new SectorsManagerPresenter(sectorManagerView, dataServices);
+        ViewLayout sectorsLayout = new DefaultViewLayout(view);
+        SectorsManagerPresenter presenter = new SectorsManagerPresenter(view, dataServices, sectorsLayout);
         presenter.doDisplay();
     }
 

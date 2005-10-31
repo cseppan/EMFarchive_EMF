@@ -27,7 +27,7 @@ public class UpdateSectorPresenter {
         view.close();
     }
 
-    public void doSave(SectorManagerView sectorManager) throws EmfException {
+    public void doSave(SectorsManagerView sectorManager) throws EmfException {
         services.updateSector(sector);
         sectorManager.refresh();
         doClose();

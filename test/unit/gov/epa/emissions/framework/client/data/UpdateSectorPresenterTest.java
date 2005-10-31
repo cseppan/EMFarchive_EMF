@@ -41,10 +41,10 @@ public class UpdateSectorPresenterTest extends MockObjectTestCase {
         UpdateSectorPresenter presenter = new UpdateSectorPresenter((UpdateSectorView) view.proxy(), s,
                 (DataServices) services.proxy());
 
-        Mock sectorManagerView = mock(SectorManagerView.class);
+        Mock sectorManagerView = mock(SectorsManagerView.class);
         sectorManagerView.expects(once()).method("refresh").withNoArguments();
         
-        presenter.doSave((SectorManagerView)sectorManagerView.proxy());
+        presenter.doSave((SectorsManagerView)sectorManagerView.proxy());
     }
 
 }
