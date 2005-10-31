@@ -8,6 +8,8 @@
  */
 package gov.epa.emissions.framework.dao;
 
+import gov.epa.emissions.framework.services.EmfKeyword;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +47,18 @@ public class EmfKeywordsDAO {
         }
         log.debug("after call to allkeywords: size of list= " + allKeywords.size());        
         return allKeywords;
+    }
+    
+    public static void insertEmfKeyword(EmfKeyword keyword,Session session){
+        
+    }
+
+    public static void updateEmfKeyword(EmfKeyword keyword,Session session){
+        
+    }
+
+    public static void deleteEmfKeyword(EmfKeyword keyword,Session session){
+        
     }
 
 }
