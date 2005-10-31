@@ -112,6 +112,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         PropertiesEditorView viewProxy = (PropertiesEditorView) metadataView.proxy();
         layout.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
+        layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.FALSE));
 
         presenter.doShowProperties(viewProxy, dataset);
     }
@@ -128,13 +129,14 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         PropertiesEditorView viewProxy = (PropertiesEditorView) propertiesEditorView.proxy();
         layout.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
+        layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.FALSE));
 
         // 1st display
         presenter.doShowProperties(viewProxy, dataset);
 
         // 2nd attempt
         propertiesEditorView.stubs().method("isAlive").withNoArguments().will(returnValue(Boolean.TRUE));
-        propertiesEditorView.expects(once()).method("bringToFront").withNoArguments();
+        layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.TRUE));
         presenter.doShowProperties(viewProxy, dataset);
     }
 
@@ -151,11 +153,12 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         PropertiesEditorView view1Proxy = (PropertiesEditorView) view1.proxy();
         layout.expects(once()).method("add").with(eq(view1Proxy), new IsInstanceOf(String.class));
+        layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.FALSE));
 
         presenter.doShowProperties(view1Proxy, dataset);
 
         // 2nd attempt - view1 is closed, view2 will be displayed
-        view1.stubs().method("isAlive").withNoArguments().will(returnValue(Boolean.FALSE));
+        layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.FALSE));
 
         Mock view2 = mock(PropertiesEditorView.class);
         view2.expects(once()).method("observe").with(new IsInstanceOf(PropertiesEditorPresenter.class));

@@ -11,9 +11,6 @@ import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class DatasetsBrowserPresenter {
 
     private DatasetsBrowserView view;
@@ -22,12 +19,9 @@ public class DatasetsBrowserPresenter {
 
     private DataServices dataServices;
 
-    private Map editorsMap;
-
     public DatasetsBrowserPresenter(DataServices dataServices, ViewLayout windowLayoutManager) {
         this.dataServices = dataServices;
         this.viewLayout = windowLayoutManager;
-        editorsMap = new HashMap();
     }
 
     public void doDisplay(DatasetsBrowserView view) {
@@ -66,20 +60,10 @@ public class DatasetsBrowserPresenter {
     // TODO: Is this a better style/pattern compared to doNew ?
     public void doShowProperties(PropertiesEditorView propertiesEditorView, EmfDataset dataset) {
         view.clearMessage();
-        if (isPropertiesEditorAlive(dataset)) {
-            propertiesEditor(dataset).bringToFront();
+        if (viewLayout.activate("Properties - " + dataset.getName()))
             return;
-        }
 
         showPropertiesEditor(propertiesEditorView, dataset);
-    }
-
-    private boolean isPropertiesEditorAlive(EmfDataset dataset) {
-        return editorsMap.containsKey(dataset) && propertiesEditor(dataset).isAlive();
-    }
-
-    private PropertiesEditorView propertiesEditor(EmfDataset dataset) {
-        return (PropertiesEditorView) editorsMap.get(dataset);
     }
 
     private void showPropertiesEditor(PropertiesEditorView propertiesEditorView, EmfDataset dataset) {
@@ -87,8 +71,6 @@ public class DatasetsBrowserPresenter {
 
         PropertiesEditorPresenter presenter = new PropertiesEditorPresenter(dataset, dataServices);
         presenter.display(propertiesEditorView);
-
-        editorsMap.put(dataset, propertiesEditorView);
     }
 
     public void doNew(ImportView importView, ImportPresenter importPresenter) throws EmfException {

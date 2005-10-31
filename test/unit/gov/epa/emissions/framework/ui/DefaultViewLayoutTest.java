@@ -14,11 +14,15 @@ public class DefaultViewLayoutTest extends MockObjectTestCase {
 
         Mock child = mock(ManagedView.class);
         child.expects(once()).method("setPosition");
+        child.stubs().method("isAlive").will(returnValue(Boolean.TRUE));
 
         ViewLayout layout = new DefaultViewLayout((EmfView) parent.proxy());
 
         layout.add((ManagedView) child.proxy(), "1");
         assertTrue("Should have been added to the layout", layout.available("1"));
+
+        child.stubs().method("isAlive").will(returnValue(Boolean.FALSE));
+        assertFalse("Should fail to activate as the view is closed", layout.available("1"));
     }
 
     public void testShouldBeAbleToActivateViewBasedOnId() {
@@ -28,7 +32,8 @@ public class DefaultViewLayoutTest extends MockObjectTestCase {
         Mock child = mock(ManagedView.class);
         child.expects(once()).method("setPosition");
         child.expects(once()).method("bringToFront");
-
+        child.stubs().method("isAlive").will(returnValue(Boolean.TRUE));
+        
         ViewLayout layout = new DefaultViewLayout((EmfView) parent.proxy());
 
         layout.add((ManagedView) child.proxy(), "1");

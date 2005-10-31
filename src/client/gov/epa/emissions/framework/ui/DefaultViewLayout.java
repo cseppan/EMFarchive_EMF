@@ -51,7 +51,15 @@ public class DefaultViewLayout implements ViewLayout {
     }
 
     public boolean available(Object id) {
-        return children.containsKey(id);
+        if (!children.containsKey(id))
+            return false;
+
+        ManagedView view = (ManagedView) children.get(id);
+        if (view.isAlive())
+            return true;
+
+        children.remove(id);// flush dead views
+        return false;
     }
 
 }
