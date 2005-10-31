@@ -25,7 +25,7 @@ public class UserManagerPresenter {
         this.user = user;
         this.userServices = userServices;
         this.layoutManager = layoutManager;
-        
+
         updateViewsMap = new HashMap();
     }
 
@@ -68,9 +68,9 @@ public class UserManagerPresenter {
         userServices.deleteUser(userToDelete.getUsername());
     }
 
-    public void doRegisterNewUser(RegisterUserView registerUserView) {
+    public void doRegisterNewUser(RegisterUserDesktopView registerUserView) {
         view.clearMessage();
-        layoutManager.add(registerUserView);
+        layoutManager.add(registerUserView, "Register New User");
 
         RegisterUserPresenter registerPresenter = new RegisterUserPresenter(userServices);
         registerPresenter.display(registerUserView);
@@ -98,7 +98,7 @@ public class UserManagerPresenter {
     }
 
     private void showUpdateUser(User updateUser, UpdateUserView updateUserView) {
-        layoutManager.add(updateUserView);
+        layoutManager.add(updateUserView, "Update - " + updateUser.getUsername());
 
         UpdateUserPresenter updateUserPresenter = new UpdateUserPresenter(userServices);
         updateUserPresenter.display(updateUserView);

@@ -10,8 +10,8 @@ import gov.epa.emissions.framework.client.data.DatasetTypesManagerPresenter;
 import gov.epa.emissions.framework.client.data.DatasetTypesManagerWindow;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserPresenter;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserWindow;
-import gov.epa.emissions.framework.client.data.SectorManagerPresenter;
-import gov.epa.emissions.framework.client.data.SectorManagerWindow;
+import gov.epa.emissions.framework.client.data.SectorsManagerPresenter;
+import gov.epa.emissions.framework.client.data.SectorsManagerWindow;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.DatasetTypesServices;
 import gov.epa.emissions.framework.services.User;
@@ -44,7 +44,7 @@ public class ManageMenu extends JMenu {
 
     private WindowLayoutManager windowLayoutManager;
 
-    private SectorManagerWindow sectorManagerView;
+    private SectorsManagerWindow sectorManagerView;
 
     private DatasetTypesManagerWindow datasetTypesManagerView;
 
@@ -151,7 +151,7 @@ public class ManageMenu extends JMenu {
         }
 
         datasetTypesManagerView = new DatasetTypesManagerWindow(parent, desktop);
-        windowLayoutManager.add(datasetTypesManagerView);
+        windowLayoutManager.add(datasetTypesManagerView, "DatasetTypes Manager");
         desktop.add(datasetTypesManagerView);
 
         DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(datasetTypesManagerView, services);
@@ -165,11 +165,11 @@ public class ManageMenu extends JMenu {
             return;
         }
 
-        sectorManagerView = new SectorManagerWindow(parent, desktop);
-        windowLayoutManager.add(sectorManagerView);
+        sectorManagerView = new SectorsManagerWindow(parent, desktop);
+        windowLayoutManager.add(sectorManagerView, "Sectors Manager");
         desktop.add(sectorManagerView);
 
-        SectorManagerPresenter presenter = new SectorManagerPresenter(sectorManagerView, dataServices);
+        SectorsManagerPresenter presenter = new SectorsManagerPresenter(sectorManagerView, dataServices);
         presenter.doDisplay();
     }
 
@@ -180,7 +180,7 @@ public class ManageMenu extends JMenu {
         }
 
         datasetsBrowserView = new DatasetsBrowserWindow(session, parent, desktop);
-        windowLayoutManager.add(datasetsBrowserView);
+        windowLayoutManager.add(datasetsBrowserView, "Datasets Browser");
         desktop.add(datasetsBrowserView);
 
         WindowLayoutManager browserLayout = new DefaultWindowLayoutManager(datasetsBrowserView);
@@ -195,7 +195,7 @@ public class ManageMenu extends JMenu {
         }
 
         myProfileView = new MyProfileWindow(session.getUser(), desktop);
-        windowLayoutManager.add(myProfileView);
+        windowLayoutManager.add(myProfileView, "My Profile");
         desktop.add(myProfileView);
 
         UpdateUserPresenter presenter = new UpdateUserPresenter(session.getUserServices());

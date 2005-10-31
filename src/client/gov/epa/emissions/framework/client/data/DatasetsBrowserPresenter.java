@@ -50,7 +50,7 @@ public class DatasetsBrowserPresenter {
         }
 
         view.clearMessage();
-        windowLayoutManager.add(exportView);
+        windowLayoutManager.add(exportView, "Export Datasets");
 
         presenter.display(exportView);
     }
@@ -82,7 +82,7 @@ public class DatasetsBrowserPresenter {
     }
 
     private void showPropertiesEditor(PropertiesEditorView propertiesEditorView, EmfDataset dataset) {
-        windowLayoutManager.add(propertiesEditorView);
+        windowLayoutManager.add(propertiesEditorView, "Properties - " + dataset.getName());
 
         PropertiesEditorPresenter presenter = new PropertiesEditorPresenter(dataset, dataServices);
         presenter.display(propertiesEditorView);
@@ -92,7 +92,7 @@ public class DatasetsBrowserPresenter {
 
     public void doNew(ImportView importView, ImportPresenter importPresenter) throws EmfException {
         view.clearMessage();
-        windowLayoutManager.add(importView);
+        windowLayoutManager.add(importView, "Datasets Browser - Import");
 
         importPresenter.display(importView);
     }

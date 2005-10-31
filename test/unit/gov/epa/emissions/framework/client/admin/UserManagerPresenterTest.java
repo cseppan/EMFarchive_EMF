@@ -80,12 +80,12 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldDisplayRegisterNewUserViewOnDisplayRegisterNewUser() {
-        Mock registerUserView = mock(RegisterUserView.class);
+        Mock registerUserView = mock(RegisterUserDesktopView.class);
         registerUserView.expects(once()).method("observe").with(new IsInstanceOf(RegisterUserPresenter.class));
         registerUserView.expects(once()).method("display").withNoArguments();
 
-        RegisterUserView viewProxy = (RegisterUserView) registerUserView.proxy();
-        layoutManager.expects(once()).method("add").with(eq(viewProxy));
+        RegisterUserDesktopView viewProxy = (RegisterUserDesktopView) registerUserView.proxy();
+        layoutManager.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
 
         view.expects(once()).method("clearMessage").withNoArguments();
         view.expects(once()).method("refresh").withNoArguments();
@@ -99,7 +99,7 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         updateUserView.expects(once()).method("display").withNoArguments();
 
         UpdateUserView viewProxy = (UpdateUserView) updateUserView.proxy();
-        layoutManager.expects(once()).method("add").with(eq(viewProxy));
+        layoutManager.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
 
         view.expects(once()).method("clearMessage").withNoArguments();
         view.expects(once()).method("refresh").withNoArguments();
@@ -139,7 +139,7 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         // 1st attempt
         Mock view1 = mock(UpdateUserView.class);
         UpdateUserView view1Proxy = createUpdateView(view1);
-        
+
         view.expects(atLeastOnce()).method("clearMessage").withNoArguments();
         view.expects(atLeastOnce()).method("refresh").withNoArguments();
 
@@ -159,8 +159,8 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         updateView.expects(once()).method("display").withNoArguments();
 
         UpdateUserView viewProxy = (UpdateUserView) updateView.proxy();
-        layoutManager.expects(once()).method("add").with(eq(viewProxy));
-        
+        layoutManager.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
+
         return viewProxy;
     }
 
@@ -171,7 +171,7 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         updateUserView.expects(once()).method("display").withNoArguments();
 
         UpdateUserView updateUserViewProxy = (UpdateUserView) updateUserView.proxy();
-        layoutManager.expects(once()).method("add").with(eq(updateUserViewProxy));
+        layoutManager.expects(once()).method("add").with(eq(updateUserViewProxy), new IsInstanceOf(String.class));
 
         view.expects(once()).method("clearMessage").withNoArguments();
         view.expects(once()).method("refresh").withNoArguments();

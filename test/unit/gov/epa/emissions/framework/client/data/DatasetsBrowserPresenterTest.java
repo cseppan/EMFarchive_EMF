@@ -74,7 +74,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         ExportView exportViewProxy = (ExportView) exportView.proxy();
         exportPresenter.expects(once()).method("display").with(eq(exportViewProxy));
 
-        layout.expects(once()).method("add").with(eq(exportViewProxy));
+        layout.expects(once()).method("add").with(eq(exportViewProxy), new IsInstanceOf(String.class));
 
         presenter.doExport(exportViewProxy, (ExportPresenter) exportPresenter.proxy(), datasets);
     }
@@ -87,7 +87,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         ImportView importViewProxy = (ImportView) importView.proxy();
         importPresenter.expects(once()).method("display").with(eq(importViewProxy));
 
-        layout.expects(once()).method("add").with(eq(importViewProxy));
+        layout.expects(once()).method("add").with(eq(importViewProxy), new IsInstanceOf(String.class));
 
         presenter.doNew(importViewProxy, (ImportPresenter) importPresenter.proxy());
     }
@@ -111,7 +111,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         metadataView.expects(once()).method("display").with(eq(dataset));
 
         PropertiesEditorView viewProxy = (PropertiesEditorView) metadataView.proxy();
-        layout.expects(once()).method("add").with(eq(viewProxy));
+        layout.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
 
         presenter.doShowProperties(viewProxy, dataset);
     }
@@ -127,7 +127,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         propertiesEditorView.expects(once()).method("display").with(eq(dataset));
 
         PropertiesEditorView viewProxy = (PropertiesEditorView) propertiesEditorView.proxy();
-        layout.expects(once()).method("add").with(eq(viewProxy));
+        layout.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
 
         // 1st display
         presenter.doShowProperties(viewProxy, dataset);
@@ -150,7 +150,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         view1.expects(once()).method("display").with(eq(dataset));
 
         PropertiesEditorView view1Proxy = (PropertiesEditorView) view1.proxy();
-        layout.expects(once()).method("add").with(eq(view1Proxy));
+        layout.expects(once()).method("add").with(eq(view1Proxy), new IsInstanceOf(String.class));
 
         presenter.doShowProperties(view1Proxy, dataset);
 
@@ -162,7 +162,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         view2.expects(once()).method("display").with(eq(dataset));
 
         PropertiesEditorView view2Proxy = (PropertiesEditorView) view2.proxy();
-        layout.expects(once()).method("add").with(eq(view2Proxy));
+        layout.expects(once()).method("add").with(eq(view2Proxy), new IsInstanceOf(String.class));
 
         presenter.doShowProperties(view2Proxy, dataset);
     }

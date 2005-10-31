@@ -28,9 +28,9 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 //FIXME: look at the common design b/w this and UserManagerWindow. Refactor ?
-public class SectorManagerWindow extends ReusableInteralFrame implements SectorManagerView {
+public class SectorsManagerWindow extends ReusableInteralFrame implements SectorManagerView {
 
-    private SectorManagerPresenter presenter;
+    private SectorsManagerPresenter presenter;
 
     private SortFilterSelectModel selectModel;
 
@@ -44,7 +44,7 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
 
     private DataServices dataServices;
 
-    public SectorManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
+    public SectorsManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
         super("Sectors Manager", desktop);
         this.parentConsole = parentConsole;
         this.desktop = desktop;
@@ -54,7 +54,7 @@ public class SectorManagerWindow extends ReusableInteralFrame implements SectorM
         this.setSize(new Dimension(475, 300));
     }
 
-    public void observe(SectorManagerPresenter presenter) {
+    public void observe(SectorsManagerPresenter presenter) {
         this.presenter = presenter;
     }
 

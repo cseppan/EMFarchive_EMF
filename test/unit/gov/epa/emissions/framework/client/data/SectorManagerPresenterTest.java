@@ -19,7 +19,7 @@ public class SectorManagerPresenterTest extends MockObjectTestCase {
         Mock view = mock(SectorManagerView.class);
         view.expects(once()).method("display").with(same(servicesProxy));
         
-        SectorManagerPresenter p = new SectorManagerPresenter((SectorManagerView) view.proxy(), servicesProxy);
+        SectorsManagerPresenter p = new SectorsManagerPresenter((SectorManagerView) view.proxy(), servicesProxy);
         view.expects(once()).method("observe").with(eq(p));
 
         p.doDisplay();
@@ -29,7 +29,7 @@ public class SectorManagerPresenterTest extends MockObjectTestCase {
         Mock view = mock(SectorManagerView.class);
         view.expects(once()).method("close").withNoArguments();
 
-        SectorManagerPresenter p = new SectorManagerPresenter((SectorManagerView) view.proxy(), null);
+        SectorsManagerPresenter p = new SectorsManagerPresenter((SectorManagerView) view.proxy(), null);
 
         p.doClose();
     }
@@ -43,7 +43,7 @@ public class SectorManagerPresenterTest extends MockObjectTestCase {
         updateSectorView.expects(once()).method("observe").with(new IsInstanceOf(UpdateSectorPresenter.class));
         updateSectorView.expects(once()).method("display").with(same(sector));
 
-        SectorManagerPresenter p = new SectorManagerPresenter((SectorManagerView) view.proxy(), null);
+        SectorsManagerPresenter p = new SectorsManagerPresenter((SectorManagerView) view.proxy(), null);
         p.doUpdateSector(sector, (UpdateSectorView) updateSectorView.proxy());
     }
 

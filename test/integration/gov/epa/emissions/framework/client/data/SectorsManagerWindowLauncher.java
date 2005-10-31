@@ -23,7 +23,7 @@ public class SectorsManagerWindowLauncher {
         JFrame frame = new JFrame();
         JDesktopPane desktop = new JDesktopPane();
 
-        SectorManagerWindow view = new SectorManagerWindow(frame, desktop);
+        SectorsManagerWindow view = new SectorsManagerWindow(frame, desktop);
         Sector sector1 = new Sector("desc1", "name1");
         SectorCriteria criteria = new SectorCriteria();
         criteria.setType("type1");
@@ -37,7 +37,7 @@ public class SectorsManagerWindowLauncher {
         Mock dataServices = new Mock(DataServices.class);
         dataServices.stubs().method(new IsEqual("getSectors")).will(new ReturnStub(sectors));
 
-        SectorManagerPresenter presenter = new SectorManagerPresenter(view, (DataServices) dataServices.proxy());
+        SectorsManagerPresenter presenter = new SectorsManagerPresenter(view, (DataServices) dataServices.proxy());
 
         launcher.addAsInternalFrame(view, frame, desktop);
 

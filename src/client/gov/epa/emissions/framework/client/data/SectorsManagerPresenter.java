@@ -4,13 +4,13 @@ import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataServices;
 
-public class SectorManagerPresenter {
+public class SectorsManagerPresenter {
 
     private SectorManagerView view;
 
     private DataServices services;
 
-    public SectorManagerPresenter(SectorManagerView view, DataServices services) {
+    public SectorsManagerPresenter(SectorManagerView view, DataServices services) {
         this.view = view;
         this.services = services;
     }
