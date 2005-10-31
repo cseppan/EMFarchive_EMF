@@ -37,8 +37,6 @@ public class ManageMenu extends JMenu {
 
     private ViewLayout viewLayout;
 
-    private DatasetTypesManagerWindow datasetTypesManagerView;
-
     // FIXME: where's the associated Presenter ?
     public ManageMenu(EmfSession session, EmfFrame parent, JDesktopPane desktop, MessagePanel messagePanel,
             ViewLayout windowLayoutManager) {
@@ -138,11 +136,12 @@ public class ManageMenu extends JMenu {
         if (viewLayout.activate("DatasetTypes Manager"))
             return;
 
-        datasetTypesManagerView = new DatasetTypesManagerWindow(parent, desktop);
-        viewLayout.add(datasetTypesManagerView, "DatasetTypes Manager");
-        desktop.add(datasetTypesManagerView);
+        DatasetTypesManagerWindow view = new DatasetTypesManagerWindow(parent, desktop);
+        viewLayout.add(view, "DatasetTypes Manager");
+        desktop.add(view);
 
-        DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(datasetTypesManagerView, services);
+        ViewLayout viewLayout = new DefaultViewLayout(view);
+        DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(view, services, viewLayout);
         presenter.doDisplay();
     }
 
