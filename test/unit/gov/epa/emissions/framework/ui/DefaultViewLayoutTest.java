@@ -6,7 +6,20 @@ import gov.epa.emissions.framework.client.ManagedView;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
-public class DefaultWindowLayoutManagerTest extends MockObjectTestCase {
+public class DefaultViewLayoutTest extends MockObjectTestCase {
+
+    public void testShouldLookupViewBasedOnId() {
+        Mock parent = mock(EmfView.class);
+        parent.expects(once()).method("getPosition").will(returnValue(new Position(10, 20)));
+
+        Mock child = mock(ManagedView.class);
+        child.expects(once()).method("setPosition");
+
+        ViewLayout layout = new DefaultViewLayout((EmfView) parent.proxy());
+
+        layout.add((ManagedView) child.proxy(), "1");
+        assertTrue("Should have been added to the layout", layout.available("1"));
+    }
 
     public void testShouldBeAbleToActivateViewBasedOnId() {
         Mock parent = mock(EmfView.class);
@@ -16,11 +29,11 @@ public class DefaultWindowLayoutManagerTest extends MockObjectTestCase {
         child.expects(once()).method("setPosition");
         child.expects(once()).method("bringToFront");
 
-        WindowLayoutManager layout = new DefaultWindowLayoutManager((EmfView) parent.proxy());
+        ViewLayout layout = new DefaultViewLayout((EmfView) parent.proxy());
 
         layout.add((ManagedView) child.proxy(), "1");
-        layout.activate("1");
-        layout.activate("2");// ignore
+        assertTrue("Should have been added to the layout", layout.activate("1"));
+        assertFalse("Should not activate as it was never added", layout.activate("2"));
     }
 
     public void testShouldPositionFirstWindowRelativeToParent() {
@@ -32,7 +45,7 @@ public class DefaultWindowLayoutManagerTest extends MockObjectTestCase {
         Position childPosition = new Position(parentPosition.x() + 25, parentPosition.y() + 25);
         child.expects(once()).method("setPosition").with(eq(childPosition));
 
-        WindowLayoutManager layout = new DefaultWindowLayoutManager((EmfView) parent.proxy());
+        ViewLayout layout = new DefaultViewLayout((EmfView) parent.proxy());
 
         layout.add((ManagedView) child.proxy(), "child");
     }
@@ -42,7 +55,7 @@ public class DefaultWindowLayoutManagerTest extends MockObjectTestCase {
         Position parentPosition = new Position(10, 20);
         parent.stubs().method("getPosition").will(returnValue(parentPosition));
 
-        WindowLayoutManager layout = new DefaultWindowLayoutManager((EmfView) parent.proxy());
+        ViewLayout layout = new DefaultViewLayout((EmfView) parent.proxy());
 
         Mock child1 = mock(ManagedView.class);
         Position child1Position = new Position(parentPosition.x() + 25, parentPosition.y() + 25);
@@ -62,7 +75,7 @@ public class DefaultWindowLayoutManagerTest extends MockObjectTestCase {
         Position parentPosition = new Position(10, 20);
         parent.stubs().method("getPosition").will(returnValue(parentPosition));
 
-        WindowLayoutManager layout = new DefaultWindowLayoutManager((EmfView) parent.proxy());
+        ViewLayout layout = new DefaultViewLayout((EmfView) parent.proxy());
 
         Mock child1 = mock(ManagedView.class);
         Position child1Position = new Position(parentPosition.x() + 25, parentPosition.y() + 25);

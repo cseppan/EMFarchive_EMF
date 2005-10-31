@@ -31,9 +31,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-public class UserManagerWindow extends ReusableInteralFrame implements UserManagerView {
+public class UsersManager extends ReusableInteralFrame implements UsersManagerView {
 
-    private UserManagerPresenter presenter;
+    private UsersManagerPresenter presenter;
 
     private SortFilterSelectModel selectModel;
 
@@ -52,7 +52,7 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
     private SortFilterSelectionPanel sortFilterSelectPanel;
 
     // FIXME: this class needs to be refactored into smaller components
-    public UserManagerWindow(User user, UserServices userServices, JFrame parentConsole, JDesktopPane desktop)
+    public UsersManager(User user, UserServices userServices, JFrame parentConsole, JDesktopPane desktop)
             throws Exception {
         super("User Manager", desktop);
         this.user = user;
@@ -243,7 +243,7 @@ public class UserManagerWindow extends ReusableInteralFrame implements UserManag
         presenter.doRegisterNewUser(registerUserView);
     }
 
-    public void observe(UserManagerPresenter presenter) {
+    public void observe(UsersManagerPresenter presenter) {
         this.presenter = presenter;
     }
 

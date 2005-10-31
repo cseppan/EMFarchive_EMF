@@ -3,8 +3,8 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
-import gov.epa.emissions.framework.ui.DefaultWindowLayoutManager;
-import gov.epa.emissions.framework.ui.WindowLayoutManager;
+import gov.epa.emissions.framework.ui.DefaultViewLayout;
+import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -14,19 +14,19 @@ import java.util.List;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 
-public class UserManagerWindowLauncher {
+public class UsersManagerWindowLauncher {
 
     public static void main(String[] args) throws Exception {
-        UserManagerWindowLauncher launcher = new UserManagerWindowLauncher();
+        UsersManagerWindowLauncher launcher = new UsersManagerWindowLauncher();
 
         UserServices userAdmin = launcher.createUserAdmin();
         JFrame frame = new JFrame();
 
         JDesktopPane desktop = new JDesktopPane();
-        UserManagerWindow view = new UserManagerWindow(null, userAdmin, frame, desktop);
+        UsersManager view = new UsersManager(null, userAdmin, frame, desktop);
 
-        WindowLayoutManager layoutManager = new DefaultWindowLayoutManager(view);
-        UserManagerPresenter presenter = new UserManagerPresenter(null, userAdmin, layoutManager);
+        ViewLayout layoutManager = new DefaultViewLayout(view);
+        UsersManagerPresenter presenter = new UsersManagerPresenter(null, userAdmin, layoutManager);
         presenter.display(view);
 
         launcher.addAsInternalFrame(view, frame, desktop);
@@ -37,7 +37,7 @@ public class UserManagerWindowLauncher {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private void addAsInternalFrame(UserManagerWindow console, JFrame frame, JDesktopPane desktop) {
+    private void addAsInternalFrame(UsersManager console, JFrame frame, JDesktopPane desktop) {
         desktop.setName("EMF Console");
         desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
         desktop.add(console);

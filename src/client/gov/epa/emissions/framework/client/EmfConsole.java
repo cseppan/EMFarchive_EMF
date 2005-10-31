@@ -6,8 +6,8 @@ import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.ui.DefaultWindowLayoutManager;
-import gov.epa.emissions.framework.ui.WindowLayoutManager;
+import gov.epa.emissions.framework.ui.DefaultViewLayout;
+import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -37,7 +37,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private StatusPresenter presenter;
 
-    private WindowLayoutManager windowLayoutManager;
+    private ViewLayout windowLayoutManager;
 
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(EmfSession session) {
@@ -45,7 +45,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         user = session.getUser();
         this.serviceLocator = session.getServiceLocator();
 
-        this.windowLayoutManager = new DefaultWindowLayoutManager(this);
+        this.windowLayoutManager = new DefaultViewLayout(this);
 
         setProperties();
         setLayout(session);

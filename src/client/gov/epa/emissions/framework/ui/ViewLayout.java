@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.ui;
 
 import gov.epa.emissions.framework.client.ManagedView;
 
-public interface WindowLayoutManager {
+public interface ViewLayout {
 
     void add(ManagedView view, Object id);
 
@@ -10,6 +10,12 @@ public interface WindowLayoutManager {
     // removed
     void remove();
 
-    void activate(Object id);
+    /**
+     * @param id
+     * @return true, if activation successful
+     */
+    boolean activate(Object id);
+
+    boolean available(Object id);
 
 }

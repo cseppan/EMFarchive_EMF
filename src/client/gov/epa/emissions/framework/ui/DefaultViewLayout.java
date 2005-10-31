@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.client.ManagedView;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DefaultWindowLayoutManager implements WindowLayoutManager {
+public class DefaultViewLayout implements ViewLayout {
 
     private EmfView parent;
 
@@ -14,7 +14,7 @@ public class DefaultWindowLayoutManager implements WindowLayoutManager {
 
     private Map children;
 
-    public DefaultWindowLayoutManager(EmfView parent) {
+    public DefaultViewLayout(EmfView parent) {
         this.parent = parent;
         childCount = 0;
 
@@ -41,12 +41,17 @@ public class DefaultWindowLayoutManager implements WindowLayoutManager {
         children.put(id, child);
     }
 
-    public void activate(Object id) {
-        if (!children.containsKey(id))
-            return;
+    public boolean activate(Object id) {
+        if (!available(id))
+            return false;
 
         ManagedView view = (ManagedView) children.get(id);
         view.bringToFront();
+        return true;
+    }
+
+    public boolean available(Object id) {
+        return children.containsKey(id);
     }
 
 }

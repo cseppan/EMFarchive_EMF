@@ -10,7 +10,7 @@ import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.ui.WindowLayoutManager;
+import gov.epa.emissions.framework.ui.ViewLayout;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -29,9 +29,9 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
     protected void setUp() {
         view = mock(DatasetsBrowserView.class);
 
-        layout = mock(WindowLayoutManager.class);
+        layout = mock(ViewLayout.class);
         dataServices = mock(DataServices.class);
-        presenter = new DatasetsBrowserPresenter((DataServices) dataServices.proxy(), (WindowLayoutManager) layout
+        presenter = new DatasetsBrowserPresenter((DataServices) dataServices.proxy(), (ViewLayout) layout
                 .proxy());
 
         view.expects(once()).method("observe").with(eq(presenter));

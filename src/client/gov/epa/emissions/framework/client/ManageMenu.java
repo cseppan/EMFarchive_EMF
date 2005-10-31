@@ -3,9 +3,8 @@ package gov.epa.emissions.framework.client;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.admin.MyProfileWindow;
 import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
-import gov.epa.emissions.framework.client.admin.UpdateUserWindow;
-import gov.epa.emissions.framework.client.admin.UserManagerPresenter;
-import gov.epa.emissions.framework.client.admin.UserManagerWindow;
+import gov.epa.emissions.framework.client.admin.UsersManagerPresenter;
+import gov.epa.emissions.framework.client.admin.UsersManager;
 import gov.epa.emissions.framework.client.data.DatasetTypesManagerPresenter;
 import gov.epa.emissions.framework.client.data.DatasetTypesManagerWindow;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserPresenter;
@@ -16,8 +15,8 @@ import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.DatasetTypesServices;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
-import gov.epa.emissions.framework.ui.DefaultWindowLayoutManager;
-import gov.epa.emissions.framework.ui.WindowLayoutManager;
+import gov.epa.emissions.framework.ui.DefaultViewLayout;
+import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,13 +35,7 @@ public class ManageMenu extends JMenu {
 
     private EmfFrame parent;
 
-    private UserManagerWindow userManagerView;
-
-    private UpdateUserWindow myProfileView;
-
-    private DatasetsBrowserWindow datasetsBrowserView;
-
-    private WindowLayoutManager windowLayoutManager;
+    private ViewLayout viewLayout;
 
     private SectorsManagerWindow sectorManagerView;
 
@@ -50,14 +43,14 @@ public class ManageMenu extends JMenu {
 
     // FIXME: where's the associated Presenter ?
     public ManageMenu(EmfSession session, EmfFrame parent, JDesktopPane desktop, MessagePanel messagePanel,
-            WindowLayoutManager windowLayoutManager) {
+            ViewLayout windowLayoutManager) {
         super("Manage");
         super.setName("manage");
 
         this.session = session;
         this.desktop = desktop;
         this.parent = parent;
-        this.windowLayoutManager = windowLayoutManager;
+        this.viewLayout = windowLayoutManager;
 
         super.add(createDatasets(parent, messagePanel));
         super.add(createDatasetTypes(session.getDatasetTypesServices(), parent, messagePanel));
@@ -144,14 +137,11 @@ public class ManageMenu extends JMenu {
     }
 
     protected void displayDatasetTypes(DatasetTypesServices services, EmfFrame parent) throws EmfException {
-        // FIXME: cull out the pattern - singleton
-        if (datasetTypesManagerView != null) {
-            datasetTypesManagerView.bringToFront();
+        if (viewLayout.activate("DatasetTypes Manager"))
             return;
-        }
 
         datasetTypesManagerView = new DatasetTypesManagerWindow(parent, desktop);
-        windowLayoutManager.add(datasetTypesManagerView, "DatasetTypes Manager");
+        viewLayout.add(datasetTypesManagerView, "DatasetTypes Manager");
         desktop.add(datasetTypesManagerView);
 
         DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(datasetTypesManagerView, services);
@@ -159,14 +149,11 @@ public class ManageMenu extends JMenu {
     }
 
     protected void displaySectors(DataServices dataServices, EmfFrame parent) throws EmfException {
-        // FIXME: cull out the pattern - singleton
-        if (sectorManagerView != null) {
-            sectorManagerView.bringToFront();
+        if (viewLayout.activate("Sectors Manager"))
             return;
-        }
 
         sectorManagerView = new SectorsManagerWindow(parent, desktop);
-        windowLayoutManager.add(sectorManagerView, "Sectors Manager");
+        viewLayout.add(sectorManagerView, "Sectors Manager");
         desktop.add(sectorManagerView);
 
         SectorsManagerPresenter presenter = new SectorsManagerPresenter(sectorManagerView, dataServices);
@@ -174,28 +161,24 @@ public class ManageMenu extends JMenu {
     }
 
     private void displayDatasets(EmfFrame parent) throws EmfException {
-        if (datasetsBrowserView != null) {
-            datasetsBrowserView.bringToFront();
+        if (viewLayout.activate("Datasets Browser"))
             return;
-        }
 
-        datasetsBrowserView = new DatasetsBrowserWindow(session, parent, desktop);
-        windowLayoutManager.add(datasetsBrowserView, "Datasets Browser");
+        DatasetsBrowserWindow datasetsBrowserView = new DatasetsBrowserWindow(session, parent, desktop);
+        viewLayout.add(datasetsBrowserView, "Datasets Browser");
         desktop.add(datasetsBrowserView);
 
-        WindowLayoutManager browserLayout = new DefaultWindowLayoutManager(datasetsBrowserView);
+        ViewLayout browserLayout = new DefaultViewLayout(datasetsBrowserView);
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session.getDataServices(), browserLayout);
         presenter.doDisplay(datasetsBrowserView);
     }
 
     private void displayMyProfile(EmfSession session) {
-        if (myProfileView != null) {
-            myProfileView.bringToFront();
+        if (viewLayout.activate("My Profile"))
             return;
-        }
 
-        myProfileView = new MyProfileWindow(session.getUser(), desktop);
-        windowLayoutManager.add(myProfileView, "My Profile");
+        MyProfileWindow myProfileView = new MyProfileWindow(session.getUser(), desktop);
+        viewLayout.add(myProfileView, "My Profile");
         desktop.add(myProfileView);
 
         UpdateUserPresenter presenter = new UpdateUserPresenter(session.getUserServices());
@@ -203,20 +186,20 @@ public class ManageMenu extends JMenu {
     }
 
     public void displayUserManager() {
-        if (userManagerView != null) {
-            userManagerView.bringToFront();
+        if (viewLayout.activate("Users Manager"))
             return;
-        }
 
         try {
             UserServices userServices = session.getUserServices();
 
-            userManagerView = new UserManagerWindow(session.getUser(), userServices, parent, desktop);
-            desktop.add(userManagerView);
+            UsersManager usesrManagerView = new UsersManager(session.getUser(), userServices, parent, desktop);
+            viewLayout.add(usesrManagerView, "Users Manager");
+            desktop.add(usesrManagerView);
 
-            WindowLayoutManager layoutManager = new DefaultWindowLayoutManager(userManagerView);
-            UserManagerPresenter presenter = new UserManagerPresenter(session.getUser(), userServices, layoutManager);
-            presenter.display(userManagerView);
+            ViewLayout userManagerViewLayout = new DefaultViewLayout(usesrManagerView);
+            UsersManagerPresenter presenter = new UsersManagerPresenter(session.getUser(), userServices,
+                    userManagerViewLayout);
+            presenter.display(usesrManagerView);
         } catch (Exception e) {
             // TODO: error handling
         }

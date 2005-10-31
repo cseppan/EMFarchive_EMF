@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.client.login.LoginWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.UserServices;
-import gov.epa.emissions.framework.ui.WindowLayoutManager;
+import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,13 +19,11 @@ import javax.swing.JMenuItem;
 
 public class FileMenu extends JMenu {
 
-    private ImportWindow importView;
+    private ViewLayout viewLayout;
 
-    private WindowLayoutManager windowLayoutManager;
-
-    //FIXME: where's the associated Presenter ?
+    // FIXME: where's the associated Presenter ?
     public FileMenu(EmfSession session, EmfConsole parent, JDesktopPane desktop, MessagePanel messagePanel,
-            WindowLayoutManager windowLayoutManager) {
+            ViewLayout windowLayoutManager) {
         super("File");
         super.setName("file");
 
@@ -34,7 +32,7 @@ public class FileMenu extends JMenu {
         super.add(createLogout(session, parent));
         super.add(createExit());
 
-        this.windowLayoutManager = windowLayoutManager;
+        this.viewLayout = windowLayoutManager;
     }
 
     private JMenuItem createExit() {
@@ -86,16 +84,14 @@ public class FileMenu extends JMenu {
     }
 
     protected void displayImport(EmfSession session, JDesktopPane desktop) throws EmfException {
-        if (importView != null) {
-            importView.bringToFront();
+        if (viewLayout.activate("Import Dataset - FileMenu"))
             return;
-        }
 
         ServiceLocator serviceLocator = session.getServiceLocator();
         ExImServices eximServices = serviceLocator.getExImServices();
 
-        importView = new ImportWindow(serviceLocator.getDatasetTypesServices(), desktop);
-        windowLayoutManager.add(importView, "Import Dataset - FileMenu");
+        ImportWindow importView = new ImportWindow(serviceLocator.getDatasetTypesServices(), desktop);
+        viewLayout.add(importView, "Import Dataset - FileMenu");
         desktop.add(importView);
 
         ImportPresenter presenter = new ImportPresenter(session.getUser(), eximServices);

@@ -3,9 +3,9 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.framework.client.EmfView;
 import gov.epa.emissions.framework.services.User;
 
-public interface UserManagerView extends EmfView {
+public interface UsersManagerView extends EmfView {
 
-    void observe(UserManagerPresenter presenter);
+    void observe(UsersManagerPresenter presenter);
 
     void refresh();
 

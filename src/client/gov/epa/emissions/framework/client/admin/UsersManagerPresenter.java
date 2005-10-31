@@ -4,24 +4,24 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
-import gov.epa.emissions.framework.ui.WindowLayoutManager;
+import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserManagerPresenter {
+public class UsersManagerPresenter {
 
-    private UserManagerView view;
+    private UsersManagerView view;
 
     private UserServices userServices;
 
     private User user;
 
-    private WindowLayoutManager layoutManager;
+    private ViewLayout layoutManager;
 
     private Map updateViewsMap;
 
-    public UserManagerPresenter(User user, UserServices userServices, WindowLayoutManager layoutManager) {
+    public UsersManagerPresenter(User user, UserServices userServices, ViewLayout layoutManager) {
         this.user = user;
         this.userServices = userServices;
         this.layoutManager = layoutManager;
@@ -33,7 +33,7 @@ public class UserManagerPresenter {
         view.close();
     }
 
-    public void display(UserManagerView view) {
+    public void display(UsersManagerView view) {
         this.view = view;
         view.observe(this);
 

@@ -9,7 +9,7 @@ import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.ui.WindowLayoutManager;
+import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,15 +18,15 @@ public class DatasetsBrowserPresenter {
 
     private DatasetsBrowserView view;
 
-    private WindowLayoutManager windowLayoutManager;
+    private ViewLayout viewLayout;
 
     private DataServices dataServices;
 
     private Map editorsMap;
 
-    public DatasetsBrowserPresenter(DataServices dataServices, WindowLayoutManager windowLayoutManager) {
+    public DatasetsBrowserPresenter(DataServices dataServices, ViewLayout windowLayoutManager) {
         this.dataServices = dataServices;
-        this.windowLayoutManager = windowLayoutManager;
+        this.viewLayout = windowLayoutManager;
         editorsMap = new HashMap();
     }
 
@@ -50,7 +50,8 @@ public class DatasetsBrowserPresenter {
         }
 
         view.clearMessage();
-        windowLayoutManager.add(exportView, "Export Datasets");
+        // TODO: attache the dataset names to the id
+        viewLayout.add(exportView, "Export Datasets");
 
         presenter.display(exportView);
     }
@@ -82,7 +83,7 @@ public class DatasetsBrowserPresenter {
     }
 
     private void showPropertiesEditor(PropertiesEditorView propertiesEditorView, EmfDataset dataset) {
-        windowLayoutManager.add(propertiesEditorView, "Properties - " + dataset.getName());
+        viewLayout.add(propertiesEditorView, "Properties - " + dataset.getName());
 
         PropertiesEditorPresenter presenter = new PropertiesEditorPresenter(dataset, dataServices);
         presenter.display(propertiesEditorView);
@@ -92,7 +93,7 @@ public class DatasetsBrowserPresenter {
 
     public void doNew(ImportView importView, ImportPresenter importPresenter) throws EmfException {
         view.clearMessage();
-        windowLayoutManager.add(importView, "Datasets Browser - Import");
+        viewLayout.add(importView, "Datasets Browser - Import");
 
         importPresenter.display(importView);
     }

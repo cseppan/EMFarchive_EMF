@@ -4,32 +4,32 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserServices;
-import gov.epa.emissions.framework.ui.WindowLayoutManager;
+import gov.epa.emissions.framework.ui.ViewLayout;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 import org.jmock.core.constraint.IsInstanceOf;
 
-public class UserManagerPresenterTest extends MockObjectTestCase {
+public class UsersManagerPresenterTest extends MockObjectTestCase {
 
     private Mock view;
 
-    private UserManagerPresenter presenter;
+    private UsersManagerPresenter presenter;
 
     private Mock layoutManager;
 
     protected void setUp() {
-        layoutManager = mock(WindowLayoutManager.class);
+        layoutManager = mock(ViewLayout.class);
         Mock userServices = mock(UserServices.class);
-        presenter = new UserManagerPresenter(null, (UserServices) userServices.proxy(),
-                (WindowLayoutManager) layoutManager.proxy());
+        presenter = new UsersManagerPresenter(null, (UserServices) userServices.proxy(),
+                (ViewLayout) layoutManager.proxy());
 
-        view = mock(UserManagerView.class);
+        view = mock(UsersManagerView.class);
 
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();
 
-        presenter.display((UserManagerView) view.proxy());
+        presenter.display((UsersManagerView) view.proxy());
     }
 
     public void testShouldCloseViewOnClickOfCloseButton() {
@@ -45,9 +45,9 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         User user = new User();
         user.setUsername("joe");
 
-        Mock layoutManager = mock(WindowLayoutManager.class);
-        UserManagerPresenter presenter = new UserManagerPresenter(user, (UserServices) userServices.proxy(),
-                (WindowLayoutManager) layoutManager.proxy());
+        Mock layoutManager = mock(ViewLayout.class);
+        UsersManagerPresenter presenter = new UsersManagerPresenter(user, (UserServices) userServices.proxy(),
+                (ViewLayout) layoutManager.proxy());
 
         Mock view = createView();
         view.expects(once()).method("refresh").withNoArguments();
@@ -58,13 +58,13 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         presenter.doDelete(new User[] { matts });
     }
 
-    private void displayView(UserManagerPresenter presenter, Mock view) {
+    private void displayView(UsersManagerPresenter presenter, Mock view) {
         view.expects(once()).method("observe").with(eq(presenter));
-        presenter.display((UserManagerView) view.proxy());
+        presenter.display((UsersManagerView) view.proxy());
     }
 
     private Mock createView() {
-        Mock view = mock(UserManagerView.class);
+        Mock view = mock(UsersManagerView.class);
         view.expects(once()).method("display").withNoArguments();
         view.expects(once()).method("promptDelete").withAnyArguments().will(returnValue(Boolean.TRUE));
         view.expects(once()).method("clearMessage").withNoArguments();
@@ -193,7 +193,7 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
         User user = new User();
         user.setUsername("joe");
 
-        UserManagerPresenter presenter = new UserManagerPresenter(user, null, null);
+        UsersManagerPresenter presenter = new UsersManagerPresenter(user, null, null);
         displayView(presenter, createView());
 
         try {
@@ -207,7 +207,7 @@ public class UserManagerPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldNotDeleteAdminOnNotifyDelete() throws UserException {
-        UserManagerPresenter presenter = new UserManagerPresenter(null, null, null);
+        UsersManagerPresenter presenter = new UsersManagerPresenter(null, null, null);
         displayView(presenter, createView());
 
         User admin = new User();
