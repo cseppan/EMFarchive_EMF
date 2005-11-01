@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
@@ -13,7 +14,7 @@ import java.util.List;
 public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implements SelectableEmfTableData {
     private List rows;
 
-    public DatasetTypeKeywordsTableData(String[] keywords) {
+    public DatasetTypeKeywordsTableData(Keyword[] keywords) {
         this.rows = createRows(keywords);
     }
 
@@ -30,7 +31,7 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
     }
 
     public void add(String keyword) {
-        rows.add(row(keyword));
+        rows.add(row(new Keyword(keyword)));
     }
 
     public void setValueAt(Object value, int row, int col) {
@@ -41,9 +42,9 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
         editableRow.setValueAt(value, col);
     }
 
-    public String[] sources() {
+    public Keyword[] sources() {
         List sources = sourcesList();
-        return (String[]) sources.toArray(new String[0]);
+        return (Keyword[]) sources.toArray(new Keyword[0]);
     }
 
     public void addBlankRow() {
@@ -54,7 +55,7 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
         remove(getSelected());
     }
 
-    private List createRows(String[] keywords) {
+    private List createRows(Keyword[] keywords) {
         List rows = new ArrayList();
         for (int i = 0; i < keywords.length; i++)
             rows.add(row(keywords[i]));
@@ -65,15 +66,15 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
     void remove(String keyword) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            String source = (String) row.source();
-            if (source == keyword) {
+            Keyword source = (Keyword) row.source();
+            if (source.getName() == keyword) {
                 rows.remove(row);
                 return;
             }
         }
     }
 
-    private EditableRow row(String keyword) {
+    private EditableRow row(Keyword keyword) {
         RowSource source = new DatasetTypeKeywordRowSource(keyword);
         return new EditableRow(source);
     }

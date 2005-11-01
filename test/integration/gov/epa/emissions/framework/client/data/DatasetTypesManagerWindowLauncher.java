@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.services.DatasetTypesServices;
 import gov.epa.emissions.framework.ui.DefaultViewLayout;
@@ -27,11 +28,11 @@ public class DatasetTypesManagerWindowLauncher {
         DatasetTypesManagerWindow view = new DatasetTypesManagerWindow(frame, desktop);
         DatasetType type1 = new DatasetType();
         type1.setName("type1");
-        type1.setKeywords(new String[]{"1", "2", "3"});
+        type1.setKeywords(new Keyword[] { new Keyword("1"), new Keyword("2"), new Keyword("3") });
         DatasetType type2 = new DatasetType();
         type2.setName("type2");
-        type2.setKeywords(new String[]{"11", "12", "13"});
-        
+        type2.setKeywords(new Keyword[] { new Keyword("11"), new Keyword("12"), new Keyword("13") });
+
         DatasetType[] types = { type1, type2 };
         Mock services = new Mock(DatasetTypesServices.class);
         services.stubs().method(new IsEqual("getDatasetTypes")).will(new ReturnStub(types));

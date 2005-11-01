@@ -14,7 +14,6 @@ import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.ExternalSource;
 import gov.epa.emissions.commons.io.InternalSource;
-import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Table;
 
 import java.util.ArrayList;
@@ -30,326 +29,293 @@ import java.util.Map;
  * 
  */
 public class EmfDataset implements Dataset {
-	// unique id needed for hibernate persistence
-	private long datasetid;
 
-	private String name;
+    private long datasetid;// unique id needed for hibernate persistence
 
-	private int year;
+    private String name;
 
-	private String description;
+    private int year;
 
-	private String status;
+    private String description;
 
-	private String region;
+    private String status;
 
-	private String country = "US";
+    private String region;
 
-	private String units;
+    private String country = "US";
 
-	private String creator;
+    private String units;
 
-	private String temporalResolution;
+    private String creator;
 
-	private Date startDateTime;
+    private String temporalResolution;
 
-	private Date endDateTime;
+    private Date startDateTime;
 
-	private List tables;
+    private Date endDateTime;
 
-	private String sector;
+    private List tables;
 
-	private String project;
+    private String sector;
 
-	private Date createdDateTime;
+    private String project;
 
-	private Date modifiedDateTime;
+    private Date createdDateTime;
 
-	private Date accessedDateTime;
+    private Date modifiedDateTime;
 
-	private List datasources;
+    private Date accessedDateTime;
 
-	private DatasetType datasetType;
+    private DatasetType datasetType;
 
-	private List internalSources;
+    private List internalSources;
 
-	private List externalSources;
-    
+    private List externalSources;
+
     private List keyValsList;
 
-	public EmfDataset() {
-		tables = new ArrayList();
-		internalSources = new ArrayList();
-		externalSources = new ArrayList();
-	}
+    public EmfDataset() {
+        tables = new ArrayList();
+        internalSources = new ArrayList();
+        externalSources = new ArrayList();
+        keyValsList = new ArrayList();
+    }
 
-	public Date getAccessedDateTime() {
-		return accessedDateTime;
-	}
+    public Date getAccessedDateTime() {
+        return accessedDateTime;
+    }
 
-	public void setAccessedDateTime(Date accessedDateTime) {
-		this.accessedDateTime = accessedDateTime;
-	}
+    public void setAccessedDateTime(Date accessedDateTime) {
+        this.accessedDateTime = accessedDateTime;
+    }
 
-	public Date getCreatedDateTime() {
-		return createdDateTime;
-	}
+    public Date getCreatedDateTime() {
+        return createdDateTime;
+    }
 
-	public void setCreatedDateTime(Date createdDateTime) {
-		this.createdDateTime = createdDateTime;
-	}
+    public void setCreatedDateTime(Date createdDateTime) {
+        this.createdDateTime = createdDateTime;
+    }
 
-	public Date getModifiedDateTime() {
-		return modifiedDateTime;
-	}
+    public Date getModifiedDateTime() {
+        return modifiedDateTime;
+    }
 
-	public void setModifiedDateTime(Date modifiedDateTime) {
-		this.modifiedDateTime = modifiedDateTime;
-	}
+    public void setModifiedDateTime(Date modifiedDateTime) {
+        this.modifiedDateTime = modifiedDateTime;
+    }
 
-	public String getProject() {
-		return project;
-	}
+    public String getProject() {
+        return project;
+    }
 
-	public void setProject(String project) {
-		this.project = project;
-	}
+    public void setProject(String project) {
+        this.project = project;
+    }
 
-	public String getSector() {
-		return sector;
-	}
+    public String getSector() {
+        return sector;
+    }
 
-	public void setSector(String sector) {
-		this.sector = sector;
-	}
+    public void setSector(String sector) {
+        this.sector = sector;
+    }
 
-	public String getDatasetTypeName() {
-		return datasetType.getName();
-	}
+    public String getDatasetTypeName() {
+        return datasetType.getName();
+    }
 
-	public DatasetType getDatasetType() {
-		return datasetType;
-	}
+    public DatasetType getDatasetType() {
+        return datasetType;
+    }
 
-	public void setUnits(String units) {
-		this.units = units;
-	}
+    public void setUnits(String units) {
+        this.units = units;
+    }
 
-	public void setTemporalResolution(String temporalResolution) {
-		this.temporalResolution = temporalResolution;
-	}
+    public void setTemporalResolution(String temporalResolution) {
+        this.temporalResolution = temporalResolution;
+    }
 
-	public void setRegion(String region) {
-		this.region = region;
-	}
+    public void setRegion(String region) {
+        this.region = region;
+    }
 
-	public void setYear(int year) {
-		this.year = year;
-	}
+    public void setYear(int year) {
+        this.year = year;
+    }
 
-	public void setStartDateTime(Date time) {
-		this.startDateTime = time;
-	}
+    public void setStartDateTime(Date time) {
+        this.startDateTime = time;
+    }
 
-	public void setStopDateTime(Date time) {
-		this.endDateTime = time;
-	}
+    public void setStopDateTime(Date time) {
+        this.endDateTime = time;
+    }
 
-	public String getRegion() {
-		return region;
-	}
+    public String getRegion() {
+        return region;
+    }
 
-	public int getYear() {
-		return year;
-	}
+    public int getYear() {
+        return year;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public Table getTable(String tableType) {
-		for (Iterator iter = tables.iterator(); iter.hasNext();) {
-			Table element = (Table) iter.next();
-			if (element.getType().equals(tableType))
-				return element;
-		}
+    public Table getTable(String tableType) {
+        for (Iterator iter = tables.iterator(); iter.hasNext();) {
+            Table element = (Table) iter.next();
+            if (element.getType().equals(tableType))
+                return element;
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	// TODO: return a list. Also, change the Hibernate mapping
-	public Map getTablesMap() {
-		Map tablesMap = new HashMap();
+    // TODO: return a list. Also, change the Hibernate mapping
+    public Map getTablesMap() {
+        Map tablesMap = new HashMap();
 
-		for (Iterator iter = tables.iterator(); iter.hasNext();) {
-			Table element = (Table) iter.next();
-			tablesMap.put(element.getType(), element.getName());
-		}
+        for (Iterator iter = tables.iterator(); iter.hasNext();) {
+            Table element = (Table) iter.next();
+            tablesMap.put(element.getType(), element.getName());
+        }
 
-		return tablesMap;
-	}
+        return tablesMap;
+    }
 
-	public void setDatasetType(DatasetType datasetType) {
-		this.datasetType = datasetType;
-	}
+    public void setDatasetType(DatasetType datasetType) {
+        this.datasetType = datasetType;
+    }
 
-	public void addTable(Table table) {
-		tables.add(table);
-	}
+    public void addTable(Table table) {
+        tables.add(table);
+    }
 
-	public String getCountry() {
-		return country;
-	}
+    public String getCountry() {
+        return country;
+    }
 
-	public void setCountry(String country) {
-		this.country = country;
-	}
+    public void setCountry(String country) {
+        this.country = country;
+    }
 
-	public String getUnits() {
-		return units;
-	}
+    public String getUnits() {
+        return units;
+    }
 
-	public void setTablesMap(Map tablesMap) {
-		tables.clear();
+    public void setTablesMap(Map tablesMap) {
+        tables.clear();
 
-		for (Iterator iter = tablesMap.keySet().iterator(); iter.hasNext();) {
-			String tableType = (String) iter.next();
-			tables.add(new Table((String) tablesMap.get(tableType), tableType));
-		}
-	}
+        for (Iterator iter = tablesMap.keySet().iterator(); iter.hasNext();) {
+            String tableType = (String) iter.next();
+            tables.add(new Table((String) tablesMap.get(tableType), tableType));
+        }
+    }
 
-	public void setCreator(String creator) {
-		this.creator = creator;
-	}
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
 
-	public String getCreator() {
-		return creator;
-	}
+    public String getCreator() {
+        return creator;
+    }
 
-	// FIXME: should use TemporalResolution type instead
-	public String getTemporalResolution() {
-		return temporalResolution;
-	}
+    // FIXME: should use TemporalResolution type instead
+    public String getTemporalResolution() {
+        return temporalResolution;
+    }
 
-	public Date getStartDateTime() {
-		return startDateTime;
-	}
+    public Date getStartDateTime() {
+        return startDateTime;
+    }
 
-	public Date getStopDateTime() {
-		return endDateTime;
-	}
+    public Date getStopDateTime() {
+        return endDateTime;
+    }
 
-	public long getDatasetid() {
-		return datasetid;
-	}
+    public long getDatasetid() {
+        return datasetid;
+    }
 
-	public void setDatasetid(long datasetid) {
-		this.datasetid = datasetid;
-	}
+    public void setDatasetid(long datasetid) {
+        this.datasetid = datasetid;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public Table[] getTables() {
-		return (Table[]) tables.toArray(new Table[0]);
-	}
+    public Table[] getTables() {
+        return (Table[]) tables.toArray(new Table[0]);
+    }
 
-	public boolean equals(Object other) {
-		if (other == null || !(other instanceof Dataset)) {
-			return false;
-		}
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof Dataset)) {
+            return false;
+        }
 
-		Dataset otherDataset = (Dataset) other;
+        Dataset otherDataset = (Dataset) other;
 
-		return (name.equals(otherDataset.getName()));
-	}
+        return (name.equals(otherDataset.getName()));
+    }
 
-	public String getStatus() {
-		return status;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	public List getDatasources() {
-		return this.datasources;
-	}
+    public InternalSource[] getInternalSources() {
+        return (InternalSource[]) this.internalSources.toArray(new InternalSource[0]);
+    }
 
-	public void setDatasources(List datasources) {
-		this.datasources = datasources;
-	}
-
-	public void setDatasetType(String datasetType) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void setDataSourcesNames(Map datasourcesNames) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public Map getDataSourcesNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public InternalSource[] getInternalSources() {
-		return (InternalSource[])this.internalSources.toArray(new InternalSource[0]);
-	}
-
-	public void setInternalSources(InternalSource[] internalSources) {
-		this.internalSources.clear();
-		this.internalSources.addAll(Arrays.asList(internalSources));
-	}
+    public void setInternalSources(InternalSource[] internalSources) {
+        this.internalSources.clear();
+        this.internalSources.addAll(Arrays.asList(internalSources));
+    }
 
     public void addInternalSource(InternalSource source) {
-    	this.internalSources.add(source);
+        this.internalSources.add(source);
     }
 
-	public ExternalSource[] getExternalSources() {
-		return (ExternalSource[])this.externalSources.toArray(new ExternalSource[0]);
-	}
-
-	public void setExternalSources(ExternalSource[] externalSources) {
-		this.externalSources.clear();
-		this.externalSources.addAll(Arrays.asList(externalSources));
-	}
-
-	public void addExternalSource(ExternalSource source) {
-		this.externalSources.add(source);
-	}
-
-
-    /**
-     * @param keyValsList The keyValsList to set.
-     */
-    public void setKeyValsList(List keyValsList) {
-        this.keyValsList = keyValsList;
+    public ExternalSource[] getExternalSources() {
+        return (ExternalSource[]) this.externalSources.toArray(new ExternalSource[0]);
     }
 
-    public void addKeyVal(KeyVal keyval) {
+    public void setExternalSources(ExternalSource[] externalSources) {
+        this.externalSources.clear();
+        this.externalSources.addAll(Arrays.asList(externalSources));
+    }
+
+    public void addExternalSource(ExternalSource source) {
+        this.externalSources.add(source);
+    }
+
+    public void addKeyVal(EmfKeyVal keyval) {
         keyValsList.add(keyval);
     }
 
-    public KeyVal[] getKeyVals() {
-        return (KeyVal[]) keyValsList.toArray(new KeyVal[0]);
+    public EmfKeyVal[] getKeyVals() {
+        return (EmfKeyVal[]) keyValsList.toArray(new EmfKeyVal[0]);
     }
 
-    public void setKeyVals(KeyVal[] keyvals) {
+    public void setKeyVals(EmfKeyVal[] keyvals) {
         keyValsList.clear();
         keyValsList.addAll(Arrays.asList(keyvals));
     }
-
 
 }

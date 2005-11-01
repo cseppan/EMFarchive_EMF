@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public class DatasetTypeKeywordsTableDataTest extends TestCase {
     private DatasetTypeKeywordsTableData data;
 
     protected void setUp() {
-        data = new DatasetTypeKeywordsTableData(new String[] { "keyword1", "keyword2" });
+        data = new DatasetTypeKeywordsTableData(new Keyword[] { new Keyword("keyword1"), new Keyword("keyword2") });
     }
 
     public void testShouldHaveTwoColumn() {
@@ -41,8 +42,8 @@ public class DatasetTypeKeywordsTableDataTest extends TestCase {
     }
 
     public void testShouldReturnARowRepresentingAKeywordEntry() {
-        assertEquals("keyword1", data.element(0));
-        assertEquals("keyword2", data.element(1));
+        assertEquals("keyword1", ((Keyword)data.element(0)).getName());
+        assertEquals("keyword2", ((Keyword)data.element(1)).getName());
     }
 
     public void testShouldRemoveKeywordOnRemove() {
@@ -62,11 +63,11 @@ public class DatasetTypeKeywordsTableDataTest extends TestCase {
     public void testShouldReturnCurrentlyHeldKeyword() {
         data.add("keyword3");
 
-        String[] sources = data.sources();
+        Keyword[] sources = data.sources();
         assertEquals(3, sources.length);
-        assertEquals("keyword1", sources[0]);
-        assertEquals("keyword2", sources[1]);
-        assertEquals("keyword3", sources[2]);
+        assertEquals("keyword1", sources[0].getName());
+        assertEquals("keyword2", sources[1].getName());
+        assertEquals("keyword3", sources[2].getName());
     }
 
 }

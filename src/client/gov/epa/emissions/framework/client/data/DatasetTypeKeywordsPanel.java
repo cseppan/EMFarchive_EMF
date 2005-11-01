@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.Keyword;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
@@ -18,9 +19,9 @@ public class DatasetTypeKeywordsPanel extends JPanel {
 
     private TableCellEditor cellEditor(DatasetType type) {
         JComboBox comboBox = new JComboBox();
-        String[] keywords = type.getKeywords();
+        Keyword[] keywords = type.getKeywords();
         for (int i = 0; i < keywords.length; i++)
-            comboBox.addItem(keywords[i]);
+            comboBox.addItem(keywords[i].getName());
         comboBox.setEditable(true);
 
         return new DefaultCellEditor(comboBox);
