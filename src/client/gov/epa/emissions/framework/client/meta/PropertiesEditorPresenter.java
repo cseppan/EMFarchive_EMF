@@ -58,7 +58,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
         doClose();
     }
 
-    private void updateDataset() throws EmfException {
+    void updateDataset() throws EmfException {
         summaryTabPresenter.doSave();
         dataServices.updateDataset(dataset);
     }

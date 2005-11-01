@@ -11,9 +11,13 @@ public class KeywordsTabPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayViewOnDisplay() {
         Mock view = mock(KeywordsTabView.class);
 
-        KeywordsTabPresenter presenter = new KeywordsTabPresenter((KeywordsTabView) view.proxy(), null);
-        view.expects(once()).method("observe").with(eq(presenter));
-        view.expects(once()).method("display").withNoArguments();
+        Mock dataset = mock(EmfDataset.class);
+        EmfKeyVal[] values = new EmfKeyVal[] { new EmfKeyVal(), new EmfKeyVal() };
+        dataset.stubs().method("getKeyVals").will(returnValue(values));
+        view.expects(once()).method("display").with(same(values));
+
+        KeywordsTabPresenter presenter = new KeywordsTabPresenter((KeywordsTabView) view.proxy(), (EmfDataset) dataset
+                .proxy());
 
         presenter.doDisplay();
     }
@@ -22,7 +26,7 @@ public class KeywordsTabPresenterTest extends MockObjectTestCase {
         Mock dataset = mock(EmfDataset.class);
         EmfKeyVal[] values = new EmfKeyVal[] { new EmfKeyVal(), new EmfKeyVal() };
         dataset.expects(once()).method("setKeyVals").with(same(values));
-        
+
         Mock view = mock(KeywordsTabView.class);
         KeywordsTabPresenter presenter = new KeywordsTabPresenter((KeywordsTabView) view.proxy(), (EmfDataset) dataset
                 .proxy());

@@ -15,8 +15,7 @@ public class KeywordsTabPresenter {
     }
 
     public void doDisplay() {
-        view.observe(this);
-        view.display();
+        view.display(dataset.getKeyVals());
     }
 
     public void doSave(EmfKeyVal[] values) {

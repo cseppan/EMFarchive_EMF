@@ -1,8 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
-public interface KeywordsTabView {
-    void observe(KeywordsTabPresenter presenter);
+import gov.epa.emissions.framework.services.EmfKeyVal;
 
-    void display();
-    
+public interface KeywordsTabView {
+    void display(EmfKeyVal[] values);
 }
