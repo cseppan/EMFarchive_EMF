@@ -29,6 +29,31 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
         return true;
     }
 
+    public void add(String keyword) {
+        rows.add(row(keyword));
+    }
+
+    public void setValueAt(Object value, int row, int col) {
+        if (!isEditable(col))
+            return;
+
+        EditableRow editableRow = (EditableRow) rows.get(row);
+        editableRow.setValueAt(value, col);
+    }
+
+    public String[] sources() {
+        List sources = sourcesList();
+        return (String[]) sources.toArray(new String[0]);
+    }
+
+    public void addBlankRow() {
+        add("");
+    }
+
+    public void removeSelected() {
+        remove(getSelected());
+    }
+
     private List createRows(String[] keywords) {
         List rows = new ArrayList();
         for (int i = 0; i < keywords.length; i++)
@@ -37,7 +62,7 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
         return rows;
     }
 
-    public void remove(String keyword) {
+    void remove(String keyword) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
             String source = (String) row.source();
@@ -48,21 +73,9 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
         }
     }
 
-    public void add(String keyword) {
-        rows.add(row(keyword));
-    }
-
     private EditableRow row(String keyword) {
         RowSource source = new DatasetTypeKeywordRowSource(keyword);
         return new EditableRow(source);
-    }
-
-    public void setValueAt(Object value, int row, int col) {
-        if (!isEditable(col))
-            return;
-
-        EditableRow editableRow = (EditableRow) rows.get(row);
-        editableRow.setValueAt(value, col);
     }
 
     private String[] getSelected() {
@@ -78,14 +91,9 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
         return (String[]) selected.toArray(new String[0]);
     }
 
-    public void remove(String[] keywords) {
+    private void remove(String[] keywords) {
         for (int i = 0; i < keywords.length; i++)
             remove(keywords[i]);
-    }
-
-    public String[] sources() {
-        List sources = sourcesList();
-        return (String[]) sources.toArray(new String[0]);
     }
 
     private List sourcesList() {
@@ -98,11 +106,4 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
         return sources;
     }
 
-    public void addBlankRow() {
-        add("");
-    }
-
-    public void removeSelected() {
-        remove(getSelected());
-    }
 }

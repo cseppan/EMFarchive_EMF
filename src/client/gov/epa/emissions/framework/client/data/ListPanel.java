@@ -53,6 +53,7 @@ public class ListPanel extends JPanel {
         tableModel = new EmfTableModel(tableData);
 
         table = new JTable(tableModel);
+        table.setRowHeight(20);
         table.setPreferredScrollableViewportSize(new Dimension(300, 100));
 
         return new JScrollPane(table);

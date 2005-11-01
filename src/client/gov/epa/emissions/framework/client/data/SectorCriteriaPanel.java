@@ -9,16 +9,17 @@ public class SectorCriteriaPanel extends JPanel {
 
     public SectorCriteriaPanel(String label, SectorCriteriaTableData tableData) {
         ListPanel listPanel = new ListPanel(label, tableData);
-        listPanel.setColumnEditor(cellEditor(), 1, "Select from the list");
+        listPanel.setColumnEditor(typesCellEditor(), 1, "Select from the list");
 
         super.add(listPanel);
     }
 
-    private TableCellEditor cellEditor() {
+    private TableCellEditor typesCellEditor() {
         JComboBox comboBox = new JComboBox();
         comboBox.addItem("SCC");
         comboBox.addItem("NAICS");
-        comboBox.addItem("IPM");
+        comboBox.addItem("SICS");
+        comboBox.addItem("IPM Flag");//True/False values
 
         return new DefaultCellEditor(comboBox);
     }
