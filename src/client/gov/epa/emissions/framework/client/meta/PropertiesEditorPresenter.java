@@ -14,9 +14,11 @@ public class PropertiesEditorPresenter implements ChangeObserver {
 
     private DataServices dataServices;
 
-    private SummaryTabPresenter summaryTabPresenter;
+    private SummaryTabPresenter summaryPresenter;
 
     private boolean unsavedChanges;
+
+    private KeywordsTabPresenter keywordsPresenter;
 
     public PropertiesEditorPresenter(EmfDataset dataset, DataServices dataServices) {
         this.dataset = dataset;
@@ -41,7 +43,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
 
     public void doSave(DatasetsBrowserView browser) {
         try {
-            updateDataset();
+            updateDataset(dataServices, summaryPresenter, keywordsPresenter);
         } catch (EmfException e) {
             view.showError("Could not update dataset - " + dataset.getName());
             return;
@@ -58,14 +60,21 @@ public class PropertiesEditorPresenter implements ChangeObserver {
         doClose();
     }
 
-    void updateDataset() throws EmfException {
-        summaryTabPresenter.doSave();
+    void updateDataset(DataServices dataServices, SummaryTabPresenter summary, KeywordsTabPresenter keywords)
+            throws EmfException {
+        summary.doSave();
+        keywords.doSave();
         dataServices.updateDataset(dataset);
     }
 
-    public void add(SummaryTabView view) {
-        summaryTabPresenter = new SummaryTabPresenter(dataset, view);
-        view.observeChanges(this);
+    public void set(SummaryTabView summary) {
+        summaryPresenter = new SummaryTabPresenter(dataset, summary);
+        summary.observeChanges(this);
+    }
+
+    public void set(KeywordsTabView keywords) {
+        keywordsPresenter = new KeywordsTabPresenter(keywords, dataset);
+        keywordsPresenter.init();
     }
 
     private void clearChanges() {

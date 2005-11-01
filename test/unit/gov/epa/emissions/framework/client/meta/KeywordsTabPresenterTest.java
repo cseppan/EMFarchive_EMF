@@ -19,18 +19,18 @@ public class KeywordsTabPresenterTest extends MockObjectTestCase {
         KeywordsTabPresenter presenter = new KeywordsTabPresenter((KeywordsTabView) view.proxy(), (EmfDataset) dataset
                 .proxy());
 
-        presenter.doDisplay();
+        presenter.init();
     }
 
     public void testUpdateDatasetOnSave() {
         Mock dataset = mock(EmfDataset.class);
-        EmfKeyVal[] values = new EmfKeyVal[] { new EmfKeyVal(), new EmfKeyVal() };
-        dataset.expects(once()).method("setKeyVals").with(same(values));
+        EmfDataset datasetProxy = (EmfDataset) dataset.proxy();
 
         Mock view = mock(KeywordsTabView.class);
-        KeywordsTabPresenter presenter = new KeywordsTabPresenter((KeywordsTabView) view.proxy(), (EmfDataset) dataset
-                .proxy());
+        view.expects(once()).method("update").with(same(datasetProxy));
 
-        presenter.doSave(values);
+        KeywordsTabPresenter presenter = new KeywordsTabPresenter((KeywordsTabView) view.proxy(), datasetProxy);
+
+        presenter.doSave();
     }
 }

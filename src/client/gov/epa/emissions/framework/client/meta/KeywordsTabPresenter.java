@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.EmfKeyVal;
 
 public class KeywordsTabPresenter {
 
@@ -14,12 +13,12 @@ public class KeywordsTabPresenter {
         this.dataset = dataset;
     }
 
-    public void doDisplay() {
+    public void init() {
         view.display(dataset.getKeyVals());
     }
 
-    public void doSave(EmfKeyVal[] values) {
-        dataset.setKeyVals(values);
+    public void doSave() {
+        view.update(dataset);
     }
 
 }

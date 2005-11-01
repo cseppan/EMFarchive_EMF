@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.stub.ThrowStub;
 
 public class PropertiesEditorPresenterTest extends MockObjectTestCase {
@@ -57,12 +57,12 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
         presenter.doClose();
     }
-    
+
     public void testShouldAddAsOnChangeListenerToSummaryTabOnAddingSummaryTab() {
         Mock summaryView = mock(SummaryTabView.class);
         summaryView.expects(once()).method("observeChanges").with(eq(presenter));
-        
-        presenter.add((SummaryTabView) summaryView.proxy());
+
+        presenter.set((SummaryTabView) summaryView.proxy());
     }
 
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() {
@@ -71,7 +71,13 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         Mock summaryView = mock(SummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
         summaryView.expects(once()).method("observeChanges").with(eq(presenter));
-        presenter.add((SummaryTabView) summaryView.proxy());
+
+        Mock keywordsView = mock(KeywordsTabView.class);
+        keywordsView.expects(once()).method("display");
+        keywordsView.expects(once()).method("update").with(eq(dataset));   
+        
+        presenter.set((SummaryTabView) summaryView.proxy());
+        presenter.set((KeywordsTabView) keywordsView.proxy());
 
         Mock datasetsBrowser = mock(DatasetsBrowserView.class);
         EmfDataset[] datasets = new EmfDataset[0];
@@ -81,25 +87,44 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
         presenter.doSave((DatasetsBrowserView) datasetsBrowser.proxy());
     }
-    
+
     public void testShouldSaveWithoutPromptingOnSaveIfChangesHaveOccuredInSummaryTab() {
         dataServices.expects(once()).method("updateDataset").with(eq(dataset));
-        
+
         Mock summaryView = mock(SummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
         summaryView.expects(atLeastOnce()).method("observeChanges").with(eq(presenter));
-        presenter.add((SummaryTabView) summaryView.proxy());
         
+        Mock keywordsView = mock(KeywordsTabView.class);
+        keywordsView.expects(once()).method("update").with(eq(dataset)); 
+        keywordsView.expects(atLeastOnce()).method("display");
+
+        presenter.set((SummaryTabView) summaryView.proxy());
+        presenter.set((KeywordsTabView) keywordsView.proxy());
+
         Mock datasetsBrowser = mock(DatasetsBrowserView.class);
         EmfDataset[] datasets = new EmfDataset[0];
         dataServices.stubs().method("getDatasets").will(returnValue(datasets));
         datasetsBrowser.expects(once()).method("refresh").with(eq(datasets));
         view.expects(once()).method("close");
-        
-        presenter.add((SummaryTabView) summaryView.proxy());
+
+        presenter.set((SummaryTabView) summaryView.proxy());
         presenter.onChange();
-        
+
         presenter.doSave((DatasetsBrowserView) datasetsBrowser.proxy());
+    }
+
+    public void testShouldUpdateDatasetWithChangesFromTabsAndSaveDatasetOnUpdate() throws Exception {
+        dataServices.expects(once()).method("updateDataset").with(eq(dataset));
+
+        Mock summaryTab = mock(SummaryTabPresenterStub.class);
+        summaryTab.expects(once()).method("doSave");
+
+        Mock keywordsTab = mock(KeywordsTabPresenterStub.class);
+        keywordsTab.expects(once()).method("doSave");
+
+        presenter.updateDataset((DataServices) dataServices.proxy(), (SummaryTabPresenter) summaryTab.proxy(),
+                (KeywordsTabPresenter) keywordsTab.proxy());
     }
 
     public void testShouldDisplayErrorMessageOnDatasetsBrowserIfGettingUpdatedDatasetsFailOnSave() {
@@ -108,7 +133,13 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         Mock summaryView = mock(SummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
         summaryView.expects(once()).method("observeChanges").with(eq(presenter));
-        presenter.add((SummaryTabView) summaryView.proxy());
+
+        Mock keywordsView = mock(KeywordsTabView.class);
+        keywordsView.expects(once()).method("display");
+        keywordsView.expects(once()).method("update").with(eq(dataset));        
+        
+        presenter.set((SummaryTabView) summaryView.proxy());
+        presenter.set((KeywordsTabView) keywordsView.proxy());
 
         Mock datasetsBrowser = mock(DatasetsBrowserView.class);
         dataServices.stubs().method("getDatasets").will(throwException(new EmfException("failure")));
@@ -127,7 +158,14 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
                 new ThrowStub(new EmfException("Could not save")));
         view.expects(once()).method("showError").with(eq("Could not update dataset - " + dataset.getName()));
 
-        presenter.add((SummaryTabView) summaryView.proxy());
+        Mock keywordsView = mock(KeywordsTabView.class);
+        keywordsView.expects(once()).method("display");
+        keywordsView.expects(once()).method("update").with(eq(dataset));        
+
+        presenter.set((SummaryTabView) summaryView.proxy());
+        presenter.set((KeywordsTabView) keywordsView.proxy());
+
         presenter.doSave(null);
     }
+
 }

@@ -47,7 +47,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
         tabbedPane.addTab("Summary", createSummaryTab(dataset, messagePanel));
         tabbedPane.addTab("Data", createDataTab(dataset, parentConsole));
-        tabbedPane.addTab("Keywords", createKeywordsTab(dataset));
+        tabbedPane.addTab("Keywords", createKeywordsTab());
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
         tabbedPane.addTab("Info", createTab());
 
@@ -59,7 +59,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
     private JPanel createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
         try {
             SummaryTab view = new SummaryTab(dataset, session.getDataServices(), messagePanel);
-            presenter.add(view);
+            presenter.set(view);
 
             return view;
         } catch (EmfException e) {
@@ -77,10 +77,9 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         return view;
     }
 
-    private JPanel createKeywordsTab(EmfDataset dataset) {
+    private JPanel createKeywordsTab() {
         KeywordsTab view = new KeywordsTab();
-        KeywordsTabPresenter presenter = new KeywordsTabPresenter(view, dataset);
-        presenter.doDisplay();
+        presenter.set(view);
 
         return view;
     }
