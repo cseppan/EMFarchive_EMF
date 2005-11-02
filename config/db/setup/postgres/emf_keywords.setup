@@ -1,11 +1,12 @@
 -- Table: emf_keywords
 
-DROP TABLE emf_keywords;
+DROP TABLE emf_keywords CASCADE;
 
 CREATE TABLE emf_keywords
 (
   id serial NOT NULL,
   keyword varchar(255) NOT NULL,
+  CONSTRAINT emf_keywords_pkey PRIMARY KEY (id),
   CONSTRAINT emf_keywords_id_key UNIQUE (id)
 ) 
 WITHOUT OIDS;
