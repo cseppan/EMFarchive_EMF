@@ -1,5 +1,5 @@
 ---- DatasetTypes
-DROP TABLE DATASETTYPES;
+DROP TABLE DATASETTYPES CASCADE;
 DROP SEQUENCE datasettypes_dataset_type_id_seq;
 
 CREATE SEQUENCE datasettypes_dataset_type_id_seq
