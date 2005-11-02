@@ -18,21 +18,21 @@ public class DbUpdate {
     protected DatabaseConnection connection;
 
     public DbUpdate() throws Exception {
-        this(new Config("test/uat/uat.conf"));
+        this(new PostgresDbConfig("test/uat/uat.conf"));
     }
-    
-    public DbUpdate(Config config) throws Exception {
+
+    public DbUpdate(PostgresDbConfig config) throws Exception {
         connection = connection(config);
     }
 
-    private DatabaseConnection connection(Config config) throws Exception {
+    private DatabaseConnection connection(PostgresDbConfig config) throws Exception {
         Class.forName(config.driver());
         Connection jdbcConnection = DriverManager.getConnection(config.url(), config.username(), config.password());
 
         DatabaseConnection dbUnitConnection = new DatabaseConnection(jdbcConnection);
         DatabaseConfig dbUnitConfig = dbUnitConnection.getConfig();
         dbUnitConfig.setFeature(DatabaseConfig.FEATURE_QUALIFIED_TABLE_NAMES, true);
-        
+
         return dbUnitConnection;
     }
 

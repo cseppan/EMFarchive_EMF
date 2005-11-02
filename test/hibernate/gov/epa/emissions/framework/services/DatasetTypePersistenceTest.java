@@ -2,49 +2,18 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
-import gov.epa.emissions.framework.db.Config;
+import gov.epa.emissions.framework.PersistenceTestCase;
 import gov.epa.emissions.framework.db.DbUpdate;
+import gov.epa.emissions.framework.db.PostgresDbConfig;
 
 import java.util.List;
-import java.util.Properties;
-
-import junit.framework.TestCase;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 
-public class DatasetTypePersistenceTest extends TestCase {
-    private SessionFactory sessionFactory = null;
-
-    private org.hibernate.classic.Session session;
-
-    protected void setUp() {
-        sessionFactory = config().buildSessionFactory();
-        session = sessionFactory.openSession();
-    }
-
-    private Configuration config() {
-        Configuration config = new Configuration().configure();
-        Properties props = config.getProperties();
-        props.remove("connection.datasource");
-        config = config.setProperties(props);
-
-        config.setProperty("hibernate.connection.driver_class", "org.postgresql.Driver");
-        config.setProperty("hibernate.connection.url", "jdbc:postgresql://localhost:5432/EMF.raghu");
-        config.setProperty("hibernate.connection.username", "emf");
-        config.setProperty("hibernate.connection.password", "emf");
-        config.setProperty("show_sql", "true");
-        
-        return config;
-    }
-
-    protected void tearDown() {
-        session.close();
-    }
-
+public class DatasetTypePersistenceTest extends PersistenceTestCase {
+    
     public void testVerifySimplePropertiesAreStored() throws Exception {
         DatasetType type = new DatasetType();
         type.setDescription("TEST");
@@ -107,7 +76,7 @@ public class DatasetTypePersistenceTest extends TestCase {
     }
 
     private void drop(DatasetType loadedType) throws Exception {
-        DbUpdate update = new DbUpdate(new Config("test/tests.conf"));
+        DbUpdate update = new DbUpdate(new PostgresDbConfig("test/tests.conf"));
         update.delete("emf.datasettypes", "dataset_type_id", loadedType.getDatasettypeid() + "");
     }
 
