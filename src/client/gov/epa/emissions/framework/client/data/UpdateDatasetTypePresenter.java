@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DatasetTypesServices;
+import gov.epa.emissions.framework.services.InterDataServices;
 
 public class UpdateDatasetTypePresenter {
 
@@ -10,17 +11,21 @@ public class UpdateDatasetTypePresenter {
 
     private DatasetType type;
 
-    private DatasetTypesServices services;
+    private DatasetTypesServices datasetTypesServices;
 
-    public UpdateDatasetTypePresenter(UpdateDatasetTypeView view, DatasetType type, DatasetTypesServices services) {
+    private InterDataServices interdataServices;
+
+    public UpdateDatasetTypePresenter(UpdateDatasetTypeView view, DatasetType type,
+            DatasetTypesServices datasetTypesServices, InterDataServices interdataServices) {
         this.view = view;
         this.type = type;
-        this.services = services;
+        this.datasetTypesServices = datasetTypesServices;
+        this.interdataServices = interdataServices;
     }
 
-    public void doDisplay() {
+    public void doDisplay() throws EmfException {
         view.observe(this);
-        view.display(type);
+        view.display(type, interdataServices.getKeywords());
     }
 
     public void doClose() {
@@ -28,7 +33,7 @@ public class UpdateDatasetTypePresenter {
     }
 
     public void doSave(DatasetTypesManagerView manager) throws EmfException {
-        services.updateDatasetType(type);
+        datasetTypesServices.updateDatasetType(type);
         manager.refresh();
         doClose();
     }

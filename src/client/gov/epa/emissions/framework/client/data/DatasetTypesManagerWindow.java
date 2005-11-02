@@ -136,7 +136,12 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         List sectors = selected();
         for (Iterator iter = sectors.iterator(); iter.hasNext();) {
             DatasetType type = (DatasetType) iter.next();
-            presenter.doUpdate(type, updateView());
+            try {
+                presenter.doUpdate(type, updateView());
+            } catch (EmfException e) {
+                messagePanel.setError("Could not display: " + type.getName() + ". Reason: " + e.getMessage());
+                break;
+            }
         }
     }
 

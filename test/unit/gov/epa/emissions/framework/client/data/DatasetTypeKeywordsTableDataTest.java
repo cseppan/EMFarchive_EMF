@@ -10,9 +10,13 @@ import junit.framework.TestCase;
 public class DatasetTypeKeywordsTableDataTest extends TestCase {
 
     private DatasetTypeKeywordsTableData data;
+    private Keyword keyword1;
+    private Keyword keyword2;
 
     protected void setUp() {
-        data = new DatasetTypeKeywordsTableData(new Keyword[] { new Keyword("keyword1"), new Keyword("keyword2") });
+        keyword1 = new Keyword("keyword1");
+        keyword2 = new Keyword("keyword2");
+        data = new DatasetTypeKeywordsTableData(new Keyword[] { keyword1, keyword2 });
     }
 
     public void testShouldHaveTwoColumn() {
@@ -47,10 +51,10 @@ public class DatasetTypeKeywordsTableDataTest extends TestCase {
     }
 
     public void testShouldRemoveKeywordOnRemove() {
-        data.remove("keyword1");
+        data.remove(keyword1);
         assertEquals(1, data.rows().size());
 
-        data.remove("non-existent keyword");
+        data.remove(new Keyword("non-existent keyword"));
         assertEquals(1, data.rows().size());
     }
 

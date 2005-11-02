@@ -11,9 +11,10 @@ import org.hibernate.cfg.Configuration;
 
 import junit.framework.TestCase;
 
-public class PersistenceTestCase extends TestCase {
+public abstract class PersistenceTestCase extends TestCase {
 
     private SessionFactory sessionFactory = null;
+
     protected Session session;
 
     protected void setUp() throws Exception {
@@ -25,11 +26,11 @@ public class PersistenceTestCase extends TestCase {
         Configuration config = new Configuration().configure();
         Properties props = config.getProperties();
         props.remove("hibernate.connection.datasource");
-    
+
         props.putAll(testConfig());
-    
+
         config = config.setProperties(props);
-    
+
         return config;
     }
 

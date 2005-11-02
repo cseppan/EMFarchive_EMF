@@ -26,7 +26,6 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
 
     public UserServices getUserServices() {
-
         return new UserServicesTransport(baseUrl + "/gov.epa.emf.services.UserServices");
     }
 

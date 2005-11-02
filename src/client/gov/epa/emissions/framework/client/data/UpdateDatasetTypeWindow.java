@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
@@ -54,19 +55,19 @@ public class UpdateDatasetTypeWindow extends DisposableInteralFrame implements U
         this.presenter = presenter;
     }
 
-    public void display(DatasetType type) {
+    public void display(DatasetType type, Keyword[] keywords) {
         layout.removeAll();
-        doLayout(layout, type);
+        doLayout(layout, type, keywords);
 
         super.display();
     }
 
     // FIXME: CRUD panel. Refactor to use in DatasetTypes Manager
-    private void doLayout(JPanel layout, DatasetType type) {
+    private void doLayout(JPanel layout, DatasetType type, Keyword[] keywords) {
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
         layout.add(createInputPanel(type));
-        layout.add(createKeywordsPanel(type));
+        layout.add(createKeywordsPanel(type, keywords));
         layout.add(createButtonsPanel(type));
     }
 
@@ -88,9 +89,9 @@ public class UpdateDatasetTypeWindow extends DisposableInteralFrame implements U
         return panel;
     }
 
-    private JPanel createKeywordsPanel(DatasetType type) {
+    private JPanel createKeywordsPanel(DatasetType type, Keyword[] keywords) {
         keywordsTableData = new DatasetTypeKeywordsTableData(type.getKeywords());
-        JPanel panel = new DatasetTypeKeywordsPanel(type, keywordsTableData);
+        JPanel panel = new DatasetTypeKeywordsPanel(keywordsTableData, keywords);
         panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 
         return panel;

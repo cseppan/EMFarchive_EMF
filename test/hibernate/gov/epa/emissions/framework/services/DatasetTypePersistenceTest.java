@@ -13,7 +13,7 @@ import org.hibernate.Query;
 import org.hibernate.Transaction;
 
 public class DatasetTypePersistenceTest extends PersistenceTestCase {
-    
+
     public void testVerifySimplePropertiesAreStored() throws Exception {
         DatasetType type = new DatasetType();
         type.setDescription("TEST");
@@ -78,6 +78,7 @@ public class DatasetTypePersistenceTest extends PersistenceTestCase {
     private void drop(DatasetType loadedType) throws Exception {
         DbUpdate update = new DbUpdate(new PostgresDbConfig("test/tests.conf"));
         update.delete("emf.datasettypes", "dataset_type_id", loadedType.getDatasettypeid() + "");
+        update.deleteAll("emf.emf_keywords");
     }
 
     private void save(DatasetType type) {

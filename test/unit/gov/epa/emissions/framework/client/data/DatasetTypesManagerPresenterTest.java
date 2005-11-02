@@ -1,13 +1,17 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DatasetTypesServices;
+import gov.epa.emissions.framework.services.InterDataServices;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 import org.jmock.core.constraint.IsInstanceOf;
 
+//FIXME: this test looks way too complicated
 public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayViewOnDisplay() throws Exception {
@@ -20,8 +24,11 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         Mock view = mock(DatasetTypesManagerView.class);
         view.expects(once()).method("display").with(same(servicesProxy));
 
+        Mock locator = mock(ServiceLocator.class);
+        locator.stubs().method("getDatasetTypesServices").withNoArguments().will(returnValue(servicesProxy));
+
         DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(),
-                servicesProxy, null);
+                (ServiceLocator) locator.proxy(), null);
         view.expects(once()).method("observe").with(eq(p));
 
         p.doDisplay();
@@ -43,17 +50,24 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         DatasetType type = new DatasetType();
         type.setName("name");
 
+        Keyword[] keywords = new Keyword[0];
         Mock updateView = mock(UpdateDatasetTypeView.class);
         updateView.expects(once()).method("observe").with(new IsInstanceOf(UpdateDatasetTypePresenter.class));
-        updateView.expects(once()).method("display").with(same(type));
+        updateView.expects(once()).method("display").with(same(type), same(keywords));
         UpdateDatasetTypeView updateProxy = (UpdateDatasetTypeView) updateView.proxy();
 
         Mock layout = mock(ViewLayout.class);
         layout.expects(once()).method("add").with(eq(updateProxy), new IsInstanceOf(Object.class));
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
 
-        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(), null,
-                (ViewLayout) layout.proxy());
+        Mock locator = mock(ServiceLocator.class);
+        locator.stubs().method("getDatasetTypesServices").withNoArguments().will(returnValue(null));
+        Mock interdataServices = mock(InterDataServices.class);
+        interdataServices.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
+        locator.stubs().method("getInterDataServices").withNoArguments().will(returnValue(interdataServices.proxy()));
+
+        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(),
+                (ServiceLocator) locator.proxy(), (ViewLayout) layout.proxy());
 
         p.doUpdate(type, updateProxy);
     }
@@ -64,17 +78,25 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         DatasetType type = new DatasetType();
         type.setName("name");
 
+        Keyword[] keywords = new Keyword[0];
         Mock updateView = mock(UpdateDatasetTypeView.class);
         updateView.expects(once()).method("observe").with(new IsInstanceOf(UpdateDatasetTypePresenter.class));
-        updateView.expects(once()).method("display").with(same(type));
+        updateView.expects(once()).method("display").with(same(type), same(keywords));
         UpdateDatasetTypeView updateProxy = (UpdateDatasetTypeView) updateView.proxy();
 
         Mock layout = mock(ViewLayout.class);
         layout.expects(once()).method("add").with(eq(updateProxy), new IsInstanceOf(Object.class));
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
 
-        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(), null,
-                (ViewLayout) layout.proxy());
+        Mock locator = mock(ServiceLocator.class);
+        locator.stubs().method("getDatasetTypesServices").withNoArguments().will(returnValue(null));
+
+        Mock interdataServices = mock(InterDataServices.class);
+        interdataServices.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
+        locator.stubs().method("getInterDataServices").withNoArguments().will(returnValue(interdataServices.proxy()));
+
+        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(),
+                (ServiceLocator) locator.proxy(), (ViewLayout) layout.proxy());
 
         p.doUpdate(type, updateProxy);
 

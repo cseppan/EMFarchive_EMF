@@ -63,11 +63,11 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
         return rows;
     }
 
-    void remove(String keyword) {
+    void remove(Keyword keyword) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
             Keyword source = (Keyword) row.source();
-            if (source.getName() == keyword) {
+            if (source == keyword) {
                 rows.remove(row);
                 return;
             }
@@ -79,7 +79,7 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
         return new EditableRow(source);
     }
 
-    private String[] getSelected() {
+    private Keyword[] getSelected() {
         List selected = new ArrayList();
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
@@ -89,10 +89,10 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
                 selected.add(rowSource.source());
         }
 
-        return (String[]) selected.toArray(new String[0]);
+        return (Keyword[]) selected.toArray(new Keyword[0]);
     }
 
-    private void remove(String[] keywords) {
+    private void remove(Keyword[] keywords) {
         for (int i = 0; i < keywords.length; i++)
             remove(keywords[i]);
     }

@@ -88,7 +88,7 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
 
         assertEquals(servicesProxy, session.getLoggingServices());
     }
-    
+
     public void testCacheMostRecentExportFolder() throws EmfException {
         EmfSession session = new DefaultEmfSession(null, (ServiceLocator) locator.proxy());
 
