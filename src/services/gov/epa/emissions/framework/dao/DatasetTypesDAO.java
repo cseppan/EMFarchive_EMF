@@ -79,7 +79,7 @@ public class DatasetTypesDAO {
         
         try {
 			tx = session.beginTransaction();
-			session.update(datasetType);
+			session.saveOrUpdate(datasetType);
 			tx.commit();    	
 			log.debug("updating dataset Type: " + datasetType.getName());
 		} catch (HibernateException e) {

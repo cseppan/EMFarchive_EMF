@@ -9,11 +9,11 @@ CREATE TABLE statusmessages
   message text NOT NULL,
   msg_read bool NOT NULL DEFAULT false,
   date timestamp NOT NULL,
+  CONSTRAINT statusmessages_pk PRIMARY KEY (status_id),
   CONSTRAINT statusmessages_status_id_key UNIQUE (status_id)
 ) 
 WITHOUT OIDS;
 ALTER TABLE statusmessages OWNER TO emf;
-
 
 
 
@@ -23,9 +23,11 @@ DROP TABLE emf_properties;
 
 CREATE TABLE emf_properties
 (
-  prop_id serial unique NOT NULL,
+  prop_id serial NOT NULL,
   prop_name varchar(255) NOT NULL,
-  prop_value varchar(255) NOT NULL
+  prop_value varchar(255) NOT NULL,
+  CONSTRAINT emf_properties_pk PRIMARY KEY (prop_id),
+  CONSTRAINT emf_properties_prop_id_key UNIQUE (prop_id)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf_properties OWNER TO emf;

@@ -12,8 +12,9 @@ ALTER TABLE countries_id_seq OWNER TO emf;
 
 CREATE TABLE countries
 (
-  id int4 NOT NULL DEFAULT nextval('emf.countries_id_seq'::text),
+  id serial NOT NULL,
   name varchar(255) NOT NULL,
+  CONSTRAINT countries_pk PRIMARY KEY (id),
   CONSTRAINT countries_id_key UNIQUE (id)
 ) 
 WITHOUT OIDS;

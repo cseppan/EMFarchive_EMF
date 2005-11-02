@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.framework.services.EmfKeyVal;
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;
@@ -11,22 +11,22 @@ public class KeywordsTableDataTest extends TestCase {
 
     private KeywordsTableData data;
 
-    private EmfKeyVal val1;
+    private KeyVal val1;
 
-    private EmfKeyVal val2;
+    private KeyVal val2;
 
     protected void setUp() {
-        val1 = new EmfKeyVal();
+        val1 = new KeyVal();
         val1.setId(1);
         val1.setKeyword("key1");
         val1.setValue("val1");
 
-        val2 = new EmfKeyVal();
+        val2 = new KeyVal();
         val2.setId(2);
         val2.setKeyword("key2");
         val2.setValue("val2");
 
-        data = new KeywordsTableData(new EmfKeyVal[] { val1, val2 });
+        data = new KeywordsTableData(new KeyVal[] { val1, val2 });
     }
 
     public void testShouldHaveThreeColumns() {
@@ -58,7 +58,7 @@ public class KeywordsTableDataTest extends TestCase {
         assertEquals("val1", row.getValueAt(2));
     }
 
-    public void testShouldReturnARowRepresentingAEmfKeyValEntry() {
+    public void testShouldReturnARowRepresentingAKeyValEntry() {
         assertEquals(val1, data.element(0));
         assertEquals(val2, data.element(1));
     }
@@ -67,7 +67,7 @@ public class KeywordsTableDataTest extends TestCase {
         data.remove(val1);
         assertEquals(1, data.rows().size());
 
-        data.remove(new EmfKeyVal());
+        data.remove(new KeyVal());
         assertEquals(1, data.rows().size());
     }
 
@@ -81,7 +81,7 @@ public class KeywordsTableDataTest extends TestCase {
     }
 
     public void testShouldAddEntryOnAdd() {
-        EmfKeyVal val = new EmfKeyVal();
+        KeyVal val = new KeyVal();
         val.setId(3);
 
         data.add(val);
@@ -95,18 +95,18 @@ public class KeywordsTableDataTest extends TestCase {
         List rows = data.rows();
         assertEquals(3, rows.size());
         Row blankRow = (Row) rows.get(2);
-        EmfKeyVal blankSource = ((EmfKeyVal) blankRow.source());
+        KeyVal blankSource = ((KeyVal) blankRow.source());
         assertEquals("", blankSource.getKeyword());
         assertEquals("", blankSource.getValue());
     }
 
-    public void testShouldReturnCurrentlyHeldEmfKeyVal() {
-        EmfKeyVal criterion = new EmfKeyVal();
+    public void testShouldReturnCurrentlyHeldKeyVal() {
+        KeyVal criterion = new KeyVal();
         criterion.setId(3);
 
         data.add(criterion);
 
-        EmfKeyVal[] sources = data.sources();
+        KeyVal[] sources = data.sources();
         assertEquals(3, sources.length);
         assertEquals(val1, sources[0]);
         assertEquals(val2, sources[1]);

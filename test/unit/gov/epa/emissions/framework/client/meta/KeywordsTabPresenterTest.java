@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.EmfKeyVal;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -12,7 +12,7 @@ public class KeywordsTabPresenterTest extends MockObjectTestCase {
         Mock view = mock(KeywordsTabView.class);
 
         Mock dataset = mock(EmfDataset.class);
-        EmfKeyVal[] values = new EmfKeyVal[] { new EmfKeyVal(), new EmfKeyVal() };
+        KeyVal[] values = new KeyVal[] { new KeyVal(), new KeyVal() };
         dataset.stubs().method("getKeyVals").will(returnValue(values));
         view.expects(once()).method("display").with(same(values));
 

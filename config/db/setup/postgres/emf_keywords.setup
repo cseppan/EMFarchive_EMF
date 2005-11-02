@@ -11,9 +11,6 @@ CREATE TABLE emf_keywords
 WITHOUT OIDS;
 ALTER TABLE emf_keywords OWNER TO emf;
 
-
-
-
 --- DataseType Keywords
 DROP TABLE dataset_types_keywords;
 

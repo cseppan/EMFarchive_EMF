@@ -23,17 +23,20 @@ WITHOUT OIDS;
 ALTER TABLE sectors OWNER TO emf;
 
 DROP TABLE sectorcriteria;
+
 CREATE TABLE sectorcriteria
 (
   id serial NOT NULL,
   sector_id int4 NOT NULL,
   list_index int4,
-  type varchar(255) NOT NULL,
+  "type" varchar(255) NOT NULL,
   criteria text,
+  CONSTRAINT sectorcriteria_pk PRIMARY KEY (id),
   CONSTRAINT sector_criteria_to_sectors FOREIGN KEY (sector_id) REFERENCES sectors (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
 ALTER TABLE sectorcriteria OWNER TO emf;
+
 
 
 ---- Sectors data

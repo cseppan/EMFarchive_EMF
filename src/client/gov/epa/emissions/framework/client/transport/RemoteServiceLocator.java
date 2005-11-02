@@ -11,6 +11,7 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.DatasetTypesServices;
 import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.InterDataServices;
 import gov.epa.emissions.framework.services.LoggingServices;
 import gov.epa.emissions.framework.services.StatusServices;
 import gov.epa.emissions.framework.services.UserServices;
@@ -47,6 +48,10 @@ public class RemoteServiceLocator implements ServiceLocator {
 
     public DatasetTypesServices getDatasetTypesServices() {
         return new DatasetTypesServicesTransport(baseUrl + "/gov.epa.emf.services.DatasetTypesServices");
+    }
+
+    public InterDataServices getInterDataServices() {
+        return new InterDataServicesTransport(baseUrl + "/gov.epa.emf.services.InterDataServices");
     }
 
 }

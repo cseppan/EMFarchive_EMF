@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.ExternalSource;
 import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Table;
 
 import java.util.ArrayList;
@@ -305,15 +306,15 @@ public class EmfDataset implements Dataset {
         this.externalSources.add(source);
     }
 
-    public void addKeyVal(EmfKeyVal keyval) {
+    public void addKeyVal(KeyVal keyval) {
         keyValsList.add(keyval);
     }
 
-    public EmfKeyVal[] getKeyVals() {
-        return (EmfKeyVal[]) keyValsList.toArray(new EmfKeyVal[0]);
+    public KeyVal[] getKeyVals() {
+        return (KeyVal[]) keyValsList.toArray(new KeyVal[0]);
     }
 
-    public void setKeyVals(EmfKeyVal[] keyvals) {
+    public void setKeyVals(KeyVal[] keyvals) {
         keyValsList.clear();
         keyValsList.addAll(Arrays.asList(keyvals));
     }

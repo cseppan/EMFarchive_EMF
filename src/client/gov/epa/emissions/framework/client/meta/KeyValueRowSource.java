@@ -1,15 +1,15 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.framework.services.EmfKeyVal;
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.framework.ui.RowSource;
 
 public class KeyValueRowSource implements RowSource {
 
-    private EmfKeyVal source;
+    private KeyVal source;
 
     private Boolean selected;
 
-    public KeyValueRowSource(EmfKeyVal source) {
+    public KeyValueRowSource(KeyVal source) {
         this.source = source;
         this.selected = Boolean.FALSE;
     }

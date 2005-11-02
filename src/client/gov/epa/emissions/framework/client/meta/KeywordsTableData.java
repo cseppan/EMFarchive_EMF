@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.framework.services.EmfKeyVal;
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
@@ -13,7 +13,7 @@ import java.util.List;
 public class KeywordsTableData extends AbstractEmfTableData implements SelectableEmfTableData {
     private List rows;
 
-    public KeywordsTableData(EmfKeyVal[] values) {
+    public KeywordsTableData(KeyVal[] values) {
         this.rows = createRows(values);
     }
 
@@ -29,7 +29,7 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
         return true;
     }
 
-    private List createRows(EmfKeyVal[] values) {
+    private List createRows(KeyVal[] values) {
         List rows = new ArrayList();
         for (int i = 0; i < values.length; i++)
             rows.add(row(values[i]));
@@ -37,10 +37,10 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
         return rows;
     }
 
-    void remove(EmfKeyVal keyValue) {
+    void remove(KeyVal keyValue) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            EmfKeyVal source = (EmfKeyVal) row.source();
+            KeyVal source = (KeyVal) row.source();
             if (source == keyValue) {
                 rows.remove(row);
                 return;
@@ -48,11 +48,11 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
         }
     }
 
-    public void add(EmfKeyVal keyValue) {
+    public void add(KeyVal keyValue) {
         rows.add(row(keyValue));
     }
 
-    private EditableRow row(EmfKeyVal keyValue) {
+    private EditableRow row(KeyVal keyValue) {
         RowSource source = new KeyValueRowSource(keyValue);
         return new EditableRow(source);
     }
@@ -65,7 +65,7 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
         editableRow.setValueAt(value, col);
     }
 
-    private EmfKeyVal[] getSelected() {
+    private KeyVal[] getSelected() {
         List selected = new ArrayList();
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
@@ -75,17 +75,17 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
                 selected.add(rowSource.source());
         }
 
-        return (EmfKeyVal[]) selected.toArray(new EmfKeyVal[0]);
+        return (KeyVal[]) selected.toArray(new KeyVal[0]);
     }
 
-    public void remove(EmfKeyVal[] values) {
+    public void remove(KeyVal[] values) {
         for (int i = 0; i < values.length; i++)
             remove(values[i]);
     }
 
-    public EmfKeyVal[] sources() {
+    public KeyVal[] sources() {
         List sources = sourcesList();
-        return (EmfKeyVal[]) sources.toArray(new EmfKeyVal[0]);
+        return (KeyVal[]) sources.toArray(new KeyVal[0]);
     }
 
     private List sourcesList() {
@@ -100,7 +100,7 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
     }
 
     public void addBlankRow() {
-        EmfKeyVal entry = new EmfKeyVal();
+        KeyVal entry = new KeyVal();
         entry.setKeyword("");
         entry.setValue("");
 
