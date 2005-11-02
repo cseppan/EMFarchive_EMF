@@ -7,7 +7,6 @@ CREATE TABLE datasets_keywords
   list_index int4,
   keyword_id int4 NOT NULL,
   value varchar(255),
-  CONSTRAINT datasets_keywords_pkey PRIMARY KEY (id),
   CONSTRAINT datasets_keywords_to_datasets FOREIGN KEY (dataset_id) REFERENCES datasets (dataset_id) ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT datasets_keywords_to_emf_keywords FOREIGN KEY (keyword_id) REFERENCES emf_keywords (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 

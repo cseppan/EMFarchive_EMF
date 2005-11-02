@@ -1,4 +1,4 @@
--- Table: emf_keywords
+-- Master Keywords list
 
 DROP TABLE emf_keywords CASCADE;
 
@@ -6,8 +6,26 @@ CREATE TABLE emf_keywords
 (
   id serial NOT NULL,
   keyword varchar(255) NOT NULL,
-  CONSTRAINT emf_keywords_pkey PRIMARY KEY (id),
-  CONSTRAINT emf_keywords_id_key UNIQUE (id)
+  CONSTRAINT emf_keywords_pkey PRIMARY KEY (id)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf_keywords OWNER TO emf;
+
+
+
+
+--- DataseType Keywords
+DROP TABLE dataset_types_keywords;
+
+CREATE TABLE dataset_types_keywords
+(
+  id serial UNIQUE NOT NULL,
+  dataset_type_id int4 NOT NULL,
+  list_index int4,
+  keyword_id int4 NOT NULL,
+  CONSTRAINT dataset_types_keywords_pkey PRIMARY KEY (id),
+  CONSTRAINT dataset_types_keywords_to_datasetstypes FOREIGN KEY (dataset_type_id) REFERENCES datasettypes (dataset_type_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT dataset_types_keywords_to_emf_keywords FOREIGN KEY (keyword_id) REFERENCES emf_keywords (id) ON UPDATE CASCADE ON DELETE CASCADE
+) 
+WITHOUT OIDS;
+ALTER TABLE dataset_types_keywords OWNER TO emf;

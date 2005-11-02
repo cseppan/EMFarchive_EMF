@@ -21,6 +21,7 @@ CREATE TABLE datasettypes
   min_columns int4 NOT NULL DEFAULT 0,
   max_columns int4 NOT NULL DEFAULT 0,
   "external" bool NOT NULL DEFAULT false,
+  CONSTRAINT datasettypes_pkey PRIMARY KEY (dataset_type_id),
   CONSTRAINT datasettypes_dataset_type_id_key UNIQUE (dataset_type_id)
 ) 
 WITHOUT OIDS;
