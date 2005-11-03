@@ -15,7 +15,7 @@
   <many-to-one lazy="false"
             name="datasetType" 
             class="gov.epa.emissions.commons.io.DatasetType"
-            column="dataset_type" /> 
+            column="dataset_type"/> 
                   
   <property name="units"				column="units"					type="java.lang.String"		not-null="false"/>
   <property name="region"				column="region"					type="java.lang.String"		not-null="false"/>
@@ -56,6 +56,15 @@
 		<property name="datasource"	column="data_source" not-null="true"/>
     </composite-element>
   </array>
+
+	<array name="keyVals" table="datasets_keywords" cascade="save-update">
+      <key column="dataset_id"/>
+      <list-index column="list_index"/>
+      <composite-element class="gov.epa.emissions.commons.io.KeyVal">
+	    <property name="value" column="value" not-null="true"/>	
+	    <many-to-one  name="keyword" column="keyword_id" class="gov.epa.emissions.commons.io.Keyword" cascade="save-update"/>
+      </composite-element>
+ 	</array>
 
 </class>
 </hibernate-mapping>
