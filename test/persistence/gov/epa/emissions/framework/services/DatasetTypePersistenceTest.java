@@ -2,9 +2,8 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
-import gov.epa.emissions.framework.PersistenceTestCase;
-import gov.epa.emissions.framework.db.DbUpdate;
-import gov.epa.emissions.framework.db.PostgresDbConfig;
+import gov.epa.emissions.framework.HibernateTestCase;
+import gov.epa.emissions.framework.db.PostgresDbUpdate;
 
 import java.util.List;
 
@@ -12,7 +11,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
 
-public class DatasetTypePersistenceTest extends PersistenceTestCase {
+public class DatasetTypePersistenceTest extends HibernateTestCase {
 
     public void testVerifySimplePropertiesAreStored() throws Exception {
         DatasetType type = new DatasetType();
@@ -76,7 +75,7 @@ public class DatasetTypePersistenceTest extends PersistenceTestCase {
     }
 
     private void drop(DatasetType loadedType) throws Exception {
-        DbUpdate update = new DbUpdate(new PostgresDbConfig("test/tests.conf"));
+        PostgresDbUpdate update = new PostgresDbUpdate();
         update.delete("emf.datasettypes", "dataset_type_id", loadedType.getDatasettypeid() + "");
         update.deleteAll("emf.emf_keywords");
     }

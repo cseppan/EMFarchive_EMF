@@ -8,7 +8,7 @@ import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.ITableIterator;
 
-public class ExImDbUpdate extends DbUpdate {
+public class ExImDbUpdate extends PostgresDbUpdate {
 
     public ExImDbUpdate() throws Exception {
         super();

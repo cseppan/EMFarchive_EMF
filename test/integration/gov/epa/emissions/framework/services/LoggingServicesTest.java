@@ -10,7 +10,7 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.db.DbUpdate;
+import gov.epa.emissions.framework.db.PostgresDbUpdate;
 
 import java.util.Date;
 
@@ -36,7 +36,7 @@ public class LoggingServicesTest extends WebServicesIntegrationTestCase {
         try {
             service.setAccessLog(log);
         } finally {
-            new DbUpdate().delete("emf.dataset_access_logs", "dataset_id", datasetId);
+            new PostgresDbUpdate().delete("emf.dataset_access_logs", "dataset_id", datasetId);
         }
     }
 

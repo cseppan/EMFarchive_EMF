@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.db;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConfig;
@@ -13,15 +14,15 @@ import org.dbunit.dataset.DefaultTable;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.operation.DatabaseOperation;
 
-public class DbUpdate {
+public class PostgresDbUpdate {
 
     protected DatabaseConnection connection;
 
-    public DbUpdate() throws Exception {
-        this(new PostgresDbConfig("test/uat/uat.conf"));
+    public PostgresDbUpdate() throws Exception {
+        this(new PostgresDbConfig("test/test.conf"));
     }
 
-    public DbUpdate(PostgresDbConfig config) throws Exception {
+    public PostgresDbUpdate(PostgresDbConfig config) throws Exception {
         connection = connection(config);
     }
 
@@ -57,4 +58,11 @@ public class DbUpdate {
         delete(table, name, value + "");
     }
 
+    public void dropTable(String schema, String table) throws SQLException {
+        Connection jdbcConnection = connection.getConnection();
+        Statement stmt = jdbcConnection.createStatement();
+        stmt.execute("DROP TABLE " + schema + "." + table);
+
+        // FIXME: use dbUnit to drop table
+    }
 }

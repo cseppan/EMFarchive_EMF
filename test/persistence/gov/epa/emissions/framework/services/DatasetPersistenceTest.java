@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
-import gov.epa.emissions.framework.PersistenceTestCase;
+import gov.epa.emissions.framework.HibernateTestCase;
 
 import java.util.Date;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
 
-public class DatasetPersistenceTest extends PersistenceTestCase {
+public class DatasetPersistenceTest extends HibernateTestCase {
 
     public void testVerifySimplePropertiesAreStored() throws Exception {
         String ds_name = "A1" + new Random().nextLong();
@@ -55,7 +55,7 @@ public class DatasetPersistenceTest extends PersistenceTestCase {
         List list = query.list();
         return list.size() == 1 ? (DatasetType) list.get(0) : null;
     }
-    
+
     private void save(Object element) {
         Transaction tx = null;
         try {

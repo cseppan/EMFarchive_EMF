@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.client.ConsoleActions;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.StatusActions;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
-import gov.epa.emissions.framework.db.DbUpdate;
+import gov.epa.emissions.framework.db.PostgresDbUpdate;
 
 import java.util.Random;
 
@@ -105,7 +105,7 @@ public class ImportORLDatasetTest extends UserAcceptanceTestCase {
             action.run(name);
             assertEquals(2, statusActions.messageCount());
         } finally {
-            new DbUpdate().delete("emf.datasets", "name", name);
+            new PostgresDbUpdate().delete("emf.datasets", "name", name);
         }
     }
 

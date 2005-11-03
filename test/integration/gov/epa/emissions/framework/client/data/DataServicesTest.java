@@ -2,8 +2,7 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.db.DbUpdate;
-import gov.epa.emissions.framework.db.PostgresDbConfig;
+import gov.epa.emissions.framework.db.PostgresDbUpdate;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.WebServicesIntegrationTestCase;
 
@@ -20,7 +19,7 @@ public class DataServicesTest extends WebServicesIntegrationTestCase {
         assertTrue(sectors.length >=14);
     }
 
-    public void xtestShouldAddSector() throws Exception {
+    public void testShouldAddSector() throws Exception {
         Sector sector = new Sector();
         sector.setName("TEST");
 
@@ -29,7 +28,7 @@ public class DataServicesTest extends WebServicesIntegrationTestCase {
             assertEquals(15, services.getSectors().length);
             sector = find(services.getSectors(), sector.getName());
         } finally {
-            DbUpdate update = new DbUpdate(new PostgresDbConfig("test/integration/integration.conf"));
+            PostgresDbUpdate update = new PostgresDbUpdate();
             update.delete("emf.sectors", "id", sector.getId() + "");
         }
     }

@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.client.ConsoleActions;
 import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 import gov.epa.emissions.framework.client.exim.ImportActions;
-import gov.epa.emissions.framework.db.DbUpdate;
+import gov.epa.emissions.framework.db.PostgresDbUpdate;
 
 import java.util.Random;
 
@@ -26,7 +26,7 @@ public class ManageDatasetsTest extends UserAcceptanceTestCase {
 
     protected void tearDown() throws Exception {
         consoleActions.close();
-        new DbUpdate().deleteAll("emf.datasets");
+        new PostgresDbUpdate().deleteAll("emf.datasets");
     }
 
     public void testShouldDisplayImportedDatasets() throws Exception {

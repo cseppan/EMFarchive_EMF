@@ -8,7 +8,7 @@
  */
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.framework.db.DbUpdate;
+import gov.epa.emissions.framework.db.PostgresDbUpdate;
 
 import java.util.Date;
 
@@ -31,7 +31,7 @@ public class StatusServicesTest extends WebServicesIntegrationTestCase {
         try {
             service.setStatus(status);
         } finally {
-            new DbUpdate().deleteAll("emf.statusmessages");
+            new PostgresDbUpdate().deleteAll("emf.statusmessages");
         }
     }
 
