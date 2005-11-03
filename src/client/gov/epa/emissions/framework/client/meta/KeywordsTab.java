@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.KeyVal;
+import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.data.ListPanel;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -16,13 +17,13 @@ public class KeywordsTab extends JPanel implements KeywordsTabView {
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     }
 
-    public void display(KeyVal[] values) {
+    public void display(KeyVal[] values, Keyword[] keywords) {
         super.removeAll();
-        super.add(createLayout(values));
+        super.add(createLayout(values, keywords));
     }
 
-    private JPanel createLayout(KeyVal[] values) {
-        tableData = new KeywordsTableData(values);
+    private JPanel createLayout(KeyVal[] values, Keyword[] keywords) {
+        tableData = new KeywordsTableData(values, keywords);
         return new ListPanel("Keywords + Values", tableData);
     }
 

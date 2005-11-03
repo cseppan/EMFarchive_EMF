@@ -3,8 +3,10 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.InterDataServices;
 
 public class PropertiesEditorPresenter implements ChangeObserver {
 
@@ -20,9 +22,12 @@ public class PropertiesEditorPresenter implements ChangeObserver {
 
     private KeywordsTabPresenter keywordsPresenter;
 
-    public PropertiesEditorPresenter(EmfDataset dataset, DataServices dataServices) {
+    private InterDataServices interdataServices;
+
+    public PropertiesEditorPresenter(EmfDataset dataset, ServiceLocator serviceLocator) {
         this.dataset = dataset;
-        this.dataServices = dataServices;
+        this.dataServices = serviceLocator.getDataServices();
+        this.interdataServices = serviceLocator.getInterDataServices();
     }
 
     public void display(PropertiesEditorView view) {
@@ -72,9 +77,9 @@ public class PropertiesEditorPresenter implements ChangeObserver {
         summary.observeChanges(this);
     }
 
-    public void set(KeywordsTabView keywords) {
-        keywordsPresenter = new KeywordsTabPresenter(keywords, dataset);
-        keywordsPresenter.init();
+    public void set(KeywordsTabView keywordsView) throws EmfException {
+        keywordsPresenter = new KeywordsTabPresenter(keywordsView, dataset);
+        keywordsPresenter.init(interdataServices.getKeywords());
     }
 
     private void clearChanges() {

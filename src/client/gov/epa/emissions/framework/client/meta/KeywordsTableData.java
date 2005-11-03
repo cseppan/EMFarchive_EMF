@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.KeyVal;
+import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
@@ -13,8 +14,11 @@ import java.util.List;
 public class KeywordsTableData extends AbstractEmfTableData implements SelectableEmfTableData {
     private List rows;
 
-    public KeywordsTableData(KeyVal[] values) {
+    private Keyword[] keywords;
+
+    public KeywordsTableData(KeyVal[] values, Keyword[] keywords) {
         this.rows = createRows(values);
+        this.keywords = keywords;
     }
 
     public String[] columns() {
@@ -48,12 +52,8 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
         }
     }
 
-    public void add(KeyVal keyValue) {
-        rows.add(row(keyValue));
-    }
-
     private EditableRow row(KeyVal keyValue) {
-        RowSource source = new KeyValueRowSource(keyValue);
+        RowSource source = new KeyValueRowSource(keyValue, keywords);
         return new EditableRow(source);
     }
 
@@ -100,11 +100,11 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
     }
 
     public void addBlankRow() {
-        KeyVal entry = new KeyVal();
-        entry.setKeyword("");
-        entry.setValue("");
-
-        add(entry);
+        KeyVal keyVal = new KeyVal();
+        keyVal.setKeyword(new Keyword(""));
+        keyVal.setValue("");
+        
+        rows.add(row(keyVal));
     }
 
     public void removeSelected() {

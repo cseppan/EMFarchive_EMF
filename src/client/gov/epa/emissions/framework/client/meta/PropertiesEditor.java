@@ -11,11 +11,13 @@ import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -49,7 +51,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         tabbedPane.addTab("Data", createDataTab(dataset, parentConsole));
         tabbedPane.addTab("Keywords", createKeywordsTab());
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
-        tabbedPane.addTab("Info", createTab());
+        tabbedPane.addTab("Info", createErrorTab("TODO"));
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -60,13 +62,11 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         try {
             SummaryTab view = new SummaryTab(dataset, session.getDataServices(), messagePanel);
             presenter.set(view);
-
             return view;
         } catch (EmfException e) {
             showError("Could not load Summary Tab. Reason - " + e.getMessage());
+            return createErrorTab("Could not load Summary Tab. Reason - " + e.getMessage());
         }
-
-        return createTab();
     }
 
     private JPanel createDataTab(EmfDataset dataset, EmfFrame parentConsole) {
@@ -79,9 +79,13 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     private JPanel createKeywordsTab() {
         KeywordsTab view = new KeywordsTab();
-        presenter.set(view);
-
-        return view;
+        try {
+            presenter.set(view);
+            return view;
+        } catch (EmfException e) {
+            showError("Could not load Keyword Tab. Reason - " + e.getMessage());
+            return createErrorTab("Could not load Keyword Tab. Reason - " + e.getMessage());
+        }
     }
 
     private JPanel createLogsTab(EmfDataset dataset, EmfFrame parentConsole) {
@@ -94,15 +98,16 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
             return view;
         } catch (EmfException e) {
-            messagePanel.setError("could not load Logs tab. Failed communication with remote Logging Services.");
+            messagePanel.setError("Could not load Logs tab. Failed communication with remote Logging Services.");
+            return createErrorTab("Could not load Logs tab. Failed communication with remote Logging Services.");
         }
-
-        return createTab();
     }
 
-    // TODO: other tabs
-    private JPanel createTab() {
+    private JPanel createErrorTab(String message) {
         JPanel panel = new JPanel(false);
+        JLabel label = new JLabel(message);
+        label.setForeground(Color.RED);
+        panel.add(label);
 
         return panel;
     }

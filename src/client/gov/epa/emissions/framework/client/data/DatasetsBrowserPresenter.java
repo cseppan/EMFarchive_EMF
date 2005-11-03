@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportView;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
@@ -17,10 +17,10 @@ public class DatasetsBrowserPresenter {
 
     private ViewLayout viewLayout;
 
-    private DataServices dataServices;
+    private ServiceLocator serviceLocator;
 
-    public DatasetsBrowserPresenter(DataServices dataServices, ViewLayout viewLayout) {
-        this.dataServices = dataServices;
+    public DatasetsBrowserPresenter(ServiceLocator serviceLocator, ViewLayout viewLayout) {
+        this.serviceLocator = serviceLocator;
         this.viewLayout = viewLayout;
     }
 
@@ -51,8 +51,7 @@ public class DatasetsBrowserPresenter {
     }
 
     public void doRefresh() throws EmfException {
-        // FIXME: fix the type casting
-        view.refresh(dataServices.getDatasets());
+        view.refresh(serviceLocator.getDataServices().getDatasets());
 
         view.clearMessage();
     }
@@ -69,7 +68,7 @@ public class DatasetsBrowserPresenter {
     private void showPropertiesEditor(PropertiesEditorView propertiesEditorView, EmfDataset dataset) {
         viewLayout.add(propertiesEditorView, "Properties - " + dataset.getName());
 
-        PropertiesEditorPresenter presenter = new PropertiesEditorPresenter(dataset, dataServices);
+        PropertiesEditorPresenter presenter = new PropertiesEditorPresenter(dataset, serviceLocator);
         presenter.display(propertiesEditorView);
     }
 

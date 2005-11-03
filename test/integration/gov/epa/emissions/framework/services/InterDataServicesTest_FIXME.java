@@ -11,21 +11,18 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 
-public class InterDataServicesTest extends WebServicesIntegrationTestCase {
+public abstract class InterDataServicesTest_FIXME extends WebServicesIntegrationTestCase {
     protected InterDataServices services;
-
-    private EmfDataset dataset;
 
     protected void setUp() {
         services = serviceLocator.getInterDataServices();
     }
 
-    protected void tearDown() throws Exception {
-    }
-
     public void testFetchEmfKeywords() throws EmfException {
-        Keyword[] emfKeywords = services.getKeywords();
-        assertTrue("Should have atleast 1 keyword", emfKeywords.length > 0);
+        services.insertKeyword(new Keyword("1"));
+        Keyword[] keywords = services.getKeywords();
+        assertTrue("Should have atleast 1 keyword", keywords.length > 0);
+        services.deleteKeyword(keywords[0]);
     }
 
 }

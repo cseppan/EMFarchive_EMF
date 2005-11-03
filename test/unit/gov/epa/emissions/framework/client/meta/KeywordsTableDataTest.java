@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.KeyVal;
+import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;
@@ -18,15 +19,16 @@ public class KeywordsTableDataTest extends TestCase {
     protected void setUp() {
         val1 = new KeyVal();
         val1.setId(1);
-        val1.setKeyword("key1");
+        val1.setKeyword(new Keyword("key1"));
         val1.setValue("val1");
 
         val2 = new KeyVal();
         val2.setId(2);
-        val2.setKeyword("key2");
+        val2.setKeyword(new Keyword("key2"));
         val2.setValue("val2");
 
-        data = new KeywordsTableData(new KeyVal[] { val1, val2 });
+        Keyword[] keywords = { new Keyword("1"), new Keyword("2") };
+        data = new KeywordsTableData(new KeyVal[] { val1, val2 }, keywords);
     }
 
     public void testShouldHaveThreeColumns() {
@@ -81,10 +83,7 @@ public class KeywordsTableDataTest extends TestCase {
     }
 
     public void testShouldAddEntryOnAdd() {
-        KeyVal val = new KeyVal();
-        val.setId(3);
-
-        data.add(val);
+        data.addBlankRow();
 
         assertEquals(3, data.rows().size());
     }
@@ -96,21 +95,18 @@ public class KeywordsTableDataTest extends TestCase {
         assertEquals(3, rows.size());
         Row blankRow = (Row) rows.get(2);
         KeyVal blankSource = ((KeyVal) blankRow.source());
-        assertEquals("", blankSource.getKeyword());
+        assertEquals(new Keyword(""), blankSource.getKeyword());
         assertEquals("", blankSource.getValue());
     }
 
     public void testShouldReturnCurrentlyHeldKeyVal() {
-        KeyVal criterion = new KeyVal();
-        criterion.setId(3);
-
-        data.add(criterion);
+        data.addBlankRow();
 
         KeyVal[] sources = data.sources();
         assertEquals(3, sources.length);
         assertEquals(val1, sources[0]);
         assertEquals(val2, sources[1]);
-        assertEquals(criterion, sources[2]);
+        assertEquals(new Keyword(""), sources[2].getKeyword());
     }
 
 }

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 public class KeywordsTabPresenter {
@@ -13,8 +14,8 @@ public class KeywordsTabPresenter {
         this.dataset = dataset;
     }
 
-    public void init() {
-        view.display(dataset.getKeyVals());
+    public void init(Keyword[] keywords) {
+        view.display(dataset.getKeyVals(), keywords);
     }
 
     public void doSave() {
