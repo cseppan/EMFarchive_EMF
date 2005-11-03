@@ -11,7 +11,7 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 
-public abstract class InterDataServicesTest_FIXME extends WebServicesIntegrationTestCase {
+public class InterDataServicesTest extends WebServicesIntegrationTestCase {
     protected InterDataServices services;
 
     protected void setUp() {

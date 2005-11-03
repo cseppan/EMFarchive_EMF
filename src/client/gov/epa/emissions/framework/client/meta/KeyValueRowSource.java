@@ -33,7 +33,6 @@ public class KeyValueRowSource implements RowSource {
         case 2:
             source.setValue((String) val);
             break;
-
         default:
             throw new RuntimeException("invalid column - " + column);
         }

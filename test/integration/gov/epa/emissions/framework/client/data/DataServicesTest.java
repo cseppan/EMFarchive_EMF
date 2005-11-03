@@ -16,7 +16,7 @@ public class DataServicesTest extends WebServicesIntegrationTestCase {
 
     public void testShouldReturnCompleteListOfSectors() throws EmfException {
         Sector[] sectors = services.getSectors();
-        assertTrue(sectors.length >=14);
+        assertTrue(sectors.length >= 14);
     }
 
     public void testShouldAddSector() throws Exception {

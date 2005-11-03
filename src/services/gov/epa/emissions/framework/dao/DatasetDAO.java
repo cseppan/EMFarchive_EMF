@@ -75,7 +75,7 @@ public class DatasetDAO {
     }// getDataset
 
     public static List getDatasets(Session session) {
-        log.debug("In get all Datasets with valid session?: " + (session == null));
+        log.debug("In get all Datasets with invalid session?: " + (session == null));
         ArrayList datasets = null;
 
 		Transaction tx = null;

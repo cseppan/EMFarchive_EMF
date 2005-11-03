@@ -17,8 +17,8 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
     private Keyword[] keywords;
 
     public KeywordsTableData(KeyVal[] values, Keyword[] keywords) {
-        this.rows = createRows(values);
         this.keywords = keywords;
+        this.rows = createRows(values, keywords);
     }
 
     public String[] columns() {
@@ -33,10 +33,10 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
         return true;
     }
 
-    private List createRows(KeyVal[] values) {
+    private List createRows(KeyVal[] values, Keyword[] keywords) {
         List rows = new ArrayList();
         for (int i = 0; i < values.length; i++)
-            rows.add(row(values[i]));
+            rows.add(row(values[i], keywords));
 
         return rows;
     }
@@ -52,7 +52,7 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
         }
     }
 
-    private EditableRow row(KeyVal keyValue) {
+    private EditableRow row(KeyVal keyValue, Keyword[] keywords) {
         RowSource source = new KeyValueRowSource(keyValue, keywords);
         return new EditableRow(source);
     }
@@ -100,11 +100,12 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
     }
 
     public void addBlankRow() {
+        System.out.println("adding blank row...");
         KeyVal keyVal = new KeyVal();
         keyVal.setKeyword(new Keyword(""));
         keyVal.setValue("");
-        
-        rows.add(row(keyVal));
+
+        rows.add(row(keyVal, keywords));
     }
 
     public void removeSelected() {

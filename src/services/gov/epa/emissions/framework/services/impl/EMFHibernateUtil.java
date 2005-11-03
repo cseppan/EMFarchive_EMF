@@ -33,7 +33,7 @@ public class EMFHibernateUtil {
         log.debug("get session");    	
         Session session = null;
         session = sessionFactory.openSession();
-        log.debug("get session: " + (session==null));
+        log.debug("get session: " + (session!=null));
         return session;
     }
 

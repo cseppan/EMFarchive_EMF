@@ -83,6 +83,7 @@
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.InternalSource" qname="ns1:InternalSource" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.ExternalSource" qname="ns1:ExternalSource" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Keyword" qname="ns1:Keyword" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.KeyVal" qname="ns1:KeyVal" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
  </service>
 
   <service name="gov.epa.emf.services.InterDataServices" provider="java:RPC" style="RPC" use="encoded">
@@ -95,6 +96,11 @@
  <arrayMapping qname="ns1:Keywords" xmlns:ns1="urn:gov.epa.services.EmfServices"
              languageSpecificType="java:gov.epa.emissions.commons.io.Keyword[]"
 			 innerType="ns1:Keyword" 
+             encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
+             
+ <arrayMapping qname="ns1:KeyVals" xmlns:ns1="urn:gov.epa.services.EmfServices"
+             languageSpecificType="java:gov.epa.emissions.commons.io.KeyVal[]"
+			 innerType="ns1:KeyVal" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
              
 

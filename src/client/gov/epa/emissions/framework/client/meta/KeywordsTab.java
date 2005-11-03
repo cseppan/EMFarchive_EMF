@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
-import gov.epa.emissions.framework.client.data.ListPanel;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import javax.swing.BoxLayout;
@@ -24,10 +23,11 @@ public class KeywordsTab extends JPanel implements KeywordsTabView {
 
     private JPanel createLayout(KeyVal[] values, Keyword[] keywords) {
         tableData = new KeywordsTableData(values, keywords);
-        return new ListPanel("Keywords + Values", tableData);
+        return new KeywordsPanel("Keywords + Values", tableData, keywords);
     }
 
     public void update(EmfDataset dataset) {
+        //TODO: if duplicate keywords, throw exception
         dataset.setKeyVals(tableData.sources());
     }
 
