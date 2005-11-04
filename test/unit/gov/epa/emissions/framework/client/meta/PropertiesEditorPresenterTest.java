@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
@@ -86,7 +87,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
         Mock keywordsView = mock(KeywordsTabView.class);
         keywordsView.expects(once()).method("display");
-        keywordsView.expects(once()).method("update").with(eq(dataset));
+        keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[]{}));
 
         presenter.set((SummaryTabView) summaryView.proxy());
         presenter.set((KeywordsTabView) keywordsView.proxy());
@@ -108,7 +109,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         summaryView.expects(atLeastOnce()).method("observeChanges").with(eq(presenter));
 
         Mock keywordsView = mock(KeywordsTabView.class);
-        keywordsView.expects(once()).method("update").with(eq(dataset));
+        keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[]{}));
         keywordsView.expects(atLeastOnce()).method("display");
 
         presenter.set((SummaryTabView) summaryView.proxy());
@@ -148,7 +149,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
         Mock keywordsView = mock(KeywordsTabView.class);
         keywordsView.expects(once()).method("display");
-        keywordsView.expects(once()).method("update").with(eq(dataset));
+        keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[]{}));
 
         presenter.set((SummaryTabView) summaryView.proxy());
         presenter.set((KeywordsTabView) keywordsView.proxy());
@@ -167,12 +168,12 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         summaryView.expects(once()).method("observeChanges").with(eq(presenter));
 
         dataServices.expects(once()).method("updateDataset").with(eq(dataset)).will(
-                new ThrowStub(new EmfException("Could not save")));
-        view.expects(once()).method("showError").with(eq("Could not update dataset - " + dataset.getName()));
+                new ThrowStub(new EmfException("Reason")));
+        view.expects(once()).method("showError").with(eq("Could not update dataset - " + dataset.getName() + ".Reason"));
 
         Mock keywordsView = mock(KeywordsTabView.class);
         keywordsView.expects(once()).method("display");
-        keywordsView.expects(once()).method("update").with(eq(dataset));
+        keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[]{}));
 
         presenter.set((SummaryTabView) summaryView.proxy());
         presenter.set((KeywordsTabView) keywordsView.proxy());

@@ -2,10 +2,9 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
-import gov.epa.emissions.framework.services.EmfDataset;
 
 public interface KeywordsTabView {
     void display(KeyVal[] values, Keyword[] keywords);
 
-    void update(EmfDataset dataset);
+    KeyVal[] updates();
 }

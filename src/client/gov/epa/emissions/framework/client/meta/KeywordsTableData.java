@@ -100,7 +100,6 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
     }
 
     public void addBlankRow() {
-        System.out.println("adding blank row...");
         KeyVal keyVal = new KeyVal();
         keyVal.setKeyword(new Keyword(""));
         keyVal.setValue("");

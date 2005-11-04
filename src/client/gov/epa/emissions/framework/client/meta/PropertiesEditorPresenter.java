@@ -50,7 +50,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
         try {
             updateDataset(dataServices, summaryPresenter, keywordsPresenter);
         } catch (EmfException e) {
-            view.showError("Could not update dataset - " + dataset.getName());
+            view.showError("Could not update dataset - " + dataset.getName() + "." + e.getMessage());
             return;
         }
 
