@@ -19,7 +19,7 @@ public class DatasetTypeKeywordsTableDataTest extends TestCase {
         keyword1 = new Keyword("keyword1");
         keyword2 = new Keyword("keyword2");
         data = new DatasetTypeKeywordsTableData(new Keyword[] { keyword1, keyword2 },
-                new MasterKeywords(new Keyword[0]));
+                new Keywords(new Keyword[0]));
     }
 
     public void testShouldHaveTwoColumn() {

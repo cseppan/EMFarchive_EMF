@@ -9,11 +9,11 @@ public class DatasetTypeKeywordRowSource implements RowSource {
 
     private Keyword keyword;
 
-    private MasterKeywords keywords;
+    private Keywords masterKeywords;
 
-    public DatasetTypeKeywordRowSource(Keyword keyword, MasterKeywords keywords) {
+    public DatasetTypeKeywordRowSource(Keyword keyword, Keywords masterKeywords) {
         this.keyword = keyword;
-        this.keywords = keywords;
+        this.masterKeywords = masterKeywords;
         this.selected = Boolean.FALSE;
     }
 
@@ -27,7 +27,7 @@ public class DatasetTypeKeywordRowSource implements RowSource {
             selected = (Boolean) val;
             break;
         case 1:
-            keyword = keywords.get((String) val);
+            keyword = masterKeywords.get((String) val);
             break;
         default:
             throw new RuntimeException("invalid column - " + column);

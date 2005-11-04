@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
-import gov.epa.emissions.framework.client.data.MasterKeywords;
+import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
@@ -15,11 +15,11 @@ import java.util.List;
 public class KeywordsTableData extends AbstractEmfTableData implements SelectableEmfTableData {
     private List rows;
 
-    private MasterKeywords keywords;
+    private Keywords masterKeywords;
 
-    public KeywordsTableData(KeyVal[] values, MasterKeywords keywords) {
-        this.keywords = keywords;
-        this.rows = createRows(values, keywords);
+    public KeywordsTableData(KeyVal[] values, Keywords masterKeywords) {
+        this.masterKeywords = masterKeywords;
+        this.rows = createRows(values, masterKeywords);
     }
 
     public String[] columns() {
@@ -34,10 +34,10 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
         return true;
     }
 
-    private List createRows(KeyVal[] values, MasterKeywords keywords) {
+    private List createRows(KeyVal[] values, Keywords masterKeywords) {
         List rows = new ArrayList();
         for (int i = 0; i < values.length; i++)
-            rows.add(row(values[i], keywords));
+            rows.add(row(values[i], masterKeywords));
 
         return rows;
     }
@@ -53,7 +53,7 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
         }
     }
 
-    private EditableRow row(KeyVal keyValue, MasterKeywords keywords) {
+    private EditableRow row(KeyVal keyValue, Keywords keywords) {
         RowSource source = new KeyValueRowSource(keyValue, keywords);
         return new EditableRow(source);
     }
@@ -105,7 +105,7 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
         keyVal.setKeyword(new Keyword(""));
         keyVal.setValue("");
 
-        rows.add(row(keyVal, keywords));
+        rows.add(row(keyVal, masterKeywords));
     }
 
     public void removeSelected() {

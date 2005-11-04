@@ -16,6 +16,8 @@ public class Label extends JLabel {
     // FIXME: refactor to be reusable across components
     private String toCanonicalName(String name) {
         name = name.trim().replaceAll(" ", "");
+        if (name.length() == 0)
+            return "";
 
         return name.substring(0, 1).toLowerCase() + name.substring(1, name.length());
     }

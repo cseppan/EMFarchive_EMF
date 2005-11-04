@@ -1,13 +1,15 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.data.MasterKeywords;
+import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.core.Constraint;
 
 public class KeywordsTabPresenterTest extends MockObjectTestCase {
 
@@ -18,13 +20,64 @@ public class KeywordsTabPresenterTest extends MockObjectTestCase {
         KeyVal[] values = new KeyVal[] { new KeyVal(), new KeyVal() };
         dataset.stubs().method("getKeyVals").will(returnValue(values));
 
-        MasterKeywords keywords = new MasterKeywords(new Keyword[0]);
-        view.expects(once()).method("display").with(same(values), same(keywords));
+        Keywords keywords = new Keywords(new Keyword[0]);
+        view.expects(once()).method("display").with(eq(values), same(keywords));
+
+        Mock type = mock(DatasetType.class);
+        type.stubs().method("getKeywords").withNoArguments().will(returnValue(new Keyword[0]));
+        dataset.stubs().method("getDatasetType").withNoArguments().will(returnValue(type.proxy()));
 
         KeywordsTabPresenter presenter = new KeywordsTabPresenter((KeywordsTabView) view.proxy(), (EmfDataset) dataset
                 .proxy());
 
         presenter.init(keywords);
+    }
+
+    public void testShouldDisplayKeyValuesForAllKeywordsOfAssociatedDatasetType() {
+        final Keyword keyword1 = new Keyword("key1");
+        final Keyword keyword2 = new Keyword("key2");
+        Keyword[] keywordsList = { keyword1, keyword2 };
+
+        Mock dataset = mock(EmfDataset.class);
+        KeyVal keyVal = new KeyVal();
+        keyVal.setKeyword(keyword1);
+        final KeyVal[] values = new KeyVal[] { keyVal };
+        dataset.stubs().method("getKeyVals").will(returnValue(values));
+
+        Mock type = mock(DatasetType.class);
+        type.stubs().method("getKeywords").withNoArguments().will(returnValue(keywordsList));
+        dataset.stubs().method("getDatasetType").withNoArguments().will(returnValue(type.proxy()));
+
+        Mock view = mock(KeywordsTabView.class);
+        Keywords keywords = new Keywords(keywordsList);
+        view.expects(once()).method("display").with(keyValsConstraint(keyword1, keyword2, values), same(keywords));
+
+        KeywordsTabPresenter presenter = new KeywordsTabPresenter((KeywordsTabView) view.proxy(), (EmfDataset) dataset
+                .proxy());
+
+        presenter.init(keywords);
+    }
+
+    private Constraint keyValsConstraint(final Keyword keyword1, final Keyword keyword2, final KeyVal[] values) {
+        return new Constraint() {
+            public boolean eval(Object arg) {
+                assertTrue(arg instanceof KeyVal[]);
+
+                KeyVal[] actual = (KeyVal[]) arg;
+                assertEquals(2, actual.length);
+                assertEquals(values[0], actual[0]);
+                assertEquals(keyword1, actual[0].getKeyword());
+                KeyVal newKeyVal = actual[1];
+                assertEquals("", newKeyVal.getValue());
+                assertEquals(keyword2, newKeyVal.getKeyword());
+
+                return true;
+            }
+
+            public StringBuffer describeTo(StringBuffer arg0) {
+                return null;
+            }
+        };
     }
 
     public void testUpdateDatasetOnSave() throws EmfException {

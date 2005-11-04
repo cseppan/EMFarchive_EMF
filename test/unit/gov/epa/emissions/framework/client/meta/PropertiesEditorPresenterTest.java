@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
@@ -28,6 +29,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     protected void setUp() {
         dataset = new EmfDataset();
         dataset.setName("test");
+        dataset.setDatasetType(new DatasetType());
 
         view = mock(PropertiesEditorView.class);
 

@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
-import gov.epa.emissions.framework.client.data.MasterKeywords;
+import gov.epa.emissions.framework.client.data.Keywords;
 
 import org.jmock.cglib.MockObjectTestCase;
 
@@ -11,7 +11,7 @@ public class KeyValueRowSourceTest extends MockObjectTestCase {
     public void testShouldSetNewKeywordOnKeyValueIfKeywordDoesNotExist() {
         Keyword[] keywords = new Keyword[0];
         KeyVal keyval = new KeyVal();
-        KeyValueRowSource source = new KeyValueRowSource(keyval, new MasterKeywords(keywords));
+        KeyValueRowSource source = new KeyValueRowSource(keyval, new Keywords(keywords));
 
         source.setValueAt(1, "new-key");
 
@@ -22,7 +22,7 @@ public class KeyValueRowSourceTest extends MockObjectTestCase {
     public void testShouldSetExistingKeywordOnKeyValueIfKeywordDoesExist() {
         Keyword[] keywords = { new Keyword("1"), new Keyword("2") };
         KeyVal keyval = new KeyVal();
-        KeyValueRowSource source = new KeyValueRowSource(keyval, new MasterKeywords(keywords));
+        KeyValueRowSource source = new KeyValueRowSource(keyval, new Keywords(keywords));
 
         source.setValueAt(1, "1");
 

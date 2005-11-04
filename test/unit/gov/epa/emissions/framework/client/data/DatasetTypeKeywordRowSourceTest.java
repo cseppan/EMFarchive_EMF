@@ -6,7 +6,7 @@ import junit.framework.TestCase;
 public class DatasetTypeKeywordRowSourceTest extends TestCase {
 
     public void testShouldCreateNewKeywordOnNewValue() {
-        DatasetTypeKeywordRowSource s = new DatasetTypeKeywordRowSource(null, new MasterKeywords(new Keyword[0]));
+        DatasetTypeKeywordRowSource s = new DatasetTypeKeywordRowSource(null, new Keywords(new Keyword[0]));
 
         s.setValueAt(1, "new");
         assertEquals("new", ((Keyword) s.source()).getName());
@@ -14,7 +14,7 @@ public class DatasetTypeKeywordRowSourceTest extends TestCase {
 
     public void testShouldUseExistingKeywordOnUsingNameOfExistingKeyword() {
         Keyword[] keywords = { new Keyword("key1"), new Keyword("key2") };
-        DatasetTypeKeywordRowSource s = new DatasetTypeKeywordRowSource(null, new MasterKeywords(keywords));
+        DatasetTypeKeywordRowSource s = new DatasetTypeKeywordRowSource(null, new Keywords(keywords));
 
         s.setValueAt(1, "key1");
         assertSame(keywords[0], s.source());
