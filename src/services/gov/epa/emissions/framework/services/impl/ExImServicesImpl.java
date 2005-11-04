@@ -158,6 +158,8 @@ public class ExImServicesImpl implements ExImServices {
             log.debug("$$$ Path: " + path.getAbsolutePath());
             log.debug("$$$ Filename: " + fileName);
             log.debug("$$$ DatasetType: " + dataset.getDatasetType().getName());
+            log.debug("%%%%% Is importer null? " + (importer==null));
+            //Test the precondition (files exist)
             importer.preCondition(path, fileName);
             ImportTask eximTask = new ImportTask(user, fileName, dataset, svcHolder, importer);
 

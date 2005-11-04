@@ -42,8 +42,8 @@ public final class EMFConstants {
     //DatasetType Names constants
     public static final String DATASETTYPE_NAME_ORL="ORL";
     public static final String DATASETTYPE_NAME_SHAPEFILES="Shapefile";
-    public static final String DATASETTYPE_NAME_EXTERNALFILES="External";
-    public static final String DATASETTYPE_NAME_METEOROLOGYFILES="Meteorology";
+    public static final String DATASETTYPE_NAME_EXTERNALFILES="External File";
+    public static final String DATASETTYPE_NAME_METEOROLOGYFILES="Meteorology File";
     public static final String DATASETTYPE_NAME_MODELREADYEMISSIONSFILES="Model Ready Emissions";
     
 }
