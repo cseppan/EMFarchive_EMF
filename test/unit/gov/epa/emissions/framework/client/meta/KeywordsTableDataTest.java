@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.framework.client.data.MasterKeywords;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class KeywordsTableDataTest extends TestCase {
         val2.setValue("val2");
 
         Keyword[] keywords = { new Keyword("1"), new Keyword("2") };
-        data = new KeywordsTableData(new KeyVal[] { val1, val2 }, keywords);
+        data = new KeywordsTableData(new KeyVal[] { val1, val2 }, new MasterKeywords(keywords));
     }
 
     public void testShouldHaveThreeColumns() {

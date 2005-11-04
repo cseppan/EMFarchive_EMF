@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.KeyVal;
-import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.data.MasterKeywords;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.util.Set;
@@ -19,7 +19,7 @@ public class KeywordsTabPresenter {
         this.dataset = dataset;
     }
 
-    public void init(Keyword[] keywords) {
+    public void init(MasterKeywords keywords) {
         view.display(dataset.getKeyVals(), keywords);
     }
 

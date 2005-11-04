@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
+import gov.epa.emissions.framework.client.data.MasterKeywords;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -79,7 +80,9 @@ public class PropertiesEditorPresenter implements ChangeObserver {
 
     public void set(KeywordsTabView keywordsView) throws EmfException {
         keywordsPresenter = new KeywordsTabPresenter(keywordsView, dataset);
-        keywordsPresenter.init(interdataServices.getKeywords());
+        
+        MasterKeywords keywords = new MasterKeywords(interdataServices.getKeywords());
+        keywordsPresenter.init(keywords);
     }
 
     private void clearChanges() {

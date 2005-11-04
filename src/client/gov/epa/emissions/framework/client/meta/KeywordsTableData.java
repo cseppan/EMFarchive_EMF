@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.framework.client.data.MasterKeywords;
 import gov.epa.emissions.framework.ui.AbstractEmfTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
@@ -14,9 +15,9 @@ import java.util.List;
 public class KeywordsTableData extends AbstractEmfTableData implements SelectableEmfTableData {
     private List rows;
 
-    private Keyword[] keywords;
+    private MasterKeywords keywords;
 
-    public KeywordsTableData(KeyVal[] values, Keyword[] keywords) {
+    public KeywordsTableData(KeyVal[] values, MasterKeywords keywords) {
         this.keywords = keywords;
         this.rows = createRows(values, keywords);
     }
@@ -33,7 +34,7 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
         return true;
     }
 
-    private List createRows(KeyVal[] values, Keyword[] keywords) {
+    private List createRows(KeyVal[] values, MasterKeywords keywords) {
         List rows = new ArrayList();
         for (int i = 0; i < values.length; i++)
             rows.add(row(values[i], keywords));
@@ -52,7 +53,7 @@ public class KeywordsTableData extends AbstractEmfTableData implements Selectabl
         }
     }
 
-    private EditableRow row(KeyVal keyValue, Keyword[] keywords) {
+    private EditableRow row(KeyVal keyValue, MasterKeywords keywords) {
         RowSource source = new KeyValueRowSource(keyValue, keywords);
         return new EditableRow(source);
     }

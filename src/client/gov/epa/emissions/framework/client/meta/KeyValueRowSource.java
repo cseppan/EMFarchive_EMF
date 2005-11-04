@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.framework.client.data.MasterKeywords;
 import gov.epa.emissions.framework.ui.RowSource;
 
 public class KeyValueRowSource implements RowSource {
@@ -10,9 +11,9 @@ public class KeyValueRowSource implements RowSource {
 
     private Boolean selected;
 
-    private Keyword[] keywords;
+    private MasterKeywords keywords;
 
-    public KeyValueRowSource(KeyVal source, Keyword[] keywords) {
+    public KeyValueRowSource(KeyVal source, MasterKeywords keywords) {
         this.source = source;
         this.keywords = keywords;
         this.selected = Boolean.FALSE;
@@ -39,12 +40,7 @@ public class KeyValueRowSource implements RowSource {
     }
 
     private Keyword keyword(Object val) {
-        for (int i = 0; i < keywords.length; i++) {
-            if (keywords[i].getName().equals(val))
-                return keywords[i];
-        }
-
-        return new Keyword((String) val);
+        return keywords.get((String) val);
     }
 
     public Object source() {
