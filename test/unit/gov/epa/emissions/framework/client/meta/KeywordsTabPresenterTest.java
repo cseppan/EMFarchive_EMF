@@ -54,7 +54,7 @@ public class KeywordsTabPresenterTest extends MockObjectTestCase {
         try {
             presenter.doSave();
         } catch (EmfException e) {
-            assertEquals("Duplicate keyword: 'name' not allowed", e.getMessage());
+            assertEquals("duplicate keyword 'name'", e.getMessage());
             return;
         }
 

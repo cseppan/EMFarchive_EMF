@@ -1,6 +1,5 @@
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDAO;
 import gov.epa.emissions.framework.dao.DatasetTypesDAO;
@@ -17,19 +16,15 @@ import org.hibernate.Session;
 public class StandAloneClient {
     private static Log log = LogFactory.getLog(DatasetTypesServicesImpl.class);
 
-    public StandAloneClient() throws EmfException{
-      super();  
-      //doDatasetTypes();
-      
-      doDatasets();
+    public StandAloneClient() throws EmfException {
+        super();
+        // doDatasetTypes();
+
+        doDatasets();
     }
-   
+
     private void doDatasets() throws EmfException {
         Dataset[] allDatasets = getDatasets();
-        
-        
-        
-        if (false) throw new EmfException("");
     }
 
     private Dataset[] getDatasets() throws EmfException {
@@ -40,9 +35,9 @@ public class StandAloneClient {
             datasets = DatasetDAO.getDatasets(session);
             log.debug("In DatasetServicesImpl:getDatasetTypes END: " + datasets.size());
             session.flush();
-            //session.close();
+            // session.close();
 
-//            hsqlCleanup(session);
+            // hsqlCleanup(session);
         } catch (HibernateException e) {
             log.error("Error in the database" + e);
             throw new EmfException("Database error");
@@ -51,70 +46,30 @@ public class StandAloneClient {
         return (Dataset[]) datasets.toArray(new DatasetType[datasets.size()]);
     }
 
-    private void doDatasetTypes() throws EmfException {
-        DatasetType[] allDsts = getDatasetTypes();
-        log.debug("OUTPUT $$$$$$$ " + allDsts.length);
-        Keyword kw = new Keyword("Halo");
-        for (int i=0; i<allDsts.length;i++){
-            
-            DatasetType dst =allDsts[i]; 
-            Keyword[] kws = dst.getKeywords();
-            System.out.println("DatasetName: " + dst.getName() + " # of Kws: " + kws.length);
-            if (dst.getName().equals("Shapefile")){
-                dst.addKeyword(kw);
-                updateDatasetType(dst);
-            }
-        }
-    }
+    public DatasetType[] getDatasetTypes() throws EmfException {
 
-    private void updateDatasetType(DatasetType dst) throws EmfException {
+        List datasettypes = null;
         try {
             log.debug("In DatasetTypesServicesImpl:getDatasetTypes START");
             Session session = HibernateUtils.currentSession();
-            DatasetTypesDAO.updateDatasetType(dst,session);
-            log.debug("In UPDATE ");
-            
+            datasettypes = DatasetTypesDAO.getDatasetTypes(session);
+            log.debug("In DatasetTypesServicesImpl:getDatasetTypes END: " + datasettypes.size());
             session.flush();
-            session.close();
+            // session.close();
+
+            // hsqlCleanup(session);
         } catch (HibernateException e) {
             log.error("Error in the database" + e);
             throw new EmfException("Database error");
         }
-        
+
+        return (DatasetType[]) datasettypes.toArray(new DatasetType[datasettypes.size()]);
     }
 
-    public DatasetType[] getDatasetTypes() throws EmfException{
-            
-            List datasettypes = null;
-            try {
-                log.debug("In DatasetTypesServicesImpl:getDatasetTypes START");
-                Session session = HibernateUtils.currentSession();
-                datasettypes = DatasetTypesDAO.getDatasetTypes(session);
-                log.debug("In DatasetTypesServicesImpl:getDatasetTypes END: " + datasettypes.size());
-                session.flush();
-                //session.close();
-
-//                hsqlCleanup(session);
-            } catch (HibernateException e) {
-                log.error("Error in the database" + e);
-                throw new EmfException("Database error");
-            }
-
-            return (DatasetType[]) datasettypes.toArray(new DatasetType[datasettypes.size()]);
-        }
-
-    
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         new StandAloneClient();
-               
-		System.exit(0);	
-	}	
-    
-    private void hsqlCleanup(Session s) {
-        try {
-            s.connection().createStatement().execute("SHUTDOWN");
-        } catch (Exception e) {
-        }
+
+        System.exit(0);
     }
 
 }

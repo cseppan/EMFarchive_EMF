@@ -68,7 +68,7 @@ public class UpdateDatasetTypeWindow extends DisposableInteralFrame implements U
         layout.add(messagePanel);
         layout.add(createInputPanel(type));
         layout.add(createKeywordsPanel(type, keywords));
-        layout.add(createButtonsPanel(type));
+        layout.add(createButtonsPanel());
     }
 
     private JPanel createInputPanel(DatasetType type) {
@@ -97,7 +97,7 @@ public class UpdateDatasetTypeWindow extends DisposableInteralFrame implements U
         return panel;
     }
 
-    private JPanel createButtonsPanel(DatasetType type) {
+    private JPanel createButtonsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel();
@@ -106,7 +106,7 @@ public class UpdateDatasetTypeWindow extends DisposableInteralFrame implements U
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button saveButton = new Button("Save", saveAction(type));
+        Button saveButton = new Button("Save", saveAction());
         container.add(saveButton);
         container.add(new Button("Close", closeAction()));
         getRootPane().setDefaultButton(saveButton);
@@ -116,14 +116,11 @@ public class UpdateDatasetTypeWindow extends DisposableInteralFrame implements U
         return panel;
     }
 
-    private Action saveAction(final DatasetType type) {
+    private Action saveAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                type.setName(name.getText());
-                type.setDescription(description.getText());
-                type.setKeywords(keywordsTableData.sources());
                 try {
-                    presenter.doSave(manager);
+                    presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), manager);
                 } catch (EmfException e) {
                     messagePanel.setError("Could not save. Reason: " + e.getMessage());
                 }

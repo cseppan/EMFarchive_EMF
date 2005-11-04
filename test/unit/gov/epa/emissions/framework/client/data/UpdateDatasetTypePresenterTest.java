@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.services.DatasetTypesServices;
 import gov.epa.emissions.framework.services.InterDataServices;
 
 import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import org.jmock.cglib.MockObjectTestCase;
 
 public class UpdateDatasetTypePresenterTest extends MockObjectTestCase {
 
@@ -39,19 +39,51 @@ public class UpdateDatasetTypePresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldUpdateSectorAndCloseOnSave() throws EmfException {
-        DatasetType type = new DatasetType();
+        String name = "name";
+        String desc = "desc";
+        Keyword[] keywords = {};
+
+        Mock type = mock(DatasetType.class);
+        type.expects(once()).method("setName").with(same(name));
+        type.expects(once()).method("setDescription").with(same(desc));
+        type.expects(once()).method("setKeywords").with(same(keywords));
+        DatasetType typeProxy = (DatasetType) type.proxy();
+
         Mock services = mock(DatasetTypesServices.class);
-        services.expects(once()).method("updateDatasetType").with(same(type));
+        services.expects(once()).method("updateDatasetType").with(same(typeProxy));
 
         Mock view = mock(UpdateDatasetTypeView.class);
         view.expects(once()).method("close");
+
         UpdateDatasetTypePresenter presenter = new UpdateDatasetTypePresenter((UpdateDatasetTypeView) view.proxy(),
-                type, (DatasetTypesServices) services.proxy(), null);
+                typeProxy, (DatasetTypesServices) services.proxy(), null);
 
         Mock managerView = mock(DatasetTypesManagerView.class);
         managerView.expects(once()).method("refresh").withNoArguments();
 
-        presenter.doSave((DatasetTypesManagerView) managerView.proxy());
+        presenter.doSave(name, desc, keywords, (DatasetTypesManagerView) managerView.proxy());
     }
 
+    public void testShouldFailWithErrorIfDuplicateKeywordsInKeyValsOnSave() {
+        String name = "name";
+        String desc = "desc";
+
+        Mock type = mock(DatasetType.class);
+        type.expects(once()).method("setName").with(same(name));
+        type.expects(once()).method("setDescription").with(same(desc));
+
+        UpdateDatasetTypePresenter presenter = new UpdateDatasetTypePresenter(null, ((DatasetType) type.proxy()), null,
+                null);
+        Mock managerView = mock(DatasetTypesManagerView.class);
+
+        Keyword key1 = new Keyword("1");
+        try {
+            presenter.doSave(name, desc, new Keyword[] { key1, key1 }, (DatasetTypesManagerView) managerView.proxy());
+        } catch (EmfException e) {
+            assertEquals("Duplicate keyword: '1' not allowed", e.getMessage());
+            return;
+        }
+
+        fail("should have raised an error on duplicate keyword entries");
+    }
 }
