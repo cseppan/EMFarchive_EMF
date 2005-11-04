@@ -14,8 +14,11 @@ import java.util.List;
 public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implements SelectableEmfTableData {
     private List rows;
 
-    public DatasetTypeKeywordsTableData(Keyword[] keywords) {
-        this.rows = createRows(keywords);
+    private MasterKeywords keywords;
+
+    public DatasetTypeKeywordsTableData(Keyword[] keywordsList, MasterKeywords keywords) {
+        this.keywords = keywords;
+        this.rows = createRows(keywordsList, keywords);
     }
 
     public String[] columns() {
@@ -30,8 +33,8 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
         return true;
     }
 
-    public void add(String keyword) {
-        rows.add(row(new Keyword(keyword)));
+    void add(String keyword) {
+        rows.add(row(new Keyword(keyword), keywords));
     }
 
     public void setValueAt(Object value, int row, int col) {
@@ -55,10 +58,10 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
         remove(getSelected());
     }
 
-    private List createRows(Keyword[] keywords) {
+    private List createRows(Keyword[] keywordsList, MasterKeywords keywords) {
         List rows = new ArrayList();
-        for (int i = 0; i < keywords.length; i++)
-            rows.add(row(keywords[i]));
+        for (int i = 0; i < keywordsList.length; i++)
+            rows.add(row(keywordsList[i], keywords));
 
         return rows;
     }
@@ -74,8 +77,8 @@ public class DatasetTypeKeywordsTableData extends AbstractEmfTableData implement
         }
     }
 
-    private EditableRow row(Keyword keyword) {
-        RowSource source = new DatasetTypeKeywordRowSource(keyword);
+    private EditableRow row(Keyword keyword, MasterKeywords keywords) {
+        RowSource source = new DatasetTypeKeywordRowSource(keyword, keywords);
         return new EditableRow(source);
     }
 

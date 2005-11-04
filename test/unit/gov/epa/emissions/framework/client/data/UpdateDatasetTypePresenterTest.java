@@ -80,7 +80,7 @@ public class UpdateDatasetTypePresenterTest extends MockObjectTestCase {
         try {
             presenter.doSave(name, desc, new Keyword[] { key1, key1 }, (DatasetTypesManagerView) managerView.proxy());
         } catch (EmfException e) {
-            assertEquals("Duplicate keyword: '1' not allowed", e.getMessage());
+            assertEquals("duplicate keyword: '1'", e.getMessage());
             return;
         }
 

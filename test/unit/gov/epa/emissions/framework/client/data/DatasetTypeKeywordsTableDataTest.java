@@ -10,13 +10,16 @@ import junit.framework.TestCase;
 public class DatasetTypeKeywordsTableDataTest extends TestCase {
 
     private DatasetTypeKeywordsTableData data;
+
     private Keyword keyword1;
+
     private Keyword keyword2;
 
     protected void setUp() {
         keyword1 = new Keyword("keyword1");
         keyword2 = new Keyword("keyword2");
-        data = new DatasetTypeKeywordsTableData(new Keyword[] { keyword1, keyword2 });
+        data = new DatasetTypeKeywordsTableData(new Keyword[] { keyword1, keyword2 },
+                new MasterKeywords(new Keyword[0]));
     }
 
     public void testShouldHaveTwoColumn() {
@@ -46,8 +49,8 @@ public class DatasetTypeKeywordsTableDataTest extends TestCase {
     }
 
     public void testShouldReturnARowRepresentingAKeywordEntry() {
-        assertEquals("keyword1", ((Keyword)data.element(0)).getName());
-        assertEquals("keyword2", ((Keyword)data.element(1)).getName());
+        assertEquals("keyword1", ((Keyword) data.element(0)).getName());
+        assertEquals("keyword2", ((Keyword) data.element(1)).getName());
     }
 
     public void testShouldRemoveKeywordOnRemove() {

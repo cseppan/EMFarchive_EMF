@@ -58,7 +58,7 @@ public class UpdateDatasetTypePresenter {
         for (int i = 0; i < keywords.length; i++) {
             String name = keywords[i].getName();
             if (!set.add(name))
-                throw new EmfException("Duplicate keyword: '" + name + "' not allowed");
+                throw new EmfException("duplicate keyword: '" + name + "'");
         }
     }
 }
