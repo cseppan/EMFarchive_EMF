@@ -8,9 +8,7 @@ import gov.epa.emissions.framework.db.PostgresDbUpdate;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -37,12 +35,6 @@ public abstract class PersistenceTestCase extends TestCase {
 
     protected void tearDown() throws Exception {
         dbSetup.tearDown();
-    }
-
-    protected ResultSet scrollableResultSet(Datasource datasource, String query) throws SQLException {
-        Statement stmt = datasource.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                ResultSet.CONCUR_READ_ONLY);
-        return stmt.executeQuery(query);
     }
 
     protected Datasource emissions() {
