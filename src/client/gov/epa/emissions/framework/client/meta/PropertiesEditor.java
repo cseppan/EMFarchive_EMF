@@ -35,12 +35,10 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
     private DatasetsBrowserView datasetsBrowser;
 
     public PropertiesEditor(EmfSession session, DatasetsBrowserView datasetsBrowser, EmfFrame parentConsole) {
-        super("Dataset Properties Editor");
+        super("Dataset Properties Editor", new Dimension(700, 485));
         this.session = session;
         this.datasetsBrowser = datasetsBrowser;
         this.parentConsole = parentConsole;
-
-        super.setSize(new Dimension(700, 485));
     }
 
     private JTabbedPane createTabbedPane(EmfDataset dataset, MessagePanel messagePanel) {

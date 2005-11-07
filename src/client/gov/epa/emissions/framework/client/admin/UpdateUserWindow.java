@@ -31,12 +31,12 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
         this.windowTitle = "Update User - " + user.getUsername();
         this.user = user;
 
-        panel = createLayout(adminOption);
         JPanel container = new JPanel();
+        panel = createLayout(adminOption);
         container.add(panel);
+        
         super.getContentPane().add(container);
-
-        super.setSize(panel.getSize());
+        super.dimensions(panel.getSize());
         super.setResizable(false);
     }
 

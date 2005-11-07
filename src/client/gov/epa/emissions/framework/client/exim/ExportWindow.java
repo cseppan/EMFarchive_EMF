@@ -38,11 +38,9 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private JTextArea purpose;
 
     public ExportWindow(EmfDataset[] datasets) {
-        super("Export Dataset(s)");
+        super("Export Dataset(s)", new Dimension(600, 300));
         super.setName("exportWindow");
         this.datasets = datasets;
-
-        super.setSize(new Dimension(600, 300));
 
         this.getContentPane().add(createLayout());
     }

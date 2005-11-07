@@ -45,13 +45,12 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     private DataServices dataServices;
 
     public SectorsManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
-        super("Sectors Manager", desktop);
+        super("Sectors Manager", new Dimension(475, 300), desktop);
         this.parentConsole = parentConsole;
         this.desktop = desktop;
 
         layout = new JPanel();
         this.getContentPane().add(layout);
-        this.setSize(new Dimension(475, 300));
     }
 
     public void observe(SectorsManagerPresenter presenter) {

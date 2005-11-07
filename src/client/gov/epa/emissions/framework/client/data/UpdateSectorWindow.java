@@ -40,14 +40,12 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
     private SectorsManagerView sectorManager;
 
     public UpdateSectorWindow(SectorsManagerView sectorManager) {
-        super("Update Sector");
+        super("Update Sector", new Dimension(400, 400));
 
         this.sectorManager = sectorManager;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
-
-        super.setSize(new Dimension(400, 400));
     }
 
     public void observe(UpdateSectorPresenter presenter) {

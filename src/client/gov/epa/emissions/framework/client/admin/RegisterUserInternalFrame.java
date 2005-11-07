@@ -13,7 +13,7 @@ public class RegisterUserInternalFrame extends ReusableInteralFrame implements R
 
         view = new RegisterUserPanel(postRegisterStrategy, new CloseViewOnCancelStrategy(), this, new AddAdminOption());
 
-        super.setSize(view.getSize());
+        super.dimensions(view.getSize());
         super.getContentPane().add(view);
     }
 

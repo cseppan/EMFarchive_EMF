@@ -54,7 +54,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     // FIXME: this class needs to be refactored into smaller components
     public UsersManager(User user, UserServices userServices, JFrame parentConsole, JDesktopPane desktop)
             throws Exception {
-        super("User Manager", desktop);
+        super("User Manager", new Dimension(550, 300), desktop);
         this.user = user;
         this.parentConsole = parentConsole;
         this.desktop = desktop;
@@ -76,8 +76,6 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
         sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         createLayout(layout, sortFilterSelectPanel);
         listenForUpdateSelection(sortFilterSelectPanel.getTable());
-
-        this.setSize(new Dimension(550, 300));
     }
 
     private void listenForUpdateSelection(final JTable table) {

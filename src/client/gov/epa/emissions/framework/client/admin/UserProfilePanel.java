@@ -83,7 +83,6 @@ public class UserProfilePanel extends JPanel {
         container.setLayout(layout);
 
         Button okButton = new Button("Ok", okAction);
-        getRootPane().setDefaultButton(okButton);
         container.add(okButton);
         container.add(new Button("Cancel", cancelAction));
 

@@ -1,9 +1,15 @@
 package gov.epa.emissions.framework.client;
 
+import java.awt.Dimension;
+
 public abstract class DisposableInteralFrame extends EmfInternalFrame {
 
     public DisposableInteralFrame(String title) {
         super(title);
+    }
+
+    public DisposableInteralFrame(String title, Dimension dimension) {
+        super(title, dimension);
     }
 
     public void close() {

@@ -48,11 +48,9 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private JTextField folder;
 
     public ImportWindow(DatasetTypesServices eximServices, JDesktopPane desktop) throws EmfException {
-        super("Import Dataset", desktop);
+        super("Import Dataset", new Dimension(700, 275), desktop);
         super.setName("importWindow");
         this.datasetTypesService = eximServices;
-
-        setSize(new Dimension(700, 275));
 
         JPanel layoutPanel = createLayout();
         this.getContentPane().add(layoutPanel);

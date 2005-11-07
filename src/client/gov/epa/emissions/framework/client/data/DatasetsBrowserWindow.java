@@ -56,7 +56,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private EmfTableModel model;
 
     public DatasetsBrowserWindow(EmfSession session, EmfFrame parentConsole, JDesktopPane desktop) throws EmfException {
-        super("Datasets Browser", desktop);
+        super("Datasets Browser", new Dimension(800, 300), desktop);
         super.setName("datasetsBrowser");
 
         this.session = session;
@@ -67,7 +67,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         layout = new JPanel();
         this.getContentPane().add(layout);
-        this.setSize(new Dimension(800, 300));
 
         // FIXME: OverallTableModel has a bug w/ respect to row-count &
         // cannot refresh itself. So, we will regen the layout on every

@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.ui.Position;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.beans.PropertyVetoException;
 
@@ -14,6 +15,11 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
                 true, // closable
                 true, // maximizable
                 true);// iconifiable
+    }
+
+    public EmfInternalFrame(String title, Dimension dimension) {
+        this(title);
+        dimensions(dimension);
     }
 
     public void bringToFront() {
@@ -42,5 +48,14 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
 
     public void refreshLayout() {
         super.validate();
+    }
+
+    protected void dimensions(Dimension size) {
+        super.setSize(size);
+        super.setMinimumSize(size);
+    }
+
+    protected void dimensions(int width, int height) {
+        this.dimensions(new Dimension(width, height));
     }
 }
