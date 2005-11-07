@@ -1,0 +1,32 @@
+package gov.epa.emissions.framework.ui;
+
+import java.net.URL;
+import java.util.ResourceBundle;
+
+import javax.swing.ImageIcon;
+
+public class ImageResources {
+
+    private ResourceBundle bundle;
+
+    public ImageResources() {
+        bundle = ResourceBundle.getBundle("images");
+    }
+
+    public ImageIcon refresh(String tooltip) {
+        return image("refresh", tooltip);
+    }
+
+    public ImageIcon trash(String tooltip) {
+        return image("trash", tooltip);
+    }
+
+    public ImageIcon open(String tooltip) {
+        return image("open", tooltip);
+    }
+
+    private ImageIcon image(String alias, String tooltip) {
+        URL url = ImageResources.class.getResource(bundle.getString(alias));
+        return new ImageIcon(url, tooltip);
+    }
+}

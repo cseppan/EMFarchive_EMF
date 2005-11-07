@@ -7,23 +7,27 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.DatasetTypesServices;
+import gov.epa.emissions.framework.ui.FileChooser;
+import gov.epa.emissions.framework.ui.ImageResources;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDesktopPane;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -48,7 +52,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         super.setName("importWindow");
         this.datasetTypesService = eximServices;
 
-        setSize(new Dimension(600, 275));
+        setSize(new Dimension(700, 275));
 
         JPanel layoutPanel = createLayout();
         this.getContentPane().add(layoutPanel);
@@ -67,40 +71,60 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     }
 
     private JPanel createImportPanel() throws EmfException {
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        GridLayout labelsLayoutManager = new GridLayout(4, 1);
-        labelsLayoutManager.setVgap(15);
-        JPanel labelsPanel = new JPanel(labelsLayoutManager);
-        labelsPanel.add(new JLabel("Dataset Type"));
-        labelsPanel.add(new JLabel("Name"));
-        labelsPanel.add(new JLabel("Folder"));
-        labelsPanel.add(new JLabel("Filename"));
-
-        panel.add(labelsPanel);
-
-        GridLayout valuesLayoutManager = new GridLayout(4, 1);
-        valuesLayoutManager.setVgap(10);
-        JPanel valuesPanel = new JPanel(valuesLayoutManager);
         datasetTypesModel = new DefaultComboBoxModel(datasetTypesService.getDatasetTypes());
         JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
         datasetTypesComboBox.setName("datasetTypes");
-        valuesPanel.add(datasetTypesComboBox);
+        layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesComboBox, panel);
 
         name = new TextField("name", 15);
-        valuesPanel.add(name);
+        layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
+        JPanel chooser = new JPanel(new BorderLayout());
         folder = new TextField("folder", 35);
-        valuesPanel.add(folder);
+        chooser.add(folder, BorderLayout.CENTER);
+        chooser.add(importFileButton(), BorderLayout.LINE_END);
+        layoutGenerator.addLabelWidgetPair("Folder", chooser, panel);
 
         filename = new TextField("filename", 35);
-        valuesPanel.add(filename);
+        layoutGenerator.addLabelWidgetPair("Filename", filename, panel);
 
-        registerForEditEvents(name, folder, filename);
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
 
-        panel.add(valuesPanel);
+        registerForEditEvents(name, folder, filename);// edit-awareness
 
         return panel;
+    }
+
+    private JButton importFileButton() {
+        final FileChooser chooser = new FileChooser("Import", new File(folder.getText()), this);
+        Button button = new Button("Choose File", new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                File file = chooser.choose();
+                if (file == null)
+                    return;
+
+                if (file.isDirectory()) {
+                    folder.setText(file.getAbsolutePath());
+                    filename.setText("");
+                    System.out.println("folder...");
+                    return;
+                }
+
+                folder.setText(file.getParent());
+                filename.setText(file.getName());
+            }
+        });
+
+        Icon icon = new ImageResources().open("Import a File");
+        button.setIcon(icon);
+
+        return button;
     }
 
     private void registerForEditEvents(JTextField name, JTextField directory, JTextField filename) {

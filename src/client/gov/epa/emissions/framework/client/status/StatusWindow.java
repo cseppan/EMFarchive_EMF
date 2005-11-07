@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.Status;
+import gov.epa.emissions.framework.ui.ImageResources;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,11 +13,9 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.ResourceBundle;
 
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
@@ -72,11 +71,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
     }
 
     private JButton createClearButton() {
-        ResourceBundle bundle = ResourceBundle.getBundle("images");
-        URL url = StatusWindow.class.getResource(bundle.getString("trash"));
-        ImageIcon icon = new ImageIcon(url, "Clear Messages");
-
-        JButton button = new JButton(icon);
+        JButton button = new JButton(trashIcon());
         button.setName("clear");
         button.setBorderPainted(false);
         button.setToolTipText("Clears the Status messages");
@@ -92,6 +87,10 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         });
 
         return button;
+    }
+
+    private ImageIcon trashIcon() {
+        return new ImageResources().trash("Clear Messages");
     }
 
     private JScrollPane createTable() {

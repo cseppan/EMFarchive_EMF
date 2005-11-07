@@ -9,27 +9,25 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.client.exim.DefaultExportPresenter;
 import gov.epa.emissions.framework.client.exim.DatasetsBrowserAwareImportPresenter;
+import gov.epa.emissions.framework.client.exim.DefaultExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.meta.PropertiesEditor;
-import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfDatasetTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.ImageResources;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -110,11 +108,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     private JPanel createRefreshPanel() {
-        ResourceBundle bundle = ResourceBundle.getBundle("images");
-        URL url = StatusWindow.class.getResource(bundle.getString("refresh"));
-        ImageIcon icon = new ImageIcon(url, "Refresh Datasets");
-
-        JButton button = new JButton(icon);
+        JButton button = new JButton(refreshIcon());
         button.setToolTipText("Refresh Datasets");
         button.setName("refresh");
         button.setBorderPainted(false);
@@ -132,6 +126,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         panel.add(button);
 
         return panel;
+    }
+
+    private ImageIcon refreshIcon() {
+        return new ImageResources().refresh("Refresh Datasets");
     }
 
     private JPanel createControlPanel() {
