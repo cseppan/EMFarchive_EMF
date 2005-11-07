@@ -10,7 +10,6 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -30,12 +29,11 @@ public class ListPanel extends JPanel {
     }
 
     private JPanel doLayout(String label, SelectableEmfTableData tableData) {
-        JPanel container = new JPanel();
-        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+        JPanel container = new JPanel(new BorderLayout());
 
-        container.add(labelPanel(label));
-        container.add(table(tableData));
-        container.add(buttonsPanel(tableData));
+        container.add(labelPanel(label), BorderLayout.PAGE_START);
+        container.add(table(tableData), BorderLayout.CENTER);
+        container.add(buttonsPanel(tableData), BorderLayout.PAGE_END);
 
         return container;
     }
@@ -54,7 +52,7 @@ public class ListPanel extends JPanel {
 
         table = new JTable(tableModel);
         table.setRowHeight(25);
-        table.setPreferredScrollableViewportSize(new Dimension(300, 100));
+        table.setPreferredScrollableViewportSize(new Dimension(300, 200));
 
         return new JScrollPane(table);
     }

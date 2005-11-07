@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
+import java.awt.BorderLayout;
+
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.data.ListPanel;
 import gov.epa.emissions.framework.client.data.Keywords;
@@ -15,7 +17,8 @@ public class KeywordsPanel extends JPanel {
         ListPanel listPanel = new ListPanel(label, tableData);
         listPanel.setColumnEditor(keywordColumnEditor(masterKeywords), 1, "Select from the list");
 
-        super.add(listPanel);
+        super.setLayout(new BorderLayout());
+        super.add(listPanel, BorderLayout.CENTER);
     }
 
     private TableCellEditor keywordColumnEditor(Keywords masterKeywords) {

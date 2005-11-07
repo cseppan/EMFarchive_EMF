@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.framework.ui.Border;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -16,15 +17,12 @@ import java.awt.GridLayout;
 import java.awt.event.KeyListener;
 
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
 
 public class UserProfilePanel extends JPanel {
 
@@ -93,7 +91,7 @@ public class UserProfilePanel extends JPanel {
 
     private JPanel createLoginPanel(Widget usernameWidget) {
         JPanel panel = new JPanel();
-        panel.setBorder(createBorder("Login"));
+        panel.setBorder(new Border("Login"));
 
         GridLayout labelsLayoutManager = new GridLayout(3, 1);
         labelsLayoutManager.setVgap(15);
@@ -125,7 +123,7 @@ public class UserProfilePanel extends JPanel {
     private JPanel createProfilePanel(User user, AdminOption adminOption) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(createBorder("Profile"));
+        panel.setBorder(new Border("Profile"));
 
         JPanel mandatoryPanel = createManadatoryProfilePanel(user);
         panel.add(mandatoryPanel);
@@ -176,13 +174,6 @@ public class UserProfilePanel extends JPanel {
         panel.setMaximumSize(new Dimension(300, 175));
 
         return panel;
-    }
-
-    private Border createBorder(String title) {
-        TitledBorder border = BorderFactory.createTitledBorder(title);
-        border.setTitleJustification(TitledBorder.LEFT);
-
-        return border;
     }
 
     protected void populateUser() throws UserException {

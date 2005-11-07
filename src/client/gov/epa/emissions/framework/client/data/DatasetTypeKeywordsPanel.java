@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Keyword;
 
+import java.awt.BorderLayout;
+
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -13,7 +15,8 @@ public class DatasetTypeKeywordsPanel extends JPanel {
         ListPanel listPanel = new ListPanel("Keywords", tableData);
         listPanel.setColumnEditor(cellEditor(keywords), 1, "Select from the list");
 
-        super.add(listPanel);
+        super.setLayout(new BorderLayout());
+        super.add(listPanel, BorderLayout.CENTER);
     }
 
     private TableCellEditor cellEditor(Keyword[] keywords) {

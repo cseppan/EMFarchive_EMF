@@ -26,9 +26,9 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
     private UserProfilePanel panel;
 
     public UpdateUserWindow(User user, AdminOption adminOption) {
-        super("Update User - " + user.getUsername());
+        super("Update User: " + user.getUsername());
 
-        this.windowTitle = "Update User - " + user.getUsername();
+        this.windowTitle = "Update User: " + user.getUsername();
         this.user = user;
 
         JPanel container = new JPanel();

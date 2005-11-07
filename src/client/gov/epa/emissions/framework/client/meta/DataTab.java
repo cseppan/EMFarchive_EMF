@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.SimpleTableModel;
 import gov.epa.emissions.commons.io.ExternalSource;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.EmfFrame;
+import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EmfTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
@@ -27,20 +28,21 @@ public class DataTab extends JPanel implements DataTabView {
     }
 
     public void displayInternalSources(InternalSource[] sources) {
-        displaySources(new InternalSourcesTableData(sources));
+        displaySources("Internal Sources", new InternalSourcesTableData(sources));
     }
 
     public void displayExternalSources(ExternalSource[] sources) {
-        displaySources(new ExternalSourcesTableData(sources));
+        displaySources("External Sources", new ExternalSourcesTableData(sources));
     }
 
-    private void displaySources(EmfTableData tableData) {
+    private void displaySources(String title, EmfTableData tableData) {
         super.removeAll();
-        super.add(createLayout(tableData, parentConsole));
+        super.add(createLayout(title, tableData, parentConsole));
     }
 
-    private JPanel createLayout(EmfTableData tableData, EmfFrame parentConsole) {
+    private JPanel createLayout(String title, EmfTableData tableData, EmfFrame parentConsole) {
         JPanel layout = new JPanel();
+        layout.setBorder(new Border(title));
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
 
         layout.add(createSortFilterPane(tableData, parentConsole));

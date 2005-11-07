@@ -38,11 +38,22 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private JTextArea purpose;
 
     public ExportWindow(EmfDataset[] datasets) {
-        super("Export Dataset(s)", new Dimension(600, 300));
+        super(title(datasets), new Dimension(600, 300));
         super.setName("exportWindow");
         this.datasets = datasets;
 
         this.getContentPane().add(createLayout());
+    }
+
+    private static String title(EmfDataset[] datasets) {
+        StringBuffer buf = new StringBuffer("Export: ");
+        for (int i = 0; i < datasets.length; i++) {
+            buf.append(datasets[i].getName());
+            if (i + 1 <= datasets.length)
+                buf.append(", ");
+        }
+
+        return buf.toString();
     }
 
     public void observe(ExportPresenter presenter) {
@@ -137,7 +148,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         });
         container.add(exportButton);
         getRootPane().setDefaultButton(exportButton);
-       
+
         JButton done = new Button("Done", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.notifyDone();

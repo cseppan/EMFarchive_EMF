@@ -113,6 +113,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
             }
         });
         closePanel.add(closeButton);
+        getRootPane().setDefaultButton(closeButton);
 
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new BorderLayout());
