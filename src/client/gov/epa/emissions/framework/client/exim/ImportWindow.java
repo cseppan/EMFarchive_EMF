@@ -52,8 +52,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         super.setName("importWindow");
         this.datasetTypesService = eximServices;
 
-        JPanel layoutPanel = createLayout();
-        this.getContentPane().add(layoutPanel);
+        this.getContentPane().add(createLayout());
     }
 
     private JPanel createLayout() throws EmfException {
@@ -82,7 +81,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
         JPanel chooser = new JPanel(new BorderLayout());
         folder = new TextField("folder", 35);
-        chooser.add(folder, BorderLayout.CENTER);
+        chooser.add(folder, BorderLayout.LINE_START);
         chooser.add(importFileButton(), BorderLayout.LINE_END);
         layoutGenerator.addLabelWidgetPair("Folder", chooser, panel);
 
@@ -100,9 +99,9 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     }
 
     private JButton importFileButton() {
-        final FileChooser chooser = new FileChooser("Import", new File(folder.getText()), this);
         Button button = new Button("Choose File", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
+                FileChooser chooser = new FileChooser("Import File", new File(folder.getText()), ImportWindow.this);
                 File file = chooser.choose();
                 if (file == null)
                     return;
@@ -110,7 +109,6 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
                 if (file.isDirectory()) {
                     folder.setText(file.getAbsolutePath());
                     filename.setText("");
-                    System.out.println("folder...");
                     return;
                 }
 
@@ -159,9 +157,6 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
         JButton importButton = new Button("Import", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                if (presenter == null)
-                    return;
-
                 clearMessagePanel();
                 doImport();
             }
@@ -171,8 +166,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
         JButton done = new Button("Done", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                if (presenter != null)
-                    presenter.doDone();
+                presenter.doDone();
             }
         });
         container.add(done);

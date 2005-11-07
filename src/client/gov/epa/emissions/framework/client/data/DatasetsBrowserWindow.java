@@ -190,6 +190,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             }
         });
         panel.add(closeButton);
+        getRootPane().setDefaultButton(closeButton);
 
         return panel;
     }

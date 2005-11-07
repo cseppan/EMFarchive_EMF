@@ -137,11 +137,10 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         });
         container.add(exportButton);
         getRootPane().setDefaultButton(exportButton);
-
+       
         JButton done = new Button("Done", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                if (presenter != null)
-                    presenter.notifyDone();
+                presenter.notifyDone();
             }
         });
         container.add(done);

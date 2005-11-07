@@ -106,6 +106,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
             }
         });
         closePanel.add(closeButton);
+        getRootPane().setDefaultButton(closeButton);
 
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new BorderLayout());
