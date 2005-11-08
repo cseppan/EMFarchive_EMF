@@ -1,12 +1,14 @@
 package gov.epa.emissions.framework.db;
 
+import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.io.importer.Record;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ScrollableResultSet {
 
@@ -57,7 +59,7 @@ public class ScrollableResultSet {
 
     public boolean available() throws SQLException {
         return position() < rowCount();// TODO: is this a serious hit to the
-                                        // ResultSet's cursor ?
+        // ResultSet's cursor ?
     }
 
     public Record next() {
@@ -66,6 +68,19 @@ public class ScrollableResultSet {
 
     public void close() throws SQLException {
         resultSet.close();
+    }
+
+    /**
+     * @return returns a range of records inclusive of start and end
+     * @throws SQLException
+     */
+    public Record[] range(int start, int end) throws SQLException {
+        List range = new ArrayList();
+        moveTo(start);
+        for (int i = start; i <= end; i++)
+            range.add(next());
+
+        return (Record[]) range.toArray(new Record[0]);
     }
 
 }

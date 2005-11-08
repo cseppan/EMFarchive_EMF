@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.db;
 
+import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.SimpleDataset;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
@@ -64,6 +65,12 @@ public class ScrollableResultSetTest extends PersistenceTestCase {
     public void testMoveToSpecificPosition() throws Exception {
         results.moveTo(3);
         assertEquals(3, results.position());
+    }
+    
+    public void testFetchRangeOfRecords() throws Exception {
+        Record[] records = results.range(3, 7);
+        assertNotNull("Should be able to fetch a range of records", records);
+        assertEquals(5, records.length);
     }
 
     public void testIterate() throws Exception {
