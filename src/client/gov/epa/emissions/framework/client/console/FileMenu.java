@@ -1,6 +1,8 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;

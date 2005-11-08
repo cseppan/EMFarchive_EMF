@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.admin.UserServicesStub;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.console.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusServices;

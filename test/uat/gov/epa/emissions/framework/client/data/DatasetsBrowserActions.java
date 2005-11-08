@@ -4,8 +4,8 @@ import javax.swing.JTable;
 
 import abbot.tester.JTableTester;
 
-import gov.epa.emissions.framework.client.EmfConsole;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.meta.PropertiesEditor;
 

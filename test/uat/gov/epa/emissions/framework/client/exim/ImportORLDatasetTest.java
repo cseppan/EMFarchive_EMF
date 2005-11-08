@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.framework.client.ConsoleActions;
-import gov.epa.emissions.framework.client.EmfConsole;
-import gov.epa.emissions.framework.client.StatusActions;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
+import gov.epa.emissions.framework.client.console.ConsoleActions;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.console.StatusActions;
 import gov.epa.emissions.framework.db.PostgresDbUpdate;
 
 import java.util.Random;

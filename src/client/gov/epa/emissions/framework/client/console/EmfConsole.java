@@ -1,6 +1,10 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.framework.ConcurrentTaskRunner;
+import gov.epa.emissions.framework.client.EmfFrame;
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.status.StatusPresenter;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;

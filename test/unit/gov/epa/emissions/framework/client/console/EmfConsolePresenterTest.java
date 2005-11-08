@@ -1,4 +1,7 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.client.console;
+
+import gov.epa.emissions.framework.client.console.EmfConsolePresenter;
+import gov.epa.emissions.framework.client.console.EmfConsoleView;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;

@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfConsole;
-import gov.epa.emissions.framework.client.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.DefaultEmfSession;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.console.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.User;

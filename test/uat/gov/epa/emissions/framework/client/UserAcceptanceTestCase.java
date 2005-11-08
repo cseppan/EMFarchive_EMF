@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;

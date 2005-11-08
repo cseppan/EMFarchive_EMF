@@ -1,4 +1,6 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.client.console;
+
+import gov.epa.emissions.framework.client.ManagedView;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

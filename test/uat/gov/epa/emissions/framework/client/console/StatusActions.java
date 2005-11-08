@@ -1,5 +1,7 @@
-package gov.epa.emissions.framework.client;
+package gov.epa.emissions.framework.client.console;
 
+import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 
 import java.util.ArrayList;
