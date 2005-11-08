@@ -2,10 +2,12 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorServices;
+import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.Page;
 
 import java.net.URL;
 
+import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
 import org.apache.axis.AxisFault;
@@ -17,18 +19,18 @@ import org.apache.commons.logging.LogFactory;
 public class DataEditorServicesTransport implements DataEditorServices {
     private static Log log = LogFactory.getLog(DataEditorServicesTransport.class);
 
-//    private String endpoint;
     private Call call = null;
-    
+    private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
+
     public DataEditorServicesTransport(String endPoint, Call call) {
-//        endpoint = endPoint;
          try {
             log.debug("Constructor: DataEditorServicesTransport");
             this.call = call;
             call.setTargetEndpointAddress(new URL(endPoint));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Transport Error: " + e.getMessage());
         }
+        log.debug("Constructor complete");
     }
 
     public String getName() throws Exception {
@@ -59,7 +61,6 @@ public class DataEditorServicesTransport implements DataEditorServices {
 
             call.invoke(new Object[] {name});
             call.removeAllParameters();
-//            call.removeProperty();
 
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get name: ", fault);
@@ -88,15 +89,22 @@ public class DataEditorServicesTransport implements DataEditorServices {
         Page page = null;
         
         try {
-            call.setOperationName("getName");
+            call.setOperationName("getPage");
             call.setReturnType(Constants.XSD_ANY);
 
-            page = (Page) call.invoke(new Object[] {  });
+            QName pageQname = new QName(emfSvcsNamespace, "ns1:Page");
+            call.addParameter("tableName", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("pageNumber", org.apache.axis.Constants.XSD_INTEGER, javax.xml.rpc.ParameterMode.IN);
+
+            call.setReturnType(pageQname);
+
+            page = (Page) call.invoke(new Object[] {tableName,new Integer(pageNumber)  });
+
             call.removeAllParameters();
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get name: ", fault);
+            throwExceptionOnAxisFault("Failed to get page: ", fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get name: " , e);
+            throwExceptionDueToServiceErrors("Failed to get page: " , e);
         }
         return page;
     }

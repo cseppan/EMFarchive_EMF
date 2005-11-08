@@ -9,6 +9,8 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.KeyVal;
+import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -98,7 +100,11 @@ public class ExImServicesTransport implements ExImServices {
             QName externalSourceQName = new QName(emfSvcsNamespace, "ns1:ExternalSource");
             QName internalSourcesQName = new QName(emfSvcsNamespace, "ns1:InternalSources");
             QName externalSourcesQName = new QName(emfSvcsNamespace, "ns1:ExternalSources");
-
+            QName keywordQName = new QName(emfSvcsNamespace, "ns1:Keyword");
+            QName keywordsQName = new QName(emfSvcsNamespace, "ns1:Keywords");
+            QName keyValQName = new QName(emfSvcsNamespace, "ns1:KeyVal");
+            QName keyValsQName = new QName(emfSvcsNamespace, "ns1:KeyVals");
+            
             call.setOperationName(operationQName);
 
             registerMapping(call, userQName, User.class);
@@ -107,6 +113,12 @@ public class ExImServicesTransport implements ExImServices {
             registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
             registerBeanMapping(call, internalSourceQName, gov.epa.emissions.commons.io.InternalSource.class);
             registerBeanMapping(call, externalSourceQName, gov.epa.emissions.commons.io.ExternalSource.class);
+
+            registerBeanMapping(call, keywordQName, Keyword.class);
+            registerArrayMapping(call, Keyword[].class,keywordsQName);
+            registerBeanMapping(call, keyValQName, KeyVal.class);
+            registerArrayMapping(call, KeyVal[].class,keyValsQName);
+
             registerArrayMapping(call, gov.epa.emissions.commons.io.ExternalSource[].class,externalSourcesQName);
             registerArrayMapping(call, gov.epa.emissions.commons.io.InternalSource[].class,internalSourcesQName);
 
@@ -155,6 +167,10 @@ public class ExImServicesTransport implements ExImServices {
             QName externalSourceQName = new QName(emfSvcsNamespace, "ns1:ExternalSource");
             QName internalSourcesQName = new QName(emfSvcsNamespace, "ns1:InternalSources");
             QName externalSourcesQName = new QName(emfSvcsNamespace, "ns1:ExternalSources");
+            QName keywordQName = new QName(emfSvcsNamespace, "ns1:Keyword");
+            QName keywordsQName = new QName(emfSvcsNamespace, "ns1:Keywords");
+            QName keyValQName = new QName(emfSvcsNamespace, "ns1:KeyVal");
+            QName keyValsQName = new QName(emfSvcsNamespace, "ns1:KeyVals");
 
             call.setOperationName(operationQName);
             registerMapping(call, userQName, gov.epa.emissions.framework.services.User.class);
@@ -170,6 +186,10 @@ public class ExImServicesTransport implements ExImServices {
             registerBeanMapping(call, externalSourceQName, gov.epa.emissions.commons.io.ExternalSource.class);
             registerArrayMapping(call, gov.epa.emissions.commons.io.ExternalSource[].class,externalSourcesQName);
             registerArrayMapping(call, gov.epa.emissions.commons.io.InternalSource[].class,internalSourcesQName);
+            registerBeanMapping(call, keywordQName, Keyword.class);
+            registerArrayMapping(call, Keyword[].class,keywordsQName);
+            registerBeanMapping(call, keyValQName, KeyVal.class);
+            registerArrayMapping(call, KeyVal[].class,keyValsQName);
 
             call.addParameter("user", userQName, ParameterMode.IN);
             call.addParameter("datasets", datasetsQName, ParameterMode.IN);
