@@ -11,7 +11,13 @@ import javax.swing.JFrame;
 public class EmfConsoleLauncher {
 
     public static void main(String[] args) throws EmfException {
-        ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services/");
+        ServiceLocator serviceLocator = null;
+        try {
+            serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services/");
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         UserServices userAdmin = serviceLocator.getUserServices();
         User user = userAdmin.getUser("admin");

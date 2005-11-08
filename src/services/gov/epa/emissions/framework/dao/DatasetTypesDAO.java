@@ -28,7 +28,7 @@ import org.hibernate.Transaction;
 public class DatasetTypesDAO {
     private static Log log = LogFactory.getLog(DatasetTypesDAO.class);
 
-    private static final String GET_DATASETTYPE_QUERY = "select dst from DatasetType as dst";
+    private static final String GET_DATASETTYPE_QUERY = "select dst from DatasetType as dst order by name";
 
     public static List getDatasetTypes(Session session) {
         log.debug("In getDatasetTypes");

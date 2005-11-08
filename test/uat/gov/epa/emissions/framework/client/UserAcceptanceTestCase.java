@@ -43,7 +43,13 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
     }
 
     public LoginWindow createLoginWindow() {
-        ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
+        ServiceLocator serviceLocator = null;
+        try {
+            serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         LoginWindow view = new LoginWindow(serviceLocator);
         view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

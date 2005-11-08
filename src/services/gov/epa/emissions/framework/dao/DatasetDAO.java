@@ -32,9 +32,9 @@ import org.hibernate.Transaction;
 public class DatasetDAO {
     private static Log log = LogFactory.getLog(DatasetDAO.class);
 
-    private static final String GET_DATASET_QUERY = "select aDset from EmfDataset as aDset";
-    private static final String GET_COUNTRY_QUERY = "select country from Country as country";
-    private static final String GET_SECTOR_QUERY = "select sector from Sector as sector";
+    private static final String GET_DATASET_QUERY = "select aDset from EmfDataset as aDset order by name";
+    private static final String GET_COUNTRY_QUERY = "select country from Country as country order by name";
+    private static final String GET_SECTOR_QUERY = "select sector from Sector as sector order by name";
 
     private static final String GET_DATASET_FOR_DATASETNAME_QUERY = "select aDset from EmfDataset as aDset where aDset.name=:datasetname";
 

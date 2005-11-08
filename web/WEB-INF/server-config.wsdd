@@ -28,28 +28,28 @@
           
   <service name="gov.epa.emf.services.UserServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
-  <parameter name="scope" value="application"/>
+  <parameter name="scope" value="session"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.UserServicesImpl"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
  </service>
 
   <service name="gov.epa.emf.services.StatusServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
-  <parameter name="scope" value="application"/>
+  <parameter name="scope" value="session"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.StatusServicesImpl"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.Status" qname="ns1:Status" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
  </service>
 
   <service name="gov.epa.emf.services.LoggingServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
-  <parameter name="scope" value="application"/>
+  <parameter name="scope" value="session"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.LoggingServicesImpl"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.AccessLog" qname="ns1:AccessLog" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
  </service>
 
  <service name="gov.epa.emf.services.ExImServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
-  <parameter name="scope" value="application"/>
+  <parameter name="scope" value="session"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.ExImServicesImpl"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.DatasetType" qname="ns1:DatasetType" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.User" qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfServices"/>  
@@ -62,7 +62,7 @@
 
   <service name="gov.epa.emf.services.DatasetTypesServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
-  <parameter name="scope" value="application"/>
+  <parameter name="scope" value="session"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.DatasetTypesServicesImpl"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.DatasetType" qname="ns1:DatasetType" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Keyword" qname="ns1:Keyword" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
@@ -70,7 +70,7 @@
 
  <service name="gov.epa.emf.services.DataServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
-  <parameter name="scope" value="application"/>
+  <parameter name="scope" value="session"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.DataServicesImpl"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.EmfDataset" qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.DatasetType" qname="ns1:DatasetType" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
@@ -88,9 +88,15 @@
 
   <service name="gov.epa.emf.services.InterDataServices" provider="java:RPC" style="RPC" use="encoded">
   <parameter name="allowedMethods" value="*"/>
-  <parameter name="scope" value="application"/>
+  <parameter name="scope" value="session"/>
   <parameter name="className" value="gov.epa.emissions.framework.services.impl.InterDataServicesImpl"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Keyword" qname="ns1:Keyword" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+ </service>
+
+ <service name="gov.epa.emf.services.DataEditorServices" provider="java:RPC" style="RPC" use="encoded">
+	  <parameter name="allowedMethods" value="*"/>
+	  <parameter name="scope" value="session"/>
+	  <parameter name="className" value="gov.epa.emissions.framework.services.impl.DataEditorServicesImpl"/>
  </service>
 
  <arrayMapping qname="ns1:Keywords" xmlns:ns1="urn:gov.epa.services.EmfServices"

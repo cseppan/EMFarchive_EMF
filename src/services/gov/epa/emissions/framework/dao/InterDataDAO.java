@@ -31,9 +31,9 @@ import org.hibernate.Transaction;
 public class InterDataDAO {
     private static Log log = LogFactory.getLog(InterDataDAO.class);
 
-    private static final String GET_EMF_KEYWORDS_QUERY = "select kw from Keyword as kw";
-    private static final String GET_COUNTRY_QUERY = "select country from Country as country";
-    private static final String GET_SECTOR_QUERY = "select sector from Sector as sector";
+    private static final String GET_EMF_KEYWORDS_QUERY = "select kw from Keyword as kw order by keyword";
+    private static final String GET_COUNTRY_QUERY = "select country from Country as country order by name";
+    private static final String GET_SECTOR_QUERY = "select sector from Sector as sector order by name";
 
     public static List getEmfKeywords(Session session){
         log.debug("In get emf keywords");

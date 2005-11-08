@@ -19,7 +19,13 @@ public class LoggingServicesTest extends WebServicesIntegrationTestCase {
     private LoggingServices service;
 
     protected void setUp() {
-        ServiceLocator locator = new RemoteServiceLocator(super.baseUrl);
+        ServiceLocator locator = null;
+        try {
+            locator = new RemoteServiceLocator(super.baseUrl);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         service = locator.getLoggingServices();
     }
 

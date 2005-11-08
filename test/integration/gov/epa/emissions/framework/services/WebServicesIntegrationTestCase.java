@@ -12,7 +12,7 @@ import org.apache.commons.configuration.SystemConfiguration;
 public abstract class WebServicesIntegrationTestCase extends TestCase {
     protected String baseUrl;
 
-    protected ServiceLocator serviceLocator;
+    protected ServiceLocator serviceLocator = null;
 
     public WebServicesIntegrationTestCase() {
         CompositeConfiguration config = new CompositeConfiguration();
@@ -29,6 +29,11 @@ public abstract class WebServicesIntegrationTestCase extends TestCase {
         }
 
         this.baseUrl = config.getString("emf.services.url");
-        this.serviceLocator = new RemoteServiceLocator(baseUrl);
+        try {
+            this.serviceLocator = new RemoteServiceLocator(baseUrl);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }
