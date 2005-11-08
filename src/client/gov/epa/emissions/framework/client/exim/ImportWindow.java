@@ -76,7 +76,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         datasetTypesComboBox.setName("datasetTypes");
         layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesComboBox, panel);
 
-        name = new TextField("name", 15);
+        name = new TextField("name", 35);
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
         JPanel chooser = new JPanel(new BorderLayout());

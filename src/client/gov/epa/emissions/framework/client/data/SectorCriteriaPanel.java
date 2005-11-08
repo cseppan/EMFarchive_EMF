@@ -21,7 +21,7 @@ public class SectorCriteriaPanel extends JPanel {
         JComboBox comboBox = new JComboBox();
         comboBox.addItem("SCC");
         comboBox.addItem("NAICS");
-        comboBox.addItem("SICS");
+        comboBox.addItem("SIC");
         comboBox.addItem("IPM Flag");// True/False values
 
         return new DefaultCellEditor(comboBox);

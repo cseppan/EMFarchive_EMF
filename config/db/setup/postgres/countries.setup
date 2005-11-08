@@ -20,6 +20,7 @@ CREATE TABLE countries
 WITHOUT OIDS;
 ALTER TABLE countries OWNER TO emf;
 
+delete from countries;
 insert into countries values (1, 'Canada');
 insert into countries values (2, 'Mexico');
-insert into countries values (3, 'United States of America');
+insert into countries values (3, 'US');

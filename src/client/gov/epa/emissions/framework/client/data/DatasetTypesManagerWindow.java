@@ -45,7 +45,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     private DatasetTypesServices services;
 
     public DatasetTypesManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
-        super("DatasetTypes Manager", new Dimension(600, 300), desktop);
+        super("DatasetType Manager", new Dimension(600, 300), desktop);
         this.parentConsole = parentConsole;
         this.desktop = desktop;
 

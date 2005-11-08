@@ -80,7 +80,7 @@ public class UserProfilePanel extends JPanel {
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button okButton = new Button("Ok", okAction);
+        Button okButton = new Button("Save", okAction);
         container.add(okButton);
         container.add(new Button("Cancel", cancelAction));
 
