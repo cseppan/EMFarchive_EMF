@@ -10,7 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScrollableResultSet {
+public class ScrollableRecords {
 
     private Datasource datasource;
 
@@ -18,7 +18,7 @@ public class ScrollableResultSet {
 
     private ResultSet resultSet;
 
-    public ScrollableResultSet(Datasource datasource, String query) {
+    public ScrollableRecords(Datasource datasource, String query) {
         this.datasource = datasource;
         this.query = query;
     }

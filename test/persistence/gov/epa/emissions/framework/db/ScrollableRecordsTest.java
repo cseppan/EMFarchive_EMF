@@ -9,15 +9,15 @@ import gov.epa.emissions.framework.PersistenceTestCase;
 import java.io.File;
 import java.util.Random;
 
-public class ScrollableResultSetTest extends PersistenceTestCase {
+public class ScrollableRecordsTest extends PersistenceTestCase {
 
-    private ScrollableResultSet results;
+    private ScrollableRecords results;
 
     protected void setUp() throws Exception {
         super.setUp();
         importNonPoint();
 
-        results = new ScrollableResultSet(emissions(), "SELECT * from emissions.test");
+        results = new ScrollableRecords(emissions(), "SELECT * from emissions.test");
         results.execute();
     }
 
