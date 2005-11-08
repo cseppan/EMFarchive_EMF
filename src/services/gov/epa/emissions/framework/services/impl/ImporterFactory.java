@@ -42,6 +42,7 @@ public class ImporterFactory {
         return importer;
     }
 
+    // FIXME: use a better scheme than rely on 'type names'
     private Importer orlImporter(DbServer dbServer, DatasetType datasetType) {
         Datasource emissions = dbServer.getEmissionsDatasource();
         SqlDataTypes dataType = dbServer.getDataType();
@@ -55,7 +56,6 @@ public class ImporterFactory {
         if (datasetType.getName().equals("ORL Point Inventory"))
             return new ORLPointImporter(emissions, dataType);
 
-        
         throw new RuntimeException("Dataset Type - " + datasetType.getName() + " unsupported");
     }
 

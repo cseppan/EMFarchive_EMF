@@ -41,7 +41,7 @@ public class ExImServicesTest extends WebServicesIntegrationTestCase {
         User user = userService.getUser("emf");
 
         File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
-        String filename = "arinv.nonpoint.nti99_NC.txt";
+        String filename = "NonPoint_WithComments.txt";
 
         eximService.startImport(user, repository.getAbsolutePath(), filename, dataset);
 
@@ -58,7 +58,7 @@ public class ExImServicesTest extends WebServicesIntegrationTestCase {
 
         // import
         File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
-        String filename = "arinv.nonpoint.nti99_NC.txt";
+        String filename = "NonPoint_WithComments.txt";
         eximService.startImport(user, repository.getAbsolutePath(), filename, dataset);
 
         // FIXME: verify that import is complete

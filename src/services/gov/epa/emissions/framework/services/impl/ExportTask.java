@@ -10,7 +10,7 @@
 
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.commons.io.exporter.Exporter;
+import gov.epa.emissions.commons.io.NewExporter;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.DataServices;
@@ -29,19 +29,26 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Conrad F. D'Cruz
- *
+ * 
  */
 public class ExportTask implements Runnable {
     private static Log log = LogFactory.getLog(ExportTask.class);
 
     private User user;
+
     private File file;
+
     private DataServices dataServices = null;
+
     private StatusServices statusServices = null;
-	private LoggingServices loggingServices = null;
+
+    private LoggingServices loggingServices = null;
+
     private EmfDataset dataset;
-	private Exporter exporter;
-	private AccessLog accesslog=null;
+
+    private NewExporter exporter;
+
+    private AccessLog accesslog = null;
 
     /**
      * 
@@ -49,32 +56,35 @@ public class ExportTask implements Runnable {
      * @param file
      * @param dataset
      * @param statusSvc
-     * @param exporter
+     * @param exporter2
      */
-	protected ExportTask(User user, File file, EmfDataset dataset, ServicesHolder  svcHolder, AccessLog accesslog, Exporter exporter) {
-		this.user=user;
-		this.file=file;
-		this.dataset=dataset;
-		this.statusServices=svcHolder.getStatusSvc();
-		this.loggingServices =svcHolder.getLogSvc();
-		this.dataServices = svcHolder.getDataSvc();
-		this.exporter=exporter;
-		this.accesslog=accesslog;
-	}
+    protected ExportTask(User user, File file, EmfDataset dataset, ServicesHolder svcHolder, AccessLog accesslog,
+            NewExporter exporter) {
+        this.user = user;
+        this.file = file;
+        this.dataset = dataset;
+        this.statusServices = svcHolder.getStatusSvc();
+        this.loggingServices = svcHolder.getLogSvc();
+        this.dataServices = svcHolder.getDataSvc();
+        this.exporter = exporter;
+        this.accesslog = accesslog;
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()
-	 */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Runnable#run()
+     */
     public void run() {
         log.info("starting export - file: " + file.getName() + " of type: " + dataset.getDatasetTypeName());
         try {
             setStartStatus();
-            exporter.run( dataset, file);
-            //update access logs
+            exporter.export(file);
+            // update access logs
             loggingServices.setAccessLog(accesslog);
-            //update dataset
+            // update dataset
             dataServices.updateDataset(dataset);
-            //update status message
+            // update status message
             setStatus(EMFConstants.END_EXPORT_MESSAGE_Prefix + dataset.getName() + ":" + file.getName());
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + file, e);

@@ -10,7 +10,7 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
-import gov.epa.emissions.commons.io.exporter.Exporter;
+import gov.epa.emissions.commons.io.NewExporter;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDAO;
@@ -182,18 +182,18 @@ public class ExImServicesImpl implements ExImServices {
         try {
             for (int i = 0; i < count; i++) {
 
-                EmfDataset aDataset = datasets[i];
+                EmfDataset dataset = datasets[i];
 
                 // FIXME: Default is overwrite
-                File file = validateExportFile(path, getCleanDatasetName(aDataset.getName()), overwrite);
+                File file = validateExportFile(path, getCleanDatasetName(dataset.getName()), overwrite);
                 ServicesHolder svcHolder = new ServicesHolder();
                 svcHolder.setLogSvc(new LoggingServicesImpl());
                 svcHolder.setStatusSvc(new StatusServicesImpl());
                 svcHolder.setDataSvc(new DataServicesImpl());
-                Exporter exporter = exporterFactory.create(aDataset.getDatasetTypeName());
-                AccessLog accesslog = new AccessLog(user.getUsername(), aDataset.getDatasetid(), aDataset
+                NewExporter exporter = exporterFactory.create(dataset);
+                AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
                         .getAccessedDateTime(), "Version 1.0", purpose, dirName);
-                ExportTask eximTask = new ExportTask(user, file, aDataset, svcHolder, accesslog, exporter);
+                ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);
                 threadPool.execute(eximTask);
             }
         } catch (Exception e) {
