@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.Datasource;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ public class ScrollableRecords {
 
     private ResultSet resultSet;
 
+    private ResultSetMetaData metadata;
+
     public ScrollableRecords(Datasource datasource, String query) {
         this.datasource = datasource;
         this.query = query;
@@ -26,7 +29,9 @@ public class ScrollableRecords {
     public void execute() throws SQLException {
         Connection connection = datasource.getConnection();
         Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
         resultSet = stmt.executeQuery(query);
+        metadata = resultSet.getMetaData();
     }
 
     public int rowCount() throws SQLException {
@@ -58,12 +63,23 @@ public class ScrollableRecords {
     }
 
     public boolean available() throws SQLException {
-        return position() < rowCount();// TODO: is this a serious hit to the
-        // ResultSet's cursor ?
+        // TODO: is this a serious hit to the ResultSet's cursor ?
+        return position() < rowCount();
     }
 
-    public Record next() {
-        return new Record();// TODO: load data
+    public Record next() throws SQLException {
+        if (!resultSet.next())
+            return null;// TODO: is NullRecord better?
+
+        Record record = new Record();
+        for (int i = 1; i <= columnCount(); i++)
+            record.add(resultSet.getString(i));
+
+        return record;// TODO: load data
+    }
+
+    private int columnCount() throws SQLException {
+        return metadata.getColumnCount();
     }
 
     public void close() throws SQLException {
