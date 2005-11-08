@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.db;
+package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.Record;
 

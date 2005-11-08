@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.db;
 
+import gov.epa.emissions.framework.services.Page;
+
 import java.sql.SQLException;
 
 public class PageReader {

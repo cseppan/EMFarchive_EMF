@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.db;
 
 import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.framework.services.Page;
 import junit.framework.TestCase;
 
 public class PageTest extends TestCase {

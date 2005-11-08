@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import gov.epa.emissions.framework.services.DataEditorServices;
+import gov.epa.emissions.framework.services.Page;
 
 /**
  * @author Conrad F. D'Cruz
@@ -45,6 +46,16 @@ public class DataEditorServicesImpl implements DataEditorServices {
     public void setName(String name) {
         log.debug("SETNAME HASHCODE: " + this.hashCode() +" name= " + name);
         this.name=name;
+    }
+
+    public Page getPage(String tableName, int pageNumber) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public int getPageCount(String tableName) throws Exception {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
 }

@@ -14,4 +14,7 @@ package gov.epa.emissions.framework.services;
 public interface DataEditorServices {
     String getName() throws Exception;
     void setName(String name) throws Exception;	
+    
+    Page getPage(String tableName, int pageNumber) throws Exception;
+    int getPageCount(String tableName) throws Exception;
 }
