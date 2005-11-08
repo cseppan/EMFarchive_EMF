@@ -188,9 +188,6 @@
 
 			<test name="gov.epa.emissions.commons.io.importer.orl.ReferenceImporterTest" fork="yes" todir="${reports.integrationtests.dir}" />
 			<test name="gov.epa.emissions.commons.io.importer.orl.ReferenceTablesCreatorTest" fork="yes" todir="${reports.integrationtests.dir}" />
-			<!-- Run Complete ORL before Base ORL as only Base is needed by rest of EMF -->
-			<test name="gov.epa.emissions.commons.io.importer.orl.CompleteORLImporterTest" fork="yes" todir="${reports.integrationtests.dir}" />
-			<test name="gov.epa.emissions.commons.io.importer.orl.BaseORLImporterTest" fork="yes" todir="${reports.integrationtests.dir}" />
 		</junit>
 		<echo message="Emissions and Reference schema setup complete." />
 	</target>
