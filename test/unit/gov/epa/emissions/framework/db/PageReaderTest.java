@@ -8,13 +8,22 @@ import org.jmock.cglib.MockObjectTestCase;
 
 public class PageReaderTest extends MockObjectTestCase {
 
-    public void testShouldGetPageCount() throws Exception {
+    public void testPageCountShouldBeTotalRecordsByPageSize() throws Exception {
         Mock scrollableRecords = mock(ScrollableRecordsStub.class);
         scrollableRecords.stubs().method("rowCount").withNoArguments().will(returnValue(new Integer(1800)));
 
         PageReader reader = new PageReader(3, (ScrollableRecords) scrollableRecords.proxy());
 
         assertEquals(600, reader.count());
+    }
+    
+    public void testPageCountShouldIncludeTheLastPageWhichCouldBeSparse() throws Exception {
+        Mock scrollableRecords = mock(ScrollableRecordsStub.class);
+        scrollableRecords.stubs().method("rowCount").withNoArguments().will(returnValue(new Integer(11)));
+        
+        PageReader reader = new PageReader(3, (ScrollableRecords) scrollableRecords.proxy());
+        
+        assertEquals(4, reader.count());
     }
 
     public void testShouldGetSpecifiedPage() throws Exception {

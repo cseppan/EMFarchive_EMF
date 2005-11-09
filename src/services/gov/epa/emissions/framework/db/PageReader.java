@@ -21,7 +21,7 @@ public class PageReader {
     }
 
     public int count() throws SQLException {
-        return scrollableRecords.rowCount() / pageSize;
+        return Math.round((float)scrollableRecords.rowCount() / pageSize);
     }
 
     public Page page(int number) throws SQLException {
@@ -29,7 +29,7 @@ public class PageReader {
             return null;
 
         int start = number * pageSize;
-        int end = start + pageSize - 1;//since, end is inclusive in the range
+        int end = start + pageSize - 1;// since, end is inclusive in the range
         Record[] records = scrollableRecords.range(start, end);
 
         Page page = new Page();
