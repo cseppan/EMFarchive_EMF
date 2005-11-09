@@ -20,10 +20,11 @@ public class DataEditorServicesTransport implements DataEditorServices {
     private static Log log = LogFactory.getLog(DataEditorServicesTransport.class);
 
     private Call call = null;
+
     private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
     public DataEditorServicesTransport(String endPoint, Call call) {
-         try {
+        try {
             log.debug("Constructor: DataEditorServicesTransport");
             this.call = call;
             call.setTargetEndpointAddress(new URL(endPoint));
@@ -33,47 +34,45 @@ public class DataEditorServicesTransport implements DataEditorServices {
         log.debug("Constructor complete");
     }
 
-    public String getName() throws Exception {
-       String name = null;
-       
+    public String getName() throws EmfException {
+        String name = null;
+
         try {
 
             call.setOperationName("getName");
             call.setReturnType(Constants.XSD_ANY);
 
-            name = (String) call.invoke(new Object[] {  });
+            name = (String) call.invoke(new Object[] {});
             call.removeAllParameters();
-            //call.removeProperty();
+            // call.removeProperty();
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get name: ", fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get name: " , e);
+            throwExceptionDueToServiceErrors("Failed to get name: ", e);
         }
         return name;
     }
 
-
-    public void setName(String name) throws Exception {
+    public void setName(String name) throws EmfException {
         try {
             call.setOperationName("setName");
             call.addParameter("name", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
             call.setReturnType(Constants.XSD_ANY);
 
-            call.invoke(new Object[] {name});
+            call.invoke(new Object[] { name });
             call.removeAllParameters();
 
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get name: ", fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get name: " , e);
+            throwExceptionDueToServiceErrors("Failed to get name: ", e);
         }
-        
+
     }
 
     private String extractMessage(String faultReason) {
         return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
     }
-
 
     private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {
         log.error(message, e);
@@ -85,9 +84,9 @@ public class DataEditorServicesTransport implements DataEditorServices {
         throw new EmfException(extractMessage(fault.getMessage()));
     }
 
-    public Page getPage(String tableName, int pageNumber) throws Exception {
+    public Page getPage(String tableName, int pageNumber) throws EmfException {
         Page page = null;
-        
+
         try {
             call.setOperationName("getPage");
             call.setReturnType(Constants.XSD_ANY);
@@ -98,18 +97,18 @@ public class DataEditorServicesTransport implements DataEditorServices {
 
             call.setReturnType(pageQname);
 
-            page = (Page) call.invoke(new Object[] {tableName,new Integer(pageNumber)  });
+            page = (Page) call.invoke(new Object[] { tableName, new Integer(pageNumber) });
 
             call.removeAllParameters();
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get page: ", fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get page: " , e);
+            throwExceptionDueToServiceErrors("Failed to get page: ", e);
         }
         return page;
     }
 
-    public int getPageCount(String tableName) throws Exception {
+    public int getPageCount(String tableName) {
         // TODO Auto-generated method stub
         return 0;
     }

@@ -18,12 +18,13 @@ import gov.epa.emissions.framework.services.Page;
 
 /**
  * @author Conrad F. D'Cruz
- *
+ * 
  */
 public class DataEditorServicesImpl implements DataEditorServices {
     private static Log log = LogFactory.getLog(DataEditorServicesImpl.class);
 
-    private String name="Default";
+    private String name = "Default";
+
     /**
      * 
      */
@@ -32,7 +33,9 @@ public class DataEditorServicesImpl implements DataEditorServices {
         log.debug("CONSTRUCTOR HASHCODE: " + this.hashCode());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see gov.epa.emissions.framework.services.DataEditorServices#getName()
      */
     public String getName() {
@@ -40,20 +43,22 @@ public class DataEditorServicesImpl implements DataEditorServices {
         return this.name;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see gov.epa.emissions.framework.services.DataEditorServices#setName(java.lang.String)
      */
     public void setName(String name) {
-        log.debug("SETNAME HASHCODE: " + this.hashCode() +" name= " + name);
-        this.name=name;
+        log.debug("SETNAME HASHCODE: " + this.hashCode() + " name= " + name);
+        this.name = name;
     }
 
-    public Page getPage(String tableName, int pageNumber) throws Exception {
+    public Page getPage(String tableName, int pageNumber) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public int getPageCount(String tableName) throws Exception {
+    public int getPageCount(String tableName) {
         // TODO Auto-generated method stub
         return 0;
     }
