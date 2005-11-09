@@ -206,7 +206,6 @@ public class User implements Serializable {
         try {
             encryptConfirmPwd = PasswordService.encrypt(confirmPassword);
         } catch (EmfException e) {
-            e.printStackTrace();
             throw new UserException("Error encrypting password");
         }
         if (!encryptedPassword.equals(encryptConfirmPwd)) {

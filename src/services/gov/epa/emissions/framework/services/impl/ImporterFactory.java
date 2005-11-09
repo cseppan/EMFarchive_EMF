@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.io.orl.ORLNonRoadImporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
 import gov.epa.emissions.commons.io.orl.ORLPointImporter;
 import gov.epa.emissions.framework.services.EMFConstants;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 public class ImporterFactory {
 
@@ -23,13 +24,14 @@ public class ImporterFactory {
         this.dbServer = dbServer;
     }
 
-    public Importer create(DatasetType datasetType) {
+    public Importer create(EmfDataset dataset) {
         Importer importer = null;
+        DatasetType datasetType = dataset.getDatasetType();
 
         // FIXME: Get the specific type of importer for the filetype. Use a
         // Factory pattern
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_ORL) >= 0) {
-            return orlImporter(dbServer, datasetType);
+            return orlImporter(dbServer, dataset);
         } else if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_SHAPEFILES) >= 0) {
             return new ShapeFilesImporter(datasetType);
         } else if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_EXTERNALFILES) >= 0) {
@@ -43,18 +45,19 @@ public class ImporterFactory {
     }
 
     // FIXME: use a better scheme than rely on 'type names'
-    private Importer orlImporter(DbServer dbServer, DatasetType datasetType) {
+    private Importer orlImporter(DbServer dbServer, EmfDataset dataset) {
         Datasource emissions = dbServer.getEmissionsDatasource();
         SqlDataTypes dataType = dbServer.getDataType();
+        DatasetType datasetType = dataset.getDatasetType();
 
         if (datasetType.getName().equals("ORL Nonpoint Inventory"))
-            return new ORLNonPointImporter(emissions, dataType);
+            return new ORLNonPointImporter(dataset, emissions, dataType);
         if (datasetType.getName().equals("ORL Nonroad Inventory"))
-            return new ORLNonRoadImporter(emissions, dataType);
+            return new ORLNonRoadImporter(dataset, emissions, dataType);
         if (datasetType.getName().equals("ORL Onroad Inventory"))
-            return new ORLOnRoadImporter(emissions, dataType);
+            return new ORLOnRoadImporter(dataset, emissions, dataType);
         if (datasetType.getName().equals("ORL Point Inventory"))
-            return new ORLPointImporter(emissions, dataType);
+            return new ORLPointImporter(dataset, emissions, dataType);
 
         throw new RuntimeException("Dataset Type - " + datasetType.getName() + " unsupported");
     }

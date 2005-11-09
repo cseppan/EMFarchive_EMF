@@ -32,8 +32,7 @@ public abstract class WebServicesIntegrationTestCase extends TestCase {
         try {
             this.serviceLocator = new RemoteServiceLocator(baseUrl);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException("could not lookup EMF Services", e);
         }
     }
 }

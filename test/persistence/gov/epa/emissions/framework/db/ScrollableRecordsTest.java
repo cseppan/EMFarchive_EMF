@@ -11,6 +11,7 @@ import java.util.Random;
 public class ScrollableRecordsTest extends PersistenceTestCase {
 
     private ScrollableRecords results;
+
     private SimpleDataset dataset;
 
     protected void setUp() throws Exception {
@@ -29,14 +30,13 @@ public class ScrollableRecordsTest extends PersistenceTestCase {
     }
 
     private void importNonPoint() throws Exception {
-        ORLNonPointImporter importer = new ORLNonPointImporter(emissions(), dataTypes());
-
-        importer.preCondition(new File("test/data/orl/nc"), "arinv.nonpoint.nti99_NC.txt");
-
         dataset = new SimpleDataset();
         dataset.setName("test");
         dataset.setDatasetid(new Random().nextLong());
 
+        ORLNonPointImporter importer = new ORLNonPointImporter(dataset, emissions(), dataTypes());
+
+        importer.preCondition(new File("test/data/orl/nc"), "arinv.nonpoint.nti99_NC.txt");
         importer.run(dataset);
     }
 
@@ -85,7 +85,7 @@ public class ScrollableRecordsTest extends PersistenceTestCase {
 
         assertEquals(14, record.size());
         assertNotNull("Should be able to fetch first record", record);
-        
+
         assertEquals(dataset.getDatasetid() + "", record.token(0));
         assertEquals("37001", record.token(1));
         assertEquals("10201302", record.token(2));

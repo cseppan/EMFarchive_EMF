@@ -48,8 +48,7 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
         try {
             serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException("could not lookup EMF Services");
         }
 
         LoginWindow view = new LoginWindow(serviceLocator);
@@ -163,6 +162,5 @@ public abstract class UserAcceptanceTestCase extends ComponentTestFixture {
             throw new RuntimeException(e);
         }
     }
-
 
 }

@@ -297,10 +297,8 @@ public class UserServicesTransport implements UserServices {
             log.error("Error invoking the service", e);
         } catch (MalformedURLException e) {
             log.error("Error in format of URL string", e);
-            e.printStackTrace();
         } catch (RemoteException e) {
             log.error("Error communicating with WS end point", e);
-            e.printStackTrace();
         }
         log.debug("Get users");
         return users;

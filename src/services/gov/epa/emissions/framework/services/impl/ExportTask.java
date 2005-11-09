@@ -10,7 +10,7 @@
 
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.commons.io.NewExporter;
+import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.DataServices;
@@ -46,7 +46,7 @@ public class ExportTask implements Runnable {
 
     private EmfDataset dataset;
 
-    private NewExporter exporter;
+    private Exporter exporter;
 
     private AccessLog accesslog = null;
 
@@ -59,7 +59,7 @@ public class ExportTask implements Runnable {
      * @param exporter2
      */
     protected ExportTask(User user, File file, EmfDataset dataset, ServicesHolder svcHolder, AccessLog accesslog,
-            NewExporter exporter) {
+            Exporter exporter) {
         this.user = user;
         this.file = file;
         this.dataset = dataset;

@@ -10,7 +10,7 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
-import gov.epa.emissions.commons.io.NewExporter;
+import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDAO;
@@ -154,7 +154,7 @@ public class ExImServicesImpl implements ExImServices {
             svcHolder.setDataSvc(new DataServicesImpl());
             svcHolder.setStatusSvc(new StatusServicesImpl());
 
-            Importer importer = importerFactory.create(dataset.getDatasetType());
+            Importer importer = importerFactory.create(dataset);
             log.debug("$$$ Path: " + path.getAbsolutePath());
             log.debug("$$$ Filename: " + fileName);
             log.debug("$$$ DatasetType: " + dataset.getDatasetType().getName());
@@ -190,7 +190,7 @@ public class ExImServicesImpl implements ExImServices {
                 svcHolder.setLogSvc(new LoggingServicesImpl());
                 svcHolder.setStatusSvc(new StatusServicesImpl());
                 svcHolder.setDataSvc(new DataServicesImpl());
-                NewExporter exporter = exporterFactory.create(dataset);
+                Exporter exporter = exporterFactory.create(dataset);
                 AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
                         .getAccessedDateTime(), "Version 1.0", purpose, dirName);
                 ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);

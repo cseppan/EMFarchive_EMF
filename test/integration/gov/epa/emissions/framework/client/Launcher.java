@@ -9,13 +9,8 @@ import javax.swing.JFrame;
 
 public class Launcher {
 
-    public static void main(String[] args) {
-        ServiceLocator serviceLocator = null;
-        try {
-            serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void main(String[] args) throws Exception {
+        ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
 
         LoginWindow view = new LoginWindow(serviceLocator);
         view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

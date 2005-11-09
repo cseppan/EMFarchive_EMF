@@ -14,7 +14,7 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.NewExporter;
+import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.orl.ORLNonPointExporter;
 import gov.epa.emissions.commons.io.orl.ORLNonRoadExporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadExporter;
@@ -33,7 +33,7 @@ public class ExporterFactory {
         this.dbServer = dbServer;
     }
 
-    public NewExporter create(EmfDataset dataset) {
+    public Exporter create(EmfDataset dataset) {
         // FIXME: Use Factory pattern
         DatasetType datasetType = dataset.getDatasetType();
         String name = datasetType.getName();
