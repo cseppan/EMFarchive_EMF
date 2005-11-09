@@ -1,23 +1,27 @@
 package gov.epa.emissions.framework.client.editor;
 
+import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorServices;
-import gov.epa.emissions.framework.services.Page;
 
 public class DataViewPresenter {
 
-    private DataEditorServices services;
-
     private DataView view;
 
-    public DataViewPresenter(DataEditorServices services, DataView view) {
-        this.services = services;
+    private Dataset dataset;
+
+    public DataViewPresenter(Dataset dataset, DataView view) {
+        this.dataset = dataset;
         this.view = view;
     }
 
-    public void doDisplay(String table) throws EmfException {
-        Page page = services.getPage(table, 0);
-        view.display(page);
+    public void doDisplay() {
+        view.display(dataset);
+    }
+
+    public void doSelectTable(String table, PageView pageView, DataEditorServices services) throws EmfException {
+        PageViewPresenter presenter = new PageViewPresenter(services, pageView, table);
+        presenter.doDisplayNext();
     }
 
 }

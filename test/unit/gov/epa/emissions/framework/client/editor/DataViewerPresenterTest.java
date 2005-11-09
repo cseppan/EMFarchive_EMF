@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.editor;
 
+import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.services.DataEditorServices;
 import gov.epa.emissions.framework.services.Page;
 
@@ -8,17 +9,30 @@ import org.jmock.cglib.MockObjectTestCase;
 
 public class DataViewerPresenterTest extends MockObjectTestCase {
 
-    public void testShouldFetchFirstPageOnDisplay() throws Exception {
-        Mock services = mock(DataEditorServices.class);
-        Page page = new Page();
-        services.stubs().method("getPage").with(eq("table"), eq(new Integer(0))).will(returnValue(page));
+    public void testShouldLoadTablesOfDatasetOnDisplay() throws Exception {
+        Mock dataset = mock(Dataset.class);
+        Dataset datasetProxy = (Dataset) dataset.proxy();
 
         Mock view = mock(DataView.class);
-        view.expects(once()).method("display").with(eq(page));
+        view.expects(once()).method("display").with(eq(datasetProxy));
 
-        DataViewPresenter p = new DataViewPresenter((DataEditorServices) services.proxy(), (DataView) view.proxy());
+        DataViewPresenter p = new DataViewPresenter(datasetProxy, (DataView) view.proxy());
 
-        p.doDisplay("table");
+        p.doDisplay();
+    }
+
+    public void testShouldLoadFirstPageOnTableSelection() throws Exception {
+        Mock dataset = mock(Dataset.class);
+        DataViewPresenter p = new DataViewPresenter(((Dataset) dataset.proxy()), null);
+
+        Mock services = mock(DataEditorServices.class);
+        Page page = new Page();
+        services.stubs().method("getPage").with(eq("table"), eq(new Integer(1))).will(returnValue(page));
+
+        Mock pageView = mock(PageView.class);
+        pageView.expects(once()).method("display").with(eq(page));
+
+        p.doSelectTable("table", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
     }
 
 }
