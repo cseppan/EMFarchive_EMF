@@ -186,8 +186,8 @@
 			<classpath refid="classpath" />
 			<formatter type="xml" />
 
-			<test name="gov.epa.emissions.commons.io.importer.orl.ReferenceImporterTest" fork="yes" todir="${reports.integrationtests.dir}" />
-			<test name="gov.epa.emissions.commons.io.importer.orl.ReferenceTablesCreatorTest" fork="yes" todir="${reports.integrationtests.dir}" />
+			<test name="gov.epa.emissions.commons.io.legacy.ReferenceImporterTest" fork="yes" todir="${reports.integrationtests.dir}" />
+			<test name="gov.epa.emissions.commons.io.ref.ReferenceTablesCreatorTest" fork="yes" todir="${reports.integrationtests.dir}" />
 		</junit>
 		<echo message="Emissions and Reference schema setup complete." />
 	</target>

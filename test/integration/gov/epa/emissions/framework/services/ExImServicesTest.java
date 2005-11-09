@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.importer.DefaultORLDatasetTypesFactory;
-import gov.epa.emissions.commons.io.importer.ORLDatasetTypesFactory;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
 
 import java.io.File;
@@ -16,18 +14,26 @@ public class ExImServicesTest extends WebServicesIntegrationTestCase {
 
     private EmfDataset dataset;
 
-    private ORLDatasetTypesFactory types;
-
-    protected void setUp() {
-        this.types = new DefaultORLDatasetTypesFactory();
-
+    protected void setUp() throws Exception {
         eximService = serviceLocator.getExImServices();
         userService = serviceLocator.getUserServices();
-
         dataset = new EmfDataset();
         Random random = new Random();
         dataset.setName("ORL NonPoint - ExImServicesTest" + random.nextInt());
         dataset.setCreator("creator");
+
+        DatasetType datasetType = orlNonPointType(serviceLocator.getDatasetTypesServices());
+        dataset.setDatasetType(datasetType);
+    }
+
+    private DatasetType orlNonPointType(DatasetTypesServices service) throws Exception {
+        DatasetType[] types = service.getDatasetTypes();
+        for (int i = 0; i < types.length; i++) {
+            if (types[i].getName().equals("ORL Nonpoint Inventory"))
+                return types[i];
+        }
+
+        return null;
     }
 
     protected void tearDown() throws Exception {
@@ -36,8 +42,6 @@ public class ExImServicesTest extends WebServicesIntegrationTestCase {
     }
 
     public void testImportOrlNonPoint() throws Exception {
-        DatasetType datasetType = types.nonPoint();
-        dataset.setDatasetType(datasetType);
         User user = userService.getUser("emf");
 
         File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
@@ -49,10 +53,8 @@ public class ExImServicesTest extends WebServicesIntegrationTestCase {
     }
 
     public void testExportOrlNonPoint() throws Exception {
-        DatasetType datasetType = types.nonPoint();
         User user = userService.getUser("emf");
 
-        dataset.setDatasetType(datasetType);
         dataset.setDescription("description");
         dataset.setStatus("imported");
 
