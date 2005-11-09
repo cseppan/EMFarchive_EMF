@@ -23,7 +23,7 @@ public abstract class PersistenceTestCase extends TestCase {
 
         if (!conf.exists() || !conf.isFile()) {
             String error = "File: " + conf + " does not exist. Please copy either of the two TEMPLATE files "
-                    + "(from " + folder + "), name it commons.conf, configure " + "it as needed, and rerun.";
+                    + "(from " + folder + "), name it test.conf, configure " + "it as needed, and rerun.";
             throw new RuntimeException(error);
         }
 
