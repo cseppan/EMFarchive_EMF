@@ -46,7 +46,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(eq(dataset));
 
-        presenter.display((PropertiesEditorView) view.proxy());
+        presenter.doDisplay((PropertiesEditorView) view.proxy());
     }
 
     public void testShouldCloseViewOnNotifyClose() {

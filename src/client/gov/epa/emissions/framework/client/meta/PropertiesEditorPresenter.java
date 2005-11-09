@@ -31,7 +31,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
         this.interdataServices = serviceLocator.getInterDataServices();
     }
 
-    public void display(PropertiesEditorView view) {
+    public void doDisplay(PropertiesEditorView view) {
         this.view = view;
         view.observe(this);
 

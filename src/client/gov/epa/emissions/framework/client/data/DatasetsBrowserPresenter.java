@@ -69,7 +69,7 @@ public class DatasetsBrowserPresenter {
         viewLayout.add(propertiesEditorView, "Properties - " + dataset.getName());
 
         PropertiesEditorPresenter presenter = new PropertiesEditorPresenter(dataset, serviceLocator);
-        presenter.display(propertiesEditorView);
+        presenter.doDisplay(propertiesEditorView);
     }
 
     public void doNew(ImportView importView, ImportPresenter importPresenter) throws EmfException {
