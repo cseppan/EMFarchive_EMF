@@ -33,7 +33,6 @@ public class Page {
     public void setRecords(Record[] array) {
         records.clear();
         records.addAll(Arrays.asList(array));
-
     }
 
 }

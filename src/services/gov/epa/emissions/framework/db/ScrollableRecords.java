@@ -91,9 +91,11 @@ public class ScrollableRecords {
      * @throws SQLException
      */
     public Record[] range(int start, int end) throws SQLException {
-        List range = new ArrayList();
         moveTo(start);
-        for (int i = start; i <= end; i++)
+
+        List range = new ArrayList();
+        int max = rowCount();
+        for (int i = start; i <= end && i <= max; i++)
             range.add(next());
 
         return (Record[]) range.toArray(new Record[0]);

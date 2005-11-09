@@ -72,6 +72,12 @@ public class ScrollableRecordsTest extends PersistenceTestCase {
         assertNotNull("Should be able to fetch a range of records", records);
         assertEquals(5, records.length);
     }
+    
+    public void testFetchRecordsOutOfRangeShouldReturnOnlyValidPartialRange() throws Exception {
+        Record[] records = results.range(388, 397);
+        assertNotNull("Should be able to fetch a range of records", records);
+        assertEquals(7, records.length);
+    }
 
     public void testIterate() throws Exception {
         for (int i = 0; i < 394; i++) {

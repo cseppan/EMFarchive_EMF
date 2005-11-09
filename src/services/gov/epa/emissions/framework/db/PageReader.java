@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.db;
 
+import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.framework.services.Page;
 
 import java.sql.SQLException;
@@ -8,19 +9,33 @@ public class PageReader {
 
     private int pageSize;
 
-    private ScrollableRecords records;
+    private ScrollableRecords scrollableRecords;
 
-    public PageReader(int pageSize, ScrollableRecords records) {
+    public PageReader(int pageSize, ScrollableRecords scrollableRecords) {
         this.pageSize = pageSize;
-        this.records = records;
+        this.scrollableRecords = scrollableRecords;
+    }
+
+    public void init() throws SQLException {
+        scrollableRecords.execute();
     }
 
     public int count() throws SQLException {
-        return records.rowCount() / pageSize;
+        return scrollableRecords.rowCount() / pageSize;
     }
 
-    public Page page(int position) throws SQLException {
-        return position <= count() ? new Page() : null;
+    public Page page(int number) throws SQLException {
+        if (number > count())
+            return null;
+
+        int start = number * pageSize;
+        int end = start + pageSize - 1;//since, end is inclusive in the range
+        Record[] records = scrollableRecords.range(start, end);
+
+        Page page = new Page();
+        page.setRecords(records);
+
+        return page;
     }
 
 }
