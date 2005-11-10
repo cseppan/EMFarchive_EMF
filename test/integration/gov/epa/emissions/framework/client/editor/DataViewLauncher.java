@@ -23,7 +23,7 @@ public class DataViewLauncher {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JDesktopPane desktop = new JDesktopPane();
-        DataViewWindow console = new DataViewWindow();
+        DataViewWindow console = new DataViewWindow(null);
         DataViewPresenter p = new DataViewPresenter(launcher.createDataset(), console);
         p.doDisplay();
 

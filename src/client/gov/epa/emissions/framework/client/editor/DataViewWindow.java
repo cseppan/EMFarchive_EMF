@@ -3,9 +3,11 @@ package gov.epa.emissions.framework.client.editor;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.services.DataEditorServices;
 import gov.epa.emissions.framework.ui.Border;
 
 import java.awt.BorderLayout;
@@ -32,8 +34,11 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
 
     private Dataset dataset;
 
-    public DataViewWindow() {
+    private DataEditorServices services;
+
+    public DataViewWindow(DataEditorServices services) {
         super("Data Viewer: ", new Dimension(700, 500));
+        this.services = services;
 
         layout = new JPanel();
         this.getContentPane().add(layout);
@@ -124,6 +129,13 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
 
         PageViewPanel panel = new PageViewPanel(source(table, dataset.getInternalSources()));
         pageContainer.add(panel);
+
+        PageViewPresenter presenter = new PageViewPresenter(services, panel, table);
+        try {
+            presenter.doDisplayNext();
+        } catch (EmfException e) {
+            messagePanel.setError("Could not fetch first page of table: " + table + ". Reason: " + e.getMessage());
+        }
     }
 
     private InternalSource source(String table, InternalSource[] sources) {

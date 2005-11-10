@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.editor.DataViewWindow;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -145,7 +146,8 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         JPanel panel = new JPanel();
         Button showData = new Button("Show Data", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                DataViewWindow view = new DataViewWindow();
+                ServiceLocator locator = session.getServiceLocator();
+                DataViewWindow view = new DataViewWindow(locator.getDataEditorServices());
                 desktop.add(view);
                 presenter.doDisplayData(view);
             }

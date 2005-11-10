@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.framework.services.DataEditorServices;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.DatasetTypesServices;
 import gov.epa.emissions.framework.services.ExImServices;
@@ -20,7 +21,9 @@ public interface ServiceLocator {
     LoggingServices getLoggingServices();
 
     DatasetTypesServices getDatasetTypesServices();
-    
+
     InterDataServices getInterDataServices();
+
+    DataEditorServices getDataEditorServices();
 
 }

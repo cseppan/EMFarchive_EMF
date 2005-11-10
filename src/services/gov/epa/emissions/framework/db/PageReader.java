@@ -21,10 +21,11 @@ public class PageReader {
     }
 
     public int count() throws SQLException {
-        return Math.round((float)scrollableRecords.rowCount() / pageSize);
+        return Math.round((float) scrollableRecords.rowCount() / pageSize);
     }
 
     public Page page(int number) throws SQLException {
+        number = number - 1; // page '1' maps to '0'
         if (number > count())
             return null;
 

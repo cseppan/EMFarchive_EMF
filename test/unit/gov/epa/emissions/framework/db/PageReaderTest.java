@@ -30,7 +30,7 @@ public class PageReaderTest extends MockObjectTestCase {
         Mock scrollableRecords = mock(ScrollableRecordsStub.class);
         scrollableRecords.stubs().method("rowCount").withNoArguments().will(returnValue(new Integer(1800)));
         Record[] records = {};
-        scrollableRecords.stubs().method("range").with(eq(new Integer(50)), eq(new Integer(59))).will(
+        scrollableRecords.stubs().method("range").with(eq(new Integer(40)), eq(new Integer(49))).will(
                 returnValue(records));
         scrollableRecords.expects(once()).method("execute").withNoArguments();
 
