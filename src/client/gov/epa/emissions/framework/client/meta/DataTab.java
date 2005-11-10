@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.io.ExternalSource;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.ui.Border;
-import gov.epa.emissions.framework.ui.EmfTableData;
+import gov.epa.emissions.framework.ui.TableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
@@ -35,12 +35,12 @@ public class DataTab extends JPanel implements DataTabView {
         displaySources("External Sources", new ExternalSourcesTableData(sources));
     }
 
-    private void displaySources(String title, EmfTableData tableData) {
+    private void displaySources(String title, TableData tableData) {
         super.removeAll();
         super.add(createLayout(title, tableData, parentConsole));
     }
 
-    private JPanel createLayout(String title, EmfTableData tableData, EmfFrame parentConsole) {
+    private JPanel createLayout(String title, TableData tableData, EmfFrame parentConsole) {
         JPanel layout = new JPanel();
         layout.setBorder(new Border(title));
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -50,7 +50,7 @@ public class DataTab extends JPanel implements DataTabView {
         return layout;
     }
 
-    private JScrollPane createSortFilterPane(EmfTableData tableData, EmfFrame parentConsole) {
+    private JScrollPane createSortFilterPane(TableData tableData, EmfFrame parentConsole) {
         EmfTableModel model = new EmfTableModel(tableData);
         SimpleTableModel wrapperModel = new SimpleTableModel(model);
 

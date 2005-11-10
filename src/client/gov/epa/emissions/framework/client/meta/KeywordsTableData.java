@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.data.Keywords;
-import gov.epa.emissions.framework.ui.AbstractEmfTableData;
+import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
 import gov.epa.emissions.framework.ui.SelectableEmfTableData;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class KeywordsTableData extends AbstractEmfTableData implements SelectableEmfTableData {
+public class KeywordsTableData extends AbstractTableData implements SelectableEmfTableData {
     private List rows;
 
     private Keywords masterKeywords;

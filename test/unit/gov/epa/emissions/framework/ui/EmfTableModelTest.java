@@ -15,7 +15,7 @@ public class EmfTableModelTest extends MockObjectTestCase {
 
     private EmfDataset dataset1;
 
-    private EmfTableData tableData;
+    private TableData tableData;
 
     private EmfDataset dataset2;
 

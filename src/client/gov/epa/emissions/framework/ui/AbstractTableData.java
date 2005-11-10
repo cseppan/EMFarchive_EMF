@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractEmfTableData implements EmfTableData {
+public abstract class AbstractTableData implements TableData {
 
     public Object element(int row) {
         Row rowObj = (Row) rows().get(row);

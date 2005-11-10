@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.ui;
 
 import java.util.List;
 
-public interface EmfTableData {
+public interface TableData {
 
     String[] columns();
 

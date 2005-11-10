@@ -1,14 +1,14 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.InternalSource;
-import gov.epa.emissions.framework.ui.AbstractEmfTableData;
+import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.ViewableRow;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class InternalSourcesTableData extends AbstractEmfTableData {
+public class InternalSourcesTableData extends AbstractTableData {
 
     private List rows;
 

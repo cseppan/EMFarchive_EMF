@@ -1,14 +1,14 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.framework.ui.AbstractEmfTableData;
+import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.ViewableRow;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatasetTypesTableData extends AbstractEmfTableData {
+public class DatasetTypesTableData extends AbstractTableData {
     private List rows;
 
     public DatasetTypesTableData(DatasetType[] types) {

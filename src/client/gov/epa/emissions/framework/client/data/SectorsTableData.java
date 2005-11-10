@@ -1,14 +1,14 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Sector;
-import gov.epa.emissions.framework.ui.AbstractEmfTableData;
+import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.ViewableRow;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SectorsTableData extends AbstractEmfTableData {
+public class SectorsTableData extends AbstractTableData {
 	private List rows;
 
 	public SectorsTableData(Sector[] sectors) {

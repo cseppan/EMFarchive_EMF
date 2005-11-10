@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.framework.client.Label;
-import gov.epa.emissions.framework.ui.EmfTableData;
+import gov.epa.emissions.framework.ui.TableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.SelectableEmfTableData;
 
@@ -47,7 +47,7 @@ public class ListPanel extends JPanel {
         return panel;
     }
 
-    private JScrollPane table(EmfTableData tableData) {
+    private JScrollPane table(TableData tableData) {
         tableModel = new EmfTableModel(tableData);
 
         table = new JTable(tableModel);

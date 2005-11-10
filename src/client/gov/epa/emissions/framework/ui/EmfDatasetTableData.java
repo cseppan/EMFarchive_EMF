@@ -5,7 +5,7 @@ import java.util.List;
 
 import gov.epa.emissions.framework.services.EmfDataset;
 
-public class EmfDatasetTableData extends AbstractEmfTableData {
+public class EmfDatasetTableData extends AbstractTableData {
 
     private List rows;
 

@@ -13,9 +13,9 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
 
     private List rows;
 
-    private EmfTableData tableData;
+    private TableData tableData;
 
-    public EmfTableModel(EmfTableData tableData) {
+    public EmfTableModel(TableData tableData) {
         refresh(tableData);
     }
 
@@ -42,7 +42,7 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
         super.fireTableDataChanged();
     }
 
-    public void refresh(EmfTableData tableData) {
+    public void refresh(TableData tableData) {
         this.tableData = tableData;
         refresh();
     }

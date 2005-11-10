@@ -1,14 +1,14 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.services.AccessLog;
-import gov.epa.emissions.framework.ui.AbstractEmfTableData;
+import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.ViewableRow;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccessLogTableData extends AbstractEmfTableData {
+public class AccessLogTableData extends AbstractTableData {
 
     private List rows;
 
