@@ -4,6 +4,8 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.data.Keywords;
+import gov.epa.emissions.framework.client.editor.DataView;
+import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -91,6 +93,11 @@ public class PropertiesEditorPresenter implements ChangeObserver {
 
     public void onChange() {
         unsavedChanges = true;
+    }
+
+    public void doDisplayData(DataView dataView) {
+        DataViewPresenter presenter = new DataViewPresenter(dataset, dataView);
+        presenter.doDisplay();
     }
 
 }

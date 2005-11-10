@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
+import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -184,4 +185,10 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         presenter.doSave(null);
     }
 
+    public void testShouldDisplayDataViewerOnDisplayData() {
+        Mock dataView = mock(DataView.class);
+        dataView.expects(once()).method("display").with(same(dataset));
+        
+        presenter.doDisplayData((DataView)dataView.proxy());
+    }
 }
