@@ -7,7 +7,6 @@ import gov.epa.emissions.framework.services.Page;
 
 import java.net.URL;
 
-import javax.xml.namespace.QName;
 import javax.xml.rpc.ParameterMode;
 
 import org.apache.axis.AxisFault;
@@ -20,11 +19,10 @@ public class DataEditorServicesTransport implements DataEditorServices {
     private static Log log = LogFactory.getLog(DataEditorServicesTransport.class);
 
     private Call call = null;
-
     private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
     public DataEditorServicesTransport(String endPoint, Call call) {
-        try {
+         try {
             log.debug("Constructor: DataEditorServicesTransport");
             this.call = call;
             call.setTargetEndpointAddress(new URL(endPoint));
@@ -34,45 +32,47 @@ public class DataEditorServicesTransport implements DataEditorServices {
         log.debug("Constructor complete");
     }
 
-    public String getName() throws EmfException {
-        String name = null;
-
+    public String getName() throws Exception {
+       String name = null;
+       
         try {
 
             call.setOperationName("getName");
             call.setReturnType(Constants.XSD_ANY);
 
-            name = (String) call.invoke(new Object[] {});
+            name = (String) call.invoke(new Object[] {  });
             call.removeAllParameters();
-            // call.removeProperty();
+            //call.removeProperty();
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get name: ", fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get name: ", e);
+            throwExceptionDueToServiceErrors("Failed to get name: " , e);
         }
         return name;
     }
 
-    public void setName(String name) throws EmfException {
+
+    public void setName(String name) throws Exception {
         try {
             call.setOperationName("setName");
             call.addParameter("name", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
             call.setReturnType(Constants.XSD_ANY);
 
-            call.invoke(new Object[] { name });
+            call.invoke(new Object[] {name});
             call.removeAllParameters();
 
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get name: ", fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get name: ", e);
+            throwExceptionDueToServiceErrors("Failed to get name: " , e);
         }
-
+        
     }
 
     private String extractMessage(String faultReason) {
         return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
     }
+
 
     private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {
         log.error(message, e);
@@ -86,30 +86,35 @@ public class DataEditorServicesTransport implements DataEditorServices {
 
     public Page getPage(String tableName, int pageNumber) throws EmfException {
         Page page = null;
-
+        
         try {
-            call.setOperationName("getPage");
-            call.setReturnType(Constants.XSD_ANY);
+            log.debug("Is call null? " + (call==null));
 
-            QName pageQname = new QName(emfSvcsNamespace, "ns1:Page");
+            DataEditorMappings mappings = new DataEditorMappings();
+
+            log.debug("Is mappings null? " + (mappings==null));
+            mappings.register(call);
+            call.setOperationName(mappings.qname("getPage"));
+            call.setReturnType(mappings.page());
+
             call.addParameter("tableName", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
             call.addParameter("pageNumber", org.apache.axis.Constants.XSD_INTEGER, javax.xml.rpc.ParameterMode.IN);
 
-            call.setReturnType(pageQname);
-
-            page = (Page) call.invoke(new Object[] { tableName, new Integer(pageNumber) });
+            page = (Page) call.invoke(new Object[] {tableName,new Integer(pageNumber)  });
 
             call.removeAllParameters();
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get page: ", fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get page: ", e);
+            throwExceptionDueToServiceErrors("Failed to get page: " , e);
         }
         return page;
     }
 
-    public int getPageCount(String tableName) {
+    public int getPageCount(String tableName) throws EmfException {
         // TODO Auto-generated method stub
+        
+        if (false) throw new EmfException("");
         return 0;
     }
 

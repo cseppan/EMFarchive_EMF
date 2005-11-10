@@ -58,6 +58,7 @@
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.InternalSource" qname="ns1:InternalSource" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.ExternalSource" qname="ns1:ExternalSource" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Keyword" qname="ns1:Keyword" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.KeyVal" qname="ns1:KeyVal" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
  </service>
 
   <service name="gov.epa.emf.services.DatasetTypesServices" provider="java:RPC" style="RPC" use="encoded">
@@ -97,7 +98,15 @@
 	  <parameter name="allowedMethods" value="*"/>
 	  <parameter name="scope" value="session"/>
 	  <parameter name="className" value="gov.epa.emissions.framework.services.impl.DataEditorServicesImpl"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.Page" qname="ns1:Page" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.Record" qname="ns1:Record" xmlns:ns1="urn:gov.epa.services.EmfServices"/>
  </service>
+
+ <arrayMapping qname="ns1:Records" xmlns:ns1="urn:gov.epa.services.EmfServices"
+             languageSpecificType="java:gov.epa.emissions.commons.Record[]"
+			 innerType="ns1:Record" 
+             encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
+
 
  <arrayMapping qname="ns1:Keywords" xmlns:ns1="urn:gov.epa.services.EmfServices"
              languageSpecificType="java:gov.epa.emissions.commons.io.Keyword[]"
