@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.InfrastructureException;
 import gov.epa.emissions.framework.db.PageReader;
 import gov.epa.emissions.framework.db.ScrollableRecords;
 import gov.epa.emissions.framework.services.DataEditorServices;
@@ -37,16 +38,16 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DataEditorServicesImpl implements DataEditorServices {
     private static Log log = LogFactory.getLog(DataEditorServicesImpl.class);
-
     private Datasource emissionsSchema = null;
-
     private HashMap readerMap = null;
+
+    private int pageSize = EMFConstants.PAGE_SIZE;
     
-    private String name="Default";
     /**
+     * @throws InfrastructureException 
      * 
      */
-    public DataEditorServicesImpl() {
+    public DataEditorServicesImpl() throws InfrastructureException {
         super();
         readerMap = new HashMap();
         log.debug("CONSTRUCTOR HASHCODE: " + this.hashCode());
@@ -61,45 +62,17 @@ public class DataEditorServicesImpl implements DataEditorServices {
         } catch (Exception ex) {
             log.error("could not initialize EMF datasource", ex);
             ex.printStackTrace();
-//            throw new InfrastructureException("Server configuration error");
+            throw new InfrastructureException("Server configuration error");
         }
     
     }
 
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.services.DataEditorServices#getName()
-     */
-    public String getName() {
-        log.debug("GET NAME HASHCODE: " + this.hashCode());
-        return this.name;
-    }
-
-    /* (non-Javadoc)
-     * @see gov.epa.emissions.framework.services.DataEditorServices#setName(java.lang.String)
-     */
-    public void setName(String name) {
-        log.debug("SETNAME HASHCODE: " + this.hashCode() +" name= " + name);
-        this.name=name;
-    }
-
     public Page getPage(String tableName, int pageNumber) {
-        final int pageSize = 100;
 
         log.debug("Table name: " + tableName + " Page number: " + pageNumber);
         long startTime = new Date().getTime();
-        PageReader reader = null;
+        PageReader reader = reader = getReader(tableName);
         
-        if (readerMap.containsKey(tableName)){
-            log.debug("FOUND READER");
-            reader = (PageReader)readerMap.get(tableName);
-        }else{
-            log.debug("NO READER FOUND");
-            String query = "select * from " + emissionsSchema.getName()+"."+ tableName;
-            log.debug("The query " + query);
-            ScrollableRecords sr = new ScrollableRecords(emissionsSchema, query);
-            reader = new PageReader(pageSize, sr);
-            readerMap.put(tableName,reader);
-        }
         try {
             reader.init();
         } catch (SQLException ex) {
@@ -134,11 +107,35 @@ public class DataEditorServicesImpl implements DataEditorServices {
         return page;
     }
 
-    public int getPageCount(String tableName) throws EmfException {
-        // TODO Auto-generated method stub
+    private PageReader getReader(String tableName) {
+        PageReader reader = null;
         
-        if (false) throw new EmfException("");
-        return 0;
+        if (readerMap.containsKey(tableName)){
+            reader = (PageReader)readerMap.get(tableName);
+        }else{
+            String query = "select * from " + emissionsSchema.getName()+"."+ tableName;
+            ScrollableRecords sr = new ScrollableRecords(emissionsSchema, query);
+            reader = new PageReader(pageSize, sr);
+            readerMap.put(tableName,reader);
+        }
+        return reader;
+    }
+
+    public int getPageCount(String tableName) throws EmfException {
+        int pageCount = -1;
+        
+        try {
+            log.debug("Table name: " + tableName);
+            PageReader reader = reader = getReader(tableName);
+
+            pageCount = reader.count();
+        } catch (SQLException e) {
+            log.error("Failed to get page count: " + e.getMessage());
+            throw new EmfException(e.getMessage());
+        }
+        
+        return pageCount;      
+
     }
 
 }
