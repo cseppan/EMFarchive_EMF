@@ -24,7 +24,8 @@ public class DataViewLauncher {
 
         JDesktopPane desktop = new JDesktopPane();
         DataViewWindow console = new DataViewWindow();
-        console.display(launcher.createDataset());
+        DataViewPresenter p = new DataViewPresenter(launcher.createDataset(), console);
+        p.doDisplay();
 
         launcher.addAsInternalFrame(console, frame, desktop);
     }
@@ -32,14 +33,14 @@ public class DataViewLauncher {
     private EmfDataset createDataset() {
         EmfDataset dataset = new EmfDataset();
         dataset.setName("ORL Point");
-        
+
         InternalSource source1 = new InternalSource();
         source1.setTable("table1");
         InternalSource source2 = new InternalSource();
         source2.setTable("table2");
-        InternalSource[] sources = {source1, source2};
+        InternalSource[] sources = { source1, source2 };
         dataset.setInternalSources(sources);
-        
+
         return dataset;
     }
 

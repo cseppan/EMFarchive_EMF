@@ -9,13 +9,13 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-public class DataViewerTableDataTest extends TestCase {
+public class PageDataTest extends TestCase {
 
     public void testShouldHaveTwoColumnsIgnoringFirstColumnForDisplayPurposes() {
         InternalSource source = new InternalSource();
         source.setCols(new String[] { "col1", "col2", "col3" });
 
-        DataViewerTableData data = new DataViewerTableData(source, new Page());
+        PageData data = new PageData(source, new Page());
 
         String[] columns = data.columns();
         assertEquals(2, columns.length);
@@ -27,7 +27,7 @@ public class DataViewerTableDataTest extends TestCase {
         InternalSource source = new InternalSource();
         source.setCols(new String[] { "col1", "col2", "col3" });
 
-        DataViewerTableData data = new DataViewerTableData(source, new Page());
+        PageData data = new PageData(source, new Page());
 
         assertFalse("All columns should not be editable", data.isEditable(0));
         assertFalse("All columns should not be editable", data.isEditable(1));
@@ -46,7 +46,7 @@ public class DataViewerTableDataTest extends TestCase {
         record2.setTokens(new String[] { "11", "12", "13" });
         page.add(record2);
 
-        DataViewerTableData data = new DataViewerTableData(source, page);
+        PageData data = new PageData(source, page);
 
         List rows = data.rows();
         assertNotNull("Should have 2 rows", rows);
@@ -65,7 +65,7 @@ public class DataViewerTableDataTest extends TestCase {
         record2.setTokens(new String[] { "11", "12", "13" });
         page.add(record2);
         
-        DataViewerTableData data = new DataViewerTableData(source, page);
+        PageData data = new PageData(source, page);
         
         List rows = data.rows();
         

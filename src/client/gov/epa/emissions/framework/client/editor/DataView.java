@@ -5,4 +5,6 @@ import gov.epa.emissions.framework.client.ManagedView;
 
 public interface DataView extends ManagedView {
     void display(Dataset dataset);
+
+    void observe(DataViewPresenter presenter);
 }

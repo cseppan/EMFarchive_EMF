@@ -13,13 +13,13 @@ import java.util.List;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntList;
 
-public class DataViewerTableData extends AbstractTableData {
+public class PageData extends AbstractTableData {
 
     private InternalSource source;
 
     private List rows;
 
-    public DataViewerTableData(InternalSource source, Page page) {
+    public PageData(InternalSource source, Page page) {
         this.source = source;
         this.rows = createRows(page);
     }

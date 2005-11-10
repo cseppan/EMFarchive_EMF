@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.editor.DataView;
+import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -13,6 +14,7 @@ import gov.epa.emissions.framework.services.InterDataServices;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.core.constraint.IsInstanceOf;
 import org.jmock.core.stub.ThrowStub;
 
 public class PropertiesEditorPresenterTest extends MockObjectTestCase {
@@ -188,6 +190,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayDataViewerOnDisplayData() {
         Mock dataView = mock(DataView.class);
         dataView.expects(once()).method("display").with(same(dataset));
+        dataView.expects(once()).method("observe").with(new IsInstanceOf(DataViewPresenter.class));
         
         presenter.doDisplayData((DataView)dataView.proxy());
     }

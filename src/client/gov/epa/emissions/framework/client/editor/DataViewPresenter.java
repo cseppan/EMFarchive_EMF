@@ -17,11 +17,16 @@ public class DataViewPresenter {
 
     public void doDisplay() {
         view.display(dataset);
+        view.observe(this);
     }
 
     public void doSelectTable(String table, PageView pageView, DataEditorServices services) throws EmfException {
         PageViewPresenter presenter = new PageViewPresenter(services, pageView, table);
         presenter.doDisplayNext();
+    }
+
+    public void doClose() {
+        view.close();
     }
 
 }
