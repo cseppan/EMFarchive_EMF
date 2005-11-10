@@ -46,4 +46,7 @@ public final class EMFConstants {
     public static final String DATASETTYPE_NAME_METEOROLOGYFILES="Meteorology File";
     public static final String DATASETTYPE_NAME_MODELREADYEMISSIONSFILES="Model Ready Emissions";
     
+    public static final int PAGE_SIZE = 10;
+
+    
 }
