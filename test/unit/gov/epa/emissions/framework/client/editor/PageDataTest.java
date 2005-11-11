@@ -11,6 +11,13 @@ import junit.framework.TestCase;
 
 public class PageDataTest extends TestCase {
 
+    public void testShouldReturnStringAsColumnClassForAllColumns() {
+        PageData data = new PageData(null, new Page());
+
+        assertEquals(String.class, data.getColumnClass(0));
+        assertEquals(String.class, data.getColumnClass(1));
+    }
+    
     public void testShouldHaveTwoColumnsIgnoringFirstColumnForDisplayPurposes() {
         InternalSource source = new InternalSource();
         source.setCols(new String[] { "col1", "col2", "col3" });

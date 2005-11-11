@@ -46,6 +46,15 @@ public class DatasetTypesTableDataTest extends TestCase {
         assertEquals("Max Cols", columns[5]);
     }
 
+    public void testShouldHaveAppropriateColumnClassDefinedForAllColumns() {
+        assertEquals(String.class, data.getColumnClass(0));
+        assertEquals(String.class, data.getColumnClass(1));
+        assertEquals(Integer.class, data.getColumnClass(2));
+        assertEquals(Integer.class, data.getColumnClass(3));
+        assertEquals(Integer.class, data.getColumnClass(4));
+        assertEquals(Integer.class, data.getColumnClass(5));
+    }
+
     public void testAllColumnsShouldBeEditable() {
         assertTrue("All cells should be uneditable", data.isEditable(0));
         assertTrue("All cells should be uneditable", data.isEditable(1));

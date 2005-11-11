@@ -60,7 +60,7 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
     }
 
     public Class getColumnClass(int col) {
-        return getValueAt(0, col).getClass();
+        return tableData.getColumnClass(col);
     }
 
     public void setValueAt(Object value, int row, int col) {

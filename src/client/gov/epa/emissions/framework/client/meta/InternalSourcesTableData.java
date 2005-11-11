@@ -2,8 +2,8 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.ui.AbstractTableData;
-import gov.epa.emissions.framework.ui.ViewableRow;
 import gov.epa.emissions.framework.ui.Row;
+import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +22,10 @@ public class InternalSourcesTableData extends AbstractTableData {
 
     public List rows() {
         return rows;
+    }
+
+    public Class getColumnClass(int col) {
+        return String.class;
     }
 
     public boolean isEditable(int col) {

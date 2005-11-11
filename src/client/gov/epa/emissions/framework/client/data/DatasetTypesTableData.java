@@ -19,6 +19,13 @@ public class DatasetTypesTableData extends AbstractTableData {
         return new String[] { "Name", "Description", "Min Files", "Max Files", "Min Cols", "Max Cols" };
     }
 
+    public Class getColumnClass(int col) {
+        if (col == 0 || col == 1)
+            return String.class;
+
+        return Integer.class;
+    }
+
     public List rows() {
         return rows;
     }

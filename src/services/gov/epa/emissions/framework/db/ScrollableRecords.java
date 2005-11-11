@@ -59,7 +59,6 @@ public class ScrollableRecords {
 
     public void moveTo(int index) throws SQLException {
         resultSet.absolute(index);
-
     }
 
     public boolean available() throws SQLException {
@@ -75,7 +74,7 @@ public class ScrollableRecords {
         for (int i = 1; i <= columnCount(); i++)
             record.add(resultSet.getString(i));
 
-        return record;// TODO: load data
+        return record;
     }
 
     private int columnCount() throws SQLException {
@@ -91,11 +90,11 @@ public class ScrollableRecords {
      * @throws SQLException
      */
     public Record[] range(int start, int end) throws SQLException {
-        moveTo(start);
+        moveTo(start);// one position prior to start
 
         List range = new ArrayList();
         int max = rowCount();
-        for (int i = start; i <= end && i <= max; i++)
+        for (int i = start; (i <= end) && (i < max); i++)
             range.add(next());
 
         return (Record[]) range.toArray(new Record[0]);

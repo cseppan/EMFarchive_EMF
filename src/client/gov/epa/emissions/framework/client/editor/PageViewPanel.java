@@ -3,30 +3,28 @@ package gov.epa.emissions.framework.client.editor;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.services.Page;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.ScrollableTable;
 import gov.epa.emissions.framework.ui.TableData;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 public class PageViewPanel extends JPanel implements PageView {
 
     private EmfTableModel tableModel;
 
-    private JTable table;
-
     private InternalSource source;
 
     public PageViewPanel(InternalSource source) {
+        super(new BorderLayout());
         this.source = source;
     }
 
     public void display(Page page) {
         // TODO: refresh table w/ new data?
-        super.add(doLayout(page));
+        super.add(doLayout(page), BorderLayout.CENTER);
     }
 
     private JPanel doLayout(Page page) {
@@ -40,12 +38,7 @@ public class PageViewPanel extends JPanel implements PageView {
 
     private JScrollPane table(TableData tableData) {
         tableModel = new EmfTableModel(tableData);
-
-        table = new JTable(tableModel);
-        table.setRowHeight(25);
-        table.setPreferredScrollableViewportSize(new Dimension(500, 200));
-
-        return new JScrollPane(table);
+        return new ScrollableTable(tableModel);
     }
 
     private JPanel paginationPanel() {

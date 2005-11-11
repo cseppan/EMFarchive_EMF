@@ -32,7 +32,6 @@ public class PageViewPresenter {
 
     private void displayPage(int pageIndex) throws EmfException {
         Page page = services.getPage(table, pageIndex);
-        System.out.println("records in page: " + page.count());
         view.display(page);
     }
 }

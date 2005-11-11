@@ -24,6 +24,11 @@ public class PageData extends AbstractTableData {
         this.rows = createRows(page);
     }
 
+    public Class getColumnClass(int col) {
+        // TODO: need to use InternalSource + other? to lookup correct Class
+        return String.class;
+    }
+
     public String[] columns() {
         String[] cols = source.getCols();
         List result = new ArrayList();
@@ -76,4 +81,5 @@ public class PageData extends AbstractTableData {
     private int colsCount() {
         return columns().length;
     }
+
 }

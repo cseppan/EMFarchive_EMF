@@ -6,6 +6,8 @@ public interface TableData {
 
     String[] columns();
 
+    Class getColumnClass(int col);
+
     List rows();
 
     boolean isEditable(int col);

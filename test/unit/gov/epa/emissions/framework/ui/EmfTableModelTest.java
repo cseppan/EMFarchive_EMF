@@ -4,9 +4,11 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
 public class EmfTableModelTest extends MockObjectTestCase {
@@ -85,5 +87,14 @@ public class EmfTableModelTest extends MockObjectTestCase {
         assertEquals(dataset1, model.element(0));
         assertEquals(dataset2, model.element(1));
     }
-    
+
+    public void testShouldGetColumnClassFromUnderlyingTableData() {
+        Mock tableData = mock(TableData.class);
+        tableData.stubs().method("getColumnClass").with(eq(new Integer(2))).will(returnValue(Integer.class));
+        tableData.stubs().method("rows").withNoArguments().will(returnValue(Collections.EMPTY_LIST));
+        tableData.stubs().method("columns").withNoArguments().will(returnValue(new String[0]));
+
+        model = new EmfTableModel((TableData) tableData.proxy());
+        assertEquals(Integer.class, model.getColumnClass(2));
+    }
 }

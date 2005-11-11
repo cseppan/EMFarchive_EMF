@@ -110,4 +110,11 @@ public class DatasetTypeKeywordsTableData extends AbstractTableData implements S
         return sources;
     }
 
+    public Class getColumnClass(int col) {
+        if (col == 0)
+            return Boolean.class;
+
+        return String.class;
+    }
+
 }

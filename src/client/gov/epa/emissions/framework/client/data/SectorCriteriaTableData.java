@@ -110,4 +110,11 @@ public class SectorCriteriaTableData extends AbstractTableData implements Select
     public void removeSelected() {
         remove(getSelected());
     }
+
+    public Class getColumnClass(int col) {
+        if (col == 0)
+            return Boolean.class;
+
+        return String.class;
+    }
 }

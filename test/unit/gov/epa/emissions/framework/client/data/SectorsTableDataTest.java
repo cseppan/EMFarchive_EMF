@@ -9,58 +9,63 @@ import junit.framework.TestCase;
 
 public class SectorsTableDataTest extends TestCase {
 
-	private SectorsTableData data;
+    private SectorsTableData data;
 
-	protected void setUp() {
-		Sector sector1 = new Sector();
-		sector1.setName("name1");
-		sector1.setDescription("desc1");
+    protected void setUp() {
+        Sector sector1 = new Sector();
+        sector1.setName("name1");
+        sector1.setDescription("desc1");
 
-		Sector sector2 = new Sector();
-		sector2.setName("name2");
-		sector2.setDescription("desc2");
+        Sector sector2 = new Sector();
+        sector2.setName("name2");
+        sector2.setDescription("desc2");
 
-		data = new SectorsTableData(new Sector[] { sector1, sector2 });
-	}
+        data = new SectorsTableData(new Sector[] { sector1, sector2 });
+    }
 
-	public void testShouldHaveTwoColumns() {
-		String[] columns = data.columns();
-		assertEquals(2, columns.length);
-		assertEquals("Name", columns[0]);
-		assertEquals("Description", columns[1]);
-	}
+    public void testShouldReturnStringAsColumnClassForAllOtherColumns() {
+        assertEquals(String.class, data.getColumnClass(0));
+        assertEquals(String.class, data.getColumnClass(1));
+    }
 
-	public void testAllColumnsShouldBeEditable() {
-		assertTrue("All cells should be uneditable", data.isEditable(0));
-		assertTrue("All cells should be uneditable", data.isEditable(1));
-	}
+    public void testShouldHaveTwoColumns() {
+        String[] columns = data.columns();
+        assertEquals(2, columns.length);
+        assertEquals("Name", columns[0]);
+        assertEquals("Description", columns[1]);
+    }
 
-	public void testShouldReturnTheRowsCorrespondingToSectorsCount() {
-		List rows = data.rows();
-		assertNotNull("Should have 2 rows", rows);
-		assertEquals(2, rows.size());
-	}
+    public void testAllColumnsShouldBeEditable() {
+        assertTrue("All cells should be uneditable", data.isEditable(0));
+        assertTrue("All cells should be uneditable", data.isEditable(1));
+    }
 
-	public void testShouldFillTheColumnsCorrectly() {
-		List rows = data.rows();
+    public void testShouldReturnTheRowsCorrespondingToSectorsCount() {
+        List rows = data.rows();
+        assertNotNull("Should have 2 rows", rows);
+        assertEquals(2, rows.size());
+    }
 
-		Row row = (Row) rows.get(0);
-		assertEquals("name1", row.getValueAt(0));
-		assertEquals("desc1", row.getValueAt(1));
-	}
+    public void testShouldFillTheColumnsCorrectly() {
+        List rows = data.rows();
 
-	public void testShouldReturnARowRepresentingASectorEntry() {
-		Sector sector1 = new Sector();
-		sector1.setName("name1");
-		sector1.setDescription("desc1");
+        Row row = (Row) rows.get(0);
+        assertEquals("name1", row.getValueAt(0));
+        assertEquals("desc1", row.getValueAt(1));
+    }
 
-		Sector sector2 = new Sector();
-		sector2.setName("name2");
-		sector2.setDescription("desc2");
+    public void testShouldReturnARowRepresentingASectorEntry() {
+        Sector sector1 = new Sector();
+        sector1.setName("name1");
+        sector1.setDescription("desc1");
 
-		data = new SectorsTableData(new Sector[] { sector1, sector2 });
+        Sector sector2 = new Sector();
+        sector2.setName("name2");
+        sector2.setDescription("desc2");
 
-		assertEquals(sector1, data.element(0));
-		assertEquals(sector2, data.element(1));
-	}
+        data = new SectorsTableData(new Sector[] { sector1, sector2 });
+
+        assertEquals(sector1, data.element(0));
+        assertEquals(sector2, data.element(1));
+    }
 }

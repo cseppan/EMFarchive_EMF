@@ -10,35 +10,39 @@ import java.util.List;
 
 public class ExternalSourcesTableData extends AbstractTableData {
 
-	private List rows;
+    private List rows;
 
-	public ExternalSourcesTableData(ExternalSource[] sources) {
-		this.rows = createRows(sources);
-	}
+    public ExternalSourcesTableData(ExternalSource[] sources) {
+        this.rows = createRows(sources);
+    }
 
-	public String[] columns() {
-		return new String[] { "Source" };
-	}
+    public String[] columns() {
+        return new String[] { "Source" };
+    }
 
-	public List rows() {
-		return rows;
-	}
+    public List rows() {
+        return rows;
+    }
 
-	public boolean isEditable(int col) {
-		return false;
-	}
+    public boolean isEditable(int col) {
+        return false;
+    }
 
-	private List createRows(ExternalSource[] sources) {
-		List rows = new ArrayList();
+    private List createRows(ExternalSource[] sources) {
+        List rows = new ArrayList();
 
-		for (int i = 0; i < sources.length; i++) {
-			Object[] values = { sources[i].getDatasource() };
+        for (int i = 0; i < sources.length; i++) {
+            Object[] values = { sources[i].getDatasource() };
 
-			Row row = new ViewableRow(sources[i], values);
-			rows.add(row);
-		}
+            Row row = new ViewableRow(sources[i], values);
+            rows.add(row);
+        }
 
-		return rows;
-	}
+        return rows;
+    }
+
+    public Class getColumnClass(int col) {
+        return String.class;
+    }
 
 }

@@ -20,6 +20,10 @@ public class AccessLogTableData extends AbstractTableData {
         return new String[] { "User", "Date", "Version", "Description", "Export Location" };
     }
 
+    public Class getColumnClass(int col) {
+        return String.class;
+    }
+
     public List rows() {
         return rows;
     }

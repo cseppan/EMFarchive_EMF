@@ -40,7 +40,7 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
         super("Data Viewer: ", new Dimension(700, 500));
         this.services = services;
 
-        layout = new JPanel();
+        layout = new JPanel(new BorderLayout());
         this.getContentPane().add(layout);
     }
 
@@ -58,7 +58,7 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
         container.add(pagePanel(), BorderLayout.CENTER);
         container.add(controlsPanel(), BorderLayout.PAGE_END);
 
-        layout.add(container);
+        layout.add(container, BorderLayout.CENTER);
 
         super.display();
     }
@@ -95,7 +95,7 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
     }
 
     private JPanel pagePanel() {
-        pageContainer = new JPanel();
+        pageContainer = new JPanel(new BorderLayout());
         pageContainer.setBorder(new Border("Data"));
         pageContainer.setPreferredSize(new Dimension(600, 350));
 
@@ -128,7 +128,7 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
             return;
 
         PageViewPanel panel = new PageViewPanel(source(table, dataset.getInternalSources()));
-        pageContainer.add(panel);
+        pageContainer.add(panel, BorderLayout.CENTER);
 
         PageViewPresenter presenter = new PageViewPresenter(services, panel, table);
         try {

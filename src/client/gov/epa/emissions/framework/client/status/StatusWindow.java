@@ -98,11 +98,9 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         JTable table = new JTable(statusTableModel);
         table.setName("statusMessages");
         setColumnWidths(table.getColumnModel());
-
-        JScrollPane scrollPane = new JScrollPane(table);
         table.setPreferredScrollableViewportSize(this.getSize());
 
-        return scrollPane;
+        return new JScrollPane(table);
     }
 
     private void setColumnWidths(TableColumnModel model) {

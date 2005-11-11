@@ -37,6 +37,11 @@ public class SectorCriteriaTableDataTest extends TestCase {
         assertEquals("Criterion", columns[2]);
     }
 
+    public void testShouldBooleanAsColumnClassForSelectAndStringForOtherTwoColumns() {
+        assertEquals(Boolean.class, data.getColumnClass(0));
+        assertEquals(String.class, data.getColumnClass(1));
+        assertEquals(String.class, data.getColumnClass(2));
+    }
     public void testAllColumnsShouldBeEditable() {
         assertTrue("All cells should be editable", data.isEditable(0));
         assertTrue("All cells should be editable", data.isEditable(1));

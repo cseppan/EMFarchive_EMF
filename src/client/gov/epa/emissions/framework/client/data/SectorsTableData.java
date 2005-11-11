@@ -9,36 +9,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SectorsTableData extends AbstractTableData {
-	private List rows;
+    private List rows;
 
-	public SectorsTableData(Sector[] sectors) {
-		this.rows = createRows(sectors);
-	}
+    public SectorsTableData(Sector[] sectors) {
+        this.rows = createRows(sectors);
+    }
 
-	public String[] columns() {
-		return new String[] { "Name", "Description" };
-	}
+    public String[] columns() {
+        return new String[] { "Name", "Description" };
+    }
 
-	public List rows() {
-		return rows;
-	}
+    public Class getColumnClass(int col) {
+        return String.class;
+    }
 
-	public boolean isEditable(int col) {
-		return true;
-	}
+    public List rows() {
+        return rows;
+    }
 
-	private List createRows(Sector[] sectors) {
-		List rows = new ArrayList();
+    public boolean isEditable(int col) {
+        return true;
+    }
 
-		for (int i = 0; i < sectors.length; i++) {
-			Sector element = sectors[i];
-			Object[] values = { element.getName(), element.getDescription() };
+    private List createRows(Sector[] sectors) {
+        List rows = new ArrayList();
 
-			Row row = new ViewableRow(element, values);
-			rows.add(row);
-		}
+        for (int i = 0; i < sectors.length; i++) {
+            Sector element = sectors[i];
+            Object[] values = { element.getName(), element.getDescription() };
 
-		return rows;
-	}
+            Row row = new ViewableRow(element, values);
+            rows.add(row);
+        }
+
+        return rows;
+    }
 
 }

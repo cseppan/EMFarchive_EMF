@@ -29,6 +29,11 @@ public class DatasetTypeKeywordsTableDataTest extends TestCase {
         assertEquals("Keyword", columns[1]);
     }
 
+    public void testShouldReturnBooleanAsColumnClassForSelectColumnAndStringForKeywordColumn() {
+        assertEquals(Boolean.class, data.getColumnClass(0));
+        assertEquals(String.class, data.getColumnClass(1));
+    }
+
     public void testAllColumnsShouldBeEditable() {
         assertTrue("All cells should be editable", data.isEditable(0));
         assertTrue("All cells should be editable", data.isEditable(1));

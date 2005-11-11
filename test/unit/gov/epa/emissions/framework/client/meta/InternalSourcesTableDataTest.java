@@ -31,6 +31,14 @@ public class InternalSourcesTableDataTest extends MockObjectTestCase {
         assertEquals("Size", columns[4]);
     }
 
+    public void testShouldReturnStringAsColumnClassForAllOtherColumns() {
+        assertEquals(String.class, data.getColumnClass(0));
+        assertEquals(String.class, data.getColumnClass(1));
+        assertEquals(String.class, data.getColumnClass(2));
+        assertEquals(String.class, data.getColumnClass(3));
+        assertEquals(String.class, data.getColumnClass(4));
+    }
+
     public void testAllColumnsShouldBeUneditable() {
         assertFalse("All cells should be uneditable", data.isEditable(0));
         assertFalse("All cells should be uneditable", data.isEditable(1));

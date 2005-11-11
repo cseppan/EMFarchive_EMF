@@ -24,12 +24,12 @@ public class PageReader {
         return Math.round((float) scrollableRecords.rowCount() / pageSize);
     }
 
-    public Page page(int number) throws SQLException {
-        number = number - 1; // page '1' maps to '0'
-        if (number > count())
+    public Page page(int pageNumber) throws SQLException {
+        int actualPage = pageNumber - 1; // page '1' maps to '0'
+        if (actualPage > count())
             return null;
 
-        int start = number * pageSize;
+        int start = actualPage * pageSize;
         int end = start + pageSize - 1;// since, end is inclusive in the range
         Record[] records = scrollableRecords.range(start, end);
 
