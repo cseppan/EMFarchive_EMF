@@ -8,17 +8,28 @@ import org.jmock.cglib.MockObjectTestCase;
 
 public class PageViewPresenterTest extends MockObjectTestCase {
 
+    public void testShouldObserveOnObserveView() throws Exception {
+        Mock services = mock(DataEditorServices.class);
+        Mock view = mock(PageView.class);
+
+        PageViewPresenter p = new PageViewPresenter((DataEditorServices) services.proxy(), (PageView) view.proxy(),
+                "table");
+        view.expects(once()).method("observe").with(eq(p));
+        
+        p.observeView();
+    }
+    
     public void testShouldDisplayFirstPageOnFirstNextCall() throws Exception {
         Mock services = mock(DataEditorServices.class);
         Page page = new Page();
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(1))).will(returnValue(page));
-
+        
         Mock view = mock(PageView.class);
         view.expects(once()).method("display").with(eq(page));
-
+        
         PageViewPresenter p = new PageViewPresenter((DataEditorServices) services.proxy(), (PageView) view.proxy(),
-                "table");
-
+        "table");
+        
         p.doDisplayNext();
     }
 

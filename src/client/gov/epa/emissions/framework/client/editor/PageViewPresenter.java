@@ -20,6 +20,10 @@ public class PageViewPresenter {
         this.table = table;
     }
 
+    public void observeView() {
+        view.observe(this);
+    }
+
     public void doDisplayNext() throws EmfException {
         pageNumber++;
         doDisplay(pageNumber);

@@ -37,7 +37,7 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
     private DataEditorServices services;
 
     public DataViewWindow(DataEditorServices services) {
-        super("Data Viewer: ", new Dimension(700, 500));
+        super("Data Viewer: ", new Dimension(700, 800));
         this.services = services;
 
         layout = new JPanel(new BorderLayout());
@@ -97,7 +97,6 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
     private JPanel pagePanel() {
         pageContainer = new JPanel(new BorderLayout());
         pageContainer.setBorder(new Border("Data"));
-        pageContainer.setPreferredSize(new Dimension(600, 350));
 
         return pageContainer;
     }
@@ -127,10 +126,11 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
         if (table.equals("Select Table"))
             return;
 
-        PageViewPanel panel = new PageViewPanel(source(table, dataset.getInternalSources()));
+        PageViewPanel panel = new PageViewPanel(source(table, dataset.getInternalSources()), messagePanel);
         pageContainer.add(panel, BorderLayout.CENTER);
 
         PageViewPresenter presenter = new PageViewPresenter(services, panel, table);
+        presenter.observeView();
         try {
             presenter.doDisplayNext();
         } catch (EmfException e) {
