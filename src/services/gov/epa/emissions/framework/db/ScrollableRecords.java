@@ -11,7 +11,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ScrollableRecords {
+    private static Log log = LogFactory.getLog(ScrollableRecords.class);
 
     private Datasource datasource;
 
@@ -36,7 +40,6 @@ public class ScrollableRecords {
 
     public int rowCount() throws SQLException {
         int current = position();
-
         resultSet.last();
         try {
             return position();

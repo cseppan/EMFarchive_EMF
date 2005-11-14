@@ -112,10 +112,25 @@ public class DataEditorServicesTransport implements DataEditorServices {
     }
 
     public int getPageCount(String tableName) throws EmfException {
-        // TODO Auto-generated method stub
+        log.debug("Table Name= " + tableName);
+        int count = -1;
         
-        if (false) throw new EmfException("");
-        return 0;
+        try {
+
+            call.setOperationName("getPageCount");
+            call.addParameter("tableName", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+            call.setReturnType(Constants.XSD_INT);
+
+            Integer cnt = (Integer) call.invoke(new Object[] { tableName });
+            count = cnt.intValue();
+            call.removeAllParameters();
+            
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to get count: ", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to get count: " , e);
+        }
+        return count;
     }
 
 }

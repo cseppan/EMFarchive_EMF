@@ -22,7 +22,6 @@ import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.Page;
 
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
 
 import javax.naming.Context;
@@ -50,7 +49,6 @@ public class DataEditorServicesImpl implements DataEditorServices {
     public DataEditorServicesImpl() throws InfrastructureException {
         super();
         readerMap = new HashMap();
-        log.debug("CONSTRUCTOR HASHCODE: " + this.hashCode());
         try {
             Context ctx = new InitialContext();
             
@@ -67,43 +65,18 @@ public class DataEditorServicesImpl implements DataEditorServices {
     
     }
 
-    public Page getPage(String tableName, int pageNumber) {
-
-        log.debug("Table name: " + tableName + " Page number: " + pageNumber);
-        long startTime = new Date().getTime();
+    public Page getPage(String tableName, int pageNumber) throws EmfException {
         PageReader reader = reader = getReader(tableName);
-        
-        try {
-            reader.init();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
         String msg = null;
         Page page = null;
         
-        if (reader==null){
-            msg = "reader is null";
-        }else{
-            
-            try {
-                log.debug("page number: " + pageNumber);
-                page = reader.page(pageNumber);
-                log.debug("page: " + page);
-            } catch (Exception e) {
-                log.debug("####################### " + e);
-                e.printStackTrace();
-            }
-            if (page==null){
-                msg = "Page is null";
-            }else{
-                msg = "Number of records in page= " + page.getRecords().length;
-            }
+        try {
+            reader.init();
+            page = reader.page(pageNumber);
+        } catch (SQLException ex) {
+            log.error("Initialize reader: " + ex.getMessage());
+            throw new EmfException("Page Reader error: " + ex.getMessage());
         }
-        log.debug(msg);
-        long endTime = new Date().getTime();
-        log.debug("START TIME= " + startTime);
-        log.debug("End Time= " + endTime);
-        log.debug("TIME LAG= " + (endTime-startTime));
         return page;
     }
 
@@ -125,9 +98,8 @@ public class DataEditorServicesImpl implements DataEditorServices {
         int pageCount = -1;
         
         try {
-            log.debug("Table name: " + tableName);
             PageReader reader = reader = getReader(tableName);
-
+            reader.init();
             pageCount = reader.count();
         } catch (SQLException e) {
             log.error("Failed to get page count: " + e.getMessage());

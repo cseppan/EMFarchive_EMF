@@ -5,7 +5,11 @@ import gov.epa.emissions.framework.services.Page;
 
 import java.sql.SQLException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class PageReader {
+    private static Log log = LogFactory.getLog(PageReader.class);
 
     private int pageSize;
 
