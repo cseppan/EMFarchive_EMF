@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.db;
 
-import gov.epa.emissions.commons.Record;
+import gov.epa.emissions.framework.services.DbRecord;
 import gov.epa.emissions.framework.services.Page;
 
 import org.jmock.Mock;
@@ -10,7 +10,7 @@ public class PageReaderTest extends MockObjectTestCase {
 
     public void testPageCountShouldBeTotalRecordsByPageSize() throws Exception {
         Mock scrollableRecords = mock(ScrollableRecordsStub.class);
-        scrollableRecords.stubs().method("rowCount").withNoArguments().will(returnValue(new Integer(1800)));
+        scrollableRecords.stubs().method("total").withNoArguments().will(returnValue(new Integer(1800)));
 
         PageReader reader = new PageReader(3, (ScrollableRecords) scrollableRecords.proxy());
 
@@ -19,7 +19,7 @@ public class PageReaderTest extends MockObjectTestCase {
     
     public void testPageCountShouldIncludeTheLastPageWhichCouldBeSparse() throws Exception {
         Mock scrollableRecords = mock(ScrollableRecordsStub.class);
-        scrollableRecords.stubs().method("rowCount").withNoArguments().will(returnValue(new Integer(394)));
+        scrollableRecords.stubs().method("total").withNoArguments().will(returnValue(new Integer(394)));
         
         PageReader reader = new PageReader(10, (ScrollableRecords) scrollableRecords.proxy());
         
@@ -28,8 +28,8 @@ public class PageReaderTest extends MockObjectTestCase {
 
     public void testShouldGetSpecifiedPage() throws Exception {
         Mock scrollableRecords = mock(ScrollableRecordsStub.class);
-        scrollableRecords.stubs().method("rowCount").withNoArguments().will(returnValue(new Integer(1800)));
-        Record[] records = {};
+        scrollableRecords.stubs().method("total").withNoArguments().will(returnValue(new Integer(1800)));
+        DbRecord[] records = {};
         scrollableRecords.stubs().method("range").with(eq(new Integer(40)), eq(new Integer(49))).will(
                 returnValue(records));
         scrollableRecords.expects(once()).method("execute").withNoArguments();

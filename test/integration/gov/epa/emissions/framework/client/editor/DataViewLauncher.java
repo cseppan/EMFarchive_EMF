@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.editor;
 
-import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.services.DataEditorServices;
+import gov.epa.emissions.framework.services.DbRecord;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Page;
 
@@ -29,11 +29,11 @@ public class DataViewLauncher {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JDesktopPane desktop = new JDesktopPane();
-        
+
         Mock service = service();
         DataViewWindow view = new DataViewWindow((DataEditorServices) service.proxy());
         DataViewPresenter p = new DataViewPresenter(launcher.createDataset(), view);
-        
+
         launcher.addAsInternalFrame(view, frame, desktop);
         p.doDisplay();
     }
@@ -41,14 +41,14 @@ public class DataViewLauncher {
     private static Mock service() {
         Mock mock = new Mock(DataEditorServices.class);
 
-        Record record1 = new Record();
+        DbRecord record1 = new DbRecord();
         record1.setTokens(new String[] { "a", "b", "c" });
-        Record record2 = new Record();
+        DbRecord record2 = new DbRecord();
         record2.setTokens(new String[] { "x", "y", "z" });
-        Record record3 = new Record();
+        DbRecord record3 = new DbRecord();
         record3.setTokens(new String[] { "d", "e", "f" });
-        
-        Record[] records = { record1, record2, record3 };
+
+        DbRecord[] records = { record1, record2, record3 };
 
         Page page = new Page();
         page.setRecords(records);

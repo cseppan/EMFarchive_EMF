@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
-import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.framework.services.DbRecord;
 import gov.epa.emissions.framework.services.Page;
 import gov.epa.emissions.framework.ui.Row;
 
@@ -46,10 +46,10 @@ public class PageDataTest extends TestCase {
         source.setCols(new String[] { "col1", "col2", "col3" });
 
         Page page = new Page();
-        Record record1 = new Record();
+        DbRecord record1 = new DbRecord();
         record1.setTokens(new String[] { "1", "2", "3" });
         page.add(record1);
-        Record record2 = new Record();
+        DbRecord record2 = new DbRecord();
         record2.setTokens(new String[] { "11", "12", "13" });
         page.add(record2);
 
@@ -65,10 +65,10 @@ public class PageDataTest extends TestCase {
         source.setCols(new String[] { "col1", "col2", "col3" });
         
         Page page = new Page();
-        Record record1 = new Record();
+        DbRecord record1 = new DbRecord();
         record1.setTokens(new String[] { "1", "2", "3" });
         page.add(record1);
-        Record record2 = new Record();
+        DbRecord record2 = new DbRecord();
         record2.setTokens(new String[] { "11", "12", "13" });
         page.add(record2);
         

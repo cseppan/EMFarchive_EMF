@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.db;
 
-import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.framework.services.DbRecord;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -11,12 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class ScrollableRecords {
-    private static Log log = LogFactory.getLog(ScrollableRecords.class);
-
     private Datasource datasource;
 
     private String query;
@@ -38,7 +33,7 @@ public class ScrollableRecords {
         metadata = resultSet.getMetaData();
     }
 
-    public int rowCount() throws SQLException {
+    public int total() throws SQLException {
         int current = position();
         resultSet.last();
         try {
@@ -66,14 +61,14 @@ public class ScrollableRecords {
 
     public boolean available() throws SQLException {
         // TODO: is this a serious hit to the ResultSet's cursor ?
-        return position() < rowCount();
+        return position() < total();
     }
 
-    public Record next() throws SQLException {
+    public DbRecord next() throws SQLException {
         if (!resultSet.next())
             return null;// TODO: is NullRecord better?
 
-        Record record = new Record();
+        DbRecord record = new DbRecord();
         for (int i = 1; i <= columnCount(); i++)
             record.add(resultSet.getString(i));
 
@@ -92,15 +87,15 @@ public class ScrollableRecords {
      * @return returns a range of records inclusive of start and end
      * @throws SQLException
      */
-    public Record[] range(int start, int end) throws SQLException {
+    public DbRecord[] range(int start, int end) throws SQLException {
         moveTo(start);// one position prior to start
 
         List range = new ArrayList();
-        int max = rowCount();
+        int max = total();
         for (int i = start; (i <= end) && (i < max); i++)
             range.add(next());
 
-        return (Record[]) range.toArray(new Record[0]);
+        return (DbRecord[]) range.toArray(new DbRecord[0]);
     }
 
 }

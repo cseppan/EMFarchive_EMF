@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.db;
 
-import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.io.SimpleDataset;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.framework.PersistenceTestCase;
+import gov.epa.emissions.framework.services.DbRecord;
 
 import java.io.File;
 import java.util.Random;
@@ -45,7 +45,7 @@ public class ScrollableRecordsTest extends PersistenceTestCase {
     }
 
     public void testRowCount() throws Exception {
-        assertEquals(394, results.rowCount());
+        assertEquals(394, results.total());
     }
 
     public void testScrollForward() throws Exception {
@@ -68,7 +68,7 @@ public class ScrollableRecordsTest extends PersistenceTestCase {
     }
 
     public void testFetchRangeOfRecords() throws Exception {
-        Record[] records = results.range(3, 7);
+        DbRecord[] records = results.range(3, 7);
         assertNotNull("Should be able to fetch a range of records", records);
         assertEquals(5, records.length);
         for (int i = 0; i < records.length; i++)
@@ -82,7 +82,7 @@ public class ScrollableRecordsTest extends PersistenceTestCase {
         assertRecords(10, results.range(0, 9));
     }
 
-    private void assertRecords(int expected, Record[] range) {
+    private void assertRecords(int expected, DbRecord[] range) {
         assertEquals(expected, range.length);
         for (int i = 0; i < range.length; i++)
             assertNotNull(range[i]);
@@ -96,7 +96,7 @@ public class ScrollableRecordsTest extends PersistenceTestCase {
     }
 
     public void testFetchFirstRecord() throws Exception {
-        Record record = results.next();
+        DbRecord record = results.next();
 
         assertEquals(14, record.size());
         assertNotNull("Should be able to fetch first record", record);
