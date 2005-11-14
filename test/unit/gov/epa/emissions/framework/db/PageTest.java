@@ -14,6 +14,20 @@ public class PageTest extends TestCase {
 
         assertEquals(2, page.count());
     }
+    
+    public void testShouldReturnRangeRepresentingMinAndMaxRecordIds() {
+        Page page = new Page();
+        
+        assertEquals(-1, page.min());
+        assertEquals(-1, page.max());
+        
+        page.add(new DbRecord(1));
+        page.add(new DbRecord(2));
+        page.add(new DbRecord(3));
+        
+        assertEquals(1, page.min());
+        assertEquals(3, page.max());
+    }
 
     public void testShouldGetRecords() {
         Page page = new Page();

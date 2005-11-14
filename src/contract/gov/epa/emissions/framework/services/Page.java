@@ -33,4 +33,18 @@ public class Page {
         records.addAll(Arrays.asList(array));
     }
 
+    public int min() {
+        if (count() == 0)
+            return -1;
+
+        return ((DbRecord) records.get(0)).getId();
+    }
+
+    public int max() {
+        if (count() == 0)
+            return -1;
+
+        return ((DbRecord) records.get(count() - 1)).getId();
+    }
+
 }

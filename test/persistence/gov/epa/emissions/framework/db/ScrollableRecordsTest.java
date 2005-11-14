@@ -91,13 +91,16 @@ public class ScrollableRecordsTest extends PersistenceTestCase {
     public void testIterate() throws Exception {
         for (int i = 0; i < 394; i++) {
             assertTrue("Should have more records", results.available());
-            assertNotNull("Should be able to iterate through records", results.next());
+            DbRecord record = results.next();
+            assertNotNull("Should be able to iterate through records", record);
+            assertEquals(i+1, record.getId());
         }
     }
 
     public void testFetchFirstRecord() throws Exception {
         DbRecord record = results.next();
-
+        assertEquals(1, record.getId());
+        
         assertEquals(14, record.size());
         assertNotNull("Should be able to fetch first record", record);
 

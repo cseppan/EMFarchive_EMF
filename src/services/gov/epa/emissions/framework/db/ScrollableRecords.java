@@ -68,7 +68,7 @@ public class ScrollableRecords {
         if (!resultSet.next())
             return null;// TODO: is NullRecord better?
 
-        DbRecord record = new DbRecord();
+        DbRecord record = new DbRecord(position());
         for (int i = 1; i <= columnCount(); i++)
             record.add(resultSet.getString(i));
 
