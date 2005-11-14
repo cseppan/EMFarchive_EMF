@@ -81,7 +81,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private void setProperties() {
-        super.setSize(new Dimension(900, 700));
+        super.setSize(new Dimension(1200, 900));
         // FIXME: prompt the user ?
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         super.setResizable(true);

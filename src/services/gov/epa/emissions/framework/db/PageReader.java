@@ -5,12 +5,7 @@ import gov.epa.emissions.framework.services.Page;
 
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class PageReader {
-    private static Log log = LogFactory.getLog(PageReader.class);
-
     private int pageSize;
 
     private ScrollableRecords scrollableRecords;
@@ -25,7 +20,8 @@ public class PageReader {
     }
 
     public int count() throws SQLException {
-        return Math.round((float) scrollableRecords.rowCount() / pageSize);
+        float val = (float) scrollableRecords.rowCount() / pageSize;
+        return (int) Math.ceil(val);
     }
 
     public Page page(int pageNumber) throws SQLException {

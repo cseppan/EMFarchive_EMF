@@ -19,11 +19,11 @@ public class PageReaderTest extends MockObjectTestCase {
     
     public void testPageCountShouldIncludeTheLastPageWhichCouldBeSparse() throws Exception {
         Mock scrollableRecords = mock(ScrollableRecordsStub.class);
-        scrollableRecords.stubs().method("rowCount").withNoArguments().will(returnValue(new Integer(11)));
+        scrollableRecords.stubs().method("rowCount").withNoArguments().will(returnValue(new Integer(394)));
         
-        PageReader reader = new PageReader(3, (ScrollableRecords) scrollableRecords.proxy());
+        PageReader reader = new PageReader(10, (ScrollableRecords) scrollableRecords.proxy());
         
-        assertEquals(4, reader.count());
+        assertEquals(40, reader.count());
     }
 
     public void testShouldGetSpecifiedPage() throws Exception {

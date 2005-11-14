@@ -37,7 +37,7 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
     private DataEditorServices services;
 
     public DataViewWindow(DataEditorServices services) {
-        super("Data Viewer: ", new Dimension(700, 800));
+        super("Data Viewer: ", new Dimension(900, 700));
         this.services = services;
 
         layout = new JPanel(new BorderLayout());

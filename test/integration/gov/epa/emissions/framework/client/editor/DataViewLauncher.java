@@ -23,8 +23,8 @@ public class DataViewLauncher {
         DataViewLauncher launcher = new DataViewLauncher();
 
         EmfFrame frame = new EmfFrame("DataView Launcher", "DataView Launcher");
-        frame.setSize(new Dimension(900, 700));
-        frame.setLocation(new Point(300, 200));
+        frame.setSize(new Dimension(1200, 900));
+        frame.setLocation(new Point(100, 50));
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -54,6 +54,7 @@ public class DataViewLauncher {
         page.setRecords(records);
 
         mock.stubs().method("getPage").withAnyArguments().will(new ReturnStub(page));
+        mock.stubs().method("getPageCount").withAnyArguments().will(new ReturnStub(new Integer(20)));
 
         return mock;
     }

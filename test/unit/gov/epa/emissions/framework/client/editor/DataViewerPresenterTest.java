@@ -41,6 +41,7 @@ public class DataViewerPresenterTest extends MockObjectTestCase {
         Mock services = mock(DataEditorServices.class);
         Page page = new Page();
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(1))).will(returnValue(page));
+        services.stubs().method("getPageCount").with(eq("table")).will(returnValue(new Integer(10)));
 
         Mock pageView = mock(PageView.class);
         pageView.expects(once()).method("display").with(eq(page));
