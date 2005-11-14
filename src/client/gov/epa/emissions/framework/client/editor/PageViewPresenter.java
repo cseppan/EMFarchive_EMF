@@ -12,7 +12,7 @@ public class PageViewPresenter {
 
     private String table;
 
-    private int pageIndex;
+    private int pageNumber;
 
     public PageViewPresenter(DataEditorServices services, PageView view, String table) {
         this.services = services;
@@ -21,17 +21,27 @@ public class PageViewPresenter {
     }
 
     public void doDisplayNext() throws EmfException {
-        pageIndex++;
-        displayPage(pageIndex);
+        pageNumber++;
+        doDisplay(pageNumber);
     }
 
     public void doDisplayPrevious() throws EmfException {
-        pageIndex--;
-        displayPage(pageIndex);
+        pageNumber--;
+        doDisplay(pageNumber);
     }
 
-    private void displayPage(int pageIndex) throws EmfException {
-        Page page = services.getPage(table, pageIndex);
+    public void doDisplay(int pageNumber) throws EmfException {
+        this.pageNumber = pageNumber;
+        Page page = services.getPage(table, pageNumber);
         view.display(page);
     }
+
+    public void doDisplayFirst() throws EmfException {
+        doDisplay(1);
+    }
+
+    public void doDisplayLast() throws EmfException {
+        doDisplay(services.getPageCount(table));
+    }
+
 }

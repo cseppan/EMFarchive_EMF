@@ -22,6 +22,49 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         p.doDisplayNext();
     }
 
+    public void testShouldDisplaySpecifiedPage() throws Exception {
+        Mock services = mock(DataEditorServices.class);
+        Page page = new Page();
+        services.stubs().method("getPage").with(eq("table"), eq(new Integer(21))).will(returnValue(page));
+
+        Mock view = mock(PageView.class);
+        view.expects(once()).method("display").with(eq(page));
+
+        PageViewPresenter p = new PageViewPresenter((DataEditorServices) services.proxy(), (PageView) view.proxy(),
+                "table");
+
+        p.doDisplay(21);
+    }
+
+    public void testShouldDisplayFirstPage() throws Exception {
+        Mock services = mock(DataEditorServices.class);
+        Page page = new Page();
+        services.stubs().method("getPage").with(eq("table"), eq(new Integer(1))).will(returnValue(page));
+
+        Mock view = mock(PageView.class);
+        view.expects(once()).method("display").with(eq(page));
+
+        PageViewPresenter p = new PageViewPresenter((DataEditorServices) services.proxy(), (PageView) view.proxy(),
+                "table");
+
+        p.doDisplayFirst();
+    }
+
+    public void testShouldDisplayLastPage() throws Exception {
+        Mock services = mock(DataEditorServices.class);
+        Page page = new Page();
+        services.stubs().method("getPage").with(eq("table"), eq(new Integer(20))).will(returnValue(page));
+        services.stubs().method("getPageCount").with(eq("table")).will(returnValue(new Integer(20)));
+
+        Mock view = mock(PageView.class);
+        view.expects(once()).method("display").with(eq(page));
+
+        PageViewPresenter p = new PageViewPresenter((DataEditorServices) services.proxy(), (PageView) view.proxy(),
+                "table");
+
+        p.doDisplayLast();
+    }
+
     public void testShouldDisplaySecondPageOnTwoConsecutiveNextCall() throws Exception {
         Mock services = mock(DataEditorServices.class);
         Page page = new Page();

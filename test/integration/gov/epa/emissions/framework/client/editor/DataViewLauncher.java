@@ -29,12 +29,13 @@ public class DataViewLauncher {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JDesktopPane desktop = new JDesktopPane();
+        
         Mock service = service();
-        DataViewWindow console = new DataViewWindow((DataEditorServices) service.proxy());
-        DataViewPresenter p = new DataViewPresenter(launcher.createDataset(), console);
+        DataViewWindow view = new DataViewWindow((DataEditorServices) service.proxy());
+        DataViewPresenter p = new DataViewPresenter(launcher.createDataset(), view);
+        
+        launcher.addAsInternalFrame(view, frame, desktop);
         p.doDisplay();
-
-        launcher.addAsInternalFrame(console, frame, desktop);
     }
 
     private static Mock service() {
@@ -44,8 +45,10 @@ public class DataViewLauncher {
         record1.setTokens(new String[] { "a", "b", "c" });
         Record record2 = new Record();
         record2.setTokens(new String[] { "x", "y", "z" });
+        Record record3 = new Record();
+        record3.setTokens(new String[] { "d", "e", "f" });
         
-        Record[] records = { record1, record2 };
+        Record[] records = { record1, record2, record3 };
 
         Page page = new Page();
         page.setRecords(records);

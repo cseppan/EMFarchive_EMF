@@ -29,4 +29,20 @@ public class ImageResources {
         URL url = ImageResources.class.getResource(bundle.getString(alias));
         return new ImageIcon(url, tooltip);
     }
+
+    public ImageIcon prev(String tooltip) {
+        return image("prev", tooltip);
+    }
+
+    public ImageIcon next(String tooltip) {
+        return image("next", tooltip);
+    }
+
+    public ImageIcon first(String tooltip) {
+        return image("first", tooltip);
+    }
+
+    public ImageIcon last(String tooltip) {
+        return image("last", tooltip);
+        }
 }
