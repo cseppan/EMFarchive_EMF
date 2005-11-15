@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.DataEditorServices;
 import gov.epa.emissions.framework.ui.Border;
 
@@ -41,6 +42,9 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
         this.services = services;
 
         layout = new JPanel(new BorderLayout());
+        messagePanel = new SingleLineMessagePanel();
+        layout.add(messagePanel, BorderLayout.PAGE_START);
+
         this.getContentPane().add(layout);
     }
 
