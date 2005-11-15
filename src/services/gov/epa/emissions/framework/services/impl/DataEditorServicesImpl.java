@@ -92,4 +92,14 @@ public class DataEditorServicesImpl implements DataEditorServices {
 
         return (PageReader) pageReadersMap.get(tableName);
     }
+
+    public Page getPageWithRecord(String tableName, int recordId) throws EmfException {
+        if (false) throw new EmfException("");
+        return null;
+    }
+
+    public int getTotalRecords(String tableName) throws EmfException {
+        if (false) throw new EmfException("");
+        return 0;
+    }
 }

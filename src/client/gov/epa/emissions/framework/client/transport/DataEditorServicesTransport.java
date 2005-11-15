@@ -133,4 +133,14 @@ public class DataEditorServicesTransport implements DataEditorServices {
         return count;
     }
 
+    public Page getPageWithRecord(String tableName, int recordId) throws EmfException {
+        if (false) throw new EmfException("");
+        return null;
+    }
+
+    public int getTotalRecords(String tableName) throws EmfException {
+        if (false) throw new EmfException("");
+        return 0;
+    }
+
 }
