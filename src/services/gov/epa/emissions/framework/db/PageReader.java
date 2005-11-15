@@ -19,14 +19,14 @@ public class PageReader {
         scrollableRecords.execute();
     }
 
-    public int count() throws SQLException {
+    public int pageCount() throws SQLException {
         float val = (float) scrollableRecords.total() / pageSize;
         return (int) Math.ceil(val);
     }
 
     public Page page(int pageNumber) throws SQLException {
         int actualPage = pageNumber - 1; // page '1' maps to '0'
-        if (actualPage > count())
+        if (actualPage > pageCount())
             return null;
 
         int start = actualPage * pageSize;
@@ -37,6 +37,10 @@ public class PageReader {
         page.setRecords(records);
 
         return page;
+    }
+
+    public int recordsCount() throws SQLException {
+        return scrollableRecords.total();
     }
 
 }
