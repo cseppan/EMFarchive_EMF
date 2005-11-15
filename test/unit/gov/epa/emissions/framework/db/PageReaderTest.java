@@ -11,6 +11,7 @@ public class PageReaderTest extends MockObjectTestCase {
     public void testPageCountShouldBeTotalRecordsByPageSize() throws Exception {
         Mock scrollableRecords = mock(ScrollableRecordsStub.class);
         scrollableRecords.stubs().method("total").withNoArguments().will(returnValue(new Integer(1800)));
+        scrollableRecords.stubs().method("execute").withNoArguments();
 
         PageReader reader = new PageReader(3, (ScrollableRecords) scrollableRecords.proxy());
 
@@ -20,7 +21,8 @@ public class PageReaderTest extends MockObjectTestCase {
     public void testTotalRecordsShouldBeEqualToTotalFromScrollableRecords() throws Exception {
         Mock scrollableRecords = mock(ScrollableRecordsStub.class);
         scrollableRecords.stubs().method("total").withNoArguments().will(returnValue(new Integer(1800)));
-        
+        scrollableRecords.stubs().method("execute").withNoArguments();
+
         PageReader reader = new PageReader(3, (ScrollableRecords) scrollableRecords.proxy());
         
         assertEquals(1800, reader.recordsCount());
@@ -29,7 +31,8 @@ public class PageReaderTest extends MockObjectTestCase {
     public void testPageCountShouldIncludeTheLastPageWhichCouldBeSparse() throws Exception {
         Mock scrollableRecords = mock(ScrollableRecordsStub.class);
         scrollableRecords.stubs().method("total").withNoArguments().will(returnValue(new Integer(394)));
-        
+        scrollableRecords.stubs().method("execute").withNoArguments();
+
         PageReader reader = new PageReader(10, (ScrollableRecords) scrollableRecords.proxy());
         
         assertEquals(40, reader.pageCount());
@@ -44,7 +47,6 @@ public class PageReaderTest extends MockObjectTestCase {
         scrollableRecords.expects(once()).method("execute").withNoArguments();
 
         PageReader reader = new PageReader(10, (ScrollableRecords) scrollableRecords.proxy());
-        reader.init();
 
         Page page = reader.page(5);
         assertNotNull("Should be able to fetch Page 5", page);

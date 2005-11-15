@@ -10,12 +10,9 @@ public class PageReader {
 
     private ScrollableRecords scrollableRecords;
 
-    public PageReader(int pageSize, ScrollableRecords scrollableRecords) {
+    public PageReader(int pageSize, ScrollableRecords scrollableRecords) throws SQLException {
         this.pageSize = pageSize;
         this.scrollableRecords = scrollableRecords;
-    }
-
-    public void init() throws SQLException {
         scrollableRecords.execute();
     }
 

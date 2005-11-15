@@ -86,7 +86,6 @@ public class DataEditorServicesImpl implements DataEditorServices {
             String query = "SELECT * FROM " + emissionsSchema.getName() + "." + tableName;
             ScrollableRecords sr = new ScrollableRecords(emissionsSchema, query);
             PageReader reader = new PageReader(20, sr);
-            reader.init();
 
             pageReadersMap.put(tableName, reader);
         }
