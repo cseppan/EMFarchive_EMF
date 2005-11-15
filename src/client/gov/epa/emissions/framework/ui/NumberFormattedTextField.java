@@ -12,7 +12,7 @@ import javax.swing.text.NumberFormatter;
 public class NumberFormattedTextField extends JFormattedTextField {
 
     public NumberFormattedTextField(int min, int max, int size, Action action) {
-        super.setFormatterFactory(new DefaultFormatterFactory(formatter(max)));
+        super.setFormatterFactory(new DefaultFormatterFactory(formatter(min, max)));
         super.setValue(new Integer(min));
         super.setColumns(size);
 
@@ -24,9 +24,9 @@ public class NumberFormattedTextField extends JFormattedTextField {
         super.getActionMap().put("check", action);
     }
 
-    private NumberFormatter formatter(int max) {
+    private NumberFormatter formatter(int min, int max) {
         NumberFormatter formatter = new NumberFormatter(NumberFormat.getIntegerInstance());
-        formatter.setMinimum(new Integer(0));
+        formatter.setMinimum(new Integer(min));
         formatter.setMaximum(new Integer(max));
 
         return formatter;

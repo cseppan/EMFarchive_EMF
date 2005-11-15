@@ -11,7 +11,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.ParseException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -122,14 +121,17 @@ public class PaginationPanel extends JPanel {
 
     private boolean verifyInput(final int max) {
         AbstractFormatter formatter = recordInput.getFormatter();
+        String val = recordInput.getText();
+
         try {
-            formatter.stringToValue(recordInput.getText());
+            Integer.parseInt(val);
+            formatter.stringToValue(val);
             recordInput.commitEdit();
+            
             messagePanel.clear();
             return true;
-        } catch (ParseException pe) {
-            messagePanel.setError("Invalid value: " + recordInput.getText() + ". Please use numbers between 1 and "
-                    + max);
+        } catch (Exception pe) {
+            messagePanel.setError("Invalid value: " + val + ". Please use numbers between 1 and " + max);
             recordInput.selectAll();
             return false;
         }
