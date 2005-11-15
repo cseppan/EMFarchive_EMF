@@ -18,4 +18,5 @@ public interface DataEditorServices {
     int getPageCount(String tableName) throws EmfException;
     Page getPageWithRecord(String tableName, int recordId) throws EmfException;
     int getTotalRecords(String tableName) throws EmfException;
+    void close() throws EmfException;
 }

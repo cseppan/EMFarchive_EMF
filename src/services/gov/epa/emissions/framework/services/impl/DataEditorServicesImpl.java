@@ -22,7 +22,9 @@ import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.Page;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -31,6 +33,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+
 
 /**
  * @author Conrad F. D'Cruz
@@ -45,6 +49,7 @@ public class DataEditorServicesImpl implements DataEditorServices {
 
     public DataEditorServicesImpl() throws InfrastructureException {
         super();
+        
         pageReadersMap = new HashMap();
         try {
             Context ctx = new InitialContext();
@@ -111,5 +116,14 @@ public class DataEditorServicesImpl implements DataEditorServices {
             log.error("Failed to get total records count: " + e.getMessage());
             throw new EmfException(e.getMessage());
         }
+    }
+
+    public void close(){        
+        Collection all = pageReadersMap.values();
+        Iterator iter = all.iterator();
+        while (iter.hasNext()){
+            ((PageReader)iter.next()).close();
+        }
+        pageReadersMap.clear();
     }
 }

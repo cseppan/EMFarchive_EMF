@@ -57,4 +57,7 @@ public class PageReader {
         return page;
     }
 
+    public void close(){
+        
+    }
 }
