@@ -74,7 +74,7 @@ public class DataEditorServicesImpl implements DataEditorServices {
     public int getPageCount(String tableName) throws EmfException {
         try {
             PageReader reader = getReader(tableName);
-            return reader.pageCount();
+            return reader.totalPages();
         } catch (SQLException e) {
             log.error("Failed to get page count: " + e.getMessage());
             throw new EmfException(e.getMessage());

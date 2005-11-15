@@ -41,11 +41,11 @@ public class DataViewLauncher {
     private static Mock service() {
         Mock mock = new Mock(DataEditorServices.class);
 
-        DbRecord record1 = new DbRecord();
+        DbRecord record1 = new DbRecord(1521);
         record1.setTokens(new String[] { "a", "b", "c" });
-        DbRecord record2 = new DbRecord();
+        DbRecord record2 = new DbRecord(1522);
         record2.setTokens(new String[] { "x", "y", "z" });
-        DbRecord record3 = new DbRecord();
+        DbRecord record3 = new DbRecord(1523);
         record3.setTokens(new String[] { "d", "e", "f" });
 
         DbRecord[] records = { record1, record2, record3 };

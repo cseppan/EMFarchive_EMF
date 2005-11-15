@@ -34,6 +34,10 @@ public class PageViewPanel extends JPanel implements PageView {
 
     private JPanel pageContainer;
 
+    private JLabel current;
+
+    private JLabel total;
+
     public PageViewPanel(InternalSource source, MessagePanel messagePanel) {
         super(new BorderLayout());
         this.source = source;
@@ -52,19 +56,29 @@ public class PageViewPanel extends JPanel implements PageView {
         // TODO: refresh table w/ new data? or remove and add back the table?
         pageContainer.removeAll();
 
+        updatePaginationPanel(page);
+
         tableModel = new EmfTableModel(new PageData(source, page));
         JScrollPane table = new ScrollableTable(tableModel);
         pageContainer.add(table, BorderLayout.CENTER);
+    }
+
+    private void updatePaginationPanel(Page page) {
+        current.setText(page.min() + " - " + page.max());
     }
 
     private JPanel paginationPanel() {
         JPanel container = new JPanel(new BorderLayout());
 
         JPanel panel = new JPanel();
-        JLabel current = new JLabel("Current: ");
+        current = new JLabel("               ");
+        current.setToolTipText("Range of displayed records");
+        panel.add(new JLabel("Current: "));
         panel.add(current);
 
-        JLabel total = new JLabel("Total Records: ");
+        total = new JLabel("             ");
+        total.setToolTipText("Total Records");
+        panel.add(new JLabel("Total: "));
         panel.add(total);
 
         JToolBar toolbar = new JToolBar();

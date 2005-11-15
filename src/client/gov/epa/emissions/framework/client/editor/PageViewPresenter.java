@@ -25,7 +25,7 @@ public class PageViewPresenter {
     }
 
     public void doDisplayNext() throws EmfException {
-        if (pageNumber < total())
+        if (pageNumber < pageCount())
             pageNumber++;
         doDisplay(pageNumber);
     }
@@ -47,10 +47,10 @@ public class PageViewPresenter {
     }
 
     public void doDisplayLast() throws EmfException {
-        doDisplay(total());
+        doDisplay(pageCount());
     }
 
-    private int total() throws EmfException {
+    private int pageCount() throws EmfException {
         return services.getPageCount(table);
     }
 

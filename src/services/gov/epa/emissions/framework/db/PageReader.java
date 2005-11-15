@@ -16,14 +16,35 @@ public class PageReader {
         scrollableRecords.execute();
     }
 
-    public int pageCount() throws SQLException {
-        float val = (float) scrollableRecords.total() / pageSize;
+    public int totalRecords() throws SQLException {
+        return scrollableRecords.total();
+    }
+
+    public int totalPages() throws SQLException {
+        return identifyPage(scrollableRecords.total());
+    }
+
+    /**
+     * @param record
+     *            starts at index '1' through n (total records)
+     */
+    public Page pageByRecord(int record) throws SQLException {
+        return page(identifyPage(record));
+    }
+
+    private int identifyPage(int record) {
+        float val = (float) record / pageSize;
         return (int) Math.ceil(val);
     }
 
+    /**
+     * 
+     * @param pageNumber
+     *            starts at index '1' through n (total pages)
+     */
     public Page page(int pageNumber) throws SQLException {
-        int actualPage = pageNumber - 1; // page '1' maps to '0'
-        if (actualPage > pageCount())
+        int actualPage = pageNumber - 1; // page '1' maps to page '0'
+        if (actualPage > totalPages())
             return null;
 
         int start = actualPage * pageSize;
@@ -34,10 +55,6 @@ public class PageReader {
         page.setRecords(records);
 
         return page;
-    }
-
-    public int recordsCount() throws SQLException {
-        return scrollableRecords.total();
     }
 
 }
