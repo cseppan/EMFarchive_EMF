@@ -112,7 +112,6 @@ public class DataEditorServicesTransport implements DataEditorServices {
     }
 
     public int getPageCount(String tableName) throws EmfException {
-        log.debug("Table Name= " + tableName);
         int count = -1;
         
         try {
@@ -134,13 +133,51 @@ public class DataEditorServicesTransport implements DataEditorServices {
     }
 
     public Page getPageWithRecord(String tableName, int recordId) throws EmfException {
-        if (false) throw new EmfException("");
-        return null;
+        Page page = null;
+        
+        try {
+            log.debug("Is call null? " + (call==null));
+
+            DataEditorMappings mappings = new DataEditorMappings();
+
+            log.debug("Is mappings null? " + (mappings==null));
+            mappings.register(call);
+            call.setOperationName(mappings.qname("getPageWithRecord"));
+            call.setReturnType(mappings.page());
+
+            call.addParameter("tableName", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("recordId", org.apache.axis.Constants.XSD_INTEGER, javax.xml.rpc.ParameterMode.IN);
+
+            page = (Page) call.invoke(new Object[] {tableName,new Integer(recordId)  });
+
+            call.removeAllParameters();
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to get page: ", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to get page: " , e);
+        }
+        return page;
     }
 
     public int getTotalRecords(String tableName) throws EmfException {
-        if (false) throw new EmfException("");
-        return 0;
+        int count = -1;
+        
+        try {
+
+            call.setOperationName("getTotalRecords");
+            call.addParameter("tableName", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+            call.setReturnType(Constants.XSD_INT);
+
+            Integer cnt = (Integer) call.invoke(new Object[] { tableName });
+            count = cnt.intValue();
+            call.removeAllParameters();
+            
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to get count: ", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to get count: " , e);
+        }
+        return count;
     }
 
 }

@@ -94,12 +94,22 @@ public class DataEditorServicesImpl implements DataEditorServices {
     }
 
     public Page getPageWithRecord(String tableName, int recordId) throws EmfException {
-        if (false) throw new EmfException("");
-        return null;
+        try {
+            PageReader reader = getReader(tableName);
+            return reader.pageByRecord(recordId);
+        } catch (SQLException ex) {
+            log.error("Initialize reader: " + ex.getMessage());
+            throw new EmfException("Page Reader error: " + ex.getMessage());
+        }
     }
 
     public int getTotalRecords(String tableName) throws EmfException {
-        if (false) throw new EmfException("");
-        return 0;
+        try {
+            PageReader reader = getReader(tableName);
+            return reader.totalRecords();
+        } catch (SQLException e) {
+            log.error("Failed to get total records count: " + e.getMessage());
+            throw new EmfException(e.getMessage());
+        }
     }
 }
