@@ -180,8 +180,20 @@ public class DataEditorServicesTransport implements DataEditorServices {
         return count;
     }
 
-    public void close() {
-        // TODO Auto-generated method stub
+    public void close() throws EmfException {
+        try {
+
+            call.setOperationName("close");
+            call.setReturnType(Constants.XSD_ANY);
+
+            call.invoke(new Object[] { });
+            call.removeAllParameters();
+            
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to get count: ", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to get count: " , e);
+        }
         
     }
 
