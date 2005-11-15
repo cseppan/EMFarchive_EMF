@@ -33,7 +33,7 @@ public class PageViewPanel extends JPanel implements PageView {
     }
 
     public void observe(PageViewPresenter presenter) {
-        paginationPanel.observe(presenter);
+        paginationPanel.init(presenter);
     }
 
     public void display(Page page) {

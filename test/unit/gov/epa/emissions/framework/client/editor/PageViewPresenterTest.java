@@ -19,6 +19,18 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         p.observeView();
     }
 
+    public void testShouldFetchTotalRecords() throws Exception {
+        Mock services = mock(DataEditorServices.class);
+        services.stubs().method("getTotalRecords").with(eq("table")).will(returnValue(new Integer(28)));
+
+        Mock view = mock(PageView.class);
+
+        PageViewPresenter p = new PageViewPresenter((DataEditorServices) services.proxy(), (PageView) view.proxy(),
+                "table");
+
+        assertEquals(28, p.totalRecords());
+    }
+
     public void testShouldDisplayFirstPageOnFirstNextCall() throws Exception {
         Mock services = mock(DataEditorServices.class);
         Page page = new Page();
@@ -46,6 +58,20 @@ public class PageViewPresenterTest extends MockObjectTestCase {
                 "table");
 
         p.doDisplay(21);
+    }
+
+    public void testShouldDisplayPageWithRecord() throws Exception {
+        Mock services = mock(DataEditorServices.class);
+        Page page = new Page();
+        services.stubs().method("getPageWithRecord").with(eq("table"), eq(new Integer(21))).will(returnValue(page));
+
+        Mock view = mock(PageView.class);
+        view.expects(once()).method("display").with(eq(page));
+
+        PageViewPresenter p = new PageViewPresenter((DataEditorServices) services.proxy(), (PageView) view.proxy(),
+                "table");
+
+        p.doDisplayPageWithRecord(21);
     }
 
     public void testShouldDisplayFirstPage() throws Exception {
@@ -76,19 +102,19 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         p.doDisplayFirst();
         p.doDisplayPrevious();
     }
-    
+
     public void testShouldDisplayLastPageEvenAfterNextvRequestOnLastPage() throws Exception {
         Mock services = mock(DataEditorServices.class);
         Page page = new Page();
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(20))).will(returnValue(page));
         services.stubs().method("getPageCount").with(eq("table")).will(returnValue(new Integer(20)));
-        
+
         Mock view = mock(PageView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
-        
+
         PageViewPresenter p = new PageViewPresenter((DataEditorServices) services.proxy(), (PageView) view.proxy(),
-        "table");
-        
+                "table");
+
         p.doDisplayLast();
         p.doDisplayNext();
     }

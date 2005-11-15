@@ -11,9 +11,9 @@ import javax.swing.text.NumberFormatter;
 
 public class NumberFormattedTextField extends JFormattedTextField {
 
-    public NumberFormattedTextField(int max, int size, Action action) {
+    public NumberFormattedTextField(int min, int max, int size, Action action) {
         super.setFormatterFactory(new DefaultFormatterFactory(formatter(max)));
-        super.setValue(new Integer(0));
+        super.setValue(new Integer(min));
         super.setColumns(size);
 
         addActionForEnterKeyPress(action);

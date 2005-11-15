@@ -35,17 +35,16 @@ public class PaginationPanel extends JPanel {
 
     private JLabel current;
 
-    private JLabel total;
-
     private MessagePanel messagePanel;
 
     private JSlider slider;
 
     public PaginationPanel(MessagePanel messagePanel) {
         super(new BorderLayout());
-
         this.messagePanel = messagePanel;
+    }
 
+    private void doLayout(int totalRecords) {
         JPanel container = new JPanel();
 
         current = new JLabel("               ");
@@ -53,25 +52,30 @@ public class PaginationPanel extends JPanel {
         container.add(new JLabel("Current: "));
         container.add(current);
 
-        total = new JLabel("             ");
+        JLabel total = new JLabel("Total: " + totalRecords);
         total.setToolTipText("Total Records");
-        container.add(new JLabel("Total: "));
         container.add(total);
 
-        container.add(layoutControls());
+        container.add(layoutControls(totalRecords));
 
         super.add(container, BorderLayout.LINE_END);
     }
 
+    public void init(PageViewPresenter presenter) {
+        this.presenter = presenter;
+        try {
+            doLayout(presenter.totalRecords());
+        } catch (EmfException e) {
+            messagePanel.setError("Could not obtain Total Records. Reason: " + e.getMessage());
+        }
+    }
+
     public void updateStatus(Page page) {
         current.setText(page.min() + " - " + page.max());
+        slider.setValue(page.min());
     }
 
-    public void observe(PageViewPresenter presenter) {
-        this.presenter = presenter;
-    }
-
-    private JPanel layoutControls() {
+    private JPanel layoutControls(int totalRecords) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -81,7 +85,6 @@ public class PaginationPanel extends JPanel {
         ImageResources res = new ImageResources();
         top.add(firstButton(res));
         top.add(prevButton(res));
-        int totalRecords = 20;
         top.add(recordInputField(totalRecords));
         top.add(nextButton(res));
         top.add(lastButton(res));
@@ -96,7 +99,7 @@ public class PaginationPanel extends JPanel {
     }
 
     private JFormattedTextField recordInputField(final int max) {
-        recordInput = new NumberFormattedTextField(max, 7, new AbstractAction() {
+        recordInput = new NumberFormattedTextField(1, max, 7, new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 if (!verifyInput(max))
                     return;
@@ -113,6 +116,7 @@ public class PaginationPanel extends JPanel {
             }
         });
 
+        recordInput.setToolTipText("Please input 'record number', and press Enter.");
         return recordInput;
     }
 
@@ -124,7 +128,7 @@ public class PaginationPanel extends JPanel {
             messagePanel.clear();
             return true;
         } catch (ParseException pe) {
-            messagePanel.setError("Invalid value: " + recordInput.getText() + ". Please use numbers between 0 and "
+            messagePanel.setError("Invalid value: " + recordInput.getText() + ". Please use numbers between 1 and "
                     + max);
             recordInput.selectAll();
             return false;
@@ -145,7 +149,7 @@ public class PaginationPanel extends JPanel {
     }
 
     private JSlider slider(int max) {
-        slider = new JSlider(JSlider.HORIZONTAL, 0, max, 0);
+        slider = new JSlider(JSlider.HORIZONTAL, 1, max, 1);
 
         slider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -164,9 +168,15 @@ public class PaginationPanel extends JPanel {
     }
 
     private void displayPage(int record) {
-        // TODO:
+        System.out.println("obtaining record: " + record);
+        try {
+            presenter.doDisplayPageWithRecord(record);
+        } catch (EmfException e) {
+            messagePanel.setError("Could not display Page with record: " + record + ". Reason: " + e.getMessage());
+        }
     }
 
+    // FIXME: change messages about 'page' to 'range' ??
     private IconButton lastButton(ImageResources res) {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {

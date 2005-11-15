@@ -54,4 +54,13 @@ public class PageViewPresenter {
         return services.getPageCount(table);
     }
 
+    public void doDisplayPageWithRecord(int record) throws EmfException {
+        Page page = services.getPageWithRecord(table, record);
+        view.display(page);
+    }
+
+    public int totalRecords() throws EmfException {
+        return services.getTotalRecords(table);
+    }
+
 }
