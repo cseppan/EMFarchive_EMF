@@ -9,7 +9,6 @@ import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.InterDataServices;
 
 public class PropertiesEditorPresenter implements ChangeObserver {
 
@@ -17,20 +16,17 @@ public class PropertiesEditorPresenter implements ChangeObserver {
 
     private PropertiesEditorView view;
 
-    private DataServices dataServices;
-
     private SummaryTabPresenter summaryPresenter;
 
     private boolean unsavedChanges;
 
     private KeywordsTabPresenter keywordsPresenter;
 
-    private InterDataServices interdataServices;
+    private ServiceLocator serviceLocator;
 
     public PropertiesEditorPresenter(EmfDataset dataset, ServiceLocator serviceLocator) {
         this.dataset = dataset;
-        this.dataServices = serviceLocator.getDataServices();
-        this.interdataServices = serviceLocator.getInterDataServices();
+        this.serviceLocator = serviceLocator;
     }
 
     public void doDisplay(PropertiesEditorView view) {
@@ -50,6 +46,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
     }
 
     public void doSave(DatasetsBrowserView browser) {
+        DataServices dataServices = serviceLocator.getDataServices();
         try {
             updateDataset(dataServices, summaryPresenter, keywordsPresenter);
         } catch (EmfException e) {
@@ -82,8 +79,8 @@ public class PropertiesEditorPresenter implements ChangeObserver {
 
     public void set(KeywordsTabView keywordsView) throws EmfException {
         keywordsPresenter = new KeywordsTabPresenter(keywordsView, dataset);
-        
-        Keywords keywords = new Keywords(interdataServices.getKeywords());
+
+        Keywords keywords = new Keywords(serviceLocator.getInterDataServices().getKeywords());
         keywordsPresenter.init(keywords);
     }
 
@@ -96,8 +93,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
     }
 
     public void doDisplayData(DataView dataView) {
-        DataViewPresenter presenter = new DataViewPresenter(dataset, dataView);
+        DataViewPresenter presenter = new DataViewPresenter(dataset, dataView, serviceLocator.getDataEditorServices());
         presenter.doDisplay();
     }
-
 }

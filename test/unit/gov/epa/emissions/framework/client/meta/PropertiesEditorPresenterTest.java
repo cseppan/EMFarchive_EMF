@@ -43,6 +43,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         Mock locator = mock(ServiceLocator.class);
         locator.stubs().method("getDataServices").withNoArguments().will(returnValue(dataServices.proxy()));
         locator.stubs().method("getInterDataServices").withNoArguments().will(returnValue(interdataServices.proxy()));
+        locator.stubs().method("getDataEditorServices").withNoArguments().will(returnValue(null));
 
         presenter = new PropertiesEditorPresenter(dataset, (ServiceLocator) locator.proxy());
 

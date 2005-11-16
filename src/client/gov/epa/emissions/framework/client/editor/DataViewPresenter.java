@@ -15,9 +15,12 @@ public class DataViewPresenter {
 
     private Map presenters;
 
-    public DataViewPresenter(Dataset dataset, DataView view) {
+    private DataEditorServices services;
+
+    public DataViewPresenter(Dataset dataset, DataView view, DataEditorServices services) {
         this.dataset = dataset;
         this.view = view;
+        this.services = services;
 
         presenters = new HashMap();
     }
@@ -27,7 +30,7 @@ public class DataViewPresenter {
         view.display(dataset);
     }
 
-    public void doSelectTable(String table, PageView pageView, DataEditorServices services) throws EmfException {
+    public void doSelectTable(String table, PageView pageView) throws EmfException {
         if (presenters.containsKey(table)) {
             PageViewPresenter presenter = (PageViewPresenter) presenters.get(table);
             presenter.displayCurrent();
@@ -36,11 +39,12 @@ public class DataViewPresenter {
 
         PageViewPresenter presenter = new PageViewPresenter(services, pageView, table);
         presenter.observeView(); // TODO: why this extra step?
-        presenter.doDisplayFirst();//display first page
+        presenter.doDisplayFirst();// display first page
         presenters.put(table, presenter);
     }
 
-    public void doClose() {
+    public void doClose() throws EmfException {
+        services.close();
         view.close();
     }
 

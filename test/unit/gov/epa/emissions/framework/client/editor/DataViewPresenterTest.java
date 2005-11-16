@@ -18,7 +18,7 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         Mock view = mock(DataView.class);
         view.expects(once()).method("display").with(eq(datasetProxy));
 
-        DataViewPresenter p = new DataViewPresenter(datasetProxy, (DataView) view.proxy());
+        DataViewPresenter p = new DataViewPresenter(datasetProxy, (DataView) view.proxy(), null);
         view.expects(once()).method("observe").with(same(p));
 
         p.doDisplay();
@@ -31,14 +31,17 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         Mock view = mock(DataView.class);
         view.expects(once()).method("close").withNoArguments();
 
-        DataViewPresenter p = new DataViewPresenter(datasetProxy, (DataView) view.proxy());
+        Mock services = mock(DataEditorServices.class);
+        services.expects(once()).method("close").withNoArguments();
+
+        DataViewPresenter p = new DataViewPresenter(datasetProxy, (DataView) view.proxy(),
+                (DataEditorServices) services.proxy());
 
         p.doClose();
     }
 
     public void testShouldLoadFirstPageOnTableSelection() throws Exception {
         Mock dataset = mock(Dataset.class);
-        DataViewPresenter presenter = new DataViewPresenter(((Dataset) dataset.proxy()), null);
 
         Mock services = mock(DataEditorServices.class);
         Page page = new Page();
@@ -48,12 +51,13 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         pageView.expects(once()).method("display").with(eq(page));
         pageView.expects(once()).method("observe").with(new IsInstanceOf(PageViewPresenter.class));
 
-        presenter.doSelectTable("table", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
+        DataViewPresenter presenter = new DataViewPresenter(((Dataset) dataset.proxy()), null,
+                (DataEditorServices) services.proxy());
+        presenter.doSelectTable("table", (PageView) pageView.proxy());
     }
 
     public void testShouldBeAbleToDisplayMultipleTablesSimultaneously() throws Exception {
         Mock dataset = mock(Dataset.class);
-        DataViewPresenter p = new DataViewPresenter(((Dataset) dataset.proxy()), null);
 
         Mock services = mock(DataEditorServices.class);
         Page page1 = new Page();
@@ -66,13 +70,14 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         pageView.expects(once()).method("display").with(eq(page2));
         pageView.expects(new InvokeCountMatcher(2)).method("observe").with(new IsInstanceOf(PageViewPresenter.class));
 
-        p.doSelectTable("table1", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
-        p.doSelectTable("table2", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
+        DataViewPresenter p = new DataViewPresenter(((Dataset) dataset.proxy()), null, (DataEditorServices) services
+                .proxy());
+        p.doSelectTable("table1", (PageView) pageView.proxy());
+        p.doSelectTable("table2", (PageView) pageView.proxy());
     }
 
     public void testShouldRedisplayPageOnReselectionOfTable() throws Exception {
         Mock dataset = mock(Dataset.class);
-        DataViewPresenter p = new DataViewPresenter(((Dataset) dataset.proxy()), null);
 
         Mock services = mock(DataEditorServices.class);
         Page page1 = new Page();
@@ -85,11 +90,14 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         pageView.expects(once()).method("display").with(eq(page2));
         pageView.expects(new InvokeCountMatcher(2)).method("observe").with(new IsInstanceOf(PageViewPresenter.class));
         pageView.expects(once()).method("refresh").withNoArguments();
-        
-        p.doSelectTable("table1", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
-        p.doSelectTable("table2", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
 
-        p.doSelectTable("table1", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
+        DataViewPresenter p = new DataViewPresenter(((Dataset) dataset.proxy()), null, (DataEditorServices) services
+                .proxy());
+
+        p.doSelectTable("table1", (PageView) pageView.proxy());
+        p.doSelectTable("table2", (PageView) pageView.proxy());
+
+        p.doSelectTable("table1", (PageView) pageView.proxy());
     }
 
 }

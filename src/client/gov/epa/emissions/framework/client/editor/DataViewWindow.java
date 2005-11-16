@@ -8,7 +8,6 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.services.DataEditorServices;
 import gov.epa.emissions.framework.ui.Border;
 
 import java.awt.BorderLayout;
@@ -35,11 +34,8 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
 
     private Dataset dataset;
 
-    private DataEditorServices services;
-
-    public DataViewWindow(DataEditorServices services) {
+    public DataViewWindow() {
         super("Data Viewer: ", new Dimension(900, 750));
-        this.services = services;
 
         layout = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
@@ -115,7 +111,7 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
         pageContainer.add(panel, BorderLayout.CENTER);
 
         try {
-            presenter.doSelectTable(table, panel, services);
+            presenter.doSelectTable(table, panel);
         } catch (EmfException e) {
             messagePanel.setError("Could not display table: " + table + ". Reason: " + e.getMessage());
         }
@@ -125,8 +121,12 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
         JPanel panel = new JPanel(new BorderLayout());
 
         Button close = new Button("Close", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                presenter.doClose();
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    presenter.doClose();
+                } catch (EmfException e) {
+                    messagePanel.setError("Could not close. Reason: " + e.getMessage());
+                }
             }
         });
         panel.add(close, BorderLayout.LINE_END);

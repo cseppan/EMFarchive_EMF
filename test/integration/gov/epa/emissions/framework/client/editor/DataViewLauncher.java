@@ -31,8 +31,9 @@ public class DataViewLauncher {
         JDesktopPane desktop = new JDesktopPane();
 
         Mock service = service();
-        DataViewWindow view = new DataViewWindow((DataEditorServices) service.proxy());
-        DataViewPresenter p = new DataViewPresenter(launcher.createDataset(), view);
+        DataEditorServices servicesProxy = (DataEditorServices) service.proxy();
+        DataViewWindow view = new DataViewWindow();
+        DataViewPresenter p = new DataViewPresenter(launcher.createDataset(), view, servicesProxy);
 
         launcher.addAsInternalFrame(view, frame, desktop);
         p.doDisplay();

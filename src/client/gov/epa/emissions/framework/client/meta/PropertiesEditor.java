@@ -147,7 +147,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         Button showData = new Button("Show Data", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 ServiceLocator locator = session.getServiceLocator();
-                DataViewWindow view = new DataViewWindow(locator.getDataEditorServices());
+                DataViewWindow view = new DataViewWindow();
                 desktop.add(view);
                 presenter.doDisplayData(view);
             }
