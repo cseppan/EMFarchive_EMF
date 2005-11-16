@@ -129,4 +129,14 @@ public class DataEditorServicesImpl implements DataEditorServices {
         }
         pageReadersMap.clear();
     }
+
+    /**
+     * This method is for cleaning up session specific
+     * objects within this service.
+     * 
+     */
+    protected void finalize() throws Throwable{
+        this.close();
+        super.finalize();
+    }
 }
