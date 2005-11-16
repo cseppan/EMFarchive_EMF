@@ -76,28 +76,4 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         p.doSelectTable("table2", (PageView) pageView.proxy());
     }
 
-    public void testShouldRedisplayPageOnReselectionOfTable() throws Exception {
-        Mock dataset = mock(Dataset.class);
-
-        Mock services = mock(DataEditorServices.class);
-        Page page1 = new Page();
-        Page page2 = new Page();
-        services.expects(once()).method("getPage").with(eq("table1"), eq(new Integer(1))).will(returnValue(page1));
-        services.expects(once()).method("getPage").with(eq("table2"), eq(new Integer(1))).will(returnValue(page2));
-
-        Mock pageView = mock(PageView.class);
-        pageView.expects(once()).method("display").with(eq(page1));
-        pageView.expects(once()).method("display").with(eq(page2));
-        pageView.expects(new InvokeCountMatcher(2)).method("observe").with(new IsInstanceOf(PageViewPresenter.class));
-        pageView.expects(once()).method("refresh").withNoArguments();
-
-        DataViewPresenter p = new DataViewPresenter(((Dataset) dataset.proxy()), null, (DataEditorServices) services
-                .proxy());
-
-        p.doSelectTable("table1", (PageView) pageView.proxy());
-        p.doSelectTable("table2", (PageView) pageView.proxy());
-
-        p.doSelectTable("table1", (PageView) pageView.proxy());
-    }
-
 }

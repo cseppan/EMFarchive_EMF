@@ -47,8 +47,4 @@ public class PageViewPanel extends JPanel implements PageView {
         pageContainer.add(table, BorderLayout.CENTER);
     }
 
-    public void refresh() {
-        super.revalidate();
-    }
-
 }

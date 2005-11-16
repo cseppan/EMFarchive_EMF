@@ -65,8 +65,4 @@ public class PageViewPresenter {
         return services.getTotalRecords(table);
     }
 
-    public void displayCurrent() {
-        view.refresh();
-    }
-
 }

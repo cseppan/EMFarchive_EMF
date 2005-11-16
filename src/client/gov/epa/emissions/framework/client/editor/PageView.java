@@ -7,5 +7,4 @@ public interface PageView {
 
     void display(Page page);
 
-    void refresh();
 }
