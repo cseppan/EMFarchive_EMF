@@ -18,6 +18,16 @@ public class PageReaderTest extends MockObjectTestCase {
         assertEquals(600, reader.totalPages());
     }
 
+    public void testShouldCloseScrollableRecordsOnClose() throws Exception {
+        Mock scrollableRecords = mock(ScrollableRecordsStub.class);
+        scrollableRecords.expects(once()).method("close").withNoArguments();
+        scrollableRecords.stubs().method("execute").withNoArguments();
+
+        PageReader reader = new PageReader(3, (ScrollableRecords) scrollableRecords.proxy());
+
+        reader.close();
+    }
+
     public void testTotalRecordsShouldBeEqualToTotalFromScrollableRecords() throws Exception {
         Mock scrollableRecords = mock(ScrollableRecordsStub.class);
         scrollableRecords.stubs().method("total").withNoArguments().will(returnValue(new Integer(1800)));
@@ -65,7 +75,7 @@ public class PageReaderTest extends MockObjectTestCase {
         scrollableRecords.stubs().method("range").with(eq(new Integer(40)), eq(new Integer(49))).will(
                 returnValue(new DbRecord[0]));
         assertNotNull("Should be able to fetch Page containing records 40-49", reader.pageByRecord(42));
-        
+
         scrollableRecords.stubs().method("range").with(eq(new Integer(0)), eq(new Integer(9))).will(
                 returnValue(new DbRecord[0]));
         assertNotNull("Should be able to fetch Page containing records 0-9", reader.pageByRecord(7));
@@ -73,10 +83,10 @@ public class PageReaderTest extends MockObjectTestCase {
         scrollableRecords.stubs().method("range").with(eq(new Integer(10)), eq(new Integer(19))).will(
                 returnValue(new DbRecord[0]));
         assertNotNull("Should be able to fetch Page containing records 10-19", reader.pageByRecord(20));
-        
+
         scrollableRecords.stubs().method("range").with(eq(new Integer(10)), eq(new Integer(19))).will(
                 returnValue(new DbRecord[0]));
         assertNotNull("Should be able to fetch Page containing records 10-19", reader.pageByRecord(20));
-        
+
     }
 }

@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.services.Page;
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
-public class DataViewerPresenterTest extends MockObjectTestCase {
+public class DataViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldLoadTablesOfDatasetOnDisplay() throws Exception {
         Mock dataset = mock(Dataset.class);
@@ -47,6 +47,26 @@ public class DataViewerPresenterTest extends MockObjectTestCase {
         pageView.expects(once()).method("display").with(eq(page));
 
         p.doSelectTable("table", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
+    }
+
+    public void testShouldBeAbleToDisplayMultipleTablesSimultaneously() throws Exception {
+        Mock dataset = mock(Dataset.class);
+        DataViewPresenter p = new DataViewPresenter(((Dataset) dataset.proxy()), null);
+
+        Mock services = mock(DataEditorServices.class);
+        Page page1 = new Page();
+        Page page2 = new Page();
+        services.stubs().method("getPage").with(eq("table1"), eq(new Integer(1))).will(returnValue(page1));
+        services.stubs().method("getPage").with(eq("table2"), eq(new Integer(1))).will(returnValue(page2));
+        services.stubs().method("getPageCount").with(eq("table1")).will(returnValue(new Integer(10)));
+        services.stubs().method("getPageCount").with(eq("table2")).will(returnValue(new Integer(20)));
+
+        Mock pageView = mock(PageView.class);
+        pageView.expects(once()).method("display").with(eq(page1));
+        pageView.expects(once()).method("display").with(eq(page2));
+
+        p.doSelectTable("table1", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
+        p.doSelectTable("table2", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
     }
 
 }

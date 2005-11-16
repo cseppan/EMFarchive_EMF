@@ -34,8 +34,6 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
-
 /**
  * @author Conrad F. D'Cruz
  * 
@@ -49,7 +47,7 @@ public class DataEditorServicesImpl implements DataEditorServices {
 
     public DataEditorServicesImpl() throws InfrastructureException {
         super();
-        
+
         pageReadersMap = new HashMap();
         try {
             Context ctx = new InitialContext();
@@ -118,11 +116,16 @@ public class DataEditorServicesImpl implements DataEditorServices {
         }
     }
 
-    public void close(){        
+    public void close() throws EmfException {
         Collection all = pageReadersMap.values();
         Iterator iter = all.iterator();
-        while (iter.hasNext()){
-            ((PageReader)iter.next()).close();
+        while (iter.hasNext()) {
+            try {
+                ((PageReader) iter.next()).close();
+            } catch (SQLException e) {
+                log.error("Could not close 'query session' due to " + e.getMessage());
+                throw new EmfException(e.getMessage());
+            }
         }
         pageReadersMap.clear();
     }

@@ -57,7 +57,7 @@ public class PageReader {
         return page;
     }
 
-    public void close(){
-        
+    public void close() throws SQLException {
+        scrollableRecords.close();
     }
 }
