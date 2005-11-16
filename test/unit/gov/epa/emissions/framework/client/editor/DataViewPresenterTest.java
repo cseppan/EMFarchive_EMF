@@ -6,6 +6,8 @@ import gov.epa.emissions.framework.services.Page;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.core.constraint.IsInstanceOf;
+import org.jmock.core.matcher.InvokeCountMatcher;
 
 public class DataViewPresenterTest extends MockObjectTestCase {
 
@@ -22,7 +24,7 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         p.doDisplay();
     }
 
-    public void testShouldCloseViewOnClose() throws Exception {
+    public void testShouldCloseViewAndCloseDataEditSessionOnClose() throws Exception {
         Mock dataset = mock(Dataset.class);
         Dataset datasetProxy = (Dataset) dataset.proxy();
 
@@ -36,17 +38,17 @@ public class DataViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldLoadFirstPageOnTableSelection() throws Exception {
         Mock dataset = mock(Dataset.class);
-        DataViewPresenter p = new DataViewPresenter(((Dataset) dataset.proxy()), null);
+        DataViewPresenter presenter = new DataViewPresenter(((Dataset) dataset.proxy()), null);
 
         Mock services = mock(DataEditorServices.class);
         Page page = new Page();
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(1))).will(returnValue(page));
-        services.stubs().method("getPageCount").with(eq("table")).will(returnValue(new Integer(10)));
 
         Mock pageView = mock(PageView.class);
         pageView.expects(once()).method("display").with(eq(page));
+        pageView.expects(once()).method("observe").with(new IsInstanceOf(PageViewPresenter.class));
 
-        p.doSelectTable("table", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
+        presenter.doSelectTable("table", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
     }
 
     public void testShouldBeAbleToDisplayMultipleTablesSimultaneously() throws Exception {
@@ -56,17 +58,38 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         Mock services = mock(DataEditorServices.class);
         Page page1 = new Page();
         Page page2 = new Page();
-        services.stubs().method("getPage").with(eq("table1"), eq(new Integer(1))).will(returnValue(page1));
-        services.stubs().method("getPage").with(eq("table2"), eq(new Integer(1))).will(returnValue(page2));
-        services.stubs().method("getPageCount").with(eq("table1")).will(returnValue(new Integer(10)));
-        services.stubs().method("getPageCount").with(eq("table2")).will(returnValue(new Integer(20)));
+        services.expects(once()).method("getPage").with(eq("table1"), eq(new Integer(1))).will(returnValue(page1));
+        services.expects(once()).method("getPage").with(eq("table2"), eq(new Integer(1))).will(returnValue(page2));
 
         Mock pageView = mock(PageView.class);
         pageView.expects(once()).method("display").with(eq(page1));
         pageView.expects(once()).method("display").with(eq(page2));
+        pageView.expects(new InvokeCountMatcher(2)).method("observe").with(new IsInstanceOf(PageViewPresenter.class));
 
         p.doSelectTable("table1", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
         p.doSelectTable("table2", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
+    }
+
+    public void testShouldRedisplayPageOnReselectionOfTable() throws Exception {
+        Mock dataset = mock(Dataset.class);
+        DataViewPresenter p = new DataViewPresenter(((Dataset) dataset.proxy()), null);
+
+        Mock services = mock(DataEditorServices.class);
+        Page page1 = new Page();
+        Page page2 = new Page();
+        services.expects(once()).method("getPage").with(eq("table1"), eq(new Integer(1))).will(returnValue(page1));
+        services.expects(once()).method("getPage").with(eq("table2"), eq(new Integer(1))).will(returnValue(page2));
+
+        Mock pageView = mock(PageView.class);
+        pageView.expects(once()).method("display").with(eq(page1));
+        pageView.expects(once()).method("display").with(eq(page2));
+        pageView.expects(new InvokeCountMatcher(2)).method("observe").with(new IsInstanceOf(PageViewPresenter.class));
+        pageView.expects(once()).method("refresh").withNoArguments();
+        
+        p.doSelectTable("table1", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
+        p.doSelectTable("table2", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
+
+        p.doSelectTable("table1", (PageView) pageView.proxy(), (DataEditorServices) services.proxy());
     }
 
 }

@@ -105,6 +105,22 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
         return pageContainer;
     }
 
+    public void showTable(String table) {
+        if (table.equals("Select Table")) {// TODO: should clear current page?
+
+            return;
+        }
+
+        PageViewPanel panel = new PageViewPanel(source(table, dataset.getInternalSources()), messagePanel);
+        pageContainer.add(panel, BorderLayout.CENTER);
+
+        try {
+            presenter.doSelectTable(table, panel, services);
+        } catch (EmfException e) {
+            messagePanel.setError("Could not display table: " + table + ". Reason: " + e.getMessage());
+        }
+    }
+
     private JPanel controlsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
@@ -123,22 +139,6 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
             JComboBox cb = (JComboBox) e.getSource();
             String table = (String) cb.getSelectedItem();
             showTable(table);
-        }
-    }
-
-    public void showTable(String table) {
-        if (table.equals("Select Table"))
-            return;
-
-        PageViewPanel panel = new PageViewPanel(source(table, dataset.getInternalSources()), messagePanel);
-        pageContainer.add(panel, BorderLayout.CENTER);
-
-        PageViewPresenter presenter = new PageViewPresenter(services, panel, table);
-        presenter.observeView();
-        try {
-            presenter.doDisplayNext();
-        } catch (EmfException e) {
-            messagePanel.setError("Could not fetch first page of table: " + table + ". Reason: " + e.getMessage());
         }
     }
 

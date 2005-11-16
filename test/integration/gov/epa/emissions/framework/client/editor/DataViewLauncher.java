@@ -56,6 +56,7 @@ public class DataViewLauncher {
         mock.stubs().method("getPage").withAnyArguments().will(new ReturnStub(page));
         mock.stubs().method("getPageCount").withAnyArguments().will(new ReturnStub(new Integer(20)));
         mock.stubs().method("getTotalRecords").withAnyArguments().will(new ReturnStub(new Integer(200)));
+        mock.stubs().method("getPageWithRecord").withAnyArguments().will(new ReturnStub(page));
 
         return mock;
     }

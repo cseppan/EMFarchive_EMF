@@ -170,7 +170,6 @@ public class PaginationPanel extends JPanel {
     }
 
     private void displayPage(int record) {
-        System.out.println("obtaining record: " + record);
         try {
             presenter.doDisplayPageWithRecord(record);
         } catch (EmfException e) {

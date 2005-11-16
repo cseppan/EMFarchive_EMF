@@ -60,6 +60,22 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         p.doDisplay(21);
     }
 
+    public void testShouldRedisplayLoadedPageOnDisplayCurrent() throws Exception {
+        Mock services = mock(DataEditorServices.class);
+        Page page = new Page();
+        services.expects(once()).method("getPage").with(eq("table"), eq(new Integer(21))).will(returnValue(page));
+
+        Mock view = mock(PageView.class);
+        view.expects(once()).method("display").with(eq(page));
+        view.expects(once()).method("refresh").withNoArguments();
+
+        PageViewPresenter p = new PageViewPresenter((DataEditorServices) services.proxy(), (PageView) view.proxy(),
+                "table");
+
+        p.doDisplay(21);
+        p.displayCurrent();
+    }
+
     public void testShouldDisplayPageWithRecord() throws Exception {
         Mock services = mock(DataEditorServices.class);
         Page page = new Page();

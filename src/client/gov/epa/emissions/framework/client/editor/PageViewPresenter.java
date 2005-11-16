@@ -14,6 +14,8 @@ public class PageViewPresenter {
 
     private int pageNumber;
 
+    private Page page;
+
     public PageViewPresenter(DataEditorServices services, PageView view, String table) {
         this.services = services;
         this.view = view;
@@ -38,7 +40,7 @@ public class PageViewPresenter {
 
     public void doDisplay(int pageNumber) throws EmfException {
         this.pageNumber = pageNumber;
-        Page page = services.getPage(table, pageNumber);
+        page = services.getPage(table, pageNumber);
         view.display(page);
     }
 
@@ -55,12 +57,16 @@ public class PageViewPresenter {
     }
 
     public void doDisplayPageWithRecord(int record) throws EmfException {
-        Page page = services.getPageWithRecord(table, record);
+        page = services.getPageWithRecord(table, record);
         view.display(page);
     }
 
     public int totalRecords() throws EmfException {
         return services.getTotalRecords(table);
+    }
+
+    public void displayCurrent() {
+        view.refresh();
     }
 
 }
