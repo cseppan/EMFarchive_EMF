@@ -11,6 +11,8 @@ import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.Border;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -95,26 +97,44 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
     }
 
     private JPanel pagePanel() {
-        pageContainer = new JPanel(new BorderLayout());
+        pageContainer = new JPanel(new CardLayout());
         pageContainer.setBorder(new Border("Data"));
+
+        JPanel selectTablePanel = new JPanel();
+        selectTablePanel.setName("Select Table");
+        pageContainer.add(selectTablePanel, "Select Table");
 
         return pageContainer;
     }
 
     public void showTable(String table) {
-        if (table.equals("Select Table")) {// TODO: should clear current page?
+        if (!contains(pageContainer, table))
+            addPageView(table);
 
-            return;
-        }
+        CardLayout layout = (CardLayout) pageContainer.getLayout();
+        layout.show(pageContainer, table);
+    }
 
+    private void addPageView(String table) {
         PageViewPanel panel = new PageViewPanel(source(table, dataset.getInternalSources()), messagePanel);
-        pageContainer.add(panel, BorderLayout.CENTER);
+        panel.setName(table);
+        pageContainer.add(panel, table);
 
         try {
             presenter.doSelectTable(table, panel);
         } catch (EmfException e) {
             messagePanel.setError("Could not display table: " + table + ". Reason: " + e.getMessage());
         }
+    }
+
+    private boolean contains(JPanel panel, String name) {
+        Component[] components = panel.getComponents();
+        for (int i = 0; i < components.length; i++) {
+            if (name.equals(components[i].getName()))
+                return true;
+        }
+
+        return false;
     }
 
     private JPanel controlsPanel() {
