@@ -1,12 +1,11 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.framework.client.Label;
-import gov.epa.emissions.framework.ui.TableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.SelectableEmfTableData;
+import gov.epa.emissions.framework.ui.TableData;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -25,7 +24,8 @@ public class ListPanel extends JPanel {
     private JTable table;
 
     public ListPanel(String label, SelectableEmfTableData tableData) {
-        super.add(doLayout(label, tableData));
+        super.setLayout(new BorderLayout());
+        super.add(doLayout(label, tableData), BorderLayout.CENTER);
     }
 
     private JPanel doLayout(String label, SelectableEmfTableData tableData) {
@@ -51,10 +51,14 @@ public class ListPanel extends JPanel {
         tableModel = new EmfTableModel(tableData);
 
         table = new JTable(tableModel);
-        table.setRowHeight(25);
-        table.setPreferredScrollableViewportSize(new Dimension(300, 200));
+        table.setRowHeight(20);
 
         return new JScrollPane(table);
+    }
+
+    private void setColumnWidths(TableColumnModel model) {
+        TableColumn col = model.getColumn(0);
+        col.setMaxWidth(250);
     }
 
     private JPanel buttonsPanel(final SelectableEmfTableData tableData) {
@@ -97,6 +101,11 @@ public class ListPanel extends JPanel {
         DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
         renderer.setToolTipText(toolTip);
         col.setCellRenderer(renderer);
+    }
+
+    public void invalidate() {
+        setColumnWidths(table.getColumnModel());
+        super.invalidate();
     }
 
 }

@@ -41,7 +41,7 @@ public class UpdateDatasetTypeWindow extends DisposableInteralFrame implements U
     private DatasetTypesManagerView manager;
 
     public UpdateDatasetTypeWindow(DatasetTypesManagerView manager) {
-        super("Update DatasetType", new Dimension(400, 500));
+        super("Update DatasetType", new Dimension(600, 500));
 
         this.manager = manager;
         layout = new JPanel();
@@ -77,7 +77,7 @@ public class UpdateDatasetTypeWindow extends DisposableInteralFrame implements U
         name = new TextField("name", type.getName(), 20);
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
-        description = new TextArea("description", type.getDescription(), 25);
+        description = new TextArea("description", type.getDescription(), 40);
         layoutGenerator.addLabelWidgetPair("Description", new ScrollableTextArea(description), panel);
 
         // Lay out the panel.
