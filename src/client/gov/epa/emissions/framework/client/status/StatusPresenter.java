@@ -33,7 +33,7 @@ public class StatusPresenter {
     public class StatusMonitor implements Runnable {
         public void run() {
             try {
-                Status[] statuses = model.getMessages(user.getUsername());
+                Status[] statuses = model.getAll(user.getUsername());
                 view.update(statuses);
             } catch (EmfException e) {
                 view.notifyError(e.getMessage());

@@ -82,7 +82,7 @@ public class ImportTask implements Runnable {
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 
-        statusServices.setStatus(endStatus);
+        statusServices.create(endStatus);
     }
 
 }

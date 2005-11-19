@@ -26,7 +26,7 @@ public class StatusServiceImpl implements StatusService {
 
     private static Log LOG = LogFactory.getLog(StatusServiceImpl.class);
 
-    public Status[] getMessages(String userName) {
+    public Status[] getAll(String userName) {
         LOG.debug("get all status messages of for user " + userName);
         // Session session = HibernateUtils.currentSession();
         Session session = EMFHibernateUtil.getSession();
@@ -38,19 +38,7 @@ public class StatusServiceImpl implements StatusService {
         return (Status[]) allStats.toArray(new Status[allStats.size()]);
     }
 
-    public Status[] getMessages(String userName, String type) {
-        LOG.debug("get all status messages of type " + type + " for user " + userName);
-        // Session session = HibernateUtils.currentSession();
-        Session session = EMFHibernateUtil.getSession();
-        List allStats = StatusDAO.getMessages(userName, type, session);
-        session.flush();
-        session.close();
-        LOG.debug("Total number of messages in the List= " + allStats.size());
-        LOG.debug("get all status messages of type " + type + " for user " + userName);
-        return (Status[]) allStats.toArray(new Status[allStats.size()]);
-    }
-
-    public void setStatus(Status status) {
+    public void create(Status status) {
         LOG.debug("EMFStatusService: setStatus " + status.getUsername());
         // Session session = HibernateUtils.currentSession();
         Session session = EMFHibernateUtil.getSession();

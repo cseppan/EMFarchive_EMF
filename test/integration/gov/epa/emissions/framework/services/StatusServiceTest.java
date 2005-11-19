@@ -10,29 +10,41 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.framework.db.PostgresDbUpdate;
 
+import java.sql.SQLException;
 import java.util.Date;
+
+import org.dbunit.DatabaseUnitException;
 
 public class StatusServiceTest extends WebServicesIntegrationTestCase {
 
     private StatusService service;
 
-    protected void setUp() {
+    private PostgresDbUpdate dbUpdate;
+
+    protected void setUp() throws Exception {
         service = super.serviceLocator.getStatusService();
+        dbUpdate = new PostgresDbUpdate();
+        clean();
     }
 
-    public void testInsert() throws Exception {
+    protected void tearDown() throws Exception {
+        clean();
+    }
+
+    public void testCreate() throws Exception {
         Status status = new Status();
         status.setMessage("import started for file XYZABC");
         status.setMessageType("INFOMATICA");
         status.setTimestamp(new Date());
-        String username = "cdcruz";
+        String username = "test-user";
         status.setUsername(username);
 
-        try {
-            service.setStatus(status);
-        } finally {
-            new PostgresDbUpdate().deleteAll("emf.statusmessages");
-        }
+        service.create(status);
+        assertEquals(1, service.getAll("test-user").length);
+    }
+
+    private void clean() throws DatabaseUnitException, SQLException {
+        dbUpdate.deleteAll("emf.statusmessages");
     }
 
 }
