@@ -1,13 +1,3 @@
-/*
- * Creation on Aug 29, 2005
- * Eclipse Project Name: EMF
- * File Name: DataServicesImpl.java
- * Author: Conrad F. D'Cruz
- */
-/**
- * 
- */
-
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.Sector;
@@ -31,10 +21,6 @@ import org.hibernate.Session;
  */
 public class DataServicesImpl implements DataServices {
     private static Log log = LogFactory.getLog(DataServicesImpl.class);
-
-    public DataServicesImpl() {
-        super();
-    }
 
     public EmfDataset[] getDatasets() throws EmfException {
         List datasets = null;

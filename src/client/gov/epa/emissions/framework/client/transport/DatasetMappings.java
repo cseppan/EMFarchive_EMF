@@ -11,40 +11,31 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.client.Call;
 
-public class DatasetMappings {
-
-    private Mapper mapper;
-
-    public DatasetMappings() {
-        mapper = new Mapper();
-    }
+public class DatasetMappings extends Mappings {
 
     public void register(Call call) {
-        mapper.registerBeanMapping(call, EmfDataset.class, dataset());
-        mapper.registerArrayMapping(call, EmfDataset[].class, datasets());
-        mapper.registerBeanMapping(call, DatasetType.class, qname("ns1:DatasetType"));
+        bean(call, EmfDataset.class, "EmfDataset");
+        bean(call, DatasetType.class, "DatasetType");
+        bean(call, InternalSource.class, "InternalSource");
+        bean(call, ExternalSource.class, "ExternalSource");
+        bean(call, KeyVal.class, "KeyVal");
+        bean(call, Keyword.class, "Keyword");
 
-        mapper.registerMappingForTable(call);
-        mapper.registerBeanMapping(call, InternalSource.class, qname("ns1:InternalSource"));
-        mapper.registerBeanMapping(call, ExternalSource.class, qname("ns1:ExternalSource"));
-        mapper.registerArrayMapping(call, ExternalSource[].class, qname("ns1:ExternalSources"));
-        mapper.registerArrayMapping(call, InternalSource[].class, qname("ns1:InternalSources"));
-        mapper.registerBeanMapping(call, KeyVal.class, qname("ns1:KeyVal"));
-        mapper.registerArrayMapping(call, KeyVal[].class, qname("ns1:KeyVals"));
-        mapper.registerBeanMapping(call, Keyword.class, qname("ns1:Keyword"));
-        mapper.registerArrayMapping(call, Keyword[].class, qname("ns1:Keywords"));
-    }
+        array(call, EmfDataset[].class, "EmfDatasets");
+        array(call, ExternalSource[].class, "ExternalSources");
+        array(call, InternalSource[].class, "InternalSources");
+        array(call, KeyVal[].class, "KeyVals");
+        array(call, Keyword[].class, "Keywords");
 
-    public QName qname(String name) {
-        return mapper.qname(name);
+        registerTable(call);
     }
 
     public QName dataset() {
-        return mapper.qname("ns1:EmfDataset");
+        return qname("EmfDataset");
     }
 
     public QName datasets() {
-        return mapper.qname("ns1:EmfDatasets");
+        return qname("EmfDatasets");
     }
 
 }

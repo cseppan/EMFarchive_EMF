@@ -65,7 +65,7 @@ public class ExportTask implements Runnable {
         this.dataset = dataset;
         this.statusServices = svcHolder.getStatusSvc();
         this.loggingServices = svcHolder.getLogSvc();
-        this.dataServices = svcHolder.getDataSvc();
+        this.dataServices = svcHolder.getDataServices();
         this.exporter = exporter;
         this.accesslog = accesslog;
     }

@@ -7,32 +7,22 @@ import gov.epa.emissions.commons.io.SectorCriteria;
 
 import org.apache.axis.client.Call;
 
-public class SectorMappings {
-
-    private Mapper mapper;
-
-    public SectorMappings() {
-        mapper = new Mapper();
-    }
+public class SectorMappings extends Mappings {
 
     public void register(Call call) {
-        mapper.registerBeanMapping(call, Sector.class, sector());
-        mapper.registerArrayMapping(call, Sector[].class, sectors());
-        mapper.registerBeanMapping(call, SectorCriteria.class, qname("ns1:SectorCriteria"));
-        mapper.registerArrayMapping(call, SectorCriteria[].class, qname("ns1:SectorCriterias"));
-        mapper.registerMappingForTable(call);
-    }
-
-    public QName qname(String name) {
-        return mapper.qname(name);
+        bean(call, Sector.class, "Sector");
+        array(call, Sector[].class, "Sectors");
+        bean(call, SectorCriteria.class, "SectorCriteria");
+        array(call, SectorCriteria[].class, "SectorCriterias");
+        registerTable(call);
     }
 
     public QName sector() {
-        return qname("ns1:Sector");
+        return qname("Sector");
     }
 
     public QName sectors() {
-        return qname("ns1:Sectors");
+        return qname("Sectors");
     }
 
 }

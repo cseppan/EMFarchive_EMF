@@ -10,7 +10,6 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Status;
@@ -30,7 +29,7 @@ public class ImportTask implements Runnable {
 
     private StatusServices statusServices = null;
 
-    private DataServices dataServices = null;
+    private DataServicesImpl dataServices = null;
 
     private Importer importer;
 
@@ -42,7 +41,7 @@ public class ImportTask implements Runnable {
         this.user = user;
         this.fileName = fileName;
         this.dataset = dataset;
-        this.dataServices = svcHolder.getDataSvc();
+        this.dataServices = svcHolder.getDataServices();
         this.statusServices = svcHolder.getStatusSvc();
 
         this.importer = importer;

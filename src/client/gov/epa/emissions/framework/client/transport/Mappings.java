@@ -34,6 +34,10 @@ public class Mappings {
         call.addParameter(id, name, ParameterMode.IN);
     }
 
+    public void addParam(Call call, String id, String name) {
+        call.addParameter(id, qname(name), ParameterMode.IN);
+    }
+
     public void addStringParam(Call call, String id) {
         call.addParameter(id, Constants.XSD_BOOLEAN, ParameterMode.IN);
     }
@@ -56,6 +60,10 @@ public class Mappings {
 
     public QName string() {
         return Constants.XSD_STRING;
+    }
+
+    public void setReturnType(Call call, QName name) {
+        call.setReturnType(name);
     }
 
 }

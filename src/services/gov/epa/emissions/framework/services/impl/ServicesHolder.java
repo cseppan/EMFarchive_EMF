@@ -7,7 +7,6 @@
 
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.LoggingServices;
 import gov.epa.emissions.framework.services.StatusServices;
 
@@ -19,18 +18,18 @@ import gov.epa.emissions.framework.services.StatusServices;
  */
 public class ServicesHolder {
     private StatusServices statusSvc = null;
-    private DataServices dataSvc = null;
+    private DataServicesImpl dataSvc = null;
     private LoggingServices logSvc = null;
     
 	public ServicesHolder() {
 		super();
 	}
 
-	public DataServices getDataSvc() {
+	public DataServicesImpl getDataServices() {
 		return dataSvc;
 	}
 
-	public void setDataSvc(DataServices dataSvc) {
+	public void setDataSvc(DataServicesImpl dataSvc) {
 		this.dataSvc = dataSvc;
 	}
 
