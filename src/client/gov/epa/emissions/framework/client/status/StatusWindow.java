@@ -13,7 +13,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -33,6 +32,8 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
     private StatusTableModel statusTableModel;
 
+    private SimpleDateFormat dateFormat;
+
     public StatusWindow(Container parent, JDesktopPane desktop) {
         super("Status", desktop);
         super.setName("statusWindow");
@@ -42,6 +43,8 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
         super.setClosable(false);
         super.setMaximizable(false);
+
+        dateFormat = new SimpleDateFormat("hh:mm:ss MM/dd/yyyy");
     }
 
     private JPanel createLayout() {
@@ -60,7 +63,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         JPanel container = new JPanel(new FlowLayout());
         messagePanel = new SingleLineMessagePanel();
         container.add(messagePanel);
-        
+
         JButton clearButton = createClearButton();
         getRootPane().setDefaultButton(clearButton);
         container.add(clearButton);
@@ -120,13 +123,12 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         setLocation(x, y);
     }
 
-    public void close() {       
+    public void close() {
         super.dispose();
     }
 
     public void update(Status[] statuses) {
-        DateFormat format = new SimpleDateFormat("hh:mm:ss MM/dd/yyyy");
-        messagePanel.setMessage("Last Update : " + format.format(new Date()), Color.GRAY);
+        messagePanel.setMessage("Last Update : " + dateFormat.format(new Date()), Color.GRAY);
         statusTableModel.refresh(statuses);
 
         super.revalidate();

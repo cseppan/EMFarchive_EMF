@@ -3,9 +3,14 @@ package gov.epa.emissions.framework.client.status;
 import gov.epa.emissions.commons.gui.TableHeader;
 import gov.epa.emissions.framework.services.Status;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,11 +24,14 @@ public class StatusTableModel extends AbstractTableModel {
 
     private List rows;
 
+    private DateFormat dateFormat;
+
     public StatusTableModel() {
         this.header = new TableHeader(new String[] { "Message Type", "Message", "Timestamp" });
         this.statusList = new ArrayList();
 
         this.rows = new ArrayList();
+        dateFormat = new SimpleDateFormat("hh:mm:ss MM/dd/yyyy");
     }
 
     public int getRowCount() {
@@ -55,16 +63,31 @@ public class StatusTableModel extends AbstractTableModel {
     private void notifyTableUpdated() {
         super.fireTableDataChanged();
     }
-    
-    public void refresh(Status[] statuses) {        
-        this.statusList.addAll(Arrays.asList(statuses));
 
-        for (int i = 0; i < statuses.length; i++) {
-            Row row = new Row(statuses[i]);
+    public void refresh(Status[] statuses) {
+        this.statusList.addAll(Arrays.asList(statuses));
+        sortDescendingByTimestamp(statusList);
+
+        rows.clear();
+        for (Iterator iter = statusList.iterator(); iter.hasNext();) {
+            Row row = new Row(((Status) iter.next()));
             rows.add(row);
         }
 
         notifyTableUpdated();
+    }
+
+    private void sortDescendingByTimestamp(List statusList) {
+        Collections.sort(statusList, new Comparator() {
+            public int compare(Object item1, Object item2) {
+                Status status1 = (Status) item1;
+                Status status2 = (Status) item2;
+                long time1 = status1.getTimestamp().getTime();
+                long time2 = status2.getTimestamp().getTime();
+
+                return time1 < time2 ? 1 : -1;// sort descending
+            }
+        });
     }
 
     private class Column {
@@ -83,7 +106,7 @@ public class StatusTableModel extends AbstractTableModel {
         public Row(Status status) {
             Column messageType = new Column(status.getMessageType());
             Column message = new Column(status.getMessage());
-            Column timestamp = new Column(status.getTimestamp());
+            Column timestamp = new Column(dateFormat.format(status.getTimestamp()));
 
             columns = new HashMap();
             columns.put(new Integer(0), messageType);
@@ -96,7 +119,5 @@ public class StatusTableModel extends AbstractTableModel {
             return columnHolder.value;
         }
     }
-
- 
 
 }
