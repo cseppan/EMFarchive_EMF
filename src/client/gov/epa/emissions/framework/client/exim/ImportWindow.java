@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.services.DatasetTypesServices;
+import gov.epa.emissions.framework.services.DatasetTypeService;
 import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
 
@@ -43,11 +43,11 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     private DefaultComboBoxModel datasetTypesModel;
 
-    private DatasetTypesServices datasetTypesService;
+    private DatasetTypeService datasetTypesService;
 
     private JTextField folder;
 
-    public ImportWindow(DatasetTypesServices eximServices, JDesktopPane desktop) throws EmfException {
+    public ImportWindow(DatasetTypeService eximServices, JDesktopPane desktop) throws EmfException {
         super("Import Dataset", new Dimension(700, 275), desktop);
         super.setName("importWindow");
         this.datasetTypesService = eximServices;

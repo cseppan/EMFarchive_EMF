@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 public class PropertiesEditorPresenter implements ChangeObserver {
@@ -46,7 +46,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
     }
 
     public void doSave(DatasetsBrowserView browser) {
-        DataServices dataServices = serviceLocator.getDataServices();
+        DataService dataServices = serviceLocator.getDataService();
         try {
             updateDataset(dataServices, summaryPresenter, keywordsPresenter);
         } catch (EmfException e) {
@@ -65,7 +65,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
         doClose();
     }
 
-    void updateDataset(DataServices dataServices, SummaryTabPresenter summary, KeywordsTabPresenter keywords)
+    void updateDataset(DataService dataServices, SummaryTabPresenter summary, KeywordsTabPresenter keywords)
             throws EmfException {
         summary.doSave();
         keywords.doSave();
@@ -80,7 +80,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
     public void set(KeywordsTabView keywordsView) throws EmfException {
         keywordsPresenter = new KeywordsTabPresenter(keywordsView, dataset);
 
-        Keywords keywords = new Keywords(serviceLocator.getInterDataServices().getKeywords());
+        Keywords keywords = new Keywords(serviceLocator.getDataCommonsService().getKeywords());
         keywordsPresenter.init(keywords);
     }
 
@@ -93,7 +93,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
     }
 
     public void doDisplayData(DataView dataView) {
-        DataViewPresenter presenter = new DataViewPresenter(dataset, dataView, serviceLocator.getDataEditorServices());
+        DataViewPresenter presenter = new DataViewPresenter(dataset, dataView, serviceLocator.getDataEditorService());
         presenter.doDisplay();
     }
 }

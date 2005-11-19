@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 import gov.epa.mims.analysisengine.table.OverallTableModel;
 
 import java.awt.BorderLayout;
@@ -52,7 +52,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     private SortFilterSelectionPanel sortFilterSelectPanel;
 
     // FIXME: this class needs to be refactored into smaller components
-    public UsersManager(User user, UserServices userServices, JFrame parentConsole, JDesktopPane desktop)
+    public UsersManager(User user, UserService userServices, JFrame parentConsole, JDesktopPane desktop)
             throws Exception {
         super("User Manager", new Dimension(550, 300), desktop);
         this.user = user;

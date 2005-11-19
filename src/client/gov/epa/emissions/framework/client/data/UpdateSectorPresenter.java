@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 
 public class UpdateSectorPresenter {
 
@@ -10,9 +10,9 @@ public class UpdateSectorPresenter {
 
     private Sector sector;
 
-    private DataServices services;
+    private DataService services;
 
-    public UpdateSectorPresenter(UpdateSectorView view, Sector sector, DataServices services) {
+    public UpdateSectorPresenter(UpdateSectorView view, Sector sector, DataService services) {
         this.view = view;
         this.sector = sector;
         this.services = services;

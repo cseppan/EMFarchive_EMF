@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.ExImService;
 
 import java.util.Date;
 
@@ -43,7 +43,7 @@ public class DefaultExportPresenter implements ExportPresenter {
         }
         session.setMostRecentExportFolder(folder);
 
-        ExImServices services = session.getExImServices();
+        ExImService services = session.getExImServices();
         if (overwrite)
             services.startExportWithOverwrite(session.getUser(), datasets, folder, purpose);
         else

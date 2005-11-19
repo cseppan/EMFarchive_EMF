@@ -3,8 +3,8 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DatasetTypesServices;
-import gov.epa.emissions.framework.services.InterDataServices;
+import gov.epa.emissions.framework.services.DatasetTypeService;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 import org.jmock.Mock;
@@ -17,15 +17,15 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayViewOnDisplay() throws Exception {
         DatasetType[] types = { new DatasetType("name1"), new DatasetType("name2") };
 
-        Mock service = mock(DatasetTypesServices.class);
+        Mock service = mock(DatasetTypeService.class);
         service.stubs().method("getDatasetTypes").withNoArguments().will(returnValue(types));
-        DatasetTypesServices servicesProxy = (DatasetTypesServices) service.proxy();
+        DatasetTypeService servicesProxy = (DatasetTypeService) service.proxy();
 
         Mock view = mock(DatasetTypesManagerView.class);
         view.expects(once()).method("display").with(same(servicesProxy));
 
         Mock locator = mock(ServiceLocator.class);
-        locator.stubs().method("getDatasetTypesServices").withNoArguments().will(returnValue(servicesProxy));
+        locator.stubs().method("getDatasetTypesService").withNoArguments().will(returnValue(servicesProxy));
 
         DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(),
                 (ServiceLocator) locator.proxy(), null);
@@ -61,10 +61,10 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
 
         Mock locator = mock(ServiceLocator.class);
-        locator.stubs().method("getDatasetTypesServices").withNoArguments().will(returnValue(null));
-        Mock interdataServices = mock(InterDataServices.class);
+        locator.stubs().method("getDatasetTypesService").withNoArguments().will(returnValue(null));
+        Mock interdataServices = mock(DataCommonsService.class);
         interdataServices.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
-        locator.stubs().method("getInterDataServices").withNoArguments().will(returnValue(interdataServices.proxy()));
+        locator.stubs().method("getDataCommonsService").withNoArguments().will(returnValue(interdataServices.proxy()));
 
         DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(),
                 (ServiceLocator) locator.proxy(), (ViewLayout) layout.proxy());
@@ -89,11 +89,11 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
 
         Mock locator = mock(ServiceLocator.class);
-        locator.stubs().method("getDatasetTypesServices").withNoArguments().will(returnValue(null));
+        locator.stubs().method("getDatasetTypesService").withNoArguments().will(returnValue(null));
 
-        Mock interdataServices = mock(InterDataServices.class);
+        Mock interdataServices = mock(DataCommonsService.class);
         interdataServices.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
-        locator.stubs().method("getInterDataServices").withNoArguments().will(returnValue(interdataServices.proxy()));
+        locator.stubs().method("getDataCommonsService").withNoArguments().will(returnValue(interdataServices.proxy()));
 
         DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(),
                 (ServiceLocator) locator.proxy(), (ViewLayout) layout.proxy());

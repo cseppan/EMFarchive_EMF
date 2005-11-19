@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.gui.TableHeader;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,9 +20,9 @@ public class UserManagerTableModel extends AbstractTableModel implements Refresh
 
     private List rows;
 
-    private UserServices userAdmin;
+    private UserService userAdmin;
 
-    public UserManagerTableModel(UserServices userAdmin) {
+    public UserManagerTableModel(UserService userAdmin) {
         this.header = new TableHeader(new String[] { "Username", "Name", "Email", "Is Admin ?" });
         this.userAdmin = userAdmin;
 
@@ -33,7 +33,7 @@ public class UserManagerTableModel extends AbstractTableModel implements Refresh
         this.createRows(this.userAdmin);
     }
 
-    private void createRows(UserServices admin) {
+    private void createRows(UserService admin) {
         this.rows = new ArrayList();
         User[] users;
         try {

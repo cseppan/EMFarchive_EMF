@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -17,9 +17,9 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
 
     protected void setUp() {
         view = mock(RegisterUserView.class);
-        userServices = mock(UserServices.class);
+        userServices = mock(UserService.class);
 
-        presenter = new RegisterUserPresenter((UserServices) userServices.proxy());
+        presenter = new RegisterUserPresenter((UserService) userServices.proxy());
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();
         

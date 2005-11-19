@@ -3,14 +3,14 @@ package gov.epa.emissions.framework.client.login;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.PasswordService;
 import gov.epa.emissions.framework.services.WebServicesIntegrationTestCase;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 public class AuthenticateTest extends WebServicesIntegrationTestCase {
 
-	private UserServices emfUserAdmin;
+	private UserService emfUserAdmin;
 
 	protected void setUp() {
-		emfUserAdmin = serviceLocator.getUserServices();
+		emfUserAdmin = serviceLocator.getUserService();
 	}
 
 	public void testShouldSucceedOnValidUsernamePassword() throws EmfException {

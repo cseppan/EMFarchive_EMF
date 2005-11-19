@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 import org.jmock.Mock;
@@ -20,8 +20,8 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
 
     protected void setUp() {
         layoutManager = mock(ViewLayout.class);
-        Mock userServices = mock(UserServices.class);
-        presenter = new UsersManagerPresenter(null, (UserServices) userServices.proxy(),
+        Mock userServices = mock(UserService.class);
+        presenter = new UsersManagerPresenter(null, (UserService) userServices.proxy(),
                 (ViewLayout) layoutManager.proxy());
 
         view = mock(UsersManagerView.class);
@@ -39,14 +39,14 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldDeleteUserOnNotifyDelete() throws EmfException {
-        Mock userServices = mock(UserServices.class);
+        Mock userServices = mock(UserService.class);
         userServices.expects(once()).method("deleteUser").with(eq("matts"));
 
         User user = new User();
         user.setUsername("joe");
 
         Mock layoutManager = mock(ViewLayout.class);
-        UsersManagerPresenter presenter = new UsersManagerPresenter(user, (UserServices) userServices.proxy(),
+        UsersManagerPresenter presenter = new UsersManagerPresenter(user, (UserService) userServices.proxy(),
                 (ViewLayout) layoutManager.proxy());
 
         Mock view = createView();

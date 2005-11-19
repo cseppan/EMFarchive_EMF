@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.User;
 
 import java.util.Date;
@@ -13,11 +13,11 @@ public class ImportPresenter {
 
     private ImportView view;
 
-    private ExImServices eximServices;
+    private ExImService eximServices;
 
     private User user;
 
-    public ImportPresenter(User user, ExImServices eximServices) {
+    public ImportPresenter(User user, ExImService eximServices) {
         this.user = user;
         this.eximServices = eximServices;
     }

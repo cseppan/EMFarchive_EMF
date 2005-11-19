@@ -6,30 +6,20 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.client.Call;
 
-public class KeywordMappings {
-
-    private Mapper mapper;
-
-    public KeywordMappings() {
-        mapper = new Mapper();
-    }
+public class KeywordMappings extends Mappings {
 
     public void register(Call call) {
-        mapper.registerBeanMapping(call, Keyword.class, keyword());
-        mapper.registerArrayMapping(call, Keyword[].class, keywords());
-        mapper.registerMappingForTable(call);
+        bean(call, Keyword.class, "Keyword");
+        array(call, Keyword[].class, "Keywords");
+        registerTable(call);
     }
 
     public QName keywords() {
-        return mapper.qname("ns1:Keywords");
+        return qname("Keywords");
     }
 
     public QName keyword() {
-        return mapper.qname("ns1:Keyword");
-    }
-
-    public QName qname(String name) {
-        return mapper.qname(name);
+        return qname("Keyword");
     }
 
 }

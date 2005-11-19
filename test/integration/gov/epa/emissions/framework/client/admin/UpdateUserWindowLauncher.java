@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -14,7 +14,7 @@ import javax.swing.JFrame;
 public class UpdateUserWindowLauncher {
 
     public static void main(String[] args) throws Exception {
-        UserServices userAdmin = new UserServicesStub(Collections.EMPTY_LIST);
+        UserService userAdmin = new UserServiceStub(Collections.EMPTY_LIST);
         User user = new User();
         user.setUsername("joes");
         user.setFullName("Joe Schmoe");

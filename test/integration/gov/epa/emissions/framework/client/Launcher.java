@@ -15,7 +15,7 @@ public class Launcher {
         LoginWindow view = new LoginWindow(serviceLocator);
         view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        LoginPresenter presenter = new LoginPresenter(serviceLocator.getUserServices());
+        LoginPresenter presenter = new LoginPresenter(serviceLocator.getUserService());
         presenter.display(view);
     }
 

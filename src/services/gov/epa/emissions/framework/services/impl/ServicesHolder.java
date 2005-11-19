@@ -7,8 +7,8 @@
 
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.framework.services.LoggingServices;
-import gov.epa.emissions.framework.services.StatusServices;
+import gov.epa.emissions.framework.services.LoggingService;
+import gov.epa.emissions.framework.services.StatusService;
 
 /**
  * This is a utility class to hold a reference to each service needed in the Import or Export task object
@@ -17,35 +17,35 @@ import gov.epa.emissions.framework.services.StatusServices;
  *
  */
 public class ServicesHolder {
-    private StatusServices statusSvc = null;
-    private DataServicesImpl dataSvc = null;
-    private LoggingServices logSvc = null;
+    private StatusService statusSvc = null;
+    private DataServiceImpl dataSvc = null;
+    private LoggingService logSvc = null;
     
 	public ServicesHolder() {
 		super();
 	}
 
-	public DataServicesImpl getDataServices() {
+	public DataServiceImpl getDataServices() {
 		return dataSvc;
 	}
 
-	public void setDataSvc(DataServicesImpl dataSvc) {
+	public void setDataSvc(DataServiceImpl dataSvc) {
 		this.dataSvc = dataSvc;
 	}
 
-	public LoggingServices getLogSvc() {
+	public LoggingService getLogSvc() {
 		return logSvc;
 	}
 
-	public void setLogSvc(LoggingServices logSvc) {
+	public void setLogSvc(LoggingService logSvc) {
 		this.logSvc = logSvc;
 	}
 
-	public StatusServices getStatusSvc() {
+	public StatusService getStatusSvc() {
 		return statusSvc;
 	}
 
-	public void setStatusSvc(StatusServices statusSvc) {
+	public void setStatusSvc(StatusService statusSvc) {
 		this.statusSvc = statusSvc;
 	}
 

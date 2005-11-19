@@ -3,12 +3,12 @@ package gov.epa.emissions.framework.client.status;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.TaskRunner;
 import gov.epa.emissions.framework.services.Status;
-import gov.epa.emissions.framework.services.StatusServices;
+import gov.epa.emissions.framework.services.StatusService;
 import gov.epa.emissions.framework.services.User;
 
 public class StatusPresenter {
 
-    private StatusServices model;
+    private StatusService model;
 
     private StatusView view;
 
@@ -18,7 +18,7 @@ public class StatusPresenter {
 
     private TaskRunner runner;
 
-    public StatusPresenter(User user, StatusServices model, TaskRunner runner) {
+    public StatusPresenter(User user, StatusService model, TaskRunner runner) {
         this.user = user;
         this.model = model;
         this.runner = runner;

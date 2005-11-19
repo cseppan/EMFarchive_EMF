@@ -10,7 +10,7 @@ import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.Country;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -72,7 +72,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private ChangeObserver changeObserver;
 
-    public SummaryTab(EmfDataset dataset, DataServices dataServices, MessagePanel messagePanel) throws EmfException {
+    public SummaryTab(EmfDataset dataset, DataService dataServices, MessagePanel messagePanel) throws EmfException {
         super.setName("summary");
         this.dataset = dataset;
         this.messagePanel = messagePanel;
@@ -85,7 +85,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         listenForKeyEvents(new SummaryTabKeyListener());
     }
 
-    private JPanel createLowerSection(DataServices dataServices, SummaryTabComboBoxChangesListener comboxBoxListener)
+    private JPanel createLowerSection(DataService dataServices, SummaryTabComboBoxChangesListener comboxBoxListener)
             throws EmfException {
         JPanel lowerPanel = new JPanel(new BorderLayout());
 
@@ -147,7 +147,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         return DATE_FORMATTER.format(date);
     }
 
-    private JPanel createTimeSpaceSection(DataServices dataServices, SummaryTabComboBoxChangesListener comboxBoxListener)
+    private JPanel createTimeSpaceSection(DataService dataServices, SummaryTabComboBoxChangesListener comboxBoxListener)
             throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));

@@ -9,14 +9,14 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataEditorServices;
-import gov.epa.emissions.framework.services.DataServices;
-import gov.epa.emissions.framework.services.DatasetTypesServices;
-import gov.epa.emissions.framework.services.ExImServices;
-import gov.epa.emissions.framework.services.InterDataServices;
-import gov.epa.emissions.framework.services.LoggingServices;
-import gov.epa.emissions.framework.services.StatusServices;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.DatasetTypeService;
+import gov.epa.emissions.framework.services.ExImService;
+import gov.epa.emissions.framework.services.DataCommonsService;
+import gov.epa.emissions.framework.services.LoggingService;
+import gov.epa.emissions.framework.services.StatusService;
+import gov.epa.emissions.framework.services.UserService;
 
 import javax.xml.rpc.ServiceException;
 
@@ -43,36 +43,36 @@ public class RemoteServiceLocator implements ServiceLocator {
         }
     }
 
-    public UserServices getUserServices() {
-        return new UserServicesTransport(baseUrl + "/gov.epa.emf.services.UserServices");
+    public UserService getUserService() {
+        return new UserServiceTransport(baseUrl + "/gov.epa.emf.services.UserService");
     }
 
-    public StatusServices getStatusServices() {
-        return new StatusServicesTransport(baseUrl + "/gov.epa.emf.services.StatusServices");
+    public StatusService getStatusService() {
+        return new StatusServiceTransport(baseUrl + "/gov.epa.emf.services.StatusService");
     }
 
-    public ExImServices getExImServices() {
-        return new ExImServicesTransport(baseUrl + "/gov.epa.emf.services.ExImServices");
+    public ExImService getExImService() {
+        return new ExImServiceTransport(baseUrl + "/gov.epa.emf.services.ExImService");
     }
 
-    public DataServices getDataServices() {
-        return new DataServicesTransport(baseUrl + "/gov.epa.emf.services.DataServices");
+    public DataService getDataService() {
+        return new DataServiceTransport(baseUrl + "/gov.epa.emf.services.DataService");
     }
 
-    public LoggingServices getLoggingServices() {
-        return new LoggingServicesTransport(baseUrl + "/gov.epa.emf.services.LoggingServices");
+    public LoggingService getLoggingService() {
+        return new LoggingServiceTransport(baseUrl + "/gov.epa.emf.services.LoggingService");
     }
 
-    public DatasetTypesServices getDatasetTypesServices() {
-        return new DatasetTypesServicesTransport(baseUrl + "/gov.epa.emf.services.DatasetTypesServices");
+    public DatasetTypeService getDatasetTypesService() {
+        return new DatasetTypeServiceTransport(baseUrl + "/gov.epa.emf.services.DatasetTypeService");
     }
 
-    public InterDataServices getInterDataServices() {
-        return new InterDataServicesTransport(baseUrl + "/gov.epa.emf.services.InterDataServices");
+    public DataCommonsService getDataCommonsService() {
+        return new DataCommonsServiceTransport(baseUrl + "/gov.epa.emf.services.DataCommonsService");
     }
 
-    public DataEditorServices getDataEditorServices() {
-        return new DataEditorServicesTransport(baseUrl + "/gov.epa.emf.services.DataEditorServices",call);
+    public DataEditorService getDataEditorService() {
+        return new DataEditorServiceTransport(baseUrl + "/gov.epa.emf.services.DataEditorService",call);
     }
 
     /*

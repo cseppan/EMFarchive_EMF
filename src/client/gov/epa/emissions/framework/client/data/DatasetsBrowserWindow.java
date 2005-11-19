@@ -16,7 +16,7 @@ import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.meta.PropertiesEditor;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfDatasetTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -60,7 +60,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         super.setName("datasetsBrowser");
 
         this.session = session;
-        DataServices services = session.getDataServices();
+        DataService services = session.getDataServices();
         model = new EmfTableModel(new EmfDatasetTableData(services.getDatasets()));
         selectModel = new SortFilterSelectModel(model);
         this.parentConsole = parentConsole;

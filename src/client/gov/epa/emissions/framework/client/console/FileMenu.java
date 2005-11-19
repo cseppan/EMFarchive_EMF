@@ -8,8 +8,8 @@ import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.ExImServices;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.ExImService;
+import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.awt.event.ActionEvent;
@@ -61,7 +61,7 @@ public class FileMenu extends JMenu {
     }
 
     private void logout(EmfSession session, EmfConsole parent) {
-        UserServices userServices = session.getUserServices();
+        UserService userServices = session.getUserServices();
         LoginWindow view = new LoginWindow(session.getServiceLocator());
 
         LoginPresenter presenter = new LoginPresenter(userServices);
@@ -90,9 +90,9 @@ public class FileMenu extends JMenu {
             return;
 
         ServiceLocator serviceLocator = session.getServiceLocator();
-        ExImServices eximServices = serviceLocator.getExImServices();
+        ExImService eximServices = serviceLocator.getExImService();
 
-        ImportWindow importView = new ImportWindow(serviceLocator.getDatasetTypesServices(), desktop);
+        ImportWindow importView = new ImportWindow(serviceLocator.getDatasetTypesService(), desktop);
         viewLayout.add(importView, "Import Dataset - FileMenu");
         desktop.add(importView);
 

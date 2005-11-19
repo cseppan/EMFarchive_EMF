@@ -2,15 +2,15 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 public class RegisterUserPresenter {
 
-    private UserServices model;
+    private UserService model;
 
     private RegisterUserView view;
 
-    public RegisterUserPresenter(UserServices model) {
+    public RegisterUserPresenter(UserService model) {
         this.model = model;
     }
 

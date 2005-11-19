@@ -1,29 +1,29 @@
 package gov.epa.emissions.framework.client.transport;
 
-import gov.epa.emissions.framework.services.DataEditorServices;
-import gov.epa.emissions.framework.services.DataServices;
-import gov.epa.emissions.framework.services.DatasetTypesServices;
-import gov.epa.emissions.framework.services.ExImServices;
-import gov.epa.emissions.framework.services.InterDataServices;
-import gov.epa.emissions.framework.services.LoggingServices;
-import gov.epa.emissions.framework.services.StatusServices;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.DatasetTypeService;
+import gov.epa.emissions.framework.services.ExImService;
+import gov.epa.emissions.framework.services.DataCommonsService;
+import gov.epa.emissions.framework.services.LoggingService;
+import gov.epa.emissions.framework.services.StatusService;
+import gov.epa.emissions.framework.services.UserService;
 
 public interface ServiceLocator {
-    UserServices getUserServices();
+    UserService getUserService();
 
-    StatusServices getStatusServices();
+    StatusService getStatusService();
 
-    ExImServices getExImServices();
+    ExImService getExImService();
 
-    DataServices getDataServices();
+    DataService getDataService();
 
-    LoggingServices getLoggingServices();
+    LoggingService getLoggingService();
 
-    DatasetTypesServices getDatasetTypesServices();
+    DatasetTypeService getDatasetTypesService();
 
-    InterDataServices getInterDataServices();
+    DataCommonsService getDataCommonsService();
 
-    DataEditorServices getDataEditorServices();
+    DataEditorService getDataEditorService();
 
 }

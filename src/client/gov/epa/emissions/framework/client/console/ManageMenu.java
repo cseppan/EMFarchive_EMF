@@ -15,9 +15,9 @@ import gov.epa.emissions.framework.client.data.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.client.data.SectorsManagerPresenter;
 import gov.epa.emissions.framework.client.data.SectorsManagerWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.ui.DefaultViewLayout;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
@@ -118,7 +118,7 @@ public class ManageMenu extends JMenu {
         return menuItem;
     }
 
-    private JMenuItem createSectors(final DataServices dataServices, final EmfFrame parent,
+    private JMenuItem createSectors(final DataService dataServices, final EmfFrame parent,
             final MessagePanel messagePanel) {
         JMenuItem menuItem = new JMenuItem("Sectors");
         menuItem.setName("sectors");
@@ -148,7 +148,7 @@ public class ManageMenu extends JMenu {
         presenter.doDisplay();
     }
 
-    protected void displaySectors(DataServices dataServices, EmfFrame parent) throws EmfException {
+    protected void displaySectors(DataService dataServices, EmfFrame parent) throws EmfException {
         if (viewLayout.activate("Sectors Manager"))
             return;
 
@@ -191,7 +191,7 @@ public class ManageMenu extends JMenu {
             return;
 
         try {
-            UserServices userServices = session.getUserServices();
+            UserService userServices = session.getUserServices();
 
             UsersManager usesrManagerView = new UsersManager(session.getUser(), userServices, parent, desktop);
             viewLayout.add(usesrManagerView, "Users Manager");

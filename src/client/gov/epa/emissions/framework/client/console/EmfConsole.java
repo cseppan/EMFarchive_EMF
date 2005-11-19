@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.status.StatusPresenter;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.StatusServices;
+import gov.epa.emissions.framework.services.StatusService;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.ui.DefaultViewLayout;
 import gov.epa.emissions.framework.ui.ViewLayout;
@@ -70,7 +70,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private void showStatus() {
-        StatusServices statusServices = serviceLocator.getStatusServices();
+        StatusService statusServices = serviceLocator.getStatusService();
         StatusWindow status = new StatusWindow(this, desktop);
         windowMenuPresenter.notifyAdd(status);
 

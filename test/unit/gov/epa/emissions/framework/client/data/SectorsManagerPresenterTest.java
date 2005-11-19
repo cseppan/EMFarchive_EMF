@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Sector;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 import org.jmock.Mock;
@@ -13,9 +13,9 @@ public class SectorsManagerPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayViewOnDisplay() throws Exception {
         Sector[] sectors = { new Sector(), new Sector() };
 
-        Mock service = mock(DataServices.class);
+        Mock service = mock(DataService.class);
         service.stubs().method("getSectors").withNoArguments().will(returnValue(sectors));
-        DataServices servicesProxy = (DataServices) service.proxy();
+        DataService servicesProxy = (DataService) service.proxy();
 
         Mock view = mock(SectorsManagerView.class);
         view.expects(once()).method("display").with(same(servicesProxy));

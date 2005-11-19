@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.io.Dataset;
-import gov.epa.emissions.framework.services.DataEditorServices;
+import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.Page;
 
 import org.jmock.Mock;
@@ -31,11 +31,11 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         Mock view = mock(DataView.class);
         view.expects(once()).method("close").withNoArguments();
 
-        Mock services = mock(DataEditorServices.class);
+        Mock services = mock(DataEditorService.class);
         services.expects(once()).method("close").withNoArguments();
 
         DataViewPresenter p = new DataViewPresenter(datasetProxy, (DataView) view.proxy(),
-                (DataEditorServices) services.proxy());
+                (DataEditorService) services.proxy());
 
         p.doClose();
     }
@@ -43,7 +43,7 @@ public class DataViewPresenterTest extends MockObjectTestCase {
     public void testShouldLoadFirstPageOnTableSelection() throws Exception {
         Mock dataset = mock(Dataset.class);
 
-        Mock services = mock(DataEditorServices.class);
+        Mock services = mock(DataEditorService.class);
         Page page = new Page();
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(1))).will(returnValue(page));
 
@@ -52,14 +52,14 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         pageView.expects(once()).method("observe").with(new IsInstanceOf(PageViewPresenter.class));
 
         DataViewPresenter presenter = new DataViewPresenter(((Dataset) dataset.proxy()), null,
-                (DataEditorServices) services.proxy());
+                (DataEditorService) services.proxy());
         presenter.doSelectTable("table", (PageView) pageView.proxy());
     }
 
     public void testShouldBeAbleToDisplayMultipleTablesSimultaneously() throws Exception {
         Mock dataset = mock(Dataset.class);
 
-        Mock services = mock(DataEditorServices.class);
+        Mock services = mock(DataEditorService.class);
         Page page1 = new Page();
         Page page2 = new Page();
         services.expects(once()).method("getPage").with(eq("table1"), eq(new Integer(1))).will(returnValue(page1));
@@ -70,7 +70,7 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         pageView.expects(once()).method("display").with(eq(page2));
         pageView.expects(new InvokeCountMatcher(2)).method("observe").with(new IsInstanceOf(PageViewPresenter.class));
 
-        DataViewPresenter p = new DataViewPresenter(((Dataset) dataset.proxy()), null, (DataEditorServices) services
+        DataViewPresenter p = new DataViewPresenter(((Dataset) dataset.proxy()), null, (DataEditorService) services
                 .proxy());
         p.doSelectTable("table1", (PageView) pageView.proxy());
         p.doSelectTable("table2", (PageView) pageView.proxy());

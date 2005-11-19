@@ -51,7 +51,7 @@ public class DatasetsBrowserPresenter {
     }
 
     public void doRefresh() throws EmfException {
-        view.refresh(serviceLocator.getDataServices().getDatasets());
+        view.refresh(serviceLocator.getDataService().getDatasets());
 
         view.clearMessage();
     }

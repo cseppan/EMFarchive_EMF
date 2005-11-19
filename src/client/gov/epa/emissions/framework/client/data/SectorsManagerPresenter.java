@@ -2,18 +2,18 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 public class SectorsManagerPresenter {
 
     private SectorsManagerView view;
 
-    private DataServices services;
+    private DataService services;
 
     private ViewLayout viewLayout;
 
-    public SectorsManagerPresenter(SectorsManagerView view, DataServices services, ViewLayout viewLayout) {
+    public SectorsManagerPresenter(SectorsManagerView view, DataService services, ViewLayout viewLayout) {
         this.view = view;
         this.services = services;
         this.viewLayout = viewLayout;

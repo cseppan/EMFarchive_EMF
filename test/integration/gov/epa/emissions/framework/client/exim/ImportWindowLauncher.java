@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.client.console.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 import javax.swing.JFrame;
 
@@ -15,7 +15,7 @@ public class ImportWindowLauncher {
     public static void main(String[] args) throws Exception {
         ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
 
-        UserServices userServices = serviceLocator.getUserServices();
+        UserService userServices = serviceLocator.getUserService();
         User user = userServices.getUser("emf");
 
         EmfConsole view = new EmfConsole(new DefaultEmfSession(user, serviceLocator));

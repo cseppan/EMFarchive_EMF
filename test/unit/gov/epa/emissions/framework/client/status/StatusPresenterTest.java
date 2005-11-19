@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.client.status.StatusPresenter;
 import gov.epa.emissions.framework.client.status.StatusView;
 import gov.epa.emissions.framework.client.status.StatusPresenter.StatusMonitor;
 import gov.epa.emissions.framework.services.Status;
-import gov.epa.emissions.framework.services.StatusServices;
+import gov.epa.emissions.framework.services.StatusService;
 import gov.epa.emissions.framework.services.User;
 
 import java.util.Date;
@@ -30,7 +30,7 @@ public class StatusPresenterTest extends MockObjectTestCase {
         user = new User();
         user.setUsername("user");
 
-        service = mock(StatusServices.class);
+        service = mock(StatusService.class);
         view = mock(StatusView.class);        
 
         runner = new TaskRunner() {
@@ -51,7 +51,7 @@ public class StatusPresenterTest extends MockObjectTestCase {
         view.expects(atLeastOnce()).method("update").with(same(messages));
         view.expects(once()).method("display").withNoArguments();
 
-        StatusPresenter presenter = new StatusPresenter(user, (StatusServices) service.proxy(), runner);
+        StatusPresenter presenter = new StatusPresenter(user, (StatusService) service.proxy(), runner);
         presenter.display((StatusView) view.proxy());
 
         presenter.stop();
@@ -65,7 +65,7 @@ public class StatusPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("notifyError").with(eq("poll failure"));
         view.expects(once()).method("display").withNoArguments();
 
-        StatusPresenter presenter = new StatusPresenter(user, (StatusServices) service.proxy(), runner);
+        StatusPresenter presenter = new StatusPresenter(user, (StatusService) service.proxy(), runner);
         presenter.display((StatusView) view.proxy());
 
         presenter.stop();
@@ -78,7 +78,7 @@ public class StatusPresenterTest extends MockObjectTestCase {
         runner.expects(once()).method("start").with(new IsInstanceOf(StatusMonitor.class));
         runner.expects(once()).method("stop").withNoArguments();
         
-        StatusPresenter presenter = new StatusPresenter(user, (StatusServices) service.proxy(), (TaskRunner) runner.proxy());        
+        StatusPresenter presenter = new StatusPresenter(user, (StatusService) service.proxy(), (TaskRunner) runner.proxy());        
         presenter.display((StatusView) view.proxy());
 
         presenter.close();

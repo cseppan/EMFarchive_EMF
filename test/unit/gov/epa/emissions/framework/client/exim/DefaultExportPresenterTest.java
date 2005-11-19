@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.User;
 
 import java.util.Date;
@@ -40,7 +40,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
 
         EmfDataset[] datasets = new EmfDataset[] { (EmfDataset) dataset.proxy() };
 
-        Mock model = mock(ExImServices.class);
+        Mock model = mock(ExImService.class);
         model.expects(once()).method("startExportWithOverwrite").with(
                 new Constraint[] { eq(user), eq(datasets), eq(folder), eq(purpose) });
 
@@ -63,7 +63,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
 
         EmfDataset[] datasets = new EmfDataset[] { dataset };
 
-        Mock model = mock(ExImServices.class);
+        Mock model = mock(ExImService.class);
         model.expects(once()).method("startExport").with(
                 new Constraint[] { eq(user), eq(datasets), eq(folder), eq(description) });
 

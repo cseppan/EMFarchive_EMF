@@ -4,8 +4,8 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DatasetTypesServices;
-import gov.epa.emissions.framework.services.InterDataServices;
+import gov.epa.emissions.framework.services.DatasetTypeService;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.DefaultViewLayout;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
@@ -30,10 +30,10 @@ public class DatasetTypesManagerWindowLauncher {
         DatasetTypesManagerWindow view = new DatasetTypesManagerWindow(frame, desktop);
         DatasetType[] types = types();
 
-        Mock datasetTypesServices = new Mock(DatasetTypesServices.class);
+        Mock datasetTypesServices = new Mock(DatasetTypeService.class);
         datasetTypesServices.stubs().method(new IsEqual("getDatasetTypes")).will(new ReturnStub(types));
 
-        Mock interdataServices = new Mock(InterDataServices.class);
+        Mock interdataServices = new Mock(DataCommonsService.class);
         interdataServices.stubs().method(new IsEqual("getKeywords")).will(new ReturnStub(keywords()));
 
         Mock serviceLocator = new Mock(ServiceLocator.class);

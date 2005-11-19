@@ -3,8 +3,8 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DatasetTypesServices;
-import gov.epa.emissions.framework.services.InterDataServices;
+import gov.epa.emissions.framework.services.DatasetTypeService;
+import gov.epa.emissions.framework.services.DataCommonsService;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -15,12 +15,12 @@ public class UpdateDatasetTypePresenter {
 
     private DatasetType type;
 
-    private DatasetTypesServices datasetTypesServices;
+    private DatasetTypeService datasetTypesServices;
 
-    private InterDataServices interdataServices;
+    private DataCommonsService interdataServices;
 
     public UpdateDatasetTypePresenter(UpdateDatasetTypeView view, DatasetType type,
-            DatasetTypesServices datasetTypesServices, InterDataServices interdataServices) {
+            DatasetTypeService datasetTypesServices, DataCommonsService interdataServices) {
         this.view = view;
         this.type = type;
         this.datasetTypesServices = datasetTypesServices;

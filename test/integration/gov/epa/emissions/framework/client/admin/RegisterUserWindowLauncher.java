@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.client.login.LaunchEmfConsolePostRegisterStrategy;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 import java.util.Collections;
 
@@ -16,7 +16,7 @@ import org.jmock.core.stub.ReturnStub;
 public class RegisterUserWindowLauncher {
 
     public static void main(String[] args) throws Exception {
-        UserServices userServices = new UserServicesStub(Collections.EMPTY_LIST);
+        UserService userServices = new UserServiceStub(Collections.EMPTY_LIST);
         Mock serviceLocator = new Mock(ServiceLocator.class);
         serviceLocator.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getUserServices")).will(
                 new ReturnStub(userServices));

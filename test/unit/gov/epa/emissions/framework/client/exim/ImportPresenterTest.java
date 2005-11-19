@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.User;
 
 import java.util.Date;
@@ -24,13 +24,13 @@ public class ImportPresenterTest extends MockObjectTestCase {
     private ImportPresenter presenter;
 
     protected void setUp() throws EmfException {
-        model = mock(ExImServices.class);
+        model = mock(ExImService.class);
         String folder = "/blah/blagh";
         model.stubs().method("getImportBaseFolder").will(returnValue(folder));
 
         view = mock(ImportView.class);
 
-        presenter = new ImportPresenter(null, (ExImServices) model.proxy());
+        presenter = new ImportPresenter(null, (ExImService) model.proxy());
         // should register with the view, set default folder, and display the
         // view
         view.expects(once()).method("register").with(eq(presenter));
@@ -65,12 +65,12 @@ public class ImportPresenterTest extends MockObjectTestCase {
         String dir = "dir";
         String filename = "filename";
 
-        Mock model = mock(ExImServices.class);
+        Mock model = mock(ExImService.class);
 
         Constraint[] constraints = new Constraint[] { eq(user), eq(dir), eq(filename), datasetConstraints };
         model.expects(once()).method("startImport").with(constraints);
 
-        ImportPresenter presenter = new ImportPresenter(user, (ExImServices) model.proxy());
+        ImportPresenter presenter = new ImportPresenter(user, (ExImService) model.proxy());
 
         presenter.doImport(dir, filename, datasetName, type);
     }

@@ -2,17 +2,17 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 public class UpdateUserPresenter {
 
-    private UserServices model;
+    private UserService model;
 
     private UpdateUserView view;
 
     private boolean userDataChanged;
 
-    public UpdateUserPresenter(UserServices model) {
+    public UpdateUserPresenter(UserService model) {
         this.model = model;
     }
 

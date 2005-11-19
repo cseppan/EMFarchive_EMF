@@ -2,11 +2,11 @@ package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataServices;
-import gov.epa.emissions.framework.services.ExImServices;
-import gov.epa.emissions.framework.services.LoggingServices;
+import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.ExImService;
+import gov.epa.emissions.framework.services.LoggingService;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -22,12 +22,12 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
     private Mock eximServices;
 
     protected void setUp() throws EmfException {
-        eximServices = mock(ExImServices.class);
+        eximServices = mock(ExImService.class);
         folder = "folder/blah";
         eximServices.stubs().method("getExportBaseFolder").will(returnValue(folder));
 
         locator = mock(ServiceLocator.class);
-        locator.stubs().method("getExImServices").will(returnValue(eximServices.proxy()));
+        locator.stubs().method("getExImService").will(returnValue(eximServices.proxy()));
 
         session = new DefaultEmfSession(null, (ServiceLocator) locator.proxy());
     }
@@ -48,8 +48,8 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
     }
 
     public void testGetExImServices() throws EmfException {
-        ExImServices proxy = (ExImServices) eximServices.proxy();
-        locator.stubs().method("getExImServices").will(returnValue(proxy));
+        ExImService proxy = (ExImService) eximServices.proxy();
+        locator.stubs().method("getExImService").will(returnValue(proxy));
 
         EmfSession session = new DefaultEmfSession(null, ((ServiceLocator) locator.proxy()));
 
@@ -57,10 +57,10 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
     }
 
     public void testGetDataServices() throws EmfException {
-        Mock services = mock(DataServices.class);
+        Mock services = mock(DataService.class);
 
-        DataServices servicesProxy = (DataServices) services.proxy();
-        locator.stubs().method("getDataServices").will(returnValue(servicesProxy));
+        DataService servicesProxy = (DataService) services.proxy();
+        locator.stubs().method("getDataService").will(returnValue(servicesProxy));
 
         EmfSession session = new DefaultEmfSession(null, ((ServiceLocator) locator.proxy()));
 
@@ -68,10 +68,10 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
     }
 
     public void testGetUserServices() throws EmfException {
-        Mock services = mock(UserServices.class);
+        Mock services = mock(UserService.class);
 
-        UserServices servicesProxy = (UserServices) services.proxy();
-        locator.stubs().method("getUserServices").will(returnValue(servicesProxy));
+        UserService servicesProxy = (UserService) services.proxy();
+        locator.stubs().method("getUserService").will(returnValue(servicesProxy));
 
         EmfSession session = new DefaultEmfSession(null, ((ServiceLocator) locator.proxy()));
 
@@ -79,10 +79,10 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
     }
 
     public void testGetLoggingServices() throws EmfException {
-        Mock services = mock(LoggingServices.class);
+        Mock services = mock(LoggingService.class);
 
-        LoggingServices servicesProxy = (LoggingServices) services.proxy();
-        locator.stubs().method("getLoggingServices").will(returnValue(servicesProxy));
+        LoggingService servicesProxy = (LoggingService) services.proxy();
+        locator.stubs().method("getLoggingService").will(returnValue(servicesProxy));
 
         EmfSession session = new DefaultEmfSession(null, ((ServiceLocator) locator.proxy()));
 

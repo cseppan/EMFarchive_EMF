@@ -2,8 +2,8 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
-import gov.epa.emissions.framework.services.DataServices;
-import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.User;
 
 /**
@@ -11,11 +11,11 @@ import gov.epa.emissions.framework.services.User;
  */
 public class DatasetsBrowserAwareImportPresenter extends ImportPresenter {
 
-    private DataServices dataServices;
+    private DataService dataServices;
 
     private DatasetsBrowserView browser;
 
-    public DatasetsBrowserAwareImportPresenter(User user, ExImServices eximServices, DataServices dataServices,
+    public DatasetsBrowserAwareImportPresenter(User user, ExImService eximServices, DataService dataServices,
             DatasetsBrowserView browser) {
         super(user, eximServices);
         this.dataServices = dataServices;

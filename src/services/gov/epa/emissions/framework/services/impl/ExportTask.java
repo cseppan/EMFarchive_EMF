@@ -13,12 +13,12 @@ package gov.epa.emissions.framework.services.impl;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.AccessLog;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.LoggingServices;
+import gov.epa.emissions.framework.services.LoggingService;
 import gov.epa.emissions.framework.services.Status;
-import gov.epa.emissions.framework.services.StatusServices;
+import gov.epa.emissions.framework.services.StatusService;
 import gov.epa.emissions.framework.services.User;
 
 import java.io.File;
@@ -38,11 +38,11 @@ public class ExportTask implements Runnable {
 
     private File file;
 
-    private DataServices dataServices = null;
+    private DataService dataServices = null;
 
-    private StatusServices statusServices = null;
+    private StatusService statusServices = null;
 
-    private LoggingServices loggingServices = null;
+    private LoggingService loggingServices = null;
 
     private EmfDataset dataset;
 

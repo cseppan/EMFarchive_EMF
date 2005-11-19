@@ -9,9 +9,9 @@ import gov.epa.emissions.framework.client.exim.ImportView;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.InterDataServices;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 import org.jmock.Mock;
@@ -35,11 +35,11 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         layout = mock(ViewLayout.class);
 
-        dataServices = mock(DataServices.class);
-        Mock interdataServices = mock(InterDataServices.class);
+        dataServices = mock(DataService.class);
+        Mock interdataServices = mock(DataCommonsService.class);
         serviceLocator = mock(ServiceLocator.class);
-        serviceLocator.stubs().method("getDataServices").withNoArguments().will(returnValue(dataServices.proxy()));
-        serviceLocator.stubs().method("getInterDataServices").withNoArguments().will(
+        serviceLocator.stubs().method("getDataService").withNoArguments().will(returnValue(dataServices.proxy()));
+        serviceLocator.stubs().method("getDataCommonsService").withNoArguments().will(
                 returnValue(interdataServices.proxy()));
 
         presenter = new DatasetsBrowserPresenter((ServiceLocator) serviceLocator.proxy(), (ViewLayout) layout.proxy());

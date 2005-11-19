@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataEditorServices;
+import gov.epa.emissions.framework.services.DataEditorService;
 
 public class DataViewPresenter {
 
@@ -10,9 +10,9 @@ public class DataViewPresenter {
 
     private Dataset dataset;
 
-    private DataEditorServices services;
+    private DataEditorService services;
 
-    public DataViewPresenter(Dataset dataset, DataView view, DataEditorServices services) {
+    public DataViewPresenter(Dataset dataset, DataView view, DataEditorService services) {
         this.dataset = dataset;
         this.view = view;
         this.services = services;

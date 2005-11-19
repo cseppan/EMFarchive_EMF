@@ -2,12 +2,12 @@ package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataServices;
-import gov.epa.emissions.framework.services.DatasetTypesServices;
-import gov.epa.emissions.framework.services.ExImServices;
-import gov.epa.emissions.framework.services.LoggingServices;
+import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.DatasetTypeService;
+import gov.epa.emissions.framework.services.ExImService;
+import gov.epa.emissions.framework.services.LoggingService;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 public class DefaultEmfSession implements EmfSession {
 
@@ -20,7 +20,7 @@ public class DefaultEmfSession implements EmfSession {
     public DefaultEmfSession(User user, ServiceLocator locator) throws EmfException {
         serviceLocator = locator;
         this.user = user;
-        mostRecentExportFolder = locator.getExImServices().getExportBaseFolder();
+        mostRecentExportFolder = locator.getExImService().getExportBaseFolder();
     }
 
     public ServiceLocator getServiceLocator() {
@@ -31,12 +31,12 @@ public class DefaultEmfSession implements EmfSession {
         return user;
     }
 
-    public ExImServices getExImServices() {
-        return serviceLocator.getExImServices();
+    public ExImService getExImServices() {
+        return serviceLocator.getExImService();
     }
 
-    public DataServices getDataServices() {
-        return serviceLocator.getDataServices();
+    public DataService getDataServices() {
+        return serviceLocator.getDataService();
     }
 
     public String getMostRecentExportFolder() {
@@ -47,15 +47,15 @@ public class DefaultEmfSession implements EmfSession {
         this.mostRecentExportFolder = mostRecentExportFolder;
     }
 
-    public UserServices getUserServices() {
-        return serviceLocator.getUserServices();
+    public UserService getUserServices() {
+        return serviceLocator.getUserService();
     }
 
-    public LoggingServices getLoggingServices() {
-        return serviceLocator.getLoggingServices();
+    public LoggingService getLoggingServices() {
+        return serviceLocator.getLoggingService();
     }
 
-    public DatasetTypesServices getDatasetTypesServices() {
-        return serviceLocator.getDatasetTypesServices();
+    public DatasetTypeService getDatasetTypesServices() {
+        return serviceLocator.getDatasetTypesService();
     }
 }

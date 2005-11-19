@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.login;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.PasswordService;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -29,23 +29,23 @@ public class LoginPresenterTest extends MockObjectTestCase {
         user.setUsername("joey");
         user.setPassword("joeymoey12");
 
-        Mock userAdmin = mock(UserServices.class);
+        Mock userAdmin = mock(UserService.class);
         userAdmin.expects(once()).method("authenticate").with(eq(user.getUsername()), eq(user.getEncryptedPassword()));
         userAdmin.expects(once()).method("getUser").with(eq(user.getUsername())).will(returnValue(user));
 
-        LoginPresenter presenter = new LoginPresenter((UserServices) userAdmin.proxy());
+        LoginPresenter presenter = new LoginPresenter((UserService) userAdmin.proxy());
 
         assertSame(user, presenter.doLogin("joey", "joeymoey12"));
     }
 
     public void testShouldFailIfAuthenticateFailsOnNotifyLogin() throws EmfException {
-        Mock userAdmin = mock(UserServices.class);
+        Mock userAdmin = mock(UserService.class);
         Throwable exception = new EmfException("authentication failure");
         String encryptedPassword = PasswordService.encrypt("password");
         userAdmin.expects(once()).method("authenticate").with(eq("username"), eq(encryptedPassword)).will(
                 throwException(exception));
 
-        LoginPresenter presenter = new LoginPresenter((UserServices) userAdmin.proxy());
+        LoginPresenter presenter = new LoginPresenter((UserService) userAdmin.proxy());
 
         try {
             presenter.doLogin("username", "password");

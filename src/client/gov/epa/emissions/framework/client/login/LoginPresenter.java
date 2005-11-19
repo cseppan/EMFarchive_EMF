@@ -3,15 +3,15 @@ package gov.epa.emissions.framework.client.login;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.PasswordService;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 public class LoginPresenter {
 
-    private UserServices userAdmin;
+    private UserService userAdmin;
 
     private LoginView view;
 
-    public LoginPresenter(UserServices model) {
+    public LoginPresenter(UserService model) {
         this.userAdmin = model;
     }
 

@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.services.DatasetTypesServices;
+import gov.epa.emissions.framework.services.DatasetTypeService;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
@@ -42,7 +42,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     private JFrame parentConsole;
 
-    private DatasetTypesServices services;
+    private DatasetTypeService services;
 
     public DatasetTypesManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
         super("DatasetType Manager", new Dimension(600, 300), desktop);
@@ -67,7 +67,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         super.refreshLayout();
     }
 
-    public void display(DatasetTypesServices services) throws EmfException {
+    public void display(DatasetTypeService services) throws EmfException {
         this.services = services;
 
         doLayout(services.getDatasetTypes());

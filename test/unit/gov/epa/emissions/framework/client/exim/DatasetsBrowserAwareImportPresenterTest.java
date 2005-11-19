@@ -2,9 +2,9 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.ExImService;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -22,15 +22,15 @@ public class DatasetsBrowserAwareImportPresenterTest extends MockObjectTestCase 
     private Mock datasetsBrowser;
 
     protected void setUp() throws EmfException {
-        eximServices = mock(ExImServices.class);
+        eximServices = mock(ExImService.class);
         String folder = "/blah/blagh";
         eximServices.stubs().method("getImportBaseFolder").will(returnValue(folder));
 
         view = mock(ImportView.class);
-        dataServices = mock(DataServices.class);
+        dataServices = mock(DataService.class);
         datasetsBrowser = mock(DatasetsBrowserView.class);
 
-        presenter = new DatasetsBrowserAwareImportPresenter(null, (ExImServices) eximServices.proxy(), (DataServices) dataServices
+        presenter = new DatasetsBrowserAwareImportPresenter(null, (ExImService) eximServices.proxy(), (DataService) dataServices
                 .proxy(), (DatasetsBrowserView) datasetsBrowser.proxy());
         // should register with the view, set default folder, and display the
         // view

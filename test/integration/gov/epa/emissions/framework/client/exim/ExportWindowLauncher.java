@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DefaultEmfSession;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.User;
 
 import java.awt.Dimension;
@@ -21,7 +21,7 @@ import org.jmock.core.stub.ReturnStub;
 public class ExportWindowLauncher {
 
     public static void main(String[] args) throws EmfException {
-        Mock exim = new Mock(ExImServices.class);
+        Mock exim = new Mock(ExImService.class);
         exim.stubs().method("getExportBaseFolder").will(new ReturnStub("folder/blah"));
 
         exim.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("startExport")).withAnyArguments();

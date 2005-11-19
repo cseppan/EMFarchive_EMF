@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.util.HashMap;
@@ -13,7 +13,7 @@ public class UsersManagerPresenter {
 
     private UsersManagerView view;
 
-    private UserServices userServices;
+    private UserService userServices;
 
     private User user;
 
@@ -21,7 +21,7 @@ public class UsersManagerPresenter {
 
     private Map updateViewsMap;
 
-    public UsersManagerPresenter(User user, UserServices userServices, ViewLayout layoutManager) {
+    public UsersManagerPresenter(User user, UserService userServices, ViewLayout layoutManager) {
         this.user = user;
         this.userServices = userServices;
         this.layoutManager = layoutManager;

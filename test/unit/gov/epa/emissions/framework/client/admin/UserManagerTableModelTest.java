@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +34,10 @@ public class UserManagerTableModelTest extends MockObjectTestCase {
         setUserAttributes(admin, "admin", "EMF Admin", "admin@emf.org", true);
         users.add(admin);
         
-        emfUserAdmin = mock(UserServices.class);
+        emfUserAdmin = mock(UserService.class);
         emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users.toArray(new User[0])));
 
-        model = new UserManagerTableModel((UserServices) emfUserAdmin.proxy());
+        model = new UserManagerTableModel((UserService) emfUserAdmin.proxy());
     }
 
     private void setUserAttributes(User joe, String username, String name, String email, boolean isAdmin)
@@ -68,7 +68,7 @@ public class UserManagerTableModelTest extends MockObjectTestCase {
         users.add(user2);
 
         emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users.toArray(new User[0])));
-        model = new UserManagerTableModel((UserServices) emfUserAdmin.proxy());
+        model = new UserManagerTableModel((UserService) emfUserAdmin.proxy());
 
         assertEquals(2, model.getRowCount());
     }
@@ -118,10 +118,10 @@ public class UserManagerTableModelTest extends MockObjectTestCase {
         User jill = new User();
         users.add(jill);
 
-        emfUserAdmin = mock(UserServices.class);
+        emfUserAdmin = mock(UserService.class);
         emfUserAdmin.stubs().method("getUsers").withNoArguments().will(returnValue(users.toArray(new User[0])));
 
-        model = new UserManagerTableModel((UserServices) emfUserAdmin.proxy());
+        model = new UserManagerTableModel((UserService) emfUserAdmin.proxy());
 
         assertEquals(3, model.getRowCount());
         assertSame(joe, model.getUser(0));

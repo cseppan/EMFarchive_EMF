@@ -1,12 +1,12 @@
 package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataServices;
-import gov.epa.emissions.framework.services.DatasetTypesServices;
-import gov.epa.emissions.framework.services.ExImServices;
-import gov.epa.emissions.framework.services.LoggingServices;
+import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.DatasetTypeService;
+import gov.epa.emissions.framework.services.ExImService;
+import gov.epa.emissions.framework.services.LoggingService;
 import gov.epa.emissions.framework.services.User;
-import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.UserService;
 
 public interface EmfSession {
 
@@ -14,18 +14,18 @@ public interface EmfSession {
 
     User getUser();
 
-    ExImServices getExImServices();
+    ExImService getExImServices();
 
-    DataServices getDataServices();
+    DataService getDataServices();
 
     String getMostRecentExportFolder();
 
     void setMostRecentExportFolder(String mostRecentExportFolder);
 
-    UserServices getUserServices();
+    UserService getUserServices();
 
-    LoggingServices getLoggingServices();
+    LoggingService getLoggingServices();
 
-    DatasetTypesServices getDatasetTypesServices();
+    DatasetTypeService getDatasetTypesServices();
 
 }

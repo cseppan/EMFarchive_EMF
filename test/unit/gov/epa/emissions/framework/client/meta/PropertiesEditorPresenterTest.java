@@ -8,9 +8,9 @@ import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.InterDataServices;
+import gov.epa.emissions.framework.services.DataCommonsService;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -36,14 +36,14 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
         view = mock(PropertiesEditorView.class);
 
-        dataServices = mock(DataServices.class);
-        interdataServices = mock(InterDataServices.class);
+        dataServices = mock(DataService.class);
+        interdataServices = mock(DataCommonsService.class);
         interdataServices.stubs().method("getKeywords").withNoArguments().will(returnValue(new Keyword[0]));
 
         Mock locator = mock(ServiceLocator.class);
-        locator.stubs().method("getDataServices").withNoArguments().will(returnValue(dataServices.proxy()));
-        locator.stubs().method("getInterDataServices").withNoArguments().will(returnValue(interdataServices.proxy()));
-        locator.stubs().method("getDataEditorServices").withNoArguments().will(returnValue(null));
+        locator.stubs().method("getDataService").withNoArguments().will(returnValue(dataServices.proxy()));
+        locator.stubs().method("getDataCommonsService").withNoArguments().will(returnValue(interdataServices.proxy()));
+        locator.stubs().method("getDataEditorService").withNoArguments().will(returnValue(null));
 
         presenter = new PropertiesEditorPresenter(dataset, (ServiceLocator) locator.proxy());
 
@@ -142,7 +142,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         Mock keywordsTab = mock(KeywordsTabPresenterStub.class);
         keywordsTab.expects(once()).method("doSave");
 
-        presenter.updateDataset((DataServices) dataServices.proxy(), (SummaryTabPresenter) summaryTab.proxy(),
+        presenter.updateDataset((DataService) dataServices.proxy(), (SummaryTabPresenter) summaryTab.proxy(),
                 (KeywordsTabPresenter) keywordsTab.proxy());
     }
 

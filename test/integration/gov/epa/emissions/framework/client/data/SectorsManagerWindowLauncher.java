@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.io.SectorCriteria;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.ui.DefaultViewLayout;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
@@ -36,11 +36,11 @@ public class SectorsManagerWindowLauncher {
         sector2.addSectorCriteria(criteria);
         Sector[] sectors = { sector1, sector2 };
 
-        Mock dataServices = new Mock(DataServices.class);
+        Mock dataServices = new Mock(DataService.class);
         dataServices.stubs().method(new IsEqual("getSectors")).will(new ReturnStub(sectors));
 
         ViewLayout viewLayout = new DefaultViewLayout(view);
-        SectorsManagerPresenter presenter = new SectorsManagerPresenter(view, (DataServices) dataServices.proxy(),
+        SectorsManagerPresenter presenter = new SectorsManagerPresenter(view, (DataService) dataServices.proxy(),
                 viewLayout);
 
         launcher.addAsInternalFrame(view, frame, desktop);

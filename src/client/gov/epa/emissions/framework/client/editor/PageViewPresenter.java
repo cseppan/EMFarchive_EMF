@@ -1,12 +1,12 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataEditorServices;
+import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.Page;
 
 public class PageViewPresenter {
 
-    private DataEditorServices services;
+    private DataEditorService services;
 
     private PageView view;
 
@@ -16,7 +16,7 @@ public class PageViewPresenter {
 
     private Page page;
 
-    public PageViewPresenter(DataEditorServices services, PageView view, String table) {
+    public PageViewPresenter(DataEditorService services, PageView view, String table) {
         this.services = services;
         this.view = view;
         this.table = table;

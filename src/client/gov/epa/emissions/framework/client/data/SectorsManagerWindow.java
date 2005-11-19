@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
@@ -42,7 +42,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
 
     private JFrame parentConsole;
 
-    private DataServices dataServices;
+    private DataService dataServices;
 
     public SectorsManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
         super("Sector Manager", new Dimension(475, 300), desktop);
@@ -57,7 +57,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
         this.presenter = presenter;
     }
 
-    public void display(DataServices dataServices) throws EmfException {
+    public void display(DataService dataServices) throws EmfException {
         this.dataServices = dataServices;
         doLayout(dataServices.getSectors());
         super.display();

@@ -21,7 +21,7 @@ public class DatasetTypesManagerPresenter {
 
     public void doDisplay() throws EmfException {
         view.observe(this);
-        view.display(serviceLocator.getDatasetTypesServices());
+        view.display(serviceLocator.getDatasetTypesService());
     }
 
     public void doClose() {
@@ -34,7 +34,7 @@ public class DatasetTypesManagerPresenter {
 
         viewLayout.add(updateView, type.getName());
         UpdateDatasetTypePresenter p = new UpdateDatasetTypePresenter(updateView, type, serviceLocator
-                .getDatasetTypesServices(), serviceLocator.getInterDataServices());
+                .getDatasetTypesService(), serviceLocator.getDataCommonsService());
         p.doDisplay();
     }
 }

@@ -13,7 +13,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Status;
-import gov.epa.emissions.framework.services.StatusServices;
+import gov.epa.emissions.framework.services.StatusService;
 import gov.epa.emissions.framework.services.User;
 
 import java.util.Date;
@@ -27,9 +27,9 @@ public class ImportTask implements Runnable {
 
     private User user;
 
-    private StatusServices statusServices = null;
+    private StatusService statusServices = null;
 
-    private DataServicesImpl dataServices = null;
+    private DataServiceImpl dataServices = null;
 
     private Importer importer;
 

@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserWindow;
-import gov.epa.emissions.framework.services.DataServices;
+import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.Dimension;
@@ -35,7 +35,7 @@ public class DatasetsBrowserLauncher {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         EmfDataset[] datasets = launcher.createDatasets();
-        Mock services = new Mock(DataServices.class);
+        Mock services = new Mock(DataService.class);
         services.expects(new InvokeAtLeastOnceMatcher()).method(new IsEqual("getDatasets")).will(
                 new ReturnStub(datasets));
 
