@@ -8,10 +8,9 @@ import junit.framework.TestCase;
 
 public class EmfDatasetTableDataTest extends TestCase {
 
-
     public void testShouldAppropriateColumnClassDefinedForAllColumns() {
         EmfDatasetTableData data = new EmfDatasetTableData(new EmfDataset[0]);
-        
+
         assertEquals(String.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
         assertEquals(String.class, data.getColumnClass(2));

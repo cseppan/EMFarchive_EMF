@@ -15,7 +15,7 @@ public class EmfDatasetTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Type", "Status", "Creator", "Region", "Start Date", "End Date" };
+        return new String[] { "Name", "Type", "Status", "Creator", "Region", "Start Date", "Last Modified Date" };
     }
 
     public List rows() {
@@ -28,7 +28,7 @@ public class EmfDatasetTableData extends AbstractTableData {
         for (int i = 0; i < datasets.length; i++) {
             EmfDataset dataset = datasets[i];
             Object[] values = { dataset.getName(), dataset.getDatasetTypeName(), dataset.getStatus(),
-                    dataset.getCreator(), dataset.getRegion(), dataset.getStartDateTime(), dataset.getStopDateTime() };
+                    dataset.getCreator(), dataset.getRegion(), dataset.getStartDateTime(), dataset.getModifiedDateTime() };
 
             Row row = new ViewableRow(dataset, values);
             rows.add(row);
