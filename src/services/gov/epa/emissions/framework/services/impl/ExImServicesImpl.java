@@ -142,8 +142,7 @@ public class ExImServicesImpl implements ExImServices {
      *      java.lang.String, gov.epa.emissions.commons.io.EmfDataset,
      *      gov.epa.emissions.commons.io.DatasetType)
      */
-    public void startImport(User user, String folderPath, String fileName, EmfDataset dataset)
-            throws EmfException {
+    public void startImport(User user, String folderPath, String fileName, EmfDataset dataset) throws EmfException {
         log.debug("In ExImServicesImpl:startImport START for: " + dataset.getDatasetid() + " " + dataset.getName());
 
         try {
@@ -158,8 +157,8 @@ public class ExImServicesImpl implements ExImServices {
             log.debug("$$$ Path: " + path.getAbsolutePath());
             log.debug("$$$ Filename: " + fileName);
             log.debug("$$$ DatasetType: " + dataset.getDatasetType().getName());
-            log.debug("%%%%% Is importer null? " + (importer==null));
-            //Test the precondition (files exist)
+            log.debug("%%%%% Is importer null? " + (importer == null));
+            // Test the precondition (files exist)
             importer.preCondition(path, fileName);
             ImportTask eximTask = new ImportTask(user, fileName, dataset, svcHolder, importer);
 
@@ -172,20 +171,49 @@ public class ExImServicesImpl implements ExImServices {
         log.debug("In ExImServicesImpl:startImport END");
     }
 
-    public void startExport(User user, EmfDataset[] datasets, String dirName, boolean overwrite, String purpose)
+    public void startExportWithOverwrite(User user, EmfDataset[] datasets, String dirName, String purpose)
             throws EmfException {
-        log.info("Start export for user: " + user.getUsername());
-        int count = datasets.length;
-        log.info("Total number of files to export: " + count);
+        log.info("Start: exporting datasets" + user.getUsername());
+        log.info("Total number of files to export: " + datasets.length);
         File path = validatePath(dirName);
 
         try {
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < datasets.length; i++) {
 
                 EmfDataset dataset = datasets[i];
 
                 // FIXME: Default is overwrite
-                File file = validateExportFile(path, getCleanDatasetName(dataset.getName()), overwrite);
+                File file = validateExportFile(path, getCleanDatasetName(dataset.getName()), true);
+                ServicesHolder svcHolder = new ServicesHolder();
+                svcHolder.setLogSvc(new LoggingServicesImpl());
+                svcHolder.setStatusSvc(new StatusServicesImpl());
+                svcHolder.setDataSvc(new DataServicesImpl());
+                Exporter exporter = exporterFactory.create(dataset);
+                AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
+                        .getAccessedDateTime(), "Version 1.0", purpose, dirName);
+                ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);
+                threadPool.execute(eximTask);
+            }
+        } catch (Exception e) {
+            log.error("Exception attempting to start export of file to folder: " + dirName, e);
+            throw new EmfException(e.getMessage());
+        }
+
+        log.info("Start export for user: " + user.getUsername());
+    }
+
+    public void startExport(User user, EmfDataset[] datasets, String dirName, String purpose) throws EmfException {
+        log.info("Start: exporting datasets" + user.getUsername());
+        log.info("Total number of files to export: " + datasets.length);
+        File path = validatePath(dirName);
+
+        try {
+            for (int i = 0; i < datasets.length; i++) {
+
+                EmfDataset dataset = datasets[i];
+
+                // FIXME: Default is overwrite
+                File file = validateExportFile(path, getCleanDatasetName(dataset.getName()), false);
                 ServicesHolder svcHolder = new ServicesHolder();
                 svcHolder.setLogSvc(new LoggingServicesImpl());
                 svcHolder.setStatusSvc(new StatusServicesImpl());

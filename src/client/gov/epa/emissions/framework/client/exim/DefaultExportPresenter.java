@@ -29,8 +29,12 @@ public class DefaultExportPresenter implements ExportPresenter {
         view.display();
     }
 
-    public void doExport(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
+    public void doExportWithOverwrite(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
         doExport(datasets, folder, true, purpose);
+    }
+
+    public void doExport(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
+        doExport(datasets, folder, false, purpose);
     }
 
     private void doExport(EmfDataset[] datasets, String folder, boolean overwrite, String purpose) throws EmfException {
@@ -40,11 +44,9 @@ public class DefaultExportPresenter implements ExportPresenter {
         session.setMostRecentExportFolder(folder);
 
         ExImServices services = session.getExImServices();
-        services.startExport(session.getUser(), datasets, folder, overwrite, purpose);
+        if (overwrite)
+            services.startExportWithOverwrite(session.getUser(), datasets, folder, purpose);
+        else
+            services.startExport(session.getUser(), datasets, folder, purpose);
     }
-
-    public void doExportWithoutOverwrite(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
-        doExport(datasets, folder, false, purpose);
-    }
-
 }

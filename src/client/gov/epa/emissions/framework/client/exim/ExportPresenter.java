@@ -5,13 +5,12 @@ import gov.epa.emissions.framework.services.EmfDataset;
 
 public interface ExportPresenter {
 
-    public abstract void notifyDone();
+    void notifyDone();
 
-    public abstract void display(ExportView view);
+    void display(ExportView view);
 
-    public abstract void doExport(EmfDataset[] datasets, String folder, String purpose) throws EmfException;
+    void doExportWithOverwrite(EmfDataset[] datasets, String folder, String purpose) throws EmfException;
 
-    public abstract void doExportWithoutOverwrite(EmfDataset[] datasets, String folder, String purpose)
-            throws EmfException;
+    void doExport(EmfDataset[] datasets, String folder, String purpose) throws EmfException;
 
 }

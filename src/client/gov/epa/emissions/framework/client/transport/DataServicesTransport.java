@@ -7,29 +7,26 @@ import gov.epa.emissions.framework.services.DataServices;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.User;
 
-import java.net.URL;
-
 import javax.xml.rpc.ParameterMode;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.Constants;
 import org.apache.axis.client.Call;
-import org.apache.axis.client.Service;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class DataServicesTransport implements DataServices {
     private static Log log = LogFactory.getLog(DataServicesTransport.class);
 
-    private String endpoint;
+    private CallFactory callFactory;
 
-    public DataServicesTransport(String endPoint) {
-        endpoint = endPoint;
+    public DataServicesTransport(String endpoint) {
+        callFactory = new CallFactory(endpoint);
     }
 
     public EmfDataset[] getDatasets() throws EmfException {
         try {
-            Call call = call();
+            Call call = callFactory.createCall();
 
             DatasetMappings mappings = new DatasetMappings();
             mappings.register(call);
@@ -55,7 +52,7 @@ public class DataServicesTransport implements DataServices {
 
     public void updateDataset(EmfDataset dataset) throws EmfException {
         try {
-            Call call = call();
+            Call call = callFactory.createCall();
 
             DatasetMappings mappings = new DatasetMappings();
             mappings.register(call);
@@ -74,7 +71,7 @@ public class DataServicesTransport implements DataServices {
     public void addCountry(Country country) throws EmfException {
 
         try {
-            Call call = call();
+            Call call = callFactory.createCall();
 
             CountryMappings mappings = new CountryMappings();
             mappings.register(call);
@@ -92,7 +89,7 @@ public class DataServicesTransport implements DataServices {
 
     public void updateCountry(Country country) throws EmfException {
         try {
-            Call call = call();
+            Call call = callFactory.createCall();
 
             CountryMappings mappings = new CountryMappings();
             mappings.register(call);
@@ -110,7 +107,7 @@ public class DataServicesTransport implements DataServices {
 
     public Country[] getCountries() throws EmfException {
         try {
-            Call call = call();
+            Call call = callFactory.createCall();
 
             CountryMappings mappings = new CountryMappings();
             mappings.register(call);
@@ -129,7 +126,7 @@ public class DataServicesTransport implements DataServices {
 
     public Sector[] getSectors() throws EmfException {
         try {
-            Call call = call();
+            Call call = callFactory.createCall();
 
             SectorMappings mappings = new SectorMappings();
             mappings.register(call);
@@ -148,7 +145,7 @@ public class DataServicesTransport implements DataServices {
 
     public void updateSector(Sector sector) throws EmfException {
         try {
-            Call call = call();
+            Call call = callFactory.createCall();
 
             SectorMappings mappings = new SectorMappings();
             mappings.register(call);
@@ -166,7 +163,7 @@ public class DataServicesTransport implements DataServices {
 
     public void addSector(Sector sector) throws EmfException {
         try {
-            Call call = call();
+            Call call = callFactory.createCall();
 
             SectorMappings mappings = new SectorMappings();
             mappings.register(call);
@@ -184,14 +181,6 @@ public class DataServicesTransport implements DataServices {
 
     private String extractMessage(String faultReason) {
         return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
-    }
-
-    private Call call() throws Exception {
-        Service service = new Service();
-        Call call = (Call) service.createCall();
-        call.setTargetEndpointAddress(new URL(endpoint));
-
-        return call;
     }
 
     private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {

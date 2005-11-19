@@ -34,15 +34,15 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         user.setUsername("user");
         user.setFullName("full name");
         String purpose = "HELLO EMF ACCESSLOGS FOR MOCK EXPORT";
-        
+
         Mock dataset = mock(EmfDataset.class);
         dataset.expects(once()).method("setAccessedDateTime").with(new IsInstanceOf(Date.class));
-        
+
         EmfDataset[] datasets = new EmfDataset[] { (EmfDataset) dataset.proxy() };
 
         Mock model = mock(ExImServices.class);
-        model.expects(once()).method("startExport").with(
-                new Constraint[] { eq(user), eq(datasets), eq(folder), eq(true), eq(purpose) });
+        model.expects(once()).method("startExportWithOverwrite").with(
+                new Constraint[] { eq(user), eq(datasets), eq(folder), eq(purpose) });
 
         session.stubs().method("getUser").withNoArguments().will(returnValue(user));
         session.stubs().method("getExImServices").withNoArguments().will(returnValue(model.proxy()));
@@ -50,7 +50,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
 
         ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
 
-        presenter.doExport(datasets, folder, purpose);
+        presenter.doExportWithOverwrite(datasets, folder, purpose);
     }
 
     public void testSendsExportRequestToEximServiceOnExportWithoutOverwrite() throws EmfException {
@@ -65,7 +65,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
 
         Mock model = mock(ExImServices.class);
         model.expects(once()).method("startExport").with(
-                new Constraint[] { eq(user), eq(datasets), eq(folder), eq(false), eq(description) });
+                new Constraint[] { eq(user), eq(datasets), eq(folder), eq(description) });
 
         session.stubs().method("getUser").withNoArguments().will(returnValue(user));
         session.stubs().method("getExImServices").withNoArguments().will(returnValue(model.proxy()));
@@ -73,7 +73,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
 
         ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
 
-        presenter.doExportWithoutOverwrite(datasets, folder, description);
+        presenter.doExport(datasets, folder, description);
     }
 
     public void testClosesViewOnDoneExport() {

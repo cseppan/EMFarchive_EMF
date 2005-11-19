@@ -1,7 +1,13 @@
-package gov.epa.emissions.framework.services;
+package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
+import gov.epa.emissions.framework.services.DatasetTypesServices;
+import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.ExImServices;
+import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.framework.services.UserServices;
+import gov.epa.emissions.framework.services.WebServicesIntegrationTestCase;
 
 import java.io.File;
 import java.util.Random;
@@ -52,7 +58,7 @@ public class ExImServicesTest extends WebServicesIntegrationTestCase {
         // FIXME: verify that import is complete
     }
 
-    public void testExportOrlNonPoint() throws Exception {
+    public void testExportWithOverwrite() throws Exception {
         User user = userService.getUser("emf");
 
         dataset.setDescription("description");
@@ -71,8 +77,34 @@ public class ExImServicesTest extends WebServicesIntegrationTestCase {
         if (!outputFile.exists())
             outputFile.mkdir();
 
-        eximService.startExport(user, new EmfDataset[] { dataset }, outputFile.getAbsolutePath(), true,
-                "HELLO EMF ACCESSLOGS TESTCASE");
+        eximService.startExportWithOverwrite(user, new EmfDataset[] { dataset }, outputFile.getAbsolutePath(),
+                "Exporting NonPoint file");
+
+        // FIXME: verify the exported file exists
+        Thread.sleep(2000);// wait, until the export is complete
+    }
+
+    public void testExport() throws Exception {
+        User user = userService.getUser("emf");
+
+        dataset.setDescription("description");
+        dataset.setStatus("imported");
+
+        // import
+        File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
+        String filename = "NonPoint_WithComments.txt";
+        eximService.startImport(user, repository.getAbsolutePath(), filename, dataset);
+
+        // FIXME: verify that import is complete
+
+        // export
+        File outputFile = new File(System.getProperty("java.io.tmpdir"));
+        outputFile.deleteOnExit();
+        if (!outputFile.exists())
+            outputFile.mkdir();
+
+        eximService.startExport(user, new EmfDataset[] { dataset }, outputFile.getAbsolutePath(),
+                "Exporting NonPoint file");
 
         // FIXME: verify the exported file exists
         Thread.sleep(2000);// wait, until the export is complete

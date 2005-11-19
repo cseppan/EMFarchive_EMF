@@ -1,299 +1,125 @@
-/*
- * Created on Jun 27, 2005
- *
- * Eclipse Project Name: EMFCommons
- * Package: package gov.epa.emissions.framework.client.transport;
- * File Name: EMFUserAdminTransport.java
- * Author: Conrad F. D'Cruz
- */
 package gov.epa.emissions.framework.client.transport;
 
-import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.KeyVal;
-import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImServices;
 import gov.epa.emissions.framework.services.User;
 
-import java.net.MalformedURLException;
-import java.rmi.RemoteException;
-
-import javax.xml.namespace.QName;
-import javax.xml.rpc.ParameterMode;
-import javax.xml.rpc.ServiceException;
-
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
-import org.apache.axis.client.Service;
-import org.apache.axis.encoding.ser.BeanDeserializerFactory;
-import org.apache.axis.encoding.ser.BeanSerializerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * @author Conrad F. D'Cruz
- * 
- * This class implements the methods specified in the UserAdmin interface
- * 
- */
 public class ExImServicesTransport implements ExImServices {
-    private static Log log = LogFactory.getLog(ExImServicesTransport.class);
+    private static Log LOG = LogFactory.getLog(ExImServicesTransport.class);
 
-    private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
+    private CallFactory callFactory;
 
-    private static String endpoint = "";
+    private ExImServiceMappings mappings;
 
-    /**
-     * 
-     */
-    public ExImServicesTransport() {
-        super();
+    public ExImServicesTransport(String endpoint) {
+        callFactory = new CallFactory(endpoint);
+        mappings = new ExImServiceMappings();
     }
 
-    public ExImServicesTransport(String endpt) {
-        super();
-        endpoint = endpt;
-    }
-
-    /**
-     * 
-     * This utility method extracts the significat message from the Axis Fault
-     * 
-     * @param faultReason
-     * @return
-     */
-    private String extractMessage(String faultReason) {
-        log.debug("Extracting significant message from Axis fault");
-        String message = faultReason.substring(faultReason.indexOf("Exception: ") + 11);
-        // if (message.equals("Connection refused: connect")){
-        // message = "Cannot communicate with EMF Server";
-        // }
-
-        log.debug("Extracting significant message from Axis fault");
-        return message;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.commons.ExImServices#startImport(gov.epa.emissions.framework.commons.User,
-     *      java.lang.String, gov.epa.emissions.framework.commons.DatasetType)
-     */
     public void startImport(User user, String folderPath, String fileName, EmfDataset dataset) throws EmfException {
-        log.debug("Begin import file for user:filename:datasettype:: " + user.getUsername() + " :: " + fileName
-                + " :: " + dataset.getDatasetTypeName());
-        Service service = new Service();
-        Call call;
-
         try {
-            call = (Call) service.createCall();
-            call.setTargetEndpointAddress(new java.net.URL(endpoint));
+            Call call = callFactory.createCall();
+            mappings.register(call);
 
-            QName userQName = new QName(emfSvcsNamespace, "ns1:User");
-            QName datasetTypeQName = new QName(emfSvcsNamespace, "ns1:DatasetType");
-            QName datasetQName = new QName(emfSvcsNamespace, "ns1:EmfDataset");
-            QName operationQName = new QName(emfSvcsNamespace, "startImport");
-            QName tableQName = new QName(emfSvcsNamespace, "ns1:Table");
-            QName internalSourceQName = new QName(emfSvcsNamespace, "ns1:InternalSource");
-            QName externalSourceQName = new QName(emfSvcsNamespace, "ns1:ExternalSource");
-            QName internalSourcesQName = new QName(emfSvcsNamespace, "ns1:InternalSources");
-            QName externalSourcesQName = new QName(emfSvcsNamespace, "ns1:ExternalSources");
-            QName keywordQName = new QName(emfSvcsNamespace, "ns1:Keyword");
-            QName keywordsQName = new QName(emfSvcsNamespace, "ns1:Keywords");
-            QName keyValQName = new QName(emfSvcsNamespace, "ns1:KeyVal");
-            QName keyValsQName = new QName(emfSvcsNamespace, "ns1:KeyVals");
-            
-            call.setOperationName(operationQName);
+            mappings.setOperation(call, "startImport");
 
-            registerMapping(call, userQName, User.class);
-            registerMapping(call, datasetTypeQName, DatasetType.class);
-            registerMapping(call, datasetQName, EmfDataset.class);
-            registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
-            registerBeanMapping(call, internalSourceQName, gov.epa.emissions.commons.io.InternalSource.class);
-            registerBeanMapping(call, externalSourceQName, gov.epa.emissions.commons.io.ExternalSource.class);
+            mappings.addParam(call, "user", mappings.user());
+            mappings.addParam(call, "folderpath", mappings.string());
+            mappings.addParam(call, "filename", mappings.string());
+            mappings.addParam(call, "dataset", mappings.datasetType());
 
-            registerBeanMapping(call, keywordQName, Keyword.class);
-            registerArrayMapping(call, Keyword[].class,keywordsQName);
-            registerBeanMapping(call, keyValQName, KeyVal.class);
-            registerArrayMapping(call, KeyVal[].class,keyValsQName);
-
-            registerArrayMapping(call, gov.epa.emissions.commons.io.ExternalSource[].class,externalSourcesQName);
-            registerArrayMapping(call, gov.epa.emissions.commons.io.InternalSource[].class,internalSourcesQName);
-
-            call.addParameter("user", userQName, ParameterMode.IN);
-            call.addParameter("folderpath", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
-            call.addParameter("filename", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
-            call.addParameter("dataset", datasetQName, ParameterMode.IN);
-
-            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
+            mappings.setAnyReturnType(call);
 
             call.invoke(new Object[] { user, folderPath, fileName, dataset });
-
-        } catch (ServiceException e) {
-            log.error("Error invoking the service", e);
-        } catch (MalformedURLException e) {
-            log.error("Error in format of URL string", e);
         } catch (AxisFault fault) {
-            log.error("Axis Fault details", fault);
+            LOG.error("Axis Fault details", fault);
             throw new EmfException(extractMessage(fault.getMessage()));
-        } catch (RemoteException e) {
-            log.error("Error communicating with WS end point", e);
+        } catch (Exception e) {
+            LOG.error("Error communicating with WS end point", e);
         }
-
-        log.debug("Begin import file for user:filename:datasettype:: " + user.getUsername() + " :: " + fileName
-                + " :: " + dataset.getDatasetTypeName());
-
-    }
-
-    public void startExport(User user, EmfDataset[] datasets, String folderName, boolean overwrite, String purpose)
-            throws EmfException {
-        log.debug("Begin export of files for user: Total files: " + datasets.length);
-        Service service = new Service();
-        Call call;
-
-        try {
-            call = (Call) service.createCall();
-            call.setTargetEndpointAddress(new java.net.URL(endpoint));
-
-            QName userQName = new QName(emfSvcsNamespace, "ns1:User");
-            QName datasetQName = new QName(emfSvcsNamespace, "ns1:EmfDataset");
-            QName datasetsQName = new QName(emfSvcsNamespace, "ns1:EmfDatasets");
-            QName operationQName = new QName(emfSvcsNamespace, "startExport");
-            QName tableQName = new QName(emfSvcsNamespace, "ns1:Table");
-            QName datasetTypeQName = new QName(emfSvcsNamespace, "ns1:DatasetType");
-            QName internalSourceQName = new QName(emfSvcsNamespace, "ns1:InternalSource");
-            QName externalSourceQName = new QName(emfSvcsNamespace, "ns1:ExternalSource");
-            QName internalSourcesQName = new QName(emfSvcsNamespace, "ns1:InternalSources");
-            QName externalSourcesQName = new QName(emfSvcsNamespace, "ns1:ExternalSources");
-            QName keywordQName = new QName(emfSvcsNamespace, "ns1:Keyword");
-            QName keywordsQName = new QName(emfSvcsNamespace, "ns1:Keywords");
-            QName keyValQName = new QName(emfSvcsNamespace, "ns1:KeyVal");
-            QName keyValsQName = new QName(emfSvcsNamespace, "ns1:KeyVals");
-
-            call.setOperationName(operationQName);
-            registerMapping(call, userQName, gov.epa.emissions.framework.services.User.class);
-            registerMapping(call, datasetQName, EmfDataset.class);
-
-            call.registerTypeMapping(EmfDataset[].class, datasetsQName,
-                    new org.apache.axis.encoding.ser.ArraySerializerFactory(EmfDataset[].class, datasetsQName),
-                    new org.apache.axis.encoding.ser.ArrayDeserializerFactory(datasetsQName));
-
-            registerMapping(call, datasetTypeQName, DatasetType.class);
-            registerMapping(call, tableQName, gov.epa.emissions.commons.io.Table.class);
-            registerBeanMapping(call, internalSourceQName, gov.epa.emissions.commons.io.InternalSource.class);
-            registerBeanMapping(call, externalSourceQName, gov.epa.emissions.commons.io.ExternalSource.class);
-            registerArrayMapping(call, gov.epa.emissions.commons.io.ExternalSource[].class,externalSourcesQName);
-            registerArrayMapping(call, gov.epa.emissions.commons.io.InternalSource[].class,internalSourcesQName);
-            registerBeanMapping(call, keywordQName, Keyword.class);
-            registerArrayMapping(call, Keyword[].class,keywordsQName);
-            registerBeanMapping(call, keyValQName, KeyVal.class);
-            registerArrayMapping(call, KeyVal[].class,keyValsQName);
-
-            call.addParameter("user", userQName, ParameterMode.IN);
-            call.addParameter("datasets", datasetsQName, ParameterMode.IN);
-            call.addParameter("foldername", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
-            call.addParameter("overwrite", org.apache.axis.Constants.XSD_BOOLEAN, ParameterMode.IN);
-            call.addParameter("purpose", org.apache.axis.Constants.XSD_BOOLEAN, ParameterMode.IN);
-
-            call.setReturnType(org.apache.axis.Constants.XSD_ANY);
-
-            call.invoke(new Object[] { user, datasets, folderName, new Boolean(overwrite), purpose });
-
-        } catch (ServiceException e) {
-            log.error("Error invoking the service", e);
-        } catch (MalformedURLException e) {
-            log.error("Error in format of URL string", e);
-        } catch (AxisFault fault) {
-            log.error("Axis Fault details", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
-        } catch (RemoteException e) {
-            log.error("Error communicating with WS end point", e);
-        }
-
-        log.debug("Begin export of files for user");
-    }
-
-    private void registerBeanMapping(Call call, QName beanQName, Class cls) {
-        call.registerTypeMapping(cls, beanQName, new BeanSerializerFactory(cls, beanQName),
-                new BeanDeserializerFactory(cls, beanQName));		
-	}
-
-    private void registerMapping(Call call, QName emfQName, Class emfClass) {
-        call.registerTypeMapping(emfClass, emfQName, new org.apache.axis.encoding.ser.BeanSerializerFactory(emfClass,
-                emfQName), new org.apache.axis.encoding.ser.BeanDeserializerFactory(emfClass, emfQName));
-    }
-
-    private void registerArrayMapping(Call call, Class cls, QName qname){
-        call.registerTypeMapping(cls, qname,
-                new org.apache.axis.encoding.ser.ArraySerializerFactory(cls, qname),
-                new org.apache.axis.encoding.ser.ArrayDeserializerFactory(qname));
     }
 
     public String getImportBaseFolder() throws EmfException {
-        String importFolder = null;
-
-        Service service = new Service();
-        Call call;
-
         try {
-            call = (Call) service.createCall();
-            call.setTargetEndpointAddress(new java.net.URL(endpoint));
+            Call call = callFactory.createCall();
+            mappings.setOperation(call, "getImportBaseFolder");
+            mappings.setStringReturnType(call);
 
-            QName operationQName = new QName(emfSvcsNamespace, "getImportBaseFolder");
-
-            call.setOperationName(operationQName);
-
-            call.setReturnType(org.apache.axis.Constants.XSD_STRING);
-
-            importFolder = (String) call.invoke(new Object[] {});
-
-        } catch (ServiceException e) {
-            log.error("Error invoking the service", e);
-        } catch (MalformedURLException e) {
-            log.error("Error in format of URL string", e);
+            return (String) call.invoke(new Object[0]);
         } catch (AxisFault fault) {
-            log.error("Axis Fault details", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
-        } catch (RemoteException e) {
-            log.error("Error communicating with WS end point", e);
+            throwExceptionOnAxisFault("Could not fetch Base Folder for Import", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not fetch Base Folder for Import", e);
         }
 
-        return importFolder;
+        return null;
     }
 
     public String getExportBaseFolder() throws EmfException {
-        String exportFolder = null;
-
-        Service service = new Service();
-        Call call;
-
         try {
-            call = (Call) service.createCall();
-            call.setTargetEndpointAddress(new java.net.URL(endpoint));
+            Call call = callFactory.createCall();
+            mappings.setOperation(call, "getExportBaseFolder");
+            mappings.setStringReturnType(call);
 
-            QName operationQName = new QName(emfSvcsNamespace, "getExportBaseFolder");
-
-            call.setOperationName(operationQName);
-
-            call.setReturnType(org.apache.axis.Constants.XSD_STRING);
-
-            exportFolder = (String) call.invoke(new Object[] {});
-
-        } catch (ServiceException e) {
-            log.error("Error invoking the service", e);
-        } catch (MalformedURLException e) {
-            log.error("Error in format of URL string", e);
+            return (String) call.invoke(new Object[0]);
         } catch (AxisFault fault) {
-            log.error("Axis Fault details", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
-        } catch (RemoteException e) {
-            log.error("Error communicating with WS end point", e);
+            throwExceptionOnAxisFault("Could not fetch Base Folder for Export", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not fetch Base Folder for Export", e);
         }
 
-        return exportFolder;
-
+        return null;
     }
 
-}// EMFDataTransport
+    public void startExport(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException {
+        doExport("startExport", user, datasets, folder, purpose);
+    }
+
+    public void startExportWithOverwrite(User user, EmfDataset[] datasets, String folder, String purpose)
+            throws EmfException {
+        doExport("startExportWithOverwrite", user, datasets, folder, purpose);
+    }
+
+    private void doExport(String operationName, User user, EmfDataset[] datasets, String folder, String purpose)
+            throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+            mappings.register(call);
+
+            mappings.setOperation(call, operationName);
+            mappings.addParam(call, "user", mappings.user());
+            mappings.addParam(call, "datasets", mappings.datasets());
+            mappings.addStringParam(call, "foldername");
+            mappings.addBooleanParameter(call, "purpose");
+            mappings.setAnyReturnType(call);
+
+            call.invoke(new Object[] { user, datasets, folder, purpose });
+
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not export datasets for user: " + user.getUsername(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not export datasets for user: " + user.getUsername(), e);
+        }
+    }
+
+    private String extractMessage(String faultReason) {
+        return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
+    }
+
+    private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {
+        LOG.error(message, e);
+        throw new EmfException(message, e.getMessage(), e);
+    }
+
+    private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
+        LOG.error(message, fault);
+        throw new EmfException(extractMessage(fault.getMessage()));
+    }
+
+}
