@@ -188,7 +188,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         sectorsCombo.setSelectedItem(dataset.getSector());
         sectorsCombo.setName("sectors");
         sectorsCombo.setEditable(true);
-        sectorsCombo.setPreferredSize(new Dimension(125, 20));
+        sectorsCombo.setPreferredSize(new Dimension(175, 20));
         sectorsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Sector", sectorsCombo, panel);
 
@@ -309,6 +309,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         dataset.setTemporalResolution((String) temporalResolutions.getSelectedItem());
         dataset.setRegion((String) regions.getSelectedItem());
         dataset.setCountry((String) countries.getSelectedItem());
+        dataset.setSector((String) sectors.getSelectedItem());
     }
 
     private Date toDate(String text) {
