@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Conrad F. D'Cruz
  */
 public class DatasetTypeServiceTransport implements DatasetTypeService {
-    private static Log log = LogFactory.getLog(DatasetTypeServiceTransport.class);
+    private static Log LOG = LogFactory.getLog(DatasetTypeServiceTransport.class);
 
     private String endpoint;
 
@@ -96,12 +96,12 @@ public class DatasetTypeServiceTransport implements DatasetTypeService {
     }
 
     private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {
-        log.error(message, e);
+        LOG.error(message, e);
         throw new EmfException(message, e.getMessage(), e);
     }
 
     private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
-        log.error(message, fault);
+        LOG.error(message, fault);
         throw new EmfException(extractMessage(fault.getMessage()));
     }
 

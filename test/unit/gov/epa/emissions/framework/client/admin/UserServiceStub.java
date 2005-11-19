@@ -49,8 +49,4 @@ public class UserServiceStub implements UserService {
         }
     }
 
-    public void updateUsers(User[] users) {
-        // TODO Auto-generated method stub
-    }
-
 }

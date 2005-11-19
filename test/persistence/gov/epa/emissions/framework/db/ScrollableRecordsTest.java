@@ -101,7 +101,7 @@ public class ScrollableRecordsTest extends PersistenceTestCase {
         DbRecord record = results.next();
         assertEquals(1, record.getId());
         
-        assertEquals(19, record.size());
+        assertEquals(14, record.size());
         assertNotNull("Should be able to fetch first record", record);
 
         assertEquals(dataset.getDatasetid() + "", record.token(0));

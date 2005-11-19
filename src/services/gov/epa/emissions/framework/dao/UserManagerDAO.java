@@ -146,17 +146,6 @@ public class UserManagerDAO {
         return emfUser;
     }// getUser
 
-    public void updateUsers(User[] users) throws InfrastructureException {
-        log.debug("Start DAO:updateUsers");
-
-        int count = users.length;
-        for (int i = 0; i < count; i++) {
-            this.updateUser(users[i]);
-        }
-        log.debug("End transport:updateUsers");
-
-    }// setUsers
-
     public List getUsers() throws InfrastructureException, UserException {
         log.debug("In getUsers");
 

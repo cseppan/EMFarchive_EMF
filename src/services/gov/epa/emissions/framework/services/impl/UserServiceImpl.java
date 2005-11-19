@@ -54,23 +54,8 @@ public class UserServiceImpl implements UserService {
 
         log.debug("Called authenticate for username= " + userName);
 
-    }// authenticate
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#resetPassword()
-     */
-    public boolean resetPassword() {
-        // TODO Auto-generated method stub
-        return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#getUser(java.lang.String)
-     */
     public User getUser(String userName) throws EmfException {
         log.debug("In get user " + userName);
         UserManagerDAO umDAO;
@@ -86,11 +71,6 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#createUser(gov.epa.emissions.framework.commons.User)
-     */
     public void createUser(User newUser) throws EmfException {
         log.debug("In create new user: " + newUser.getUsername());
         UserManagerDAO umDAO;
@@ -109,11 +89,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#updateUser(gov.epa.emissions.framework.commons.User)
-     */
     public void updateUser(User newUser) throws EmfException {
         log.debug("updating user info: " + newUser.getUsername());
         UserManagerDAO umDAO;
@@ -127,11 +102,6 @@ public class UserServiceImpl implements UserService {
         log.debug("updating user info: " + newUser.getUsername());
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#deleteUser(java.lang.String)
-     */
     public void deleteUser(String userName) throws EmfException {
         log.debug("Delete user " + userName);
         UserManagerDAO umDAO;
@@ -144,12 +114,6 @@ public class UserServiceImpl implements UserService {
         }
         log.debug("Delete user " + userName);
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.client.transport.EMFUserAdmin#getUsers()
-     */
 
     public User[] getUsers() throws EmfException {
         log.debug("get all users");
@@ -166,25 +130,6 @@ public class UserServiceImpl implements UserService {
         }
         log.debug("get all users");
         return users;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.commons.EMFUserAdmin#updateUsers(gov.epa.emissions.framework.commons.User[])
-     */
-    public void updateUsers(User[] users) throws EmfException {
-        log.debug("Start update Users");
-        UserManagerDAO umDAO;
-        try {
-            umDAO = new UserManagerDAO();
-            umDAO.updateUsers(users);
-        } catch (InfrastructureException ex) {
-            log.error(ex);
-            throw new EmfException(ex.getMessage());
-        }
-        log.debug("End Update Users");
-
     }
 
 }

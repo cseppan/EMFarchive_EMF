@@ -70,11 +70,6 @@ public class ExportTask implements Runnable {
         this.accesslog = accesslog;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Runnable#run()
-     */
     public void run() {
         log.info("starting export - file: " + file.getName() + " of type: " + dataset.getDatasetTypeName());
         try {

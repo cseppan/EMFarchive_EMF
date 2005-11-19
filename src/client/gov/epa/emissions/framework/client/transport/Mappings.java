@@ -54,6 +54,10 @@ public class Mappings {
         call.setReturnType(Constants.XSD_ANY);
     }
 
+    public void setVoidReturnType(Call call) {
+        call.setReturnType(Constants.XSD_ANY);// FIXME: what's it exactly?
+    }
+
     public void setStringReturnType(Call call) {
         call.setReturnType(Constants.XSD_STRING);
     }

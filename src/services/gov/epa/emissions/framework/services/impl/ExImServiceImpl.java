@@ -135,13 +135,6 @@ public class ExImServiceImpl implements ExImService {
         log.debug("check if dataset name exists in table: " + dataset.getName());
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see gov.epa.emissions.framework.services.ExImServices#startImport(gov.epa.emissions.framework.services.User,
-     *      java.lang.String, gov.epa.emissions.commons.io.EmfDataset,
-     *      gov.epa.emissions.commons.io.DatasetType)
-     */
     public void startImport(User user, String folderPath, String fileName, EmfDataset dataset) throws EmfException {
         log.debug("In ExImServicesImpl:startImport START for: " + dataset.getDatasetid() + " " + dataset.getName());
 

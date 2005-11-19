@@ -36,9 +36,6 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
 		super();
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.epa.emissions.framework.services.DatasetTypesServices#getDatasetTypes()
-	 */
 	public DatasetType[] getDatasetTypes() throws EmfException {
 		
         List datasettypes = null;
@@ -58,9 +55,6 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
         return (DatasetType[]) datasettypes.toArray(new DatasetType[datasettypes.size()]);
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.epa.emissions.framework.services.DatasetTypesServices#insertDatasetType(gov.epa.emissions.commons.io.DatasetType)
-	 */
 	public void insertDatasetType(DatasetType datasetType) throws EmfException {
         try {
             Session session = EMFHibernateUtil.getSession();
@@ -73,9 +67,6 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
         }
 	}
 
-	/* (non-Javadoc)
-	 * @see gov.epa.emissions.framework.services.DatasetTypesServices#updateDatasetType(gov.epa.emissions.commons.io.DatasetType)
-	 */
 	public void updateDatasetType(DatasetType datasetType) throws EmfException {
         try {
             Session session = EMFHibernateUtil.getSession();
