@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -18,8 +19,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
@@ -35,7 +34,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private JCheckBox overwrite;
 
-    private JTextArea purpose;
+    private TextArea purpose;
 
     public ExportWindow(EmfDataset[] datasets) {
         super(title(datasets), new Dimension(600, 300));
@@ -84,10 +83,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         TextArea datasetNames = new TextArea("datasets", getDatasetsLabel(datasets));
         datasetNames.setLineWrap(false);
         datasetNames.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(datasetNames, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-        layoutGenerator.addLabelWidgetPair("Datasets", scrollPane, panel);
+        layoutGenerator.addLabelWidgetPair("Datasets", new ScrollableTextArea(datasetNames), panel);
 
         // folder
         folder = new JTextField(40);
@@ -98,10 +94,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         purpose = new TextArea("purpose", "");
         purpose.setSize(2, 45);
         purpose.setLineWrap(false);
-        JScrollPane purposeScrollPane = new JScrollPane(purpose, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-        layoutGenerator.addLabelWidgetPair("Purpose", purposeScrollPane, panel);
+        layoutGenerator.addLabelWidgetPair("Purpose", new ScrollableTextArea(purpose), panel);
 
         // overwrite
         JPanel overwritePanel = new JPanel(new BorderLayout());

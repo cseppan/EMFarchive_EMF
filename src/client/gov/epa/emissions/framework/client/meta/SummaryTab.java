@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.Sector;
@@ -17,6 +18,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -39,7 +41,6 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 
@@ -52,7 +53,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private TextField name;
 
-    private JFormattedTextField startDateTime;
+    private FormattedTextField startDateTime;
 
     private FormattedTextField endDateTime;
 
@@ -77,20 +78,20 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         this.dataset = dataset;
         this.messagePanel = messagePanel;
 
-        super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        super.setLayout(new BorderLayout());
         SummaryTabComboBoxChangesListener comboxBoxListener = new SummaryTabComboBoxChangesListener();
-        super.add(createOverviewSection(comboxBoxListener));
-        super.add(createLowerSection(dataServices, comboxBoxListener));
+        super.add(createOverviewSection(comboxBoxListener), BorderLayout.PAGE_START);
+        super.add(createLowerSection(dataServices, comboxBoxListener), BorderLayout.CENTER);
 
         listenForKeyEvents(new SummaryTabKeyListener());
     }
 
     private JPanel createLowerSection(DataService dataServices, SummaryTabComboBoxChangesListener comboxBoxListener)
             throws EmfException {
-        JPanel lowerPanel = new JPanel(new BorderLayout());
+        JPanel lowerPanel = new JPanel(new FlowLayout());
 
-        lowerPanel.add(createTimeSpaceSection(dataServices, comboxBoxListener), BorderLayout.LINE_START);
-        lowerPanel.add(createStatusSection(), BorderLayout.CENTER);
+        lowerPanel.add(createTimeSpaceSection(dataServices, comboxBoxListener));
+        lowerPanel.add(createStatusSection());
 
         return lowerPanel;
     }
@@ -98,7 +99,6 @@ public class SummaryTab extends JPanel implements SummaryTabView {
     private JPanel createStatusSection() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        panel.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, Color.GRAY));
 
         panel.add(createStatusDatesPanel(), BorderLayout.PAGE_START);
         panel.add(createSubscriptionPanel(), BorderLayout.CENTER);
@@ -252,7 +252,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // name
-        name = new TextField("name", 15);
+        name = new TextField("name", 25);
         name.setText(dataset.getName());
         name.setMaximumSize(new Dimension(300, 15));
 
@@ -260,9 +260,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
         // description
         description = new TextArea("description", dataset.getDescription());
-        JScrollPane scrollPane = new JScrollPane(description, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        layoutGenerator.addLabelWidgetPair("Description", scrollPane, panel);
+        layoutGenerator.addLabelWidgetPair("Description", new ScrollableTextArea(description), panel);
 
         // project - TODO: look up all projects
         String[] projectNames = new String[] { dataset.getProject() };
@@ -271,7 +269,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         projectsCombo.setSelectedItem(dataset.getProject());
         projectsCombo.setName("projects");
         projectsCombo.setEditable(true);
-        projectsCombo.setPreferredSize(new Dimension(125, 20));
+        projectsCombo.setPreferredSize(new Dimension(250, 20));
         projectsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Project", projectsCombo, panel);
 
@@ -330,7 +328,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
             super(format);
             super.setName(name);
             super.setValue(value);
-            super.setColumns(12);
+            super.setColumns(8);
 
             super.setInputVerifier(new FormattedTextFieldVerifier());
         }

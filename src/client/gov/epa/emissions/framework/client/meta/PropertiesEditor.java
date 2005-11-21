@@ -41,7 +41,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     public PropertiesEditor(EmfSession session, DatasetsBrowserView datasetsBrowser, EmfFrame parentConsole,
             JDesktopPane desktop) {
-        super("Properties Editor", new Dimension(700, 485));
+        super("Properties Editor", new Dimension(700, 550));
         this.session = session;
         this.datasetsBrowser = datasetsBrowser;
         this.parentConsole = parentConsole;
