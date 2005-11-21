@@ -16,7 +16,6 @@ import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.LoggingService;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusService;
 import gov.epa.emissions.framework.services.User;
@@ -42,7 +41,7 @@ public class ExportTask implements Runnable {
 
     private StatusService statusServices = null;
 
-    private LoggingService loggingServices = null;
+    private LoggingServiceImpl loggingServices = null;
 
     private EmfDataset dataset;
 
@@ -64,7 +63,7 @@ public class ExportTask implements Runnable {
         this.file = file;
         this.dataset = dataset;
         this.statusServices = svcHolder.getStatusSvc();
-        this.loggingServices = svcHolder.getLogSvc();
+        this.loggingServices = svcHolder.getLoggingService();
         this.dataServices = svcHolder.getDataServices();
         this.exporter = exporter;
         this.accesslog = accesslog;

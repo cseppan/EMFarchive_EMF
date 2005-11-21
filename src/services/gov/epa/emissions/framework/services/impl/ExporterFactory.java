@@ -1,13 +1,3 @@
-/*
- * Creation on Sep 1, 2005
- * Eclipse Project Name: EMF
- * File Name: ExporterFactory.java
- * Author: Conrad F. D'Cruz
- */
-/**
- * 
- */
-
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.Datasource;
@@ -40,6 +30,8 @@ public class ExporterFactory {
         Datasource datasource = dbServer.getEmissionsDatasource();
         SqlDataTypes sqlTypes = dbServer.getDataType();
 
+        // FIXME: matching w/ names is weak. Updating the name property of
+        // DatasetType would break this Factory
         if (name.equals("ORL Nonpoint Inventory"))
             return new ORLNonPointExporter(dataset, datasource, sqlTypes);
         if (name.equals("ORL Nonroad Inventory"))

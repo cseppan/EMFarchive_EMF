@@ -7,46 +7,44 @@
 
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.framework.services.LoggingService;
 import gov.epa.emissions.framework.services.StatusService;
 
 /**
- * This is a utility class to hold a reference to each service needed in the Import or Export task object
+ * This is a utility class to hold a reference to each service needed in the
+ * Import or Export task object
  * 
  * @author Conrad F. D'Cruz
- *
+ * 
  */
 public class ServicesHolder {
     private StatusService statusSvc = null;
-    private DataServiceImpl dataSvc = null;
-    private LoggingService logSvc = null;
-    
-	public ServicesHolder() {
-		super();
-	}
 
-	public DataServiceImpl getDataServices() {
-		return dataSvc;
-	}
+    private DataServiceImpl dataService = null;
 
-	public void setDataSvc(DataServiceImpl dataSvc) {
-		this.dataSvc = dataSvc;
-	}
+    private LoggingServiceImpl loggingService = null;
 
-	public LoggingService getLogSvc() {
-		return logSvc;
-	}
+    public DataServiceImpl getDataServices() {
+        return dataService;
+    }
 
-	public void setLogSvc(LoggingService logSvc) {
-		this.logSvc = logSvc;
-	}
+    public void setDataSvc(DataServiceImpl dataService) {
+        this.dataService = dataService;
+    }
 
-	public StatusService getStatusSvc() {
-		return statusSvc;
-	}
+    public LoggingServiceImpl getLoggingService() {
+        return loggingService;
+    }
 
-	public void setStatusSvc(StatusService statusSvc) {
-		this.statusSvc = statusSvc;
-	}
+    public void setLogSvc(LoggingServiceImpl loggingService) {
+        this.loggingService = loggingService;
+    }
+
+    public StatusService getStatusSvc() {
+        return statusSvc;
+    }
+
+    public void setStatusSvc(StatusService statusSvc) {
+        this.statusSvc = statusSvc;
+    }
 
 }

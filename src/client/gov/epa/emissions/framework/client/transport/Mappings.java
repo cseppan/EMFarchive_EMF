@@ -70,4 +70,8 @@ public class Mappings {
         call.setReturnType(name);
     }
 
+    public void addLongParam(Call call, String id) {
+        call.addParameter(id, Constants.XSD_LONG, ParameterMode.IN);
+    }
+
 }

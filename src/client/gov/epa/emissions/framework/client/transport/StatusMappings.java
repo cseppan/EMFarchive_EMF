@@ -13,7 +13,7 @@ public class StatusMappings extends Mappings {
         array(call, Status[].class, "AllStatus");
     }
 
-    public QName statuses() {
+    public QName logsw() {
         return qname("AllStatus");
     }
 

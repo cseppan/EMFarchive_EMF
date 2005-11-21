@@ -29,7 +29,7 @@ public class StatusServiceTransport implements StatusService {
             mappings.register(call);
             mappings.setOperation(call, "getAll");
             mappings.addStringParam(call, "username");
-            mappings.setReturnType(call, mappings.statuses());
+            mappings.setReturnType(call, mappings.logsw());
 
             return (Status[]) call.invoke(new Object[] { username });
         } catch (AxisFault fault) {
