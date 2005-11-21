@@ -1,4 +1,5 @@
 -- DATA_TABLE
+DROP TABLE emissions.version_table;
 DROP TABLE emissions.data_table;
 DROP SEQUENCE emissions.data_table_record_id_seq;
 
@@ -23,7 +24,6 @@ ALTER TABLE emissions.data_table OWNER TO emf;
 
 
 -- VERSION_TABLE
-DROP TABLE emissions.version_table;
 
 CREATE TABLE emissions.version_table
 (

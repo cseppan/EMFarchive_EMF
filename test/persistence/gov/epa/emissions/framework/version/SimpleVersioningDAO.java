@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,7 @@ public class SimpleVersioningDAO {
     private String INSERT_VT_QUERY = "INSERT INTO emissions.version_table (record_id,version_number,version_name) VALUES (?,?,?)";
     private String SELECT_VERSION_NUMBER = "select version_number from emissions.version_table order by version_number";
     private String SELECT_RECORDS_FOR_VERSION="select emissions.data_table.record_id,version_name, version_number,dataset_id,description from emissions.data_table, emissions.version_table where emissions.data_table.record_id=emissions.version_table.record_id and version_number=?";
-    Connection connection = null;
+    private Connection connection = null;
 
     private PreparedStatement insertDTStmt = null;
     private PreparedStatement insertVTStmt = null;
@@ -64,55 +63,53 @@ public class SimpleVersioningDAO {
     public SimpleVersioningDAO() throws Exception {
         super();
         setup();
-        int lastVersNum = getLastVersionNumber();
-        System.out.println("lastversionnumber" + lastVersNum);
-        allRecs = getRecordsByVersionNumber(lastVersNum);
-        DTVTRecord rec = new DTVTRecord(1,"new rec","",-99);
-        //insertNewRecord(rec, lastVersNum);
-        lastVersNum = getLastVersionNumber();
-        System.out.println("lastversionnumber" + lastVersNum);
-        allRecs = getRecordsByVersionNumber(lastVersNum);
-//        printRecs(allRecs);
-//        deleteRecordFromVersion(5,lastVersNum);
-        updateRecord(221);
-        
-        closeConnection();
-        
     }
     
-    private void updateRecord(int updateRecordId) throws Exception {
+    public void updateRecord(DTVTRecord[] recsToUpdate, int versToUpdate) throws Exception {
         int lastVersNum = getLastVersionNumber();
-        DTVTRecord[] versRecs = getRecordsByVersionNumber(lastVersNum);
-        DTVTRecord modRec = null;
+        DTVTRecord[] versRecs = getRecordsByVersionNumber(versToUpdate);
+
         int newVersNum=lastVersNum+1;
         String versionName = "V_" + newVersNum;
+
+        //for each updated record:
+        // insert into the data table with new record id
+        // update the collection versRec with the new records
         
-        for (int k=0; k<versRecs.length;k++){
-            if (versRecs[k].getRecordId()==updateRecordId){
-                versRecs[k].setDescription("modifiedrecord original recid= " + updateRecordId);
-                modRec = versRecs[k];                
+        for (int x=0; x<recsToUpdate.length;x++){ 
+            int originalRecId = recsToUpdate[x].getRecordId();
 
-                //insert the updated record into the data table
-                insertDTStmt.setInt(1, modRec.getDatasetId());
-                insertDTStmt.setString(2, modRec.getDescription());
-                insertDTStmt.executeUpdate();
+            //insert the updated record into the data table
+            insertDTStmt.setInt(1, recsToUpdate[x].getDatasetId());
+            insertDTStmt.setString(2, recsToUpdate[x].getDescription());
+            insertDTStmt.executeUpdate();
 
-                ResultSet rs = seqPSStmt.executeQuery();
-                int recordId=-99;
-                
-                while (rs.next()){
-                    recordId=rs.getInt(1);
-                }
-                rs.close();
-                versRecs[k].setRecordId(recordId);
-            }            
+            ResultSet rs = seqPSStmt.executeQuery();
+            int newRecordId=-99;
+            
+            while (rs.next()){
+                newRecordId=rs.getInt(1);
+            }
+            rs.close();
+
+            recsToUpdate[x].setRecordId(newRecordId);
+            
+            //replace the updated record in the original collections
+            for (int y=0;y<versRecs.length;y++){
+                if (versRecs[y].getRecordId()==originalRecId){
+                    versRecs[y]=recsToUpdate[x];
+                }    
+            }    
+        }
+        
+        for (int c=0; c< versRecs.length;c++){
             //insert all into the version table
-            insertVTStmt.setInt(1, versRecs[k].getRecordId());
+            insertVTStmt.setInt(1, versRecs[c].getRecordId());
             insertVTStmt.setInt(2, newVersNum);
             insertVTStmt.setString(3, versionName);
             insertVTStmt.executeUpdate();
 
-        }
+        }    
         
     }
 
@@ -121,7 +118,7 @@ public class SimpleVersioningDAO {
         System.out.println(allRecs.length);
     }
 
-    private int getLastVersionNumber() throws SQLException {
+    public int getLastVersionNumber() throws SQLException {
         int lastVersionNumber = -99;
         
         ResultSet rs = selectVersionStmt.executeQuery();
@@ -137,7 +134,7 @@ public class SimpleVersioningDAO {
         return lastVersionNumber;
     }
 
-    private void deleteRecordFromVersion(int recId, int versNum) throws Exception {
+    public void deleteRecordFromVersion(int recId, int versNum) throws Exception {
         DTVTRecord[] versRecs = getRecordsByVersionNumber(versNum);
         DTVTRecord[] temp = new DTVTRecord[versRecs.length-1];
         int k=0;
@@ -147,7 +144,7 @@ public class SimpleVersioningDAO {
             }
         }
         
-        int newVersNum=versNum+1;
+        int newVersNum=getLastVersionNumber()+1;
         String versionName = "V_" + newVersNum;
 
         //Insert the versions of all the other records from the previous version with the new version id
@@ -155,13 +152,12 @@ public class SimpleVersioningDAO {
             insertVTStmt.setInt(1, temp[i].getRecordId());
             insertVTStmt.setInt(2, newVersNum);
             insertVTStmt.setString(3, versionName);
-            insertVTStmt.executeUpdate();
-            
+            insertVTStmt.executeUpdate();          
         }
        
     }
 
-    private void closeConnection() throws Exception {
+    public void closeConnection() throws Exception {
         selectVersionStmt.close();
         insertDTStmt.close();
         insertVTStmt.close();
@@ -170,31 +166,37 @@ public class SimpleVersioningDAO {
         connection.close();
     }
 
-    private void insertNewRecord(DTVTRecord newRec, int lastVersionNumber) throws Exception {
-        
-        
+    public void insertNewRecords(DTVTRecord[] newRecs, int currentVersNum) throws Exception {
+        int lastVersionNumber = getLastVersionNumber();
         int newVersNum=lastVersionNumber+1;
         String versionName = "V_" + newVersNum;
 
-        insertDTStmt.setInt(1, newRec.getDatasetId());
-        insertDTStmt.setString(2, newRec.getDescription());
-        insertDTStmt.executeUpdate();
+        //first insert all the new records into the data table and version table
+        for (int x=0;x<newRecs.length;x++){
+            insertDTStmt.setInt(1, newRecs[x].getDatasetId());
+            insertDTStmt.setString(2, newRecs[x].getDescription());
+            insertDTStmt.executeUpdate();
 
-        ResultSet rs = seqPSStmt.executeQuery();
-        int recordId=-99;
+            ResultSet rs = seqPSStmt.executeQuery();
+            int recordId=-99;
+            
+            while (rs.next()){
+                recordId=rs.getInt(1);
+            }
+            rs.close();
+
+            insertVTStmt.setInt(1, recordId);
+            insertVTStmt.setInt(2, newVersNum);
+            insertVTStmt.setString(3, versionName);
+            insertVTStmt.executeUpdate();
+            
+        }//for
         
-        while (rs.next()){
-            recordId=rs.getInt(1);
-        }
 
-        insertVTStmt.setInt(1, recordId);
-        insertVTStmt.setInt(2, newVersNum);
-        insertVTStmt.setString(3, versionName);
-        insertVTStmt.executeUpdate();
-
+        DTVTRecord[] currentRecs = getRecordsByVersionNumber(currentVersNum);
         //Insert the versions of all the other records from the previous version with the new version id
-        for (int i=0; i< allRecs.length; i++){
-            insertVTStmt.setInt(1, allRecs[i].getRecordId());
+        for (int i=0; i< currentRecs.length; i++){
+            insertVTStmt.setInt(1, currentRecs[i].getRecordId());
             insertVTStmt.setInt(2, newVersNum);
             insertVTStmt.setString(3, versionName);
             insertVTStmt.executeUpdate();
@@ -202,8 +204,6 @@ public class SimpleVersioningDAO {
         }
         
         
-        // Close the result set, statement and the connection
-        rs.close();
 
     }
 
@@ -272,65 +272,5 @@ public class SimpleVersioningDAO {
 
         
     }
-
-    private void printData(ResultSet rs) throws Exception {
-        ResultSetMetaData rsmd = rs.getMetaData();
-        int numberOfColumns = rsmd.getColumnCount();
-
-        String delim="::";
-        
-        while (rs.next()){
-            String result = "";
-            result += rs.getInt("record_id") + delim;
-            result += rs.getInt("dataset_id") + delim;
-            result += rs.getInt("version_number") + delim;
-            result += rs.getString("version_name") + delim;
-            result += rs.getString("description") + delim;
-            System.out.println(result);
-        }
-    }
-    
-    /**
-     * @param rsmd
-     * @param numberOfColumns
-     * @throws SQLException
-     */
-    private void printMetaData(ResultSet rs) throws Exception {
-        ResultSetMetaData rsmd = rs.getMetaData();
-        int numberOfColumns = rsmd.getColumnCount();
-
-        System.out.println("*****************************************************");
-
-        for (int i=1; i<= numberOfColumns;i++){
-            System.out.println("Column#: " + i);
-            System.out.println("SchemaName: " + rsmd.getSchemaName(i));
-            System.out.println("TableName: " + rsmd.getTableName(i));
-            System.out.println("Catalog name: " + rsmd.getCatalogName(i));
-            System.out.println("ColumnClassName: " + rsmd.getColumnClassName(i));
-            System.out.println("ColumnClassName: " + rsmd.getColumnClassName(i));
-            System.out.println("ColumnLabel: " + rsmd.getColumnLabel(i));
-            System.out.println("ColumnName: " + rsmd.getColumnName(i));
-            System.out.println("ColumnType: " + rsmd.getColumnType(i));
-            System.out.println("ColumnTypeName: " + rsmd.getColumnTypeName(i));
-            System.out.println("Precision: " + rsmd.getPrecision(i));
-            System.out.println("Scale: " + rsmd.getScale(i));
-
-            System.out.println("autoincrement: " + rsmd.isAutoIncrement(i));
-            System.out.println("Nullable: " + rsmd.isNullable(i));
-            System.out.println("Writable: " + rsmd.isWritable(i));
-            System.out.println("CaseSensitive: " + rsmd.isCaseSensitive(i));                
-            System.out.println("Currency: " + rsmd.isCurrency(i));
-            System.out.println("DefinitelyWritable: " + rsmd.isDefinitelyWritable(i));
-            System.out.println("ReadOnly: " + rsmd.isReadOnly(i));
-            System.out.println("Searchable: " + rsmd.isSearchable(i));
-            System.out.println("Signed: " + rsmd.isSigned(i));
-            System.out.println("*****************************************************");
-        }
-    }
-
-    
-    public static void main(String[] args) throws Exception{
-        new SimpleVersioningDAO();
-    }
-
+   
 }
