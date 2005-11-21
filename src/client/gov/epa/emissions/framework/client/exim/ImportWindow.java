@@ -114,6 +114,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
                 folder.setText(file.getParent());
                 filename.setText(file.getName());
+                name.setText(formatDatasetName(file.getName()));
             }
         });
 
@@ -123,6 +124,15 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         return button;
     }
 
+    private String formatDatasetName(String name) {
+        int dot = name.indexOf(".");
+        if (dot == -1)
+            return name;
+
+        String result = name.substring(0, dot);
+        return result.replace('-', '_');
+    }
+    
     private void registerForEditEvents(JTextField name, JTextField directory, JTextField filename) {
         name.getDocument().addDocumentListener(notifyBeginInput());
         directory.getDocument().addDocumentListener(notifyBeginInput());

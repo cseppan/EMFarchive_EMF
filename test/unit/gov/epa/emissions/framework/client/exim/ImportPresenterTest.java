@@ -41,9 +41,9 @@ public class ImportPresenterTest extends MockObjectTestCase {
     }
 
     public void testSendsImportRequestToEximServiceOnImport() throws EmfException {
-	    DatasetType type = new DatasetType("ORL NonRoad");
-		
-		User user = new User();
+        DatasetType type = new DatasetType("ORL NonRoad");
+
+        User user = new User();
         user.setUsername("user");
         user.setFullName("full name");
 
