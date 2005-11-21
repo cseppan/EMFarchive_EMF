@@ -39,25 +39,10 @@ public class LoggingServiceTransport implements LoggingService {
 
     private static String endpoint = "";
 
-    /**
-     * 
-     */
-    public LoggingServiceTransport() {
-        super();
-    }
-
     public LoggingServiceTransport(String endpt) {
-        super();
         endpoint = endpt;
     }
 
-    /**
-     * 
-     * This utility method extracts the significat message from the Axis Fault
-     * 
-     * @param faultReason
-     * @return
-     */
     private String extractMessage(String faultReason) {
         log.debug("Utility method extracting Axis fault reason");
         String message = faultReason.substring(faultReason.indexOf("Exception: ") + 11);

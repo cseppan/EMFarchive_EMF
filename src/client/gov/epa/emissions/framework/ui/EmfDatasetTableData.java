@@ -2,6 +2,8 @@ package gov.epa.emissions.framework.ui;
 
 import gov.epa.emissions.framework.services.EmfDataset;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,7 +12,10 @@ public class EmfDatasetTableData extends AbstractTableData {
 
     private List rows;
 
+    private DateFormat dateFormat;
+
     public EmfDatasetTableData(EmfDataset[] datasets) {
+        dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         this.rows = createRows(datasets);
     }
 
@@ -28,13 +33,18 @@ public class EmfDatasetTableData extends AbstractTableData {
         for (int i = 0; i < datasets.length; i++) {
             EmfDataset dataset = datasets[i];
             Object[] values = { dataset.getName(), dataset.getDatasetTypeName(), dataset.getStatus(),
-                    dataset.getCreator(), dataset.getRegion(), dataset.getStartDateTime(), dataset.getModifiedDateTime() };
+                    dataset.getCreator(), dataset.getRegion(), format(dataset.getStartDateTime()),
+                    format(dataset.getModifiedDateTime()) };
 
             Row row = new ViewableRow(dataset, values);
             rows.add(row);
         }
 
         return rows;
+    }
+
+    private String format(Date date) {
+        return dateFormat.format(date);
     }
 
     public boolean isEditable(int col) {

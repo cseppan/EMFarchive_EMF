@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.ui;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.services.EmfDataset;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -31,7 +32,8 @@ public class EmfTableModelTest extends MockObjectTestCase {
         dataset1.setCreator("creator1");
         dataset1.setRegion("region1");
         dataset1.setStartDateTime(new Date());
-        dataset1.setStopDateTime(new Date());
+        dataset1.setModifiedDateTime(new Date());
+
         datasetList.add(dataset1);
 
         dataset2 = new EmfDataset();
@@ -41,7 +43,7 @@ public class EmfTableModelTest extends MockObjectTestCase {
         dataset2.setCreator("creator1");
         dataset2.setRegion("region1");
         dataset2.setStartDateTime(new Date());
-        dataset2.setStopDateTime(new Date());
+        dataset2.setModifiedDateTime(new Date());
         datasetList.add(dataset2);
 
         tableData = new EmfDatasetTableData(new EmfDataset[] { dataset1, dataset2 });
@@ -71,8 +73,9 @@ public class EmfTableModelTest extends MockObjectTestCase {
         assertEquals(dataset1.getStatus(), model.getValueAt(0, 2));
         assertEquals(dataset1.getCreator(), model.getValueAt(0, 3));
         assertEquals(dataset1.getRegion(), model.getValueAt(0, 4));
-        assertEquals(dataset1.getStartDateTime(), model.getValueAt(0, 5));
-        assertEquals(dataset1.getModifiedDateTime(), model.getValueAt(0, 6));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        assertEquals(dateFormat.format(dataset1.getStartDateTime()), model.getValueAt(0, 5));
+        assertEquals(dateFormat.format(dataset1.getModifiedDateTime()), model.getValueAt(0, 6));
     }
 
     public void testShouldMarkEmailColumnAsEditable() {
