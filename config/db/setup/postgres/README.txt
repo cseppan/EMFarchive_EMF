@@ -13,4 +13,5 @@ the relevant script once finalized by Marc and Alison
 7. keywords.setup
 8. sources.setup
 9. versioning_sql_scheme01.setup
+10. data_versions.setup
 
