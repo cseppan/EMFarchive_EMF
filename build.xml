@@ -193,7 +193,7 @@
 	</target>
 
 	<!-- All tests -->
-	<target name="all-dev-tests" depends="unit-tests, integration-tests" />
+	<target name="all-dev-tests" depends="unit-tests, integration-tests, persistence-tests" />
 	<target name="all-tests" depends="unit-tests, integration-tests, uat-tests" />
 	<target name="run-uat" description="Deploys application to Tomcat, runs all UAT tests, and stops Tomcat">
 		<antcall target="run-integration-tests">
