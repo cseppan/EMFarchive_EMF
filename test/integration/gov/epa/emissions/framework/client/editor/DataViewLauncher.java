@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.editor;
 
+import gov.epa.emissions.commons.db.DbRecord;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.DbRecord;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Page;
 

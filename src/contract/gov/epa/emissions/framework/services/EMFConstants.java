@@ -15,7 +15,6 @@ package gov.epa.emissions.framework.services;
 // FIXME: why need this ? Constants are a very bad idea
 public final class EMFConstants {
 
-	public static final String emfServicesNamespace = "urn:gov.epa.services.EmfServices";
     public static final String IMPORT_MESSAGE_TYPE = "Import";
 
     public static final String EXPORT_MESSAGE_TYPE = "Export";

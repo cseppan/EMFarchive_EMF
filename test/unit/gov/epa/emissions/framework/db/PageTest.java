@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.db;
 
-import gov.epa.emissions.framework.services.DbRecord;
+import gov.epa.emissions.commons.db.DbRecord;
 import gov.epa.emissions.framework.services.Page;
 import junit.framework.TestCase;
 

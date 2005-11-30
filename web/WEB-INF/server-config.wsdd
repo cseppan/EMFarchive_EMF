@@ -99,11 +99,11 @@
 	  <parameter name="scope" value="session"/>
 	  <parameter name="className" value="gov.epa.emissions.framework.services.impl.DataEditorServiceImpl"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.Page" qname="ns1:Page" xmlns:ns1="urn:gov.epa.services.EmfService"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.DbRecord" qname="ns1:Record" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.db.DbRecord" qname="ns1:Record" xmlns:ns1="urn:gov.epa.services.EmfService"/>
  </service>
 
  <arrayMapping qname="ns1:Records" xmlns:ns1="urn:gov.epa.services.EmfService"
-             languageSpecificType="java:gov.epa.emissions.framework.services.DbRecord[]"
+             languageSpecificType="java:gov.epa.emissions.commons.db.DbRecord[]"
 			 innerType="ns1:Record" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
 

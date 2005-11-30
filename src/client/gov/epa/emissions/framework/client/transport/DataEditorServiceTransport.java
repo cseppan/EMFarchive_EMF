@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.Page;
 
 import java.net.URL;
@@ -19,7 +18,6 @@ public class DataEditorServiceTransport implements DataEditorService {
     private static Log log = LogFactory.getLog(DataEditorServiceTransport.class);
 
     private Call call = null;
-    private String emfSvcsNamespace = EMFConstants.emfServicesNamespace;
 
     public DataEditorServiceTransport(String endPoint, Call call) {
          try {
@@ -36,7 +34,6 @@ public class DataEditorServiceTransport implements DataEditorService {
        String name = null;
        
         try {
-
             call.setOperationName("getName");
             call.setReturnType(Constants.XSD_ANY);
 

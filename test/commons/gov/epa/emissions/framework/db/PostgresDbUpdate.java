@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.db;
 
+import gov.epa.emissions.commons.db.PostgresDbConfig;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

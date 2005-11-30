@@ -6,7 +6,6 @@ import gov.epa.emissions.framework.dao.DatasetDAO;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.User;
 
 import java.util.List;
 
@@ -27,20 +26,6 @@ public class DataServiceImpl implements DataService {
         try {
             Session session = EMFHibernateUtil.getSession();
             datasets = DatasetDAO.getDatasets(session);
-            session.flush();
-            session.close();
-        } catch (HibernateException e) {
-            log.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
-        }
-        return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
-    }
-
-    public EmfDataset[] getDatasets(User user) throws EmfException {
-        List datasets = null;
-        try {
-            Session session = EMFHibernateUtil.getSession();
-            datasets = DatasetDAO.getDatasets(user, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {

@@ -1,16 +1,9 @@
-/*
- * Creation on Oct 30, 2005
- * Eclipse Project Name: EMF
- * File Name: KeywordServicesImpl.java
- * Author: Conrad F. D'Cruz
- */
-
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.dao.InterDataDAO;
+import gov.epa.emissions.framework.dao.DataCommonsDAO;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataCommonsService;
 
@@ -28,7 +21,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         List keywords = null;
         try {
             Session session = EMFHibernateUtil.getSession();
-            keywords = InterDataDAO.getEmfKeywords(session);
+            keywords = DataCommonsDAO.getEmfKeywords(session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -38,46 +31,10 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         return (Keyword[]) keywords.toArray(new Keyword[keywords.size()]);
     }
 
-    public void deleteKeyword(Keyword keyword) throws EmfException {
-        try {
-            Session session = EMFHibernateUtil.getSession();
-            InterDataDAO.deleteEmfKeyword(keyword, session);
-            session.flush();
-            session.close();
-        } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
-        }
-    }
-
-    public void insertKeyword(Keyword keyword) throws EmfException {
-        try {
-            Session session = EMFHibernateUtil.getSession();
-            InterDataDAO.insertEmfKeyword(keyword, session);
-            session.flush();
-            session.close();
-        } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
-        }
-    }
-
-    public void updateKeyword(Keyword keyword) throws EmfException {
-        try {
-            Session session = EMFHibernateUtil.getSession();
-            InterDataDAO.updateEmfKeyword(keyword, session);
-            session.flush();
-            session.close();
-        } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
-        }
-    }
-
     public void addCountry(Country country) throws EmfException {
         try {
             Session session = EMFHibernateUtil.getSession();
-            InterDataDAO.insertCountry(country, session);
+            DataCommonsDAO.insertCountry(country, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -89,7 +46,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void updateCountry(Country country) throws EmfException {
         try {
             Session session = EMFHibernateUtil.getSession();
-            InterDataDAO.updateCountry(country, session);
+            DataCommonsDAO.updateCountry(country, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -104,7 +61,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         List countries = null;
         try {
             Session session = EMFHibernateUtil.getSession();
-            countries = InterDataDAO.getCountries(session);
+            countries = DataCommonsDAO.getCountries(session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -117,7 +74,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addSector(Sector sector) throws EmfException {
         try {
             Session session = EMFHibernateUtil.getSession();
-            InterDataDAO.insertSector(sector, session);
+            DataCommonsDAO.insertSector(sector, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -129,7 +86,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void updateSector(Sector sector) throws EmfException {
         try {
             Session session = EMFHibernateUtil.getSession();
-            InterDataDAO.updateSector(sector, session);
+            DataCommonsDAO.updateSector(sector, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -143,7 +100,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         List sectors;
         try {
             Session session = EMFHibernateUtil.getSession();
-            sectors = InterDataDAO.getSectors(session);
+            sectors = DataCommonsDAO.getSectors(session);
             session.flush();
             session.close();
         } catch (HibernateException e) {

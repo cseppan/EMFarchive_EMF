@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.commons.db.DbRecord;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

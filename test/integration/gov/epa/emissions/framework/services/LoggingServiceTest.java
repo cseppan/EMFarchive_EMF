@@ -22,7 +22,7 @@ public class LoggingServiceTest extends WebServicesIntegrationTestCase {
         userService = serviceLocator.getUserService();
         dataset = new EmfDataset();
         Random random = new Random();
-        dataset.setName("ORL_NonPoint_LoggingServiceTest" + random.nextInt());
+        dataset.setName("ORL_NonPoint_LoggingServiceTest" + Math.abs(random.nextInt()));
         dataset.setCreator("creator");
         dataset.setAccessedDateTime(new Date());
 
