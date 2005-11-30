@@ -16,7 +16,7 @@ import gov.epa.emissions.commons.db.ScrollableRecords;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
-import gov.epa.emissions.framework.db.PageReader;
+import gov.epa.emissions.framework.db.SimplePageReader;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.SimplePage;
@@ -66,7 +66,7 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     public SimplePage getPage(String tableName, int pageNumber) throws EmfException {
         try {
-            PageReader reader = getReader(tableName);
+            SimplePageReader reader = getReader(tableName);
             return reader.page(pageNumber);
         } catch (SQLException ex) {
             log.error("Initialize reader: " + ex.getMessage());
@@ -76,7 +76,7 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     public int getPageCount(String tableName) throws EmfException {
         try {
-            PageReader reader = getReader(tableName);
+            SimplePageReader reader = getReader(tableName);
             return reader.totalPages();
         } catch (SQLException e) {
             log.error("Failed to get page count: " + e.getMessage());
@@ -84,21 +84,21 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
-    private PageReader getReader(String tableName) throws SQLException {
+    private SimplePageReader getReader(String tableName) throws SQLException {
         if (!pageReadersMap.containsKey(tableName)) {
             String query = "SELECT * FROM " + emissionsSchema.getName() + "." + tableName;
             ScrollableRecords sr = new ScrollableRecords(emissionsSchema, query);
-            PageReader reader = new PageReader(20, sr);
+            SimplePageReader reader = new SimplePageReader(20, sr);
 
             pageReadersMap.put(tableName, reader);
         }
 
-        return (PageReader) pageReadersMap.get(tableName);
+        return (SimplePageReader) pageReadersMap.get(tableName);
     }
 
     public SimplePage getPageWithRecord(String tableName, int recordId) throws EmfException {
         try {
-            PageReader reader = getReader(tableName);
+            SimplePageReader reader = getReader(tableName);
             return reader.pageByRecord(recordId);
         } catch (SQLException ex) {
             log.error("Initialize reader: " + ex.getMessage());
@@ -108,7 +108,7 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     public int getTotalRecords(String tableName) throws EmfException {
         try {
-            PageReader reader = getReader(tableName);
+            SimplePageReader reader = getReader(tableName);
             return reader.totalRecords();
         } catch (SQLException e) {
             log.error("Failed to get total records count: " + e.getMessage());
@@ -121,7 +121,7 @@ public class DataEditorServiceImpl implements DataEditorService {
         Iterator iter = all.iterator();
         while (iter.hasNext()) {
             try {
-                ((PageReader) iter.next()).close();
+                ((SimplePageReader) iter.next()).close();
             } catch (SQLException e) {
                 log.error("Could not close 'query session' due to " + e.getMessage());
                 throw new EmfException(e.getMessage());
