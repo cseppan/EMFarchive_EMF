@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -33,7 +33,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayFirstPageOnFirstNextCall() throws Exception {
         Mock services = mock(DataEditorService.class);
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(1))).will(returnValue(page));
         services.stubs().method("getPageCount").with(eq("table")).will(returnValue(new Integer(20)));
 
@@ -48,7 +48,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplaySpecifiedPage() throws Exception {
         Mock services = mock(DataEditorService.class);
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(21))).will(returnValue(page));
 
         Mock view = mock(PageView.class);
@@ -62,7 +62,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayPageWithRecord() throws Exception {
         Mock services = mock(DataEditorService.class);
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         services.stubs().method("getPageWithRecord").with(eq("table"), eq(new Integer(21))).will(returnValue(page));
 
         Mock view = mock(PageView.class);
@@ -76,7 +76,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayFirstPage() throws Exception {
         Mock services = mock(DataEditorService.class);
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(1))).will(returnValue(page));
 
         Mock view = mock(PageView.class);
@@ -90,7 +90,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayFirstPageEvenAfterPrevRequestOnFirstPage() throws Exception {
         Mock services = mock(DataEditorService.class);
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(1))).will(returnValue(page));
 
         Mock view = mock(PageView.class);
@@ -105,7 +105,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayLastPageEvenAfterNextvRequestOnLastPage() throws Exception {
         Mock services = mock(DataEditorService.class);
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(20))).will(returnValue(page));
         services.stubs().method("getPageCount").with(eq("table")).will(returnValue(new Integer(20)));
 
@@ -121,7 +121,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayLastPage() throws Exception {
         Mock services = mock(DataEditorService.class);
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(20))).will(returnValue(page));
         services.stubs().method("getPageCount").with(eq("table")).will(returnValue(new Integer(20)));
 
@@ -136,7 +136,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplaySecondPageOnTwoConsecutiveNextCall() throws Exception {
         Mock services = mock(DataEditorService.class);
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         services.expects(once()).method("getPage").with(eq("table"), eq(new Integer(1))).will(returnValue(page));
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(2))).will(returnValue(page));
         services.stubs().method("getPageCount").with(eq("table")).will(returnValue(new Integer(20)));
@@ -155,10 +155,10 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         Mock services = mock(DataEditorService.class);
         services.stubs().method("getPageCount").with(eq("table")).will(returnValue(new Integer(20)));
 
-        Page page1 = new Page();
+        SimplePage page1 = new SimplePage();
         services.expects(atLeastOnce()).method("getPage").with(eq("table"), eq(new Integer(1)))
                 .will(returnValue(page1));
-        Page page2 = new Page();
+        SimplePage page2 = new SimplePage();
         services.expects(once()).method("getPage").with(eq("table"), eq(new Integer(2))).will(returnValue(page2));
 
         Mock view = mock(PageView.class);

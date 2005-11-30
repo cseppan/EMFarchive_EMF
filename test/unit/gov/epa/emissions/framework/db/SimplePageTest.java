@@ -1,13 +1,13 @@
 package gov.epa.emissions.framework.db;
 
 import gov.epa.emissions.commons.db.DbRecord;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 import junit.framework.TestCase;
 
-public class PageTest extends TestCase {
+public class SimplePageTest extends TestCase {
 
     public void testShouldAddRecord() {
-        Page page = new Page();
+        SimplePage page = new SimplePage();
 
         page.add(new DbRecord());
         page.add(new DbRecord());
@@ -16,7 +16,7 @@ public class PageTest extends TestCase {
     }
     
     public void testShouldReturnRangeRepresentingMinAndMaxRecordIds() {
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         
         assertEquals(-1, page.min());
         assertEquals(-1, page.max());
@@ -30,7 +30,7 @@ public class PageTest extends TestCase {
     }
 
     public void testShouldGetRecords() {
-        Page page = new Page();
+        SimplePage page = new SimplePage();
 
         DbRecord record1 = new DbRecord();
         page.add(record1);
@@ -45,7 +45,7 @@ public class PageTest extends TestCase {
     }
 
     public void testShouldSetRecords() {
-        Page page = new Page();
+        SimplePage page = new SimplePage();
 
         DbRecord record1 = new DbRecord();
         DbRecord record2 = new DbRecord();
@@ -59,7 +59,7 @@ public class PageTest extends TestCase {
     }
 
     public void testShouldRemoveRecord() {
-        Page page = new Page();
+        SimplePage page = new SimplePage();
 
         page.add(new DbRecord());
         page.add(new DbRecord());

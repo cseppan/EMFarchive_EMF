@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.DbRecord;
 import gov.epa.emissions.commons.io.InternalSource;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 public class PageDataTest extends TestCase {
 
     public void testShouldReturnStringAsColumnClassForAllColumns() {
-        PageData data = new PageData(null, new Page());
+        PageData data = new PageData(null, new SimplePage());
 
         assertEquals(String.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
@@ -22,7 +22,7 @@ public class PageDataTest extends TestCase {
         InternalSource source = new InternalSource();
         source.setCols(new String[] { "col1", "col2", "col3" });
 
-        PageData data = new PageData(source, new Page());
+        PageData data = new PageData(source, new SimplePage());
 
         String[] columns = data.columns();
         assertEquals(2, columns.length);
@@ -34,7 +34,7 @@ public class PageDataTest extends TestCase {
         InternalSource source = new InternalSource();
         source.setCols(new String[] { "col1", "col2", "col3" });
 
-        PageData data = new PageData(source, new Page());
+        PageData data = new PageData(source, new SimplePage());
 
         assertFalse("All columns should not be editable", data.isEditable(0));
         assertFalse("All columns should not be editable", data.isEditable(1));
@@ -45,7 +45,7 @@ public class PageDataTest extends TestCase {
         InternalSource source = new InternalSource();
         source.setCols(new String[] { "col1", "col2", "col3" });
 
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         DbRecord record1 = new DbRecord();
         record1.setTokens(new String[] { "1", "2", "3" });
         page.add(record1);
@@ -64,7 +64,7 @@ public class PageDataTest extends TestCase {
         InternalSource source = new InternalSource();
         source.setCols(new String[] { "col1", "col2", "col3" });
         
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         DbRecord record1 = new DbRecord();
         record1.setTokens(new String[] { "1", "2", "3" });
         page.add(record1);

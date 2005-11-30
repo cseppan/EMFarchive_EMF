@@ -19,7 +19,7 @@ import gov.epa.emissions.framework.InfrastructureException;
 import gov.epa.emissions.framework.db.PageReader;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EMFConstants;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -64,7 +64,7 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     }
 
-    public Page getPage(String tableName, int pageNumber) throws EmfException {
+    public SimplePage getPage(String tableName, int pageNumber) throws EmfException {
         try {
             PageReader reader = getReader(tableName);
             return reader.page(pageNumber);
@@ -96,7 +96,7 @@ public class DataEditorServiceImpl implements DataEditorService {
         return (PageReader) pageReadersMap.get(tableName);
     }
 
-    public Page getPageWithRecord(String tableName, int recordId) throws EmfException {
+    public SimplePage getPageWithRecord(String tableName, int recordId) throws EmfException {
         try {
             PageReader reader = getReader(tableName);
             return reader.pageByRecord(recordId);

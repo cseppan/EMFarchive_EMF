@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.db;
 
 import gov.epa.emissions.commons.db.DbRecord;
 import gov.epa.emissions.commons.db.ScrollableRecords;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 
 import java.sql.SQLException;
 
@@ -29,7 +29,7 @@ public class PageReader {
      * @param record
      *            starts at index '1' through n (total records)
      */
-    public Page pageByRecord(int record) throws SQLException {
+    public SimplePage pageByRecord(int record) throws SQLException {
         return page(identifyPage(record));
     }
 
@@ -43,7 +43,7 @@ public class PageReader {
      * @param pageNumber
      *            starts at index '1' through n (total pages)
      */
-    public Page page(int pageNumber) throws SQLException {
+    public SimplePage page(int pageNumber) throws SQLException {
         int actualPage = pageNumber - 1; // page '1' maps to page '0'
         if (actualPage > totalPages())
             return null;
@@ -52,7 +52,7 @@ public class PageReader {
         int end = start + pageSize - 1;// since, end is inclusive in the range
         DbRecord[] records = scrollableRecords.range(start, end);
 
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         page.setRecords(records);
 
         return page;

@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.db;
 import gov.epa.emissions.commons.db.DbRecord;
 import gov.epa.emissions.commons.db.ScrollableRecords;
 import gov.epa.emissions.commons.db.ScrollableRecordsStub;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -60,7 +60,7 @@ public class PageReaderTest extends MockObjectTestCase {
 
         PageReader reader = new PageReader(10, (ScrollableRecords) scrollableRecords.proxy());
 
-        Page page = reader.page(5);
+        SimplePage page = reader.page(5);
         assertNotNull("Should be able to fetch Page 5", page);
         assertEquals(records.length, page.getRecords().length);
 

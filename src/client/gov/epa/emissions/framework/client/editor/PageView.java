@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.editor;
 
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 
 public interface PageView {
     void observe(PageViewPresenter presenter);
 
-    void display(Page page);
+    void display(SimplePage page);
 
 }

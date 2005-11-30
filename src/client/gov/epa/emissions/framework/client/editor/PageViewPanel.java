@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.MessagePanel;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 
@@ -36,7 +36,7 @@ public class PageViewPanel extends JPanel implements PageView {
         paginationPanel.init(presenter);
     }
 
-    public void display(Page page) {
+    public void display(SimplePage page) {
         // TODO: refresh table w/ new data? or remove and add back the table?
         pageContainer.removeAll();
 

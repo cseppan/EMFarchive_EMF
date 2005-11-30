@@ -14,9 +14,9 @@ import gov.epa.emissions.framework.EmfException;
  * 
  */
 public interface DataEditorService {
-    Page getPage(String tableName, int pageNumber) throws EmfException;
+    SimplePage getPage(String tableName, int pageNumber) throws EmfException;
     int getPageCount(String tableName) throws EmfException;
-    Page getPageWithRecord(String tableName, int recordId) throws EmfException;
+    SimplePage getPageWithRecord(String tableName, int recordId) throws EmfException;
     int getTotalRecords(String tableName) throws EmfException;
     void close() throws EmfException;
 

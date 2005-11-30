@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 
 public class PageViewPresenter {
 
@@ -14,7 +14,7 @@ public class PageViewPresenter {
 
     private int pageNumber;
 
-    private Page page;
+    private SimplePage page;
 
     public PageViewPresenter(DataEditorService services, PageView view, String table) {
         this.services = services;

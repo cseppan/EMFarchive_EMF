@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.db.DbRecord;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 
 import javax.xml.namespace.QName;
 
@@ -16,8 +16,8 @@ public class DataEditorMappings {
     }
 
     public void register(Call call) {
-        mapper.registerBeanMapping(call, Page.class, page());
-        mapper.registerArrayMapping(call, Page[].class, pages());
+        mapper.registerBeanMapping(call, SimplePage.class, page());
+        mapper.registerArrayMapping(call, SimplePage[].class, pages());
         mapper.registerBeanMapping(call, DbRecord.class, record());
         mapper.registerArrayMapping(call, DbRecord[].class, records());
         

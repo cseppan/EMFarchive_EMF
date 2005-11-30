@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Page {
+public class SimplePage {
 
     private List records;
 
-    public Page() {
+    public SimplePage() {
         records = new ArrayList();
     }
 

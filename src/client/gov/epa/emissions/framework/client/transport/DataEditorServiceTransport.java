@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 
 import java.net.URL;
 
@@ -81,8 +81,8 @@ public class DataEditorServiceTransport implements DataEditorService {
         throw new EmfException(extractMessage(fault.getMessage()));
     }
 
-    public Page getPage(String tableName, int pageNumber) throws EmfException {
-        Page page = null;
+    public SimplePage getPage(String tableName, int pageNumber) throws EmfException {
+        SimplePage page = null;
         
         try {
             log.debug("Is call null? " + (call==null));
@@ -97,7 +97,7 @@ public class DataEditorServiceTransport implements DataEditorService {
             call.addParameter("tableName", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
             call.addParameter("pageNumber", org.apache.axis.Constants.XSD_INTEGER, javax.xml.rpc.ParameterMode.IN);
 
-            page = (Page) call.invoke(new Object[] {tableName,new Integer(pageNumber)  });
+            page = (SimplePage) call.invoke(new Object[] {tableName,new Integer(pageNumber)  });
 
             call.removeAllParameters();
         } catch (AxisFault fault) {
@@ -129,8 +129,8 @@ public class DataEditorServiceTransport implements DataEditorService {
         return count;
     }
 
-    public Page getPageWithRecord(String tableName, int recordId) throws EmfException {
-        Page page = null;
+    public SimplePage getPageWithRecord(String tableName, int recordId) throws EmfException {
+        SimplePage page = null;
         
         try {
             log.debug("Is call null? " + (call==null));
@@ -145,7 +145,7 @@ public class DataEditorServiceTransport implements DataEditorService {
             call.addParameter("tableName", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
             call.addParameter("recordId", org.apache.axis.Constants.XSD_INTEGER, javax.xml.rpc.ParameterMode.IN);
 
-            page = (Page) call.invoke(new Object[] {tableName,new Integer(recordId)  });
+            page = (SimplePage) call.invoke(new Object[] {tableName,new Integer(recordId)  });
 
             call.removeAllParameters();
         } catch (AxisFault fault) {

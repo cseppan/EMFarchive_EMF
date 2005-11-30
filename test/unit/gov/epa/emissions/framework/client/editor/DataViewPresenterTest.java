@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -44,7 +44,7 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
 
         Mock services = mock(DataEditorService.class);
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         services.stubs().method("getPage").with(eq("table"), eq(new Integer(1))).will(returnValue(page));
 
         Mock pageView = mock(PageView.class);
@@ -60,8 +60,8 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
 
         Mock services = mock(DataEditorService.class);
-        Page page1 = new Page();
-        Page page2 = new Page();
+        SimplePage page1 = new SimplePage();
+        SimplePage page2 = new SimplePage();
         services.expects(once()).method("getPage").with(eq("table1"), eq(new Integer(1))).will(returnValue(page1));
         services.expects(once()).method("getPage").with(eq("table2"), eq(new Integer(1))).will(returnValue(page2));
 

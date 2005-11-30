@@ -11,7 +11,7 @@ import gov.epa.emissions.commons.io.SimpleDataset;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 import gov.epa.emissions.framework.services.WebServicesIntegrationTestCase;
 
 import java.io.File;
@@ -80,7 +80,7 @@ public class DataEditorServiceTest extends WebServicesIntegrationTestCase {
     }
 
     public void testShouldReturnExactlyOnePage() throws EmfException {
-        Page page = services.getPage(datasetName, 1);
+        SimplePage page = services.getPage(datasetName, 1);
         assertTrue(page != null);
     }
 
@@ -104,7 +104,7 @@ public class DataEditorServiceTest extends WebServicesIntegrationTestCase {
     public void testShouldReturnOnlyOnePage() throws EmfException {
         int numberOfRecords = services.getTotalRecords(datasetName);
 
-        Page page = services.getPageWithRecord(datasetName, numberOfRecords - 1);
+        SimplePage page = services.getPageWithRecord(datasetName, numberOfRecords - 1);
         DbRecord[] allRecs = page.getRecords();
         boolean found = false;
 
@@ -125,7 +125,7 @@ public class DataEditorServiceTest extends WebServicesIntegrationTestCase {
     public void testShouldReturnNoPage() throws EmfException {
         int numberOfRecords = services.getTotalRecords(datasetName);
 
-        Page page = services.getPageWithRecord(datasetName, numberOfRecords + 1);
+        SimplePage page = services.getPageWithRecord(datasetName, numberOfRecords + 1);
         DbRecord[] allRecs = page.getRecords();
         boolean found = false;
 

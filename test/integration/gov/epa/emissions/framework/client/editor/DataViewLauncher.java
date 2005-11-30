@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -51,7 +51,7 @@ public class DataViewLauncher {
 
         DbRecord[] records = { record1, record2, record3 };
 
-        Page page = new Page();
+        SimplePage page = new SimplePage();
         page.setRecords(records);
 
         mock.stubs().method("getPage").withAnyArguments().will(new ReturnStub(page));

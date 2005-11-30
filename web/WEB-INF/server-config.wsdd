@@ -98,7 +98,7 @@
 	  <parameter name="allowedMethods" value="*"/>
 	  <parameter name="scope" value="session"/>
 	  <parameter name="className" value="gov.epa.emissions.framework.services.impl.DataEditorServiceImpl"/>
-  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.Page" qname="ns1:Page" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.SimplePage" qname="ns1:Page" xmlns:ns1="urn:gov.epa.services.EmfService"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.db.DbRecord" qname="ns1:Record" xmlns:ns1="urn:gov.epa.services.EmfService"/>
  </service>
 

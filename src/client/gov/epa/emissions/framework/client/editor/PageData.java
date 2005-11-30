@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.DbRecord;
 import gov.epa.emissions.commons.io.InternalSource;
-import gov.epa.emissions.framework.services.Page;
+import gov.epa.emissions.framework.services.SimplePage;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -19,7 +19,7 @@ public class PageData extends AbstractTableData {
 
     private List rows;
 
-    public PageData(InternalSource source, Page page) {
+    public PageData(InternalSource source, SimplePage page) {
         this.source = source;
         this.rows = createRows(page);
     }
@@ -47,7 +47,7 @@ public class PageData extends AbstractTableData {
         return false;
     }
 
-    private List createRows(Page page) {
+    private List createRows(SimplePage page) {
         List rows = new ArrayList();
         DbRecord[] records = page.getRecords();
 
