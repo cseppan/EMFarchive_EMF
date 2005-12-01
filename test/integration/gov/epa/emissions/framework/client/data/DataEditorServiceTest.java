@@ -44,7 +44,7 @@ public class DataEditorServiceTest extends WebServicesIntegrationTestCase {
         databaseSetup();
         services = serviceLocator.getDataEditorService();
         DbServer dbServer = dbSetup.getDbServer();
-        sqlDataTypes = dbServer.getDataType();
+        sqlDataTypes = dbServer.getSqlDataTypes();
         datasource = dbServer.getEmissionsDatasource();
 
         dataset = new SimpleDataset();

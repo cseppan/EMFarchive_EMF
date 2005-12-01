@@ -47,7 +47,7 @@ public class ImporterFactory {
     // FIXME: use a better scheme than rely on 'type names'
     private Importer orlImporter(DbServer dbServer, EmfDataset dataset) {
         Datasource emissions = dbServer.getEmissionsDatasource();
-        SqlDataTypes dataType = dbServer.getDataType();
+        SqlDataTypes dataType = dbServer.getSqlDataTypes();
         DatasetType datasetType = dataset.getDatasetType();
 
         if (datasetType.getName().equals("ORL Nonpoint Inventory"))

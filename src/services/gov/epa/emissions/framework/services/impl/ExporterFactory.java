@@ -28,7 +28,7 @@ public class ExporterFactory {
         DatasetType datasetType = dataset.getDatasetType();
         String name = datasetType.getName();
         Datasource datasource = dbServer.getEmissionsDatasource();
-        SqlDataTypes sqlTypes = dbServer.getDataType();
+        SqlDataTypes sqlTypes = dbServer.getSqlDataTypes();
 
         // FIXME: matching w/ names is weak. Updating the name property of
         // DatasetType would break this Factory
