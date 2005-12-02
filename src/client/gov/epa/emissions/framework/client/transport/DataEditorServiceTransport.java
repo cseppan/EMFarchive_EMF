@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.ChangeSet;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
 
@@ -191,6 +193,21 @@ public class DataEditorServiceTransport implements DataEditorService {
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Failed to get count: " , e);
         }
+        
+    }
+
+    public Version derive(Version baseVersion){
+
+        return null;
+    }
+
+    public void submit(ChangeSet changeset){
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void markFinal() {
+        // TODO Auto-generated method stub
         
     }
 

@@ -15,7 +15,9 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
+import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
 import gov.epa.emissions.framework.services.DataEditorService;
@@ -139,5 +141,20 @@ public class DataEditorServiceImpl implements DataEditorService {
     protected void finalize() throws Throwable {
         this.close();
         super.finalize();
+    }
+
+    public Version derive(Version baseVersion){
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void submit(ChangeSet changeset) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void markFinal() {
+        // TODO Auto-generated method stub
+        
     }
 }
