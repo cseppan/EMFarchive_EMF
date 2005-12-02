@@ -6,7 +6,6 @@
  */
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.framework.EmfException;
 
 
@@ -14,10 +13,10 @@ import gov.epa.emissions.framework.EmfException;
  * @author Conrad F. D'Cruz
  * 
  */
-public interface DataEditorService {
-    Page getPage(String tableName, int pageNumber) throws EmfException;
+public interface SimpleDataEditorService {
+    SimplePage getPage(String tableName, int pageNumber) throws EmfException;
     int getPageCount(String tableName) throws EmfException;
-    Page getPageWithRecord(String tableName, int recordId) throws EmfException;
+    SimplePage getPageWithRecord(String tableName, int recordId) throws EmfException;
     int getTotalRecords(String tableName) throws EmfException;
     void close() throws EmfException;
 

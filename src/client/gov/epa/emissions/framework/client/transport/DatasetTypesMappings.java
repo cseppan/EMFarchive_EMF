@@ -7,7 +7,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.client.Call;
 
-public class DatasetTypesMappings {
+public class DatasetTypesMappings extends Mappings {
 
     private Mapper mapper;
 

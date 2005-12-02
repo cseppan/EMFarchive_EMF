@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.editor;
 
+import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
-import gov.epa.emissions.framework.services.SimplePage;
 import gov.epa.emissions.framework.ui.IconButton;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
@@ -69,7 +69,7 @@ public class PaginationPanel extends JPanel {
         }
     }
 
-    public void updateStatus(SimplePage page) {
+    public void updateStatus(Page page) {
         current.setText(page.min() + " - " + page.max());
         slider.setValue(page.min());
     }

@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.editor;
 
-import gov.epa.emissions.commons.db.DbRecord;
+import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.io.InternalSource;
-import gov.epa.emissions.framework.services.SimplePage;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 public class PageDataTest extends TestCase {
 
     public void testShouldReturnStringAsColumnClassForAllColumns() {
-        PageData data = new PageData(null, new SimplePage());
+        PageData data = new PageData(null, new Page());
 
         assertEquals(String.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
@@ -22,7 +22,7 @@ public class PageDataTest extends TestCase {
         InternalSource source = new InternalSource();
         source.setCols(new String[] { "col1", "col2", "col3" });
 
-        PageData data = new PageData(source, new SimplePage());
+        PageData data = new PageData(source, new Page());
 
         String[] columns = data.columns();
         assertEquals(2, columns.length);
@@ -34,7 +34,7 @@ public class PageDataTest extends TestCase {
         InternalSource source = new InternalSource();
         source.setCols(new String[] { "col1", "col2", "col3" });
 
-        PageData data = new PageData(source, new SimplePage());
+        PageData data = new PageData(source, new Page());
 
         assertFalse("All columns should not be editable", data.isEditable(0));
         assertFalse("All columns should not be editable", data.isEditable(1));
@@ -43,13 +43,13 @@ public class PageDataTest extends TestCase {
 
     public void testShouldReturnTheRowsCorrespondingToRecordsInSpecifiedPage() {
         InternalSource source = new InternalSource();
-        source.setCols(new String[] { "col1", "col2", "col3" });
+        source.setCols(new String[] { "col1", "col2", "col3", "col4", "col5", "col6", "col7" });
 
-        SimplePage page = new SimplePage();
-        DbRecord record1 = new DbRecord();
+        Page page = new Page();
+        VersionedRecord record1 = new VersionedRecord();
         record1.setTokens(new String[] { "1", "2", "3" });
         page.add(record1);
-        DbRecord record2 = new DbRecord();
+        VersionedRecord record2 = new VersionedRecord();
         record2.setTokens(new String[] { "11", "12", "13" });
         page.add(record2);
 
@@ -62,13 +62,13 @@ public class PageDataTest extends TestCase {
     
     public void testRowsShouldContainDataValuesOfRecords() {
         InternalSource source = new InternalSource();
-        source.setCols(new String[] { "col1", "col2", "col3" });
+        source.setCols(new String[] { "col1", "col2", "col3", "col4", "col5", "col6", "col7" });
         
-        SimplePage page = new SimplePage();
-        DbRecord record1 = new DbRecord();
+        Page page = new Page();
+        VersionedRecord record1 = new VersionedRecord();
         record1.setTokens(new String[] { "1", "2", "3" });
         page.add(record1);
-        DbRecord record2 = new DbRecord();
+        VersionedRecord record2 = new VersionedRecord();
         record2.setTokens(new String[] { "11", "12", "13" });
         page.add(record2);
         
@@ -77,11 +77,13 @@ public class PageDataTest extends TestCase {
         List rows = data.rows();
         
         Row row1 = (Row) rows.get(0);
-        assertEquals(record1.token(1), row1.getValueAt(0));
-        assertEquals(record1.token(2), row1.getValueAt(1));
+        assertEquals(record1.token(0), row1.getValueAt(0));
+        assertEquals(record1.token(1), row1.getValueAt(1));
+
         
         Row row2 = (Row) rows.get(1);
-        assertEquals(record2.token(1), row2.getValueAt(0));
-        assertEquals(record2.token(2), row2.getValueAt(1));
+        assertEquals(record2.token(0), row2.getValueAt(0));
+        assertEquals(record2.token(1), row2.getValueAt(1));
+
     }
 }

@@ -2,16 +2,16 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.db.DatabaseSetup;
 import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.db.DbRecord;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.DbUpdate;
+import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.SqlDataTypes;
+import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.SimpleDataset;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.SimplePage;
 import gov.epa.emissions.framework.services.WebServicesIntegrationTestCase;
 
 import java.io.File;
@@ -49,7 +49,7 @@ public class DataEditorServiceTest extends WebServicesIntegrationTestCase {
 
         dataset = new SimpleDataset();
         dataset.setName(datasetName);
-        dataset.setDatasetid(new Random().nextLong());
+        dataset.setDatasetid(Math.abs(new Random().nextInt()));
 
         ORLNonPointImporter importer = new ORLNonPointImporter(dataset, datasource, sqlDataTypes);
 
@@ -80,7 +80,7 @@ public class DataEditorServiceTest extends WebServicesIntegrationTestCase {
     }
 
     public void testShouldReturnExactlyOnePage() throws EmfException {
-        SimplePage page = services.getPage(datasetName, 1);
+        Page page = services.getPage(datasetName, 1);
         assertTrue(page != null);
     }
 
@@ -104,12 +104,12 @@ public class DataEditorServiceTest extends WebServicesIntegrationTestCase {
     public void testShouldReturnOnlyOnePage() throws EmfException {
         int numberOfRecords = services.getTotalRecords(datasetName);
 
-        SimplePage page = services.getPageWithRecord(datasetName, numberOfRecords - 1);
-        DbRecord[] allRecs = page.getRecords();
+        Page page = services.getPageWithRecord(datasetName, numberOfRecords - 1);
+        VersionedRecord[] allRecs = page.getRecords();
         boolean found = false;
 
         for (int i = 0; i < allRecs.length; i++) {
-            if (allRecs[i].getId() == numberOfRecords - 1) {
+            if (allRecs[i].getRecordId() == numberOfRecords - 1) {
                 found = true;
             }
         }
@@ -125,12 +125,12 @@ public class DataEditorServiceTest extends WebServicesIntegrationTestCase {
     public void testShouldReturnNoPage() throws EmfException {
         int numberOfRecords = services.getTotalRecords(datasetName);
 
-        SimplePage page = services.getPageWithRecord(datasetName, numberOfRecords + 1);
-        DbRecord[] allRecs = page.getRecords();
+        Page page = services.getPageWithRecord(datasetName, numberOfRecords + 1);
+        VersionedRecord[] allRecs = page.getRecords();
         boolean found = false;
 
         for (int i = 0; i < allRecs.length; i++) {
-            if (allRecs[i].getId() == numberOfRecords + 1) {
+            if (allRecs[i].getRecordId() == numberOfRecords + 1) {
                 found = true;
             }
         }

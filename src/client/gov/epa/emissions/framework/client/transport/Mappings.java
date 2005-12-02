@@ -46,6 +46,10 @@ public class Mappings {
         call.addParameter(id, Constants.XSD_BOOLEAN, ParameterMode.IN);
     }
 
+    public void addIntegerParam(Call call, String id) {
+        call.addParameter(id, Constants.XSD_INTEGER, ParameterMode.IN);
+    }
+
     public void setOperation(Call call, String id) {
         call.setOperationName(qname(id));
     }

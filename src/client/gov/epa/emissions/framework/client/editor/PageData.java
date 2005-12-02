@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.editor;
 
-import gov.epa.emissions.commons.db.DbRecord;
+import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.io.InternalSource;
-import gov.epa.emissions.framework.services.SimplePage;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -10,16 +10,13 @@ import gov.epa.emissions.framework.ui.ViewableRow;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.primitives.ArrayIntList;
-import org.apache.commons.collections.primitives.IntList;
-
 public class PageData extends AbstractTableData {
 
     private InternalSource source;
 
     private List rows;
 
-    public PageData(InternalSource source, SimplePage page) {
+    public PageData(InternalSource source, Page page) {
         this.source = source;
         this.rows = createRows(page);
     }
@@ -47,9 +44,9 @@ public class PageData extends AbstractTableData {
         return false;
     }
 
-    private List createRows(SimplePage page) {
+    private List createRows(Page page) {
         List rows = new ArrayList();
-        DbRecord[] records = page.getRecords();
+        VersionedRecord[] records = page.getRecords();
 
         for (int i = 0; i < records.length; i++) {
             String[] values = values(records[i]);
@@ -60,26 +57,9 @@ public class PageData extends AbstractTableData {
         return rows;
     }
 
-    private String[] values(DbRecord record) {
-        List values = new ArrayList();
-        int[] colIndexes = colIndexes();
-        for (int i = 0; i < colIndexes.length; i++)
-            values.add(record.token(colIndexes[i]));
-
-        return (String[]) values.toArray(new String[0]);
+    private String[] values(VersionedRecord record) {
+        return record.getTokens();
     }
 
-    private int[] colIndexes() {
-        IntList indexes = new ArrayIntList();
-        // ignore first col - dataset id, not for display
-        for (int i = 1; i <= colsCount(); i++)
-            indexes.add(i);
-
-        return indexes.toArray();
-    }
-
-    private int colsCount() {
-        return columns().length;
-    }
 
 }

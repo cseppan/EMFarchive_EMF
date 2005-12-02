@@ -1,13 +1,13 @@
 package gov.epa.emissions.framework.client.transport;
 
-import gov.epa.emissions.commons.db.DbRecord;
-import gov.epa.emissions.framework.services.SimplePage;
+import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.VersionedRecord;
 
 import javax.xml.namespace.QName;
 
 import org.apache.axis.client.Call;
 
-public class DataEditorMappings {
+public class DataEditorMappings extends Mappings {
 
     private Mapper mapper;
 
@@ -16,11 +16,11 @@ public class DataEditorMappings {
     }
 
     public void register(Call call) {
-        mapper.registerBeanMapping(call, SimplePage.class, page());
-        mapper.registerArrayMapping(call, SimplePage[].class, pages());
-        mapper.registerBeanMapping(call, DbRecord.class, record());
-        mapper.registerArrayMapping(call, DbRecord[].class, records());
-        
+        mapper.registerBeanMapping(call, Page.class, page());
+        mapper.registerArrayMapping(call, Page[].class, pages());
+        mapper.registerBeanMapping(call, VersionedRecord.class, record());
+        mapper.registerArrayMapping(call, VersionedRecord[].class, records());
+
         mapper.registerMappingForTable(call);
     }
 
