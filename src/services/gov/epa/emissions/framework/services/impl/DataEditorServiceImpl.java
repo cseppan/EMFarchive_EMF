@@ -1,13 +1,3 @@
-/*
- * Creation on Nov 7, 2005
- * Eclipse Project Name: EMF
- * File Name: DataEditorServicesImpl.java
- * Author: Conrad F. D'Cruz
- */
-/**
- * 
- */
-
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.Datasource;
@@ -36,10 +26,6 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * @author Conrad F. D'Cruz
- * 
- */
 public class DataEditorServiceImpl implements DataEditorService {
     private static Log log = LogFactory.getLog(DataEditorServiceImpl.class);
 
@@ -136,7 +122,6 @@ public class DataEditorServiceImpl implements DataEditorService {
     /**
      * This method is for cleaning up session specific objects within this
      * service.
-     * 
      */
     protected void finalize() throws Throwable {
         this.close();
