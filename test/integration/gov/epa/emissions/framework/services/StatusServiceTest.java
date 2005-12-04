@@ -8,21 +8,26 @@
  */
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.db.PostgresDbUpdate;
+import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 import java.sql.SQLException;
 import java.util.Date;
 
 import org.dbunit.DatabaseUnitException;
 
-public class StatusServiceTest extends WebServicesIntegrationTestCase {
+public class StatusServiceTest extends ServicesTestCase {
 
     private StatusService service;
 
     private PostgresDbUpdate dbUpdate;
 
     protected void setUp() throws Exception {
-        service = super.serviceLocator.getStatusService();
+        super.setUp();
+
+        ServiceLocator serviceLocator = serviceLocator();
+        service = serviceLocator.getStatusService();
         dbUpdate = new PostgresDbUpdate();
         clean();
     }

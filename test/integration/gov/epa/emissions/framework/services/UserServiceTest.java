@@ -1,11 +1,16 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
-public class UserServiceTest extends WebServicesIntegrationTestCase {
+public class UserServiceTest extends ServicesTestCase {
     private UserService service;
 
-    protected void setUp() {
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        ServiceLocator serviceLocator = serviceLocator();
         service = serviceLocator.getUserService();
     }
 
@@ -24,12 +29,12 @@ public class UserServiceTest extends WebServicesIntegrationTestCase {
         user.setEmail("email@email.edu");
 
         int initialCount = service.getUsers().length;
-        
+
         service.createUser(user);
 
         assertNotNull(service.getUser("test-user"));
         assertEquals(initialCount + 1, service.getUsers().length);
-        
+
         service.deleteUser("test-user");
     }
 
@@ -43,10 +48,10 @@ public class UserServiceTest extends WebServicesIntegrationTestCase {
         user.setEmail("email@email.edu");
 
         service.createUser(user);
-        
+
         user.setFullName("modified-name");
         service.updateUser(user);
-        
+
         User result = service.getUser("test-user");
         assertNotNull(result);
         assertEquals("modified-name", result.getFullName());

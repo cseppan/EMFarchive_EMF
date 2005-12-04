@@ -1,18 +1,19 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
 import gov.epa.emissions.framework.services.DatasetTypeService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserService;
-import gov.epa.emissions.framework.services.WebServicesIntegrationTestCase;
+import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 import java.io.File;
 import java.util.Random;
 
-public class ExImServiceTest extends WebServicesIntegrationTestCase {
+public class ExImServiceTest extends ServicesTestCase {
 
     protected ExImService eximService;
 
@@ -21,8 +22,13 @@ public class ExImServiceTest extends WebServicesIntegrationTestCase {
     private EmfDataset dataset;
 
     protected void setUp() throws Exception {
+        super.setUp();
+        
+        ServiceLocator serviceLocator = serviceLocator();
+
         eximService = serviceLocator.getExImService();
         userService = serviceLocator.getUserService();
+        
         dataset = new EmfDataset();
         Random random = new Random();
         dataset.setName("ORL NonPoint - ExImServicesTest" + random.nextInt());

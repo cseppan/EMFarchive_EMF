@@ -2,14 +2,18 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DatasetTypeService;
-import gov.epa.emissions.framework.services.WebServicesIntegrationTestCase;
+import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
-public class DatasetTypesServiceTest extends WebServicesIntegrationTestCase {
+public class DatasetTypesServiceTest extends ServicesTestCase {
 
     private DatasetTypeService services;
 
-    protected void setUp() {
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        ServiceLocator serviceLocator = serviceLocator();
         services = serviceLocator.getDatasetTypesService();
     }
 

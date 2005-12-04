@@ -1,13 +1,15 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
+import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 import java.io.File;
 import java.util.Date;
 import java.util.Random;
 
-public class LoggingServiceTest extends WebServicesIntegrationTestCase {
+public class LoggingServiceTest extends ServicesTestCase {
 
     protected ExImService eximService;
 
@@ -15,11 +17,16 @@ public class LoggingServiceTest extends WebServicesIntegrationTestCase {
 
     private EmfDataset dataset;
 
+    private ServiceLocator serviceLocator;
+
     protected void setUp() throws Exception {
+        super.setUp();
         cleanData();
 
+        serviceLocator = serviceLocator();
         eximService = serviceLocator.getExImService();
         userService = serviceLocator.getUserService();
+
         dataset = new EmfDataset();
         Random random = new Random();
         dataset.setName("ORL_NonPoint_LoggingServiceTest" + Math.abs(random.nextInt()));

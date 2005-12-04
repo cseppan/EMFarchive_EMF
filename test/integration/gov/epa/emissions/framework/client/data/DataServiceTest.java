@@ -2,15 +2,19 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.db.PostgresDbUpdate;
 import gov.epa.emissions.framework.services.DataService;
-import gov.epa.emissions.framework.services.WebServicesIntegrationTestCase;
+import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
-public class DataServiceTest extends WebServicesIntegrationTestCase {
+public class DataServiceTest extends ServicesTestCase {
 
     private DataService services;
 
-    protected void setUp() {
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        ServiceLocator serviceLocator = serviceLocator();
         services = serviceLocator.getDataService();
     }
 

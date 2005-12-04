@@ -1,23 +1,31 @@
-package gov.epa.emissions.framework;
+package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DatabaseSetup;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
+import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.db.PostgresDbUpdate;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
 
 import junit.framework.TestCase;
 
-public abstract class PersistenceTestCase extends TestCase {
+public abstract class ServicesTestCase extends TestCase {
 
     private DatabaseSetup dbSetup;
 
     protected void setUp() throws Exception {
+        dbSetup = new DatabaseSetup(config());
+    }
+
+    protected Properties config() throws IOException, FileNotFoundException {
         String folder = "test";
         File conf = new File(folder, "test.conf");
 
@@ -30,7 +38,7 @@ public abstract class PersistenceTestCase extends TestCase {
         Properties properties = new Properties();
         properties.load(new FileInputStream(conf));
 
-        dbSetup = new DatabaseSetup(properties);
+        return properties;
     }
 
     protected void tearDown() throws Exception {
@@ -52,5 +60,11 @@ public abstract class PersistenceTestCase extends TestCase {
     protected void dropTable(Datasource datasource, String table) throws Exception, SQLException {
         PostgresDbUpdate dbUpdate = new PostgresDbUpdate();
         dbUpdate.dropTable(datasource.getName(), table);
+    }
+
+    protected ServiceLocator serviceLocator() throws Exception {
+        Properties config = config();
+        String baseUrl = config.getProperty("emf.services.url");
+        return new RemoteServiceLocator(baseUrl);
     }
 }

@@ -29,27 +29,34 @@ import org.apache.commons.logging.LogFactory;
 public class DataEditorServiceImpl implements DataEditorService {
     private static Log log = LogFactory.getLog(DataEditorServiceImpl.class);
 
-    private Datasource emissionsSchema = null;
+    private Datasource datasource = null;
 
     private Map pageReadersMap = null;
 
     public DataEditorServiceImpl() throws InfrastructureException {
-        super();
 
-        pageReadersMap = new HashMap();
         try {
             Context ctx = new InitialContext();
 
             DataSource emfDatabase = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
             DbServer dbServer = new PostgresDbServer(emfDatabase.getConnection(), EMFConstants.EMF_REFERENCE_SCHEMA,
                     EMFConstants.EMF_EMISSIONS_SCHEMA);
-            emissionsSchema = dbServer.getEmissionsDatasource();
 
+            init(dbServer.getEmissionsDatasource());
         } catch (Exception ex) {
             log.error("could not initialize EMF datasource", ex);
             throw new InfrastructureException("Server configuration error");
         }
 
+    }
+
+    public DataEditorServiceImpl(Datasource datasource) {
+        init(datasource);
+    }
+
+    private void init(Datasource datasource) {
+        pageReadersMap = new HashMap();
+        this.datasource = datasource;
     }
 
     public Page getPage(String tableName, int pageNumber) throws EmfException {
@@ -74,8 +81,8 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     private PageReader getReader(String tableName) throws SQLException {
         if (!pageReadersMap.containsKey(tableName)) {
-            String query = "SELECT * FROM " + emissionsSchema.getName() + "." + tableName;
-            ScrollableVersionedRecords sr = new ScrollableVersionedRecords(emissionsSchema, query);
+            String query = "SELECT * FROM " + datasource.getName() + "." + tableName;
+            ScrollableVersionedRecords sr = new ScrollableVersionedRecords(datasource, query);
             PageReader reader = new PageReader(20, sr);
 
             pageReadersMap.put(tableName, reader);
@@ -128,18 +135,18 @@ public class DataEditorServiceImpl implements DataEditorService {
         super.finalize();
     }
 
-    public Version derive(Version baseVersion){
+    public Version derive(Version baseVersion) {
         // TODO Auto-generated method stub
         return null;
     }
 
     public void submit(ChangeSet changeset) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void markFinal() {
         // TODO Auto-generated method stub
-        
+
     }
 }
