@@ -9,12 +9,6 @@ import org.apache.axis.client.Call;
 
 public class DatasetTypesMappings extends Mappings {
 
-    private Mapper mapper;
-
-    public DatasetTypesMappings() {
-        mapper = new Mapper();
-    }
-
     public void register(Call call) {
         mapper.registerBeanMapping(call, DatasetType.class, datasetType());
         mapper.registerArrayMapping(call, DatasetType[].class, datasetTypes());
@@ -23,15 +17,11 @@ public class DatasetTypesMappings extends Mappings {
     }
 
     public QName datasetType() {
-        return qname("ns1:DatasetType");
+        return qname("DatasetType");
     }
 
     public QName datasetTypes() {
-        return qname("ns1:DatasetTypes");
-    }
-
-    public QName qname(String name) {
-        return mapper.qname(name);
+        return qname("DatasetTypes");
     }
 
 }

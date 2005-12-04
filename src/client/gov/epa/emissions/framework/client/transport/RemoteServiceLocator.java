@@ -86,6 +86,7 @@ public class RemoteServiceLocator implements ServiceLocator {
         Call call = (Call) service.createCall();
         call.setMaintainSession(true);
         call.setTimeout(new Integer(0));
+        
         return call;
     }
 

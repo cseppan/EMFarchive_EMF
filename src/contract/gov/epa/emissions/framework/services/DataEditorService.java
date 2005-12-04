@@ -14,6 +14,8 @@ public interface DataEditorService {
 
     int getTotalRecords(String tableName) throws EmfException;
 
+    Version[] getVersions(long datasetId) throws EmfException;
+
     Version derive(Version baseVersion) throws EmfException;
 
     void submit(ChangeSet changeset) throws EmfException;

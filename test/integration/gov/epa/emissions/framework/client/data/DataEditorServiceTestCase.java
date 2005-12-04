@@ -3,12 +3,12 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
-import gov.epa.emissions.commons.io.Dataset;
-import gov.epa.emissions.commons.io.SimpleDataset;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 import java.io.File;
@@ -20,13 +20,13 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
     private Datasource datasource;
 
-    private Dataset dataset;
+    private EmfDataset dataset;
 
     protected void setUpService(DataEditorService service) throws Exception {
         this.service = service;
         datasource = emissions();
 
-        dataset = new SimpleDataset();
+        dataset = new EmfDataset();
         dataset.setName("test");
         dataset.setDatasetid(Math.abs(new Random().nextInt()));
 
@@ -93,4 +93,14 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         assertTrue(!found);
     }
 
+    public void testShouldHaveVersionZeroAfterDatasetImport() throws Exception {
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+
+        assertNotNull("Should return versions of imported dataset", versions);
+        assertEquals(1, versions.length);
+        
+        Version versionZero = versions[0];
+        assertEquals(0, versionZero.getVersion());
+        assertEquals(dataset.getDatasetid(), versionZero.getDatasetId());
+    }
 }

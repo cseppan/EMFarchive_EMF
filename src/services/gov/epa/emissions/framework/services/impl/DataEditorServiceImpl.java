@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
 import gov.epa.emissions.framework.services.DataEditorService;
@@ -33,6 +34,8 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     private Map pageReadersMap = null;
 
+    private Versions versions;
+
     public DataEditorServiceImpl() throws InfrastructureException {
 
         try {
@@ -50,13 +53,14 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     }
 
-    public DataEditorServiceImpl(Datasource datasource) {
+    public DataEditorServiceImpl(Datasource datasource) throws SQLException {
         init(datasource);
     }
 
-    private void init(Datasource datasource) {
+    private void init(Datasource datasource) throws SQLException {
         pageReadersMap = new HashMap();
         this.datasource = datasource;
+        versions = new Versions(datasource);
     }
 
     public Page getPage(String tableName, int pageNumber) throws EmfException {
@@ -148,5 +152,13 @@ public class DataEditorServiceImpl implements DataEditorService {
     public void markFinal() {
         // TODO Auto-generated method stub
 
+    }
+
+    public Version[] getVersions(long datasetId) throws EmfException {
+        try {
+            return versions.get(datasetId);
+        } catch (SQLException e) {
+            throw new EmfException("Could not get all versions of Dataset : " + datasetId);
+        }
     }
 }

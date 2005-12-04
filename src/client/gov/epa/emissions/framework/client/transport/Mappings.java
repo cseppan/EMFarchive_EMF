@@ -22,7 +22,7 @@ public class Mappings {
         mapper.registerBeanMapping(call, clazz, qname(name));
     }
 
-    protected QName qname(String name) {
+    public QName qname(String name) {
         return mapper.qname("ns1:" + name);
     }
 

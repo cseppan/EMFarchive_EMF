@@ -100,6 +100,7 @@
 	  <parameter name="className" value="gov.epa.emissions.framework.services.impl.DataEditorServiceImpl"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.db.Page" qname="ns1:Page" xmlns:ns1="urn:gov.epa.services.EmfService"/>
   <beanMapping languageSpecificType="java:gov.epa.emissions.commons.db.version.VersionedRecord" qname="ns1:Record" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+  <beanMapping languageSpecificType="java:gov.epa.emissions.commons.db.version.Version" qname="ns1:Version" xmlns:ns1="urn:gov.epa.services.EmfService"/>
  </service>
 
  <arrayMapping qname="ns1:Records" xmlns:ns1="urn:gov.epa.services.EmfService"
@@ -107,6 +108,10 @@
 			 innerType="ns1:Record" 
              encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
 
+ <arrayMapping qname="ns1:Versions" xmlns:ns1="urn:gov.epa.services.EmfService"
+             languageSpecificType="java:gov.epa.emissions.commons.db.version.Version[]"
+			 innerType="ns1:Version" 
+             encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>          
 
  <arrayMapping qname="ns1:Keywords" xmlns:ns1="urn:gov.epa.services.EmfService"
              languageSpecificType="java:gov.epa.emissions.commons.io.Keyword[]"
