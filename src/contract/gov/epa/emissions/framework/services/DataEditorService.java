@@ -13,7 +13,7 @@ public interface DataEditorService {
 
     Page getPageWithRecord(String tableName, int recordId) throws EmfException;
 
-    int getTotalRecords(String tableName) throws EmfException;
+    int getTotalRecords(EditToken token) throws EmfException;
 
     // edit
     void submit(EditToken token, ChangeSet changeset) throws EmfException;

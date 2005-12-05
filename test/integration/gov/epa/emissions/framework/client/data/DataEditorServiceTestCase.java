@@ -59,7 +59,9 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     }
 
     public void testShouldReturnAtleastOneRecord() throws EmfException {
-        int numberOfRecords = service.getTotalRecords(dataset.getName());
+        EditToken token = new EditToken(dataset.getDatasetid(), 0, dataset.getName());
+
+        int numberOfRecords = service.getTotalRecords(token);
         assertTrue(numberOfRecords >= 1);
     }
 
@@ -74,7 +76,9 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
      * record id that was supplied.
      */
     public void testShouldReturnOnlyOnePage() throws EmfException {
-        int numberOfRecords = service.getTotalRecords(dataset.getName());
+        EditToken token = new EditToken(dataset.getDatasetid(), 0, dataset.getName());
+
+        int numberOfRecords = service.getTotalRecords(token);
 
         Page page = service.getPageWithRecord(dataset.getName(), numberOfRecords - 1);
         VersionedRecord[] allRecs = page.getRecords();
@@ -89,7 +93,9 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     }
 
     public void testShouldReturnNoPage() throws EmfException {
-        int numberOfRecords = service.getTotalRecords(dataset.getName());
+        EditToken token = new EditToken(dataset.getDatasetid(), 0, dataset.getName());
+
+        int numberOfRecords = service.getTotalRecords(token);
 
         Page page = service.getPageWithRecord(dataset.getName(), numberOfRecords + 1);
         VersionedRecord[] allRecs = page.getRecords();
@@ -161,6 +167,41 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         EditToken token = new EditToken(versionOne, table);
         service.submit(token, changeset);
+
+        VersionedRecordsReader reader = new VersionedRecordsReader(datasource);
+        int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName()).length;
+
+        VersionedRecord[] records = reader.fetchAll(versionOne, dataset.getName());
+        assertEquals(versionZeroRecordsCount + 2, records.length);
+        int init = records[0].getRecordId();
+        for (int i = 1; i < records.length; i++) {
+            assertEquals(++init, records[i].getRecordId());
+        }
+    }
+
+    public void testShouldBeAbleToSubmitMultipleChangeSetsForSameVersion() throws Exception {
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+
+        Version versionZero = versions[0];
+        Version versionOne = service.derive(versionZero);
+
+        EditToken token = new EditToken(versionOne, table);
+
+        ChangeSet changeset1 = new ChangeSet();
+        changeset1.setVersion(versionOne);
+        VersionedRecord record6 = new VersionedRecord();
+        record6.setDatasetId((int) dataset.getDatasetid());
+        changeset1.addNew(record6);
+
+        service.submit(token, changeset1);
+
+        ChangeSet changeset2 = new ChangeSet();
+        changeset2.setVersion(versionOne);
+        VersionedRecord record7 = new VersionedRecord();
+        record7.setDatasetId((int) dataset.getDatasetid());
+        changeset2.addNew(record7);
+
+        service.submit(token, changeset2);
 
         VersionedRecordsReader reader = new VersionedRecordsReader(datasource);
         int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName()).length;

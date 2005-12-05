@@ -41,6 +41,8 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     private SqlDataTypes sqlTypes;
 
+    private Map writersMap;
+
     public DataEditorServiceImpl() throws InfrastructureException {
         try {
             Context ctx = new InitialContext();
@@ -58,13 +60,6 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     public DataEditorServiceImpl(DbServer dbServer) throws SQLException {
         init(dbServer);
-    }
-
-    private void init(DbServer dbServer) throws SQLException {
-        pageReadersMap = new HashMap();
-        this.datasource = dbServer.getEmissionsDatasource();
-        sqlTypes = dbServer.getSqlDataTypes();
-        versions = new Versions(datasource);
     }
 
     public Page getPage(String tableName, int pageNumber) throws EmfException {
@@ -87,18 +82,6 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
-    private PageReader getReader(String tableName) throws SQLException {
-        if (!pageReadersMap.containsKey(tableName)) {
-            String query = "SELECT * FROM " + datasource.getName() + "." + tableName;
-            ScrollableVersionedRecords sr = new ScrollableVersionedRecords(datasource, query);
-            PageReader reader = new PageReader(20, sr);
-
-            pageReadersMap.put(tableName, reader);
-        }
-
-        return (PageReader) pageReadersMap.get(tableName);
-    }
-
     public Page getPageWithRecord(String tableName, int recordId) throws EmfException {
         try {
             PageReader reader = getReader(tableName);
@@ -109,13 +92,48 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
-    public int getTotalRecords(String tableName) throws EmfException {
+    public int getTotalRecords(EditToken token) throws EmfException {
         try {
-            PageReader reader = getReader(tableName);
+            PageReader reader = getReader(token.getTable());
             return reader.totalRecords();
         } catch (SQLException e) {
             log.error("Failed to get total records count: " + e.getMessage());
             throw new EmfException(e.getMessage());
+        }
+    }
+
+    public Version derive(Version baseVersion) throws EmfException {
+        try {
+            return versions.derive(baseVersion);
+        } catch (SQLException e) {
+            throw new EmfException("Could not derive a new Version from the base Version: " + baseVersion.getVersion()
+                    + " of Dataset: " + baseVersion.getDatasetId());
+        }
+    }
+
+    public void submit(EditToken token, ChangeSet changeset) throws EmfException {
+        try {
+            VersionedRecordsWriter writer = getWriter(token);
+            writer.update(changeset);
+        } catch (Exception e) {
+            throw new EmfException("Could not update Dataset: " + token.getDatasetId() + " with changes for Version: "
+                    + token.getVersion());
+        }
+    }
+
+    public Version markFinal(Version derived) throws EmfException {
+        try {
+            return versions.markFinal(derived);
+        } catch (SQLException e) {
+            throw new EmfException("Could not mark a derived Version: " + derived.getDatasetId() + " as Final");
+        }
+    }
+
+    public Version[] getVersions(long datasetId) throws EmfException {
+        try {
+            return versions.get(datasetId);
+        } catch (SQLException e) {
+            throw new EmfException("Could not get all versions of Dataset : " + datasetId);
         }
     }
 
@@ -128,6 +146,27 @@ public class DataEditorServiceImpl implements DataEditorService {
             log.error("Could not close Versions due to: " + e.getMessage());
             throw new EmfException("Could not close Versions", e.getMessage());
         }
+    }
+
+    private void init(DbServer dbServer) throws SQLException {
+        pageReadersMap = new HashMap();
+        writersMap = new HashMap();
+
+        this.datasource = dbServer.getEmissionsDatasource();
+        sqlTypes = dbServer.getSqlDataTypes();
+        versions = new Versions(datasource);
+    }
+
+    private PageReader getReader(String tableName) throws SQLException {
+        if (!pageReadersMap.containsKey(tableName)) {
+            String query = "SELECT * FROM " + datasource.getName() + "." + tableName;
+            ScrollableVersionedRecords sr = new ScrollableVersionedRecords(datasource, query);
+            PageReader reader = new PageReader(20, sr);
+
+            pageReadersMap.put(tableName, reader);
+        }
+
+        return (PageReader) pageReadersMap.get(tableName);
     }
 
     private void closePageReaders() throws EmfException {
@@ -154,38 +193,18 @@ public class DataEditorServiceImpl implements DataEditorService {
         super.finalize();
     }
 
-    public Version derive(Version baseVersion) throws EmfException {
-        try {
-            return versions.derive(baseVersion);
-        } catch (SQLException e) {
-            throw new EmfException("Could not derive a new Version from the base Version: " + baseVersion.getVersion()
-                    + " of Dataset: " + baseVersion.getDatasetId());
-        }
-    }
-
-    public void submit(EditToken token, ChangeSet changeset) throws EmfException {
-        try {
+    private VersionedRecordsWriter getWriter(EditToken token) throws SQLException {
+        Object key = key(token);
+        if (!writersMap.containsKey(key)) {
             VersionedRecordsWriter writer = new VersionedRecordsWriter(datasource, token.getTable(), sqlTypes);
-            writer.update(changeset);
-        } catch (Exception e) {
-            throw new EmfException("Could not update Dataset: " + token.getDatasetId() + " with changes for Version: "
-                    + token.getVersion());
+            writersMap.put(key, writer);
         }
+
+        return (VersionedRecordsWriter) writersMap.get(key);
     }
 
-    public Version markFinal(Version derived) throws EmfException {
-        try {
-            return versions.markFinal(derived);
-        } catch (SQLException e) {
-            throw new EmfException("Could not mark a derived Version: " + derived.getDatasetId() + " as Final");
-        }
+    private Object key(EditToken token) {
+        return "D:" + token.getDatasetId() + "V:" + token.getVersion() + "T:" + token.getTable();
     }
 
-    public Version[] getVersions(long datasetId) throws EmfException {
-        try {
-            return versions.get(datasetId);
-        } catch (SQLException e) {
-            throw new EmfException("Could not get all versions of Dataset : " + datasetId);
-        }
-    }
 }

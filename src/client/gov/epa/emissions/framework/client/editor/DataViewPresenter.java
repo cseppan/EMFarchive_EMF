@@ -24,7 +24,7 @@ public class DataViewPresenter {
     }
 
     public void doSelectTable(String table, PageView pageView) throws EmfException {
-        PageViewPresenter presenter = new PageViewPresenter(services, pageView, table);
+        PageViewPresenter presenter = new PageViewPresenter(services, pageView, dataset, table);
         presenter.observeView(); // TODO: why this extra step?
         presenter.doDisplayFirst();// display first page
     }

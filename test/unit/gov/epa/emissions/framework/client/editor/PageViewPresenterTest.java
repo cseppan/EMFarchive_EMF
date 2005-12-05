@@ -1,10 +1,13 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EditToken;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.core.constraint.IsInstanceOf;
 
 public class PageViewPresenterTest extends MockObjectTestCase {
 
@@ -13,7 +16,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         Mock view = mock(PageView.class);
 
         PageViewPresenter p = new PageViewPresenter((DataEditorService) services.proxy(), (PageView) view.proxy(),
-                "table");
+                null, "table");
         view.expects(once()).method("observe").with(eq(p));
 
         p.observeView();
@@ -21,12 +24,15 @@ public class PageViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldFetchTotalRecords() throws Exception {
         Mock services = mock(DataEditorService.class);
-        services.stubs().method("getTotalRecords").with(eq("table")).will(returnValue(new Integer(28)));
+        services.stubs().method("getTotalRecords").with(new IsInstanceOf(EditToken.class)).will(
+                returnValue(new Integer(28)));
 
         Mock view = mock(PageView.class);
-
+        Mock dataset = mock(Dataset.class);
+        dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
+        
         PageViewPresenter p = new PageViewPresenter((DataEditorService) services.proxy(), (PageView) view.proxy(),
-                "table");
+                (Dataset) dataset.proxy(), "table");
 
         assertEquals(28, p.totalRecords());
     }
@@ -41,7 +47,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").with(eq(page));
 
         PageViewPresenter p = new PageViewPresenter((DataEditorService) services.proxy(), (PageView) view.proxy(),
-                "table");
+                null, "table");
 
         p.doDisplayNext();
     }
@@ -55,7 +61,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").with(eq(page));
 
         PageViewPresenter p = new PageViewPresenter((DataEditorService) services.proxy(), (PageView) view.proxy(),
-                "table");
+                null, "table");
 
         p.doDisplay(21);
     }
@@ -69,7 +75,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").with(eq(page));
 
         PageViewPresenter p = new PageViewPresenter((DataEditorService) services.proxy(), (PageView) view.proxy(),
-                "table");
+                null, "table");
 
         p.doDisplayPageWithRecord(21);
     }
@@ -83,7 +89,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").with(eq(page));
 
         PageViewPresenter p = new PageViewPresenter((DataEditorService) services.proxy(), (PageView) view.proxy(),
-                "table");
+                null, "table");
 
         p.doDisplayFirst();
     }
@@ -97,7 +103,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         PageViewPresenter p = new PageViewPresenter((DataEditorService) services.proxy(), (PageView) view.proxy(),
-                "table");
+                null, "table");
 
         p.doDisplayFirst();
         p.doDisplayPrevious();
@@ -113,7 +119,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         PageViewPresenter p = new PageViewPresenter((DataEditorService) services.proxy(), (PageView) view.proxy(),
-                "table");
+                null, "table");
 
         p.doDisplayLast();
         p.doDisplayNext();
@@ -129,7 +135,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").with(eq(page));
 
         PageViewPresenter p = new PageViewPresenter((DataEditorService) services.proxy(), (PageView) view.proxy(),
-                "table");
+                null, "table");
 
         p.doDisplayLast();
     }
@@ -145,7 +151,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         PageViewPresenter p = new PageViewPresenter((DataEditorService) services.proxy(), (PageView) view.proxy(),
-                "table");
+                null, "table");
 
         p.doDisplayNext();
         p.doDisplayNext();
@@ -166,7 +172,7 @@ public class PageViewPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").with(eq(page2));
 
         PageViewPresenter p = new PageViewPresenter((DataEditorService) services.proxy(), (PageView) view.proxy(),
-                "table");
+                null, "table");
 
         p.doDisplayNext();
         p.doDisplayNext();

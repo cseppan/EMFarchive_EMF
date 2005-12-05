@@ -1,8 +1,10 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EditToken;
 
 public class PageViewPresenter {
 
@@ -16,9 +18,12 @@ public class PageViewPresenter {
 
     private Page page;
 
-    public PageViewPresenter(DataEditorService services, PageView view, String table) {
+    private Dataset dataset;
+
+    public PageViewPresenter(DataEditorService services, PageView view, Dataset dataset, String table) {
         this.services = services;
         this.view = view;
+        this.dataset = dataset;
         this.table = table;
     }
 
@@ -62,7 +67,9 @@ public class PageViewPresenter {
     }
 
     public int totalRecords() throws EmfException {
-        return services.getTotalRecords(table);
+        // TODO: use the specified version
+        EditToken token = new EditToken(dataset.getDatasetid(), 0, table);
+        return services.getTotalRecords(token);
     }
 
 }

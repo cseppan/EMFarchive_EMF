@@ -110,13 +110,13 @@ public class DataEditorServiceTransport implements DataEditorService {
         return page;
     }
 
-    public int getTotalRecords(String tableName) throws EmfException {
+    public int getTotalRecords(EditToken token) throws EmfException {
         try {
             mappings.setOperation(call, "getTotalRecords");
-            mappings.addStringParam(call, "tableName");
+            mappings.addParam(call, "token", mappings.editToken());
             mappings.setIntegerReturnType(call);
 
-            Integer cnt = (Integer) call.invoke(new Object[] { tableName });
+            Integer cnt = (Integer) call.invoke(new Object[] { token });
             return cnt.intValue();
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get count: ", fault);

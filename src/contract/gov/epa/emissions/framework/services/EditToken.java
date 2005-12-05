@@ -14,9 +14,13 @@ public class EditToken {
     }
 
     public EditToken(Version version, String table) {
-        this.datasetId = version.getDatasetId();
-        this.version = version.getVersion();
-        this.table = table;
+        this(version.getDatasetId(), version.getVersion(), table);
+    }
+
+    public EditToken(long datasetId, int version, String table) {
+        setDatasetId(datasetId);
+        setVersion(version);
+        setTable(table);
     }
 
     public String getTable() {
