@@ -9,10 +9,7 @@ import gov.epa.emissions.framework.services.DataEditorService;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.xml.rpc.ParameterMode;
-
 import org.apache.axis.AxisFault;
-import org.apache.axis.Constants;
 import org.apache.axis.client.Call;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,46 +19,18 @@ public class DataEditorServiceTransport implements DataEditorService {
 
     private Call call = null;
 
-    public DataEditorServiceTransport(String endPoint, Call call) {
+    private DataEditorMappings mappings;
+
+    public DataEditorServiceTransport(Call call, String endPoint) {
         this.call = call;
         try {
             call.setTargetEndpointAddress(new URL(endPoint));
         } catch (MalformedURLException e) {
             throw new RuntimeException("Could not connect to Data Editor service at " + endPoint);
         }
-    }
 
-    public String getName() throws Exception {
-        try {
-            call.setOperationName("getName");
-            call.setReturnType(Constants.XSD_ANY);
-
-            return (String) call.invoke(new Object[] {});
-        } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get name: ", fault);
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get name: ", e);
-        } finally {
-            call.removeAllParameters();
-        }
-
-        return null;
-    }
-
-    public void setName(String name) throws Exception {
-        try {
-            call.setOperationName("setName");
-            call.addParameter("name", org.apache.axis.Constants.XSD_STRING, ParameterMode.IN);
-            call.setReturnType(Constants.XSD_ANY);
-
-            call.invoke(new Object[] { name });
-        } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get name: ", fault);
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get name: ", e);
-        } finally {
-            call.removeAllParameters();
-        }
+        mappings = new DataEditorMappings();
+        mappings.register(call);
     }
 
     private String extractMessage(String faultReason) {
@@ -80,14 +49,11 @@ public class DataEditorServiceTransport implements DataEditorService {
 
     public Page getPage(String tableName, int pageNumber) throws EmfException {
         try {
-            DataEditorMappings mappings = new DataEditorMappings();
-            mappings.register(call);
-
-            call.setOperationName(mappings.qname("getPage"));
-            call.setReturnType(mappings.page());
-
             mappings.addStringParam(call, "tableName");
             mappings.addIntegerParam(call, "pageNumber");
+
+            mappings.setOperation(call, "getPage");
+            mappings.setReturnType(call, mappings.page());
 
             return (Page) call.invoke(new Object[] { tableName, new Integer(pageNumber) });
         } catch (AxisFault fault) {
@@ -103,9 +69,9 @@ public class DataEditorServiceTransport implements DataEditorService {
 
     public int getPageCount(String tableName) throws EmfException {
         try {
-            call.setOperationName("getPageCount");
-            call.addParameter("tableName", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
-            call.setReturnType(Constants.XSD_INT);
+            mappings.setOperation(call, "getPageCount");
+            mappings.addStringParam(call, "tableName");
+            mappings.setIntegerReturnType(call);
 
             Integer cnt = (Integer) call.invoke(new Object[] { tableName });
 
@@ -125,14 +91,11 @@ public class DataEditorServiceTransport implements DataEditorService {
         Page page = null;
 
         try {
-            DataEditorMappings mappings = new DataEditorMappings();
-            mappings.register(call);
+            mappings.setOperation(call, "getPageWithRecord");
+            mappings.setReturnType(call, mappings.page());
 
-            call.setOperationName(mappings.qname("getPageWithRecord"));
-            call.setReturnType(mappings.page());
-
-            call.addParameter("tableName", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
-            call.addParameter("recordId", org.apache.axis.Constants.XSD_INTEGER, javax.xml.rpc.ParameterMode.IN);
+            mappings.addStringParam(call, "tableName");
+            mappings.addIntegerParam(call, "recordId");
 
             page = (Page) call.invoke(new Object[] { tableName, new Integer(recordId) });
         } catch (AxisFault fault) {
@@ -148,9 +111,9 @@ public class DataEditorServiceTransport implements DataEditorService {
 
     public int getTotalRecords(String tableName) throws EmfException {
         try {
-            call.setOperationName("getTotalRecords");
-            call.addParameter("tableName", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
-            call.setReturnType(Constants.XSD_INT);
+            mappings.setOperation(call, "getTotalRecords");
+            mappings.addStringParam(call, "tableName");
+            mappings.setIntegerReturnType(call);
 
             Integer cnt = (Integer) call.invoke(new Object[] { tableName });
             return cnt.intValue();
@@ -167,11 +130,10 @@ public class DataEditorServiceTransport implements DataEditorService {
 
     public void close() throws EmfException {
         try {
-            call.setOperationName("close");
-            call.setReturnType(Constants.XSD_ANY);
+            mappings.setOperation(call, "close");
+            mappings.setAnyReturnType(call);
 
-            call.invoke(new Object[] {});
-            call.removeAllParameters();
+            call.invoke(new Object[0]);
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get count: ", fault);
         } catch (Exception e) {
@@ -181,7 +143,23 @@ public class DataEditorServiceTransport implements DataEditorService {
         }
     }
 
-    public Version derive(Version baseVersion) {
+    public Version derive(Version baseVersion) throws EmfException {
+        try {
+            mappings.addParam(call, "baseVersion", mappings.version());
+            mappings.setOperation(call, "derive");
+            mappings.setReturnType(call, mappings.version());
+
+            return (Version) call.invoke(new Object[] { baseVersion });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to get derive Version from base Version: " + baseVersion.getVersion()
+                    + " for Dataset: " + baseVersion.getDatasetId(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to get derive Version from base Version: "
+                    + baseVersion.getVersion() + " for Dataset: " + baseVersion.getDatasetId(), e);
+        } finally {
+            call.removeAllParameters();
+        }
+
         return null;
     }
 
@@ -190,16 +168,27 @@ public class DataEditorServiceTransport implements DataEditorService {
 
     }
 
-    public void markFinal() {
-        // TODO Auto-generated method stub
+    public Version markFinal(Version derived) throws EmfException {
+        try {
+            mappings.addParam(call, "derived", mappings.version());
+            mappings.setOperation(call, "markFinal");
+            mappings.setReturnType(call, mappings.version());
 
+            return (Version) call.invoke(new Object[] { derived });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to mark a derived Version: " + derived.getVersion() + " as Final", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to mark a derived Version: " + derived.getVersion() + " as Final",
+                    e);
+        } finally {
+            call.removeAllParameters();
+        }
+
+        return null;
     }
 
     public Version[] getVersions(long datasetId) throws EmfException {
         try {
-            DataEditorMappings mappings = new DataEditorMappings();
-            mappings.register(call);
-
             mappings.addLongParam(call, "datasetId");
             mappings.setOperation(call, "getVersions");
             mappings.setReturnType(call, mappings.versions());

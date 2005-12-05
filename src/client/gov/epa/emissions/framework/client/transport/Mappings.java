@@ -78,4 +78,8 @@ public class Mappings {
         call.addParameter(id, Constants.XSD_LONG, ParameterMode.IN);
     }
 
+    public void setIntegerReturnType(Call call) {
+        call.setReturnType(Constants.XSD_INT);
+    }
+
 }

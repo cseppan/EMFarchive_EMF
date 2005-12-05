@@ -22,6 +22,6 @@ public interface DataEditorService {
 
     void close() throws EmfException;
 
-    void markFinal() throws EmfException;
+    Version markFinal(Version derived) throws EmfException;
 
 }

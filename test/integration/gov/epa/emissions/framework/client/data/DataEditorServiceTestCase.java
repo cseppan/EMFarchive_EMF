@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.Page;
@@ -39,6 +40,9 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     protected void tearDown() throws Exception {
         DbUpdate dbUpdate = new DbUpdate(datasource.getConnection());
         dbUpdate.dropTable(datasource.getName(), dataset.getName());
+
+        DataModifier modifier = datasource.dataModifier();
+        modifier.dropAll("versions");
 
         super.tearDown();
     }
@@ -98,9 +102,37 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         assertNotNull("Should return versions of imported dataset", versions);
         assertEquals(1, versions.length);
-        
+
         Version versionZero = versions[0];
         assertEquals(0, versionZero.getVersion());
         assertEquals(dataset.getDatasetid(), versionZero.getDatasetId());
+    }
+
+    public void testShouldDeriveVersionFromAFinalVersion() throws Exception {
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+
+        Version versionZero = versions[0];
+        Version derived = service.derive(versionZero);
+
+        assertNotNull("Should be able to derive from a Final version", derived);
+        assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
+        assertEquals(1, derived.getVersion());
+        assertEquals("0", derived.getPath());
+        assertFalse("Derived version should be non-final", derived.isFinalVersion());
+    }
+
+    public void testShouldBeAbleToMarkADerivedVersionAsFinal() throws Exception {
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+
+        Version versionZero = versions[0];
+        Version derived = service.derive(versionZero);
+
+        Version finalVersion = service.markFinal(derived);
+
+        assertNotNull("Should be able to mark a 'derived' as a Final version", derived);
+        assertEquals(derived.getDatasetId(), finalVersion.getDatasetId());
+        assertEquals(derived.getVersion(), finalVersion.getVersion());
+        assertEquals("0", finalVersion.getPath());
+        assertTrue("Derived version should be final on being marked 'final'", finalVersion.isFinalVersion());
     }
 }

@@ -72,7 +72,7 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
 
     public DataEditorService getDataEditorService() {
-        return new DataEditorServiceTransport(baseUrl + "/gov.epa.emf.services.DataEditorService",call);
+        return new DataEditorServiceTransport(call,baseUrl + "/gov.epa.emf.services.DataEditorService");
     }
 
     /*
