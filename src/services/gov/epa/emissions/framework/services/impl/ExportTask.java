@@ -14,7 +14,6 @@ import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.DataService;
-import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusService;
@@ -74,12 +73,10 @@ public class ExportTask implements Runnable {
         try {
             setStartStatus();
             exporter.export(file);
-            // update access logs
+            
             loggingServices.setAccessLog(accesslog);
-            // update dataset
             dataServices.updateDataset(dataset);
-            // update status message
-            setStatus(EMFConstants.END_EXPORT_MESSAGE_Prefix + dataset.getName() + ":" + file.getName());
+            setStatus("Completed export for " + dataset.getName() + ":" + file.getName());
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + file, e);
             try {
@@ -93,13 +90,13 @@ public class ExportTask implements Runnable {
     }
 
     private void setStartStatus() throws EmfException {
-        setStatus(EMFConstants.START_EXPORT_MESSAGE_Prefix + dataset.getName() + ":" + file.getName());
+        setStatus("Started export for " + dataset.getName() + ":" + file.getName());
     }
 
     private void setStatus(String message) throws EmfException {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
-        endStatus.setMessageType(EMFConstants.EXPORT_MESSAGE_TYPE);
+        endStatus.setMessageType("Export");
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 

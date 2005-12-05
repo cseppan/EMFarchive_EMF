@@ -1,8 +1,10 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
+import gov.epa.emissions.framework.services.EditToken;
 
 import javax.xml.namespace.QName;
 
@@ -13,12 +15,15 @@ public class DataEditorMappings extends Mappings {
     public void register(Call call) {
         mapper.registerBeanMapping(call, Page.class, page());
         mapper.registerArrayMapping(call, Page[].class, pages());
-        
+
         mapper.registerBeanMapping(call, VersionedRecord.class, record());
         mapper.registerArrayMapping(call, VersionedRecord[].class, records());
-        
+
         mapper.registerBeanMapping(call, Version.class, version());
         mapper.registerArrayMapping(call, Version[].class, versions());
+
+        mapper.registerBeanMapping(call, EditToken.class, editToken());
+        mapper.registerBeanMapping(call, ChangeSet.class, changeset());
 
         mapper.registerMappingForTable(call);
     }
@@ -45,6 +50,14 @@ public class DataEditorMappings extends Mappings {
 
     public QName versions() {
         return qname("Versions");
+    }
+
+    public QName editToken() {
+        return qname("EditToken");
+    }
+
+    public QName changeset() {
+        return qname("ChangeSet");
     }
 
 }

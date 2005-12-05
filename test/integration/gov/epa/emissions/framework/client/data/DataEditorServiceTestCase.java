@@ -4,11 +4,14 @@ import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
+import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EditToken;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
@@ -23,12 +26,15 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
     private EmfDataset dataset;
 
+    private String table;
+
     protected void setUpService(DataEditorService service) throws Exception {
         this.service = service;
         datasource = emissions();
 
         dataset = new EmfDataset();
-        dataset.setName("test");
+        table = "test";
+        dataset.setName(table);
         dataset.setDatasetid(Math.abs(new Random().nextInt()));
 
         ORLNonPointImporter importer = new ORLNonPointImporter(dataset, datasource, dataTypes());
@@ -134,5 +140,36 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         assertEquals(derived.getVersion(), finalVersion.getVersion());
         assertEquals("0", finalVersion.getPath());
         assertTrue("Derived version should be final on being marked 'final'", finalVersion.isFinalVersion());
+    }
+
+    public void testChangeSetWithNewRecordsResultsInNewVersion() throws Exception {
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+
+        Version versionZero = versions[0];
+        Version versionOne = service.derive(versionZero);
+
+        ChangeSet changeset = new ChangeSet();
+        changeset.setVersion(versionOne);
+
+        VersionedRecord record6 = new VersionedRecord();
+        record6.setDatasetId((int) dataset.getDatasetid());
+        changeset.addNew(record6);
+
+        VersionedRecord record7 = new VersionedRecord();
+        record7.setDatasetId((int) dataset.getDatasetid());
+        changeset.addNew(record7);
+
+        EditToken token = new EditToken(versionOne, table);
+        service.submit(token, changeset);
+
+        VersionedRecordsReader reader = new VersionedRecordsReader(datasource);
+        int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName()).length;
+
+        VersionedRecord[] records = reader.fetchAll(versionOne, dataset.getName());
+        assertEquals(versionZeroRecordsCount + 2, records.length);
+        int init = records[0].getRecordId();
+        for (int i = 1; i < records.length; i++) {
+            assertEquals(++init, records[i].getRecordId());
+        }
     }
 }

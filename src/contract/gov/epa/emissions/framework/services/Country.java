@@ -1,52 +1,34 @@
-/*
- * Creation on Sep 27, 2005
- * Eclipse Project Name: EMF
- * File Name: Country.java
- * Author: Conrad F. D'Cruz
- */
-/**
- * 
- */
-
 package gov.epa.emissions.framework.services;
 
 import java.io.Serializable;
 
-/**
- * @author Conrad F. D'Cruz
- *
- */
 public class Country implements Serializable {
 
-	private long id;
-	private String name;
-	
-	/**
-	 * 
-	 */
-	public Country() {
-		super();
-	}
+    private long id;
 
-	public Country(String name) {
-		super();
-		this.name = name;
-	}
+    private String name;
 
-	public long getId() {
-		return id;
-	}
+    public Country() {// needed for serialization
+    }
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public Country(String name) {
+        this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

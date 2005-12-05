@@ -6,7 +6,7 @@ public class DataEditorServiceImplTest extends DataEditorServiceTestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        super.setUpService(new DataEditorServiceImpl(emissions()));
+        super.setUpService(new DataEditorServiceImpl(super.dbServer()));
     }
 
 }

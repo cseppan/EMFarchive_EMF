@@ -4,15 +4,18 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.PageReader;
+import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EMFConstants;
+import gov.epa.emissions.framework.services.EditToken;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -36,6 +39,8 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     private Versions versions;
 
+    private SqlDataTypes sqlTypes;
+
     public DataEditorServiceImpl() throws InfrastructureException {
         try {
             Context ctx = new InitialContext();
@@ -44,20 +49,21 @@ public class DataEditorServiceImpl implements DataEditorService {
             DbServer dbServer = new PostgresDbServer(emfDatabase.getConnection(), EMFConstants.EMF_REFERENCE_SCHEMA,
                     EMFConstants.EMF_EMISSIONS_SCHEMA);
 
-            init(dbServer.getEmissionsDatasource());
+            init(dbServer);
         } catch (Exception ex) {
             log.error("could not initialize EMF datasource", ex);
             throw new InfrastructureException("Server configuration error");
         }
     }
 
-    public DataEditorServiceImpl(Datasource datasource) throws SQLException {
-        init(datasource);
+    public DataEditorServiceImpl(DbServer dbServer) throws SQLException {
+        init(dbServer);
     }
 
-    private void init(Datasource datasource) throws SQLException {
+    private void init(DbServer dbServer) throws SQLException {
         pageReadersMap = new HashMap();
-        this.datasource = datasource;
+        this.datasource = dbServer.getEmissionsDatasource();
+        sqlTypes = dbServer.getSqlDataTypes();
         versions = new Versions(datasource);
     }
 
@@ -114,9 +120,19 @@ public class DataEditorServiceImpl implements DataEditorService {
     }
 
     public void close() throws EmfException {
+        closePageReaders();
+
+        try {
+            versions.close();
+        } catch (SQLException e) {
+            log.error("Could not close Versions due to: " + e.getMessage());
+            throw new EmfException("Could not close Versions", e.getMessage());
+        }
+    }
+
+    private void closePageReaders() throws EmfException {
         Collection all = pageReadersMap.values();
-        Iterator iter = all.iterator();
-        while (iter.hasNext()) {
+        for (Iterator iter = all.iterator(); iter.hasNext();) {
             try {
                 PageReader pageReader = (PageReader) iter.next();
                 pageReader.close();
@@ -125,14 +141,8 @@ public class DataEditorServiceImpl implements DataEditorService {
                 throw new EmfException(e.getMessage());
             }
         }
-        pageReadersMap.clear();
 
-        try {
-            versions.close();
-        } catch (SQLException e) {
-            log.error("Could not close Versions due to: " + e.getMessage());
-            throw new EmfException("Could not close Versions", e.getMessage());
-        }
+        pageReadersMap.clear();
     }
 
     /**
@@ -153,8 +163,14 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
-    public void submit(ChangeSet changeset) {
-        // TODO Auto-generated method stub
+    public void submit(EditToken token, ChangeSet changeset) throws EmfException {
+        try {
+            VersionedRecordsWriter writer = new VersionedRecordsWriter(datasource, token.getTable(), sqlTypes);
+            writer.update(changeset);
+        } catch (Exception e) {
+            throw new EmfException("Could not update Dataset: " + token.getDatasetId() + " with changes for Version: "
+                    + token.getVersion());
+        }
     }
 
     public Version markFinal(Version derived) throws EmfException {

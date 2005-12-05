@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 
 public interface DataEditorService {
+    // read
     Page getPage(String tableName, int pageNumber) throws EmfException;
 
     int getPageCount(String tableName) throws EmfException;
@@ -14,14 +15,17 @@ public interface DataEditorService {
 
     int getTotalRecords(String tableName) throws EmfException;
 
+    // edit
+    void submit(EditToken token, ChangeSet changeset) throws EmfException;
+
+    // version-related
     Version[] getVersions(long datasetId) throws EmfException;
 
     Version derive(Version baseVersion) throws EmfException;
 
-    void submit(ChangeSet changeset) throws EmfException;
-
-    void close() throws EmfException;
-
     Version markFinal(Version derived) throws EmfException;
+
+    // session
+    void close() throws EmfException;
 
 }

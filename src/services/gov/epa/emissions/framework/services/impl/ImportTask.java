@@ -10,7 +10,6 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusService;
@@ -58,7 +57,7 @@ public class ImportTask implements Runnable {
             dataset.setStatus(DatasetStatus.IMPORTED);
             dataServices.insertDataset(dataset);
 
-            setStatus(EMFConstants.END_IMPORT_MESSAGE_Prefix + dataset.getDatasetTypeName() + ":" + fileName);
+            setStatus("Completed import for " + dataset.getDatasetTypeName() + ":" + fileName);
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + fileName, e);
             try {
@@ -72,13 +71,13 @@ public class ImportTask implements Runnable {
     }
 
     private void setStartStatus() throws EmfException {
-        setStatus(EMFConstants.START_IMPORT_MESSAGE_Prefix + dataset.getDatasetTypeName());
+        setStatus("Started import for " + dataset.getDatasetTypeName());
     }
 
     private void setStatus(String message) throws EmfException {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
-        endStatus.setMessageType(EMFConstants.IMPORT_MESSAGE_TYPE);
+        endStatus.setMessageType("Import");
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 

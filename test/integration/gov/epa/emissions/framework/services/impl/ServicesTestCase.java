@@ -49,7 +49,7 @@ public abstract class ServicesTestCase extends TestCase {
         return dbServer().getEmissionsDatasource();
     }
 
-    private DbServer dbServer() {
+    protected DbServer dbServer() {
         return dbSetup.getDbServer();
     }
 

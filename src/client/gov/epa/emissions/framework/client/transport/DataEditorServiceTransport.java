@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EditToken;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -163,9 +164,21 @@ public class DataEditorServiceTransport implements DataEditorService {
         return null;
     }
 
-    public void submit(ChangeSet changeset) {
-        // TODO Auto-generated method stub
+    public void submit(EditToken token, ChangeSet changeset) throws EmfException {
+        try {
+            mappings.addParam(call, "token", mappings.editToken());
+            mappings.addParam(call, "changeset", mappings.changeset());
+            mappings.setOperation(call, "submit");
+            mappings.setVoidReturnType(call);
 
+            call.invoke(new Object[] { token, changeset });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not submit changes for " + token, fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not submit changes for " + token, e);
+        } finally {
+            call.removeAllParameters();
+        }
     }
 
     public Version markFinal(Version derived) throws EmfException {
