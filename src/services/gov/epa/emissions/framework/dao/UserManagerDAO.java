@@ -1,11 +1,3 @@
-/*
- * Created on Jul 11, 2005
- *
- * Eclipse Project Name: EMFServer
- * Package: package gov.epa.emissions.framework.dao;
- * File Name: UserManagerDAO.java
- * Author: Conrad F. D'Cruz
- */
 package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.framework.InfrastructureException;
@@ -26,10 +18,6 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * @author Conrad F. D'Cruz
- * 
- */
 public class UserManagerDAO {
     private static Log log = LogFactory.getLog(UserManagerDAO.class);
 

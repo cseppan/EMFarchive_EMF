@@ -1,11 +1,3 @@
-/*
- * Created on Jul 29, 2005
- *
- * Eclipse Project Name: EMF
- * Package: package gov.epa.emissions.framework.dao;
- * File Name: HibernateUtil.java
- * Author: Conrad F. D'Cruz
- */
 package gov.epa.emissions.framework.services.impl;
 
 import org.apache.commons.logging.Log;
@@ -15,10 +7,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-/**
- * @author Conrad F. D'Cruz
- * 
- */
 public class HibernateUtils {
 
     private static Log log = LogFactory.getLog(HibernateUtils.class);

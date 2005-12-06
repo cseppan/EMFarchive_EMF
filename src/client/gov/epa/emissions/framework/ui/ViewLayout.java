@@ -11,7 +11,6 @@ public interface ViewLayout {
     void remove();
 
     /**
-     * @param id
      * @return true, if activation successful
      */
     boolean activate(Object id);

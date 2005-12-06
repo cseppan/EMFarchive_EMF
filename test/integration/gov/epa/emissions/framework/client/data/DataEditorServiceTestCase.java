@@ -37,10 +37,10 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         dataset.setName(table);
         dataset.setDatasetid(Math.abs(new Random().nextInt()));
 
-        ORLNonPointImporter importer = new ORLNonPointImporter(dataset, datasource, dataTypes());
+        File file = new File("test/data/orl/nc", "small-nonpoint.txt");
+        ORLNonPointImporter importer = new ORLNonPointImporter(file, dataset, datasource, dataTypes());
 
-        importer.preCondition(new File("test/data/orl/nc"), "small-nonpoint.txt");
-        importer.run(dataset);
+        importer.run();
     }
 
     protected void tearDown() throws Exception {
@@ -65,7 +65,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
             assertEquals(editToken.datasetId(), records[i].getDatasetId());
             assertEquals(0, records[i].getVersion());
         }
-        
+
         int recordId = records[0].getRecordId();
         for (int i = 1; i < records.length; i++) {
             assertEquals(++recordId, records[i].getRecordId());
@@ -84,7 +84,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
     private EditToken editToken() {
         Version version = new Version();
-        version.setDatasetId((int) dataset.getDatasetid());
+        version.setDatasetId(dataset.getDatasetid());
         version.setVersion(0);
         version.setPath("");
         version.markFinal();

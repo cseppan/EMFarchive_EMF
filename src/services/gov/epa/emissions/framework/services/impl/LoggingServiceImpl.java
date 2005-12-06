@@ -1,10 +1,3 @@
-/*
- * Creation on Sep 19, 2005
- * Eclipse Project Name: EMF
- * File Name: LoggingServicesImpl.java
- * Author: Conrad F. D'Cruz
- */
-
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.framework.dao.LoggingDAO;

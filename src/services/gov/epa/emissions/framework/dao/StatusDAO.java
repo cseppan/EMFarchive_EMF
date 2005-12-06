@@ -1,11 +1,3 @@
-/*
- * Created on Jul 29, 2005
- *
- * Eclipse Project Name: EMF
- * Package: package gov.epa.emissions.framework.dao;
- * File Name: StatusDAO.java
- * Author: Conrad F. D'Cruz
- */
 package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.framework.services.Status;
@@ -22,10 +14,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-/**
- * @author Conrad F. D'Cruz
- * 
- */
 public class StatusDAO {
     private static Log log = LogFactory.getLog(StatusDAO.class);
 
@@ -68,7 +56,7 @@ public class StatusDAO {
     public static void insertStatusMessage(Status status, Session session) {
         log.debug("StatusDAO: insertStatusMessage: " + status.getUsername() + "\n" + session.toString());
         Transaction tx = null;
-        
+
         try {
             tx = session.beginTransaction();
             log.debug("StatusDAO: insertStatusMessage before session.save");

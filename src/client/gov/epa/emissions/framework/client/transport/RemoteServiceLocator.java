@@ -1,11 +1,3 @@
-/*
- * Created on Aug 11, 2005
- *
- * Eclipse Project Name: EMF
- * Package: package gov.epa.emissions.framework.client.transport;
- * File Name: ServiceLocator.java
- * Author: Conrad F. D'Cruz
- */
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.EmfException;

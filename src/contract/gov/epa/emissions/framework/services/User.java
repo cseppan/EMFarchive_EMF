@@ -1,12 +1,3 @@
-/*
- * Created on Jun 27, 2005
- *
- * Eclipse Project Name: EMFCommons
- * Package: package gov.epa.emissions.framework.commons;
- * File Name: User.java
- * Author: Conrad F. D'Cruz
- * 
- */
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.framework.EmfException;
@@ -16,8 +7,6 @@ import java.io.Serializable;
 import java.util.regex.Pattern;
 
 /**
- * @author Conrad F. D'Cruz
- * 
  * The User value object encapsulates all of the EMF user data The User object
  * is serialized between the server and client using Apache Axis Web Services
  * (SOAP/HTTP and XML)
@@ -77,9 +66,6 @@ public class User implements Serializable {
         this.acctDisabled = disabled;
     }
 
-    /**
-     * @return Returns the acctDisabled.
-     */
     public boolean isAcctDisabled() {
         return acctDisabled;
     }

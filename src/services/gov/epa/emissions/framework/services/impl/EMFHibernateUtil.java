@@ -1,10 +1,3 @@
-/*
- * Creation on Sep 2, 2005
- * Eclipse Project Name: EMF
- * File Name: EMFHibernateUtil.java
- * Author: Conrad F. D'Cruz
- */
-
 package gov.epa.emissions.framework.services.impl;
 
 import org.apache.commons.logging.Log;
@@ -17,8 +10,9 @@ import org.hibernate.cfg.Configuration;
 public class EMFHibernateUtil {
 
     private static Log log = LogFactory.getLog(EMFHibernateUtil.class);
+
     private static SessionFactory sessionFactory = null;
-   
+
     static {
         try {
             Configuration configure = new Configuration().configure("hibernate.cfg.xml");
@@ -30,20 +24,7 @@ public class EMFHibernateUtil {
     }
 
     public static Session getSession() throws HibernateException {
-        log.debug("get session");    	
-        Session session = null;
-        session = sessionFactory.openSession();
-        log.debug("get session: " + (session!=null));
-        return session;
+        return sessionFactory.openSession();
     }
-
-    public static void closeSession(Session s) throws HibernateException {
-        log.debug("closing session");
-        if (s != null) {
-            s.close();
-        }
-        log.debug("closing session");
-    }
-
 
 }

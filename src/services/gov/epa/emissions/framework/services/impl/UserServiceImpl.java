@@ -1,7 +1,3 @@
-/*
- * Created on Jun 21, 2005
- *
- */
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.framework.AuthenticationException;
@@ -17,10 +13,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * @author adm$wkstn
- * 
- */
 public class UserServiceImpl implements UserService {
     private static Log log = LogFactory.getLog(UserServiceImpl.class);
 

@@ -1,11 +1,3 @@
-/*
- * Created on Aug 4, 2005
- *
- * Eclipse Project Name: EMF
- * Package: package gov.epa.emissions.framework.service;
- * File Name: EMFDataService.java
- * Author: Conrad F. D'Cruz
- */
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
@@ -37,10 +29,6 @@ import org.hibernate.Session;
 import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
-/**
- * @author Conrad F. D'Cruz
- * 
- */
 public class ExImServiceImpl implements ExImService {
 
     private static Log log = LogFactory.getLog(ExImServiceImpl.class);
@@ -142,17 +130,11 @@ public class ExImServiceImpl implements ExImService {
             File path = validatePath(folderPath);
 
             validateDatasetName(dataset);
-            ServicesHolder svcHolder = new ServicesHolder();
+            Services svcHolder = new Services();
             svcHolder.setDataSvc(new DataServiceImpl());
             svcHolder.setStatusSvc(new StatusServiceImpl());
 
-            Importer importer = importerFactory.create(dataset);
-            log.debug("$$$ Path: " + path.getAbsolutePath());
-            log.debug("$$$ Filename: " + fileName);
-            log.debug("$$$ DatasetType: " + dataset.getDatasetType().getName());
-            log.debug("%%%%% Is importer null? " + (importer == null));
-            // Test the precondition (files exist)
-            importer.preCondition(path, fileName);
+            Importer importer = importerFactory.create(dataset, path, fileName);
             ImportTask eximTask = new ImportTask(user, fileName, dataset, svcHolder, importer);
 
             threadPool.execute(eximTask);
@@ -177,7 +159,7 @@ public class ExImServiceImpl implements ExImService {
 
                 // FIXME: Default is overwrite
                 File file = validateExportFile(path, getCleanDatasetName(dataset.getName()), true);
-                ServicesHolder svcHolder = new ServicesHolder();
+                Services svcHolder = new Services();
                 svcHolder.setLogSvc(new LoggingServiceImpl());
                 svcHolder.setStatusSvc(new StatusServiceImpl());
                 svcHolder.setDataSvc(new DataServiceImpl());
@@ -207,7 +189,7 @@ public class ExImServiceImpl implements ExImService {
 
                 // FIXME: Default is overwrite
                 File file = validateExportFile(path, getCleanDatasetName(dataset.getName()), false);
-                ServicesHolder svcHolder = new ServicesHolder();
+                Services svcHolder = new Services();
                 svcHolder.setLogSvc(new LoggingServiceImpl());
                 svcHolder.setStatusSvc(new StatusServiceImpl());
                 svcHolder.setDataSvc(new DataServiceImpl());

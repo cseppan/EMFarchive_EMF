@@ -74,7 +74,7 @@ public class PageViewPresenter {
     private EditToken editToken() {
         // TODO: pull this from the DataEditorService
         Version version = new Version();
-        version.setDatasetId((int) dataset.getDatasetid());
+        version.setDatasetId(dataset.getDatasetid());
         version.setVersion(0);
         version.markFinal();
         version.setPath("");

@@ -1,22 +1,10 @@
-/*
- * Creation on Sep 1, 2005
- * Eclipse Project Name: EMF
- * File Name: ExportTask.java
- * Author: Conrad F. D'Cruz
- */
-/**
- * 
- */
-
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.Exporter;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Status;
-import gov.epa.emissions.framework.services.StatusService;
 import gov.epa.emissions.framework.services.User;
 
 import java.io.File;
@@ -36,34 +24,26 @@ public class ExportTask implements Runnable {
 
     private File file;
 
-    private DataService dataServices = null;
+    private DataService dataServices;
 
-    private StatusService statusServices = null;
+    private StatusServiceImpl statusServices;
 
-    private LoggingServiceImpl loggingServices = null;
+    private LoggingServiceImpl loggingServices;
 
     private EmfDataset dataset;
 
     private Exporter exporter;
 
-    private AccessLog accesslog = null;
+    private AccessLog accesslog;
 
-    /**
-     * 
-     * @param user
-     * @param file
-     * @param dataset
-     * @param statusSvc
-     * @param exporter2
-     */
-    protected ExportTask(User user, File file, EmfDataset dataset, ServicesHolder svcHolder, AccessLog accesslog,
+    protected ExportTask(User user, File file, EmfDataset dataset, Services svcHolder, AccessLog accesslog,
             Exporter exporter) {
         this.user = user;
         this.file = file;
         this.dataset = dataset;
-        this.statusServices = svcHolder.getStatusSvc();
+        this.statusServices = svcHolder.getStatus();
         this.loggingServices = svcHolder.getLoggingService();
-        this.dataServices = svcHolder.getDataServices();
+        this.dataServices = svcHolder.getData();
         this.exporter = exporter;
         this.accesslog = accesslog;
     }
@@ -73,27 +53,23 @@ public class ExportTask implements Runnable {
         try {
             setStartStatus();
             exporter.export(file);
-            
+
             loggingServices.setAccessLog(accesslog);
             dataServices.updateDataset(dataset);
             setStatus("Completed export for " + dataset.getName() + ":" + file.getName());
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + file, e);
-            try {
-                setStatus("Export failure. Reason: " + e.getMessage());
-            } catch (EmfException e1) {
-                log.error("Problem attempting to post 'end status' using Status Service for file : " + file, e1);
-            }
+            setStatus("Export failure. Reason: " + e.getMessage());
         }
 
         log.info("exporting of file: " + file.getName() + " of type: " + dataset.getName() + " complete");
     }
 
-    private void setStartStatus() throws EmfException {
+    private void setStartStatus() {
         setStatus("Started export for " + dataset.getName() + ":" + file.getName());
     }
 
-    private void setStatus(String message) throws EmfException {
+    private void setStatus(String message) {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
         endStatus.setMessageType("Export");

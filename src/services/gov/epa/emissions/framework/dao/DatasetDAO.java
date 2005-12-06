@@ -1,14 +1,6 @@
-/*
- * Creation on Aug 29, 2005
- * Eclipse Project Name: EMF
- * File Name: DatasetDAO.java
- * Author: Conrad F. D'Cruz
- */
-
 package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.commons.io.Sector;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -24,10 +16,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-/**
- * @author Conrad F. D'Cruz
- * 
- */
 public class DatasetDAO {
     private static Log log = LogFactory.getLog(DatasetDAO.class);
 
@@ -43,11 +31,6 @@ public class DatasetDAO {
      * This method checks if the dataset name exists in the Datasets table A
      * dataset name is unique in the EMF system. If the name is already used by
      * another dataset record then return true else return false.
-     * 
-     * @param datasetName
-     * @param session
-     * @return
-     * @throws EmfException
      */
     public static boolean isDatasetNameUsed(String datasetName, Session session) {
         boolean dsNameExists = false;
