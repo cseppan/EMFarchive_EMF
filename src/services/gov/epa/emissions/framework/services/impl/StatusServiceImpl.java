@@ -17,14 +17,11 @@ public class StatusServiceImpl implements StatusService {
     }
 
     public Status[] getAll(String userName) {
-        System.out.println("get all...");
         Session session = sessionFactory.getSession();
-        System.out.println("session : " + session);
         List allStats = StatusDAO.getMessages(userName, session);
         session.flush();
         session.close();
         
-        System.out.println("closed session");
         return (Status[]) allStats.toArray(new Status[allStats.size()]);
     }
 

@@ -12,8 +12,10 @@ public class SectorMappings extends Mappings {
     public void register(Call call) {
         bean(call, Sector.class, "Sector");
         array(call, Sector[].class, "Sectors");
+        
         bean(call, SectorCriteria.class, "SectorCriteria");
         array(call, SectorCriteria[].class, "SectorCriterias");
+        
         registerTable(call);
     }
 

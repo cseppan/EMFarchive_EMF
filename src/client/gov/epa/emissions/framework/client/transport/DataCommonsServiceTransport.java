@@ -124,6 +124,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
 
             SectorMappings mappings = new SectorMappings();
             mappings.register(call);
+            
             call.setOperationName(mappings.qname("addSector"));
             call.addParameter("sector", mappings.sector(), ParameterMode.IN);
             call.setReturnType(Constants.XSD_ANY);
