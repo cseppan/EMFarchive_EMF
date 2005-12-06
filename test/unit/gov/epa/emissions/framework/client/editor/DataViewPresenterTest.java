@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EditToken;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -42,10 +43,11 @@ public class DataViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldLoadFirstPageOnTableSelection() throws Exception {
         Mock dataset = mock(Dataset.class);
-
+        dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
+        
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
-        services.stubs().method("getPage").with(eq("table"), eq(new Integer(1))).will(returnValue(page));
+        services.stubs().method("getPage").with(new IsInstanceOf(EditToken.class), eq(new Integer(1))).will(returnValue(page));
 
         Mock pageView = mock(PageView.class);
         pageView.expects(once()).method("display").with(eq(page));
@@ -58,12 +60,13 @@ public class DataViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldBeAbleToDisplayMultipleTablesSimultaneously() throws Exception {
         Mock dataset = mock(Dataset.class);
+        dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
         Mock services = mock(DataEditorService.class);
         Page page1 = new Page();
         Page page2 = new Page();
-        services.expects(once()).method("getPage").with(eq("table1"), eq(new Integer(1))).will(returnValue(page1));
-        services.expects(once()).method("getPage").with(eq("table2"), eq(new Integer(1))).will(returnValue(page2));
+        services.expects(once()).method("getPage").with(new IsInstanceOf(EditToken.class), eq(new Integer(1))).will(returnValue(page1));
+        services.expects(once()).method("getPage").with(new IsInstanceOf(EditToken.class), eq(new Integer(1))).will(returnValue(page2));
 
         Mock pageView = mock(PageView.class);
         pageView.expects(once()).method("display").with(eq(page1));

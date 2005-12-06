@@ -48,15 +48,15 @@ public class DataEditorServiceTransport implements DataEditorService {
         throw new EmfException(extractMessage(fault.getMessage()));
     }
 
-    public Page getPage(String tableName, int pageNumber) throws EmfException {
+    public Page getPage(EditToken token, int pageNumber) throws EmfException {
         try {
-            mappings.addStringParam(call, "tableName");
+            mappings.addParam(call, "token", mappings.editToken());
             mappings.addIntegerParam(call, "pageNumber");
 
             mappings.setOperation(call, "getPage");
             mappings.setReturnType(call, mappings.page());
 
-            return (Page) call.invoke(new Object[] { tableName, new Integer(pageNumber) });
+            return (Page) call.invoke(new Object[] { token, new Integer(pageNumber) });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get page: ", fault);
         } catch (Exception e) {
@@ -68,13 +68,13 @@ public class DataEditorServiceTransport implements DataEditorService {
         return null;
     }
 
-    public int getPageCount(String tableName) throws EmfException {
+    public int getPageCount(EditToken token) throws EmfException {
         try {
             mappings.setOperation(call, "getPageCount");
-            mappings.addStringParam(call, "tableName");
+            mappings.addParam(call, "token", mappings.editToken());
             mappings.setIntegerReturnType(call);
 
-            Integer cnt = (Integer) call.invoke(new Object[] { tableName });
+            Integer cnt = (Integer) call.invoke(new Object[] { token });
 
             return cnt.intValue();
         } catch (AxisFault fault) {
@@ -88,17 +88,17 @@ public class DataEditorServiceTransport implements DataEditorService {
         return -1;
     }
 
-    public Page getPageWithRecord(String tableName, int recordId) throws EmfException {
+    public Page getPageWithRecord(EditToken token, int recordId) throws EmfException {
         Page page = null;
 
         try {
             mappings.setOperation(call, "getPageWithRecord");
             mappings.setReturnType(call, mappings.page());
 
-            mappings.addStringParam(call, "tableName");
+            mappings.addParam(call, "token", mappings.editToken());
             mappings.addIntegerParam(call, "recordId");
 
-            page = (Page) call.invoke(new Object[] { tableName, new Integer(recordId) });
+            page = (Page) call.invoke(new Object[] { token, new Integer(recordId) });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get page: ", fault);
         } catch (Exception e) {

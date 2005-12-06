@@ -45,7 +45,7 @@ public class PageViewPresenter {
 
     public void doDisplay(int pageNumber) throws EmfException {
         this.pageNumber = pageNumber;
-        page = services.getPage(table, pageNumber);
+        page = services.getPage(editToken(), pageNumber);
         view.display(page);
     }
 
@@ -58,18 +58,20 @@ public class PageViewPresenter {
     }
 
     private int pageCount() throws EmfException {
-        return services.getPageCount(table);
+        return services.getPageCount(editToken());
     }
 
     public void doDisplayPageWithRecord(int record) throws EmfException {
-        page = services.getPageWithRecord(table, record);
+        page = services.getPageWithRecord(editToken(), record);
         view.display(page);
     }
 
     public int totalRecords() throws EmfException {
-        // TODO: use the specified version
-        EditToken token = new EditToken(dataset.getDatasetid(), 0, table);
-        return services.getTotalRecords(token);
+        return services.getTotalRecords(editToken());
+    }
+
+    private EditToken editToken() {
+        return new EditToken(dataset.getDatasetid(), 0, table);//TODO: use specific version
     }
 
 }

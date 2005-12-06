@@ -62,9 +62,9 @@ public class DataEditorServiceImpl implements DataEditorService {
         init(dbServer);
     }
 
-    public Page getPage(String tableName, int pageNumber) throws EmfException {
+    public Page getPage(EditToken token, int pageNumber) throws EmfException {
         try {
-            PageReader reader = getReader(tableName);
+            PageReader reader = getReader(token.getTable());
             return reader.page(pageNumber);
         } catch (SQLException ex) {
             log.error("Initialize reader: " + ex.getMessage());
@@ -72,9 +72,9 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
-    public int getPageCount(String tableName) throws EmfException {
+    public int getPageCount(EditToken token) throws EmfException {
         try {
-            PageReader reader = getReader(tableName);
+            PageReader reader = getReader(token.getTable());
             return reader.totalPages();
         } catch (SQLException e) {
             log.error("Failed to get page count: " + e.getMessage());
@@ -82,9 +82,9 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
-    public Page getPageWithRecord(String tableName, int recordId) throws EmfException {
+    public Page getPageWithRecord(EditToken token, int recordId) throws EmfException {
         try {
-            PageReader reader = getReader(tableName);
+            PageReader reader = getReader(token.getTable());
             return reader.pageByRecord(recordId);
         } catch (SQLException ex) {
             log.error("Initialize reader: " + ex.getMessage());

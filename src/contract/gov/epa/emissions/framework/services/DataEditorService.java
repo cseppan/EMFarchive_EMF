@@ -7,11 +7,11 @@ import gov.epa.emissions.framework.EmfException;
 
 public interface DataEditorService {
     // read
-    Page getPage(String tableName, int pageNumber) throws EmfException;
+    Page getPage(EditToken token, int pageNumber) throws EmfException;
 
-    int getPageCount(String tableName) throws EmfException;
+    int getPageCount(EditToken token) throws EmfException;
 
-    Page getPageWithRecord(String tableName, int recordId) throws EmfException;
+    Page getPageWithRecord(EditToken token, int recordId) throws EmfException;
 
     int getTotalRecords(EditToken token) throws EmfException;
 

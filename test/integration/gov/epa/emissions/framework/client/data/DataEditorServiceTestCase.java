@@ -54,20 +54,23 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     }
 
     public void testShouldReturnExactlyOnePage() throws EmfException {
-        Page page = service.getPage(dataset.getName(), 1);
+        Page page = service.getPage(editToken(), 1);
         assertTrue(page != null);
     }
 
     public void testShouldReturnAtleastOneRecord() throws EmfException {
-        EditToken token = new EditToken(dataset.getDatasetid(), 0, dataset.getName());
-
-        int numberOfRecords = service.getTotalRecords(token);
+        int numberOfRecords = service.getTotalRecords(editToken());
         assertTrue(numberOfRecords >= 1);
     }
 
     public void testShouldReturnAtLeastOnePage() throws EmfException {
-        int numberOfPages = service.getPageCount(dataset.getName());
+        int numberOfPages = service.getPageCount(editToken());
         assertTrue(numberOfPages >= 1);
+    }
+
+    private EditToken editToken() {
+        EditToken token = new EditToken(dataset.getDatasetid(), 0, dataset.getName());
+        return token;
     }
 
     /**
@@ -76,11 +79,10 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
      * record id that was supplied.
      */
     public void testShouldReturnOnlyOnePage() throws EmfException {
-        EditToken token = new EditToken(dataset.getDatasetid(), 0, dataset.getName());
-
+        EditToken token = editToken();
         int numberOfRecords = service.getTotalRecords(token);
 
-        Page page = service.getPageWithRecord(dataset.getName(), numberOfRecords - 1);
+        Page page = service.getPageWithRecord(token, numberOfRecords - 1);
         VersionedRecord[] allRecs = page.getRecords();
         boolean found = false;
 
@@ -93,11 +95,10 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     }
 
     public void testShouldReturnNoPage() throws EmfException {
-        EditToken token = new EditToken(dataset.getDatasetid(), 0, dataset.getName());
-
+        EditToken token = editToken();
         int numberOfRecords = service.getTotalRecords(token);
 
-        Page page = service.getPageWithRecord(dataset.getName(), numberOfRecords + 1);
+        Page page = service.getPageWithRecord(token, numberOfRecords + 1);
         VersionedRecord[] allRecs = page.getRecords();
         boolean found = false;
 
