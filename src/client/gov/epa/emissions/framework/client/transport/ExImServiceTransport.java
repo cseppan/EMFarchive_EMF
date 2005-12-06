@@ -15,11 +15,11 @@ public class ExImServiceTransport implements ExImService {
 
     private CallFactory callFactory;
 
-    private ExImServiceMappings mappings;
+    private EmfMappings mappings;
 
     public ExImServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
-        mappings = new ExImServiceMappings();
+        mappings = new EmfMappings();
     }
 
     public void startImport(User user, String folderPath, String fileName, EmfDataset dataset) throws EmfException {

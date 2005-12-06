@@ -16,27 +16,20 @@ public class DataServiceTransport implements DataService {
 
     private CallFactory callFactory;
 
-    private DatasetMappings datasetMappings;
-
-    private CountryMappings countryMappings;
-
-    private SectorMappings sectorMappings;
+    private EmfMappings mappings;
 
     public DataServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
-
-        datasetMappings = new DatasetMappings();
-        countryMappings = new CountryMappings();
-        sectorMappings = new SectorMappings();
+        mappings = new EmfMappings();
     }
 
     public EmfDataset[] getDatasets() throws EmfException {
         try {
             Call call = callFactory.createCall();
 
-            datasetMappings.register(call);
-            datasetMappings.setOperation(call, "getDatasets");
-            datasetMappings.setReturnType(call, datasetMappings.datasets());
+            mappings.register(call);
+            mappings.setOperation(call, "getDatasets");
+            mappings.setReturnType(call, mappings.datasets());
 
             return (EmfDataset[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {
@@ -52,10 +45,10 @@ public class DataServiceTransport implements DataService {
         try {
             Call call = callFactory.createCall();
 
-            datasetMappings.register(call);
-            datasetMappings.setOperation(call, "updateDataset");
-            datasetMappings.addParam(call, "dataset", datasetMappings.dataset());
-            datasetMappings.setAnyReturnType(call);
+            mappings.register(call);
+            mappings.setOperation(call, "updateDataset");
+            mappings.addParam(call, "dataset", mappings.dataset());
+            mappings.setAnyReturnType(call);
 
             call.invoke(new Object[] { dataset });
         } catch (AxisFault fault) {
@@ -70,10 +63,10 @@ public class DataServiceTransport implements DataService {
         try {
             Call call = callFactory.createCall();
 
-            countryMappings.register(call);
-            countryMappings.setOperation(call, "addCountry");
-            countryMappings.addParam(call, "country", countryMappings.country());
-            countryMappings.setAnyReturnType(call);
+            mappings.register(call);
+            mappings.setOperation(call, "addCountry");
+            mappings.addParam(call, "country", mappings.country());
+            mappings.setAnyReturnType(call);
 
             call.invoke(new Object[] { country });
         } catch (AxisFault fault) {
@@ -87,10 +80,10 @@ public class DataServiceTransport implements DataService {
         try {
             Call call = callFactory.createCall();
 
-            countryMappings.register(call);
-            countryMappings.setOperation(call, "updateCountry");
-            countryMappings.addParam(call, "country", countryMappings.country());
-            countryMappings.setAnyReturnType(call);
+            mappings.register(call);
+            mappings.setOperation(call, "updateCountry");
+            mappings.addParam(call, "country", mappings.country());
+            mappings.setAnyReturnType(call);
 
             call.invoke(new Object[] { country });
         } catch (AxisFault fault) {
@@ -104,9 +97,9 @@ public class DataServiceTransport implements DataService {
         try {
             Call call = callFactory.createCall();
 
-            countryMappings.register(call);
-            countryMappings.setOperation(call, "getCountries");
-            countryMappings.setReturnType(call, countryMappings.countries());
+            mappings.register(call);
+            mappings.setOperation(call, "getCountries");
+            mappings.setReturnType(call, mappings.countries());
 
             return (Country[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {
@@ -122,9 +115,9 @@ public class DataServiceTransport implements DataService {
         try {
             Call call = callFactory.createCall();
 
-            sectorMappings.register(call);
-            sectorMappings.setOperation(call, "getSectors");
-            sectorMappings.setReturnType(call, sectorMappings.sectors());
+            mappings.register(call);
+            mappings.setOperation(call, "getSectors");
+            mappings.setReturnType(call, mappings.sectors());
 
             return (Sector[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {
@@ -140,10 +133,10 @@ public class DataServiceTransport implements DataService {
         try {
             Call call = callFactory.createCall();
 
-            sectorMappings.register(call);
-            sectorMappings.setOperation(call, "updateSector");
-            sectorMappings.addParam(call, "sector", sectorMappings.sector());
-            sectorMappings.setAnyReturnType(call);
+            mappings.register(call);
+            mappings.setOperation(call, "updateSector");
+            mappings.addParam(call, "sector", mappings.sector());
+            mappings.setAnyReturnType(call);
 
             call.invoke(new Object[] { sector });
         } catch (AxisFault fault) {
@@ -157,10 +150,10 @@ public class DataServiceTransport implements DataService {
         try {
             Call call = callFactory.createCall();
 
-            sectorMappings.register(call);
-            sectorMappings.setOperation(call, "addSector");
-            sectorMappings.addParam(call, "sector", sectorMappings.sector());
-            sectorMappings.setAnyReturnType(call);
+            mappings.register(call);
+            mappings.setOperation(call, "addSector");
+            mappings.addParam(call, "sector", mappings.sector());
+            mappings.setAnyReturnType(call);
 
             call.invoke(new Object[] { sector });
         } catch (AxisFault fault) {

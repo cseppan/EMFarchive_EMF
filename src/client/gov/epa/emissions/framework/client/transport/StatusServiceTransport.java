@@ -12,13 +12,13 @@ import org.apache.commons.logging.LogFactory;
 public class StatusServiceTransport implements StatusService {
     private static Log LOG = LogFactory.getLog(StatusServiceTransport.class);
 
-    private StatusMappings mappings;
+    private EmfMappings mappings;
 
     private CallFactory callFactory;
 
     public StatusServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
-        mappings = new StatusMappings();
+        mappings = new EmfMappings();
     }
 
     public Status[] getAll(String username) throws EmfException {

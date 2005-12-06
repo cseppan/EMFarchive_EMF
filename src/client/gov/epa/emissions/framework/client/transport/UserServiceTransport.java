@@ -14,11 +14,11 @@ public class UserServiceTransport implements UserService {
 
     private CallFactory callFactory;
 
-    private UserMappings mappings;
+    private EmfMappings mappings;
 
     public UserServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
-        mappings = new UserMappings();
+        mappings = new EmfMappings();
     }
 
     public void authenticate(String username, String password) throws EmfException {

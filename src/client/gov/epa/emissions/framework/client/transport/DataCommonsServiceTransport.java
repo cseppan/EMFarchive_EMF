@@ -17,20 +17,19 @@ import org.apache.commons.logging.LogFactory;
 public class DataCommonsServiceTransport implements DataCommonsService {
     private static Log LOG = LogFactory.getLog(DataCommonsServiceTransport.class);
 
-    private KeywordMappings mappings;
+    private EmfMappings mappings;
 
     private CallFactory callFactory;
 
     public DataCommonsServiceTransport(String endPoint) {
         callFactory = new CallFactory(endPoint);
-        mappings = new KeywordMappings();
+        mappings = new EmfMappings();
     }
 
     public void addCountry(Country country) throws EmfException {
         try {
             Call call = callFactory.createCall();
 
-            CountryMappings mappings = new CountryMappings();
             mappings.register(call);
             call.setOperationName(mappings.qname("addCountry"));
             call.addParameter("country", mappings.country(), ParameterMode.IN);
@@ -48,7 +47,6 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         try {
             Call call = callFactory.createCall();
 
-            CountryMappings mappings = new CountryMappings();
             mappings.register(call);
             call.setOperationName(mappings.qname("updateCountry"));
             call.addParameter("country", mappings.country(), ParameterMode.IN);
@@ -66,7 +64,6 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         try {
             Call call = callFactory.createCall();
 
-            CountryMappings mappings = new CountryMappings();
             mappings.register(call);
             call.setOperationName(mappings.qname("getCountries"));
             call.setReturnType(mappings.countries());
@@ -85,7 +82,6 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         try {
             Call call = callFactory.createCall();
 
-            SectorMappings mappings = new SectorMappings();
             mappings.register(call);
             call.setOperationName(mappings.qname("getSectors"));
             call.setReturnType(mappings.sectors());
@@ -104,7 +100,6 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         try {
             Call call = callFactory.createCall();
 
-            SectorMappings mappings = new SectorMappings();
             mappings.register(call);
             call.setOperationName(mappings.qname("updateSector"));
             call.addParameter("sector", mappings.sector(), ParameterMode.IN);
@@ -122,7 +117,6 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         try {
             Call call = callFactory.createCall();
 
-            SectorMappings mappings = new SectorMappings();
             mappings.register(call);
             
             call.setOperationName(mappings.qname("addSector"));

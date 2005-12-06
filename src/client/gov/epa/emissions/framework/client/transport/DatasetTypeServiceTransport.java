@@ -20,15 +20,17 @@ public class DatasetTypeServiceTransport implements DatasetTypeService {
 
     private String endpoint;
 
+    private EmfMappings mappings;
+
     public DatasetTypeServiceTransport(String endpt) {
         endpoint = endpt;
+        mappings = new EmfMappings();
     }
 
     public DatasetType[] getDatasetTypes() throws EmfException {
         try {
             Call call = call();
 
-            DatasetTypesMappings mappings = new DatasetTypesMappings();
             mappings.register(call);
             call.setOperationName(mappings.qname("getDatasetTypes"));
             call.setReturnType(mappings.datasetTypes());
@@ -47,7 +49,6 @@ public class DatasetTypeServiceTransport implements DatasetTypeService {
         try {
             Call call = call();
 
-            DatasetTypesMappings mappings = new DatasetTypesMappings();
             mappings.register(call);
             call.setOperationName(mappings.qname("updateDatasetType"));
             call.addParameter("datasettype", mappings.datasetType(), ParameterMode.IN);
@@ -66,7 +67,6 @@ public class DatasetTypeServiceTransport implements DatasetTypeService {
         try {
             Call call = call();
 
-            DatasetTypesMappings mappings = new DatasetTypesMappings();
             mappings.register(call);
             call.setOperationName(mappings.qname("insertDatasetType"));
             call.addParameter("datasettype", mappings.datasetType(), ParameterMode.IN);

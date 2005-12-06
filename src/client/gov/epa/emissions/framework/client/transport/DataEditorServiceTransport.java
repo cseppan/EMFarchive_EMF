@@ -20,7 +20,7 @@ public class DataEditorServiceTransport implements DataEditorService {
 
     private Call call = null;
 
-    private DataEditorMappings mappings;
+    private EmfMappings mappings;
 
     public DataEditorServiceTransport(Call call, String endPoint) {
         this.call = call;
@@ -30,7 +30,7 @@ public class DataEditorServiceTransport implements DataEditorService {
             throw new RuntimeException("Could not connect to Data Editor service at " + endPoint);
         }
 
-        mappings = new DataEditorMappings();
+        mappings = new EmfMappings();
         mappings.register(call);
     }
 

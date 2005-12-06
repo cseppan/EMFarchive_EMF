@@ -14,11 +14,11 @@ public class LoggingServiceTransport implements LoggingService {
 
     private CallFactory callFactory;
 
-    private LoggingMappings mappings;
+    private EmfMappings mappings;
 
     public LoggingServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
-        mappings = new LoggingMappings();
+        mappings = new EmfMappings();
     }
 
     public AccessLog[] getAccessLogs(long datasetid) throws EmfException {

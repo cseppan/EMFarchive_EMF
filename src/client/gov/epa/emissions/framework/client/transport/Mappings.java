@@ -14,12 +14,20 @@ public class Mappings {
         mapper = new Mapper();
     }
 
-    protected void array(Call call, Class clazz, String name) {
-        mapper.registerArrayMapping(call, clazz, qname(name));
+    public void array(Call call, Class clazz, String name) {
+        array(call, clazz, qname(name));
     }
 
-    protected void bean(Call call, Class clazz, String name) {
-        mapper.registerBeanMapping(call, clazz, qname(name));
+    public void array(Call call, Class clazz, QName name) {
+        mapper.registerArrayMapping(call, clazz, name);
+    }
+
+    public void bean(Call call, Class clazz, String name) {
+        bean(call, clazz, qname(name));
+    }
+
+    public void bean(Call call, Class clazz, QName name) {
+        mapper.registerBeanMapping(call, clazz, name);
     }
 
     public QName qname(String name) {
