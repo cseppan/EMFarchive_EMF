@@ -6,45 +6,38 @@ public class EditToken {
 
     private String table;
 
-    private int version;
-
-    private long datasetId;
+    private Version version;
 
     public EditToken() {// needed by Axis
     }
 
     public EditToken(Version version, String table) {
-        this(version.getDatasetId(), version.getVersion(), table);
-    }
-
-    public EditToken(long datasetId, int version, String table) {
-        setDatasetId(datasetId);
-        setVersion(version);
-        setTable(table);
+        this.version = version;
+        this.table = table;
     }
 
     public String getTable() {
         return table;
     }
 
+    public Version getVersion() {
+        return version;
+    }
+
     public void setTable(String table) {
         this.table = table;
     }
 
-    public int getVersion() {
-        return version;
-    }
-
-    public long getDatasetId() {
-        return datasetId;
-    }
-
-    public void setDatasetId(long datasetId) {
-        this.datasetId = datasetId;
-    }
-
-    public void setVersion(int version) {
+    public void setVersion(Version version) {
         this.version = version;
+    }
+
+    public Object key() {
+        return "DatasetId:" + version.getDatasetId() + "-Version:" + version.getVersion() + "-Table:" + getTable();
+    }
+
+    public long datasetId() {
+        return version.getDatasetId();
     }
 
 }

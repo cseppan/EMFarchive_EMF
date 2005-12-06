@@ -54,8 +54,22 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     }
 
     public void testShouldReturnExactlyOnePage() throws EmfException {
-        Page page = service.getPage(editToken(), 1);
-        assertTrue(page != null);
+        EditToken editToken = editToken();
+        Page page = service.getPage(editToken, 1);
+        assertNotNull("Should be able to get Page 1", page);
+
+        assertEquals(6, page.count());
+        VersionedRecord[] records = page.getRecords();
+        assertEquals(page.count(), records.length);
+        for (int i = 0; i < records.length; i++) {
+            assertEquals(editToken.datasetId(), records[i].getDatasetId());
+            assertEquals(0, records[i].getVersion());
+        }
+        
+        int recordId = records[0].getRecordId();
+        for (int i = 1; i < records.length; i++) {
+            assertEquals(++recordId, records[i].getRecordId());
+        }
     }
 
     public void testShouldReturnAtleastOneRecord() throws EmfException {
@@ -69,8 +83,13 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     }
 
     private EditToken editToken() {
-        EditToken token = new EditToken(dataset.getDatasetid(), 0, dataset.getName());
-        return token;
+        Version version = new Version();
+        version.setDatasetId((int) dataset.getDatasetid());
+        version.setVersion(0);
+        version.setPath("");
+        version.markFinal();
+
+        return new EditToken(version, dataset.getName());
     }
 
     /**

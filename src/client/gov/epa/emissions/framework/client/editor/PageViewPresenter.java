@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
@@ -71,7 +72,14 @@ public class PageViewPresenter {
     }
 
     private EditToken editToken() {
-        return new EditToken(dataset.getDatasetid(), 0, table);//TODO: use specific version
+        // TODO: pull this from the DataEditorService
+        Version version = new Version();
+        version.setDatasetId((int) dataset.getDatasetid());
+        version.setVersion(0);
+        version.markFinal();
+        version.setPath("");
+
+        return new EditToken(version, table);
     }
 
 }
