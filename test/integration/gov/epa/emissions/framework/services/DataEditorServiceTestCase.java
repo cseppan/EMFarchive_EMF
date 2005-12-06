@@ -86,6 +86,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version version = new Version();
         version.setDatasetId(dataset.getDatasetid());
         version.setVersion(0);
+        version.setName("v0");
         version.setPath("");
         version.markFinal();
 
@@ -144,7 +145,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version[] versions = service.getVersions(dataset.getDatasetid());
 
         Version versionZero = versions[0];
-        Version derived = service.derive(versionZero);
+        Version derived = service.derive(versionZero, "v 1");
 
         assertNotNull("Should be able to derive from a Final version", derived);
         assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
@@ -157,7 +158,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version[] versions = service.getVersions(dataset.getDatasetid());
 
         Version versionZero = versions[0];
-        Version derived = service.derive(versionZero);
+        Version derived = service.derive(versionZero, "v 1");
 
         Version finalVersion = service.markFinal(derived);
 
@@ -172,7 +173,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version[] versions = service.getVersions(dataset.getDatasetid());
 
         Version versionZero = versions[0];
-        Version versionOne = service.derive(versionZero);
+        Version versionOne = service.derive(versionZero, "v 1");
 
         ChangeSet changeset = new ChangeSet();
         changeset.setVersion(versionOne);
@@ -203,7 +204,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version[] versions = service.getVersions(dataset.getDatasetid());
 
         Version versionZero = versions[0];
-        Version versionOne = service.derive(versionZero);
+        Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
 

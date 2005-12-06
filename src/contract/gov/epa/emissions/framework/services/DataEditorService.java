@@ -21,7 +21,7 @@ public interface DataEditorService {
     // version-related
     Version[] getVersions(long datasetId) throws EmfException;
 
-    Version derive(Version baseVersion) throws EmfException;
+    Version derive(Version baseVersion, String name) throws EmfException;
 
     Version markFinal(Version derived) throws EmfException;
 

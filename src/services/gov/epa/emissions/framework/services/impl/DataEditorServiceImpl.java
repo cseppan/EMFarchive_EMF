@@ -105,9 +105,9 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
-    public Version derive(Version baseVersion) throws EmfException {
+    public Version derive(Version baseVersion, String name) throws EmfException {
         try {
-            return versions.derive(baseVersion);
+            return versions.derive(baseVersion, name);
         } catch (SQLException e) {
             throw new EmfException("Could not derive a new Version from the base Version: " + baseVersion.getVersion()
                     + " of Dataset: " + baseVersion.getDatasetId());

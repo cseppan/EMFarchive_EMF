@@ -144,13 +144,14 @@ public class DataEditorServiceTransport implements DataEditorService {
         }
     }
 
-    public Version derive(Version baseVersion) throws EmfException {
+    public Version derive(Version baseVersion, String name) throws EmfException {
         try {
             mappings.addParam(call, "baseVersion", mappings.version());
+            mappings.addStringParam(call, "name");
             mappings.setOperation(call, "derive");
             mappings.setReturnType(call, mappings.version());
 
-            return (Version) call.invoke(new Object[] { baseVersion });
+            return (Version) call.invoke(new Object[] { baseVersion, name });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get derive Version from base Version: " + baseVersion.getVersion()
                     + " for Dataset: " + baseVersion.getDatasetId(), fault);
