@@ -10,16 +10,26 @@ import org.hibernate.Session;
 
 public class StatusServiceImpl implements StatusService {
 
+    private HibernateSessionFactory sessionFactory;
+
+    public StatusServiceImpl() {
+        sessionFactory = HibernateSessionFactory.get();
+    }
+
     public Status[] getAll(String userName) {
-        Session session = EMFHibernateUtil.getSession();
+        System.out.println("get all...");
+        Session session = sessionFactory.getSession();
+        System.out.println("session : " + session);
         List allStats = StatusDAO.getMessages(userName, session);
         session.flush();
         session.close();
+        
+        System.out.println("closed session");
         return (Status[]) allStats.toArray(new Status[allStats.size()]);
     }
 
     public void create(Status status) {
-        Session session = EMFHibernateUtil.getSession();
+        Session session = sessionFactory.getSession();
 
         // FIXME: replace static w/ instance methods
         StatusDAO.insertStatusMessage(status, session);

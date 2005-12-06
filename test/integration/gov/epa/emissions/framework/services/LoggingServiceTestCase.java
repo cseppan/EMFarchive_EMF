@@ -9,7 +9,8 @@ import java.io.File;
 import java.util.Date;
 import java.util.Random;
 
-public class LoggingServiceTest extends ServicesTestCase {
+//FIXME: what's this trying to test?
+public abstract class LoggingServiceTestCase extends ServicesTestCase {
 
     protected ExImService eximService;
 
@@ -35,6 +36,9 @@ public class LoggingServiceTest extends ServicesTestCase {
 
         DatasetType datasetType = orlNonPointType(serviceLocator.getDatasetTypesService());
         dataset.setDatasetType(datasetType);
+    }
+
+    protected void setUpService(LoggingService service) throws Exception {
     }
 
     private DatasetType orlNonPointType(DatasetTypeService service) throws Exception {

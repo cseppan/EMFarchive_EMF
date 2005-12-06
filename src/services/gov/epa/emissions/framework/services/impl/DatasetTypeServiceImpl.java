@@ -15,11 +15,17 @@ import org.hibernate.Session;
 public class DatasetTypeServiceImpl implements DatasetTypeService {
     private static Log log = LogFactory.getLog(DatasetTypeServiceImpl.class);
 
+    private HibernateSessionFactory sessionFactory;
+
+    public DatasetTypeServiceImpl() {
+        sessionFactory = HibernateSessionFactory.get();
+    }
+
     public DatasetType[] getDatasetTypes() throws EmfException {
 
         List datasettypes = null;
         try {
-            Session session = EMFHibernateUtil.getSession();
+            Session session = sessionFactory.getSession();
             datasettypes = DatasetTypesDAO.getDatasetTypes(session);
 
             close(session);
@@ -33,7 +39,7 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
 
     public void insertDatasetType(DatasetType datasetType) throws EmfException {
         try {
-            Session session = EMFHibernateUtil.getSession();
+            Session session = sessionFactory.getSession();
             DatasetTypesDAO.insertDatasetType(datasetType, session);
 
             close(session);
@@ -45,7 +51,7 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
 
     public void updateDatasetType(DatasetType datasetType) throws EmfException {
         try {
-            Session session = EMFHibernateUtil.getSession();
+            Session session = sessionFactory.getSession();
             DatasetTypesDAO.updateDatasetType(datasetType, session);
 
             close(session);

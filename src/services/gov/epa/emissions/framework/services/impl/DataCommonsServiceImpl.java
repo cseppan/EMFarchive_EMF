@@ -17,10 +17,20 @@ import org.hibernate.Session;
 public class DataCommonsServiceImpl implements DataCommonsService {
     private static Log LOG = LogFactory.getLog(DataCommonsServiceImpl.class);
 
+    private HibernateSessionFactory sessionFactory;
+
+    public DataCommonsServiceImpl() {
+        this(HibernateSessionFactory.get());
+    }
+
+    public DataCommonsServiceImpl(HibernateSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
     public Keyword[] getKeywords() throws EmfException {
         List keywords = null;
         try {
-            Session session = EMFHibernateUtil.getSession();
+            Session session = sessionFactory.getSession();
             keywords = DataCommonsDAO.getEmfKeywords(session);
             session.flush();
             session.close();
@@ -33,7 +43,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public void addCountry(Country country) throws EmfException {
         try {
-            Session session = EMFHibernateUtil.getSession();
+            Session session = sessionFactory.getSession();
             DataCommonsDAO.insertCountry(country, session);
             session.flush();
             session.close();
@@ -45,7 +55,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public void updateCountry(Country country) throws EmfException {
         try {
-            Session session = EMFHibernateUtil.getSession();
+            Session session = sessionFactory.getSession();
             DataCommonsDAO.updateCountry(country, session);
             session.flush();
             session.close();
@@ -57,10 +67,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
 
     public Country[] getCountries() throws EmfException {
-
         List countries = null;
         try {
-            Session session = EMFHibernateUtil.getSession();
+            Session session = sessionFactory.getSession();
             countries = DataCommonsDAO.getCountries(session);
             session.flush();
             session.close();
@@ -73,7 +82,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public void addSector(Sector sector) throws EmfException {
         try {
-            Session session = EMFHibernateUtil.getSession();
+            Session session = sessionFactory.getSession();
             DataCommonsDAO.insertSector(sector, session);
             session.flush();
             session.close();
@@ -85,7 +94,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public void updateSector(Sector sector) throws EmfException {
         try {
-            Session session = EMFHibernateUtil.getSession();
+            Session session = sessionFactory.getSession();
             DataCommonsDAO.updateSector(sector, session);
             session.flush();
             session.close();
@@ -99,7 +108,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public Sector[] getSectors() throws EmfException {
         List sectors;
         try {
-            Session session = EMFHibernateUtil.getSession();
+            Session session = sessionFactory.getSession();
             sectors = DataCommonsDAO.getSectors(session);
             session.flush();
             session.close();

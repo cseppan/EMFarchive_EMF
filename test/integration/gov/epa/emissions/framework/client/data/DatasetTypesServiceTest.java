@@ -22,7 +22,7 @@ public class DatasetTypesServiceTest extends ServicesTestCase {
         assertEquals(8, types.length);
     }
 
-    public void testShouldUpdate() throws EmfException {
+    public void testShouldUpdate() throws Exception {
         DatasetType[] types = services.getDatasetTypes();
         DatasetType type = types[0];
         String name = type.getName();

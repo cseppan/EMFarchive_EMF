@@ -44,6 +44,7 @@ public class StatusDAO {
 
             tx.commit();
         } catch (HibernateException e) {
+            e.printStackTrace(System.out);
             log.error(e);
             tx.rollback();
             throw e;

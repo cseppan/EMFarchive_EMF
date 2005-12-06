@@ -11,6 +11,7 @@ import java.util.Random;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class DatasetPersistenceTest extends HibernateTestCase {
@@ -51,13 +52,19 @@ public class DatasetPersistenceTest extends HibernateTestCase {
     }
 
     private DatasetType load(String name) {
-        Query query = session.createQuery("SELECT type FROM DatasetType AS type WHERE name='" + name + "'");
-        List list = query.list();
-        return list.size() == 1 ? (DatasetType) list.get(0) : null;
+        Session session = session();
+        try {
+            Query query = session.createQuery("SELECT type FROM DatasetType AS type WHERE name='" + name + "'");
+            List list = query.list();
+            return list.size() == 1 ? (DatasetType) list.get(0) : null;
+        } finally {
+            session.close();
+        }
     }
 
     private void save(Object element) {
         Transaction tx = null;
+        Session session = session();
         try {
             tx = session.beginTransaction();
             session.save(element);
@@ -65,11 +72,14 @@ public class DatasetPersistenceTest extends HibernateTestCase {
         } catch (HibernateException e) {
             tx.rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
 
     private void update(Object element) {
         Transaction tx = null;
+        Session session = session();
         try {
             tx = session.beginTransaction();
             session.update(element);
@@ -77,6 +87,8 @@ public class DatasetPersistenceTest extends HibernateTestCase {
         } catch (HibernateException e) {
             tx.rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
 }

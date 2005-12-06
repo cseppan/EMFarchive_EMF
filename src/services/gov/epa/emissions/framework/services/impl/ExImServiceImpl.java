@@ -43,7 +43,11 @@ public class ExImServiceImpl implements ExImService {
 
     private PooledExecutor threadPool;
 
+    private HibernateSessionFactory sessionFactory;
+
     public ExImServiceImpl() throws NamingException, SQLException {
+        sessionFactory = HibernateSessionFactory.get();
+
         // TODO: should we move this into an abstract super class ?
         Context ctx = new InitialContext();
         DataSource datasource = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
@@ -55,8 +59,6 @@ public class ExImServiceImpl implements ExImService {
 
         baseImportFolder = importFolder.getAbsolutePath();
         baseExportFolder = exportFolder.getAbsolutePath();
-        log.info("### baseImportFolder= " + baseImportFolder);
-        log.info("### baseExportFolder= " + baseExportFolder);
 
         // FIXME: we should not hard-code the db server. Also, read the
         // datasource names from properties
@@ -74,7 +76,7 @@ public class ExImServiceImpl implements ExImService {
     private String getValue(String root) {
         log.debug("In ExImServicesImpl:getBaseDirectoryProperty START");
 
-        Session session = EMFHibernateUtil.getSession();
+        Session session = sessionFactory.getSession();
         String propvalue = EmfPropertiesDAO.getEmfPropertyValue(root, session);
         log.debug("In ExImServicesImpl:getBaseDirectoryProperty END");
         session.flush();
@@ -112,7 +114,7 @@ public class ExImServiceImpl implements ExImService {
 
     private void validateDatasetName(EmfDataset dataset) throws EmfException {
         log.debug("check if dataset name exists in table: " + dataset.getName());
-        Session session = EMFHibernateUtil.getSession();
+        Session session = sessionFactory.getSession();
         boolean dsNameUsed = DatasetDAO.isDatasetNameUsed(dataset.getName(), session);
         session.flush();
         session.close();

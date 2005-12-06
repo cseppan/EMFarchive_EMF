@@ -15,9 +15,6 @@ import org.apache.axis.client.Service;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * @author Conrad F. D'Cruz
- */
 public class DatasetTypeServiceTransport implements DatasetTypeService {
     private static Log LOG = LogFactory.getLog(DatasetTypeServiceTransport.class);
 

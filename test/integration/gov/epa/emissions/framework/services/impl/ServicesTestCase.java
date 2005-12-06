@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.db.LocalHibernateConfiguration;
 import gov.epa.emissions.framework.db.PostgresDbUpdate;
 
 import java.io.File;
@@ -14,6 +15,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
+
+import org.hibernate.SessionFactory;
 
 import junit.framework.TestCase;
 
@@ -66,5 +69,10 @@ public abstract class ServicesTestCase extends TestCase {
         Properties config = config();
         String baseUrl = config.getProperty("emf.services.url");
         return new RemoteServiceLocator(baseUrl);
+    }
+
+    protected SessionFactory sessionFactory() throws Exception {
+        LocalHibernateConfiguration config = new LocalHibernateConfiguration();
+        return config.factory();
     }
 }
