@@ -10,4 +10,4 @@ CREATE TABLE emissions.versions
   final_version bool NOT NULL DEFAULT false
 ) 
 WITHOUT OIDS;
-
+ALTER TABLE emissions.versions OWNER TO emf;
