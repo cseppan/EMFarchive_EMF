@@ -1,17 +1,17 @@
 ---- DatasetTypes
-DROP TABLE DATASETTYPES CASCADE;
-DROP SEQUENCE datasettypes_dataset_type_id_seq;
+DROP TABLE emf.DATASETTYPES CASCADE;
+DROP SEQUENCE emf.datasettypes_dataset_type_id_seq;
 
-CREATE SEQUENCE datasettypes_dataset_type_id_seq
+CREATE SEQUENCE emf.datasettypes_dataset_type_id_seq
   INCREMENT 1
   MINVALUE 1
   MAXVALUE 9223372036854775807
   START 200
   CACHE 1;
-ALTER TABLE datasettypes_dataset_type_id_seq OWNER TO emf;
+ALTER TABLE emf.datasettypes_dataset_type_id_seq OWNER TO emf;
 
 
-CREATE TABLE datasettypes
+CREATE TABLE emf.datasettypes
 (
   dataset_type_id int4 NOT NULL DEFAULT nextval('emf.datasettypes_dataset_type_id_seq'::text),
   name varchar(255) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE datasettypes
   CONSTRAINT datasettypes_dataset_type_id_key UNIQUE (dataset_type_id)
 ) 
 WITHOUT OIDS;
-ALTER TABLE datasettypes OWNER TO emf;
+ALTER TABLE emf.datasettypes OWNER TO emf;
 
 ---- Load Data
 delete from emf.datasettypes;

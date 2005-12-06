@@ -1,17 +1,17 @@
 ---- Sectors
 
-DROP SEQUENCE sectors_id_seq;
-DROP TABLE sectors CASCADE;
+DROP SEQUENCE emf.sectors_id_seq;
+DROP TABLE emf.sectors CASCADE;
 
-CREATE SEQUENCE sectors_id_seq
+CREATE SEQUENCE emf.sectors_id_seq
   INCREMENT 1
   MINVALUE 1
   MAXVALUE 9223372036854775807
   START 199
   CACHE 1;
-ALTER TABLE sectors_id_seq OWNER TO emf;
+ALTER TABLE emf.sectors_id_seq OWNER TO emf;
 
-CREATE TABLE sectors
+CREATE TABLE emf.sectors
 (
   id int4 NOT NULL DEFAULT nextval('emf.sectors_id_seq'::text),
   name varchar(255) NOT NULL,
@@ -20,11 +20,11 @@ CREATE TABLE sectors
   CONSTRAINT sectors_pk PRIMARY KEY (id)
 ) 
 WITHOUT OIDS;
-ALTER TABLE sectors OWNER TO emf;
+ALTER TABLE emf.sectors OWNER TO emf;
 
-DROP TABLE sectorcriteria;
+DROP TABLE emf.sectorcriteria;
 
-CREATE TABLE sectorcriteria
+CREATE TABLE emf.sectorcriteria
 (
   id serial NOT NULL,
   sector_id int4 NOT NULL,
@@ -32,30 +32,30 @@ CREATE TABLE sectorcriteria
   "type" varchar(255) NOT NULL,
   criteria text,
   CONSTRAINT sectorcriteria_pk PRIMARY KEY (id),
-  CONSTRAINT sector_criteria_to_sectors FOREIGN KEY (sector_id) REFERENCES sectors (id) ON UPDATE CASCADE ON DELETE CASCADE
+  CONSTRAINT sector_criteria_to_sectors FOREIGN KEY (sector_id) REFERENCES emf.sectors (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
-ALTER TABLE sectorcriteria OWNER TO emf;
+ALTER TABLE emf.sectorcriteria OWNER TO emf;
 
 
 
 ---- Sectors data
-DELETE FROM Sectors;
+DELETE FROM emf.Sectors;
 
-insert into sectors values (1, 'Point', 'Point');
-insert into sectors values (2, 'Nonpoint', 'Nonpoint');
-insert into sectors values (3, 'Area','Area');
-insert into sectors values (4, 'Point IPM','Point IPM');
-insert into sectors values (5, 'Point Non-IPM','Point Non-IPM');
-insert into sectors values (6, 'Point Fugitive Dust','Point Fugitive Dust');
-insert into sectors values (7, 'Fire','Fire');
-insert into sectors values (8, 'Average Fire','Average Fire');
-insert into sectors values (9, 'Agricultural','Agricultural');
-insert into sectors values (10, 'Area Fugitive Dust','Area Fugitive Dust');
-insert into sectors values (11, 'Other Area','Other Area');
-insert into sectors values (12, 'Nonroad','Nonroad');
-insert into sectors values (13, 'On Road','On Road');
-insert into sectors values (14, 'Biogenic','Biogenic');
+insert into emf.sectors values (1, 'Point', 'Point');
+insert into emf.sectors values (2, 'Nonpoint', 'Nonpoint');
+insert into emf.sectors values (3, 'Area','Area');
+insert into emf.sectors values (4, 'Point IPM','Point IPM');
+insert into emf.sectors values (5, 'Point Non-IPM','Point Non-IPM');
+insert into emf.sectors values (6, 'Point Fugitive Dust','Point Fugitive Dust');
+insert into emf.sectors values (7, 'Fire','Fire');
+insert into emf.sectors values (8, 'Average Fire','Average Fire');
+insert into emf.sectors values (9, 'Agricultural','Agricultural');
+insert into emf.sectors values (10, 'Area Fugitive Dust','Area Fugitive Dust');
+insert into emf.sectors values (11, 'Other Area','Other Area');
+insert into emf.sectors values (12, 'Nonroad','Nonroad');
+insert into emf.sectors values (13, 'On Road','On Road');
+insert into emf.sectors values (14, 'Biogenic','Biogenic');
 
 
 

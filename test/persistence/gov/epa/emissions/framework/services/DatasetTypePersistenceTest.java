@@ -29,20 +29,29 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
     }
 
     public void testVerifyKeywordsAreStored() throws Exception {
-        DatasetType type = new DatasetType();
-        type.setDescription("TEST");
-        type.setName("NAME");
-        type.addKeyword(new Keyword("key1"));
-        type.addKeyword(new Keyword("key2"));
+        DatasetType loadedType = null;
+        try{
+            DatasetType type = new DatasetType();
+            type.setDescription("TEST");
+            type.setName("NAME");
+            type.addKeyword(new Keyword("key1"));
+            type.addKeyword(new Keyword("key2"));
 
-        save(type);
-        DatasetType loadedType = load("NAME");
-        assertNotNull(loadedType);
-        assertEquals(2, loadedType.getKeywords().length);
-        assertEquals("key1", loadedType.getKeywords()[0].getName());
-        assertEquals("key2", loadedType.getKeywords()[1].getName());
+            save(type);
+            loadedType = load("NAME");
+            System.out.println(loadedType==null);
+            assertNotNull(loadedType);
+            System.out.println(loadedType.getKeywords().length);
+            assertEquals(2, loadedType.getKeywords().length);
+            assertEquals("key1", loadedType.getKeywords()[0].getName());
+            assertEquals("key2", loadedType.getKeywords()[1].getName());
+            
+        }finally{
+            System.out.println("FINALLY CALLED");
+            drop(loadedType);
+                       
+        }
 
-        drop(loadedType);
     }
 
     public void FIXME_testVerifyUpdatedKeywordIsStored() throws Exception {

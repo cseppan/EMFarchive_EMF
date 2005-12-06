@@ -1,39 +1,39 @@
 -- Master Keywords list
 
-DROP TABLE emf_keywords CASCADE;
+DROP TABLE emf.emf_keywords CASCADE;
 
-CREATE TABLE emf_keywords
+CREATE TABLE emf.emf_keywords
 (
   id serial NOT NULL,
   keyword varchar(255) NOT NULL,
   CONSTRAINT emf_keywords_pkey PRIMARY KEY (id)
 ) 
 WITHOUT OIDS;
-ALTER TABLE emf_keywords OWNER TO emf;
+ALTER TABLE emf.emf_keywords OWNER TO emf;
 
 --- DataseType Keywords
-DROP TABLE dataset_types_keywords;
+DROP TABLE emf.dataset_types_keywords;
 
-CREATE TABLE dataset_types_keywords
+CREATE TABLE emf.dataset_types_keywords
 (
   id serial UNIQUE NOT NULL,
   dataset_type_id int4 NOT NULL,
   list_index int4,
   keyword_id int4 NOT NULL,
   CONSTRAINT dataset_types_keywords_pkey PRIMARY KEY (id),
-  CONSTRAINT dataset_types_keywords_to_datasetstypes FOREIGN KEY (dataset_type_id) REFERENCES datasettypes (dataset_type_id) ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT dataset_types_keywords_to_emf_keywords FOREIGN KEY (keyword_id) REFERENCES emf_keywords (id) ON UPDATE CASCADE ON DELETE CASCADE
+  CONSTRAINT dataset_types_keywords_to_datasetstypes FOREIGN KEY (dataset_type_id) REFERENCES emf.datasettypes (dataset_type_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT dataset_types_keywords_to_emf_keywords FOREIGN KEY (keyword_id) REFERENCES emf.emf_keywords (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
-ALTER TABLE dataset_types_keywords OWNER TO emf;
+ALTER TABLE emf.dataset_types_keywords OWNER TO emf;
 
 
 
 
 ---- Dataset Keywords
-DROP TABLE datasets_keywords;
+DROP TABLE emf.datasets_keywords;
 
-CREATE TABLE datasets_keywords
+CREATE TABLE emf.datasets_keywords
 (
   id serial NOT NULL,
   list_index int4,
@@ -41,9 +41,9 @@ CREATE TABLE datasets_keywords
   keyword_id int4 NOT NULL,
   value varchar(255),
   CONSTRAINT datasets_keywords_pkey PRIMARY KEY (id),
-  CONSTRAINT datasets_keywords_to_datasets FOREIGN KEY (dataset_id) REFERENCES datasets (dataset_id) ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT dataset_types_keywords_to_emf_keywords FOREIGN KEY (keyword_id) REFERENCES emf_keywords (id) ON UPDATE CASCADE ON DELETE CASCADE
+  CONSTRAINT datasets_keywords_to_datasets FOREIGN KEY (dataset_id) REFERENCES emf.datasets (dataset_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT dataset_types_keywords_to_emf_keywords FOREIGN KEY (keyword_id) REFERENCES emf.emf_keywords (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
-ALTER TABLE datasets_keywords OWNER TO emf;
+ALTER TABLE emf.datasets_keywords OWNER TO emf;
 

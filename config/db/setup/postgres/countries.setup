@@ -1,16 +1,16 @@
 ---- Countries
-DROP SEQUENCE countries_id_seq;
-DROP TABLE countries;
+DROP SEQUENCE emf.countries_id_seq;
+DROP TABLE emf.countries;
 
-CREATE SEQUENCE countries_id_seq
+CREATE SEQUENCE emf.countries_id_seq
   INCREMENT 1
   MINVALUE 1
   MAXVALUE 9223372036854775807
   START 199
   CACHE 1;
-ALTER TABLE countries_id_seq OWNER TO emf;
+ALTER TABLE emf.countries_id_seq OWNER TO emf;
 
-CREATE TABLE countries
+CREATE TABLE emf.countries
 (
   id serial NOT NULL,
   name varchar(255) NOT NULL,
@@ -18,9 +18,9 @@ CREATE TABLE countries
   CONSTRAINT countries_id_key UNIQUE (id)
 ) 
 WITHOUT OIDS;
-ALTER TABLE countries OWNER TO emf;
+ALTER TABLE emf.countries OWNER TO emf;
 
-delete from countries;
-insert into countries values (1, 'Canada');
-insert into countries values (2, 'Mexico');
-insert into countries values (3, 'US');
+delete from emf.countries;
+insert into emf.countries values (1, 'Canada');
+insert into emf.countries values (2, 'Mexico');
+insert into emf.countries values (3, 'US');

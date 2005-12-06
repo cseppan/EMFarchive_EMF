@@ -1,15 +1,15 @@
 ---- External Sources
-DROP TABLE external_sources;
+DROP TABLE emf.external_sources;
 
-CREATE TABLE external_sources
+CREATE TABLE emf.external_sources
 (
   dataset_id int4 NOT NULL,
   list_index int4,
   data_source varchar(255) NOT NULL,
-  CONSTRAINT dataset_tables_to_datasets FOREIGN KEY (dataset_id) REFERENCES datasets (dataset_id) ON UPDATE CASCADE ON DELETE CASCADE
+  CONSTRAINT dataset_tables_to_datasets FOREIGN KEY (dataset_id) REFERENCES emf.datasets (dataset_id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
-ALTER TABLE external_sources OWNER TO emf;
+ALTER TABLE emf.external_sources OWNER TO emf;
 
 
 
@@ -18,9 +18,9 @@ ALTER TABLE external_sources OWNER TO emf;
 
 
 ---- Internal Sources
-DROP TABLE internal_sources;
+DROP TABLE emf.internal_sources;
 
-CREATE TABLE internal_sources
+CREATE TABLE emf.internal_sources
 (
   dataset_id int4 NOT NULL,
   list_index int4,
@@ -29,7 +29,7 @@ CREATE TABLE internal_sources
   table_type varchar(255) NOT NULL,
   table_columns text NOT NULL,
   file_size int4 NOT NULL,
-  CONSTRAINT internalsources_to_datasets FOREIGN KEY (dataset_id) REFERENCES datasets (dataset_id) ON UPDATE CASCADE ON DELETE CASCADE
+  CONSTRAINT internalsources_to_datasets FOREIGN KEY (dataset_id) REFERENCES emf.datasets (dataset_id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
-ALTER TABLE internal_sources OWNER TO emf;
+ALTER TABLE emf.internal_sources OWNER TO emf;

@@ -9,7 +9,6 @@
 	<classpathentry including="**/*.java" kind="src" path="test/uat"/>
 	<classpathentry including="**/*.java" kind="src" path="test/unit"/>
 	<classpathentry kind="src" path="res"/>
-	<classpathentry kind="src" path="config/db/src"/>
 	<classpathentry kind="lib" path="lib/axis.jar"/>
 	<classpathentry kind="lib" path="lib/axis-ant.jar"/>
 	<classpathentry kind="lib" path="lib/commons-discovery-0.2.jar"/>

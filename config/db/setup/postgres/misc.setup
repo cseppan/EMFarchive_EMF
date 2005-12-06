@@ -1,7 +1,7 @@
 --- Status Messages
-DROP TABLE statusmessages;
+DROP TABLE emf.statusmessages;
 
-CREATE TABLE statusmessages
+CREATE TABLE emf.statusmessages
 (
   status_id serial NOT NULL,
   user_name varchar(255) NOT NULL,
@@ -13,15 +13,15 @@ CREATE TABLE statusmessages
   CONSTRAINT statusmessages_status_id_key UNIQUE (status_id)
 ) 
 WITHOUT OIDS;
-ALTER TABLE statusmessages OWNER TO emf;
+ALTER TABLE emf.statusmessages OWNER TO emf;
 
 
 
 
 --- Properties
-DROP TABLE emf_properties;
+DROP TABLE emf.emf_properties;
 
-CREATE TABLE emf_properties
+CREATE TABLE emf.emf_properties
 (
   prop_id serial NOT NULL,
   prop_name varchar(255) NOT NULL,
@@ -30,13 +30,13 @@ CREATE TABLE emf_properties
   CONSTRAINT emf_properties_prop_id_key UNIQUE (prop_id)
 ) 
 WITHOUT OIDS;
-ALTER TABLE emf_properties OWNER TO emf;
+ALTER TABLE emf.emf_properties OWNER TO emf;
 
 --- TODO: PLEASE SPECIFY CUSTOM PROPERTIES BASED ON YOUR ENVIRONMENT
-delete from emf_properties;
-insert into emf_properties values (1,'emf.data.root.folder','C:\\UNC_CEP\\emf_data');
-insert into emf_properties values (2,'emf.data.import.folder','');
-insert into emf_properties values (3,'emf.data.export.folder','');
+delete from emf.emf_properties;
+insert into emf.emf_properties values (1,'emf.data.root.folder','C:\\UNC_CEP\\emf_data');
+insert into emf.emf_properties values (2,'emf.data.import.folder','');
+insert into emf.emf_properties values (3,'emf.data.export.folder','');
 
 
 
