@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.commons.security.User;
 
 public class DisposableUpdateUserWindow extends UpdateUserWindow {
 

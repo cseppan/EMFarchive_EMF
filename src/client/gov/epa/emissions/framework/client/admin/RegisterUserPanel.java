@@ -2,9 +2,9 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.gui.TextFieldWidget;
 import gov.epa.emissions.commons.gui.Widget;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfView;
-import gov.epa.emissions.framework.services.User;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

@@ -1,8 +1,9 @@
 package gov.epa.emissions.framework.client.login;
 
+import gov.epa.emissions.commons.CommonsException;
+import gov.epa.emissions.commons.security.PasswordGenerator;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.PasswordService;
-import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserService;
 
 public class LoginPresenter {
@@ -17,7 +18,11 @@ public class LoginPresenter {
 
     public User doLogin(String username, String password) throws EmfException {
         // FIXME: replace statics w/ objects
-        userAdmin.authenticate(username, PasswordService.encrypt(password));
+        try {
+            userAdmin.authenticate(username, new PasswordGenerator().encrypt(password));
+        } catch (CommonsException e) {
+            throw new EmfException(e.getMessage());
+        }
         return userAdmin.getUser(username);
     }
 

@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.security.UserException;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.UserException;
-import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
@@ -38,7 +38,7 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
         presenter.doCloseView();
     }
 
-    public void testShouldDeleteUserOnNotifyDelete() throws EmfException {
+    public void testShouldDeleteUserOnNotifyDelete() throws Exception {
         Mock userServices = mock(UserService.class);
         userServices.expects(once()).method("deleteUser").with(eq("matts"));
 
@@ -189,7 +189,7 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
         presenter.doUpdateUsers(new User[] {});
     }
 
-    public void testShouldNotDeleteCurrentlyLoggedInUserOnNotifyDelete() throws EmfException {
+    public void testShouldNotDeleteCurrentlyLoggedInUserOnNotifyDelete() throws Exception {
         User user = new User();
         user.setUsername("joe");
 

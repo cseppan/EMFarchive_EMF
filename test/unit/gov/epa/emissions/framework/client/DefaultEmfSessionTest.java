@@ -1,11 +1,10 @@
 package gov.epa.emissions.framework.client;
 
-import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.LoggingService;
-import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserService;
 
 import org.jmock.Mock;
@@ -21,7 +20,7 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
 
     private Mock eximServices;
 
-    protected void setUp() throws EmfException {
+    protected void setUp() throws Exception {
         eximServices = mock(ExImService.class);
         folder = "folder/blah";
         eximServices.stubs().method("getExportBaseFolder").will(returnValue(folder));
@@ -32,7 +31,7 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
         session = new DefaultEmfSession(null, (ServiceLocator) locator.proxy());
     }
 
-    public void testGetUser() throws EmfException {
+    public void testGetUser() throws Exception {
         User user = new User();
         user.setUsername("user");
         EmfSession session = new DefaultEmfSession(user, (ServiceLocator) locator.proxy());
@@ -40,14 +39,14 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
         assertEquals(user, session.getUser());
     }
 
-    public void testGetServiceLocator() throws EmfException {
+    public void testGetServiceLocator() throws Exception {
         ServiceLocator locatorProxy = (ServiceLocator) locator.proxy();
         EmfSession session = new DefaultEmfSession(null, locatorProxy);
 
         assertEquals(locatorProxy, session.getServiceLocator());
     }
 
-    public void testGetExImServices() throws EmfException {
+    public void testGetExImServices() throws Exception {
         ExImService proxy = (ExImService) eximServices.proxy();
         locator.stubs().method("getExImService").will(returnValue(proxy));
 
@@ -56,7 +55,7 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
         assertEquals(proxy, session.getExImServices());
     }
 
-    public void testGetDataServices() throws EmfException {
+    public void testGetDataServices() throws Exception {
         Mock services = mock(DataService.class);
 
         DataService servicesProxy = (DataService) services.proxy();
@@ -67,7 +66,7 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
         assertEquals(servicesProxy, session.getDataServices());
     }
 
-    public void testGetUserServices() throws EmfException {
+    public void testGetUserServices() throws Exception {
         Mock services = mock(UserService.class);
 
         UserService servicesProxy = (UserService) services.proxy();
@@ -78,7 +77,7 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
         assertEquals(servicesProxy, session.getUserServices());
     }
 
-    public void testGetLoggingServices() throws EmfException {
+    public void testGetLoggingServices() throws Exception {
         Mock services = mock(LoggingService.class);
 
         LoggingService servicesProxy = (LoggingService) services.proxy();
@@ -89,7 +88,7 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
         assertEquals(servicesProxy, session.getLoggingServices());
     }
 
-    public void testCacheMostRecentExportFolder() throws EmfException {
+    public void testCacheMostRecentExportFolder() throws Exception {
         EmfSession session = new DefaultEmfSession(null, (ServiceLocator) locator.proxy());
 
         session.setMostRecentExportFolder("folder/blah");

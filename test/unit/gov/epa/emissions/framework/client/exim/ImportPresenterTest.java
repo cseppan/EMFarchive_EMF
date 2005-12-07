@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
-import gov.epa.emissions.framework.services.User;
 
 import java.util.Date;
 
@@ -40,7 +40,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         presenter.display((ImportView) view.proxy());
     }
 
-    public void testSendsImportRequestToEximServiceOnImport() throws EmfException {
+    public void testSendsImportRequestToEximServiceOnImport() throws Exception {
         DatasetType type = new DatasetType("ORL NonRoad");
 
         User user = new User();

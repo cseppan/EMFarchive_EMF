@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.UserService;
 
 import org.jmock.Mock;
@@ -26,7 +25,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         presenter.display((UpdateUserView) view.proxy());
     }
 
-    public void testShouldUpdateUserViaEmfUserAdminOnNotifySave() throws EmfException {
+    public void testShouldUpdateUserViaEmfUserAdminOnNotifySave() throws Exception {
         User user = new User();
         user.setUsername("joey");
         user.setFullName("Joey Moey");
@@ -49,7 +48,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         presenter.doClose();
     }
 
-    public void testShouldCloseWithNoPromptsOnSaveFollowedByClose() throws EmfException {
+    public void testShouldCloseWithNoPromptsOnSaveFollowedByClose() throws Exception {
         User user = new User();
         user.setUsername("joey");
         user.setFullName("Joey Moey");

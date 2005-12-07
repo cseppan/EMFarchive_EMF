@@ -1,10 +1,9 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
-import gov.epa.emissions.framework.services.User;
 
 import java.util.Date;
 
@@ -29,7 +28,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         session.stubs().method("getMostRecentExportFolder").withNoArguments().will(returnValue(folder));
     }
 
-    public void testSendsExportRequestToEximServiceOnExport() throws EmfException {
+    public void testSendsExportRequestToEximServiceOnExport() throws Exception {
         User user = new User();
         user.setUsername("user");
         user.setFullName("full name");
@@ -53,7 +52,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         presenter.doExportWithOverwrite(datasets, folder, purpose);
     }
 
-    public void testSendsExportRequestToEximServiceOnExportWithoutOverwrite() throws EmfException {
+    public void testSendsExportRequestToEximServiceOnExportWithoutOverwrite() throws Exception {
         User user = new User();
         user.setUsername("user");
         user.setFullName("full name");

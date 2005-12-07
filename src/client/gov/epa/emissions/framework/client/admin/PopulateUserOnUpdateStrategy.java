@@ -1,7 +1,8 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.framework.UserException;
-import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.security.UserException;
+import gov.epa.emissions.framework.EmfException;
 
 public class PopulateUserOnUpdateStrategy implements PopulateUserStrategy {
 
@@ -12,14 +13,18 @@ public class PopulateUserOnUpdateStrategy implements PopulateUserStrategy {
     }
 
     public void populate(String name, String affiliation, String phone, String email, String username, char[] password,
-            char[] confirmPassword) throws UserException {
-        user.setFullName(name);
-        user.setAffiliation(affiliation);
-        user.setPhone(phone);
-        user.setEmail(email);
-        if (password.length > 0) {
-            user.setPassword(new String(password));
-            user.confirmPassword(new String(confirmPassword));
+            char[] confirmPassword) throws EmfException {
+        try {
+            user.setFullName(name);
+            user.setAffiliation(affiliation);
+            user.setPhone(phone);
+            user.setEmail(email);
+            if (password.length > 0) {
+                user.setPassword(new String(password));
+                user.confirmPassword(new String(confirmPassword));
+            }
+        } catch (UserException e) {
+            throw new EmfException(e.getMessage());
         }
     }
 

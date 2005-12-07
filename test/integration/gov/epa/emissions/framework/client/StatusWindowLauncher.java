@@ -1,13 +1,12 @@
 package gov.epa.emissions.framework.client;
 
-import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.admin.UserServiceStub;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.console.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusService;
-import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserService;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ import org.jmock.core.stub.ReturnStub;
 
 public class StatusWindowLauncher {
 
-    public static void main(String[] args) throws EmfException {
+    public static void main(String[] args) throws Exception {
         User user = createUser("joe", "Joe Fullman", "joef@zukoswky.com");
         UserService userServices = createUserServices(user);
 
@@ -63,7 +62,7 @@ public class StatusWindowLauncher {
         return new UserServiceStub(users);
     }
 
-    static private User createUser(String username, String name, String email) throws EmfException {
+    static private User createUser(String username, String name, String email) throws Exception {
         User user = new User();
         user.setUsername(username);
         user.setFullName(name);

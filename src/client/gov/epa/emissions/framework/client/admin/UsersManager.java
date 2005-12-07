@@ -2,11 +2,11 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserService;
 import gov.epa.mims.analysisengine.table.OverallTableModel;
 

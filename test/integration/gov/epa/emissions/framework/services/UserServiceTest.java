@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
@@ -14,12 +14,12 @@ public class UserServiceTest extends ServicesTestCase {
         service = serviceLocator.getUserService();
     }
 
-    public void testGetUserSucceedsForEMFAdministrator() throws EmfException {
+    public void testGetUserSucceedsForEMFAdministrator() throws Exception {
         User user = service.getUser("admin");
         assertEquals("EMF Administrator", user.getFullName());
     }
 
-    public void testCreateUser() throws EmfException {
+    public void testCreateUser() throws Exception {
         User user = new User();
         user.setUsername("test-user");
         user.setPassword("user12345");
@@ -38,7 +38,7 @@ public class UserServiceTest extends ServicesTestCase {
         service.deleteUser("test-user");
     }
 
-    public void testUpdateUser() throws EmfException {
+    public void testUpdateUser() throws Exception {
         User user = new User();
         user.setUsername("test-user");
         user.setPassword("user12345");

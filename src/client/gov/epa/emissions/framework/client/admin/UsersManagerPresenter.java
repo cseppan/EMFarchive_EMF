@@ -1,8 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.UserException;
-import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
@@ -57,13 +56,13 @@ public class UsersManagerPresenter {
         view.refresh();
     }
 
-    private void doDelete(User userToDelete) throws UserException, EmfException {
+    private void doDelete(User userToDelete) throws EmfException {
         // NOTE: super user's name is fixed
         if (userToDelete.getUsername().equals("admin"))
-            throw new UserException("Cannot delete EMF super user - '" + userToDelete.getUsername() + "'");
+            throw new EmfException("Cannot delete EMF super user - '" + userToDelete.getUsername() + "'");
 
         if (user.getUsername().equals(userToDelete.getUsername()))
-            throw new UserException("Cannot delete yourself - '" + userToDelete.getUsername() + "'");
+            throw new EmfException("Cannot delete yourself - '" + userToDelete.getUsername() + "'");
 
         userServices.deleteUser(userToDelete.getUsername());
     }

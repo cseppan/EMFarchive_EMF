@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.login;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DefaultEmfSession;
 import gov.epa.emissions.framework.client.EmfFrame;
@@ -12,7 +13,6 @@ import gov.epa.emissions.framework.client.admin.RegisterUserWindow;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.console.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.User;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

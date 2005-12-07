@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 
 public interface ExImService extends EMFService {

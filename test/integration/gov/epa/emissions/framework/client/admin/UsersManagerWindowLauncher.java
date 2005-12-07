@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.User;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.ui.DefaultViewLayout;
 import gov.epa.emissions.framework.ui.ViewLayout;
@@ -45,7 +44,7 @@ public class UsersManagerWindowLauncher {
         frame.setContentPane(desktop);
     }
 
-    private UserService createUserAdmin() throws EmfException {
+    private UserService createUserAdmin() throws Exception {
         List users = new ArrayList();
 
         users.add(createUser("joe", "Joe Fullman", "joef@zukoswky.com", false));
@@ -57,7 +56,7 @@ public class UsersManagerWindowLauncher {
         return userAdmin;
     }
 
-    private User createUser(String username, String name, String email, boolean isAdmin) throws EmfException {
+    private User createUser(String username, String name, String email, boolean isAdmin) throws Exception {
         User user = new User();
         user.setUsername(username);
         user.setFullName(name);

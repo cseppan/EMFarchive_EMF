@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.login;
 
+import gov.epa.emissions.commons.security.PasswordGenerator;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.PasswordService;
 import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
@@ -17,8 +17,8 @@ public class AuthenticateTest extends ServicesTestCase {
         emfUserAdmin = serviceLocator.getUserService();
     }
 
-    public void testShouldSucceedOnValidUsernamePassword() throws EmfException {
-        emfUserAdmin.authenticate("emf", PasswordService.encrypt("emf12345"));
+    public void testShouldSucceedOnValidUsernamePassword() throws Exception {
+        emfUserAdmin.authenticate("emf", new PasswordGenerator().encrypt("emf12345"));
     }
 
     public void testShouldFailOnInvalidPassword() {

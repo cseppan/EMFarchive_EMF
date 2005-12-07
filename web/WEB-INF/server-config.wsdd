@@ -111,7 +111,7 @@
 	
 	<!-- Structs (Java Beans-style)-->
 	<beanMapping
-		languageSpecificType="java:gov.epa.emissions.framework.services.User"
+		languageSpecificType="java:gov.epa.emissions.commons.security.User"
 		qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.Status"
@@ -194,7 +194,7 @@
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
 	<arrayMapping qname="ns1:Users" xmlns:ns1="urn:gov.epa.services.EmfService"
-		languageSpecificType="java:gov.epa.emissions.framework.services.User[]"
+		languageSpecificType="java:gov.epa.emissions.commons.security.User[]"
 		innerType="ns1:User"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	

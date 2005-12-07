@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.dao;
 
+import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
-import gov.epa.emissions.framework.UserException;
-import gov.epa.emissions.framework.services.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -80,7 +80,7 @@ public class UserManagerDAO {
         return newuser;
     }
 
-    public User getUser(String userName) throws InfrastructureException, UserException {
+    public User getUser(String userName) throws EmfException {
         log.debug("in getUser for username= " + userName);
 
         User emfUser = null;
@@ -102,15 +102,7 @@ public class UserManagerDAO {
 
                     while (rst.next()) {
                         log.debug("An rst record found ");
-                        emfUser = new User();
-                        emfUser.setAcctDisabled(rst.getBoolean("acctdisabled"));
-                        emfUser.setAffiliation(rst.getString("affiliation"));
-                        emfUser.setEmail(rst.getString("emailaddr"));
-                        emfUser.setFullName(rst.getString("fullname"));
-                        emfUser.setInAdminGroup(rst.getBoolean("inadmingrp"));
-                        emfUser.setEncryptedPassword(rst.getString("user_pass"));
-                        emfUser.setUsername(rst.getString("user_name"));
-                        emfUser.setPhone(rst.getString("workphone"));
+                        emfUser = createUser(rst);
                     }// while
 
                     // Close the result set, statement and the connection
@@ -134,7 +126,26 @@ public class UserManagerDAO {
         return emfUser;
     }// getUser
 
-    public List getUsers() throws InfrastructureException, UserException {
+    private User createUser(ResultSet rst) throws EmfException {
+        User emfUser;
+        emfUser = new User();
+        try {
+            emfUser.setAcctDisabled(rst.getBoolean("acctdisabled"));
+            emfUser.setAffiliation(rst.getString("affiliation"));
+            emfUser.setEmail(rst.getString("emailaddr"));
+            emfUser.setFullName(rst.getString("fullname"));
+            emfUser.setInAdminGroup(rst.getBoolean("inadmingrp"));
+            emfUser.setEncryptedPassword(rst.getString("user_pass"));
+            emfUser.setUsername(rst.getString("user_name"));
+            emfUser.setPhone(rst.getString("workphone"));
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+
+        return emfUser;
+    }
+
+    public List getUsers() throws EmfException {
         log.debug("In getUsers");
 
         ArrayList users = new ArrayList();
@@ -155,15 +166,7 @@ public class UserManagerDAO {
 
                     while (rst.next()) {
                         log.debug("An rst record found ");
-                        emfUser = new User();
-                        emfUser.setAcctDisabled(rst.getBoolean("acctdisabled"));
-                        emfUser.setAffiliation(rst.getString("affiliation"));
-                        emfUser.setEmail(rst.getString("emailaddr"));
-                        emfUser.setFullName(rst.getString("fullname"));
-                        emfUser.setInAdminGroup(rst.getBoolean("inadmingrp"));
-                        emfUser.setEncryptedPassword(rst.getString("user_pass"));
-                        emfUser.setUsername(rst.getString("user_name"));
-                        emfUser.setPhone(rst.getString("workphone"));
+                        emfUser = createUser(rst);
 
                         users.add(emfUser);
                         log.debug(emfUser.getUsername());

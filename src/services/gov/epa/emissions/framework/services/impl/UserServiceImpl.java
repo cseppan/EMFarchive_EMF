@@ -1,11 +1,10 @@
 package gov.epa.emissions.framework.services.impl;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.AuthenticationException;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
-import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.dao.UserManagerDAO;
-import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserService;
 
 import java.util.List;
@@ -72,7 +71,7 @@ public class UserServiceImpl implements UserService {
                 umDAO.insertUser(newUser);
             } else {
                 log.error("User data error: Duplicate username: " + newUser.getUsername());
-                throw new UserException("Duplicate username");
+                throw new EmfException("Duplicate username");
             }
         } catch (InfrastructureException ex) {
             log.error(ex);

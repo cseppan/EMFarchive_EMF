@@ -4,10 +4,10 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.PasswordField;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.Widget;
-import gov.epa.emissions.framework.UserException;
+import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.ui.Border;
 
 import java.awt.BorderLayout;
@@ -176,7 +176,7 @@ public class UserProfilePanel extends JPanel {
         return panel;
     }
 
-    protected void populateUser() throws UserException {
+    protected void populateUser() throws EmfException {
         populateUserStrategy.populate(name.getText(), affiliation.getText(), phone.getText(), email.getText(), username
                 .value(), password.getPassword(), confirmPassword.getPassword());
 

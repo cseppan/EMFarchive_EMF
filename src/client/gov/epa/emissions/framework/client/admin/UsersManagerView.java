@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfView;
-import gov.epa.emissions.framework.services.User;
 
 public interface UsersManagerView extends EmfView {
 

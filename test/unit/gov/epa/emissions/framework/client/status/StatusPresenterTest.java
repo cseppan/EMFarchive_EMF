@@ -1,14 +1,14 @@
 package gov.epa.emissions.framework.client.status;
 
+import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.commons.security.UserException;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.TaskRunner;
-import gov.epa.emissions.framework.UserException;
 import gov.epa.emissions.framework.client.status.StatusPresenter;
 import gov.epa.emissions.framework.client.status.StatusView;
 import gov.epa.emissions.framework.client.status.StatusPresenter.StatusMonitor;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusService;
-import gov.epa.emissions.framework.services.User;
 
 import java.util.Date;
 

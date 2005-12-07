@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.login;
 
+import gov.epa.emissions.commons.security.PasswordGenerator;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.PasswordService;
-import gov.epa.emissions.framework.services.User;
 import gov.epa.emissions.framework.services.UserService;
 
 import org.jmock.Mock;
@@ -24,7 +24,7 @@ public class LoginPresenterTest extends MockObjectTestCase {
         presenter.display((LoginView) view.proxy());
     }
 
-    public void testShouldAuthenticateWithEmfUserAdminOnNotifyLogin() throws EmfException {
+    public void testShouldAuthenticateWithEmfUserAdminOnNotifyLogin() throws Exception {
         User user = new User();
         user.setUsername("joey");
         user.setPassword("joeymoey12");
@@ -38,10 +38,10 @@ public class LoginPresenterTest extends MockObjectTestCase {
         assertSame(user, presenter.doLogin("joey", "joeymoey12"));
     }
 
-    public void testShouldFailIfAuthenticateFailsOnNotifyLogin() throws EmfException {
+    public void testShouldFailIfAuthenticateFailsOnNotifyLogin() throws Exception {
         Mock userAdmin = mock(UserService.class);
         Throwable exception = new EmfException("authentication failure");
-        String encryptedPassword = PasswordService.encrypt("password");
+        String encryptedPassword = new PasswordGenerator().encrypt("password");
         userAdmin.expects(once()).method("authenticate").with(eq("username"), eq(encryptedPassword)).will(
                 throwException(exception));
 
