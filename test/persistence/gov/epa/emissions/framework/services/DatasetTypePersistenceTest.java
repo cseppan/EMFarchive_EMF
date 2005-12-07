@@ -14,6 +14,16 @@ import org.hibernate.Transaction;
 
 public class DatasetTypePersistenceTest extends HibernateTestCase {
 
+    protected void setUp() throws Exception {
+        super.setUp();
+        drop("NAME");
+    }
+
+    protected void tearDown() {
+        drop("NAME");
+        super.tearDown();
+    }
+
     public void testVerifySimplePropertiesAreStored() throws Exception {
         DatasetType type = new DatasetType();
         type.setDescription("TEST");
@@ -24,34 +34,21 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
         save(type);
         DatasetType loadedType = load("NAME");
         assertNotNull("DatasetType with name - 'NAME' should have been persisted ", loadedType);
-
-        drop(loadedType);
     }
 
     public void testVerifyKeywordsAreStored() throws Exception {
-        DatasetType loadedType = null;
-        try{
-            DatasetType type = new DatasetType();
-            type.setDescription("TEST");
-            type.setName("NAME");
-            type.addKeyword(new Keyword("key1"));
-            type.addKeyword(new Keyword("key2"));
+        DatasetType type = new DatasetType();
+        type.setDescription("TEST");
+        type.setName("NAME");
+        type.addKeyword(new Keyword("key1"));
+        type.addKeyword(new Keyword("key2"));
 
-            save(type);
-            loadedType = load("NAME");
-            System.out.println(loadedType==null);
-            assertNotNull(loadedType);
-            System.out.println(loadedType.getKeywords().length);
-            assertEquals(2, loadedType.getKeywords().length);
-            assertEquals("key1", loadedType.getKeywords()[0].getName());
-            assertEquals("key2", loadedType.getKeywords()[1].getName());
-            
-        }finally{
-            System.out.println("FINALLY CALLED");
-            drop(loadedType);
-                       
-        }
-
+        save(type);
+        DatasetType loadedType = load("NAME");
+        assertNotNull(loadedType);
+        assertEquals(2, loadedType.getKeywords().length);
+        assertEquals("key1", loadedType.getKeywords()[0].getName());
+        assertEquals("key2", loadedType.getKeywords()[1].getName());
     }
 
     public void FIXME_testVerifyUpdatedKeywordIsStored() throws Exception {
@@ -74,8 +71,6 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
         DatasetType updatedType = load("NAME");
         Keyword updatedKey = updatedType.getKeywords()[0];
         assertEquals("updated-key1", updatedKey.getName());
-
-        drop(loadedType);
     }
 
     private DatasetType load(String name) {
@@ -89,10 +84,14 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
         }
     }
 
-    private void drop(DatasetType loadedType) throws Exception {
-        PostgresDbUpdate update = new PostgresDbUpdate();
-        update.delete("emf.datasettypes", "dataset_type_id", loadedType.getDatasettypeid() + "");
-        update.deleteAll("emf.emf_keywords");
+    private void drop(String name) {
+        try {
+            PostgresDbUpdate update = new PostgresDbUpdate();
+            update.delete("emf.datasettypes", "name", name + "");
+            update.deleteAll("emf.emf_keywords");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void save(DatasetType type) {
@@ -124,4 +123,5 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
             session.close();
         }
     }
+
 }

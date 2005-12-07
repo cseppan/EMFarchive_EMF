@@ -9,7 +9,6 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.editor.DataViewWindow;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -127,26 +126,25 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
         panel.add(createTabbedPane(dataset, messagePanel), BorderLayout.CENTER);
-        panel.add(createBottomPanel(dataset), BorderLayout.PAGE_END);
+        panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         contentPane.add(panel);
 
         super.display();
     }
 
-    private JPanel createBottomPanel(EmfDataset dataset) {
+    private JPanel createBottomPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(createDataPanel(dataset), BorderLayout.LINE_START);
+        panel.add(createDataPanel(), BorderLayout.LINE_START);
         panel.add(createControlPanel(), BorderLayout.LINE_END);
 
         return panel;
     }
 
-    private JPanel createDataPanel(final EmfDataset dataset) {
+    private JPanel createDataPanel() {
         JPanel panel = new JPanel();
         Button showData = new Button("Show Data", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                ServiceLocator locator = session.getServiceLocator();
                 DataViewWindow view = new DataViewWindow();
                 desktop.add(view);
                 presenter.doDisplayData(view);

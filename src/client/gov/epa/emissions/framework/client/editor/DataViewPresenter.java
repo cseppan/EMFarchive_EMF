@@ -23,8 +23,8 @@ public class DataViewPresenter {
         view.display(dataset);
     }
 
-    public void doSelectTable(String table, PageView pageView) throws EmfException {
-        PageViewPresenter presenter = new PageViewPresenter(services, pageView, dataset, table);
+    public void doSelectTable(String table, TableView pageView) throws EmfException {
+        TableViewPresenter presenter = new TableViewPresenter(services, pageView, dataset, table);
         presenter.observeView(); // TODO: why this extra step?
         presenter.doDisplayFirst();// display first page
     }

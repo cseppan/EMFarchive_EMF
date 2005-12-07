@@ -7,11 +7,11 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EditToken;
 
-public class PageViewPresenter {
+public class TableViewPresenter {
 
     private DataEditorService services;
 
-    private PageView view;
+    private TableView view;
 
     private String table;
 
@@ -21,7 +21,7 @@ public class PageViewPresenter {
 
     private Dataset dataset;
 
-    public PageViewPresenter(DataEditorService services, PageView view, Dataset dataset, String table) {
+    public TableViewPresenter(DataEditorService services, TableView view, Dataset dataset, String table) {
         this.services = services;
         this.view = view;
         this.dataset = dataset;

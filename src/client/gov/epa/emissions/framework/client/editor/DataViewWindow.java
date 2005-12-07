@@ -116,7 +116,7 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
     }
 
     private void addPageView(String table) {
-        PageViewPanel panel = new PageViewPanel(source(table, dataset.getInternalSources()), messagePanel);
+        TableViewPanel panel = new TableViewPanel(source(table, dataset.getInternalSources()), messagePanel);
         panel.setName(table);
         pageContainer.add(panel, table);
 

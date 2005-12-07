@@ -11,7 +11,7 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class PageViewPanel extends JPanel implements PageView {
+public class TableViewPanel extends JPanel implements TableView {
 
     private EmfTableModel tableModel;
 
@@ -21,7 +21,7 @@ public class PageViewPanel extends JPanel implements PageView {
 
     private PaginationPanel paginationPanel;
 
-    public PageViewPanel(InternalSource source, MessagePanel messagePanel) {
+    public TableViewPanel(InternalSource source, MessagePanel messagePanel) {
         super(new BorderLayout());
         this.source = source;
 
@@ -32,7 +32,7 @@ public class PageViewPanel extends JPanel implements PageView {
         super.add(pageContainer, BorderLayout.CENTER);
     }
 
-    public void observe(PageViewPresenter presenter) {
+    public void observe(TableViewPresenter presenter) {
         paginationPanel.init(presenter);
     }
 

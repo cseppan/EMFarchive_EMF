@@ -26,7 +26,6 @@ public class PostgresDbUpdate {
 
     public PostgresDbUpdate(PostgresDbConfig config) throws Exception {
         connection = connection(config);
-        System.out.println("IN CONFIG: " + config.url());
     }
 
     private DatabaseConnection connection(PostgresDbConfig config) throws Exception {

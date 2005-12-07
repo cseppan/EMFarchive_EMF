@@ -30,7 +30,7 @@ public class PaginationPanel extends JPanel {
 
     private JFormattedTextField recordInput;
 
-    private PageViewPresenter presenter;
+    private TableViewPresenter presenter;
 
     private JLabel current;
 
@@ -60,7 +60,7 @@ public class PaginationPanel extends JPanel {
         super.add(container, BorderLayout.LINE_END);
     }
 
-    public void init(PageViewPresenter presenter) {
+    public void init(TableViewPresenter presenter) {
         this.presenter = presenter;
         try {
             doLayout(presenter.totalRecords());
