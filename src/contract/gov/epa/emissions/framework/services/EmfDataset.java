@@ -305,4 +305,12 @@ public class EmfDataset implements Dataset {
         keyValsList.addAll(Arrays.asList(keyvals));
     }
 
+    public void setSummarySource(InternalSource summary) {
+        //TODO: implement Summary
+    }
+
+    public InternalSource getSummarySource() {
+        return null;
+    }
+
 }

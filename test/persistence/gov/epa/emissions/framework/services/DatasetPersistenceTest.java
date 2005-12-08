@@ -1,9 +1,11 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.HibernateTestCase;
+import gov.epa.emissions.framework.db.ExImDbUpdate;
 
 import java.util.Date;
 import java.util.List;
@@ -16,9 +18,22 @@ import org.hibernate.Transaction;
 
 public class DatasetPersistenceTest extends HibernateTestCase {
 
-    public void testVerifySimplePropertiesAreStored() throws Exception {
-        String ds_name = "A1" + new Random().nextLong();
+    private String datasetName;
 
+    protected void setUp() throws Exception {
+        super.setUp();
+        datasetName = "A1" + new Random().nextLong();
+    }
+
+    protected void tearDown() throws Exception {
+        DbUpdate emissionsUpdate = new DbUpdate(emissions().getConnection());
+        emissionsUpdate.deleteAll(emissions().getName(), "versions");
+
+        ExImDbUpdate eximUpdate = new ExImDbUpdate();
+        eximUpdate.deleteAllDatasets();
+    }
+
+    public void testVerifySimplePropertiesAreStored() throws Exception {
         EmfDataset ds = new EmfDataset();
         ds.setAccessedDateTime(new Date());
         ds.setCountry("FR");
@@ -26,7 +41,7 @@ public class DatasetPersistenceTest extends HibernateTestCase {
         ds.setCreator("CFD");
         ds.setDescription("DESCRIPTION");
         ds.setModifiedDateTime(new Date());
-        ds.setName(ds_name);
+        ds.setName(datasetName);
         ds.setProject("P1");
         ds.setRegion("USA");
         ds.setSector("S1");
@@ -91,4 +106,5 @@ public class DatasetPersistenceTest extends HibernateTestCase {
             session.close();
         }
     }
+
 }

@@ -19,7 +19,7 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
         drop("NAME");
     }
 
-    protected void tearDown() {
+    protected void tearDown() throws Exception {
         drop("NAME");
         super.tearDown();
     }

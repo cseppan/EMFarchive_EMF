@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
@@ -30,7 +31,16 @@ public class DataTabPresenter {
         else
             view.displayExternalSources(dataset.getExternalSources());
 
-        view.displayVersions(dataEditorService.getVersions(dataset.getDatasetid()));
+        Version[] versions = dataEditorService.getVersions(dataset.getDatasetid());
+        view.displayVersions(versions);
+    }
+
+    public void doDisplayVersionedTable(Version version, String table, VersionedTableView versionedView)
+            throws EmfException {
+        VersionedTablePresenter presenter = new VersionedTablePresenter(version, table, versionedView,
+                dataEditorService);
+        presenter.observeView();
+        presenter.doDisplayFirst();
     }
 
 }

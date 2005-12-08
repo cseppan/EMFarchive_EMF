@@ -62,7 +62,7 @@
 	<classpathentry kind="lib" path="lib/concurrent.jar"/>
 	<classpathentry kind="lib" path="lib/dev/jmock/jmock-SNAPSHOT-09262005.jar"/>
 	<classpathentry kind="lib" path="lib/jnlp.jar"/>
-	<classpathentry kind="lib" path="lib/emissions-commons-0.1.3x.jar"/>
 	<classpathentry kind="lib" path="lib/c3p0-0.9.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/emissions-commons-0.1.4.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

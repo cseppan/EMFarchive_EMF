@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.ui.TableData;
 import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -36,13 +37,13 @@ public class DataTab extends JPanel implements DataTabView {
     }
 
     private JPanel createLayout() {
-        JPanel container = new JPanel();
+        JPanel container = new JPanel(new BorderLayout());
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
-        sourcesPanel = new JPanel();
+        sourcesPanel = new JPanel(new BorderLayout());
         container.add(sourcesPanel);
 
-        versionsPanel = new JPanel();
+        versionsPanel = new JPanel(new BorderLayout());
         versionsPanel.setBorder(new Border("Versions"));
         container.add(versionsPanel);
 
@@ -60,30 +61,26 @@ public class DataTab extends JPanel implements DataTabView {
     public void displayVersions(Version[] versions) {
         AbstractTableData tableData = new VersionsTableData(versions);
         JScrollPane table = new ScrollableTable(new EmfTableModel(tableData));
+        versionsPanel.removeAll();
         versionsPanel.add(table);
     }
 
     private void displaySources(String title, TableData tableData) {
         sourcesPanel.removeAll();
-        sourcesPanel.add(createSourcesLayout(title, tableData, parentConsole));
-    }
-
-    private JPanel createSourcesLayout(String title, TableData tableData, EmfFrame parentConsole) {
-        JPanel sourcesPanel = new JPanel();
         sourcesPanel.setBorder(new Border(title));
         sourcesPanel.add(createSortFilterPane(tableData, parentConsole));
-
-        return sourcesPanel;
     }
 
-    private JScrollPane createSortFilterPane(TableData tableData, EmfFrame parentConsole) {
+    private JPanel createSortFilterPane(TableData tableData, EmfFrame parentConsole) {
         EmfTableModel model = new EmfTableModel(tableData);
         SimpleTableModel wrapperModel = new SimpleTableModel(model);
 
         SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, wrapperModel);
         panel.getTable().setName("sourcesTable");
 
-        return new JScrollPane(panel);
+        panel.setPreferredSize(new Dimension(450, 200));// essential for SortFilterTablePanel
+
+        return panel;
     }
 
 }

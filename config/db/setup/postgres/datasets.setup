@@ -8,7 +8,7 @@ CREATE TABLE emf.datasets
   dataset_id serial NOT NULL,
   name varchar(255) NOT NULL,
   creator varchar(255) NOT NULL,
-  status varchar(255) NOT NULL,
+  status varchar(255),
   dataset_type integer,
   units varchar(255),
   region varchar(255),

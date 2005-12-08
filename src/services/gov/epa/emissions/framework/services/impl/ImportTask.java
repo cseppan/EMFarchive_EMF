@@ -41,12 +41,14 @@ public class ImportTask implements Runnable {
 
         try {
             setStartStatus();
+
+            dataServices.insertDataset(dataset);
             importer.run();
 
             // if no errors then insert the dataset into the database
             dataset.setStatus(DatasetStatus.IMPORTED);
-            dataServices.insertDataset(dataset);
-
+            dataServices.updateDataset(dataset);
+            
             setStatus("Completed import for " + dataset.getDatasetTypeName() + ":" + fileName);
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + fileName, e);

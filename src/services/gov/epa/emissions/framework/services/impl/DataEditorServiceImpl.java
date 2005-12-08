@@ -217,8 +217,7 @@ public class DataEditorServiceImpl implements DataEditorService {
     }
 
     /**
-     * This method is for cleaning up session specific objects within this
-     * service.
+     * This method is for cleaning up session specific objects within this service.
      */
     protected void finalize() throws Throwable {
         this.close();

@@ -94,9 +94,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     }
 
     /**
-     * This test gets a page using an integer record ID. The resulting
-     * collection that is acquired from the page should contain the record with
-     * record id that was supplied.
+     * This test gets a page using an integer record ID. The resulting collection that is acquired from the page should
+     * contain the record with record id that was supplied.
      */
     public void testShouldReturnOnlyOnePage() throws EmfException {
         EditToken token = editToken();
@@ -159,6 +158,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         Version versionZero = versions[0];
         Version derived = service.derive(versionZero, "v 1");
+        assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
+        assertEquals("v 1", derived.getName());
 
         Version finalVersion = service.markFinal(derived);
 
