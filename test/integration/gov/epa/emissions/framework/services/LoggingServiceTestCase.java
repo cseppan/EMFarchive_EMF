@@ -26,8 +26,8 @@ public abstract class LoggingServiceTestCase extends ServicesTestCase {
         cleanData();
 
         serviceLocator = serviceLocator();
-        eximService = serviceLocator.getExImService();
-        userService = serviceLocator.getUserService();
+        eximService = serviceLocator.eximService();
+        userService = serviceLocator.userService();
 
         dataset = new EmfDataset();
         Random random = new Random();
@@ -35,7 +35,7 @@ public abstract class LoggingServiceTestCase extends ServicesTestCase {
         dataset.setCreator("creator");
         dataset.setAccessedDateTime(new Date());
 
-        DatasetType datasetType = orlNonPointType(serviceLocator.getDatasetTypesService());
+        DatasetType datasetType = orlNonPointType(serviceLocator.datasetTypeService());
         dataset.setDatasetType(datasetType);
     }
 
@@ -71,7 +71,7 @@ public abstract class LoggingServiceTestCase extends ServicesTestCase {
         dataset.setStatus("imported");
 
         doImport(dataset, user);
-        EmfDataset importedDataset = serviceLocator.getDataService().getDatasets()[0];
+        EmfDataset importedDataset = serviceLocator.dataService().getDatasets()[0];
         File folder = new File(System.getProperty("java.io.tmpdir"));
         doExport(importedDataset, user, folder);
 
@@ -94,7 +94,7 @@ public abstract class LoggingServiceTestCase extends ServicesTestCase {
     }
 
     private void verifyTaskComplete(User user, String task) throws Exception {
-        StatusService service = serviceLocator.getStatusService();
+        StatusService service = serviceLocator.statusService();
         int counter = 0;
         for (int i = 0; i < 3000; i += 500) {
             Status[] status = service.getAll(user.getUsername());
@@ -110,7 +110,7 @@ public abstract class LoggingServiceTestCase extends ServicesTestCase {
     private void verifyAccessLog(long datasetId) throws Exception {
         Thread.sleep(3000);
 
-        LoggingService loggingService = serviceLocator.getLoggingService();
+        LoggingService loggingService = serviceLocator.loggingService();
 
         AccessLog[] logs = loggingService.getAccessLogs(datasetId);
         assertEquals(1, logs.length);

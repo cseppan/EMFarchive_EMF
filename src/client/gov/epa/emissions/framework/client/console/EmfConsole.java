@@ -47,7 +47,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     public EmfConsole(EmfSession session) {
         super("EMF Console", "Emissions Modeling Framework (EMF)");
         user = session.getUser();
-        this.serviceLocator = session.getServiceLocator();
+        this.serviceLocator = session.serviceLocator();
 
         this.windowLayoutManager = new DefaultViewLayout(this);
 
@@ -70,7 +70,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private void showStatus() {
-        StatusService statusServices = serviceLocator.getStatusService();
+        StatusService statusServices = serviceLocator.statusService();
         StatusWindow status = new StatusWindow(this, desktop);
         windowMenuPresenter.notifyAdd(status);
 

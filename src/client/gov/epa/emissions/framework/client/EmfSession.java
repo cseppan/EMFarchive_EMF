@@ -10,22 +10,22 @@ import gov.epa.emissions.framework.services.UserService;
 
 public interface EmfSession {
 
-    ServiceLocator getServiceLocator();
+    ServiceLocator serviceLocator();
 
     User getUser();
 
-    ExImService getExImServices();
+    ExImService eximService();
 
-    DataService getDataServices();
+    DataService dataService();
 
     String getMostRecentExportFolder();
 
     void setMostRecentExportFolder(String mostRecentExportFolder);
 
-    UserService getUserServices();
+    UserService userService();
 
-    LoggingService getLoggingServices();
+    LoggingService loggingService();
 
-    DatasetTypeService getDatasetTypesServices();
+    DatasetTypeService datasetTypesService();
 
 }

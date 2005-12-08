@@ -20,10 +20,10 @@ public class DefaultEmfSession implements EmfSession {
     public DefaultEmfSession(User user, ServiceLocator locator) throws EmfException {
         serviceLocator = locator;
         this.user = user;
-        mostRecentExportFolder = locator.getExImService().getExportBaseFolder();
+        mostRecentExportFolder = locator.eximService().getExportBaseFolder();
     }
 
-    public ServiceLocator getServiceLocator() {
+    public ServiceLocator serviceLocator() {
         return serviceLocator;
     }
 
@@ -31,12 +31,12 @@ public class DefaultEmfSession implements EmfSession {
         return user;
     }
 
-    public ExImService getExImServices() {
-        return serviceLocator.getExImService();
+    public ExImService eximService() {
+        return serviceLocator.eximService();
     }
 
-    public DataService getDataServices() {
-        return serviceLocator.getDataService();
+    public DataService dataService() {
+        return serviceLocator.dataService();
     }
 
     public String getMostRecentExportFolder() {
@@ -47,15 +47,15 @@ public class DefaultEmfSession implements EmfSession {
         this.mostRecentExportFolder = mostRecentExportFolder;
     }
 
-    public UserService getUserServices() {
-        return serviceLocator.getUserService();
+    public UserService userService() {
+        return serviceLocator.userService();
     }
 
-    public LoggingService getLoggingServices() {
-        return serviceLocator.getLoggingService();
+    public LoggingService loggingService() {
+        return serviceLocator.loggingService();
     }
 
-    public DatasetTypeService getDatasetTypesServices() {
-        return serviceLocator.getDatasetTypesService();
+    public DatasetTypeService datasetTypesService() {
+        return serviceLocator.datasetTypeService();
     }
 }

@@ -14,7 +14,7 @@ public class AuthenticateTest extends ServicesTestCase {
         super.setUp();
 
         ServiceLocator serviceLocator = serviceLocator();
-        emfUserAdmin = serviceLocator.getUserService();
+        emfUserAdmin = serviceLocator.userService();
     }
 
     public void testShouldSucceedOnValidUsernamePassword() throws Exception {

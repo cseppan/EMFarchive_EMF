@@ -26,15 +26,15 @@ public class ExImServiceTest extends ServicesTestCase {
         
         ServiceLocator serviceLocator = serviceLocator();
 
-        eximService = serviceLocator.getExImService();
-        userService = serviceLocator.getUserService();
+        eximService = serviceLocator.eximService();
+        userService = serviceLocator.userService();
         
         dataset = new EmfDataset();
         Random random = new Random();
         dataset.setName("ORL NonPoint - ExImServicesTest" + random.nextInt());
         dataset.setCreator("creator");
 
-        DatasetType datasetType = orlNonPointType(serviceLocator.getDatasetTypesService());
+        DatasetType datasetType = orlNonPointType(serviceLocator.datasetTypeService());
         dataset.setDatasetType(datasetType);
     }
 

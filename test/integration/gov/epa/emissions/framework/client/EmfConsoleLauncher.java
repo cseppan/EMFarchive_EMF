@@ -14,7 +14,7 @@ public class EmfConsoleLauncher {
     public static void main(String[] args) throws Exception {
         ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services/");
 
-        UserService userAdmin = serviceLocator.getUserService();
+        UserService userAdmin = serviceLocator.userService();
         User user = userAdmin.getUser("admin");
 
         EmfConsole console = new EmfConsole(new DefaultEmfSession(user, serviceLocator));

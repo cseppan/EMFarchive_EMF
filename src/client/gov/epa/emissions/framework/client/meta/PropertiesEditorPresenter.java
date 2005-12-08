@@ -46,7 +46,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
     }
 
     public void doSave(DatasetsBrowserView browser) {
-        DataService dataServices = serviceLocator.getDataService();
+        DataService dataServices = serviceLocator.dataService();
         try {
             updateDataset(dataServices, summaryPresenter, keywordsPresenter);
         } catch (EmfException e) {
@@ -80,7 +80,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
     public void set(KeywordsTabView keywordsView) throws EmfException {
         keywordsPresenter = new KeywordsTabPresenter(keywordsView, dataset);
 
-        Keywords keywords = new Keywords(serviceLocator.getDataCommonsService().getKeywords());
+        Keywords keywords = new Keywords(serviceLocator.dataCommonsService().getKeywords());
         keywordsPresenter.init(keywords);
     }
 
@@ -93,7 +93,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
     }
 
     public void doDisplayData(DataView dataView) {
-        DataViewPresenter presenter = new DataViewPresenter(dataset, dataView, serviceLocator.getDataEditorService());
+        DataViewPresenter presenter = new DataViewPresenter(dataset, dataView, serviceLocator.dataEditorService());
         presenter.doDisplay();
     }
 }

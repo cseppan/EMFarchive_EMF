@@ -61,8 +61,8 @@ public class FileMenu extends JMenu {
     }
 
     private void logout(EmfSession session, EmfConsole parent) {
-        UserService userServices = session.getUserServices();
-        LoginWindow view = new LoginWindow(session.getServiceLocator());
+        UserService userServices = session.userService();
+        LoginWindow view = new LoginWindow(session.serviceLocator());
 
         LoginPresenter presenter = new LoginPresenter(userServices);
         presenter.display(view);
@@ -89,10 +89,10 @@ public class FileMenu extends JMenu {
         if (viewLayout.activate("Import Dataset - FileMenu"))
             return;
 
-        ServiceLocator serviceLocator = session.getServiceLocator();
-        ExImService eximServices = serviceLocator.getExImService();
+        ServiceLocator serviceLocator = session.serviceLocator();
+        ExImService eximServices = serviceLocator.eximService();
 
-        ImportWindow importView = new ImportWindow(serviceLocator.getDatasetTypesService(), desktop);
+        ImportWindow importView = new ImportWindow(serviceLocator.datasetTypeService(), desktop);
         viewLayout.add(importView, "Import Dataset - FileMenu");
         desktop.add(importView);
 

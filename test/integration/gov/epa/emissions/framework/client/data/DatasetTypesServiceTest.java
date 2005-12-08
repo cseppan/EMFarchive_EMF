@@ -14,7 +14,7 @@ public class DatasetTypesServiceTest extends ServicesTestCase {
         super.setUp();
 
         ServiceLocator serviceLocator = serviceLocator();
-        services = serviceLocator.getDatasetTypesService();
+        services = serviceLocator.datasetTypeService();
     }
 
     public void testShouldReturnCompleteListOfDatasetTypes() throws EmfException {

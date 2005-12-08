@@ -43,7 +43,7 @@ public class DefaultExportPresenter implements ExportPresenter {
         }
         session.setMostRecentExportFolder(folder);
 
-        ExImService services = session.getExImServices();
+        ExImService services = session.eximService();
         if (overwrite)
             services.startExportWithOverwrite(session.getUser(), datasets, folder, purpose);
         else

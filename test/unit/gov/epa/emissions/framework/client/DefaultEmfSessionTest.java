@@ -26,7 +26,7 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
         eximServices.stubs().method("getExportBaseFolder").will(returnValue(folder));
 
         locator = mock(ServiceLocator.class);
-        locator.stubs().method("getExImService").will(returnValue(eximServices.proxy()));
+        locator.stubs().method("eximService").will(returnValue(eximServices.proxy()));
 
         session = new DefaultEmfSession(null, (ServiceLocator) locator.proxy());
     }
@@ -43,49 +43,49 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
         ServiceLocator locatorProxy = (ServiceLocator) locator.proxy();
         EmfSession session = new DefaultEmfSession(null, locatorProxy);
 
-        assertEquals(locatorProxy, session.getServiceLocator());
+        assertEquals(locatorProxy, session.serviceLocator());
     }
 
     public void testGetExImServices() throws Exception {
         ExImService proxy = (ExImService) eximServices.proxy();
-        locator.stubs().method("getExImService").will(returnValue(proxy));
+        locator.stubs().method("eximService").will(returnValue(proxy));
 
         EmfSession session = new DefaultEmfSession(null, ((ServiceLocator) locator.proxy()));
 
-        assertEquals(proxy, session.getExImServices());
+        assertEquals(proxy, session.eximService());
     }
 
     public void testGetDataServices() throws Exception {
         Mock services = mock(DataService.class);
 
         DataService servicesProxy = (DataService) services.proxy();
-        locator.stubs().method("getDataService").will(returnValue(servicesProxy));
+        locator.stubs().method("dataService").will(returnValue(servicesProxy));
 
         EmfSession session = new DefaultEmfSession(null, ((ServiceLocator) locator.proxy()));
 
-        assertEquals(servicesProxy, session.getDataServices());
+        assertEquals(servicesProxy, session.dataService());
     }
 
     public void testGetUserServices() throws Exception {
         Mock services = mock(UserService.class);
 
         UserService servicesProxy = (UserService) services.proxy();
-        locator.stubs().method("getUserService").will(returnValue(servicesProxy));
+        locator.stubs().method("userService").will(returnValue(servicesProxy));
 
         EmfSession session = new DefaultEmfSession(null, ((ServiceLocator) locator.proxy()));
 
-        assertEquals(servicesProxy, session.getUserServices());
+        assertEquals(servicesProxy, session.userService());
     }
 
     public void testGetLoggingServices() throws Exception {
         Mock services = mock(LoggingService.class);
 
         LoggingService servicesProxy = (LoggingService) services.proxy();
-        locator.stubs().method("getLoggingService").will(returnValue(servicesProxy));
+        locator.stubs().method("loggingService").will(returnValue(servicesProxy));
 
         EmfSession session = new DefaultEmfSession(null, ((ServiceLocator) locator.proxy()));
 
-        assertEquals(servicesProxy, session.getLoggingServices());
+        assertEquals(servicesProxy, session.loggingService());
     }
 
     public void testCacheMostRecentExportFolder() throws Exception {

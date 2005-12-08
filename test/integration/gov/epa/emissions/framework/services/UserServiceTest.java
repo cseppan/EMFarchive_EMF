@@ -11,7 +11,7 @@ public class UserServiceTest extends ServicesTestCase {
         super.setUp();
 
         ServiceLocator serviceLocator = serviceLocator();
-        service = serviceLocator.getUserService();
+        service = serviceLocator.userService();
     }
 
     public void testGetUserSucceedsForEMFAdministrator() throws Exception {

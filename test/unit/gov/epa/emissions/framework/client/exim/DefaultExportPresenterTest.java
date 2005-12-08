@@ -22,7 +22,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         session = mock(EmfSession.class);
 
         session.stubs().method("getUser").withNoArguments().will(returnValue(null));
-        session.stubs().method("getExImServices").withNoArguments().will(returnValue(null));
+        session.stubs().method("eximService").withNoArguments().will(returnValue(null));
 
         folder = "foo/blah";
         session.stubs().method("getMostRecentExportFolder").withNoArguments().will(returnValue(folder));
@@ -44,7 +44,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
                 new Constraint[] { eq(user), eq(datasets), eq(folder), eq(purpose) });
 
         session.stubs().method("getUser").withNoArguments().will(returnValue(user));
-        session.stubs().method("getExImServices").withNoArguments().will(returnValue(model.proxy()));
+        session.stubs().method("eximService").withNoArguments().will(returnValue(model.proxy()));
         session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
 
         ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
@@ -67,7 +67,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
                 new Constraint[] { eq(user), eq(datasets), eq(folder), eq(description) });
 
         session.stubs().method("getUser").withNoArguments().will(returnValue(user));
-        session.stubs().method("getExImServices").withNoArguments().will(returnValue(model.proxy()));
+        session.stubs().method("eximService").withNoArguments().will(returnValue(model.proxy()));
         session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
 
         ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
@@ -93,7 +93,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
 
     public void testShouldRegisterWithViewOnObserve() {
         session.stubs().method("getUser").withNoArguments().will(returnValue(null));
-        session.stubs().method("getExImServices").withNoArguments().will(returnValue(null));
+        session.stubs().method("eximService").withNoArguments().will(returnValue(null));
 
         ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
 

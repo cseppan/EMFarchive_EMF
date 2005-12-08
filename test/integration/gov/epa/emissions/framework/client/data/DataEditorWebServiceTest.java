@@ -9,7 +9,7 @@ public class DataEditorWebServiceTest extends DataEditorServiceTestCase {
         super.setUp();
         
         ServiceLocator serviceLocator = serviceLocator();
-        super.setUpService(serviceLocator.getDataEditorService());
+        super.setUpService(serviceLocator.dataEditorService());
     }
 
 }

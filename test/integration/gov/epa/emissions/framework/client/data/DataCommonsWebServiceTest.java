@@ -9,7 +9,7 @@ public class DataCommonsWebServiceTest extends DataCommonsServiceTestCase {
         super.setUp();
         
         ServiceLocator serviceLocator = serviceLocator();
-        super.setUpService(serviceLocator.getDataCommonsService());
+        super.setUpService(serviceLocator.dataCommonsService());
     }
 
 }

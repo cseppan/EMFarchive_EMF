@@ -35,35 +35,35 @@ public class RemoteServiceLocator implements ServiceLocator {
         }
     }
 
-    public UserService getUserService() {
+    public UserService userService() {
         return new UserServiceTransport(baseUrl + "/gov.epa.emf.services.UserService");
     }
 
-    public StatusService getStatusService() {
+    public StatusService statusService() {
         return new StatusServiceTransport(baseUrl + "/gov.epa.emf.services.StatusService");
     }
 
-    public ExImService getExImService() {
+    public ExImService eximService() {
         return new ExImServiceTransport(baseUrl + "/gov.epa.emf.services.ExImService");
     }
 
-    public DataService getDataService() {
+    public DataService dataService() {
         return new DataServiceTransport(baseUrl + "/gov.epa.emf.services.DataService");
     }
 
-    public LoggingService getLoggingService() {
+    public LoggingService loggingService() {
         return new LoggingServiceTransport(baseUrl + "/gov.epa.emf.services.LoggingService");
     }
 
-    public DatasetTypeService getDatasetTypesService() {
+    public DatasetTypeService datasetTypeService() {
         return new DatasetTypeServiceTransport(baseUrl + "/gov.epa.emf.services.DatasetTypeService");
     }
 
-    public DataCommonsService getDataCommonsService() {
+    public DataCommonsService dataCommonsService() {
         return new DataCommonsServiceTransport(baseUrl + "/gov.epa.emf.services.DataCommonsService");
     }
 
-    public DataEditorService getDataEditorService() {
+    public DataEditorService dataEditorService() {
         return new DataEditorServiceTransport(call,baseUrl + "/gov.epa.emf.services.DataEditorService");
     }
 

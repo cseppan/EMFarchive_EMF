@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.editor.DataViewWindow;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -64,7 +65,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     private JPanel createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
         try {
-            SummaryTab view = new SummaryTab(dataset, session.getDataServices(), messagePanel);
+            SummaryTab view = new SummaryTab(dataset, session.dataService(), messagePanel);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
@@ -75,8 +76,14 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     private JPanel createDataTab(EmfDataset dataset, EmfFrame parentConsole) {
         DataTab view = new DataTab(parentConsole);
-        DataTabPresenter presenter = new DataTabPresenter(view, dataset);
-        presenter.doDisplay();
+        ServiceLocator serviceLocator = session.serviceLocator();
+        DataTabPresenter presenter = new DataTabPresenter(view, dataset, serviceLocator.dataEditorService());
+        try {
+            presenter.doDisplay();
+        } catch (EmfException e) {
+            showError("Could not load Data Tab. Reason - " + e.getMessage());
+            return createErrorTab("Could not load Data Tab. Reason - " + e.getMessage());
+        }
 
         return view;
     }
@@ -97,7 +104,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
             LogsTab view = new LogsTab(parentConsole);
 
             // FIXME: activate the presenter on tab-click
-            LogsTabPresenter presenter = new LogsTabPresenter(view, dataset, session.getLoggingServices());
+            LogsTabPresenter presenter = new LogsTabPresenter(view, dataset, session.loggingService());
             presenter.doDisplay();
 
             return view;

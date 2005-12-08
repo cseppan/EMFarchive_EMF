@@ -10,20 +10,20 @@ import gov.epa.emissions.framework.services.StatusService;
 import gov.epa.emissions.framework.services.UserService;
 
 public interface ServiceLocator {
-    UserService getUserService();
+    UserService userService();
 
-    StatusService getStatusService();
+    StatusService statusService();
 
-    ExImService getExImService();
+    ExImService eximService();
 
-    DataService getDataService();
+    DataService dataService();
 
-    LoggingService getLoggingService();
+    LoggingService loggingService();
 
-    DatasetTypeService getDatasetTypesService();
+    DatasetTypeService datasetTypeService();
 
-    DataCommonsService getDataCommonsService();
+    DataCommonsService dataCommonsService();
 
-    DataEditorService getDataEditorService();
+    DataEditorService dataEditorService();
 
 }

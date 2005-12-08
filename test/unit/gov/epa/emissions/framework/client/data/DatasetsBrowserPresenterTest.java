@@ -38,8 +38,8 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         dataServices = mock(DataService.class);
         Mock interdataServices = mock(DataCommonsService.class);
         serviceLocator = mock(ServiceLocator.class);
-        serviceLocator.stubs().method("getDataService").withNoArguments().will(returnValue(dataServices.proxy()));
-        serviceLocator.stubs().method("getDataCommonsService").withNoArguments().will(
+        serviceLocator.stubs().method("dataService").withNoArguments().will(returnValue(dataServices.proxy()));
+        serviceLocator.stubs().method("dataCommonsService").withNoArguments().will(
                 returnValue(interdataServices.proxy()));
 
         presenter = new DatasetsBrowserPresenter((ServiceLocator) serviceLocator.proxy(), (ViewLayout) layout.proxy());

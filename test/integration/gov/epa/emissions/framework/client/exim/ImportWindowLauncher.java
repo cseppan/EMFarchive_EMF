@@ -15,7 +15,7 @@ public class ImportWindowLauncher {
     public static void main(String[] args) throws Exception {
         ServiceLocator serviceLocator = new RemoteServiceLocator("http://localhost:8080/emf/services");
 
-        UserService userServices = serviceLocator.getUserService();
+        UserService userServices = serviceLocator.userService();
         User user = userServices.getUser("emf");
 
         EmfConsole view = new EmfConsole(new DefaultEmfSession(user, serviceLocator));

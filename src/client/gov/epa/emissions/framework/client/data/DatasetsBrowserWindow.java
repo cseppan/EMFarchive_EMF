@@ -60,7 +60,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         super.setName("datasetsBrowser");
 
         this.session = session;
-        DataService services = session.getDataServices();
+        DataService services = session.dataService();
         model = new EmfTableModel(new EmfDatasetTableData(services.getDatasets()));
         selectModel = new SortFilterSelectModel(model);
         this.parentConsole = parentConsole;
@@ -165,12 +165,12 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void doNewDataset() throws EmfException {
-        ImportWindow importView = new ImportWindow(session.getDatasetTypesServices(), desktop);
+        ImportWindow importView = new ImportWindow(session.datasetTypesService(), desktop);
         // windowLayoutManager.add(importView); //FIXME: needs layout
         desktop.add(importView);
 
         ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session.getUser(), session
-                .getExImServices(), session.getDataServices(), this);
+                .eximService(), session.dataService(), this);
         presenter.doNew(importView, importPresenter);
     }
 

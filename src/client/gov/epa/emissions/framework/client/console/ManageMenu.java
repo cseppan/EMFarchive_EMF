@@ -52,8 +52,8 @@ public class ManageMenu extends JMenu {
         this.viewLayout = windowLayoutManager;
 
         super.add(createDatasets(parent, messagePanel));
-        super.add(createDatasetTypes(session.getServiceLocator(), parent, messagePanel));
-        super.add(createSectors(session.getDataServices(), parent, messagePanel));
+        super.add(createDatasetTypes(session.serviceLocator(), parent, messagePanel));
+        super.add(createSectors(session.dataService(), parent, messagePanel));
         super.addSeparator();
 
         addUsers(session.getUser());
@@ -170,7 +170,7 @@ public class ManageMenu extends JMenu {
         desktop.add(datasetsBrowserView);
 
         ViewLayout browserLayout = new DefaultViewLayout(datasetsBrowserView);
-        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session.getServiceLocator(), browserLayout);
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session.serviceLocator(), browserLayout);
         presenter.doDisplay(datasetsBrowserView);
     }
 
@@ -182,7 +182,7 @@ public class ManageMenu extends JMenu {
         viewLayout.add(myProfileView, "My Profile");
         desktop.add(myProfileView);
 
-        UpdateUserPresenter presenter = new UpdateUserPresenter(session.getUserServices());
+        UpdateUserPresenter presenter = new UpdateUserPresenter(session.userService());
         presenter.display(myProfileView);
     }
 
@@ -191,7 +191,7 @@ public class ManageMenu extends JMenu {
             return;
 
         try {
-            UserService userServices = session.getUserServices();
+            UserService userServices = session.userService();
 
             UsersManager usesrManagerView = new UsersManager(session.getUser(), userServices, parent, desktop);
             viewLayout.add(usesrManagerView, "Users Manager");

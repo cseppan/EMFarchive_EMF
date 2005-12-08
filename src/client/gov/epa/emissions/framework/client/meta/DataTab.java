@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.SimpleTableModel;
 import gov.epa.emissions.commons.io.ExternalSource;
 import gov.epa.emissions.commons.io.InternalSource;
@@ -33,6 +34,10 @@ public class DataTab extends JPanel implements DataTabView {
 
     public void displayExternalSources(ExternalSource[] sources) {
         displaySources("External Sources", new ExternalSourcesTableData(sources));
+    }
+
+    public void displayVersions(Version[] versions) {
+        // TODO Auto-generated method stub
     }
 
     private void displaySources(String title, TableData tableData) {
