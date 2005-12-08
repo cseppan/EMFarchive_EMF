@@ -3,6 +3,7 @@ DROP TABLE emf.users CASCADE;
 
 CREATE TABLE emf.users
 (
+  id serial NOT NULL,
   user_name varchar(255) NOT NULL,
   user_pass varchar(255) NOT NULL,
   fullname varchar(255) NOT NULL,
@@ -11,7 +12,8 @@ CREATE TABLE emf.users
   emailaddr varchar(255) NOT NULL,
   inadmingrp bool NOT NULL DEFAULT false,
   acctdisabled bool NOT NULL DEFAULT false,
-  CONSTRAINT pk_users PRIMARY KEY (user_name)
+  CONSTRAINT users_pkey PRIMARY KEY (id),
+  CONSTRAINT users_username_key UNIQUE (user_name)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.users OWNER TO emf;
