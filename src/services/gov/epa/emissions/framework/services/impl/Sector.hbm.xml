@@ -4,14 +4,14 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false"> 
-  <class name="gov.epa.emissions.commons.io.Sector" table="sectors"> 
+  <class name="gov.epa.emissions.commons.io.Sector" table="emf.sectors"> 
  	<id name="id" type="long" column="id">
 	  <generator class="identity"/>
  	</id>
 	<property name="name"			column="name"			type="java.lang.String"		not-null="true"/>
 	<property name="description" 	column="description"	type="java.lang.String"		not-null="false"/>
 	
-	<array name="sectorCriteria" table="sectorcriteria">
+	<array name="sectorCriteria" table="emf.sectorcriteria">
     <key column="sector_id"/>
     <list-index column="list_index"/>
     <composite-element class="gov.epa.emissions.commons.io.SectorCriteria">

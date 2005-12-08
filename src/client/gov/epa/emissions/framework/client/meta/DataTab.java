@@ -5,12 +5,14 @@ import gov.epa.emissions.commons.gui.SimpleTableModel;
 import gov.epa.emissions.commons.io.ExternalSource;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.EmfFrame;
+import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Border;
-import gov.epa.emissions.framework.ui.TableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.ScrollableTable;
+import gov.epa.emissions.framework.ui.TableData;
 import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
-import java.awt.Dimension;
+import java.awt.BorderLayout;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -21,11 +23,30 @@ public class DataTab extends JPanel implements DataTabView {
 
     private EmfFrame parentConsole;
 
+    private JPanel versionsPanel;
+
+    private JPanel sourcesPanel;
+
     public DataTab(EmfFrame parentConsole) {
         super.setName("logsTab");
         this.parentConsole = parentConsole;
 
-        super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        super.setLayout(new BorderLayout());
+        super.add(createLayout(), BorderLayout.CENTER);
+    }
+
+    private JPanel createLayout() {
+        JPanel container = new JPanel();
+        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+
+        sourcesPanel = new JPanel();
+        container.add(sourcesPanel);
+
+        versionsPanel = new JPanel();
+        versionsPanel.setBorder(new Border("Versions"));
+        container.add(versionsPanel);
+
+        return container;
     }
 
     public void displayInternalSources(InternalSource[] sources) {
@@ -37,22 +58,22 @@ public class DataTab extends JPanel implements DataTabView {
     }
 
     public void displayVersions(Version[] versions) {
-        // TODO Auto-generated method stub
+        AbstractTableData tableData = new VersionsTableData(versions);
+        JScrollPane table = new ScrollableTable(new EmfTableModel(tableData));
+        versionsPanel.add(table);
     }
 
     private void displaySources(String title, TableData tableData) {
-        super.removeAll();
-        super.add(createLayout(title, tableData, parentConsole));
+        sourcesPanel.removeAll();
+        sourcesPanel.add(createSourcesLayout(title, tableData, parentConsole));
     }
 
-    private JPanel createLayout(String title, TableData tableData, EmfFrame parentConsole) {
-        JPanel layout = new JPanel();
-        layout.setBorder(new Border(title));
-        layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
+    private JPanel createSourcesLayout(String title, TableData tableData, EmfFrame parentConsole) {
+        JPanel sourcesPanel = new JPanel();
+        sourcesPanel.setBorder(new Border(title));
+        sourcesPanel.add(createSortFilterPane(tableData, parentConsole));
 
-        layout.add(createSortFilterPane(tableData, parentConsole));
-
-        return layout;
+        return sourcesPanel;
     }
 
     private JScrollPane createSortFilterPane(TableData tableData, EmfFrame parentConsole) {
@@ -62,10 +83,7 @@ public class DataTab extends JPanel implements DataTabView {
         SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, wrapperModel);
         panel.getTable().setName("sourcesTable");
 
-        JScrollPane scrollPane = new JScrollPane(panel);
-        panel.setPreferredSize(new Dimension(450, 60));
-
-        return scrollPane;
+        return new JScrollPane(panel);
     }
 
 }

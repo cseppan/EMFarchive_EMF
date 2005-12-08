@@ -13,7 +13,11 @@ public class StatusServiceImpl implements StatusService {
     private HibernateSessionFactory sessionFactory;
 
     public StatusServiceImpl() {
-        sessionFactory = HibernateSessionFactory.get();
+        this(HibernateSessionFactory.get());
+    }
+
+    public StatusServiceImpl(HibernateSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public Status[] getAll(String userName) {
@@ -21,7 +25,7 @@ public class StatusServiceImpl implements StatusService {
         List allStats = StatusDAO.getMessages(userName, session);
         session.flush();
         session.close();
-        
+
         return (Status[]) allStats.toArray(new Status[allStats.size()]);
     }
 
