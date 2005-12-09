@@ -60,6 +60,16 @@ public class EmfDataset implements Dataset {
     private List externalSources;
 
     private List keyValsList;
+    
+    private int defaultVersion;
+    
+    public int getDefaultVersion() {
+        return defaultVersion;
+    }
+
+    public void setDefaultVersion(int defaultVersion) {
+        this.defaultVersion = defaultVersion;
+    }
 
     public EmfDataset() {
         tables = new ArrayList();
