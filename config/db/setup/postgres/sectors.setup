@@ -40,7 +40,7 @@ ALTER TABLE emf.sectorcriteria OWNER TO emf;
 
 
 ---- Sectors data
-DELETE FROM emf.Sectors;
+delete from emf.sectors;
 
 insert into emf.sectors values (1, 'Point', 'Point');
 insert into emf.sectors values (2, 'Nonpoint', 'Nonpoint');
