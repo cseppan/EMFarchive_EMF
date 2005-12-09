@@ -1,0 +1,16 @@
+delete from emissions.versions;
+delete from emf.users;
+delete from emf.countries;
+delete from emf.datasettypes;
+delete from emf.datasets;
+delete from emf.dataset_access_logs;
+delete from emf.datasettables;
+delete from emf.emf_properties;
+delete from emf.sectors;
+delete from emf.statusmessages;
+delete from emf.sectorcriteria;
+delete from emf.datasets_keywords;
+delete from emf.emf_keywords;
+delete from emf.dataset_types_keywords;
+delete from emf.external_sources;
+delete from emf.internal_sources;
