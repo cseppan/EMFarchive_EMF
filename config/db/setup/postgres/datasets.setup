@@ -23,6 +23,7 @@ CREATE TABLE emf.datasets
   created_date_time timestamp,
   modified_date_time timestamp,
   accessed_date_time timestamp,
+  default_version int4 DEFAULT 0,
   CONSTRAINT datasets_pkey PRIMARY KEY (dataset_id),
   CONSTRAINT datasets_name_key UNIQUE (name)
 ) 
