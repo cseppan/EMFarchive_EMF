@@ -147,7 +147,6 @@ public class VersionedPaginationPanel extends JPanel {
         public boolean verify(JComponent input) {
             return verifyInput(max);
         }
-
     }
 
     private JSlider slider(int max) {
