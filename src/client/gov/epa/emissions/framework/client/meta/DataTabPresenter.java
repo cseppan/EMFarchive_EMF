@@ -34,7 +34,7 @@ public class DataTabPresenter {
             view.displayExternalSources(dataset.getExternalSources());
 
         Version[] versions = dataEditorService.getVersions(dataset.getDatasetid());
-        view.displayVersions(versions);
+        view.displayVersions(versions, dataset.getInternalSources());
     }
 
     public void doDisplayVersionedTable(Version version, String table, VersionedTableView versionedView)

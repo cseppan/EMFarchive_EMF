@@ -5,10 +5,8 @@ import gov.epa.emissions.commons.gui.SimpleTableModel;
 import gov.epa.emissions.commons.io.ExternalSource;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.EmfFrame;
-import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EmfTableModel;
-import gov.epa.emissions.framework.ui.ScrollableTable;
 import gov.epa.emissions.framework.ui.TableData;
 import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
@@ -17,14 +15,13 @@ import java.awt.Dimension;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 //FIXME: very similar to LogsTab (uneditable table displays). Refactor ?
 public class DataTab extends JPanel implements DataTabView {
 
     private EmfFrame parentConsole;
 
-    private JPanel versionsPanel;
+    private VersionsPanel versionsPanel;
 
     private JPanel sourcesPanel;
 
@@ -37,14 +34,13 @@ public class DataTab extends JPanel implements DataTabView {
     }
 
     private JPanel createLayout() {
-        JPanel container = new JPanel(new BorderLayout());
+        JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
         sourcesPanel = new JPanel(new BorderLayout());
         container.add(sourcesPanel);
 
-        versionsPanel = new JPanel(new BorderLayout());
-        versionsPanel.setBorder(new Border("Versions"));
+        versionsPanel = new VersionsPanel();
         container.add(versionsPanel);
 
         return container;
@@ -58,11 +54,8 @@ public class DataTab extends JPanel implements DataTabView {
         displaySources("External Sources", new ExternalSourcesTableData(sources));
     }
 
-    public void displayVersions(Version[] versions) {
-        AbstractTableData tableData = new VersionsTableData(versions);
-        JScrollPane table = new ScrollableTable(new EmfTableModel(tableData));
-        versionsPanel.removeAll();
-        versionsPanel.add(table);
+    public void displayVersions(Version[] versions, InternalSource[] sources) {
+        versionsPanel.display(versions, sources);
     }
 
     private void displaySources(String title, TableData tableData) {

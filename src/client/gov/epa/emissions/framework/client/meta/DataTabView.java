@@ -9,5 +9,5 @@ public interface DataTabView {
 
     void displayExternalSources(ExternalSource[] sources);
 
-    void displayVersions(Version[] versions);
+    void displayVersions(Version[] versions, InternalSource[] sources);
 }

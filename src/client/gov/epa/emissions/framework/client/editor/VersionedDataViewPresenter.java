@@ -8,17 +8,17 @@ public class VersionedDataViewPresenter {
 
     private VersionedDataView view;
 
-    private DataEditorService services;
+    private DataEditorService service;
 
     private Version version;
 
     private String table;
 
-    public VersionedDataViewPresenter(Version version, String table, VersionedDataView view, DataEditorService services) {
+    public VersionedDataViewPresenter(Version version, String table, VersionedDataView view, DataEditorService service) {
         this.version = version;
         this.table = table;
         this.view = view;
-        this.services = services;
+        this.service = service;
     }
 
     public void display() {
@@ -26,7 +26,7 @@ public class VersionedDataViewPresenter {
     }
 
     public void doClose() throws EmfException {
-        services.close();
+        service.close();
         view.close();
     }
 
