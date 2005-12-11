@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.Date;
@@ -78,5 +79,15 @@ public class VersionsTableDataTest extends TestCase {
     public void testShouldReturnARowRepresentingAVersionEntry() {
         assertEquals(version0, data.element(0));
         assertEquals(version1, data.element(1));
+    }
+    
+    public void testShouldReturnSelectedVersions() {
+        List rows = data.rows();
+        EditableRow row = (EditableRow) rows.get(1);
+        row.setValueAt(Boolean.TRUE, 0);
+        
+        Version[] versions = data.selected();
+        assertEquals(1, versions.length);
+        assertSame(version1, versions[0]);
     }
 }

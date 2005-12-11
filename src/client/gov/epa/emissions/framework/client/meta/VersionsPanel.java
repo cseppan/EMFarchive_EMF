@@ -22,6 +22,8 @@ import javax.swing.JScrollPane;
 
 public class VersionsPanel extends JPanel {
 
+    private VersionsTableData tableData;
+
     public VersionsPanel() {
         super.setLayout(new BorderLayout());
         super.setBorder(new Border("Versions"));
@@ -33,7 +35,8 @@ public class VersionsPanel extends JPanel {
     }
 
     private JPanel tablePanel(Version[] versions) {
-        EmfTableModel tableModel = new EmfTableModel(new VersionsTableData(versions));
+        tableData = new VersionsTableData(versions);
+        EmfTableModel tableModel = new EmfTableModel(tableData);
         JScrollPane table = new ScrollableTable(tableModel);
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -81,6 +84,8 @@ public class VersionsPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String table = (String) tableCombo.getSelectedItem();
                 // TODO: launch VersionedDataView
+                if (table.equals("Select Table"))
+                    return;
             }
         });
         panel.add(view);
