@@ -24,12 +24,11 @@ public class FileMenu extends JMenu {
     private ViewLayout viewLayout;
 
     // FIXME: where's the associated Presenter ?
-    public FileMenu(EmfSession session, EmfConsole parent, JDesktopPane desktop, MessagePanel messagePanel,
-            ViewLayout windowLayoutManager) {
+    public FileMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, ViewLayout windowLayoutManager) {
         super("File");
         super.setName("file");
 
-        super.add(createImport(session, desktop, messagePanel));
+        super.add(createImport(session, parent.desktop(), messagePanel));
         super.addSeparator();
         super.add(createLogout(session, parent));
         super.add(createExit());

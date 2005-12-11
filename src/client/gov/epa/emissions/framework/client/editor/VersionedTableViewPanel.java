@@ -7,6 +7,8 @@ import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 
 import java.awt.BorderLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -42,9 +44,21 @@ public class VersionedTableViewPanel extends JPanel implements VersionedTableVie
 
         paginationPanel.updateStatus(page);
 
-        tableModel = new EmfTableModel(new PageData(source, page));
+        tableModel = new EmfTableModel(new PageData(cols(), page));
         JScrollPane table = new ScrollableTable(tableModel);
         pageContainer.add(table, BorderLayout.CENTER);
+    }
+
+    // Filter out the first four (version-specific cols)
+    private String[] cols() {
+        // TODO: should these cols come from the Page/Service?
+        List cols = new ArrayList();
+
+        String[] allCols = source.getCols();
+        for (int i = 4; i < allCols.length; i++)
+            cols.add(allCols[i]);
+
+        return (String[]) cols.toArray(new String[0]);
     }
 
 }

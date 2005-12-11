@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
-import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -12,12 +11,12 @@ import java.util.List;
 
 public class PageData extends AbstractTableData {
 
-    private InternalSource source;
-
     private List rows;
 
-    public PageData(InternalSource source, Page page) {
-        this.source = source;
+    private String[] cols;
+
+    public PageData(String[] cols, Page page) {
+        this.cols = cols;
         this.rows = createRows(page);
     }
 
@@ -27,7 +26,6 @@ public class PageData extends AbstractTableData {
     }
 
     public String[] columns() {
-        String[] cols = source.getCols();
         List result = new ArrayList();
         // ignore first col - dataset id, not for display
         for (int i = 1; i < cols.length; i++)
@@ -60,6 +58,5 @@ public class PageData extends AbstractTableData {
     private String[] values(VersionedRecord record) {
         return record.getTokens();
     }
-
 
 }

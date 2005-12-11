@@ -8,7 +8,6 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
-import gov.epa.emissions.framework.client.editor.DataViewWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -20,7 +19,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.JDesktopPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -38,15 +36,11 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     private DatasetsBrowserView datasetsBrowser;
 
-    private JDesktopPane desktop;
-
-    public PropertiesEditor(EmfSession session, DatasetsBrowserView datasetsBrowser, EmfConsole parentConsole,
-            JDesktopPane desktop) {
+    public PropertiesEditor(EmfSession session, DatasetsBrowserView datasetsBrowser, EmfConsole parentConsole) {
         super("Properties Editor", new Dimension(700, 550));
         this.session = session;
         this.datasetsBrowser = datasetsBrowser;
         this.parentConsole = parentConsole;
-        this.desktop = desktop;
     }
 
     private JTabbedPane createTabbedPane(EmfDataset dataset, MessagePanel messagePanel) {
@@ -145,22 +139,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     private JPanel createBottomPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(createDataPanel(), BorderLayout.LINE_START);
         panel.add(createControlPanel(), BorderLayout.LINE_END);
-
-        return panel;
-    }
-
-    private JPanel createDataPanel() {
-        JPanel panel = new JPanel();
-        Button showData = new Button("Show Data", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                DataViewWindow view = new DataViewWindow();
-                desktop.add(view);
-                presenter.doDisplayData(view);
-            }
-        });
-        panel.add(showData);
 
         return panel;
     }

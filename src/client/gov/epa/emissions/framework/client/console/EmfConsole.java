@@ -107,7 +107,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private JMenu createFileMenu(EmfSession session, JDesktopPane desktop) {
-        return new FileMenu(session, this, desktop, messagePanel, windowLayoutManager);
+        return new FileMenu(session, this, messagePanel, windowLayoutManager);
     }
 
     public void close() {
