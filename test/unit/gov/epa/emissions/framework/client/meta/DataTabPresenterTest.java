@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.ExternalSource;
 import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.framework.client.editor.VersionedTableView;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EditToken;
 import gov.epa.emissions.framework.services.EmfDataset;

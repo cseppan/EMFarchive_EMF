@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;

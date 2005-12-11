@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.editor.VersionedTablePresenter;
+import gov.epa.emissions.framework.client.editor.VersionedTableView;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 

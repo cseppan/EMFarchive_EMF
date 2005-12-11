@@ -3,15 +3,13 @@ package gov.epa.emissions.framework.client.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Dataset;
-import gov.epa.emissions.framework.client.meta.VersionedTablePresenter;
-import gov.epa.emissions.framework.client.meta.VersionedTableView;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EditToken;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
-public class VersionedTableViewPresenterTest extends MockObjectTestCase {
+public class VersionedTablePresenterTest extends MockObjectTestCase {
 
     public void testShouldObserveOnObserveView() throws Exception {
         Mock services = mock(DataEditorService.class);
