@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -41,12 +42,12 @@ public class VersionedDataViewWindow extends DisposableInteralFrame implements V
         this.presenter = presenter;
     }
 
-    public void display(Version version, String table) {
+    public void display(Version version, String table, DataEditorService service) {
         super.setTitle(super.getTitle() + ". Version: " + version.getVersion() + ". Table: " + table);
 
         JPanel container = new JPanel(new BorderLayout());
 
-        container.add(tablePanel(version, table), BorderLayout.CENTER);
+        container.add(tablePanel(version, table, service), BorderLayout.CENTER);
         container.add(controlsPanel(), BorderLayout.PAGE_END);
 
         layout.add(container, BorderLayout.CENTER);
@@ -54,11 +55,12 @@ public class VersionedDataViewWindow extends DisposableInteralFrame implements V
         super.display();
     }
 
-    private JPanel tablePanel(Version version, String table) {
+    private JPanel tablePanel(Version version, String table, DataEditorService service) {
         VersionedTableViewPanel tableView = new VersionedTableViewPanel(source(table, dataset.getInternalSources()),
                 messagePanel);
-        VersionedTablePresenter tablePresenter = new VersionedTablePresenter(version, table, tableView, null);
-
+        VersionedTablePresenter tablePresenter = new VersionedTablePresenter(version, table, tableView, service);
+        tablePresenter.observe();
+        
         try {
             tablePresenter.doDisplayFirst();
         } catch (EmfException e) {

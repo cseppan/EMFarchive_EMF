@@ -3,13 +3,14 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
-import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.editor.DataViewWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -31,7 +32,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     private MessagePanel messagePanel;
 
-    private EmfFrame parentConsole;
+    private EmfConsole parentConsole;
 
     private EmfSession session;
 
@@ -39,7 +40,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     private JDesktopPane desktop;
 
-    public PropertiesEditor(EmfSession session, DatasetsBrowserView datasetsBrowser, EmfFrame parentConsole,
+    public PropertiesEditor(EmfSession session, DatasetsBrowserView datasetsBrowser, EmfConsole parentConsole,
             JDesktopPane desktop) {
         super("Properties Editor", new Dimension(700, 550));
         this.session = session;
@@ -74,10 +75,12 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         }
     }
 
-    private JPanel createDataTab(EmfDataset dataset, EmfFrame parentConsole) {
-        DataTab view = new DataTab(parentConsole);
+    private JPanel createDataTab(EmfDataset dataset, EmfConsole parentConsole) {
         ServiceLocator serviceLocator = session.serviceLocator();
-        DataTabPresenter presenter = new DataTabPresenter(view, dataset, serviceLocator.dataEditorService());
+        DataEditorService dataEditorService = serviceLocator.dataEditorService();
+
+        DataTab view = new DataTab(dataset, dataEditorService, parentConsole);
+        DataTabPresenter presenter = new DataTabPresenter(view, dataset, dataEditorService);
         try {
             presenter.doDisplay();
         } catch (EmfException e) {
@@ -99,7 +102,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         }
     }
 
-    private JPanel createLogsTab(EmfDataset dataset, EmfFrame parentConsole) {
+    private JPanel createLogsTab(EmfDataset dataset, EmfConsole parentConsole) {
         try {
             LogsTab view = new LogsTab(parentConsole);
 

@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.services.StatusService;
 import gov.epa.emissions.framework.ui.DefaultViewLayout;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -123,7 +124,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private JMenu createManageMenu(EmfSession session, JDesktopPane desktop) {
-        manageMenu = new ManageMenu(session, this, desktop, messagePanel, windowLayoutManager);
+        manageMenu = new ManageMenu(session, this, messagePanel, windowLayoutManager);
 
         return manageMenu;
     }
@@ -153,6 +154,14 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     public void displayUserManager() {
         manageMenu.displayUserManager();
+    }
+
+    public JDesktopPane desktop() {
+        return desktop;
+    }
+
+    public void addToDesktop(Component view) {
+        desktop.add(view);
     }
 
 }

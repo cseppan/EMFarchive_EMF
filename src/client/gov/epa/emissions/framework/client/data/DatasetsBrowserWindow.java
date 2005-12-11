@@ -4,11 +4,11 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.exim.DatasetsBrowserAwareImportPresenter;
 import gov.epa.emissions.framework.client.exim.DefaultExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
@@ -32,8 +32,6 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -47,7 +45,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private DatasetsBrowserPresenter presenter;
 
-    private EmfFrame parentConsole;
+    private EmfConsole parentConsole;
 
     private JScrollPane sortFilterPane;
 
@@ -55,8 +53,9 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private EmfTableModel model;
 
-    public DatasetsBrowserWindow(EmfSession session, EmfFrame parentConsole, JDesktopPane desktop) throws EmfException {
-        super("Datasets Browser", new Dimension(800, 300), desktop);
+    public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole)
+            throws EmfException {
+        super("Datasets Browser", new Dimension(800, 300), parentConsole.desktop());
         super.setName("datasetsBrowser");
 
         this.session = session;
@@ -74,7 +73,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         createLayout(layout, parentConsole);
     }
 
-    private void createLayout(JPanel layout, JFrame parentConsole) {
+    private void createLayout(JPanel layout, EmfConsole parentConsole) {
         layout.removeAll();
 
         layout.setLayout(new BorderLayout());
@@ -85,7 +84,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         layout.add(createControlPanel(), BorderLayout.SOUTH);
     }
 
-    private JScrollPane createSortFilterPane(JFrame parentConsole) {
+    private JScrollPane createSortFilterPane(EmfConsole parentConsole) {
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
         panel.getTable().setName("datasetsTable");
 

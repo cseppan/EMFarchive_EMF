@@ -27,7 +27,7 @@ public class VersionedTablePresenter {
         this.version = version;
     }
 
-    public void observeView() {
+    public void observe() {
         view.observe(this);
     }
 

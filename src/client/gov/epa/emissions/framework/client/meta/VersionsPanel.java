@@ -5,6 +5,9 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.editor.VersionedDataViewWindow;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
@@ -21,16 +24,29 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class VersionsPanel extends JPanel {
+public class VersionsPanel extends JPanel implements VersionsView {
 
     private VersionsTableData tableData;
 
     private MessagePanel messagePanel;
 
-    public VersionsPanel(MessagePanel messagePanel) {
+    private VersionsPresenter presenter;
+
+    private EmfDataset dataset;
+
+    private EmfConsole parentConsole;
+
+    public VersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole) {
         super.setLayout(new BorderLayout());
         super.setBorder(new Border("Versions"));
+
+        this.dataset = dataset;
         this.messagePanel = messagePanel;
+        this.parentConsole = parentConsole;
+    }
+
+    public void observe(VersionsPresenter presenter) {
+        this.presenter = presenter;
     }
 
     public void display(Version[] versions, InternalSource[] sources) {
@@ -110,7 +126,9 @@ public class VersionsPanel extends JPanel {
         if (versions.length != 1)
             messagePanel.setError("Please select only one Version");
 
-        // TODO: launch VersionedDataView
+        VersionedDataViewWindow view = new VersionedDataViewWindow(dataset);
+        parentConsole.addToDesktop(view);
+        presenter.doView(versions[0], table, view);
     }
 
     private void clear() {
@@ -125,4 +143,5 @@ public class VersionsPanel extends JPanel {
 
         return (String[]) tables.toArray(new String[0]);
     }
+
 }

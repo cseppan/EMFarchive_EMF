@@ -23,7 +23,7 @@ public class VersionedDataViewPresenter {
 
     public void display() {
         view.observe(this);
-        view.display(version, table);
+        view.display(version, table, service);
     }
 
     public void doClose() throws EmfException {

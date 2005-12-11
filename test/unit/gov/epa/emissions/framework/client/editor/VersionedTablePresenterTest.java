@@ -11,15 +11,13 @@ import org.jmock.cglib.MockObjectTestCase;
 
 public class VersionedTablePresenterTest extends MockObjectTestCase {
 
-    public void testShouldObserveOnObserveView() throws Exception {
-        Mock services = mock(DataEditorService.class);
+    public void testShouldObserveViewOnObserve() {
         Mock view = mock(VersionedTableView.class);
 
-        VersionedTablePresenter p = new VersionedTablePresenter(new Version(), "table", (VersionedTableView) view
-                .proxy(), (DataEditorService) services.proxy());
-        view.expects(once()).method("observe").with(eq(p));
+        VersionedTablePresenter p = new VersionedTablePresenter(null, "table", (VersionedTableView) view.proxy(), null);
+        view.expects(once()).method("observe").with(same(p));
 
-        p.observeView();
+        p.observe();
     }
 
     public void testShouldFetchTotalRecords() throws Exception {

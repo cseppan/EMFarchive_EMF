@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.DatasetTypeService;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 
@@ -20,8 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.InternalFrameAdapter;
@@ -40,14 +39,13 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     private MessagePanel messagePanel;
 
-    private JFrame parentConsole;
+    private EmfConsole parentConsole;
 
     private DatasetTypeService services;
 
-    public DatasetTypesManagerWindow(JFrame parentConsole, JDesktopPane desktop) {
-        super("DatasetType Manager", new Dimension(600, 300), desktop);
+    public DatasetTypesManagerWindow(EmfConsole parentConsole) {
+        super("DatasetType Manager", new Dimension(600, 300), parentConsole.desktop());
         this.parentConsole = parentConsole;
-        this.desktop = desktop;
 
         layout = new JPanel();
         this.getContentPane().add(layout);

@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.UserService;
 import gov.epa.mims.analysisengine.table.OverallTableModel;
 
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -43,21 +43,17 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
     private MessagePanel messagePanel;
 
-    private JFrame parentConsole;
+    private EmfConsole parentConsole;
 
     private User user;
-
-    private JDesktopPane desktop;
 
     private SortFilterSelectionPanel sortFilterSelectPanel;
 
     // FIXME: this class needs to be refactored into smaller components
-    public UsersManager(User user, UserService userServices, JFrame parentConsole, JDesktopPane desktop)
-            throws Exception {
-        super("User Manager", new Dimension(550, 300), desktop);
+    public UsersManager(User user, UserService userServices, EmfConsole parentConsole) throws Exception {
+        super("User Manager", new Dimension(550, 300), parentConsole.desktop());
         this.user = user;
         this.parentConsole = parentConsole;
-        this.desktop = desktop;
 
         model = new UserManagerTableModel(userServices);
         selectModel = new SortFilterSelectModel(model);
