@@ -5,4 +5,6 @@ import gov.epa.emissions.framework.client.ManagedView;
 
 public interface VersionedDataView extends ManagedView {
     void display(Version version, String table);
+
+    void observe(VersionedDataViewPresenter presenter);
 }

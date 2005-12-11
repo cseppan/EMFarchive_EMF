@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.Label;
+import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
@@ -24,9 +25,12 @@ public class VersionsPanel extends JPanel {
 
     private VersionsTableData tableData;
 
-    public VersionsPanel() {
+    private MessagePanel messagePanel;
+
+    public VersionsPanel(MessagePanel messagePanel) {
         super.setLayout(new BorderLayout());
         super.setBorder(new Border("Versions"));
+        this.messagePanel = messagePanel;
     }
 
     public void display(Version[] versions, InternalSource[] sources) {
@@ -59,12 +63,17 @@ public class VersionsPanel extends JPanel {
 
         Button view = new Button("New", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // TODO: launch VersionedDataView
+                doNew();
             }
         });
         panel.add(view);
 
         return panel;
+    }
+
+    protected void doNew() {
+        clear();
+        // TODO: launch VersionedDataView
     }
 
     private JPanel rightControlPanel(InternalSource[] sources) {
@@ -82,15 +91,30 @@ public class VersionsPanel extends JPanel {
 
         Button view = new Button("View", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                String table = (String) tableCombo.getSelectedItem();
-                // TODO: launch VersionedDataView
-                if (table.equals("Select Table"))
-                    return;
+                doView(tableCombo);
             }
         });
         panel.add(view);
 
         return panel;
+    }
+
+    private void doView(final JComboBox tableCombo) {
+        clear();
+
+        String table = (String) tableCombo.getSelectedItem();
+        if (table.equals("Select Table"))
+            return;
+
+        Version[] versions = tableData.selected();
+        if (versions.length != 1)
+            messagePanel.setError("Please select only one Version");
+
+        // TODO: launch VersionedDataView
+    }
+
+    private void clear() {
+        messagePanel.clear();
     }
 
     private String[] tableNames(InternalSource[] sources) {

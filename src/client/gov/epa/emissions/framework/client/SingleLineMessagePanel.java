@@ -30,6 +30,7 @@ public class SingleLineMessagePanel extends MessagePanel {
         label.setText(message);
 
         super.setVisible(true);
+        super.validate();
     }
 
     public String getMessage() {

@@ -17,7 +17,8 @@ public class VersionedDataViewPresenterTest extends MockObjectTestCase {
 
         VersionedDataViewPresenter p = new VersionedDataViewPresenter(version, table, (VersionedDataView) view.proxy(),
                 null);
-
+        view.expects(once()).method("observe").with(same(p));
+        
         p.display();
     }
 

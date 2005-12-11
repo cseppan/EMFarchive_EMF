@@ -22,6 +22,7 @@ public class VersionedDataViewPresenter {
     }
 
     public void display() {
+        view.observe(this);
         view.display(version, table);
     }
 

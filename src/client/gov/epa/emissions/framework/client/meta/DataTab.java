@@ -5,6 +5,8 @@ import gov.epa.emissions.commons.gui.SimpleTableModel;
 import gov.epa.emissions.commons.io.ExternalSource;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.EmfFrame;
+import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.TableData;
@@ -25,22 +27,27 @@ public class DataTab extends JPanel implements DataTabView {
 
     private JPanel sourcesPanel;
 
+    private SingleLineMessagePanel messagePanel;
+
     public DataTab(EmfFrame parentConsole) {
-        super.setName("logsTab");
+        setName("logsTab");
         this.parentConsole = parentConsole;
 
         super.setLayout(new BorderLayout());
-        super.add(createLayout(), BorderLayout.CENTER);
+        
+        messagePanel = new SingleLineMessagePanel();
+        add(messagePanel, BorderLayout.PAGE_START);
+        add(createLayout(messagePanel), BorderLayout.CENTER);
     }
 
-    private JPanel createLayout() {
+    private JPanel createLayout(MessagePanel messagePanel) {
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
         sourcesPanel = new JPanel(new BorderLayout());
         container.add(sourcesPanel);
 
-        versionsPanel = new VersionsPanel();
+        versionsPanel = new VersionsPanel(messagePanel);
         container.add(versionsPanel);
 
         return container;
