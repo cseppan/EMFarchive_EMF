@@ -45,4 +45,20 @@ public class EmfDatasetTableDataTest extends TestCase {
         assertEquals(format.format(startDate), row.getValueAt(5));
         assertEquals(format.format(modifiedDate), row.getValueAt(6));
     }
+
+    public void testShouldFormatStartDateAsNAIfUnavailable() {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("name");
+        dataset.setDatasetType(new DatasetType("type"));
+        dataset.setModifiedDateTime(new Date());
+        
+        EmfDataset[] datasets = { dataset };
+        EmfDatasetTableData data = new EmfDatasetTableData(datasets);
+
+        List rows = data.rows();
+        assertEquals(1, rows.size());
+
+        Row row = (Row) rows.get(0);
+        assertEquals("N/A", row.getValueAt(5));
+    }
 }
