@@ -37,7 +37,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         dataset.setName(table);
         dataset.setDatasetid(Math.abs(new Random().nextInt()));
 
-        File file = new File("test/data/orl/nc", "small-nonpoint.txt");
+        File file = new File("test/data/orl/nc", "midsize-nonpoint.txt");
         ORLNonPointImporter importer = new ORLNonPointImporter(file, dataset, datasource, dataTypes());
 
         importer.run();
@@ -53,16 +53,18 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         super.tearDown();
     }
 
-    public void testShouldReturnExactlyOnePage() throws EmfException {
-        EditToken editToken = editToken();
-        Page page = service.getPage(editToken, 1);
+    public void testShouldReturnExactlyTenPages() throws EmfException {
+        EditToken token = editToken();
+        assertEquals(10, service.getPageCount(token));
+
+        Page page = service.getPage(token, 1);
         assertNotNull("Should be able to get Page 1", page);
 
-        assertEquals(6, page.count());
+        assertEquals(20, page.count());
         VersionedRecord[] records = page.getRecords();
         assertEquals(page.count(), records.length);
         for (int i = 0; i < records.length; i++) {
-            assertEquals(editToken.datasetId(), records[i].getDatasetId());
+            assertEquals(token.datasetId(), records[i].getDatasetId());
             assertEquals(0, records[i].getVersion());
         }
 
@@ -281,8 +283,58 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         service.submit(token, changeset);
 
+        // random page browsing
+        assertEquals(10, service.getPageCount(token));
+        service.getPage(token, 6);
+        service.getPage(token, 3);
+        service.getPage(token, 9);
+
         Page result = service.getPage(token, 1);
         VersionedRecord[] records = result.getRecords();
         assertEquals(page.count() + 1, records.length);
+        
+        VersionedRecord[] page1Records = page.getRecords();
+        for (int i = 0; i < page1Records.length; i++) 
+            assertEquals(page1Records[i].getRecordId(), records[i].getRecordId());
+        assertEquals(record6.getRecordId(), records[records.length - 1].getRecordId());
+    }
+
+    public void testShouldApplyChangeSetToPageOnRepeatFetchOfSamePage() throws Exception {
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+
+        Version versionZero = versions[0];
+        Version versionOne = service.derive(versionZero, "v 1");
+
+        EditToken token = new EditToken(versionOne, table);
+        Page page = service.getPage(token, 1);
+
+        ChangeSet changeset = new ChangeSet();
+        changeset.setVersion(versionOne);
+
+        VersionedRecord record6 = new VersionedRecord(10);
+        record6.setDatasetId((int) dataset.getDatasetid());
+        changeset.addNew(record6);
+
+        VersionedRecord[] page1Records = page.getRecords();
+        changeset.addDeleted(page1Records[2]);
+
+        service.submit(token, changeset);
+
+        // random page browsing
+        assertEquals(10, service.getPageCount(token));
+        service.getPage(token, 5);
+        service.getPage(token, 6);
+
+        Page result = service.getPage(token, 1);
+        VersionedRecord[] records = result.getRecords();
+        assertEquals(page.count(), records.length);
+        
+        assertEquals(page1Records[0].getRecordId(), records[0].getRecordId());
+        assertEquals(page1Records[1].getRecordId(), records[1].getRecordId());
+        //record 2 deleted from Page 1
+        for (int i = 3; i < page1Records.length; i++) 
+            assertEquals(page1Records[i].getRecordId(), records[i-1].getRecordId());
+        assertEquals(record6.getRecordId(), records[records.length - 1].getRecordId());
+
     }
 }
