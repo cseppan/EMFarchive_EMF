@@ -127,6 +127,10 @@ public class DataEditorServiceImpl implements DataEditorService {
         list.add(changeset);
     }
 
+    public void discard(EditToken token) {
+        changesetsMap.remove(token.key());// clear
+    }
+
     public void save(EditToken token) throws EmfException {
         try {
             VersionedRecordsWriter writer = getWriter(token);
@@ -139,7 +143,7 @@ public class DataEditorServiceImpl implements DataEditorService {
                     + token.getVersion());
         }
 
-        changesetsMap.remove(token.key());// clear
+        discard(token);
     }
 
     private ChangeSet[] changesets(EditToken token) {

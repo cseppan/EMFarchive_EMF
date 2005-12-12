@@ -18,6 +18,8 @@ public interface DataEditorService {
     // edit
     void submit(EditToken token, ChangeSet changeset) throws EmfException;
 
+    void discard(EditToken token) throws EmfException;
+
     void save(EditToken token) throws EmfException;
 
     // version-related

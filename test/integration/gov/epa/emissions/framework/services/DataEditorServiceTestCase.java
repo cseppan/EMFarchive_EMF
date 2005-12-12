@@ -216,14 +216,14 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         record6.setDatasetId((int) dataset.getDatasetid());
         changeset1.addNew(record6);
         service.submit(token, changeset1);
-        
+
         ChangeSet changeset2 = new ChangeSet();
         changeset2.setVersion(versionOne);
         VersionedRecord record7 = new VersionedRecord();
         record7.setDatasetId((int) dataset.getDatasetid());
         changeset2.addNew(record7);
         service.submit(token, changeset2);
-        
+
         service.save(token);
 
         VersionedRecordsReader reader = new VersionedRecordsReader(datasource);
@@ -232,8 +232,34 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         VersionedRecord[] records = reader.fetchAll(versionOne, dataset.getName());
         assertEquals(versionZeroRecordsCount + 2, records.length);
         int init = records[0].getRecordId();
-        for (int i = 1; i < records.length; i++) {
+        for (int i = 1; i < records.length; i++)
             assertEquals(++init, records[i].getRecordId());
-        }
+    }
+
+    public void testShouldDiscardChangesOnDiscard() throws Exception {
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+
+        Version versionZero = versions[0];
+        Version versionOne = service.derive(versionZero, "v 1");
+
+        EditToken token = new EditToken(versionOne, table);
+
+        ChangeSet changeset1 = new ChangeSet();
+        changeset1.setVersion(versionOne);
+        VersionedRecord record6 = new VersionedRecord();
+        record6.setDatasetId((int) dataset.getDatasetid());
+        changeset1.addNew(record6);
+        service.submit(token, changeset1);
+
+        service.discard(token);
+
+        VersionedRecordsReader reader = new VersionedRecordsReader(datasource);
+
+        VersionedRecord[] versionZeroRecords = reader.fetchAll(versionZero, dataset.getName());
+        VersionedRecord[] versionOneRecords = reader.fetchAll(versionOne, dataset.getName());
+
+        assertEquals(versionZeroRecords.length, versionOneRecords.length);
+        for (int i = 0; i < versionOneRecords.length; i++)
+            assertEquals(versionZeroRecords[i].getRecordId(), versionOneRecords[i].getRecordId());
     }
 }

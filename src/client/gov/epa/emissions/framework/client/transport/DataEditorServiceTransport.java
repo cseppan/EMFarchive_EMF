@@ -182,6 +182,20 @@ public class DataEditorServiceTransport implements DataEditorService {
         }
     }
 
+    public void discard(EditToken token) throws EmfException {
+        try {
+            mappings.addParam(call, "token", mappings.editToken());
+            mappings.setOperation(call, "discard");
+            mappings.setVoidReturnType(call);
+
+            call.invoke(new Object[] { token });
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not submit changes for " + token, e);
+        } finally {
+            call.removeAllParameters();
+        }
+    }
+
     public void save(EditToken token) throws EmfException {
         try {
             mappings.addParam(call, "token", mappings.editToken());
