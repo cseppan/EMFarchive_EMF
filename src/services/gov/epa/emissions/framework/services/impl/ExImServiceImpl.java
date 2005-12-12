@@ -142,7 +142,12 @@ public class ExImServiceImpl implements ExImService {
             threadPool.execute(eximTask);
         } catch (Exception e) {
             log.error("Exception attempting to start import of file: " + fileName, e);
-            throw new EmfException(e.getMessage());
+            String message="Import failed - Dataset Type does not match file type";
+            
+            if (e.getMessage()!=null){
+                message=e.getMessage();
+            }
+            throw new EmfException(message);
         }
 
         log.debug("In ExImServicesImpl:startImport END");
@@ -167,7 +172,7 @@ public class ExImServiceImpl implements ExImService {
                 svcHolder.setDataSvc(new DataServiceImpl());
                 Exporter exporter = exporterFactory.create(dataset);
                 AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
-                        .getAccessedDateTime(), "Version 1.0", purpose, dirName);
+                        .getAccessedDateTime(), "Version " + dataset.getDefaultVersion(), purpose, dirName);
                 ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);
                 threadPool.execute(eximTask);
             }
@@ -197,7 +202,7 @@ public class ExImServiceImpl implements ExImService {
                 svcHolder.setDataSvc(new DataServiceImpl());
                 Exporter exporter = exporterFactory.create(dataset);
                 AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
-                        .getAccessedDateTime(), "Version 1.0", purpose, dirName);
+                        .getAccessedDateTime(), "Version " + dataset.getDefaultVersion(), purpose, dirName);
                 ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);
                 threadPool.execute(eximTask);
             }
