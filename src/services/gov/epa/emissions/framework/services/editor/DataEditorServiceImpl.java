@@ -58,9 +58,13 @@ public class DataEditorServiceImpl implements DataEditorService {
     }
 
     public Page getPage(EditToken token, int pageNumber) throws EmfException {
+        RecordsFilter filter = new RecordsFilter();
         try {
             PageReader reader = cache.reader(token);
-            return reader.page(pageNumber);
+            Page page = reader.page(pageNumber);
+
+            List changesets = cache.changesets(token);
+            return filter.filter(page, changesets);
         } catch (SQLException ex) {
             log.error("Initialize reader: " + ex.getMessage());
             throw new EmfException("Page Reader error: " + ex.getMessage());
@@ -107,8 +111,7 @@ public class DataEditorServiceImpl implements DataEditorService {
     }
 
     public void submit(EditToken token, ChangeSet changeset) {
-        List list = cache.changesets(token);
-        list.add(changeset);
+        cache.submitChangeSet(token, changeset);
     }
 
     public void discard(EditToken token) {

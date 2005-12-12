@@ -262,4 +262,27 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         for (int i = 0; i < versionOneRecords.length; i++)
             assertEquals(versionZeroRecords[i].getRecordId(), versionOneRecords[i].getRecordId());
     }
+
+    public void testShouldAddNewRecordsInChangeSetToPageOnRepeatFetchOfSamePage() throws Exception {
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+
+        Version versionZero = versions[0];
+        Version versionOne = service.derive(versionZero, "v 1");
+
+        EditToken token = new EditToken(versionOne, table);
+        Page page = service.getPage(token, 1);
+
+        ChangeSet changeset = new ChangeSet();
+        changeset.setVersion(versionOne);
+
+        VersionedRecord record6 = new VersionedRecord(10);
+        record6.setDatasetId((int) dataset.getDatasetid());
+        changeset.addNew(record6);
+
+        service.submit(token, changeset);
+
+        Page result = service.getPage(token, 1);
+        VersionedRecord[] records = result.getRecords();
+        assertEquals(page.count() + 1, records.length);
+    }
 }

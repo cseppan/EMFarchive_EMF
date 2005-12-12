@@ -4,7 +4,20 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 
+import java.util.Iterator;
+import java.util.List;
+
 public class RecordsFilter {
+
+    public Page filter(Page page, List changesets) {
+        // TODO: efficiency is O(n^2). Need to optimize, but order should be maintained
+        for (Iterator iter = changesets.iterator(); iter.hasNext();) {
+            ChangeSet element = (ChangeSet) iter.next();
+            page = filter(page, element);
+        }
+
+        return page;
+    }
 
     public Page filter(Page page, ChangeSet changeset) {
         VersionedRecord[] results = filter(page.getRecords(), changeset);

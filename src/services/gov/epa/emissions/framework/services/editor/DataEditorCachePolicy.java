@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.editor;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.SqlDataTypes;
+import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
@@ -94,6 +95,11 @@ public class DataEditorCachePolicy {
         }
 
         return (List) changesetsMap.get(token.key());
+    }
+
+    public void submitChangeSet(EditToken token, ChangeSet changeset) {
+        List list = changesets(token);
+        list.add(changeset);
     }
 
     public void discardChangeSets(EditToken token) {
