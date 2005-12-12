@@ -1,6 +1,7 @@
-package gov.epa.emissions.framework.services.impl;
+package gov.epa.emissions.framework.services.editor;
 
 import gov.epa.emissions.framework.services.DataEditorServiceTestCase;
+import gov.epa.emissions.framework.services.editor.DataEditorServiceImpl;
 
 public class DataEditorServiceImplTest extends DataEditorServiceTestCase {
 

@@ -1,13 +1,11 @@
-package gov.epa.emissions.framework.services.impl;
+package gov.epa.emissions.framework.services.editor;
 
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.PageReader;
-import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
 import gov.epa.emissions.commons.db.version.ChangeSet;
-import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
@@ -19,12 +17,8 @@ import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EditToken;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -38,17 +32,11 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     private Datasource datasource;
 
-    private Map readersMap;
-
     private Versions versions;
-
-    private SqlDataTypes sqlTypes;
-
-    private Map writersMap;
 
     private VersionedRecordsReader reader;
 
-    private Map changesetsMap;
+    private DataEditorCachePolicy cache;
 
     public DataEditorServiceImpl() throws InfrastructureException {
         try {
@@ -71,7 +59,7 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     public Page getPage(EditToken token, int pageNumber) throws EmfException {
         try {
-            PageReader reader = getReader(token);
+            PageReader reader = cache.reader(token);
             return reader.page(pageNumber);
         } catch (SQLException ex) {
             log.error("Initialize reader: " + ex.getMessage());
@@ -81,7 +69,7 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     public int getPageCount(EditToken token) throws EmfException {
         try {
-            PageReader reader = getReader(token);
+            PageReader reader = cache.reader(token);
             return reader.totalPages();
         } catch (SQLException e) {
             log.error("Failed to get page count: " + e.getMessage());
@@ -91,7 +79,7 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     public Page getPageWithRecord(EditToken token, int recordId) throws EmfException {
         try {
-            PageReader reader = getReader(token);
+            PageReader reader = cache.reader(token);
             return reader.pageByRecord(recordId);
         } catch (SQLException ex) {
             log.error("Initialize reader: " + ex.getMessage());
@@ -101,7 +89,7 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     public int getTotalRecords(EditToken token) throws EmfException {
         try {
-            PageReader reader = getReader(token);
+            PageReader reader = cache.reader(token);
             return reader.totalRecords();
         } catch (SQLException e) {
             log.error("Failed to get total records count: " + e.getMessage());
@@ -119,36 +107,28 @@ public class DataEditorServiceImpl implements DataEditorService {
     }
 
     public void submit(EditToken token, ChangeSet changeset) {
-        if (!changesetsMap.containsKey(token.key())) {
-            changesetsMap.put(token.key(), new ArrayList());
-        }
-
-        List list = (List) changesetsMap.get(token.key());
+        List list = cache.changesets(token);
         list.add(changeset);
     }
 
     public void discard(EditToken token) {
-        changesetsMap.remove(token.key());// clear
+        cache.discardChangeSets(token);
     }
 
     public void save(EditToken token) throws EmfException {
         try {
-            VersionedRecordsWriter writer = getWriter(token);
-            ChangeSet[] changesets = changesets(token);
-            for (int i = 0; i < changesets.length; i++)
-                writer.update(changesets[i]);
+            VersionedRecordsWriter writer = cache.writer(token);
+            List list = cache.changesets(token);
+            for (Iterator iter = list.iterator(); iter.hasNext();) {
+                ChangeSet element = (ChangeSet) iter.next();
+                writer.update(element);
+            }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new EmfException("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
                     + token.getVersion());
         }
 
         discard(token);
-    }
-
-    private ChangeSet[] changesets(EditToken token) {
-        List results = (List) changesetsMap.get(token.key());
-        return (ChangeSet[]) results.toArray(new ChangeSet[0]);
     }
 
     public Version markFinal(Version derived) throws EmfException {
@@ -168,8 +148,7 @@ public class DataEditorServiceImpl implements DataEditorService {
     }
 
     public void close() throws EmfException {
-        closeReaders();
-        closeWriters();
+        invalidateCache();
 
         try {
             versions.close();
@@ -181,67 +160,20 @@ public class DataEditorServiceImpl implements DataEditorService {
     }
 
     private void init(DbServer dbServer) throws SQLException {
-        readersMap = new HashMap();
-        writersMap = new HashMap();
-        changesetsMap = new HashMap();
-
         this.datasource = dbServer.getEmissionsDatasource();
-        sqlTypes = dbServer.getSqlDataTypes();
 
         versions = new Versions(datasource);
         reader = new VersionedRecordsReader(datasource);
+        cache = new DataEditorCachePolicy(reader, datasource, dbServer.getSqlDataTypes());
     }
 
-    private PageReader getReader(EditToken token) throws SQLException {
-        Object key = token.key();
-        if (!readersMap.containsKey(key)) {
-            ScrollableVersionedRecords records = reader.fetch(token.getVersion(), token.getTable());
-            PageReader reader = new PageReader(20, records);
-
-            readersMap.put(key, reader);
+    private void invalidateCache() throws EmfException {
+        try {
+            cache.invalidate();
+        } catch (SQLException e) {
+            log.error("Could not invalidate cache due to " + e.getMessage());
+            throw new EmfException(e.getMessage());
         }
-
-        return (PageReader) readersMap.get(key);
-    }
-
-    private void closeReaders() throws EmfException {
-        Collection all = readersMap.values();
-        for (Iterator iter = all.iterator(); iter.hasNext();) {
-            try {
-                PageReader pageReader = (PageReader) iter.next();
-                pageReader.close();
-            } catch (SQLException e) {
-                log.error("Could not close 'query session' due to " + e.getMessage());
-                throw new EmfException(e.getMessage());
-            }
-        }
-
-        readersMap.clear();
-    }
-
-    private VersionedRecordsWriter getWriter(EditToken token) throws SQLException {
-        Object key = token.key();
-        if (!writersMap.containsKey(key)) {
-            VersionedRecordsWriter writer = new VersionedRecordsWriter(datasource, token.getTable(), sqlTypes);
-            writersMap.put(key, writer);
-        }
-
-        return (VersionedRecordsWriter) writersMap.get(key);
-    }
-
-    private void closeWriters() throws EmfException {
-        Collection all = writersMap.values();
-        for (Iterator iter = all.iterator(); iter.hasNext();) {
-            try {
-                VersionedRecordsWriter writer = (VersionedRecordsWriter) iter.next();
-                writer.close();
-            } catch (SQLException e) {
-                log.error("Could not close 'write session' due to " + e.getMessage());
-                throw new EmfException(e.getMessage());
-            }
-        }
-
-        writersMap.clear();
     }
 
     /**

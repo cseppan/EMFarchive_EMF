@@ -106,7 +106,7 @@
 		<parameter name="allowedMethods" value="*"/>
 		<parameter name="scope" value="session"/>
 		<parameter name="className"
-			value="gov.epa.emissions.framework.services.impl.DataEditorServiceImpl"/>
+			value="gov.epa.emissions.framework.services.editor.DataEditorServiceImpl"/>
 	</service>
 	
 	<!-- Structs (Java Beans-style)-->
