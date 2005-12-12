@@ -1,9 +1,17 @@
 package gov.epa.emissions.framework.services.editor;
 
+import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 
 public class RecordsFilter {
+
+    public Page filter(Page page, ChangeSet changeset) {
+        VersionedRecord[] results = filter(page.getRecords(), changeset);
+        page.setRecords(results);
+
+        return page;
+    }
 
     public VersionedRecord[] filter(VersionedRecord[] records, ChangeSet changeset) {
         VersionedRecords results = new VersionedRecords();

@@ -182,6 +182,22 @@ public class DataEditorServiceTransport implements DataEditorService {
         }
     }
 
+    public void save(EditToken token) throws EmfException {
+        try {
+            mappings.addParam(call, "token", mappings.editToken());
+            mappings.setOperation(call, "save");
+            mappings.setVoidReturnType(call);
+
+            call.invoke(new Object[] { token });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not save changes for " + token, fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not save changes for " + token, e);
+        } finally {
+            call.removeAllParameters();
+        }
+    }
+
     public Version markFinal(Version derived) throws EmfException {
         try {
             mappings.addParam(call, "derived", mappings.version());

@@ -19,9 +19,11 @@ import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EditToken;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -45,6 +47,8 @@ public class DataEditorServiceImpl implements DataEditorService {
     private Map writersMap;
 
     private VersionedRecordsReader reader;
+
+    private Map changesetsMap;
 
     public DataEditorServiceImpl() throws InfrastructureException {
         try {
@@ -114,14 +118,33 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
-    public void submit(EditToken token, ChangeSet changeset) throws EmfException {
+    public void submit(EditToken token, ChangeSet changeset) {
+        if (!changesetsMap.containsKey(token.key())) {
+            changesetsMap.put(token.key(), new ArrayList());
+        }
+
+        List list = (List) changesetsMap.get(token.key());
+        list.add(changeset);
+    }
+
+    public void save(EditToken token) throws EmfException {
         try {
             VersionedRecordsWriter writer = getWriter(token);
-            writer.update(changeset);
+            ChangeSet[] changesets = changesets(token);
+            for (int i = 0; i < changesets.length; i++)
+                writer.update(changesets[i]);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
                     + token.getVersion());
         }
+
+        changesetsMap.remove(token.key());// clear
+    }
+
+    private ChangeSet[] changesets(EditToken token) {
+        List results = (List) changesetsMap.get(token.key());
+        return (ChangeSet[]) results.toArray(new ChangeSet[0]);
     }
 
     public Version markFinal(Version derived) throws EmfException {
@@ -156,6 +179,7 @@ public class DataEditorServiceImpl implements DataEditorService {
     private void init(DbServer dbServer) throws SQLException {
         readersMap = new HashMap();
         writersMap = new HashMap();
+        changesetsMap = new HashMap();
 
         this.datasource = dbServer.getEmissionsDatasource();
         sqlTypes = dbServer.getSqlDataTypes();

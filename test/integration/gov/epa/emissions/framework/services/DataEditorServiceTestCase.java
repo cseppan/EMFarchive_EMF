@@ -189,6 +189,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         EditToken token = new EditToken(versionOne, table);
         service.submit(token, changeset);
+        service.save(token);
 
         VersionedRecordsReader reader = new VersionedRecordsReader(datasource);
         int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName()).length;
@@ -214,16 +215,16 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         VersionedRecord record6 = new VersionedRecord();
         record6.setDatasetId((int) dataset.getDatasetid());
         changeset1.addNew(record6);
-
         service.submit(token, changeset1);
-
+        
         ChangeSet changeset2 = new ChangeSet();
         changeset2.setVersion(versionOne);
         VersionedRecord record7 = new VersionedRecord();
         record7.setDatasetId((int) dataset.getDatasetid());
         changeset2.addNew(record7);
-
         service.submit(token, changeset2);
+        
+        service.save(token);
 
         VersionedRecordsReader reader = new VersionedRecordsReader(datasource);
         int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName()).length;
