@@ -26,6 +26,7 @@ public class DatasetDAO {
     private static final String GET_SECTOR_QUERY = "select sector from Sector as sector order by name";
 
     private static final String GET_DATASET_FOR_DATASETNAME_QUERY = "select aDset from EmfDataset as aDset where aDset.name=:datasetname";
+    private static final String GET_DATASET_FOR_DATASETID_QUERY = "select aDset from EmfDataset as aDset where aDset.datasetid=:datasetid";
 
     /**
      * This method checks if the dataset name exists in the Datasets table A
@@ -57,6 +58,39 @@ public class DatasetDAO {
 
         return dsNameExists;
     }// getDataset
+
+
+    public static void updateDefaultVersion(long datasetId, int lastFinalVersion, Session session) {
+        EmfDataset dataset = getDataset(datasetId,session);
+        dataset.setDefaultVersion(lastFinalVersion);
+        updateDataset(dataset,session);
+    }
+    
+    public static EmfDataset getDataset(long datasetId, Session session) {
+        log.debug("In get Dataset for datasetId: " + datasetId);
+        EmfDataset lastFinalDataset = null;
+        Transaction tx = null;
+
+        try {
+            tx = session.beginTransaction();
+
+            Query query = session.createQuery(GET_DATASET_FOR_DATASETID_QUERY);
+            query.setLong("datasetid",datasetId);
+
+            Iterator iter = query.iterate();
+            while (iter.hasNext()) {
+                lastFinalDataset = (EmfDataset) iter.next();
+            }
+
+            tx.commit();
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
+        }
+
+        return lastFinalDataset;
+    }
 
     public static List getDatasets(Session session) {
         log.debug("In get all Datasets with invalid session?: " + (session == null));
@@ -240,5 +274,6 @@ public class DatasetDAO {
         }
 
     }
+
 
 }

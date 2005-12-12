@@ -176,4 +176,14 @@ public class DataServiceTransport implements DataService {
         LOG.error(message, fault);
         throw new EmfException(extractMessage(fault.getMessage()));
     }
+
+    public void updateDefaultVersion(long datasetId, int lastFinalVersion) {
+        // Null implementation in the transport since this is
+        // only implemented in the DataServiceImpl and will never
+        //be called from the client
+        
+        // TODO:  Maybe we need local interfaces like all other
+        // Web Services frameworks to allow for methods such as these
+        
+    }
 }

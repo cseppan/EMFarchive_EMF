@@ -7,6 +7,7 @@ public interface DataService {
 
     // Datasets
     EmfDataset[] getDatasets() throws EmfException;
+    void updateDefaultVersion(long datasetId, int lastFinalVersion) throws EmfException;
 
     void updateDataset(EmfDataset dataset) throws EmfException;
 
