@@ -9,6 +9,8 @@ import gov.epa.emissions.commons.io.orl.ORLNonPointExporter;
 import gov.epa.emissions.commons.io.orl.ORLNonRoadExporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadExporter;
 import gov.epa.emissions.commons.io.orl.ORLPointExporter;
+import gov.epa.emissions.commons.io.temporal.TemporalReferenceExporter;
+import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 /**
@@ -41,6 +43,9 @@ public class ExporterFactory {
         if (name.equals("ORL Point Inventory"))
             return new ORLPointExporter(dataset, datasource, sqlTypes);
 
+        if (name.equals(EMFConstants.DATASETTYPE_NAME_TEMPORALCROSSREFERENCE))
+            return new TemporalReferenceExporter(dataset, datasource, sqlTypes);
+        
         throw new RuntimeException("Dataset Type - " + name + " unsupported");
     }
 }

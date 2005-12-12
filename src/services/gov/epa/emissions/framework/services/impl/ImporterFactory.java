@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.services.impl;
 
-import java.io.File;
-
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
@@ -16,15 +14,22 @@ import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.commons.io.orl.ORLNonRoadImporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
 import gov.epa.emissions.commons.io.orl.ORLPointImporter;
+import gov.epa.emissions.commons.io.temporal.TemporalReferenceImporter;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
+
+import java.io.File;
 
 public class ImporterFactory {
 
     private DbServer dbServer;
+    private Datasource datasource;
+    private SqlDataTypes dataType;
 
     public ImporterFactory(DbServer dbServer) {
         this.dbServer = dbServer;
+        datasource = dbServer.getEmissionsDatasource();
+        dataType = dbServer.getSqlDataTypes();
     }
 
     public Importer create(EmfDataset dataset, File folder, String filename) throws ImporterException {
@@ -34,7 +39,12 @@ public class ImporterFactory {
         // Factory pattern
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_ORL) >= 0) {
             File file = new File(folder, filename);
-            return orlImporter(dbServer, dataset, file);
+            return orlImporter(dataset, file);
+        }
+
+        if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_TEMPORAL) >= 0) {
+            File file = new File(folder, filename);
+            return temporalImporter(dataset, file);
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_SHAPEFILES) >= 0) {
@@ -56,11 +66,23 @@ public class ImporterFactory {
         return null;
     }
 
+    private Importer temporalImporter(EmfDataset dataset, File file) throws ImporterException {
+        DatasetType datasetType  = dataset.getDatasetType();
+        
+        if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_TEMPORALCROSSREFERENCE) >= 0) {
+            return new TemporalReferenceImporter(file,dataset,datasource,dataType);
+        }
+        
+        
+        //Temporal Profile
+        // TODO: add importer
+        return null;
+    }
+
     // FIXME: use a better scheme than rely on 'type names'
-    private Importer orlImporter(DbServer dbServer, EmfDataset dataset, File file) throws ImporterException {
-        Datasource datasource = dbServer.getEmissionsDatasource();
-        SqlDataTypes dataType = dbServer.getSqlDataTypes();
-        DatasetType datasetType = dataset.getDatasetType();
+    private Importer orlImporter(EmfDataset dataset, File file) throws ImporterException {
+
+        DatasetType datasetType  = dataset.getDatasetType();
 
         if (datasetType.getName().equals("ORL Nonpoint Inventory"))
             return new ORLNonPointImporter(file, dataset, datasource, dataType);

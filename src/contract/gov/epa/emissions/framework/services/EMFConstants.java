@@ -26,6 +26,12 @@ public final class EMFConstants {
 
     public static final String DATASETTYPE_NAME_MODELREADYEMISSIONSFILES = "Model Ready Emissions";
 
+    public static final String DATASETTYPE_NAME_TEMPORAL = "Temporal";
+
+    public static final String DATASETTYPE_NAME_TEMPORALCROSSREFERENCE = "Temporal Cross Reference";
+
+    public static final String DATASETTYPE_NAME_TEMPORALPROFILE = "Temporal Profile";
+
     public static final int PAGE_SIZE = 10;
 
 }
