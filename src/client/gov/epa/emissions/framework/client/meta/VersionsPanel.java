@@ -36,6 +36,8 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     private EmfConsole parentConsole;
 
+    private EmfTableModel tableModel;
+
     public VersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole) {
         super.setLayout(new BorderLayout());
         super.setBorder(new Border("Versions"));
@@ -54,9 +56,14 @@ public class VersionsPanel extends JPanel implements VersionsView {
         add(bottomPanel(sources), BorderLayout.PAGE_END);
     }
 
+    public void add(Version version) {
+        tableData.add(version);
+        tableModel.refresh();
+    }
+
     private JPanel tablePanel(Version[] versions) {
         tableData = new VersionsTableData(versions);
-        EmfTableModel tableModel = new EmfTableModel(tableData);
+        tableModel = new EmfTableModel(tableData);
         JScrollPane table = new ScrollableTable(tableModel);
 
         JPanel panel = new JPanel(new BorderLayout());
@@ -90,6 +97,8 @@ public class VersionsPanel extends JPanel implements VersionsView {
     protected void doNew() {
         clear();
         // TODO: launch VersionedDataView
+        
+        
     }
 
     private JPanel rightControlPanel(InternalSource[] sources) {

@@ -80,14 +80,22 @@ public class VersionsTableDataTest extends TestCase {
         assertEquals(version0, data.element(0));
         assertEquals(version1, data.element(1));
     }
-    
+
     public void testShouldReturnSelectedVersions() {
         List rows = data.rows();
         EditableRow row = (EditableRow) rows.get(1);
         row.setValueAt(Boolean.TRUE, 0);
-        
+
         Version[] versions = data.selected();
         assertEquals(1, versions.length);
         assertSame(version1, versions[0]);
+    }
+
+    public void testShouldAddRowOnAddingNewVersion() {
+        int count = data.rows().size();
+
+        data.add(new Version());
+        
+        assertEquals(count + 1, data.rows().size());
     }
 }

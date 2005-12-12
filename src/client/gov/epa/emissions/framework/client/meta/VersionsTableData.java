@@ -33,6 +33,10 @@ public class VersionsTableData extends AbstractTableData {
         return rows;
     }
 
+    public void add(Version version) {
+        rows.add(row(version));
+    }
+
     private List createRows(Version[] values) {
         List rows = new ArrayList();
         for (int i = 0; i < values.length; i++)
