@@ -23,6 +23,7 @@ public class DataServiceImpl implements DataService {
         sessionFactory = HibernateSessionFactory.get();
     }
 
+    
     public EmfDataset[] getDatasets() throws EmfException {
         List datasets = null;
         try {
@@ -138,4 +139,32 @@ public class DataServiceImpl implements DataService {
         return (Sector[]) sectors.toArray(new Sector[sectors.size()]);
     }
 
+
+    public EmfDataset getDataset(long datasetId) throws EmfException {
+        EmfDataset dataset = null;
+        try {
+            Session session = sessionFactory.getSession();
+            dataset = DatasetDAO.getDataset(datasetId, session);
+            session.flush();
+            session.close();
+        } catch (HibernateException e) {
+            log.error("Database error: " + e);
+            throw new EmfException("Error communicating with the server");
+        }
+        return dataset;
+    }
+
+
+    public void updateDefaultVersion(long datasetId,int lastFinalVersion) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            DatasetDAO.updateDefaultVersion(datasetId, lastFinalVersion, session);
+            session.flush();
+            session.close();
+        } catch (HibernateException e) {
+            log.error("Database error: " + e);
+            throw new EmfException("Error communicating with the server");
+        }
+        
+    }
 }
