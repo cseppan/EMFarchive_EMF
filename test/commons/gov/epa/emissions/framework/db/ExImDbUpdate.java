@@ -46,7 +46,6 @@ public class ExImDbUpdate extends PostgresDbUpdate {
 
     public void deleteAllDatasets() throws DatabaseUnitException, SQLException {
         super.deleteAll("emf.dataset_access_logs");
-        super.deleteAll("emf.datasettables");
         super.deleteAll("emf.datasets");
     }
 

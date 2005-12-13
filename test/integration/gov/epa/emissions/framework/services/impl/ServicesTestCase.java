@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.db.ExImDbUpdate;
 import gov.epa.emissions.framework.db.LocalHibernateConfiguration;
 import gov.epa.emissions.framework.db.PostgresDbUpdate;
 
@@ -74,5 +75,10 @@ public abstract class ServicesTestCase extends TestCase {
     protected SessionFactory sessionFactory() throws Exception {
         LocalHibernateConfiguration config = new LocalHibernateConfiguration();
         return config.factory();
+    }
+
+    public void deleteDatasets() throws Exception {
+        ExImDbUpdate dbUpdate = new ExImDbUpdate();
+        dbUpdate.deleteAllDatasets();
     }
 }

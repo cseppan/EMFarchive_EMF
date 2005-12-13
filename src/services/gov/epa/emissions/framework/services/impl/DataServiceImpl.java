@@ -20,10 +20,13 @@ public class DataServiceImpl implements DataService {
     private HibernateSessionFactory sessionFactory;
 
     public DataServiceImpl() {
-        sessionFactory = HibernateSessionFactory.get();
+        this(HibernateSessionFactory.get());
     }
 
-    
+    public DataServiceImpl(HibernateSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
     public EmfDataset[] getDatasets() throws EmfException {
         List datasets = null;
         try {
@@ -139,7 +142,6 @@ public class DataServiceImpl implements DataService {
         return (Sector[]) sectors.toArray(new Sector[sectors.size()]);
     }
 
-
     public EmfDataset getDataset(long datasetId) throws EmfException {
         EmfDataset dataset = null;
         try {
@@ -154,8 +156,7 @@ public class DataServiceImpl implements DataService {
         return dataset;
     }
 
-
-    public void updateDefaultVersion(long datasetId,int lastFinalVersion) throws EmfException {
+    public void updateDefaultVersion(long datasetId, int lastFinalVersion) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             DatasetDAO.updateDefaultVersion(datasetId, lastFinalVersion, session);
@@ -165,6 +166,6 @@ public class DataServiceImpl implements DataService {
             log.error("Database error: " + e);
             throw new EmfException("Error communicating with the server");
         }
-        
+
     }
 }

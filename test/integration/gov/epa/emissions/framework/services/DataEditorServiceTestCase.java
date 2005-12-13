@@ -10,12 +10,11 @@ import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.EditToken;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 import java.io.File;
+import java.util.Date;
 import java.util.Random;
 
 public abstract class DataEditorServiceTestCase extends ServicesTestCase {
@@ -28,19 +27,27 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
     private String table;
 
-    protected void setUpService(DataEditorService service) throws Exception {
+    protected void setUpService(DataEditorService service, HibernateSessionFactory sessionFactory) throws Exception {
         this.service = service;
         datasource = emissions();
 
         dataset = new EmfDataset();
         table = "test";
         dataset.setName(table);
-        dataset.setDatasetid(Math.abs(new Random().nextInt()));
+        setTestValues(dataset);
 
         File file = new File("test/data/orl/nc", "midsize-nonpoint.txt");
         ORLNonPointImporter importer = new ORLNonPointImporter(file, dataset, datasource, dataTypes());
 
         importer.run();
+    }
+
+    private void setTestValues(EmfDataset dataset) {
+        dataset.setDatasetid(Math.abs(new Random().nextInt()));
+        dataset.setCreator("tester");
+        dataset.setCreatedDateTime(new Date());
+        dataset.setModifiedDateTime(new Date());
+        dataset.setAccessedDateTime(new Date());
     }
 
     protected void tearDown() throws Exception {
@@ -49,7 +56,6 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         DataModifier modifier = datasource.dataModifier();
         modifier.dropAll("versions");
-
         super.tearDown();
     }
 
@@ -157,7 +163,6 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
     public void testShouldBeAbleToMarkADerivedVersionAsFinal() throws Exception {
         Version[] versions = service.getVersions(dataset.getDatasetid());
-
         Version versionZero = versions[0];
         Version derived = service.derive(versionZero, "v 1");
         assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
@@ -292,9 +297,9 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Page result = service.getPage(token, 1);
         VersionedRecord[] records = result.getRecords();
         assertEquals(page.count() + 1, records.length);
-        
+
         VersionedRecord[] page1Records = page.getRecords();
-        for (int i = 0; i < page1Records.length; i++) 
+        for (int i = 0; i < page1Records.length; i++)
             assertEquals(page1Records[i].getRecordId(), records[i].getRecordId());
         assertEquals(record6.getRecordId(), records[records.length - 1].getRecordId());
     }
@@ -328,13 +333,50 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Page result = service.getPage(token, 1);
         VersionedRecord[] records = result.getRecords();
         assertEquals(page.count(), records.length);
-        
+
         assertEquals(page1Records[0].getRecordId(), records[0].getRecordId());
         assertEquals(page1Records[1].getRecordId(), records[1].getRecordId());
-        //record 2 deleted from Page 1
-        for (int i = 3; i < page1Records.length; i++) 
-            assertEquals(page1Records[i].getRecordId(), records[i-1].getRecordId());
+        // record 2 deleted from Page 1
+        for (int i = 3; i < page1Records.length; i++)
+            assertEquals(page1Records[i].getRecordId(), records[i - 1].getRecordId());
         assertEquals(record6.getRecordId(), records[records.length - 1].getRecordId());
+    }
 
+    public void testShouldApplyChangeSetToMultiplePages() throws Exception {
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+
+        Version versionZero = versions[0];
+        Version versionOne = service.derive(versionZero, "v 1");
+
+        EditToken token = new EditToken(versionOne, table);
+        Page page = service.getPage(token, 1);
+
+        ChangeSet changeset = new ChangeSet();
+        changeset.setVersion(versionOne);
+
+        VersionedRecord record6 = new VersionedRecord(10);
+        record6.setDatasetId((int) dataset.getDatasetid());
+        changeset.addNew(record6);
+
+        VersionedRecord[] page1Records = page.getRecords();
+        changeset.addDeleted(page1Records[2]);
+
+        service.submit(token, changeset);
+
+        // random page browsing
+        assertEquals(10, service.getPageCount(token));
+        service.getPage(token, 5);
+        service.getPage(token, 6);
+
+        Page result = service.getPage(token, 1);
+        VersionedRecord[] records = result.getRecords();
+        assertEquals(page.count(), records.length);
+
+        assertEquals(page1Records[0].getRecordId(), records[0].getRecordId());
+        assertEquals(page1Records[1].getRecordId(), records[1].getRecordId());
+        // record 2 deleted from Page 1
+        for (int i = 3; i < page1Records.length; i++)
+            assertEquals(page1Records[i].getRecordId(), records[i - 1].getRecordId());
+        assertEquals(record6.getRecordId(), records[records.length - 1].getRecordId());
     }
 }
