@@ -19,13 +19,12 @@ public class VersionsTableData extends AbstractTableData {
 
     public String[] columns() {
         // TODO: convert these into 'TableColumn' (w/ properties: name, editable)
-        return new String[] { "Select", "Name", "Version", "Base", "Date" };
+        return new String[] { "Select", "Name", "Version", "Base", "Is Final?", "Date" };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 0)
+        if ((col == 0) || (col == 4))
             return Boolean.class;
-
         return String.class;
     }
 

@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.ui.Dialog;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -15,14 +16,12 @@ import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
 import javax.swing.SpringLayout;
 
 import abbot.editor.widgets.TextField;
 
-public class NewVersionDialog extends JDialog {
+public class NewVersionDialog extends Dialog {
 
     private TextField name;
 
@@ -33,13 +32,9 @@ public class NewVersionDialog extends JDialog {
     private Version[] versions;
 
     public NewVersionDialog(EmfDataset dataset, Version[] versions, EmfConsole parent) {
-        super(parent);
+        super("Create new Version for Dataset: " + dataset.getName(), parent);
         this.versions = versions;
-        super.setTitle("Create new Version for Dataset: " + dataset.getName());
-        super.setModal(true);
         super.setSize(new Dimension(500, 150));
-        super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        super.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
 
         super.getContentPane().add(createLayout(versions));
     }
@@ -47,7 +42,7 @@ public class NewVersionDialog extends JDialog {
     private JPanel createLayout(Version[] versions) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        
+
         panel.add(inputPanel(versions));
         panel.add(buttonsPanel());
 
@@ -87,7 +82,7 @@ public class NewVersionDialog extends JDialog {
         combo.setName("Versions");
         combo.setEditable(false);
         combo.setPreferredSize(new Dimension(300, 20));
-        
+
         return combo;
     }
 

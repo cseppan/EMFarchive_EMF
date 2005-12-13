@@ -3,20 +3,31 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.ui.RowSource;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class VersionRowSource implements RowSource {
 
     private Version source;
 
     private Boolean selected;
 
+    private DateFormat dateFormat;
+
     public VersionRowSource(Version source) {
         this.source = source;
         this.selected = Boolean.FALSE;
+        dateFormat = new SimpleDateFormat("MM/dd/yyyy");
     }
 
     public Object[] values() {
         return new Object[] { selected, source.getName(), new Integer(source.getVersion()), new Long(source.getBase()),
-                source.getDate() };
+                Boolean.valueOf(source.isFinalVersion()), format(source.getDate()) };
+    }
+
+    private Object format(Date date) {
+        return date == null ? "N/A" : dateFormat.format(date);
     }
 
     public void setValueAt(int column, Object val) {

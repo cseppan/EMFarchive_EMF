@@ -43,7 +43,7 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
     }
 
     public void display(Version version, String table, DataEditorService service) {
-        super.setTitle(super.getTitle() + ". Version: " + version.getVersion() + ". Table: " + table);
+        super.setTitle(super.getTitle() + ". Version: " + version.getName() + ". Table: " + table);
 
         JPanel container = new JPanel(new BorderLayout());
 

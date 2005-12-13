@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.Row;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -35,20 +37,22 @@ public class VersionsTableDataTest extends TestCase {
 
     public void testShouldHaveThreeColumns() {
         String[] columns = data.columns();
-        assertEquals(5, columns.length);
+        assertEquals(6, columns.length);
         assertEquals("Select", columns[0]);
         assertEquals("Name", columns[1]);
         assertEquals("Version", columns[2]);
         assertEquals("Base", columns[3]);
-        assertEquals("Date", columns[4]);
+        assertEquals("Is Final?", columns[4]);
+        assertEquals("Date", columns[5]);
     }
 
     public void testShouldReturnBooleanAsColumnClassForSelectColumnAndStringForAllOtherColumns() {
         assertEquals(Boolean.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
         assertEquals(String.class, data.getColumnClass(2));
-        assertEquals(String.class, data.getColumnClass(2));
-        assertEquals(String.class, data.getColumnClass(2));
+        assertEquals(String.class, data.getColumnClass(3));
+        assertEquals(Boolean.class, data.getColumnClass(4));
+        assertEquals(String.class, data.getColumnClass(5));
     }
 
     public void testExceptForSelectAllOtherColumnsShouldBeUneditable() {
@@ -73,7 +77,9 @@ public class VersionsTableDataTest extends TestCase {
         assertEquals(version0.getName(), row.getValueAt(1));
         assertEquals(version0.getVersion(), ((Integer) row.getValueAt(2)).intValue());
         assertEquals(version0.getBase(), ((Long) row.getValueAt(3)).longValue());
-        assertEquals(version0.getDate(), row.getValueAt(4));
+        assertFalse(((Boolean) row.getValueAt(4)).booleanValue());
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        assertEquals(dateFormat.format(version0.getDate()), row.getValueAt(5));
     }
 
     public void testShouldReturnARowRepresentingAVersionEntry() {
