@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.framework.ui.Row;
 
@@ -96,6 +97,13 @@ public class EditablePageTableDataTest extends TestCase {
         data.removeSelected();
 
         assertEquals(1, data.rows().size());
+
+        ChangeSet changeset = data.changeset();
+        assertEquals(0, changeset.getNewRecords().length);
+        assertEquals(1, changeset.getDeletedRecords().length);
+        assertEquals(0, changeset.getUpdatedRecords().length);
+        assertSame(record1, changeset.getDeletedRecords()[0]);
+
     }
 
     public void testShouldAddEntryOnAdd() {
@@ -118,6 +126,12 @@ public class EditablePageTableDataTest extends TestCase {
         assertEquals(cols.length, blankRecord.tokens().size());
         for (int i = 0; i < cols.length; i++)
             assertEquals("", blankRecord.token(i));
+        
+        ChangeSet changeset = data.changeset();
+        assertEquals(1, changeset.getNewRecords().length);
+        assertEquals(0, changeset.getDeletedRecords().length);
+        assertEquals(0, changeset.getUpdatedRecords().length);
+        assertSame(blankRecord, changeset.getNewRecords()[0]);
     }
 
     public void testShouldReturnCurrentlyHeldRecords() {

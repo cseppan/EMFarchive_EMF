@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
@@ -21,11 +22,14 @@ public class EditablePageTableData extends AbstractTableData implements Selectab
 
     private int version;
 
+    private ChangeSet changeset;
+
     public EditablePageTableData(int datasetId, int version, Page page, String[] cols) {
         this.datasetId = datasetId;
         this.version = version;
         this.cols = cols;
         this.rows = createRows(page);
+        changeset = new ChangeSet();
     }
 
     public String[] columns() {
@@ -125,13 +129,21 @@ public class EditablePageTableData extends AbstractTableData implements Selectab
         record.setTokens((String[]) tokens.toArray(new String[0]));
 
         rows.add(row(record));
+        changeset.addNew(record);
     }
 
     public void removeSelected() {
-        remove(getSelected());
+        VersionedRecord[] record = getSelected();
+     
+        remove(record);
+        changeset.addDeleted(record);
     }
 
     public Class getColumnClass(int col) {
         return col == 0 ? Boolean.class : String.class;
+    }
+
+    public ChangeSet changeset() {
+        return changeset;
     }
 }
