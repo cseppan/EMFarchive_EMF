@@ -130,14 +130,19 @@ public class DataEditorServiceImpl implements DataEditorService {
                 ChangeSet element = (ChangeSet) iter.next();
                 writer.update(element);
             }
+
+            flushCache(token);
         } catch (Exception e) {
             log.error("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
                     + token.getVersion() + "\t" + e.getMessage());
             throw new EmfException("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
                     + token.getVersion());
         }
+    }
 
+    private void flushCache(EditToken token) throws SQLException {
         discard(token);
+        cache.closeReaders();
     }
 
     public Version markFinal(Version derived) throws EmfException {

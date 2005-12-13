@@ -81,7 +81,7 @@ public class DataEditorServiceCache {
         writersMap.clear();
     }
 
-    private void closeReaders() throws SQLException {
+    void closeReaders() throws SQLException {
         Collection all = readersMap.values();
         for (Iterator iter = all.iterator(); iter.hasNext();) {
             PageReader pageReader = (PageReader) iter.next();

@@ -216,7 +216,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
-        
+
         ChangeSet changeset1 = new ChangeSet();
         changeset1.setVersion(versionOne);
         VersionedRecord record6 = new VersionedRecord();
@@ -250,7 +250,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
-        
+
         ChangeSet changeset1 = new ChangeSet();
         changeset1.setVersion(versionOne);
         VersionedRecord record6 = new VersionedRecord();
@@ -349,13 +349,13 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         EditToken token = new EditToken(versionOne, table);
 
-        //page 1 changes
+        // page 1 changes
         ChangeSet page1ChangeSet = new ChangeSet();
         page1ChangeSet.setVersion(versionOne);
         VersionedRecord record6 = new VersionedRecord(10);
         record6.setDatasetId((int) dataset.getDatasetid());
         page1ChangeSet.addNew(record6);
-
+        Page page1 = service.getPage(token, 1);
         service.submit(token, page1ChangeSet, 1);
 
         // random page browsing
@@ -369,8 +369,37 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         ChangeSet page4ChangeSet = new ChangeSet();
         page4ChangeSet.setVersion(versionOne);
         page4ChangeSet.addDeleted(page4Records[2]);
-        service.submit(token, page1ChangeSet, 4);
+        service.submit(token, page4ChangeSet, 4);
 
-        
+        Page page1AfterChanges = service.getPage(token, 1);
+        assertEquals(page1.count() + 1, page1AfterChanges.count());
+
+        Page page4AfterChanges = service.getPage(token, 4);
+        assertEquals(page4.count() - 1, page4AfterChanges.count());
+    }
+
+    public void testShouldSaveChangeSetAndRegeneratePagesAfterSave() throws Exception {
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+        Version versionZero = versions[0];
+        Version versionOne = service.derive(versionZero, "v 1");
+
+        EditToken token = new EditToken(versionOne, table);
+
+        // page 1 changes
+        ChangeSet page1ChangeSet = new ChangeSet();
+        page1ChangeSet.setVersion(versionOne);
+        VersionedRecord newRecord = new VersionedRecord(10);
+        newRecord.setDatasetId((int) dataset.getDatasetid());
+        page1ChangeSet.addNew(newRecord);
+        service.submit(token, page1ChangeSet, 1);
+
+        // random page browsing
+        service.getPage(token, 5);
+        service.getPage(token, 6);
+
+        int recordsBeforeSave = service.getTotalRecords(token);
+        service.save(token);
+
+        assertEquals(recordsBeforeSave + 1, service.getTotalRecords(token));
     }
 }
