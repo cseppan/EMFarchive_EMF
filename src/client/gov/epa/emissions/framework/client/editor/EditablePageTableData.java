@@ -82,6 +82,20 @@ public class EditablePageTableData extends AbstractTableData implements Selectab
 
         EditableRow editableRow = (EditableRow) rows.get(row);
         editableRow.setValueAt(value, col);
+
+        if (col != 0) // not Select
+            addUpdated(row);
+    }
+
+    private void addUpdated(int row) {
+        EditableRow editableRow = (EditableRow) rows.get(row);
+        VersionedRecord record = (VersionedRecord) editableRow.source();
+
+        if (changeset.containsNew(record))// ignore changes to new records
+            return;
+
+        if (!changeset.containsUpdated(record))
+            changeset.addUpdated(record);
     }
 
     private VersionedRecord[] getSelected() {
@@ -134,7 +148,7 @@ public class EditablePageTableData extends AbstractTableData implements Selectab
 
     public void removeSelected() {
         VersionedRecord[] record = getSelected();
-     
+
         remove(record);
         changeset.addDeleted(record);
     }

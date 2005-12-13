@@ -103,7 +103,60 @@ public class EditablePageTableDataTest extends TestCase {
         assertEquals(1, changeset.getDeletedRecords().length);
         assertEquals(0, changeset.getUpdatedRecords().length);
         assertSame(record1, changeset.getDeletedRecords()[0]);
+    }
 
+    public void testShouldAddPreExistingRecordsThatAreModifiedToChangeSet() {
+        data.setValueAt("modified-1", 0, 1);
+        data.setValueAt("modified-2", 0, 2);
+        data.setValueAt("modified-12", 1, 2);
+
+        assertEquals(2, data.rows().size());
+
+        ChangeSet changeset = data.changeset();
+        assertEquals(0, changeset.getNewRecords().length);
+        assertEquals(0, changeset.getDeletedRecords().length);
+        assertEquals(2, changeset.getUpdatedRecords().length);
+
+        VersionedRecord updated1 = changeset.getUpdatedRecords()[0];
+        assertEquals("modified-1", updated1.token(0));
+        assertEquals("modified-2", updated1.token(1));
+
+        VersionedRecord updated2 = changeset.getUpdatedRecords()[1];
+        assertEquals("modified-12", updated2.token(1));
+    }
+
+    public void testModificationsToBlankRowShouldNotImpactChangeSet() {
+        data.addBlankRow();
+        assertEquals(3, data.rows().size());
+
+        // modify newly added (blank) row
+        data.setValueAt("31", 2, 1);
+        data.setValueAt("32", 2, 2);
+
+        ChangeSet changeset = data.changeset();
+        assertEquals(1, changeset.getNewRecords().length);
+        assertEquals(0, changeset.getDeletedRecords().length);
+        assertEquals(0, changeset.getUpdatedRecords().length);
+
+        VersionedRecord newRecord = changeset.getNewRecords()[0];
+        assertEquals("31", newRecord.token(0));
+        assertEquals("32", newRecord.token(1));
+    }
+
+    public void testChangeSetShouldIgnoreChangesToSelectCol() {
+        data.addBlankRow();
+        data.addBlankRow();
+
+        data.setValueAt(Boolean.TRUE, 1, 0);
+        data.setValueAt(Boolean.TRUE, 3, 0);
+        data.setValueAt(Boolean.FALSE, 1, 0);
+
+        assertEquals(4, data.rows().size());
+
+        ChangeSet changeset = data.changeset();
+        assertEquals(2, changeset.getNewRecords().length);
+        assertEquals(0, changeset.getDeletedRecords().length);
+        assertEquals(0, changeset.getUpdatedRecords().length);
     }
 
     public void testShouldAddEntryOnAdd() {
@@ -126,7 +179,7 @@ public class EditablePageTableDataTest extends TestCase {
         assertEquals(cols.length, blankRecord.tokens().size());
         for (int i = 0; i < cols.length; i++)
             assertEquals("", blankRecord.token(i));
-        
+
         ChangeSet changeset = data.changeset();
         assertEquals(1, changeset.getNewRecords().length);
         assertEquals(0, changeset.getDeletedRecords().length);
