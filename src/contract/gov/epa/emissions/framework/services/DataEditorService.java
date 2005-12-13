@@ -16,7 +16,7 @@ public interface DataEditorService {
     int getTotalRecords(EditToken token) throws EmfException;
 
     // edit
-    void submit(EditToken token, ChangeSet changeset) throws EmfException;
+    void submit(EditToken token, ChangeSet changeset, int page) throws EmfException;
 
     void discard(EditToken token) throws EmfException;
 

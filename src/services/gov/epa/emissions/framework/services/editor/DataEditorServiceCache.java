@@ -16,8 +16,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
-public class DataEditorCachePolicy {
+public class DataEditorServiceCache {
 
     private Map readersMap;
 
@@ -31,7 +33,7 @@ public class DataEditorCachePolicy {
 
     private Map changesetsMap;
 
-    public DataEditorCachePolicy(VersionedRecordsReader reader, Datasource datasource, SqlDataTypes sqlTypes) {
+    public DataEditorServiceCache(VersionedRecordsReader reader, Datasource datasource, SqlDataTypes sqlTypes) {
         recordsReader = reader;
         this.datasource = datasource;
         this.sqlTypes = sqlTypes;
@@ -89,21 +91,53 @@ public class DataEditorCachePolicy {
         readersMap.clear();
     }
 
-    public List changesets(EditToken token) {
-        if (!changesetsMap.containsKey(token.key())) {
-            changesetsMap.put(token.key(), new ArrayList());
+    /*
+     * Keeps a two-level mapping. First map, ChangeSetMap is a map of tokens and PageChangeSetMap. PageChangeSetMap maps
+     * Page Number to Change Sets (of that Page)
+     */
+    public List changesets(EditToken token, int pageNumber) {
+        Map map = pageChangesetsMap(token);
+        Integer pageKey = pageChangesetsKey(pageNumber);
+        if (!map.containsKey(pageKey)) {
+            map.put(pageKey, new ArrayList());
         }
 
-        return (List) changesetsMap.get(token.key());
+        return (List) map.get(pageKey);
     }
 
-    public void submitChangeSet(EditToken token, ChangeSet changeset) {
-        List list = changesets(token);
+    public void submitChangeSet(EditToken token, ChangeSet changeset, int pageNumber) {
+        List list = changesets(token, pageNumber);
         list.add(changeset);
     }
 
     public void discardChangeSets(EditToken token) {
-        changesetsMap.remove(token.key());// clear
+        Map pageChangsetsMap = (Map) changesetsMap.remove(token.key());// clear
+        pageChangsetsMap.clear();
+    }
+
+    public List changesets(EditToken token) {
+        List all = new ArrayList();
+        Map pageChangesetsMap = (Map) changesetsMap.get(token.key());
+        Set keys = new TreeSet(pageChangesetsMap.keySet());
+        for (Iterator iter = keys.iterator(); iter.hasNext();) {
+            List list = (List) pageChangesetsMap.get(iter.next());
+            all.addAll(list);
+        }
+
+        return all;
+    }
+
+    private Integer pageChangesetsKey(int pageNumber) {
+        return new Integer(pageNumber);
+    }
+
+    private Map pageChangesetsMap(EditToken token) {
+        Object key = token.key();
+        if (!changesetsMap.containsKey(key)) {
+            changesetsMap.put(key, new HashMap());
+        }
+
+        return (Map) changesetsMap.get(key);
     }
 
 }

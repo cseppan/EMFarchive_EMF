@@ -195,7 +195,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         changeset.addNew(record7);
 
         EditToken token = new EditToken(versionOne, table);
-        service.submit(token, changeset);
+        service.submit(token, changeset, 1);
         service.save(token);
 
         VersionedRecordsReader reader = new VersionedRecordsReader(datasource);
@@ -216,20 +216,20 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
-
+        
         ChangeSet changeset1 = new ChangeSet();
         changeset1.setVersion(versionOne);
         VersionedRecord record6 = new VersionedRecord();
         record6.setDatasetId((int) dataset.getDatasetid());
         changeset1.addNew(record6);
-        service.submit(token, changeset1);
+        service.submit(token, changeset1, 1);
 
         ChangeSet changeset2 = new ChangeSet();
         changeset2.setVersion(versionOne);
         VersionedRecord record7 = new VersionedRecord();
         record7.setDatasetId((int) dataset.getDatasetid());
         changeset2.addNew(record7);
-        service.submit(token, changeset2);
+        service.submit(token, changeset2, 1);
 
         service.save(token);
 
@@ -250,13 +250,13 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
-
+        
         ChangeSet changeset1 = new ChangeSet();
         changeset1.setVersion(versionOne);
         VersionedRecord record6 = new VersionedRecord();
         record6.setDatasetId((int) dataset.getDatasetid());
         changeset1.addNew(record6);
-        service.submit(token, changeset1);
+        service.submit(token, changeset1, 1);
 
         service.discard(token);
 
@@ -286,7 +286,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         record6.setDatasetId((int) dataset.getDatasetid());
         changeset.addNew(record6);
 
-        service.submit(token, changeset);
+        service.submit(token, changeset, 1);
 
         // random page browsing
         assertEquals(10, service.getPageCount(token));
@@ -323,7 +323,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         VersionedRecord[] page1Records = page.getRecords();
         changeset.addDeleted(page1Records[2]);
 
-        service.submit(token, changeset);
+        service.submit(token, changeset, 1);
 
         // random page browsing
         assertEquals(10, service.getPageCount(token));
@@ -344,39 +344,33 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
     public void testShouldApplyChangeSetToMultiplePages() throws Exception {
         Version[] versions = service.getVersions(dataset.getDatasetid());
-
         Version versionZero = versions[0];
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
-        Page page = service.getPage(token, 1);
 
-        ChangeSet changeset = new ChangeSet();
-        changeset.setVersion(versionOne);
-
+        //page 1 changes
+        ChangeSet page1ChangeSet = new ChangeSet();
+        page1ChangeSet.setVersion(versionOne);
         VersionedRecord record6 = new VersionedRecord(10);
         record6.setDatasetId((int) dataset.getDatasetid());
-        changeset.addNew(record6);
+        page1ChangeSet.addNew(record6);
 
-        VersionedRecord[] page1Records = page.getRecords();
-        changeset.addDeleted(page1Records[2]);
-
-        service.submit(token, changeset);
+        service.submit(token, page1ChangeSet, 1);
 
         // random page browsing
         assertEquals(10, service.getPageCount(token));
         service.getPage(token, 5);
         service.getPage(token, 6);
 
-        Page result = service.getPage(token, 1);
-        VersionedRecord[] records = result.getRecords();
-        assertEquals(page.count(), records.length);
+        // page 4 changes
+        Page page4 = service.getPage(token, 4);
+        VersionedRecord[] page4Records = page4.getRecords();
+        ChangeSet page4ChangeSet = new ChangeSet();
+        page4ChangeSet.setVersion(versionOne);
+        page4ChangeSet.addDeleted(page4Records[2]);
+        service.submit(token, page1ChangeSet, 4);
 
-        assertEquals(page1Records[0].getRecordId(), records[0].getRecordId());
-        assertEquals(page1Records[1].getRecordId(), records[1].getRecordId());
-        // record 2 deleted from Page 1
-        for (int i = 3; i < page1Records.length; i++)
-            assertEquals(page1Records[i].getRecordId(), records[i - 1].getRecordId());
-        assertEquals(record6.getRecordId(), records[records.length - 1].getRecordId());
+        
     }
 }

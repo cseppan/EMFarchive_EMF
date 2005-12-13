@@ -165,14 +165,15 @@ public class DataEditorServiceTransport implements DataEditorService {
         return null;
     }
 
-    public void submit(EditToken token, ChangeSet changeset) throws EmfException {
+    public void submit(EditToken token, ChangeSet changeset, int pageNumber) throws EmfException {
         try {
             mappings.addParam(call, "token", mappings.editToken());
             mappings.addParam(call, "changeset", mappings.changeset());
+            mappings.addIntegerParam(call, "pageNumber");
             mappings.setOperation(call, "submit");
             mappings.setVoidReturnType(call);
 
-            call.invoke(new Object[] { token, changeset });
+            call.invoke(new Object[] { token, changeset, new Integer(pageNumber) });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Could not submit changes for " + token, fault);
         } catch (Exception e) {

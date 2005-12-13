@@ -38,7 +38,7 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     private VersionedRecordsReader reader;
 
-    private DataEditorCachePolicy cache;
+    private DataEditorServiceCache cache;
 
     private HibernateSessionFactory sessionFactory;
 
@@ -67,7 +67,7 @@ public class DataEditorServiceImpl implements DataEditorService {
             PageReader reader = cache.reader(token);
             Page page = reader.page(pageNumber);
 
-            List changesets = cache.changesets(token);
+            List changesets = cache.changesets(token, pageNumber);
             return filter.filter(page, changesets);
         } catch (SQLException ex) {
             log.error("Initialize reader: " + ex.getMessage());
@@ -114,8 +114,8 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
-    public void submit(EditToken token, ChangeSet changeset) {
-        cache.submitChangeSet(token, changeset);
+    public void submit(EditToken token, ChangeSet changeset, int pageNumber) {
+        cache.submitChangeSet(token, changeset, pageNumber);
     }
 
     public void discard(EditToken token) {
@@ -148,6 +148,8 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
+    // FIXME: Please add setup/teardown operations in the DataEditorServiceTestCase, and
+    // then include this update
     private void updateDatasetDefaultVersion(Version finalVersion) throws EmfException {
         long datasetId = finalVersion.getDatasetId();
         try {
@@ -184,10 +186,10 @@ public class DataEditorServiceImpl implements DataEditorService {
     private void init(DbServer dbServer, HibernateSessionFactory factory) throws SQLException {
         this.datasource = dbServer.getEmissionsDatasource();
         this.sessionFactory = factory;
-        
+
         versions = new Versions(datasource);
         reader = new VersionedRecordsReader(datasource);
-        cache = new DataEditorCachePolicy(reader, datasource, dbServer.getSqlDataTypes());
+        cache = new DataEditorServiceCache(reader, datasource, dbServer.getSqlDataTypes());
     }
 
     private void invalidateCache() throws EmfException {
