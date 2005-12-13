@@ -6,7 +6,7 @@ import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.client.editor.VersionedDataViewWindow;
+import gov.epa.emissions.framework.client.editor.DataViewWindow;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -135,7 +135,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
         if (versions.length != 1)
             messagePanel.setError("Please select only one Version");
 
-        VersionedDataViewWindow view = new VersionedDataViewWindow(dataset);
+        DataViewWindow view = new DataViewWindow(dataset);
         parentConsole.addToDesktop(view);
         presenter.doView(versions[0], table, view);
     }

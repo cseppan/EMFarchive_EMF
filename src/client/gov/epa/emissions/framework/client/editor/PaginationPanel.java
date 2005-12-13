@@ -26,11 +26,11 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class VersionedPaginationPanel extends JPanel {
+public class PaginationPanel extends JPanel {
 
     private JFormattedTextField recordInput;
 
-    private VersionedTablePresenter presenter;
+    private TablePresenter presenter;
 
     private JLabel current;
 
@@ -38,7 +38,7 @@ public class VersionedPaginationPanel extends JPanel {
 
     private JSlider slider;
 
-    public VersionedPaginationPanel(MessagePanel messagePanel) {
+    public PaginationPanel(MessagePanel messagePanel) {
         super(new BorderLayout());
         this.messagePanel = messagePanel;
     }
@@ -60,7 +60,7 @@ public class VersionedPaginationPanel extends JPanel {
         super.add(container, BorderLayout.LINE_END);
     }
 
-    public void init(VersionedTablePresenter presenter) {
+    public void init(TablePresenter presenter) {
         this.presenter = presenter;
         try {
             doLayout(presenter.totalRecords());

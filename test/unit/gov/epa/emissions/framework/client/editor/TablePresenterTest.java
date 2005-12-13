@@ -9,12 +9,12 @@ import gov.epa.emissions.framework.services.EditToken;
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
-public class VersionedTablePresenterTest extends MockObjectTestCase {
+public class TablePresenterTest extends MockObjectTestCase {
 
     public void testShouldObserveViewOnObserve() {
-        Mock view = mock(VersionedTableView.class);
+        Mock view = mock(TableView.class);
 
-        VersionedTablePresenter p = new VersionedTablePresenter(null, "table", (VersionedTableView) view.proxy(), null);
+        TablePresenter p = new TablePresenter(null, "table", (TableView) view.proxy(), null);
         view.expects(once()).method("observe").with(same(p));
 
         p.observe();
@@ -25,7 +25,7 @@ public class VersionedTablePresenterTest extends MockObjectTestCase {
         Version version = new Version();
         services.stubs().method("getTotalRecords").with(isA(EditToken.class)).will(returnValue(new Integer(28)));
 
-        VersionedTablePresenter p = new VersionedTablePresenter(version, "table", null, (DataEditorService) services
+        TablePresenter p = new TablePresenter(version, "table", null, (DataEditorService) services
                 .proxy());
 
         assertEquals(28, p.totalRecords());
@@ -37,13 +37,13 @@ public class VersionedTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(VersionedTableView.class);
+        Mock view = mock(TableView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        VersionedTablePresenter p = new VersionedTablePresenter(new Version(), "table", (VersionedTableView) view
+        TablePresenter p = new TablePresenter(new Version(), "table", (TableView) view
                 .proxy(), (DataEditorService) services.proxy());
 
         p.doDisplayNext();
@@ -54,13 +54,13 @@ public class VersionedTablePresenterTest extends MockObjectTestCase {
         Page page = new Page();
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(21))).will(returnValue(page));
 
-        Mock view = mock(VersionedTableView.class);
+        Mock view = mock(TableView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        VersionedTablePresenter p = new VersionedTablePresenter(new Version(), "table", (VersionedTableView) view
+        TablePresenter p = new TablePresenter(new Version(), "table", (TableView) view
                 .proxy(), (DataEditorService) services.proxy());
 
         p.doDisplay(21);
@@ -72,13 +72,13 @@ public class VersionedTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPageWithRecord").with(isA(EditToken.class), eq(new Integer(21))).will(
                 returnValue(page));
 
-        Mock view = mock(VersionedTableView.class);
+        Mock view = mock(TableView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        VersionedTablePresenter p = new VersionedTablePresenter(new Version(), "table", (VersionedTableView) view
+        TablePresenter p = new TablePresenter(new Version(), "table", (TableView) view
                 .proxy(), (DataEditorService) services.proxy());
 
         p.doDisplayPageWithRecord(21);
@@ -89,13 +89,13 @@ public class VersionedTablePresenterTest extends MockObjectTestCase {
         Page page = new Page();
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
 
-        Mock view = mock(VersionedTableView.class);
+        Mock view = mock(TableView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        VersionedTablePresenter p = new VersionedTablePresenter(new Version(), "table", (VersionedTableView) view
+        TablePresenter p = new TablePresenter(new Version(), "table", (TableView) view
                 .proxy(), (DataEditorService) services.proxy());
 
         p.doDisplayFirst();
@@ -106,13 +106,13 @@ public class VersionedTablePresenterTest extends MockObjectTestCase {
         Page page = new Page();
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
 
-        Mock view = mock(VersionedTableView.class);
+        Mock view = mock(TableView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        VersionedTablePresenter p = new VersionedTablePresenter(new Version(), "table", (VersionedTableView) view
+        TablePresenter p = new TablePresenter(new Version(), "table", (TableView) view
                 .proxy(), (DataEditorService) services.proxy());
 
         p.doDisplayFirst();
@@ -125,13 +125,13 @@ public class VersionedTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(20))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(VersionedTableView.class);
+        Mock view = mock(TableView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        VersionedTablePresenter p = new VersionedTablePresenter(new Version(), "table", (VersionedTableView) view
+        TablePresenter p = new TablePresenter(new Version(), "table", (TableView) view
                 .proxy(), (DataEditorService) services.proxy());
 
         p.doDisplayLast();
@@ -144,13 +144,13 @@ public class VersionedTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(20))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(VersionedTableView.class);
+        Mock view = mock(TableView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        VersionedTablePresenter p = new VersionedTablePresenter(new Version(), "table", (VersionedTableView) view
+        TablePresenter p = new TablePresenter(new Version(), "table", (TableView) view
                 .proxy(), (DataEditorService) services.proxy());
 
         p.doDisplayLast();
@@ -164,13 +164,13 @@ public class VersionedTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(VersionedTableView.class);
+        Mock view = mock(TableView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        VersionedTablePresenter p = new VersionedTablePresenter(new Version(), "table", (VersionedTableView) view
+        TablePresenter p = new TablePresenter(new Version(), "table", (TableView) view
                 .proxy(), (DataEditorService) services.proxy());
 
         p.doDisplayNext();
@@ -188,14 +188,14 @@ public class VersionedTablePresenterTest extends MockObjectTestCase {
         services.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(
                 returnValue(page2));
 
-        Mock view = mock(VersionedTableView.class);
+        Mock view = mock(TableView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page1));
         view.expects(once()).method("display").with(eq(page2));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        VersionedTablePresenter p = new VersionedTablePresenter(new Version(), "table", (VersionedTableView) view
+        TablePresenter p = new TablePresenter(new Version(), "table", (TableView) view
                 .proxy(), (DataEditorService) services.proxy());
 
         p.doDisplayNext();

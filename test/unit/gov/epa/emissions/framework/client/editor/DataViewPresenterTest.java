@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.services.DataEditorService;
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
-public class VersionedDataViewPresenterTest extends MockObjectTestCase {
+public class DataViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldLoadTablesOfDatasetOnDisplay() throws Exception {
         Version version = new Version();
@@ -14,10 +14,10 @@ public class VersionedDataViewPresenterTest extends MockObjectTestCase {
         Mock service = mock(DataEditorService.class);
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
-        Mock view = mock(VersionedDataView.class);
+        Mock view = mock(DataView.class);
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
 
-        VersionedDataViewPresenter p = new VersionedDataViewPresenter(version, table, (VersionedDataView) view.proxy(),
+        DataViewPresenter p = new DataViewPresenter(version, table, (DataView) view.proxy(),
                 serviceProxy);
         view.expects(once()).method("observe").with(same(p));
 
@@ -25,13 +25,13 @@ public class VersionedDataViewPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldCloseViewAndCloseDataEditSessionOnClose() throws Exception {
-        Mock view = mock(VersionedDataView.class);
+        Mock view = mock(DataView.class);
         view.expects(once()).method("close").withNoArguments();
 
         Mock services = mock(DataEditorService.class);
         services.expects(once()).method("close").withNoArguments();
 
-        VersionedDataViewPresenter p = new VersionedDataViewPresenter(null, null, (VersionedDataView) view.proxy(),
+        DataViewPresenter p = new DataViewPresenter(null, null, (DataView) view.proxy(),
                 (DataEditorService) services.proxy());
 
         p.doClose();

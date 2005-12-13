@@ -13,7 +13,7 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class VersionedTableViewPanel extends JPanel implements VersionedTableView {
+public class TableViewPanel extends JPanel implements TableView {
 
     private EmfTableModel tableModel;
 
@@ -21,20 +21,20 @@ public class VersionedTableViewPanel extends JPanel implements VersionedTableVie
 
     private JPanel pageContainer;
 
-    private VersionedPaginationPanel paginationPanel;
+    private PaginationPanel paginationPanel;
 
-    public VersionedTableViewPanel(InternalSource source, MessagePanel messagePanel) {
+    public TableViewPanel(InternalSource source, MessagePanel messagePanel) {
         super(new BorderLayout());
         this.source = source;
 
-        paginationPanel = new VersionedPaginationPanel(messagePanel);
+        paginationPanel = new PaginationPanel(messagePanel);
         super.add(paginationPanel, BorderLayout.PAGE_START);
 
         pageContainer = new JPanel(new BorderLayout());
         super.add(pageContainer, BorderLayout.CENTER);
     }
 
-    public void observe(VersionedTablePresenter presenter) {
+    public void observe(TablePresenter presenter) {
         paginationPanel.init(presenter);
     }
 

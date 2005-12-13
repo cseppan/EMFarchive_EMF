@@ -4,9 +4,9 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
 
-public class VersionedDataViewPresenter {
+public class DataViewPresenter {
 
-    private VersionedDataView view;
+    private DataView view;
 
     private DataEditorService service;
 
@@ -14,7 +14,7 @@ public class VersionedDataViewPresenter {
 
     private String table;
 
-    public VersionedDataViewPresenter(Version version, String table, VersionedDataView view, DataEditorService service) {
+    public DataViewPresenter(Version version, String table, DataView view, DataEditorService service) {
         this.version = version;
         this.table = table;
         this.view = view;

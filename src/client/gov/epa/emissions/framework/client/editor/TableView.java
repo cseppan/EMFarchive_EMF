@@ -2,8 +2,8 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
 
-public interface VersionedTableView {
+public interface TableView {
     void display(Page page);
 
-    void observe(VersionedTablePresenter presenter);
+    void observe(TablePresenter presenter);
 }

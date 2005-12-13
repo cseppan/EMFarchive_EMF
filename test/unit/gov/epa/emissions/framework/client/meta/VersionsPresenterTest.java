@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.framework.client.editor.VersionedDataView;
-import gov.epa.emissions.framework.client.editor.VersionedDataViewPresenter;
+import gov.epa.emissions.framework.client.editor.DataView;
+import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.services.DataEditorService;
 
 import org.jmock.Mock;
@@ -17,12 +17,12 @@ public class VersionsPresenterTest extends MockObjectTestCase {
         Mock service = mock(DataEditorService.class);
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
-        Mock dataView = mock(VersionedDataView.class);
+        Mock dataView = mock(DataView.class);
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
-        dataView.expects(once()).method("observe").with(new IsInstanceOf(VersionedDataViewPresenter.class));
+        dataView.expects(once()).method("observe").with(new IsInstanceOf(DataViewPresenter.class));
 
         VersionsPresenter presenter = new VersionsPresenter(serviceProxy);
-        presenter.doView(version, table, (VersionedDataView) dataView.proxy());
+        presenter.doView(version, table, (DataView) dataView.proxy());
     }
 
     public void testShouldDeriveNewVersionOnNew() throws Exception {

@@ -17,17 +17,17 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 
-public class VersionedDataViewWindow extends DisposableInteralFrame implements VersionedDataView {
+public class DataViewWindow extends DisposableInteralFrame implements DataView {
 
     private JPanel layout;
 
     private MessagePanel messagePanel;
 
-    private VersionedDataViewPresenter presenter;
+    private DataViewPresenter presenter;
 
     private EmfDataset dataset;
 
-    public VersionedDataViewWindow(EmfDataset dataset) {
+    public DataViewWindow(EmfDataset dataset) {
         super("Dataset: " + dataset.getName(), new Dimension(900, 750));
         this.dataset = dataset;
 
@@ -38,7 +38,7 @@ public class VersionedDataViewWindow extends DisposableInteralFrame implements V
         this.getContentPane().add(layout);
     }
 
-    public void observe(VersionedDataViewPresenter presenter) {
+    public void observe(DataViewPresenter presenter) {
         this.presenter = presenter;
     }
 
@@ -56,9 +56,9 @@ public class VersionedDataViewWindow extends DisposableInteralFrame implements V
     }
 
     private JPanel tablePanel(Version version, String table, DataEditorService service) {
-        VersionedTableViewPanel tableView = new VersionedTableViewPanel(source(table, dataset.getInternalSources()),
+        TableViewPanel tableView = new TableViewPanel(source(table, dataset.getInternalSources()),
                 messagePanel);
-        VersionedTablePresenter tablePresenter = new VersionedTablePresenter(version, table, tableView, service);
+        TablePresenter tablePresenter = new TablePresenter(version, table, tableView, service);
         tablePresenter.observe();
         
         try {
