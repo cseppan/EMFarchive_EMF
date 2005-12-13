@@ -1,10 +1,11 @@
 package gov.epa.emissions.framework.client.editor;
 
-import java.util.List;
-
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.framework.ui.Row;
+
+import java.util.List;
+
 import junit.framework.TestCase;
 
 public class EditablePageTableDataTest extends TestCase {
@@ -13,9 +14,31 @@ public class EditablePageTableDataTest extends TestCase {
 
     private String[] cols;
 
+    private VersionedRecord record1;
+
+    private VersionedRecord record2;
+
+    private Page page;
+
+    private int datasetId;
+
+    private int version;
+
     protected void setUp() {
+        page = new Page();
+
+        record1 = new VersionedRecord();
+        record1.setTokens(new String[] { "1", "2", "3" });
+        page.add(record1);
+
+        record2 = new VersionedRecord();
+        record2.setTokens(new String[] { "11", "12", "13" });
+        page.add(record2);
+
         cols = new String[] { "col1", "col2", "col3" };
-        data = new EditablePageTableData(cols, new Page());
+        datasetId = 2;
+        version = 34;
+        data = new EditablePageTableData(datasetId, version, page, cols);
     }
 
     public void testShouldHaveThreeColumns() {
@@ -38,17 +61,7 @@ public class EditablePageTableDataTest extends TestCase {
             assertTrue("All cells should be editable", data.isEditable(i));
     }
 
-    public void testRowsShouldContainDataValuesOfRecords() {
-        Page page = new Page();
-        VersionedRecord record1 = new VersionedRecord();
-        record1.setTokens(new String[] { "1", "2", "3" });
-        page.add(record1);
-        VersionedRecord record2 = new VersionedRecord();
-        record2.setTokens(new String[] { "11", "12", "13" });
-        page.add(record2);
-
-        data = new EditablePageTableData(cols, page);
-
+    public void testRowsShouldContainDataValuesOfRecord() {
         List rows = data.rows();
 
         assertNotNull("Should have 2 rows", rows);
@@ -63,4 +76,57 @@ public class EditablePageTableDataTest extends TestCase {
         assertEquals(record2.token(1), row2.getValueAt(2));
     }
 
+    public void testShouldReturnARowRepresentingARecordEntry() {
+        assertEquals(record1, data.element(0));
+        assertEquals(record2, data.element(1));
+    }
+
+    public void testShouldRemoveRowOnRemove() {
+        data.remove(record1);
+        assertEquals(1, data.rows().size());
+
+        data.remove(new VersionedRecord());
+        assertEquals(1, data.rows().size());
+    }
+
+    public void testShouldRemoveSelectedOnRemove() {
+        assertEquals(2, data.rows().size());
+
+        data.setValueAt(Boolean.TRUE, 0, 0);
+        data.removeSelected();
+
+        assertEquals(1, data.rows().size());
+    }
+
+    public void testShouldAddEntryOnAdd() {
+        data.addBlankRow();
+
+        assertEquals(3, data.rows().size());
+    }
+
+    public void testShouldAddBlankEntry() {
+        data.addBlankRow();
+
+        List rows = data.rows();
+        assertEquals(3, rows.size());
+        Row blankRow = (Row) rows.get(2);
+
+        VersionedRecord blankRecord = (VersionedRecord) blankRow.source();
+        assertEquals(datasetId, blankRecord.getDatasetId());
+        assertEquals(version, blankRecord.getVersion());
+        assertEquals("", blankRecord.getDeleteVersions());
+        assertEquals(cols.length, blankRecord.tokens().size());
+        for (int i = 0; i < cols.length; i++)
+            assertEquals("", blankRecord.token(i));
+    }
+
+    public void testShouldReturnCurrentlyHeldRecords() {
+        data.addBlankRow();
+
+        VersionedRecord[] sources = data.sources();
+        assertEquals(3, sources.length);
+        assertEquals(record1, sources[0]);
+        assertEquals(record2, sources[1]);
+        assertEquals(datasetId, sources[2].getDatasetId());
+    }
 }

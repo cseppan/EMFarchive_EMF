@@ -2,9 +2,6 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
-import gov.epa.emissions.commons.io.KeyVal;
-import gov.epa.emissions.framework.client.data.Keywords;
-import gov.epa.emissions.framework.client.meta.KeyValueRowSource;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
@@ -18,15 +15,16 @@ import java.util.List;
 public class EditablePageTableData extends AbstractTableData implements SelectableEmfTableData {
     private List rows;
 
-    private Keywords masterKeywords;
-
     private String[] cols;
 
-    private Page page;
+    private int datasetId;
 
-    public EditablePageTableData(String[] cols, Page page) {
+    private int version;
+
+    public EditablePageTableData(int datasetId, int version, Page page, String[] cols) {
+        this.datasetId = datasetId;
+        this.version = version;
         this.cols = cols;
-        this.page = page;
         this.rows = createRows(page);
     }
 
@@ -58,11 +56,11 @@ public class EditablePageTableData extends AbstractTableData implements Selectab
         return rows;
     }
 
-    void remove(KeyVal keyValue) {
+    void remove(VersionedRecord record) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            KeyVal source = (KeyVal) row.source();
-            if (source == keyValue) {
+            VersionedRecord source = (VersionedRecord) row.source();
+            if (source == record) {
                 rows.remove(row);
                 return;
             }
@@ -82,27 +80,27 @@ public class EditablePageTableData extends AbstractTableData implements Selectab
         editableRow.setValueAt(value, col);
     }
 
-    private KeyVal[] getSelected() {
+    private VersionedRecord[] getSelected() {
         List selected = new ArrayList();
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            KeyValueRowSource rowSource = (KeyValueRowSource) row.rowSource();
+            PageDataRowSource rowSource = (PageDataRowSource) row.rowSource();
             if (rowSource.isSelected())
                 selected.add(rowSource.source());
         }
 
-        return (KeyVal[]) selected.toArray(new KeyVal[0]);
+        return (VersionedRecord[]) selected.toArray(new VersionedRecord[0]);
     }
 
-    public void remove(KeyVal[] values) {
+    public void remove(VersionedRecord[] values) {
         for (int i = 0; i < values.length; i++)
             remove(values[i]);
     }
 
-    public KeyVal[] sources() {
+    public VersionedRecord[] sources() {
         List sources = sourcesList();
-        return (KeyVal[]) sources.toArray(new KeyVal[0]);
+        return (VersionedRecord[]) sources.toArray(new VersionedRecord[0]);
     }
 
     private List sourcesList() {
@@ -110,15 +108,23 @@ public class EditablePageTableData extends AbstractTableData implements Selectab
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            KeyValueRowSource rowSource = (KeyValueRowSource) row.rowSource();
+            PageDataRowSource rowSource = (PageDataRowSource) row.rowSource();
             sources.add(rowSource.source());
         }
         return sources;
     }
 
     public void addBlankRow() {
-        //TODO: source the template w/ same dataset id, and ??
-        rows.add(row(new VersionedRecord()));
+        VersionedRecord record = new VersionedRecord();
+        record.setDatasetId(datasetId);
+        record.setVersion(version);
+        record.setDeleteVersions("");
+        List tokens = new ArrayList();
+        for (int i = 0; i < cols.length; i++)
+            tokens.add("");
+        record.setTokens((String[]) tokens.toArray(new String[0]));
+
+        rows.add(row(record));
     }
 
     public void removeSelected() {
