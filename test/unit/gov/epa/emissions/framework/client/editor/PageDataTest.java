@@ -78,6 +78,5 @@ public class PageDataTest extends TestCase {
         Row row2 = (Row) rows.get(1);
         assertEquals(record2.token(0), row2.getValueAt(0));
         assertEquals(record2.token(1), row2.getValueAt(1));
-
     }
 }
