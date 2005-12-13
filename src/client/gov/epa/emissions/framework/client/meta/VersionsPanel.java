@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -53,7 +54,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     public void display(Version[] versions, InternalSource[] sources) {
         add(tablePanel(versions), BorderLayout.CENTER);
-        add(bottomPanel(sources), BorderLayout.PAGE_END);
+        add(bottomPanel(versions, sources), BorderLayout.PAGE_END);
     }
 
     public void add(Version version) {
@@ -72,21 +73,21 @@ public class VersionsPanel extends JPanel implements VersionsView {
         return panel;
     }
 
-    private JPanel bottomPanel(InternalSource[] sources) {
+    private JPanel bottomPanel(Version[] versions, InternalSource[] sources) {
         JPanel container = new JPanel(new BorderLayout());
 
-        container.add(leftControlPanel(), BorderLayout.LINE_START);
+        container.add(leftControlPanel(versions), BorderLayout.LINE_START);
         container.add(rightControlPanel(sources), BorderLayout.LINE_END);
 
         return container;
     }
 
-    private JPanel leftControlPanel() {
+    private JPanel leftControlPanel(final Version[] versions) {
         JPanel panel = new JPanel();
 
         Button view = new Button("New", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doNew();
+                doNew(versions);
             }
         });
         panel.add(view);
@@ -94,11 +95,20 @@ public class VersionsPanel extends JPanel implements VersionsView {
         return panel;
     }
 
-    protected void doNew() {
+    protected void doNew(Version[] versions) {
         clear();
-        // TODO: launch VersionedDataView
-        
-        
+
+        NewVersionDialog dialog = new NewVersionDialog(dataset, versions, parentConsole);
+        dialog.run();
+
+        if (dialog.shouldCreate()) {
+            try {
+                presenter.doNew(dialog.version(), dialog.name());
+            } catch (EmfException e) {
+                messagePanel.setError("Could not create new Version: " + dialog.name() + ". Reason: " + e.getMessage());
+                // TODO: refresh layout
+            }
+        }
     }
 
     private JPanel rightControlPanel(InternalSource[] sources) {
