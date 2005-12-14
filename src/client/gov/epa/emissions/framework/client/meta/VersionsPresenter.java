@@ -28,7 +28,7 @@ public class VersionsPresenter {
         view.add(derived);
     }
 
-    public void doView(Version version, String table, DataView view) {
+    public void doView(Version version, String table, DataView view) throws EmfException {
         DataViewPresenter presenter = new DataViewPresenter(version, table, view, service);
         presenter.display();
     }

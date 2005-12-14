@@ -186,6 +186,11 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         assertEquals(derived.getVersion(), finalVersion.getVersion());
         assertEquals("0", finalVersion.getPath());
         assertTrue("Derived version should be final on being marked 'final'", finalVersion.isFinalVersion());
+
+        Version[] updated = service.getVersions(dataset.getDatasetid());
+        assertEquals(2, updated.length);
+        assertEquals("v 1", updated[1].getName());
+        assertTrue("Derived version (loaded from db) should be final on being marked 'final'", updated[1].isFinalVersion());
     }
 
     public void testChangeSetWithNewRecordsResultsInNewVersion() throws Exception {

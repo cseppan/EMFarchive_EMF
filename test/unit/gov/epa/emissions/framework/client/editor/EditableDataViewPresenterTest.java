@@ -91,7 +91,7 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
         Mock service = mock(DataEditorService.class);
         Constraint constraint = tokenConstraint(version, table);
         service.expects(once()).method("closeSession").with(constraint);
-        service.expects(once()).method("markFinal").with(same(version)).will(returnValue(null));
+        service.expects(once()).method("markFinal").with(same(version)).will(returnValue(new Version()));
 
         Mock view = mock(EditableDataView.class);
         view.expects(once()).method("close").withNoArguments();

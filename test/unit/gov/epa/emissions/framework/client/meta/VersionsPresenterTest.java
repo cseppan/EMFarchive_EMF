@@ -13,10 +13,12 @@ import org.jmock.core.constraint.IsInstanceOf;
 
 public class VersionsPresenterTest extends MockObjectTestCase {
 
-    public void testShouldDisplayTableViewOnView() {
+    public void testShouldDisplayTableViewOnView() throws Exception {
         Version version = new Version();
         String table = "table";
+
         Mock service = mock(DataEditorService.class);
+        service.expects(once()).method("openSession").withAnyArguments();
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
         Mock dataView = mock(DataView.class);
@@ -26,18 +28,19 @@ public class VersionsPresenterTest extends MockObjectTestCase {
         VersionsPresenter presenter = new VersionsPresenter(serviceProxy);
         presenter.doView(version, table, (DataView) dataView.proxy());
     }
-    
+
     public void testShouldDisplayEditableTableViewOnEdit() throws Exception {
         Version version = new Version();
         String table = "table";
+        
         Mock service = mock(DataEditorService.class);
         service.expects(once()).method("openSession").withAnyArguments();
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
-        
+
         Mock dataView = mock(EditableDataView.class);
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
         dataView.expects(once()).method("observe").with(new IsInstanceOf(EditableDataViewPresenter.class));
-        
+
         VersionsPresenter presenter = new VersionsPresenter(serviceProxy);
         presenter.doEdit(version, table, (EditableDataView) dataView.proxy());
     }

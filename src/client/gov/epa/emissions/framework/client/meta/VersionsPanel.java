@@ -65,10 +65,10 @@ public class VersionsPanel extends JPanel implements VersionsView {
     private JPanel tablePanel(Version[] versions) {
         tableData = new VersionsTableData(versions);
         tableModel = new EmfTableModel(tableData);
-        
+
         ScrollableTable table = new ScrollableTable(tableModel);
         table.disableScrolling();
-        
+
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(table, BorderLayout.CENTER);
 
@@ -156,9 +156,17 @@ public class VersionsPanel extends JPanel implements VersionsView {
             return;
         }
 
+        showView(table, versions);
+    }
+
+    private void showView(String table, Version[] versions) {
         DataViewWindow view = new DataViewWindow(dataset);
         parentConsole.addToDesktop(view);
-        presenter.doView(versions[0], table, view);
+        try {
+            presenter.doView(versions[0], table, view);
+        } catch (EmfException e) {
+            displayError("Could not open Viewer. Reason: " + e.getMessage());
+        }
     }
 
     private void displayError(String message) {
@@ -179,6 +187,10 @@ public class VersionsPanel extends JPanel implements VersionsView {
             return;
         }
 
+        showEditor(table, versions);
+    }
+
+    private void showEditor(String table, Version[] versions) {
         EditableDataViewWindow view = new EditableDataViewWindow(dataset);
         parentConsole.addToDesktop(view);
         try {
