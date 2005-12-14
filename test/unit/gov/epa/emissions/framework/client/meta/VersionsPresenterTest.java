@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.client.editor.EditableDataView;
@@ -32,7 +33,7 @@ public class VersionsPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayEditableTableViewOnEdit() throws Exception {
         Version version = new Version();
         String table = "table";
-        
+
         Mock service = mock(DataEditorService.class);
         service.expects(once()).method("openSession").withAnyArguments();
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
@@ -72,6 +73,36 @@ public class VersionsPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("observe").with(same(presenter));
 
         presenter.observe((VersionsView) view.proxy());
+    }
+
+    public void testShouldMarkVersionAsFinalOnMarkFinal() throws Exception {
+        Version version = new Version();
+        version.setVersion(8);
+
+        Mock service = mock(DataEditorService.class);
+        service.expects(once()).method("markFinal").with(same(version)).will(returnValue(new Version()));
+
+        VersionsPresenter p = new VersionsPresenter((DataEditorService) service.proxy());
+
+        p.doMarkFinal(new Version[] { version });
+    }
+
+    public void testShouldRaiseErrorOnMarkFinalWhenVersionIsAlreadyFinal() throws Exception {
+        Version version = new Version();
+        version.setVersion(2);
+        version.markFinal();
+
+        VersionsPresenter p = new VersionsPresenter(null);
+
+        try {
+            p.doMarkFinal(new Version[] { version });
+        } catch (EmfException e) {
+            assertEquals("Version: " + version.getVersion() + " is already Final. It should be non-final.", e
+                    .getMessage());
+            return;
+        }
+
+        fail("Should have failed to mark Final when Version is already Final");
     }
 
 }

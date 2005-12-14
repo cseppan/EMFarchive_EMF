@@ -94,6 +94,13 @@ public class VersionsPanel extends JPanel implements VersionsView {
         });
         panel.add(view);
 
+        Button markFinal = new Button("Mark Final", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doMarkFinal(tableData.selected());
+            }
+        });
+        panel.add(markFinal);
+
         return panel;
     }
 
@@ -110,6 +117,17 @@ public class VersionsPanel extends JPanel implements VersionsView {
                 messagePanel.setError("Could not create new Version: " + dialog.name() + ". Reason: " + e.getMessage());
                 // TODO: refresh layout
             }
+        }
+    }
+
+    protected void doMarkFinal(Version[] versions) {
+        clear();
+
+        try {
+            presenter.doMarkFinal(versions);
+        } catch (EmfException e) {
+            messagePanel.setError("Could not mark Final. Reason: " + e.getMessage());
+            // TODO: refresh layout
         }
     }
 

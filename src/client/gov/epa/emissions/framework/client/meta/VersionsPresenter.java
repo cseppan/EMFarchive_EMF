@@ -38,4 +38,13 @@ public class VersionsPresenter {
         presenter.display();
     }
 
+    public void doMarkFinal(Version[] versions) throws EmfException {
+        for (int i = 0; i < versions.length; i++) {
+            if (versions[i].isFinalVersion())
+                throw new EmfException("Version: " + versions[i].getVersion()
+                        + " is already Final. It should be non-final.");
+            service.markFinal(versions[i]);
+        }
+    }
+
 }

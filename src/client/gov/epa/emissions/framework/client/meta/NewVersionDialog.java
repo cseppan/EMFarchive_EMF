@@ -37,6 +37,7 @@ public class NewVersionDialog extends Dialog {
         super.setSize(new Dimension(500, 150));
 
         super.getContentPane().add(createLayout(versions));
+        super.center();
     }
 
     private JPanel createLayout(Version[] versions) {

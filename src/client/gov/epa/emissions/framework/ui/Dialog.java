@@ -16,12 +16,15 @@ public class Dialog extends JDialog {
         super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         applyDecorations();
-        super.setLocation(ScreenUtils.getPointToCenter(this));
     }
 
     private void applyDecorations() {
         super.setUndecorated(true);
         super.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
+    }
+
+    public void center() {
+        super.setLocation(ScreenUtils.getPointToCenter(this));
     }
 
 }
