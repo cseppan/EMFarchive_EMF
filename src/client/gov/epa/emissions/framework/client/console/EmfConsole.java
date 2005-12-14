@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -82,7 +83,11 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private void setProperties() {
-        super.setSize(new Dimension(1200, 900));
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        double height = dim.getHeight();
+        double width = dim.getWidth();
+        Dimension newDim = new Dimension((int)(height*0.80), (int)(width*0.80));
+        super.setSize(newDim);
         // FIXME: prompt the user ?
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         super.setResizable(true);
