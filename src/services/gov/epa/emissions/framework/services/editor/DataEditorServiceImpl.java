@@ -15,8 +15,6 @@ import gov.epa.emissions.framework.InfrastructureException;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EditToken;
-import gov.epa.emissions.framework.services.impl.DataServiceImpl;
-import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -40,8 +38,6 @@ public class DataEditorServiceImpl implements DataEditorService {
 
     private DataEditorServiceCache cache;
 
-    private HibernateSessionFactory sessionFactory;
-
     public DataEditorServiceImpl() throws InfrastructureException {
         try {
             Context ctx = new InitialContext();
@@ -50,15 +46,15 @@ public class DataEditorServiceImpl implements DataEditorService {
             DbServer dbServer = new PostgresDbServer(emfDatabase.getConnection(), EMFConstants.EMF_REFERENCE_SCHEMA,
                     EMFConstants.EMF_EMISSIONS_SCHEMA);
 
-            init(dbServer, HibernateSessionFactory.get());
+            init(dbServer);
         } catch (Exception ex) {
             log.error("could not initialize Data Editor Service", ex);
             throw new InfrastructureException("Server configuration error");
         }
     }
 
-    public DataEditorServiceImpl(DbServer dbServer, HibernateSessionFactory sessionFactory) throws SQLException {
-        init(dbServer, sessionFactory);
+    public DataEditorServiceImpl(DbServer dbServer) throws SQLException {
+        init(dbServer);
     }
 
     public Page getPage(EditToken token, int pageNumber) throws EmfException {
@@ -134,7 +130,7 @@ public class DataEditorServiceImpl implements DataEditorService {
             flushCache(token);
         } catch (Exception e) {
             log.error("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
-                    + token.getVersion() + "\t" + e.getMessage());
+                    + token.getVersion() + "\t" + e.getMessage(), e);
             throw new EmfException("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
                     + token.getVersion());
         }
@@ -153,25 +149,11 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
-    // FIXME: Please add setup/teardown operations in the DataEditorServiceTestCase, and
-    // then include this update
-    private void updateDatasetDefaultVersion(Version finalVersion) throws EmfException {
-        long datasetId = finalVersion.getDatasetId();
-        try {
-            int lastFinalVersion = versions.getLastFinalVersion(datasetId);
-            DataServiceImpl dataService = new DataServiceImpl(sessionFactory);
-            dataService.updateDefaultVersion(datasetId, lastFinalVersion);
-        } catch (SQLException e) {
-            log.error("Could not update default version for : " + datasetId + "\t" + e.getMessage());
-            throw new EmfException("Could not update default version for : " + datasetId);
-        }
-    }
-
     public Version[] getVersions(long datasetId) throws EmfException {
         try {
             return versions.get(datasetId);
         } catch (SQLException e) {
-            log.error("Could not get all versions of Dataset : " + datasetId + "\t" + e.getMessage());
+            log.error("Could not get all versions of Dataset : " + datasetId + "\t" + e.getMessage(), e);
             throw new EmfException("Could not get all versions of Dataset : " + datasetId);
         }
     }
@@ -188,10 +170,8 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
-    private void init(DbServer dbServer, HibernateSessionFactory factory) throws SQLException {
+    private void init(DbServer dbServer) throws SQLException {
         this.datasource = dbServer.getEmissionsDatasource();
-        this.sessionFactory = factory;
-
         versions = new Versions(datasource);
         reader = new VersionedRecordsReader(datasource);
         cache = new DataEditorServiceCache(reader, datasource, dbServer.getSqlDataTypes());

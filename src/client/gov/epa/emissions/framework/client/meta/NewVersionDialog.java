@@ -94,6 +94,7 @@ public class NewVersionDialog extends Dialog {
                 close();
             }
         });
+        getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
         Button cancel = new Button("Cancel", new AbstractAction() {

@@ -164,11 +164,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
 
         Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doClose();
-                } catch (EmfException e) {
-                    displayError("Could not Close. Reason: " + e.getMessage());
-                }
+                presenter.doClose();
             }
 
         });

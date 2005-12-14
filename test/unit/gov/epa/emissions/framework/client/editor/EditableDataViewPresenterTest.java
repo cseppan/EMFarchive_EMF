@@ -33,7 +33,6 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("close").withNoArguments();
 
         Mock services = mock(DataEditorService.class);
-        services.expects(once()).method("close").withNoArguments();
 
         EditableDataViewPresenter p = new EditableDataViewPresenter(null, null, (EditableDataView) view.proxy(),
                 (DataEditorService) services.proxy());
@@ -78,7 +77,6 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
 
         Mock services = mock(DataEditorService.class);
         services.expects(once()).method("markFinal").with(same(version)).will(returnValue(null));
-        services.expects(once()).method("close").withNoArguments();
 
         Mock view = mock(EditableDataView.class);
         view.expects(once()).method("close").withNoArguments();

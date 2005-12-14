@@ -30,8 +30,7 @@ public class EditableDataViewPresenter {
         view.display(version, table, service);
     }
 
-    public void doClose() throws EmfException {
-        service.close();
+    public void doClose() {
         view.close();
     }
 

@@ -10,7 +10,6 @@ import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 import java.io.File;
@@ -27,7 +26,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
     private String table;
 
-    protected void setUpService(DataEditorService service, HibernateSessionFactory sessionFactory) throws Exception {
+    protected void setUpService(DataEditorService service) throws Exception {
         this.service = service;
         datasource = emissions();
 
@@ -401,5 +400,21 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         service.save(token);
 
         assertEquals(recordsBeforeSave + 1, service.getTotalRecords(token));
+    }
+
+    public void testShouldMarkFinalAndRetrieveVersions() throws Exception {
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+        Version versionZero = versions[0];
+        Version derived = service.derive(versionZero, "v 1");
+        assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
+        assertEquals("v 1", derived.getName());
+
+        Version finalVersion = service.markFinal(derived);
+
+        assertNotNull("Should be able to mark a 'derived' as a Final version", derived);
+        assertEquals(derived.getDatasetId(), finalVersion.getDatasetId());
+        assertEquals(derived.getVersion(), finalVersion.getVersion());
+        assertEquals("0", finalVersion.getPath());
+        assertTrue("Derived version should be final on being marked 'final'", finalVersion.isFinalVersion());
     }
 }

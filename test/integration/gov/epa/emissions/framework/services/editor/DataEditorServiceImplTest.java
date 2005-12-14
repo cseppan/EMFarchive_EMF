@@ -10,8 +10,8 @@ public class DataEditorServiceImplTest extends DataEditorServiceTestCase {
         super.setUp();
 
         HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
-        DataEditorServiceImpl service = new DataEditorServiceImpl(super.dbServer(), sessionFactory);
-        super.setUpService(service, sessionFactory);
+        DataEditorServiceImpl service = new DataEditorServiceImpl(super.dbServer());
+        super.setUpService(service);
     }
 
 }
