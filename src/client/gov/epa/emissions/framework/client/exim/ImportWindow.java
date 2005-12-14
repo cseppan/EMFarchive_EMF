@@ -127,7 +127,9 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
                 folder.setText(file.getParent());
                 filename.setText(file.getName());
-                name.setText(formatDatasetName(file.getName()));
+//For demo #3 changing the filename
+//                name.setText(formatDatasetName(file.getName()));
+              name.setText(file.getName());
             }
         });
 
