@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -25,12 +24,6 @@ public class DataTabPresenter {
     }
 
     public void doDisplay() throws EmfException {
-        DatasetType type = dataset.getDatasetType();
-        if (!type.isExternal())
-            view.displayInternalSources(dataset.getInternalSources());
-        else
-            view.displayExternalSources(dataset.getExternalSources());
-
         Version[] versions = dataEditorService.getVersions(dataset.getDatasetid());
         view.displayVersions(versions, dataset.getInternalSources());
     }

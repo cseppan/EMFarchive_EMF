@@ -51,7 +51,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         tabbedPane.addTab("Data", createDataTab(dataset, parentConsole));
         tabbedPane.addTab("Keywords", createKeywordsTab());
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
-        tabbedPane.addTab("Info", createErrorTab("TODO"));
+        tabbedPane.addTab("Info", createInfoTab(dataset, parentConsole));
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -81,6 +81,17 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
             showError("Could not load Data Tab. Reason - " + e.getMessage());
             return createErrorTab("Could not load Data Tab. Reason - " + e.getMessage());
         }
+
+        return view;
+    }
+
+    private JPanel createInfoTab(EmfDataset dataset, EmfConsole parentConsole) {
+        ServiceLocator serviceLocator = session.serviceLocator();
+        DataEditorService dataEditorService = serviceLocator.dataEditorService();
+
+        InfoTab view = new InfoTab(parentConsole);
+        InfoTabPresenter presenter = new InfoTabPresenter(view, dataset);
+        presenter.doDisplay();
 
         return view;
     }

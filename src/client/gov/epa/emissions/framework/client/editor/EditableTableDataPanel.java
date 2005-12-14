@@ -9,13 +9,16 @@ import gov.epa.emissions.framework.ui.SelectableEmfTableData;
 import gov.epa.emissions.framework.ui.TableData;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.border.CompoundBorder;
 
 public class EditableTableDataPanel extends JPanel {
 
@@ -32,7 +35,16 @@ public class EditableTableDataPanel extends JPanel {
         container.add(table(tableData), BorderLayout.CENTER);
         container.add(bottomPanel(tableData), BorderLayout.PAGE_END);
 
+        setBorder();
         return container;
+    }
+
+    private void setBorder() {
+        javax.swing.border.Border outer = BorderFactory.createEmptyBorder(10, 5, 10, 5);
+        javax.swing.border.Border inner = BorderFactory.createLineBorder(Color.GRAY);
+        CompoundBorder border = BorderFactory.createCompoundBorder(outer, inner);
+
+        super.setBorder(border);
     }
 
     private JPanel bottomPanel(SelectableEmfTableData tableData) {
@@ -42,7 +54,10 @@ public class EditableTableDataPanel extends JPanel {
         JPanel buttonsPanel = buttonsPanel(tableData);
         panel.add(buttonsPanel);
 
-        panel.add(new JLabel("Notes"));
+        JPanel notesLabelPanel = new JPanel(new BorderLayout());
+        notesLabelPanel.add(new JLabel("Notes"), BorderLayout.LINE_START);
+        panel.add(notesLabelPanel);
+
         TextArea notes = new TextArea("Notes", "");
         panel.add(new ScrollableTextArea(notes));
 

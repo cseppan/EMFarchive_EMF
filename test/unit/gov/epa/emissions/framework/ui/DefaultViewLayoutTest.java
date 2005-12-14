@@ -47,7 +47,7 @@ public class DefaultViewLayoutTest extends MockObjectTestCase {
         parent.expects(once()).method("getPosition").will(returnValue(parentPosition));
 
         Mock child = mock(ManagedView.class);
-        Position childPosition = new Position(parentPosition.x() + 25, parentPosition.y() + 25);
+        Position childPosition = new Position(parentPosition.x() + 1*22, parentPosition.y() + 1*22);
         child.expects(once()).method("setPosition").with(eq(childPosition));
 
         ViewLayout layout = new CascadeLayout((EmfView) parent.proxy());
@@ -63,13 +63,13 @@ public class DefaultViewLayoutTest extends MockObjectTestCase {
         ViewLayout layout = new CascadeLayout((EmfView) parent.proxy());
 
         Mock child1 = mock(ManagedView.class);
-        Position child1Position = new Position(parentPosition.x() + 25, parentPosition.y() + 25);
+        Position child1Position = new Position(parentPosition.x() + 1*22, parentPosition.y() + 1*22);
         child1.expects(once()).method("setPosition").with(eq(child1Position));
 
         layout.add((ManagedView) child1.proxy(), "child1");
 
         Mock child2 = mock(ManagedView.class);
-        Position child2Position = new Position(child1Position.x() + 25, child1Position.y() + 25);
+        Position child2Position = new Position(child1Position.x() + 1*22, child1Position.y() + 1*22);
         child2.expects(once()).method("setPosition").with(eq(child2Position));
 
         layout.add((ManagedView) child2.proxy(), "child2");
@@ -83,13 +83,13 @@ public class DefaultViewLayoutTest extends MockObjectTestCase {
         ViewLayout layout = new CascadeLayout((EmfView) parent.proxy());
 
         Mock child1 = mock(ManagedView.class);
-        Position child1Position = new Position(parentPosition.x() + 25, parentPosition.y() + 25);
+        Position child1Position = new Position(parentPosition.x() + 1*22, parentPosition.y() + 1*22);
         child1.expects(once()).method("setPosition").with(eq(child1Position));
 
         layout.add((ManagedView) child1.proxy(), "child1");
 
         Mock child2 = mock(ManagedView.class);
-        Position child2Position = new Position(child1Position.x() + 25, child1Position.y() + 25);
+        Position child2Position = new Position(child1Position.x() + 1*22, child1Position.y() + 1*22);
         child2.expects(once()).method("setPosition").with(eq(child2Position));
         ManagedView child2Proxy = (ManagedView) child2.proxy();
 
@@ -97,7 +97,7 @@ public class DefaultViewLayoutTest extends MockObjectTestCase {
         layout.remove();
 
         Mock child3 = mock(ManagedView.class);
-        Position child3Position = new Position(child1Position.x() + 25, child1Position.y() + 25);
+        Position child3Position = new Position(child1Position.x() + 1*22, child1Position.y() + 1*22);
         child3.expects(once()).method("setPosition").with(eq(child3Position));
 
         layout.add((ManagedView) child3.proxy(), "child3");

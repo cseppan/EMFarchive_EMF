@@ -11,11 +11,11 @@ import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.StatusService;
 import gov.epa.emissions.framework.ui.CascadeLayout;
+import gov.epa.emissions.framework.ui.Dimensions;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -91,12 +91,8 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private void setSize() {
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        double height = dim.getHeight();
-        double width = dim.getWidth();
-        Dimension newDim = new Dimension();
-        newDim.setSize(width * 0.9, height * 0.9);
-        super.setSize(newDim);
+        Dimension dim = new Dimensions().getSize(0.9, 0.9);
+        super.setSize(dim);
     }
 
     private JMenuBar createMenuBar(EmfSession session) {
