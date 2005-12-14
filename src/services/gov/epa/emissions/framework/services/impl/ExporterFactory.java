@@ -50,6 +50,6 @@ public class ExporterFactory {
         if (name.equals(EMFConstants.DATASETTYPE_NAME_TEMPORALPROFILE))
             return new TemporalProfileExporter(dataset, datasource, sqlTypes);
 
-        throw new RuntimeException("Export of Dataset Type - " + name + " unsupported");
+        throw new RuntimeException("Warning files of type " + name + " will not be exported");
     }
 }
