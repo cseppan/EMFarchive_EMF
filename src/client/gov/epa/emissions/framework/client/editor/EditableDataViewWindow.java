@@ -74,13 +74,13 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
 
     private void updateTitle(Version version, String table) {
         super.setTitle(super.getTitle() + ". Version: " + version.getName() + ". Table: " + table);
-        labelPanel.add(new JLabel("    Version:   " + version.getName()));
-        labelPanel.add(new JLabel("    Table:      " + table));
+        labelPanel.add(new JLabel("    Version:    " + version.getName()));
+        labelPanel.add(new JLabel("    Table:       " + table));
     }
 
     private JPanel tablePanel(Version version, String table, DataEditorService service) {
         InternalSource source = source(table, dataset.getInternalSources());
-        TableViewPanel tableView = new TableViewPanel(source, messagePanel);
+        EditableTableViewPanel tableView = new EditableTableViewPanel(dataset, version, source, messagePanel);
         TablePresenter tablePresenter = new TablePresenter(version, table, tableView, service);
         tablePresenter.observe();
 
@@ -105,17 +105,75 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
     private JPanel controlPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
+        panel.add(leftControlPanel(), BorderLayout.LINE_START);
+        panel.add(rightControlPanel(), BorderLayout.LINE_END);
+
+        return panel;
+    }
+
+    private JPanel leftControlPanel() {
+        JPanel panel = new JPanel();
+
+        // TODO: prompt for submit changes, save, and mark final - all in one step
+        Button markFinal = new Button("Mark Final", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    presenter.doMarkFinal();
+                } catch (EmfException e) {
+                    displayError("Could not Mark version as Final. Reason: " + e.getMessage());
+                }
+            }
+
+        });
+        markFinal.setToolTipText("Save changes, Mark version as Final, and Close editor.");
+        panel.add(markFinal);
+
+        return panel;
+    }
+
+    private JPanel rightControlPanel() {
+        JPanel panel = new JPanel();
+
+        // TODO: prompts for Discard and Close (if changes exist)
+
+        Button discard = new Button("Discard", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    presenter.doDiscard();
+                } catch (EmfException e) {
+                    displayError("Could not Discard. Reason: " + e.getMessage());
+                }
+            }
+
+        });
+        discard.setToolTipText("Discard your changes");
+        panel.add(discard);
+
+        Button save = new Button("Save", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    presenter.doSave();
+                } catch (EmfException e) {
+                    displayError("Could not Save. Reason: " + e.getMessage());
+                }
+            }
+
+        });
+        save.setToolTipText("Save your changes");
+        panel.add(save);
+
         Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     presenter.doClose();
                 } catch (EmfException e) {
-                    displayError("Could not close. Reason: " + e.getMessage());
+                    displayError("Could not Close. Reason: " + e.getMessage());
                 }
             }
 
         });
-        panel.add(close, BorderLayout.LINE_END);
+        close.setToolTipText("Close without Saving your changes");
+        panel.add(close);
 
         return panel;
     }

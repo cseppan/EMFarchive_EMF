@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 public class PageDataTest extends TestCase {
 
     public void testShouldReturnStringAsColumnClassForAllColumns() {
-        PageData data = new PageData(null, new Page());
+        PageData data = new PageData(new Page(), null);
 
         assertEquals(String.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
@@ -20,7 +20,7 @@ public class PageDataTest extends TestCase {
     public void testShouldHaveTwoColumnsIgnoringFirstColumnForDisplayPurposes() {
         String[] cols = new String[] { "col1", "col2", "col3" };
 
-        PageData data = new PageData(cols, new Page());
+        PageData data = new PageData(new Page(), cols);
 
         String[] columns = data.columns();
         assertEquals(2, columns.length);
@@ -31,7 +31,7 @@ public class PageDataTest extends TestCase {
     public void testShouldMarkAllColumnsAsNotEditable() {
         String[] cols = new String[] { "col1", "col2", "col3" };
 
-        PageData data = new PageData(cols, new Page());
+        PageData data = new PageData(new Page(), cols);
 
         assertFalse("All columns should not be editable", data.isEditable(0));
         assertFalse("All columns should not be editable", data.isEditable(1));
@@ -49,7 +49,7 @@ public class PageDataTest extends TestCase {
         record2.setTokens(new String[] { "11", "12", "13" });
         page.add(record2);
 
-        PageData data = new PageData(cols, page);
+        PageData data = new PageData(page, cols);
 
         List rows = data.rows();
         assertNotNull("Should have 2 rows", rows);
@@ -67,7 +67,7 @@ public class PageDataTest extends TestCase {
         record2.setTokens(new String[] { "11", "12", "13" });
         page.add(record2);
 
-        PageData data = new PageData(cols, page);
+        PageData data = new PageData(page, cols);
 
         List rows = data.rows();
 

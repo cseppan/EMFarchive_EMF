@@ -56,21 +56,37 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
 
         p.doDiscard();
     }
-    
+
     public void testShouldSaveChangesOnSave() throws Exception {
         Version version = new Version();
         String table = "table";
-        
+
         Mock services = mock(DataEditorService.class);
         Constraint propertyConstraint = and(new HasPropertyWithValue("version", same(version)),
                 new HasPropertyWithValue("table", eq(table)));
         Constraint constraint = and(new IsInstanceOf(EditToken.class), propertyConstraint);
         services.expects(once()).method("save").with(constraint);
-        
+
         EditableDataViewPresenter p = new EditableDataViewPresenter(version, table, null, (DataEditorService) services
                 .proxy());
-        
+
         p.doSave();
+    }
+
+    public void testShouldMarkVersionAsFinalChangesOnMarkFinal() throws Exception {
+        Version version = new Version();
+
+        Mock services = mock(DataEditorService.class);
+        services.expects(once()).method("markFinal").with(same(version)).will(returnValue(null));
+        services.expects(once()).method("close").withNoArguments();
+
+        Mock view = mock(EditableDataView.class);
+        view.expects(once()).method("close").withNoArguments();
+
+        EditableDataViewPresenter p = new EditableDataViewPresenter(version, null, (EditableDataView) view.proxy(),
+                (DataEditorService) services.proxy());
+
+        p.doMarkFinal();
     }
 
 }

@@ -44,7 +44,7 @@ public class TableViewPanel extends JPanel implements TableView {
 
         paginationPanel.updateStatus(page);
 
-        tableModel = new EmfTableModel(new PageData(cols(), page));
+        tableModel = new EmfTableModel(new PageData(page, cols()));
         JScrollPane table = new ScrollableTable(tableModel);
         pageContainer.add(table, BorderLayout.CENTER);
     }

@@ -15,7 +15,7 @@ public class PageData extends AbstractTableData {
 
     private String[] cols;
 
-    public PageData(String[] cols, Page page) {
+    public PageData(Page page, String[] cols) {
         this.cols = cols;
         this.rows = createRows(page);
     }

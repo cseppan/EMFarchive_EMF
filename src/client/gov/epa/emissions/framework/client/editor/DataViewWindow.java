@@ -15,6 +15,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class DataViewWindow extends DisposableInteralFrame implements DataView {
@@ -27,15 +29,30 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
 
     private EmfDataset dataset;
 
+    private JPanel labelPanel;
+
     public DataViewWindow(EmfDataset dataset) {
-        super("Dataset: " + dataset.getName(), new Dimension(900, 750));
+        super("Dataset Viewer - Dataset: " + dataset.getName(), new Dimension(900, 750));
         this.dataset = dataset;
 
         layout = new JPanel(new BorderLayout());
-        messagePanel = new SingleLineMessagePanel();
-        layout.add(messagePanel, BorderLayout.PAGE_START);
+        layout.add(topPanel(dataset), BorderLayout.PAGE_START);
 
         this.getContentPane().add(layout);
+    }
+
+    private JPanel topPanel(EmfDataset dataset) {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        labelPanel = new JPanel();
+        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.Y_AXIS));
+        labelPanel.add(new JLabel("    Dataset:    " + dataset.getName()));
+        panel.add(labelPanel, BorderLayout.LINE_START);
+
+        messagePanel = new SingleLineMessagePanel();
+        panel.add(messagePanel, BorderLayout.CENTER);
+
+        return panel;
     }
 
     public void observe(DataViewPresenter presenter) {
@@ -43,7 +60,7 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
     }
 
     public void display(Version version, String table, DataEditorService service) {
-        super.setTitle(super.getTitle() + ". Version: " + version.getName() + ". Table: " + table);
+        updateTitle(version, table);
 
         JPanel container = new JPanel(new BorderLayout());
 
@@ -55,12 +72,17 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
         super.display();
     }
 
+    private void updateTitle(Version version, String table) {
+        super.setTitle(super.getTitle() + ". Version: " + version.getName() + ". Table: " + table);
+        labelPanel.add(new JLabel("    Version:    " + version.getName()));
+        labelPanel.add(new JLabel("    Table:       " + table));
+    }
+
     private JPanel tablePanel(Version version, String table, DataEditorService service) {
-        TableViewPanel tableView = new TableViewPanel(source(table, dataset.getInternalSources()),
-                messagePanel);
+        TableViewPanel tableView = new TableViewPanel(source(table, dataset.getInternalSources()), messagePanel);
         TablePresenter tablePresenter = new TablePresenter(version, table, tableView, service);
         tablePresenter.observe();
-        
+
         try {
             tablePresenter.doDisplayFirst();
         } catch (EmfException e) {

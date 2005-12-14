@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 
 public class EditablePageTableDataTest extends TestCase {
 
-    private EditablePageTableData data;
+    private EditablePageData data;
 
     private String[] cols;
 
@@ -39,7 +39,7 @@ public class EditablePageTableDataTest extends TestCase {
         cols = new String[] { "col1", "col2", "col3" };
         datasetId = 2;
         version = 34;
-        data = new EditablePageTableData(datasetId, version, page, cols);
+        data = new EditablePageData(datasetId, version, page, cols);
     }
 
     public void testShouldHaveThreeColumns() {

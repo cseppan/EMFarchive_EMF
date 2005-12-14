@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class EditablePageTableData extends AbstractTableData implements SelectableEmfTableData {
+public class EditablePageData extends AbstractTableData implements SelectableEmfTableData {
     private List rows;
 
     private String[] cols;
@@ -24,7 +24,7 @@ public class EditablePageTableData extends AbstractTableData implements Selectab
 
     private ChangeSet changeset;
 
-    public EditablePageTableData(int datasetId, int version, Page page, String[] cols) {
+    public EditablePageData(int datasetId, int version, Page page, String[] cols) {
         this.datasetId = datasetId;
         this.version = version;
         this.cols = cols;

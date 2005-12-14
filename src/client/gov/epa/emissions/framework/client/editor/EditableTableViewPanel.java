@@ -1,8 +1,10 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 
@@ -23,8 +25,14 @@ public class EditableTableViewPanel extends JPanel implements TableView {
 
     private PaginationPanel paginationPanel;
 
-    public EditableTableViewPanel(InternalSource source, MessagePanel messagePanel) {
+    private EmfDataset dataset;
+
+    private Version version;
+
+    public EditableTableViewPanel(EmfDataset dataset, Version version, InternalSource source, MessagePanel messagePanel) {
         super(new BorderLayout());
+        this.dataset = dataset;
+        this.version = version;
         this.source = source;
 
         paginationPanel = new PaginationPanel(messagePanel);
@@ -44,7 +52,10 @@ public class EditableTableViewPanel extends JPanel implements TableView {
 
         paginationPanel.updateStatus(page);
 
-        tableModel = new EmfTableModel(new PageData(cols(), page));
+        // FIXME: why is Dataset Id int, and not long?
+        EditablePageData pageData = new EditablePageData((int) dataset.getDatasetid(), version.getVersion(), page,
+                cols());
+        tableModel = new EmfTableModel(pageData);
         JScrollPane table = new ScrollableTable(tableModel);
         pageContainer.add(table, BorderLayout.CENTER);
     }
