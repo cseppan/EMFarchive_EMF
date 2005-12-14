@@ -94,7 +94,8 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         double height = dim.getHeight();
         double width = dim.getWidth();
-        Dimension newDim = new Dimension((int) (width * 0.9), (int) (height * 0.9));
+        Dimension newDim = new Dimension();
+        newDim.setSize(width * 0.9, height * 0.9);
         super.setSize(newDim);
     }
 
