@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.commons.io.orl.ORLNonRoadImporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
 import gov.epa.emissions.commons.io.orl.ORLPointImporter;
+import gov.epa.emissions.commons.io.temporal.TemporalProfileImporter;
 import gov.epa.emissions.commons.io.temporal.TemporalReferenceImporter;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -75,8 +76,12 @@ public class ImporterFactory {
         
         
         //Temporal Profile
-        // TODO: add importer
-        return null;
+        if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_TEMPORALPROFILE) >= 0) {
+            return new TemporalProfileImporter(file,dataset,datasource,dataType);
+        }
+
+        // If no datasetType match then throw exception
+        throw new RuntimeException("Dataset Type - " + datasetType.getName() + " unsupported");
     }
 
     // FIXME: use a better scheme than rely on 'type names'
