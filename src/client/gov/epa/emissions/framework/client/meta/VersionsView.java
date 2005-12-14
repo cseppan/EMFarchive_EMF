@@ -7,4 +7,6 @@ public interface VersionsView {
     void observe(VersionsPresenter presenter);
 
     void add(Version version);
+
+    void reload(Version[] versions);
 }

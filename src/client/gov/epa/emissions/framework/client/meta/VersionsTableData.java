@@ -13,7 +13,10 @@ public class VersionsTableData extends AbstractTableData {
 
     private List rows;
 
+    private Version[] values;
+
     public VersionsTableData(Version[] values) {
+        this.values = values;
         this.rows = createRows(values);
     }
 
@@ -64,6 +67,10 @@ public class VersionsTableData extends AbstractTableData {
         }
 
         return (Version[]) selected.toArray(new Version[0]);
+    }
+
+    public Version[] getValues() {
+        return values;
     }
 
 }

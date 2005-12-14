@@ -64,7 +64,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
         this.setContentPane(desktop);
 
-        JMenuBar menuBar = createMenuBar(session, desktop);
+        JMenuBar menuBar = createMenuBar(session);
         super.setJMenuBar(menuBar);
 
         messagePanel = new SingleLineMessagePanel();
@@ -83,23 +83,26 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private void setProperties() {
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        double height = dim.getHeight();
-        double width = dim.getWidth();
-        Dimension newDim = new Dimension();
-        newDim.setSize(width*0.91,height*0.91);
-        super.setSize(newDim);
+        setSize();
 
         // FIXME: prompt the user ?
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         super.setResizable(true);
     }
 
-    private JMenuBar createMenuBar(EmfSession session, JDesktopPane desktop) {
+    private void setSize() {
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        double height = dim.getHeight();
+        double width = dim.getWidth();
+        Dimension newDim = new Dimension((int) (width * 0.9), (int) (height * 0.9));
+        super.setSize(newDim);
+    }
+
+    private JMenuBar createMenuBar(EmfSession session) {
         JMenuBar menubar = new JMenuBar();
 
-        menubar.add(createFileMenu(session, desktop));
-        menubar.add(createManageMenu(session, desktop));
+        menubar.add(createFileMenu(session));
+        menubar.add(createManageMenu(session));
         menubar.add(createWindowMenu());
         menubar.add(createHelpMenu());
 
@@ -113,7 +116,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         return menu;
     }
 
-    private JMenu createFileMenu(EmfSession session, JDesktopPane desktop) {
+    private JMenu createFileMenu(EmfSession session) {
         return new FileMenu(session, this, messagePanel, windowLayoutManager);
     }
 
@@ -130,7 +133,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         return menuItem;
     }
 
-    private JMenu createManageMenu(EmfSession session, JDesktopPane desktop) {
+    private JMenu createManageMenu(EmfSession session) {
         manageMenu = new ManageMenu(session, this, messagePanel, windowLayoutManager);
 
         return manageMenu;

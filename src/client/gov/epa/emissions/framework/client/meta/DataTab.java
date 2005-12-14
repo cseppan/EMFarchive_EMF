@@ -57,7 +57,7 @@ public class DataTab extends JPanel implements DataTabView {
 
     private VersionsPanel createVersionsPanel(EmfDataset dataset, DataEditorService service, MessagePanel messagePanel) {
         VersionsPanel versionsPanel = new VersionsPanel(dataset, messagePanel, parentConsole);
-        VersionsPresenter versionsPresenter = new VersionsPresenter(service);
+        VersionsPresenter versionsPresenter = new VersionsPresenter(dataset, service);
         versionsPresenter.observe(versionsPanel);
 
         return versionsPanel;

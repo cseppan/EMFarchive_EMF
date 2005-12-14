@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.client.editor.EditableDataView;
 import gov.epa.emissions.framework.client.editor.EditableDataViewPresenter;
 import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 public class VersionsPresenter {
 
@@ -14,7 +15,10 @@ public class VersionsPresenter {
 
     private VersionsView view;
 
-    public VersionsPresenter(DataEditorService service) {
+    private EmfDataset dataset;
+
+    public VersionsPresenter(EmfDataset dataset, DataEditorService service) {
+        this.dataset = dataset;
         this.service = service;
     }
 
@@ -45,6 +49,13 @@ public class VersionsPresenter {
                         + " is already Final. It should be non-final.");
             service.markFinal(versions[i]);
         }
+
+        reload(dataset);
+    }
+
+    private void reload(EmfDataset dataset) throws EmfException {
+        Version[] updatedVersions = service.getVersions(dataset.getDatasetid());
+        view.reload(updatedVersions);
     }
 
 }

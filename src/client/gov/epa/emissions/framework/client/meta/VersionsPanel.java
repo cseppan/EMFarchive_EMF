@@ -39,6 +39,8 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     private EmfTableModel tableModel;
 
+    private JPanel tablePanel;
+
     public VersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole) {
         super.setLayout(new BorderLayout());
         super.setBorder(new Border("Versions"));
@@ -54,7 +56,15 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     public void display(Version[] versions, InternalSource[] sources) {
         add(tablePanel(versions), BorderLayout.CENTER);
-        add(bottomPanel(versions, sources), BorderLayout.PAGE_END);
+        add(bottomPanel(sources), BorderLayout.PAGE_END);
+    }
+
+    public void reload(Version[] versions) {
+        tablePanel.removeAll();
+
+        ScrollableTable table = createTable(versions);
+        tablePanel.add(table, BorderLayout.CENTER);
+        refreshLayout();
     }
 
     public void add(Version version) {
@@ -63,33 +73,38 @@ public class VersionsPanel extends JPanel implements VersionsView {
     }
 
     private JPanel tablePanel(Version[] versions) {
+        ScrollableTable table = createTable(versions);
+
+        tablePanel = new JPanel(new BorderLayout());
+        tablePanel.add(table, BorderLayout.CENTER);
+
+        return tablePanel;
+    }
+
+    private ScrollableTable createTable(Version[] versions) {
         tableData = new VersionsTableData(versions);
         tableModel = new EmfTableModel(tableData);
 
         ScrollableTable table = new ScrollableTable(tableModel);
         table.disableScrolling();
-
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(table, BorderLayout.CENTER);
-
-        return panel;
+        return table;
     }
 
-    private JPanel bottomPanel(Version[] versions, InternalSource[] sources) {
+    private JPanel bottomPanel(InternalSource[] sources) {
         JPanel container = new JPanel(new BorderLayout());
 
-        container.add(leftControlPanel(versions), BorderLayout.LINE_START);
+        container.add(leftControlPanel(), BorderLayout.LINE_START);
         container.add(rightControlPanel(sources), BorderLayout.LINE_END);
 
         return container;
     }
 
-    private JPanel leftControlPanel(final Version[] versions) {
+    private JPanel leftControlPanel() {
         JPanel panel = new JPanel();
 
         Button view = new Button("New", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doNew(versions);
+                doNew(tableData.getValues());
             }
         });
         panel.add(view);
@@ -189,6 +204,11 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     private void displayError(String message) {
         messagePanel.setError(message);
+        refreshLayout();
+    }
+
+    private void refreshLayout() {
+        super.validate();
     }
 
     private void doEdit(final JComboBox tableCombo) {
@@ -220,6 +240,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     private void clear() {
         messagePanel.clear();
+        refreshLayout();
     }
 
     private String[] tableNames(InternalSource[] sources) {
