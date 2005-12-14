@@ -24,10 +24,11 @@ public class CascadeLayout implements ViewLayout {
     public void add(EmfView child) {
         childCount++;
         Position parentPosition = parent.getPosition();
-        int newx = parentPosition.x() + (childCount % 10) * 22;
-        int newy = parentPosition.y() + (childCount % 10) * 22;
-        /* don't let the windows start cascading off the bottom of the
-         * screen.  Would like to know how big the child window is here.
+        int newx = parentPosition.x() + (childCount % 8) * 22;
+        int newy = parentPosition.y() + (childCount % 8) * 22;
+        /* don't let the windows start cascading off the bottom of the screen.
+         * Would really like to know how big the child window is here to do a
+         * better job of this.
          */
         Position childPosition = new Position(newx, newy);
 
