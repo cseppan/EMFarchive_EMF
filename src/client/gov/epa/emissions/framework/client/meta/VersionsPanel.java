@@ -24,7 +24,6 @@ import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class VersionsPanel extends JPanel implements VersionsView {
 
@@ -66,8 +65,10 @@ public class VersionsPanel extends JPanel implements VersionsView {
     private JPanel tablePanel(Version[] versions) {
         tableData = new VersionsTableData(versions);
         tableModel = new EmfTableModel(tableData);
-        JScrollPane table = new ScrollableTable(tableModel);
-
+        
+        ScrollableTable table = new ScrollableTable(tableModel);
+        table.disableScrolling();
+        
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(table, BorderLayout.CENTER);
 

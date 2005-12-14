@@ -7,26 +7,33 @@ import javax.swing.table.TableColumnModel;
 
 public class ScrollableTable extends JScrollPane {
 
+    private JTable table;
+
     public ScrollableTable(EmfTableModel tableModel) {
         super(VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        JTable table = table(tableModel);
+        table = table(tableModel);
         super.setViewportView(table);
     }
 
     private JTable table(EmfTableModel tableModel) {
         JTable table = new JTable(tableModel);
         table.setRowHeight(25);
-        // essential for horizontal scrolling
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        setColumnWidths(table.getColumnModel());
-        table.repaint();
+        enableScrolling(table);
+        setColWidthsBasedOnColNames(table);
 
         return table;
     }
 
-    private void setColumnWidths(TableColumnModel model) {
+    private void enableScrolling(JTable table) {
+        // essential for horizontal scrolling
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    }
+
+    private void setColWidthsBasedOnColNames(JTable table) {
+        TableColumnModel model = table.getColumnModel();
+
         for (int i = 0; i < model.getColumnCount(); i++) {
             TableColumn col = model.getColumn(i);
             String headerValue = (String) col.getHeaderValue();
@@ -34,6 +41,11 @@ public class ScrollableTable extends JScrollPane {
             col.setMinWidth(width);
             col.setResizable(true);
         }
+        table.repaint();
+    }
+
+    public void disableScrolling() {
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
     }
 
 }

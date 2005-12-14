@@ -18,7 +18,6 @@ public class Mapper {
     public void registerBeanMapping(Call call, Class clazz, QName beanQName) {
         call.registerTypeMapping(clazz, beanQName, new BeanSerializerFactory(clazz, beanQName),
                 new BeanDeserializerFactory(clazz, beanQName));
-
     }
 
     public void registerArrayMapping(Call call, Class cls, QName qname) {

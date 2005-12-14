@@ -12,12 +12,10 @@ import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 public class EditableTableViewPanel extends JPanel implements TableView {
-
-    private EmfTableModel tableModel;
 
     private InternalSource source;
 
@@ -35,11 +33,15 @@ public class EditableTableViewPanel extends JPanel implements TableView {
         this.version = version;
         this.source = source;
 
+        doLayout(messagePanel);
+    }
+
+    private void doLayout(MessagePanel messagePanel) {
         paginationPanel = new PaginationPanel(messagePanel);
-        super.add(paginationPanel, BorderLayout.PAGE_START);
+        add(paginationPanel, BorderLayout.PAGE_START);
 
         pageContainer = new JPanel(new BorderLayout());
-        super.add(pageContainer, BorderLayout.CENTER);
+        add(pageContainer, BorderLayout.CENTER);
     }
 
     public void observe(TablePresenter presenter) {
@@ -53,11 +55,15 @@ public class EditableTableViewPanel extends JPanel implements TableView {
         paginationPanel.updateStatus(page);
 
         // FIXME: why is Dataset Id int, and not long?
+        pageContainer.add(createEditablePage(page), BorderLayout.CENTER);
+    }
+
+    private JComponent createEditablePage(Page page) {
         EditablePageData pageData = new EditablePageData((int) dataset.getDatasetid(), version.getVersion(), page,
                 cols());
-        tableModel = new EmfTableModel(pageData);
-        JScrollPane table = new ScrollableTable(tableModel);
-        pageContainer.add(table, BorderLayout.CENTER);
+        EmfTableModel tableModel = new EmfTableModel(pageData);
+
+        return new ScrollableTable(tableModel);
     }
 
     // Filter out the first four (version-specific cols)

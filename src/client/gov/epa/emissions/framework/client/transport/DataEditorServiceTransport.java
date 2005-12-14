@@ -205,7 +205,7 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             call.invoke(new Object[] { token });
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not open editing session for" + token, e);
+            throwExceptionDueToServiceErrors("Could not open editing session for " + token.key(), e);
         } finally {
             call.removeAllParameters();
         }
@@ -219,7 +219,7 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             call.invoke(new Object[] { token });
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not close editing session for" + token, e);
+            throwExceptionDueToServiceErrors("Could not close editing session for " + token.key(), e);
         } finally {
             call.removeAllParameters();
         }
