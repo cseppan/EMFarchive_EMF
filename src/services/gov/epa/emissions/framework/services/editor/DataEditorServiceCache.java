@@ -164,7 +164,7 @@ public class DataEditorServiceCache {
     private void initReader(EditToken token) throws SQLException {
         if (!readersMap.containsKey(token.key())) {
             ScrollableVersionedRecords records = recordsReader.fetch(token.getVersion(), token.getTable());
-            PageReader reader = new PageReader(20, records);
+            PageReader reader = new PageReader(100, records);
 
             readersMap.put(token.key(), reader);
         }

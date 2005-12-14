@@ -113,7 +113,68 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
 
     private JPanel leftControlPanel() {
         JPanel panel = new JPanel();
+        panel.add(markFinalButton());
 
+        return panel;
+    }
+
+    private JPanel rightControlPanel() {
+        JPanel panel = new JPanel();
+
+        panel.add(discardButton());
+        panel.add(saveButton());
+        panel.add(closeButton());
+
+        return panel;
+    }
+
+    private Button closeButton() {
+        Button close = new Button("Close", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    presenter.doClose();
+                } catch (EmfException e) {
+                    displayError("Could not Close. Reason: " + e.getMessage());
+                }
+            }
+
+        });
+        close.setToolTipText("Close without Saving your changes");
+        return close;
+    }
+
+    private Button saveButton() {
+        Button save = new Button("Save", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    presenter.doSave();
+                } catch (EmfException e) {
+                    displayError("Could not Save. Reason: " + e.getMessage());
+                }
+            }
+
+        });
+        save.setToolTipText("Save your changes");
+        return save;
+    }
+
+    private Button discardButton() {
+        // TODO: prompts for Discard and Close (if changes exist)
+        Button discard = new Button("Discard", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    presenter.doDiscard();
+                } catch (EmfException e) {
+                    displayError("Could not Discard. Reason: " + e.getMessage());
+                }
+            }
+
+        });
+        discard.setToolTipText("Discard your changes");
+        return discard;
+    }
+
+    private Button markFinalButton() {
         // TODO: prompt for submit changes, save, and mark final - all in one step
         Button markFinal = new Button("Mark Final", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -126,56 +187,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
 
         });
         markFinal.setToolTipText("Save changes, Mark version as Final, and Close editor.");
-        panel.add(markFinal);
-
-        return panel;
-    }
-
-    private JPanel rightControlPanel() {
-        JPanel panel = new JPanel();
-
-        // TODO: prompts for Discard and Close (if changes exist)
-
-        Button discard = new Button("Discard", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doDiscard();
-                } catch (EmfException e) {
-                    displayError("Could not Discard. Reason: " + e.getMessage());
-                }
-            }
-
-        });
-        discard.setToolTipText("Discard your changes");
-        panel.add(discard);
-
-        Button save = new Button("Save", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doSave();
-                } catch (EmfException e) {
-                    displayError("Could not Save. Reason: " + e.getMessage());
-                }
-            }
-
-        });
-        save.setToolTipText("Save your changes");
-        panel.add(save);
-
-        Button close = new Button("Close", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doClose();
-                } catch (EmfException e) {
-                    displayError("Could not Close. Reason: " + e.getMessage());
-                }
-            }
-
-        });
-        close.setToolTipText("Close without Saving your changes");
-        panel.add(close);
-
-        return panel;
+        return markFinal;
     }
 
     private void displayError(String message) {

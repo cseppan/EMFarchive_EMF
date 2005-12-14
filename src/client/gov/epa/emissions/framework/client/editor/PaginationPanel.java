@@ -46,9 +46,11 @@ public class PaginationPanel extends JPanel {
     private void doLayout(int totalRecords) {
         JPanel container = new JPanel();
 
+        JLabel currentName = new JLabel("Current: ");
+        currentName.setToolTipText("Range of displayed records");
+        container.add(currentName);
         current = new JLabel("               ");
         current.setToolTipText("Range of displayed records");
-        container.add(new JLabel("Current: "));
         container.add(current);
 
         JLabel total = new JLabel("Total: " + totalRecords);

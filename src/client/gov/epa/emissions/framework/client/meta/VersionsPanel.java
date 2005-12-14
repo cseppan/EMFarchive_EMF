@@ -21,11 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.CompoundBorder;
 
 public class VersionsPanel extends JPanel implements VersionsView {
 
@@ -47,11 +49,17 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     public VersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole) {
         super.setLayout(new BorderLayout());
-        super.setBorder(new Border("Versions"));
+        setBorder();
 
         this.dataset = dataset;
         this.messagePanel = messagePanel;
         this.parentConsole = parentConsole;
+    }
+
+    private void setBorder() {
+        javax.swing.border.Border outer = BorderFactory.createEmptyBorder(5, 2, 5, 2);
+        CompoundBorder border = BorderFactory.createCompoundBorder(outer, new Border("Versions"));
+        super.setBorder(border);
     }
 
     public void observe(VersionsPresenter presenter) {
@@ -217,7 +225,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
         }
 
         Version[] versions = tableData.selected();
-        if (versions.length >= 1) {
+        if (versions.length < 1) {
             displayError("Please select at least one Version");
             return;
         }

@@ -77,7 +77,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Page page = service.getPage(token, 1);
         assertNotNull("Should be able to get Page 1", page);
 
-        assertEquals(20, page.count());
+        assertEquals(100, page.count());
         VersionedRecord[] records = page.getRecords();
         assertEquals(page.count(), records.length);
         for (int i = 0; i < records.length; i++) {

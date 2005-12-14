@@ -5,13 +5,13 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.ui.EmfTableModel;
-import gov.epa.emissions.framework.ui.ScrollableTable;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -29,6 +29,8 @@ public class EditableTableViewPanel extends JPanel implements TableView {
 
     public EditableTableViewPanel(EmfDataset dataset, Version version, InternalSource source, MessagePanel messagePanel) {
         super(new BorderLayout());
+        super.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
         this.dataset = dataset;
         this.version = version;
         this.source = source;
@@ -61,9 +63,7 @@ public class EditableTableViewPanel extends JPanel implements TableView {
     private JComponent createEditablePage(Page page) {
         EditablePageData pageData = new EditablePageData((int) dataset.getDatasetid(), version.getVersion(), page,
                 cols());
-        EmfTableModel tableModel = new EmfTableModel(pageData);
-
-        return new ScrollableTable(tableModel);
+        return new EditableTableDataPanel(pageData);
     }
 
     // Filter out the first four (version-specific cols)
