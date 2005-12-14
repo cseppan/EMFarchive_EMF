@@ -38,6 +38,9 @@ public class VersionsPresenter {
     }
 
     public void doEdit(Version version, String table, EditableDataView view) throws EmfException {
+        if (version.isFinalVersion())
+            throw new EmfException("Cannot edit a Version(" + version.getVersion() + ") that is Final.");
+
         EditableDataViewPresenter presenter = new EditableDataViewPresenter(version, table, view, service);
         presenter.display();
     }

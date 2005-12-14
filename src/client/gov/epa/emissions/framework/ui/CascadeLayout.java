@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.client.ManagedView;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DefaultViewLayout implements ViewLayout {
+public class CascadeLayout implements ViewLayout {
 
     private EmfView parent;
 
@@ -14,7 +14,7 @@ public class DefaultViewLayout implements ViewLayout {
 
     private Map children;
 
-    public DefaultViewLayout(EmfView parent) {
+    public CascadeLayout(EmfView parent) {
         this.parent = parent;
         childCount = 0;
 

@@ -16,7 +16,7 @@ public class DefaultViewLayoutTest extends MockObjectTestCase {
         child.expects(once()).method("setPosition");
         child.stubs().method("isAlive").will(returnValue(Boolean.TRUE));
 
-        ViewLayout layout = new DefaultViewLayout((EmfView) parent.proxy());
+        ViewLayout layout = new CascadeLayout((EmfView) parent.proxy());
 
         layout.add((ManagedView) child.proxy(), "1");
         assertTrue("Should have been added to the layout", layout.available("1"));
@@ -34,7 +34,7 @@ public class DefaultViewLayoutTest extends MockObjectTestCase {
         child.expects(once()).method("bringToFront");
         child.stubs().method("isAlive").will(returnValue(Boolean.TRUE));
         
-        ViewLayout layout = new DefaultViewLayout((EmfView) parent.proxy());
+        ViewLayout layout = new CascadeLayout((EmfView) parent.proxy());
 
         layout.add((ManagedView) child.proxy(), "1");
         assertTrue("Should have been added to the layout", layout.activate("1"));
@@ -50,7 +50,7 @@ public class DefaultViewLayoutTest extends MockObjectTestCase {
         Position childPosition = new Position(parentPosition.x() + 25, parentPosition.y() + 25);
         child.expects(once()).method("setPosition").with(eq(childPosition));
 
-        ViewLayout layout = new DefaultViewLayout((EmfView) parent.proxy());
+        ViewLayout layout = new CascadeLayout((EmfView) parent.proxy());
 
         layout.add((ManagedView) child.proxy(), "child");
     }
@@ -60,7 +60,7 @@ public class DefaultViewLayoutTest extends MockObjectTestCase {
         Position parentPosition = new Position(10, 20);
         parent.stubs().method("getPosition").will(returnValue(parentPosition));
 
-        ViewLayout layout = new DefaultViewLayout((EmfView) parent.proxy());
+        ViewLayout layout = new CascadeLayout((EmfView) parent.proxy());
 
         Mock child1 = mock(ManagedView.class);
         Position child1Position = new Position(parentPosition.x() + 25, parentPosition.y() + 25);
@@ -80,7 +80,7 @@ public class DefaultViewLayoutTest extends MockObjectTestCase {
         Position parentPosition = new Position(10, 20);
         parent.stubs().method("getPosition").will(returnValue(parentPosition));
 
-        ViewLayout layout = new DefaultViewLayout((EmfView) parent.proxy());
+        ViewLayout layout = new CascadeLayout((EmfView) parent.proxy());
 
         Mock child1 = mock(ManagedView.class);
         Position child1Position = new Position(parentPosition.x() + 25, parentPosition.y() + 25);

@@ -10,7 +10,7 @@ import gov.epa.emissions.framework.client.status.StatusPresenter;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.StatusService;
-import gov.epa.emissions.framework.ui.DefaultViewLayout;
+import gov.epa.emissions.framework.ui.CascadeLayout;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.awt.Component;
@@ -51,7 +51,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         user = session.getUser();
         this.serviceLocator = session.serviceLocator();
 
-        this.windowLayoutManager = new DefaultViewLayout(this);
+        this.windowLayoutManager = new CascadeLayout(this);
 
         setProperties();
         setLayout(session);

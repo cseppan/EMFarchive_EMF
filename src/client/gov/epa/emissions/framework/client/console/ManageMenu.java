@@ -17,7 +17,7 @@ import gov.epa.emissions.framework.client.data.SectorsManagerWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.UserService;
-import gov.epa.emissions.framework.ui.DefaultViewLayout;
+import gov.epa.emissions.framework.ui.CascadeLayout;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 import java.awt.event.ActionEvent;
@@ -137,7 +137,7 @@ public class ManageMenu extends JMenu {
         viewLayout.add(view, "DatasetTypes Manager");
         parent.addToDesktop(view);
 
-        ViewLayout viewLayout = new DefaultViewLayout(view);
+        ViewLayout viewLayout = new CascadeLayout(view);
         DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(view, serviceLocator, viewLayout);
         presenter.doDisplay();
     }
@@ -150,7 +150,7 @@ public class ManageMenu extends JMenu {
         viewLayout.add(view, "Sectors Manager");
         parent.addToDesktop(view);
 
-        ViewLayout sectorsLayout = new DefaultViewLayout(view);
+        ViewLayout sectorsLayout = new CascadeLayout(view);
         SectorsManagerPresenter presenter = new SectorsManagerPresenter(view, dataServices, sectorsLayout);
         presenter.doDisplay();
     }
@@ -163,7 +163,7 @@ public class ManageMenu extends JMenu {
         viewLayout.add(datasetsBrowserView, "Datasets Browser");
         parent.addToDesktop(datasetsBrowserView);
 
-        ViewLayout browserLayout = new DefaultViewLayout(datasetsBrowserView);
+        ViewLayout browserLayout = new CascadeLayout(datasetsBrowserView);
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session.serviceLocator(), browserLayout);
         presenter.doDisplay(datasetsBrowserView);
     }
@@ -191,7 +191,7 @@ public class ManageMenu extends JMenu {
             viewLayout.add(usesrManagerView, "Users Manager");
             parent.addToDesktop(usesrManagerView);
 
-            ViewLayout userManagerViewLayout = new DefaultViewLayout(usesrManagerView);
+            ViewLayout userManagerViewLayout = new CascadeLayout(usesrManagerView);
             UsersManagerPresenter presenter = new UsersManagerPresenter(session.getUser(), userServices,
                     userManagerViewLayout);
             presenter.display(usesrManagerView);

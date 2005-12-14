@@ -46,11 +46,11 @@ public class DataTab extends JPanel implements DataTabView {
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
-        sourcesPanel = new JPanel(new BorderLayout());
-        container.add(sourcesPanel);
-
         versionsPanel = createVersionsPanel(dataset, service, messagePanel);
         container.add(versionsPanel);
+
+        sourcesPanel = new JPanel(new BorderLayout());
+        container.add(sourcesPanel);
 
         return container;
     }
@@ -64,11 +64,11 @@ public class DataTab extends JPanel implements DataTabView {
     }
 
     public void displayInternalSources(InternalSource[] sources) {
-        displaySources("Internal Sources", new InternalSourcesTableData(sources));
+        displaySources("Data Tables", new InternalSourcesTableData(sources));
     }
 
     public void displayExternalSources(ExternalSource[] sources) {
-        displaySources("External Sources", new ExternalSourcesTableData(sources));
+        displaySources("External Files", new ExternalSourcesTableData(sources));
     }
 
     public void displayVersions(Version[] versions, InternalSource[] sources) {

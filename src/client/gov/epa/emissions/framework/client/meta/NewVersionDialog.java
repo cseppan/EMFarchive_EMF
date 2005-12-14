@@ -16,6 +16,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -91,8 +92,10 @@ public class NewVersionDialog extends Dialog {
         JPanel panel = new JPanel();
         Button ok = new Button("Ok", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                shouldCreate = true;
-                close();
+                if (verifyInput()) {
+                    shouldCreate = true;
+                    close();
+                }
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -107,6 +110,14 @@ public class NewVersionDialog extends Dialog {
         panel.add(cancel);
 
         return panel;
+    }
+
+    protected boolean verifyInput() {
+        if (name().trim().length() != 0)
+            return true;
+
+        JOptionPane.showMessageDialog(super.getParent(), "Please enter Name", "Error", JOptionPane.ERROR_MESSAGE);
+        return false;
     }
 
     protected void close() {

@@ -47,6 +47,22 @@ public class VersionsPresenterTest extends MockObjectTestCase {
         presenter.doEdit(version, table, (EditableDataView) dataView.proxy());
     }
 
+    public void testShouldRaiseErrorOnEditWhenVersionIsFinal() throws Exception {
+        Version version = new Version();
+        version.markFinal();
+
+        VersionsPresenter presenter = new VersionsPresenter(null, null);
+
+        try {
+            presenter.doEdit(version, null, null);
+        } catch (EmfException e) {
+            assertEquals("Cannot edit a Version(" + version.getVersion() + ") that is Final.", e.getMessage());
+            return;
+        }
+
+        fail("Should have failed to edit a Version that is already Final.");
+    }
+
     public void testShouldDeriveNewVersionOnNew() throws Exception {
         Version version = new Version();
         Version derived = new Version();
