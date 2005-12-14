@@ -33,8 +33,12 @@ public class DataEditorServiceCache {
 
     private Map changesetsMap;
 
-    public DataEditorServiceCache(VersionedRecordsReader reader, Datasource datasource, SqlDataTypes sqlTypes) {
+    private VersionedRecordsWriterFactory writerFactory;
+
+    public DataEditorServiceCache(VersionedRecordsReader reader, VersionedRecordsWriterFactory writerFactory,
+            Datasource datasource, SqlDataTypes sqlTypes) {
         recordsReader = reader;
+        this.writerFactory = writerFactory;
         this.datasource = datasource;
         this.sqlTypes = sqlTypes;
 
@@ -43,32 +47,82 @@ public class DataEditorServiceCache {
         changesetsMap = new HashMap();
     }
 
-    public PageReader reader(EditToken token) throws SQLException {
-        Object key = token.key();
-        if (!readersMap.containsKey(key)) {
-            ScrollableVersionedRecords records = recordsReader.fetch(token.getVersion(), token.getTable());
-            PageReader reader = new PageReader(20, records);
-
-            readersMap.put(key, reader);
-        }
-
-        return (PageReader) readersMap.get(key);
+    public PageReader reader(EditToken token) {
+        return (PageReader) readersMap.get(token.key());
 
     }
 
-    public VersionedRecordsWriter writer(EditToken token) throws SQLException {
-        Object key = token.key();
-        if (!writersMap.containsKey(key)) {
-            VersionedRecordsWriter writer = new VersionedRecordsWriter(datasource, token.getTable(), sqlTypes);
-            writersMap.put(key, writer);
+    public VersionedRecordsWriter writer(EditToken token) {
+        return (VersionedRecordsWriter) writersMap.get(token.key());
+    }
+
+    /*
+     * Keeps a two-level mapping. First map, ChangeSetMap is a map of tokens and PageChangeSetMap. PageChangeSetMap maps
+     * Page Number to Change Sets (of that Page)
+     */
+    public List changesets(EditToken token, int pageNumber) throws SQLException {
+        Map map = pageChangesetsMap(token);
+        Integer pageKey = pageChangesetsKey(pageNumber);
+        if (!map.containsKey(pageKey)) {
+            map.put(pageKey, new ArrayList());
         }
 
-        return (VersionedRecordsWriter) writersMap.get(key);
+        return (List) map.get(pageKey);
+    }
+
+    public void submitChangeSet(EditToken token, ChangeSet changeset, int pageNumber) throws SQLException {
+        List list = changesets(token, pageNumber);
+        list.add(changeset);
+    }
+
+    public void discardChangeSets(EditToken token) throws SQLException {
+        Map pageChangsetsMap = pageChangesetsMap(token);
+        pageChangsetsMap.clear();
+    }
+
+    public List changesets(EditToken token) throws SQLException {
+        List all = new ArrayList();
+        Map pageChangesetsMap = pageChangesetsMap(token);
+        Set keys = new TreeSet(pageChangesetsMap.keySet());
+        for (Iterator iter = keys.iterator(); iter.hasNext();) {
+            List list = (List) pageChangesetsMap.get(iter.next());
+            all.addAll(list);
+        }
+
+        return all;
+    }
+
+    public void init(EditToken token) throws SQLException {
+        initChangesetsMap(token);
+        initReader(token);
+        initWriter(token);
+    }
+
+    public void close(EditToken token) throws SQLException {
+        removeChangesets(token);
+        closeReader(token);
+        closeWriter(token);
+    }
+
+    private void closeReader(EditToken token) throws SQLException {
+        PageReader reader = (PageReader) readersMap.remove(token.key());
+        reader.close();
+    }
+
+    private void closeWriter(EditToken token) throws SQLException {
+        VersionedRecordsWriter writer = (VersionedRecordsWriter) writersMap.remove(token.key());
+        writer.close();
     }
 
     public void invalidate() throws SQLException {
         closeReaders();
         closeWriters();
+        changesetsMap.clear();
+    }
+
+    private void removeChangesets(EditToken token) throws SQLException {
+        discardChangeSets(token);
+        changesetsMap.remove(token.key());
     }
 
     private void closeWriters() throws SQLException {
@@ -91,53 +145,40 @@ public class DataEditorServiceCache {
         readersMap.clear();
     }
 
-    /*
-     * Keeps a two-level mapping. First map, ChangeSetMap is a map of tokens and PageChangeSetMap. PageChangeSetMap maps
-     * Page Number to Change Sets (of that Page)
-     */
-    public List changesets(EditToken token, int pageNumber) {
-        Map map = pageChangesetsMap(token);
-        Integer pageKey = pageChangesetsKey(pageNumber);
-        if (!map.containsKey(pageKey)) {
-            map.put(pageKey, new ArrayList());
-        }
-
-        return (List) map.get(pageKey);
-    }
-
-    public void submitChangeSet(EditToken token, ChangeSet changeset, int pageNumber) {
-        List list = changesets(token, pageNumber);
-        list.add(changeset);
-    }
-
-    public void discardChangeSets(EditToken token) {
-        Map pageChangsetsMap = (Map) changesetsMap.remove(token.key());// clear
-        pageChangsetsMap.clear();
-    }
-
-    public List changesets(EditToken token) {
-        List all = new ArrayList();
-        Map pageChangesetsMap = (Map) changesetsMap.get(token.key());
-        Set keys = new TreeSet(pageChangesetsMap.keySet());
-        for (Iterator iter = keys.iterator(); iter.hasNext();) {
-            List list = (List) pageChangesetsMap.get(iter.next());
-            all.addAll(list);
-        }
-
-        return all;
-    }
-
     private Integer pageChangesetsKey(int pageNumber) {
         return new Integer(pageNumber);
     }
 
-    private Map pageChangesetsMap(EditToken token) {
-        Object key = token.key();
-        if (!changesetsMap.containsKey(key)) {
-            changesetsMap.put(key, new HashMap());
-        }
+    private Map pageChangesetsMap(EditToken token) throws SQLException {
+        init(token);
+        return (Map) changesetsMap.get(token.key());
+    }
 
-        return (Map) changesetsMap.get(key);
+    private void initWriter(EditToken token) throws SQLException {
+        if (!writersMap.containsKey(token.key())) {
+            VersionedRecordsWriter writer = writerFactory.create(datasource, token.getTable(), sqlTypes);
+            writersMap.put(token.key(), writer);
+        }
+    }
+
+    private void initReader(EditToken token) throws SQLException {
+        if (!readersMap.containsKey(token.key())) {
+            ScrollableVersionedRecords records = recordsReader.fetch(token.getVersion(), token.getTable());
+            PageReader reader = new PageReader(20, records);
+
+            readersMap.put(token.key(), reader);
+        }
+    }
+
+    private void initChangesetsMap(EditToken token) {
+        if (!changesetsMap.containsKey(token.key())) {
+            changesetsMap.put(token.key(), new HashMap());
+        }
+    }
+
+    public void reload(EditToken token) throws SQLException {
+        close(token);
+        init(token);
     }
 
 }

@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
 import gov.epa.emissions.commons.db.version.ChangeSet;
+import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
@@ -110,12 +111,26 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
-    public void submit(EditToken token, ChangeSet changeset, int pageNumber) {
-        cache.submitChangeSet(token, changeset, pageNumber);
+    public void submit(EditToken token, ChangeSet changeset, int pageNumber) throws EmfException {
+        try {
+            cache.submitChangeSet(token, changeset, pageNumber);
+        } catch (SQLException e) {
+            log.error("Could not submit changes for Dataset: " + token.datasetId() + ". Version: " + token.getVersion()
+                    + "\t" + e.getMessage(), e);
+            throw new EmfException("Could not submit changes for Dataset: " + token.datasetId() + ". Version: "
+                    + token.getVersion() + "\t" + e.getMessage());
+        }
     }
 
-    public void discard(EditToken token) {
-        cache.discardChangeSets(token);
+    public void discard(EditToken token) throws EmfException {
+        try {
+            cache.discardChangeSets(token);
+        } catch (SQLException e) {
+            log.error("Could not discard changes for Dataset: " + token.datasetId() + ". Version: "
+                    + token.getVersion() + "\t" + e.getMessage(), e);
+            throw new EmfException("Could not discard changes for Dataset: " + token.datasetId() + ". Version: "
+                    + token.getVersion() + "\t" + e.getMessage());
+        }
     }
 
     public void save(EditToken token) throws EmfException {
@@ -126,19 +141,13 @@ public class DataEditorServiceImpl implements DataEditorService {
                 ChangeSet element = (ChangeSet) iter.next();
                 writer.update(element);
             }
-
-            flushCache(token);
+            cache.reload(token);
         } catch (Exception e) {
             log.error("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
                     + token.getVersion() + "\t" + e.getMessage(), e);
             throw new EmfException("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
                     + token.getVersion());
         }
-    }
-
-    private void flushCache(EditToken token) throws SQLException {
-        discard(token);
-        cache.closeReaders();
     }
 
     public Version markFinal(Version derived) throws EmfException {
@@ -170,11 +179,23 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
+    public void openSession(EditToken token) throws EmfException {
+        try {
+            cache.init(token);
+        } catch (SQLException e) {
+            log.error("Could not initialize editing Session for Dataset: " + token.datasetId() + ", Version: "
+                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
+            throw new EmfException("Could not initialize editing Session for Dataset: " + token.datasetId()
+                    + ", Version: " + token.getVersion().getVersion() + ". Reason: " + e.getMessage());
+        }
+    }
+
     private void init(DbServer dbServer) throws SQLException {
         this.datasource = dbServer.getEmissionsDatasource();
         versions = new Versions(datasource);
-        reader = new VersionedRecordsReader(datasource);
-        cache = new DataEditorServiceCache(reader, datasource, dbServer.getSqlDataTypes());
+        reader = new DefaultVersionedRecordsReader(datasource);
+        VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
+        cache = new DataEditorServiceCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
     }
 
     private void invalidateCache() throws EmfException {
@@ -192,6 +213,17 @@ public class DataEditorServiceImpl implements DataEditorService {
     protected void finalize() throws Throwable {
         this.close();
         super.finalize();
+    }
+
+    public void closeSession(EditToken token) throws EmfException {
+        try {
+            cache.close(token);
+        } catch (SQLException e) {
+            log.error("Could not close editing Session for Dataset: " + token.datasetId() + ", Version: "
+                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
+            throw new EmfException("Could not close editing Session for Dataset: " + token.datasetId() + ", Version: "
+                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage());
+        }
     }
 
 }

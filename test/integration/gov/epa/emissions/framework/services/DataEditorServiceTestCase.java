@@ -5,9 +5,11 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
+import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
+import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
@@ -26,6 +28,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
     private String table;
 
+    private EditToken token;
+
     protected void setUpService(DataEditorService service) throws Exception {
         this.service = service;
         datasource = emissions();
@@ -35,6 +39,13 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         dataset.setName(table);
         setTestValues(dataset);
 
+        doImport();
+
+        token = editToken();
+        service.openSession(token);
+    }
+
+    private void doImport() throws ImporterException {
         File file = new File("test/data/orl/nc", "midsize-nonpoint.txt");
         ORLNonPointImporter importer = new ORLNonPointImporter(file, dataset, datasource, dataTypes());
 
@@ -50,6 +61,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     }
 
     protected void tearDown() throws Exception {
+        service.closeSession(token);
+
         DbUpdate dbUpdate = new DbUpdate(datasource.getConnection());
         dbUpdate.dropTable(datasource.getName(), dataset.getName());
 
@@ -59,7 +72,6 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     }
 
     public void testShouldReturnExactlyTenPages() throws EmfException {
-        EditToken token = editToken();
         assertEquals(10, service.getPageCount(token));
 
         Page page = service.getPage(token, 1);
@@ -194,10 +206,12 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         changeset.addNew(record7);
 
         EditToken token = new EditToken(versionOne, table);
+        service.openSession(token);
+
         service.submit(token, changeset, 1);
         service.save(token);
 
-        VersionedRecordsReader reader = new VersionedRecordsReader(datasource);
+        VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
         int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName()).length;
 
         VersionedRecord[] records = reader.fetchAll(versionOne, dataset.getName());
@@ -232,7 +246,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         service.save(token);
 
-        VersionedRecordsReader reader = new VersionedRecordsReader(datasource);
+        VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
         int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName()).length;
 
         VersionedRecord[] records = reader.fetchAll(versionOne, dataset.getName());
@@ -259,7 +273,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         service.discard(token);
 
-        VersionedRecordsReader reader = new VersionedRecordsReader(datasource);
+        VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
 
         VersionedRecord[] versionZeroRecords = reader.fetchAll(versionZero, dataset.getName());
         VersionedRecord[] versionOneRecords = reader.fetchAll(versionOne, dataset.getName());
@@ -276,6 +290,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
+        service.openSession(token);
         Page page = service.getPage(token, 1);
 
         ChangeSet changeset = new ChangeSet();
@@ -310,6 +325,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
+        service.openSession(token);
+        
         Page page = service.getPage(token, 1);
 
         ChangeSet changeset = new ChangeSet();
@@ -347,7 +364,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
-
+        service.openSession(token);
+        
         // page 1 changes
         ChangeSet page1ChangeSet = new ChangeSet();
         page1ChangeSet.setVersion(versionOne);
@@ -383,7 +401,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
-
+        service.openSession(token);
+        
         // page 1 changes
         ChangeSet page1ChangeSet = new ChangeSet();
         page1ChangeSet.setVersion(versionOne);
@@ -410,11 +429,11 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         assertEquals("v 1", derived.getName());
 
         Version finalVersion = service.markFinal(derived);
-
-        assertNotNull("Should be able to mark a 'derived' as a Final version", derived);
         assertEquals(derived.getDatasetId(), finalVersion.getDatasetId());
         assertEquals(derived.getVersion(), finalVersion.getVersion());
-        assertEquals("0", finalVersion.getPath());
-        assertTrue("Derived version should be final on being marked 'final'", finalVersion.isFinalVersion());
+
+        Version[] updatedVersions = service.getVersions(dataset.getDatasetid());
+        assertEquals(versionZero.getVersion(), updatedVersions[0].getVersion());
+        assertEquals(finalVersion.getVersion(), updatedVersions[1].getVersion());
     }
 }

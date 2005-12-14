@@ -191,7 +191,35 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             call.invoke(new Object[] { token });
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not submit changes for " + token, e);
+            throwExceptionDueToServiceErrors("Could not discard changes for " + token, e);
+        } finally {
+            call.removeAllParameters();
+        }
+    }
+
+    public void openSession(EditToken token) throws EmfException {
+        try {
+            mappings.addParam(call, "token", mappings.editToken());
+            mappings.setOperation(call, "openSession");
+            mappings.setVoidReturnType(call);
+
+            call.invoke(new Object[] { token });
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not open editing session for" + token, e);
+        } finally {
+            call.removeAllParameters();
+        }
+    }
+
+    public void closeSession(EditToken token) throws EmfException {
+        try {
+            mappings.addParam(call, "token", mappings.editToken());
+            mappings.setOperation(call, "closeSession");
+            mappings.setVoidReturnType(call);
+
+            call.invoke(new Object[] { token });
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not close editing session for" + token, e);
         } finally {
             call.removeAllParameters();
         }
