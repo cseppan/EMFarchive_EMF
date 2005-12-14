@@ -30,6 +30,10 @@ public class ImportPresenter {
         if (filename.length() == 0)
             throw new EmfException("Filename should be specified");
 
+        if (type.getName().equals("Choose a type ..."))
+            throw new EmfException("Dataset Type should be selected");
+
+        
         EmfDataset dataset = new EmfDataset();
         dataset.setCreator(user.getFullName());
         dataset.setDatasetType(type);

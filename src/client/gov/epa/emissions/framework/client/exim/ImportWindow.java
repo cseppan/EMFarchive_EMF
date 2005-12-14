@@ -73,7 +73,10 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        datasetTypesModel = new DefaultComboBoxModel(datasetTypesService.getDatasetTypes());
+        DatasetType[] allDatasetTypes = datasetTypesService.getDatasetTypes();
+        DatasetType[] allTypesWithMessage = new DatasetType[allDatasetTypes.length+1];
+        copyDatasetTypes(allDatasetTypes,allTypesWithMessage);
+        datasetTypesModel = new DefaultComboBoxModel(allTypesWithMessage);
         JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
         datasetTypesComboBox.setName("datasetTypes");
         layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesComboBox, panel);
@@ -98,6 +101,14 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         registerForEditEvents(name, folder, filename);// edit-awareness
 
         return panel;
+    }
+
+    private void copyDatasetTypes(DatasetType[] allDatasetTypes, DatasetType[] allTypesWithMessage) {
+        allTypesWithMessage[0]=new DatasetType("Choose a type ...");
+        for (int i = 0; i < allDatasetTypes.length; i++) {
+            allTypesWithMessage[i+1]=allDatasetTypes[i];
+        }
+        
     }
 
     private JButton importFileButton() {
