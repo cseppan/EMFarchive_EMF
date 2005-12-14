@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.ui.Dimensions;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -32,13 +33,19 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
     private JPanel labelPanel;
 
     public DataViewWindow(EmfDataset dataset) {
-        super("Dataset Viewer - Dataset: " + dataset.getName(), new Dimension(900, 750));
+        super("Dataset Viewer - Dataset: " + dataset.getName());
+        setDimension();
         this.dataset = dataset;
 
         layout = new JPanel(new BorderLayout());
         layout.add(topPanel(dataset), BorderLayout.PAGE_START);
 
         this.getContentPane().add(layout);
+    }
+
+    private void setDimension() {
+        Dimension dim = new Dimensions().getSize(0.7, 0.7);
+        setSize(dim);
     }
 
     private JPanel topPanel(EmfDataset dataset) {
