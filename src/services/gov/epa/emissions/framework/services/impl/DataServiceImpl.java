@@ -168,4 +168,16 @@ public class DataServiceImpl implements DataService {
         }
 
     }
+
+    public void deleteDataset(EmfDataset dataset) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            DatasetDAO.deleteDataset(dataset, session);
+            session.flush();
+            session.close();
+        } catch (HibernateException e) {
+            log.error("Database error: " + e);
+            throw new EmfException("Error communicating with the server");
+        }        
+    }
 }

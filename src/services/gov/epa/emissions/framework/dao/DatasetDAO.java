@@ -275,5 +275,19 @@ public class DatasetDAO {
 
     }
 
+    public static void deleteDataset(EmfDataset dataset, Session session) {
+        Transaction tx = null;
+
+        try {
+            tx = session.beginTransaction();
+            session.delete(dataset);
+            tx.commit();
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
+        }
+    }
+
 
 }

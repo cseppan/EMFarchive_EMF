@@ -186,4 +186,11 @@ public class DataServiceTransport implements DataService {
         // Web Services frameworks to allow for methods such as these
         
     }
+
+    public void deleteDataset(EmfDataset dataset) {
+        //Method neeeded in DataServiceImpl to clean up
+        //failed imports
+        
+        //Later will be needed from the client.
+    }
 }
