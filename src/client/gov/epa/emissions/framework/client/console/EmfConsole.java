@@ -86,8 +86,10 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         double height = dim.getHeight();
         double width = dim.getWidth();
-        Dimension newDim = new Dimension((int)(height*0.80), (int)(width*0.80));
+        Dimension newDim = new Dimension();
+        newDim.setSize(width*0.91,height*0.91);
         super.setSize(newDim);
+
         // FIXME: prompt the user ?
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         super.setResizable(true);
