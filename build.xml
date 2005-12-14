@@ -205,7 +205,8 @@
 	<target name="ci-build" depends="compile, unit-tests, app-dist" description="Continuous Integration build" />
 
 	<!-- DEFAULT target-->
-	<target name="nirvana" description="Deploys application to Tomcat, runs ALL (except UAT) tests, and stops Tomcat">
+	<target name="nirvana" description="Deploys application to Tomcat, runs ALL (except UAT) tests, and stops Tomcat"
+		depends="clean, init">
 		<antcall target="run-integration-tests">
 			<param name="tests-target" value="all-dev-tests" />
 		</antcall>

@@ -12,5 +12,5 @@ the relevant script once finalized by Marc and Alison
 6. datasets.setup
 7. keywords.setup
 8. sources.setup
-9. data_versions.setup
+9. versions.setup
 
