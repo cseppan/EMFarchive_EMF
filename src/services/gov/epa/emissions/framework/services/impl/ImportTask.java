@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Status;
 
@@ -53,6 +54,11 @@ public class ImportTask implements Runnable {
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + fileName, e);
             setStatus("Import failure. Reason: " + e.getMessage());
+            try {
+                dataServices.deleteDataset(dataset);
+            } catch (EmfException e1) {
+                log.error("Problem removing inserted dataset for failed import : " + dataset.getName(), e);
+            }
         }
 
         log.info("importing of file: " + fileName + " of type: " + dataset.getDatasetTypeName() + " complete");
