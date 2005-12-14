@@ -33,7 +33,7 @@ public class VersionsPresenter {
         presenter.display();
     }
 
-    public void doEdit(Version version, String table, EditableDataView view) {
+    public void doEdit(Version version, String table, EditableDataView view) throws EmfException {
         EditableDataViewPresenter presenter = new EditableDataViewPresenter(version, table, view, service);
         presenter.display();
     }

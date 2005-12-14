@@ -27,10 +27,11 @@ public class VersionsPresenterTest extends MockObjectTestCase {
         presenter.doView(version, table, (DataView) dataView.proxy());
     }
     
-    public void testShouldDisplayEditableTableViewOnEdit() {
+    public void testShouldDisplayEditableTableViewOnEdit() throws Exception {
         Version version = new Version();
         String table = "table";
         Mock service = mock(DataEditorService.class);
+        service.expects(once()).method("openSession").withAnyArguments();
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
         
         Mock dataView = mock(EditableDataView.class);

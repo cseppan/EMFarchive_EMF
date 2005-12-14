@@ -25,12 +25,14 @@ public class EditableDataViewPresenter {
         this.service = service;
     }
 
-    public void display() {
+    public void display() throws EmfException {
+        service.openSession(token);
         view.observe(this);
         view.display(version, table, service);
     }
 
-    public void doClose() {
+    public void doClose() throws EmfException {
+        service.closeSession(token);
         view.close();
     }
 

@@ -151,13 +151,17 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
         Version[] versions = tableData.selected();
         if (versions.length != 1) {
-            messagePanel.setError("Please select only one Version");
+            displayError("Please select only one Version");
             return;
         }
 
         DataViewWindow view = new DataViewWindow(dataset);
         parentConsole.addToDesktop(view);
         presenter.doView(versions[0], table, view);
+    }
+
+    private void displayError(String message) {
+        messagePanel.setError(message);
     }
 
     private void doEdit(final JComboBox tableCombo) {
@@ -170,13 +174,17 @@ public class VersionsPanel extends JPanel implements VersionsView {
         Version[] versions = tableData.selected();
         // TODO: verify that only non-final version is selected
         if (versions.length != 1) {
-            messagePanel.setError("Please select only one Version");
+            displayError("Please select only one Version");
             return;
         }
 
         EditableDataViewWindow view = new EditableDataViewWindow(dataset);
         parentConsole.addToDesktop(view);
-        presenter.doEdit(versions[0], table, view);
+        try {
+            presenter.doEdit(versions[0], table, view);
+        } catch (EmfException e) {
+            displayError("Could not open Editor. Reason: " + e.getMessage());
+        }
     }
 
     private void clear() {
