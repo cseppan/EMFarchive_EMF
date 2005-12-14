@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.editor.DataViewWindow;
+import gov.epa.emissions.framework.client.editor.EditableDataViewWindow;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -131,6 +132,13 @@ public class VersionsPanel extends JPanel implements VersionsView {
         });
         panel.add(view);
 
+        Button edit = new Button("Edit", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doEdit(tableCombo);
+            }
+        });
+        panel.add(edit);
+
         return panel;
     }
 
@@ -142,12 +150,33 @@ public class VersionsPanel extends JPanel implements VersionsView {
             return;
 
         Version[] versions = tableData.selected();
-        if (versions.length != 1)
+        if (versions.length != 1) {
             messagePanel.setError("Please select only one Version");
+            return;
+        }
 
         DataViewWindow view = new DataViewWindow(dataset);
         parentConsole.addToDesktop(view);
         presenter.doView(versions[0], table, view);
+    }
+
+    private void doEdit(final JComboBox tableCombo) {
+        clear();
+
+        String table = (String) tableCombo.getSelectedItem();
+        if (table.equals("Select Table"))
+            return;
+
+        Version[] versions = tableData.selected();
+        // TODO: verify that only non-final version is selected
+        if (versions.length != 1) {
+            messagePanel.setError("Please select only one Version");
+            return;
+        }
+
+        EditableDataViewWindow view = new EditableDataViewWindow(dataset);
+        parentConsole.addToDesktop(view);
+        presenter.doEdit(versions[0], table, view);
     }
 
     private void clear() {

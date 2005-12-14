@@ -4,11 +4,14 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
+import gov.epa.emissions.framework.client.editor.EditableDataView;
+import gov.epa.emissions.framework.client.editor.EditableDataViewPresenter;
 import gov.epa.emissions.framework.services.DataEditorService;
 
 public class VersionsPresenter {
 
     private DataEditorService service;
+
     private VersionsView view;
 
     public VersionsPresenter(DataEditorService service) {
@@ -20,14 +23,19 @@ public class VersionsPresenter {
         view.observe(this);
     }
 
+    public void doNew(Version base, String name) throws EmfException {
+        Version derived = service.derive(base, name);
+        view.add(derived);
+    }
+
     public void doView(Version version, String table, DataView view) {
         DataViewPresenter presenter = new DataViewPresenter(version, table, view, service);
         presenter.display();
     }
 
-    public void doNew(Version base, String name) throws EmfException {
-        Version derived = service.derive(base, name);
-        view.add(derived);
+    public void doEdit(Version version, String table, EditableDataView view) {
+        EditableDataViewPresenter presenter = new EditableDataViewPresenter(version, table, view, service);
+        presenter.display();
     }
 
 }
