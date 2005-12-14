@@ -1,5 +1,5 @@
 -- emf.users
-insert into emf.users values(100000,'admin', '1Ojm3qp7H4OB4J4+a4PjbwtoHFw=', 'EMF Administrator', 'UNC', '919-843-8593', 'admin@emf.cep.unc.edu', TRUE, FALSE);
+insert into emf.users values(1000000,'admin', '1Ojm3qp7H4OB4J4+a4PjbwtoHFw=', 'EMF Administrator', 'UNC', '919-843-8593', 'admin@emf.cep.unc.edu', TRUE, FALSE);
 insert into emf.users values(1000001,'emf', '7Dq/pgn1VOcABL644L59KlfI/eo=', 'EMF User', 'UNC', '919-843-8593', 'emf@emf.cep.unc.edu', FALSE, FALSE);
 -- emf.users
 -- emf.countries
@@ -40,8 +40,8 @@ insert into emf.datasettypes values(5,'Shapefile','Shapefile', '3', '-1','-1','-
 insert into emf.datasettypes values(6,'External File','External File', '1', '-1','-1','-1', true);
 insert into emf.datasettypes values(7,'Meteorology File','Meteorology File', '1', '-1','-1','-1', true);
 insert into emf.datasettypes values(8,'Model Ready Emissions File','Model Ready Emissions', '1', '-1','-1','-1', true);
-insert into emf.datasettypes values(9,'Temporal Cross Reference','Temporal Cross Reference', '1', '1','6','12', false);
-insert into emf.datasettypes values(10,'Temporal Profile','Temporal Profile', '1', '1','-1','-1', false);
+insert into emf.datasettypes values(9,'Temporal Cross Reference','Temporal Cross Reference', '1', '1','12','12', false);
+insert into emf.datasettypes values(10,'Temporal Profile','Temporal Profile', '1', '1','26','26', false);
 -- emf.datasettypes
 --
 
