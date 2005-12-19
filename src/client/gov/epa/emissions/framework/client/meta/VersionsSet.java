@@ -21,7 +21,7 @@ public class VersionsSet {
         return (Integer[]) list.toArray(new Integer[0]);
     }
 
-    public Object[] finalVersions() {
+    public Integer[] finalVersions() {
         List list = new ArrayList();
         for (int i = 0; i < versions.length; i++) {
             if (versions[i].isFinalVersion())

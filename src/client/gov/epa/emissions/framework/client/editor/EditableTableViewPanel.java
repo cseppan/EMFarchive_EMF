@@ -15,7 +15,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-public class EditableTableViewPanel extends JPanel implements TableView {
+public class EditableTableViewPanel extends JPanel implements EditsAwareTableView {
 
     private InternalSource source;
 
@@ -46,7 +46,7 @@ public class EditableTableViewPanel extends JPanel implements TableView {
         add(pageContainer, BorderLayout.CENTER);
     }
 
-    public void observe(TablePresenter presenter) {
+    public void observe(EditsAwareTablePresenter presenter) {
         paginationPanel.init(presenter);
     }
 

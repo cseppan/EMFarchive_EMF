@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.CompoundBorder;
 
-public class TableViewPanel extends JPanel implements TableView {
+public class PaginateOnlyTableViewPanel extends JPanel implements PaginateOnlyTableView {
 
     private EmfTableModel tableModel;
 
@@ -30,7 +30,7 @@ public class TableViewPanel extends JPanel implements TableView {
 
     private PaginationPanel paginationPanel;
 
-    public TableViewPanel(InternalSource source, MessagePanel messagePanel) {
+    public PaginateOnlyTableViewPanel(InternalSource source, MessagePanel messagePanel) {
         super(new BorderLayout());
         this.source = source;
 

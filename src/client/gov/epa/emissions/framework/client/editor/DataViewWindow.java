@@ -86,8 +86,8 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
     }
 
     private JPanel tablePanel(Version version, String table, DataEditorService service) {
-        TableViewPanel tableView = new TableViewPanel(source(table, dataset.getInternalSources()), messagePanel);
-        TablePresenter tablePresenter = new TablePresenter(version, table, tableView, service);
+        PaginateOnlyTableViewPanel tableView = new PaginateOnlyTableViewPanel(source(table, dataset.getInternalSources()), messagePanel);
+        TablePresenter tablePresenter = new PaginateOnlyTablePresenter(version, table, tableView, service);
         tablePresenter.observe();
 
         try {
