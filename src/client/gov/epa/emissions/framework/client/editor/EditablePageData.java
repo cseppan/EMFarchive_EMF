@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
@@ -20,16 +21,18 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
 
     private int datasetId;
 
-    private int version;
+    private Version version;
 
     private ChangeSet changeset;
 
-    public EditablePageData(int datasetId, int version, Page page, String[] cols) {
+    public EditablePageData(int datasetId, Version version, Page page, String[] cols) {
         this.datasetId = datasetId;
         this.version = version;
         this.cols = cols;
         this.rows = createRows(page);
+
         changeset = new ChangeSet();
+        changeset.setVersion(version);
     }
 
     public String[] columns() {
@@ -135,7 +138,7 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
     public void addBlankRow() {
         VersionedRecord record = new VersionedRecord();
         record.setDatasetId(datasetId);
-        record.setVersion(version);
+        record.setVersion(version.getVersion());
         record.setDeleteVersions("");
         List tokens = new ArrayList();
         for (int i = 0; i < cols.length; i++)

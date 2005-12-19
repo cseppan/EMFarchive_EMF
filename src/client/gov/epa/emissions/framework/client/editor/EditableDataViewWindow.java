@@ -32,6 +32,8 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
 
     private JPanel labelPanel;
 
+    private EditableTableViewPanel tableView;
+
     public EditableDataViewWindow(EmfDataset dataset) {
         super("Dataset Editor - Dataset: " + dataset.getName());
         setDimension();
@@ -71,7 +73,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
 
         JPanel container = new JPanel(new BorderLayout());
 
-        container.add(tablePanel(version, table, service), BorderLayout.CENTER);
+        container.add(tablePanel(version, table), BorderLayout.CENTER);
         container.add(controlPanel(), BorderLayout.PAGE_END);
 
         layout.add(container, BorderLayout.CENTER);
@@ -85,14 +87,12 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
         labelPanel.add(new JLabel("    Table:       " + table));
     }
 
-    private JPanel tablePanel(Version version, String table, DataEditorService service) {
+    private JPanel tablePanel(Version version, String table) {
         InternalSource source = source(table, dataset.getInternalSources());
-        EditableTableViewPanel tableView = new EditableTableViewPanel(dataset, version, source, messagePanel);
-        TablePresenter tablePresenter = new EditableTablePresenter(version, table, tableView, service);
-        tablePresenter.observe();
+        tableView = new EditableTableViewPanel(dataset, version, source, messagePanel);
 
         try {
-            tablePresenter.doDisplayFirst();
+            presenter.displayTable(tableView);
         } catch (EmfException e) {
             displayError("Could not display table: " + table + ". Reason: " + e.getMessage());
         }
@@ -201,4 +201,5 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
         messagePanel.setError(message);
         refreshLayout();
     }
+
 }

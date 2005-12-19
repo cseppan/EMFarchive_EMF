@@ -17,15 +17,16 @@ public class NonEditablePageDataTest extends TestCase {
         assertEquals(String.class, data.getColumnClass(1));
     }
 
-    public void testShouldHaveTwoColumnsIgnoringFirstColumnForDisplayPurposes() {
+    public void testShouldDisplayAllColumns() {
         String[] cols = new String[] { "col1", "col2", "col3" };
 
         NonEditablePageData data = new NonEditablePageData(new Page(), cols);
 
         String[] columns = data.columns();
-        assertEquals(2, columns.length);
-        assertEquals(cols[1], columns[0]);
-        assertEquals(cols[2], columns[1]);
+        assertEquals(3, columns.length);
+        assertEquals(cols[0], columns[0]);
+        assertEquals(cols[1], columns[1]);
+        assertEquals(cols[2], columns[2]);
     }
 
     public void testShouldMarkAllColumnsAsNotEditable() {

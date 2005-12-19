@@ -27,8 +27,7 @@ public class NonEditablePageData extends AbstractTableData {
 
     public String[] columns() {
         List result = new ArrayList();
-        // ignore first col - dataset id, not for display
-        for (int i = 1; i < cols.length; i++)
+        for (int i = 0; i < cols.length; i++)
             result.add(cols[i]);
 
         return (String[]) result.toArray(new String[0]);

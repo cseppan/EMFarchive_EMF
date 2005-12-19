@@ -8,4 +8,5 @@ public interface EditableDataView extends ManagedView {
     void display(Version version, String table, DataEditorService service);
 
     void observe(EditableDataViewPresenter presenter);
+
 }

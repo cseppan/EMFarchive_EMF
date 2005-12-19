@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.framework.ui.Row;
 
@@ -23,7 +24,7 @@ public class EditablePageDataTest extends TestCase {
 
     private int datasetId;
 
-    private int version;
+    private Version version;
 
     protected void setUp() {
         page = new Page();
@@ -38,7 +39,8 @@ public class EditablePageDataTest extends TestCase {
 
         cols = new String[] { "col1", "col2", "col3" };
         datasetId = 2;
-        version = 34;
+        version = new Version();
+        version.setVersion(34);
         data = new EditablePageData(datasetId, version, page, cols);
     }
 
@@ -174,7 +176,7 @@ public class EditablePageDataTest extends TestCase {
 
         VersionedRecord blankRecord = (VersionedRecord) blankRow.source();
         assertEquals(datasetId, blankRecord.getDatasetId());
-        assertEquals(version, blankRecord.getVersion());
+        assertEquals(version.getVersion(), blankRecord.getVersion());
         assertEquals("", blankRecord.getDeleteVersions());
         assertEquals(cols.length, blankRecord.tokens().size());
         for (int i = 0; i < cols.length; i++)

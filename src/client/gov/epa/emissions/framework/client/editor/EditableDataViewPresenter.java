@@ -17,6 +17,8 @@ public class EditableDataViewPresenter {
 
     private EditToken token;
 
+    private EditableTablePresenter tablePresenter;
+
     public EditableDataViewPresenter(Version version, String table, EditableDataView view, DataEditorService service) {
         this.version = version;
         this.table = table;
@@ -31,6 +33,12 @@ public class EditableDataViewPresenter {
         view.display(version, table, service);
     }
 
+    public void displayTable(EditableTableView tableView) throws EmfException {
+        tablePresenter = new EditableTablePresenter(version, table, tableView, service);
+        tablePresenter.observe();
+        tablePresenter.doDisplayFirst();
+    }
+
     public void doClose() throws EmfException {
         service.closeSession(token);
         view.close();
@@ -41,6 +49,7 @@ public class EditableDataViewPresenter {
     }
 
     public void doSave() throws EmfException {
+        tablePresenter.submitChanges();
         service.save(token);
     }
 

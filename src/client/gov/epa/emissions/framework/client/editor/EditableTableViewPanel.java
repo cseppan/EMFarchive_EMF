@@ -64,7 +64,7 @@ public class EditableTableViewPanel extends JPanel implements EditableTableView 
     }
 
     private JComponent createEditablePage(Page page) {
-        pageData = new EditablePageData((int) dataset.getDatasetid(), version.getVersion(), page, cols());
+        pageData = new EditablePageData((int) dataset.getDatasetid(), version, page, cols());
         return new EditableTableDataPanel(pageData);
     }
 
@@ -81,7 +81,8 @@ public class EditableTableViewPanel extends JPanel implements EditableTableView 
     }
 
     public ChangeSet changeset() {
-        return pageData.changeset();
+        // if not initializes, no changes
+        return pageData != null ? pageData.changeset() : new ChangeSet();
     }
 
 }
