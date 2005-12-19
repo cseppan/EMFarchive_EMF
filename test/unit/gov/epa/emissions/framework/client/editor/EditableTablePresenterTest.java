@@ -118,7 +118,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         p.doDisplayPrevious();
     }
 
-    public void testShouldDisplayLastPageEvenAfterNextvRequestOnLastPage() throws Exception {
+    public void testShouldDisplayLastPageEvenAfterNextRequestOnLastPage() throws Exception {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(20))).will(returnValue(page));

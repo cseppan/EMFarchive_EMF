@@ -1,9 +1,5 @@
 package gov.epa.emissions.framework.client.editor;
 
-import gov.epa.emissions.commons.db.Page;
-
-public interface EditableTableView {
-    void display(Page page);
-
+public interface EditableTableView extends TableView {
     void observe(EditableTablePresenter presenter);
 }
