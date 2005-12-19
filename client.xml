@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<project name="EMF" default="run" basedir=".">
+
+	<!--  =================== Properties ====================================== -->
+	<property file="build.properties" />
+	<property file="${user.home}/build.properties" />
+
+	<property name="env" environment="env" value="env" />
+	<property name="J2EE_HOME" value="${env.J2EE_HOME}" />
+	<property name="JAVA_HOME" value="${env.JAVA_HOME}" />
+
+	<!-- URL property can be overridden on command line-->
+	<property name="url" value="http://localhost:8080/emf/services" />
+
+
+	<path id="classpath">
+		<fileset dir="${basedir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="run" description="Runs the EMF Client">
+		<java classname="gov.epa.emissions.framework.client.Launcher" classpathref="classpath" fork="true" failonerror="true">
+			<!-- URL property can be overridden on command line, using the '-D' option-->
+			<arg line="${url}" />
+		</java>
+	</target>
+
+</project>
+

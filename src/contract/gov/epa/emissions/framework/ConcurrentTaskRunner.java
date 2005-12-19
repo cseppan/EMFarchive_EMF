@@ -12,8 +12,7 @@ public class ConcurrentTaskRunner implements TaskRunner {
     public void start(Runnable task) {
         alive = true;
         this.delegate = new TaskDelegate(task);
-        Thread thread = new Thread(delegate);// FIXME: use thread pool or
-        // does it matter ?
+        Thread thread = new Thread(delegate);// FIXME: use thread pool or does it matter ?
         thread.start();
     }
 
@@ -38,7 +37,8 @@ public class ConcurrentTaskRunner implements TaskRunner {
                     task.run();
                     try {
                         // FIXME: what's a reasonable polling time ?
-                        mutex.wait(1000);
+                        long pollInterval = 2 * 60 * 1000;
+                        mutex.wait(pollInterval);
                     } catch (InterruptedException e) {
                         alive = false;
                     }

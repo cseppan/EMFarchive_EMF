@@ -26,8 +26,6 @@
 	<classpathentry kind="lib" path="lib/weka.jar"/>
 	<classpathentry kind="lib" path="lib/commons-primitives-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/dev/j2ee.jar"/>
-	<classpathentry kind="lib" path="lib/dev/saaj-api.jar"/>
-	<classpathentry kind="lib" path="lib/dev/saaj-impl.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat/mysql-connector-java-3.1.10-bin.jar"/>
 	<classpathentry kind="lib" path="lib/antlr-2.7.5H3.jar"/>
 	<classpathentry kind="lib" path="lib/cglib-2.1.jar"/>
@@ -64,5 +62,9 @@
 	<classpathentry kind="lib" path="lib/c3p0-0.9.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/emissions-commons-0.1.4.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat/postgresql-8.1-404.jdbc3.jar"/>
+	<classpathentry kind="lib" path="lib/activation.jar"/>
+	<classpathentry kind="lib" path="lib/mail.jar"/>
+	<classpathentry kind="lib" path="lib/saaj-api.jar"/>
+	<classpathentry kind="lib" path="lib/saaj-impl.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>

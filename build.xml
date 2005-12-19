@@ -86,29 +86,41 @@
 		</delete>
 	</target>
 
-	<target name="compile-src" depends="clean, init">
+	<target name="compile-contract" depends="clean, init">
 		<antcall target="do-compile">
 			<param name="compile.src" value="${src.contract.dir}" />
 		</antcall>
+	</target>
+	<target name="compile-client" depends="clean, init, compile-contract">
 		<antcall target="do-compile">
 			<param name="compile.src" value="${src.client.dir}" />
 		</antcall>
+		<antcall target="copy-client-resources">
+			<param name="target.dir" value="${build.classes.dir}" />
+		</antcall>
+	</target>
+	<target name="compile-services" depends="clean, init, compile-contract">
 		<antcall target="do-compile">
 			<param name="compile.src" value="${src.services.dir}" />
 		</antcall>
-		<antcall target="copy-resources">
+		<antcall target="copy-services-resources">
 			<param name="resources.root" value="${src.services.dir}" />
 		</antcall>
-		<copy todir="${build.classes.dir}">
-			<fileset dir="${res.dir}" includes="**/*" />
-		</copy>
 	</target>
+
+	<target name="compile-src" depends="clean, init, compile-contract, compile-client, compile-services" />
 
 	<target name="do-compile">
 		<javac srcdir="${compile.src}" destdir="${build.classes.dir}" classpathref="classpath" debug="on" />
 	</target>
 
-	<target name="copy-resources">
+	<target name="copy-client-resources">
+		<copy todir="${target.dir}">
+			<fileset dir="${res.dir}" includes="**/*" />
+		</copy>
+	</target>
+
+	<target name="copy-services-resources">
 		<copy todir="${build.classes.dir}">
 			<fileset dir="${resources.root}" includes="**/*.properties" />
 			<fileset dir="${resources.root}" includes="**/*.xml" />
@@ -205,8 +217,7 @@
 	<target name="ci-build" depends="compile, unit-tests, app-dist" description="Continuous Integration build" />
 
 	<!-- DEFAULT target-->
-	<target name="nirvana" description="Deploys application to Tomcat, runs ALL (except UAT) tests, and stops Tomcat"
-		depends="clean, init">
+	<target name="nirvana" description="Deploys application to Tomcat, runs ALL (except UAT) tests, and stops Tomcat" depends="clean, init">
 		<antcall target="run-integration-tests">
 			<param name="tests-target" value="all-dev-tests" />
 		</antcall>
@@ -250,7 +261,53 @@
 	<target name="pre-checkin" depends="cvs-update, compile, unit-tests" />
 	<!--  ===============END CVS Targets ====================================== -->
 
+	<!--  =============START Client Distribution ====================================== -->
+	<target name="client-env">
+		<property name="client.dist" value="${build.home}/client" />
+		<property name="client.dist.lib" value="${client.dist}/lib" />
+		<property name="client.jar" value="${client.dist}/${app.name}-client.jar" />
+	</target>
 
+	<target name="client-dist-sandbox" depends="clean, init, compile-client, client-env" description="Builds the sandbox for EMF Client distribution">
+		<mkdir dir="${client.dist}" />
+		<mkdir dir="${client.dist.lib}" />
+
+		<copy todir="${client.dist.lib}">
+			<fileset dir="${lib.dir}">
+				<exclude name="dev/**" />
+				<exclude name="tomcat/**" />
+			</fileset>
+		</copy>
+		<jar jarfile="${client.dist}/${app.name}-client.jar" basedir="${build.classes.dir}">
+			<include name="**/*" />
+		</jar>
+		<copy todir="${client.dist}">
+			<fileset dir="${basedir}">
+				<include name="launch-client.bat" />
+				<include name="client.xml" />
+			</fileset>
+			<fileset dir="${build.classes.dir}">
+				<include name="*.properties" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="client-dist" depends="client-dist-sandbox" description="Builds the EMF Client distribution ">
+		<zip destfile="${build.home}/client.zip" basedir="${client.dist}" />
+	</target>
+
+	<target name="run-client" depends="client-env, client-dist-sandbox" description="Runs the EMF Client">
+		<java classname="gov.epa.emissions.framework.client.Launcher" fork="true" failonerror="true">
+			<classpath>
+				<pathelement location="${client.jar}" />
+				<fileset dir="${client.dist.lib}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</java>
+	</target>
+
+	<!--  =============END Client Distribution ====================================== -->
 
 	<!--  =============START Tomcat Deployment Targets ====================================== -->
 	<target name="app-prepare" depends="clean, init, compile">
