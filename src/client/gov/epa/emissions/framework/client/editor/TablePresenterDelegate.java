@@ -12,8 +12,6 @@ public class TablePresenterDelegate {
 
     private String table;
 
-    private int pageNumber;
-
     private Page page;
 
     private Version version;
@@ -21,6 +19,8 @@ public class TablePresenterDelegate {
     private TableView view;
 
     public TablePresenterDelegate(Version version, String table, TableView view, DataEditorService service) {
+        page = new Page();// page 0, uninitialized
+
         this.version = version;
         this.table = table;
 
@@ -29,19 +29,26 @@ public class TablePresenterDelegate {
     }
 
     public void doDisplayNext() throws EmfException {
+        int pageNumber = pageNumber();
         if (pageNumber < pageCount())
             pageNumber++;
+
         doDisplay(pageNumber);
     }
 
     public void doDisplayPrevious() throws EmfException {
+        int pageNumber = pageNumber();
         if (pageNumber > 1)
             pageNumber--;
+
         doDisplay(pageNumber);
     }
 
+    int pageNumber() {
+        return page.getNumber();
+    }
+
     public void doDisplay(int pageNumber) throws EmfException {
-        this.pageNumber = pageNumber;
         page = service.getPage(editToken(), pageNumber);
 
         view.display(page);
@@ -68,7 +75,7 @@ public class TablePresenterDelegate {
         return service.getTotalRecords(editToken());
     }
 
-    private EditToken editToken() {
+    EditToken editToken() {
         return new EditToken(version, table);
     }
 

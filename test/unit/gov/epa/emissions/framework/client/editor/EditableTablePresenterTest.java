@@ -1,13 +1,18 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EditToken;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.core.Stub;
+import org.jmock.core.constraint.IsInstanceOf;
+import org.jmock.core.stub.ReturnStub;
 
 public class EditableTablePresenterTest extends MockObjectTestCase {
 
@@ -38,6 +43,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
 
         Mock view = mock(EditableTableView.class);
         view.expects(once()).method("display").with(eq(page));
+        view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -55,6 +61,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
 
         Mock view = mock(EditableTableView.class);
         view.expects(once()).method("display").with(eq(page));
+        view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -73,6 +80,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
 
         Mock view = mock(EditableTableView.class);
         view.expects(once()).method("display").with(eq(page));
+        view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -90,6 +98,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
 
         Mock view = mock(EditableTableView.class);
         view.expects(once()).method("display").with(eq(page));
+        view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -103,10 +112,12 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
     public void testShouldDisplayFirstPageEvenAfterPrevRequestOnFirstPage() throws Exception {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
+        page.setNumber(1);
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
 
         Mock view = mock(EditableTableView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
+        view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -121,11 +132,13 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
     public void testShouldDisplayLastPageEvenAfterNextRequestOnLastPage() throws Exception {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
+        page.setNumber(20);
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(20))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
         Mock view = mock(EditableTableView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
+        view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -145,6 +158,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
 
         Mock view = mock(EditableTableView.class);
         view.expects(once()).method("display").with(eq(page));
+        view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -155,9 +169,10 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         p.doDisplayLast();
     }
 
-    public void testShouldDisplaySecondPageOnTwoConsecutiveNextCall() throws Exception {
+    public void testShouldDisplaySecondPageOnTwoConsecutiveNextCalls() throws Exception {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
+        page.setNumber(1);
         services.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(
                 returnValue(page));
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(returnValue(page));
@@ -165,6 +180,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
 
         Mock view = mock(EditableTableView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
+        view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -176,20 +192,91 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         p.doDisplayNext();
     }
 
+    public void testShouldSubmitChangesOnPage1OnDisplayNextOnPage1() throws Exception {
+        Mock service = mock(DataEditorService.class);
+        Page page = new Page();
+        page.setNumber(1);
+        service.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(1)))
+                .will(returnValue(page));
+        service.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(returnValue(page));
+        service.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
+
+        Mock view = mock(EditableTableView.class);
+        view.expects(atLeastOnce()).method("display").with(eq(page));
+
+        Mock dataset = mock(Dataset.class);
+        dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
+
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+                (DataEditorService) service.proxy());
+
+        //changes
+        Stub pageZeroChanges = new ReturnStub(new ChangeSet());
+
+        ChangeSet page1Changes = new ChangeSet();
+        page1Changes.addNew(new VersionedRecord());
+        Stub pageOneChanges = new ReturnStub(page1Changes);
+        
+        view.stubs().method("changeset").withNoArguments().will(onConsecutiveCalls(pageZeroChanges, pageOneChanges));
+
+        service.expects(once()).method("submit").with(new IsInstanceOf(EditToken.class), same(page1Changes),
+                eq(new Integer(page.getNumber())));
+
+        p.doDisplayNext();// page 1
+        p.doDisplayNext();// page 2
+    }
+    
+    public void testShouldSubmitChangesOnPage2OnDisplayPreviousOnPage2() throws Exception {
+        Mock service = mock(DataEditorService.class);
+        Page page2 = new Page();
+        page2.setNumber(2);
+        service.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(1)))
+        .will(returnValue(page2));
+        service.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(returnValue(page2));
+        service.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
+        
+        Mock view = mock(EditableTableView.class);
+        view.expects(atLeastOnce()).method("display").with(eq(page2));
+        
+        Mock dataset = mock(Dataset.class);
+        dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
+        
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+                (DataEditorService) service.proxy());
+        
+        //changes
+        Stub pageZeroChanges = new ReturnStub(new ChangeSet());
+        
+        ChangeSet page2Changes = new ChangeSet();
+        page2Changes.addNew(new VersionedRecord());
+        Stub pageTwoChanges = new ReturnStub(page2Changes);
+        
+        view.stubs().method("changeset").withNoArguments().will(onConsecutiveCalls(pageZeroChanges, pageTwoChanges));
+        
+        service.expects(once()).method("submit").with(new IsInstanceOf(EditToken.class), same(page2Changes),
+                eq(new Integer(page2.getNumber())));
+        
+        p.doDisplay(2);// page 2
+        p.doDisplayPrevious();// page 1
+    }
+
     public void testShouldDisplayFirstPageOnDisplayPreviousAfterTwoConsecutiveNextCalls() throws Exception {
         Mock services = mock(DataEditorService.class);
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
         Page page1 = new Page();
+        page1.setNumber(1);
         services.expects(atLeastOnce()).method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(
                 returnValue(page1));
         Page page2 = new Page();
+        page2.setNumber(2);
         services.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(
                 returnValue(page2));
 
         Mock view = mock(EditableTableView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page1));
         view.expects(once()).method("display").with(eq(page2));
+        view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));

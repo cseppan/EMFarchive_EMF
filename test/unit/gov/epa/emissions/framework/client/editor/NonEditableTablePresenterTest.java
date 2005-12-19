@@ -104,6 +104,7 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
     public void testShouldDisplayFirstPageEvenAfterPrevRequestOnFirstPage() throws Exception {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
+        page.setNumber(1);
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
 
         Mock view = mock(NonEditableTableView.class);
@@ -122,6 +123,7 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
     public void testShouldDisplayLastPageEvenAfterNextvRequestOnLastPage() throws Exception {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
+        page.setNumber(20);
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(20))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
@@ -159,6 +161,7 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
     public void testShouldDisplaySecondPageOnTwoConsecutiveNextCall() throws Exception {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
+        page.setNumber(1);
         services.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(
                 returnValue(page));
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(returnValue(page));
@@ -182,9 +185,11 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
         Page page1 = new Page();
+        page1.setNumber(1);
         services.expects(atLeastOnce()).method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(
                 returnValue(page1));
         Page page2 = new Page();
+        page2.setNumber(2);
         services.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(
                 returnValue(page2));
 

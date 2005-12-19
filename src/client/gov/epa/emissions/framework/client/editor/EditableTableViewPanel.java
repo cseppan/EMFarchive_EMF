@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.MessagePanel;
@@ -77,6 +78,10 @@ public class EditableTableViewPanel extends JPanel implements EditableTableView 
             cols.add(allCols[i]);
 
         return (String[]) cols.toArray(new String[0]);
+    }
+
+    public ChangeSet changeset() {
+        return pageData.changeset();
     }
 
 }
