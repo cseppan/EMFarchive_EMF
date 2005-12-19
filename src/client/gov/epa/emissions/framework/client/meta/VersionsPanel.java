@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.client.editor.DataViewWindow;
+import gov.epa.emissions.framework.client.editor.NonEditableDataViewWindow;
 import gov.epa.emissions.framework.client.editor.EditableDataViewWindow;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
@@ -235,7 +235,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
     }
 
     private void showView(String table, Version version) {
-        DataViewWindow view = new DataViewWindow(dataset);
+        NonEditableDataViewWindow view = new NonEditableDataViewWindow(dataset);
         parentConsole.addToDesktop(view);
         try {
             presenter.doView(version, table, view);

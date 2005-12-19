@@ -72,7 +72,7 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
     }
 
     private EditableRow row(VersionedRecord record) {
-        RowSource source = new PageDataRowSource(record);
+        RowSource source = new EditablePageDataRowSource(record);
         return new EditableRow(source);
     }
 
@@ -103,7 +103,7 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            PageDataRowSource rowSource = (PageDataRowSource) row.rowSource();
+            EditablePageDataRowSource rowSource = (EditablePageDataRowSource) row.rowSource();
             if (rowSource.isSelected())
                 selected.add(rowSource.source());
         }
@@ -126,7 +126,7 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            PageDataRowSource rowSource = (PageDataRowSource) row.rowSource();
+            EditablePageDataRowSource rowSource = (EditablePageDataRowSource) row.rowSource();
             sources.add(rowSource.source());
         }
         return sources;

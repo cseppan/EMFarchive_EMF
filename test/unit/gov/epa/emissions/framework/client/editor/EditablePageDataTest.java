@@ -9,7 +9,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-public class EditablePageTableDataTest extends TestCase {
+public class EditablePageDataTest extends TestCase {
 
     private EditablePageData data;
 

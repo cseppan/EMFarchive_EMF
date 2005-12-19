@@ -4,8 +4,8 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.ManagedView;
 import gov.epa.emissions.framework.services.DataEditorService;
 
-public interface DataView extends ManagedView {
+public interface NonEditableDataView extends ManagedView {
     void display(Version version, String table, DataEditorService service);
 
-    void observe(DataViewPresenter presenter);
+    void observe(NonEditableDataViewPresenter presenter);
 }

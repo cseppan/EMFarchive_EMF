@@ -88,7 +88,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
     private JPanel tablePanel(Version version, String table, DataEditorService service) {
         InternalSource source = source(table, dataset.getInternalSources());
         EditableTableViewPanel tableView = new EditableTableViewPanel(dataset, version, source, messagePanel);
-        TablePresenter tablePresenter = new EditsAwareTablePresenter(version, table, tableView, service);
+        TablePresenter tablePresenter = new EditableTablePresenter(version, table, tableView, service);
         tablePresenter.observe();
 
         try {

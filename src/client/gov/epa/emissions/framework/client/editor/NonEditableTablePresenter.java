@@ -6,11 +6,11 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EditToken;
 
-public class PaginateOnlyTablePresenter implements TablePresenter {
+public class NonEditableTablePresenter implements TablePresenter {
 
     private DataEditorService service;
 
-    private PaginateOnlyTableView view;
+    private NonEditableTableView view;
 
     private String table;
 
@@ -20,7 +20,7 @@ public class PaginateOnlyTablePresenter implements TablePresenter {
 
     private Version version;
 
-    public PaginateOnlyTablePresenter(Version version, String table, PaginateOnlyTableView view, DataEditorService service) {
+    public NonEditableTablePresenter(Version version, String table, NonEditableTableView view, DataEditorService service) {
         this.service = service;
         this.view = view;
         this.table = table;

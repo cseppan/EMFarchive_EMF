@@ -9,12 +9,12 @@ import gov.epa.emissions.framework.services.EditToken;
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
-public class PaginateOnlyTablePresenterTest extends MockObjectTestCase {
+public class EditableTablePresenterTest extends MockObjectTestCase {
 
     public void testShouldObserveViewOnObserve() {
-        Mock view = mock(PaginateOnlyTableView.class);
+        Mock view = mock(EditableTableView.class);
 
-        TablePresenter p = new PaginateOnlyTablePresenter(null, "table", (PaginateOnlyTableView) view.proxy(), null);
+        TablePresenter p = new EditableTablePresenter(null, "table", (EditableTableView) view.proxy(), null);
         view.expects(once()).method("observe").with(same(p));
 
         p.observe();
@@ -25,8 +25,7 @@ public class PaginateOnlyTablePresenterTest extends MockObjectTestCase {
         Version version = new Version();
         services.stubs().method("getTotalRecords").with(isA(EditToken.class)).will(returnValue(new Integer(28)));
 
-        TablePresenter p = new PaginateOnlyTablePresenter(version, "table", null, (DataEditorService) services
-                .proxy());
+        TablePresenter p = new EditableTablePresenter(version, "table", null, (DataEditorService) services.proxy());
 
         assertEquals(28, p.totalRecords());
     }
@@ -37,14 +36,14 @@ public class PaginateOnlyTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(PaginateOnlyTableView.class);
+        Mock view = mock(EditableTableView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new PaginateOnlyTablePresenter(new Version(), "table", (PaginateOnlyTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+                (DataEditorService) services.proxy());
 
         p.doDisplayNext();
     }
@@ -54,14 +53,14 @@ public class PaginateOnlyTablePresenterTest extends MockObjectTestCase {
         Page page = new Page();
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(21))).will(returnValue(page));
 
-        Mock view = mock(PaginateOnlyTableView.class);
+        Mock view = mock(EditableTableView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new PaginateOnlyTablePresenter(new Version(), "table", (PaginateOnlyTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+                (DataEditorService) services.proxy());
 
         p.doDisplay(21);
     }
@@ -72,14 +71,14 @@ public class PaginateOnlyTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPageWithRecord").with(isA(EditToken.class), eq(new Integer(21))).will(
                 returnValue(page));
 
-        Mock view = mock(PaginateOnlyTableView.class);
+        Mock view = mock(EditableTableView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new PaginateOnlyTablePresenter(new Version(), "table", (PaginateOnlyTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+                (DataEditorService) services.proxy());
 
         p.doDisplayPageWithRecord(21);
     }
@@ -89,14 +88,14 @@ public class PaginateOnlyTablePresenterTest extends MockObjectTestCase {
         Page page = new Page();
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
 
-        Mock view = mock(PaginateOnlyTableView.class);
+        Mock view = mock(EditableTableView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new PaginateOnlyTablePresenter(new Version(), "table", (PaginateOnlyTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+                (DataEditorService) services.proxy());
 
         p.doDisplayFirst();
     }
@@ -106,14 +105,14 @@ public class PaginateOnlyTablePresenterTest extends MockObjectTestCase {
         Page page = new Page();
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
 
-        Mock view = mock(PaginateOnlyTableView.class);
+        Mock view = mock(EditableTableView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new PaginateOnlyTablePresenter(new Version(), "table", (PaginateOnlyTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+                (DataEditorService) services.proxy());
 
         p.doDisplayFirst();
         p.doDisplayPrevious();
@@ -125,14 +124,14 @@ public class PaginateOnlyTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(20))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(PaginateOnlyTableView.class);
+        Mock view = mock(EditableTableView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new PaginateOnlyTablePresenter(new Version(), "table", (PaginateOnlyTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+                (DataEditorService) services.proxy());
 
         p.doDisplayLast();
         p.doDisplayNext();
@@ -144,14 +143,14 @@ public class PaginateOnlyTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(20))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(PaginateOnlyTableView.class);
+        Mock view = mock(EditableTableView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new PaginateOnlyTablePresenter(new Version(), "table", (PaginateOnlyTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+                (DataEditorService) services.proxy());
 
         p.doDisplayLast();
     }
@@ -164,14 +163,14 @@ public class PaginateOnlyTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(PaginateOnlyTableView.class);
+        Mock view = mock(EditableTableView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new PaginateOnlyTablePresenter(new Version(), "table", (PaginateOnlyTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+                (DataEditorService) services.proxy());
 
         p.doDisplayNext();
         p.doDisplayNext();
@@ -188,15 +187,15 @@ public class PaginateOnlyTablePresenterTest extends MockObjectTestCase {
         services.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(
                 returnValue(page2));
 
-        Mock view = mock(PaginateOnlyTableView.class);
+        Mock view = mock(EditableTableView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page1));
         view.expects(once()).method("display").with(eq(page2));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new PaginateOnlyTablePresenter(new Version(), "table", (PaginateOnlyTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+                (DataEditorService) services.proxy());
 
         p.doDisplayNext();
         p.doDisplayNext();

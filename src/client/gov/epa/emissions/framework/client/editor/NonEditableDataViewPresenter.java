@@ -5,9 +5,9 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EditToken;
 
-public class DataViewPresenter {
+public class NonEditableDataViewPresenter {
 
-    private DataView view;
+    private NonEditableDataView view;
 
     private DataEditorService service;
 
@@ -17,7 +17,7 @@ public class DataViewPresenter {
 
     private EditToken token;
 
-    public DataViewPresenter(Version version, String table, DataView view, DataEditorService service) {
+    public NonEditableDataViewPresenter(Version version, String table, NonEditableDataView view, DataEditorService service) {
         this.version = version;
         this.table = table;
         token = new EditToken(version, table);

@@ -4,18 +4,18 @@ import gov.epa.emissions.commons.db.version.VersionedRecord;
 
 import org.jmock.cglib.MockObjectTestCase;
 
-public class PageDataRowSourceTest extends MockObjectTestCase {
+public class EditablePageDataRowSourceTest extends MockObjectTestCase {
 
     private VersionedRecord record;
 
-    private PageDataRowSource row;
+    private EditablePageDataRowSource row;
 
     protected void setUp() {
         record = new VersionedRecord();
         String[] values = { "1", "2", "3" };
         record.setTokens(values);
 
-        row = new PageDataRowSource(record);
+        row = new EditablePageDataRowSource(record);
     }
 
     public void testShouldReplaceValueAtSpecificPostionWhenModified() {

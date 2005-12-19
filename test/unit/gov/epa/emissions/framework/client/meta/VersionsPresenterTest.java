@@ -2,8 +2,8 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.editor.DataView;
-import gov.epa.emissions.framework.client.editor.DataViewPresenter;
+import gov.epa.emissions.framework.client.editor.NonEditableDataView;
+import gov.epa.emissions.framework.client.editor.NonEditableDataViewPresenter;
 import gov.epa.emissions.framework.client.editor.EditableDataView;
 import gov.epa.emissions.framework.client.editor.EditableDataViewPresenter;
 import gov.epa.emissions.framework.services.DataEditorService;
@@ -23,12 +23,12 @@ public class VersionsPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("openSession").withAnyArguments();
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
-        Mock dataView = mock(DataView.class);
+        Mock dataView = mock(NonEditableDataView.class);
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
-        dataView.expects(once()).method("observe").with(new IsInstanceOf(DataViewPresenter.class));
+        dataView.expects(once()).method("observe").with(new IsInstanceOf(NonEditableDataViewPresenter.class));
 
         VersionsPresenter presenter = new VersionsPresenter(null, serviceProxy);
-        presenter.doView(version, table, (DataView) dataView.proxy());
+        presenter.doView(version, table, (NonEditableDataView) dataView.proxy());
     }
 
     public void testShouldDisplayEditableTableViewOnEdit() throws Exception {

@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.CompoundBorder;
 
-public class PaginateOnlyTableViewPanel extends JPanel implements PaginateOnlyTableView {
+public class NonEditableTableViewPanel extends JPanel implements NonEditableTableView {
 
     private EmfTableModel tableModel;
 
@@ -30,7 +30,7 @@ public class PaginateOnlyTableViewPanel extends JPanel implements PaginateOnlyTa
 
     private PaginationPanel paginationPanel;
 
-    public PaginateOnlyTableViewPanel(InternalSource source, MessagePanel messagePanel) {
+    public NonEditableTableViewPanel(InternalSource source, MessagePanel messagePanel) {
         super(new BorderLayout());
         this.source = source;
 
@@ -81,7 +81,7 @@ public class PaginateOnlyTableViewPanel extends JPanel implements PaginateOnlyTa
 
         paginationPanel.updateStatus(page);
 
-        tableModel = new EmfTableModel(new PageData(page, cols()));
+        tableModel = new EmfTableModel(new NonEditablePageData(page, cols()));
         JScrollPane table = new ScrollableTable(tableModel);
         pageContainer.add(table, BorderLayout.CENTER);
     }

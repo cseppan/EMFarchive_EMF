@@ -20,19 +20,19 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class DataViewWindow extends DisposableInteralFrame implements DataView {
+public class NonEditableDataViewWindow extends DisposableInteralFrame implements NonEditableDataView {
 
     private JPanel layout;
 
     private MessagePanel messagePanel;
 
-    private DataViewPresenter presenter;
+    private NonEditableDataViewPresenter presenter;
 
     private EmfDataset dataset;
 
     private JPanel labelPanel;
 
-    public DataViewWindow(EmfDataset dataset) {
+    public NonEditableDataViewWindow(EmfDataset dataset) {
         super("Dataset Viewer - Dataset: " + dataset.getName());
         setDimension();
         this.dataset = dataset;
@@ -62,7 +62,7 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
         return panel;
     }
 
-    public void observe(DataViewPresenter presenter) {
+    public void observe(NonEditableDataViewPresenter presenter) {
         this.presenter = presenter;
     }
 
@@ -86,8 +86,8 @@ public class DataViewWindow extends DisposableInteralFrame implements DataView {
     }
 
     private JPanel tablePanel(Version version, String table, DataEditorService service) {
-        PaginateOnlyTableViewPanel tableView = new PaginateOnlyTableViewPanel(source(table, dataset.getInternalSources()), messagePanel);
-        TablePresenter tablePresenter = new PaginateOnlyTablePresenter(version, table, tableView, service);
+        NonEditableTableViewPanel tableView = new NonEditableTableViewPanel(source(table, dataset.getInternalSources()), messagePanel);
+        TablePresenter tablePresenter = new NonEditableTablePresenter(version, table, tableView, service);
         tablePresenter.observe();
 
         try {

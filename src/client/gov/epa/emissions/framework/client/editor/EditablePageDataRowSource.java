@@ -6,13 +6,13 @@ import gov.epa.emissions.framework.ui.RowSource;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PageDataRowSource implements RowSource {
+public class EditablePageDataRowSource implements RowSource {
 
     private VersionedRecord source;
 
     private Boolean selected;
 
-    public PageDataRowSource(VersionedRecord source) {
+    public EditablePageDataRowSource(VersionedRecord source) {
         this.source = source;
         this.selected = Boolean.FALSE;
     }
