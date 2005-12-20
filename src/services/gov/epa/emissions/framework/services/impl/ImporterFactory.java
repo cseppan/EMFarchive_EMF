@@ -24,13 +24,15 @@ import java.io.File;
 public class ImporterFactory {
 
     private DbServer dbServer;
+
     private Datasource datasource;
-    private SqlDataTypes dataType;
+
+    private SqlDataTypes sqlDataTypes;
 
     public ImporterFactory(DbServer dbServer) {
         this.dbServer = dbServer;
         datasource = dbServer.getEmissionsDatasource();
-        dataType = dbServer.getSqlDataTypes();
+        sqlDataTypes = dbServer.getSqlDataTypes();
     }
 
     public Importer create(EmfDataset dataset, File folder, String filename) throws ImporterException {
@@ -68,16 +70,15 @@ public class ImporterFactory {
     }
 
     private Importer temporalImporter(EmfDataset dataset, File file) throws ImporterException {
-        DatasetType datasetType  = dataset.getDatasetType();
-        
+        DatasetType datasetType = dataset.getDatasetType();
+
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_TEMPORALCROSSREFERENCE) >= 0) {
-            return new TemporalReferenceImporter(file,dataset,datasource,dataType);
+            return new TemporalReferenceImporter(file, dataset, datasource, sqlDataTypes);
         }
-        
-        
-        //Temporal Profile
+
+        // Temporal Profile
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_TEMPORALPROFILE) >= 0) {
-            return new TemporalProfileImporter(file,dataset,datasource,dataType);
+            return new TemporalProfileImporter(file, dataset, datasource, sqlDataTypes);
         }
 
         // If no datasetType match then throw exception
@@ -87,16 +88,16 @@ public class ImporterFactory {
     // FIXME: use a better scheme than rely on 'type names'
     private Importer orlImporter(EmfDataset dataset, File file) throws ImporterException {
 
-        DatasetType datasetType  = dataset.getDatasetType();
+        DatasetType datasetType = dataset.getDatasetType();
 
         if (datasetType.getName().equals("ORL Nonpoint Inventory"))
-            return new ORLNonPointImporter(file, dataset, datasource, dataType);
+            return new ORLNonPointImporter(file, dataset, datasource, sqlDataTypes);
         if (datasetType.getName().equals("ORL Nonroad Inventory"))
-            return new ORLNonRoadImporter(file, dataset, datasource, dataType);
+            return new ORLNonRoadImporter(file, dataset, datasource, sqlDataTypes);
         if (datasetType.getName().equals("ORL Onroad Inventory"))
-            return new ORLOnRoadImporter(file, dataset, datasource, dataType);
+            return new ORLOnRoadImporter(file, dataset, datasource, sqlDataTypes);
         if (datasetType.getName().equals("ORL Point Inventory"))
-            return new ORLPointImporter(file, dataset, datasource, dataType);
+            return new ORLPointImporter(file, dataset, datasource, sqlDataTypes);
 
         throw new RuntimeException("Dataset Type - " + datasetType.getName() + " unsupported");
     }
