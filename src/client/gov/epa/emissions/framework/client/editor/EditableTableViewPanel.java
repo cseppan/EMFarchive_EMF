@@ -30,6 +30,8 @@ public class EditableTableViewPanel extends JPanel implements EditableTableView 
 
     private EditablePageData pageData;
 
+    private MessagePanel messagePanel;
+
     public EditableTableViewPanel(EmfDataset dataset, Version version, InternalSource source, MessagePanel messagePanel) {
         super(new BorderLayout());
         super.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -37,6 +39,7 @@ public class EditableTableViewPanel extends JPanel implements EditableTableView 
         this.dataset = dataset;
         this.version = version;
         this.source = source;
+        this.messagePanel = messagePanel;
 
         doLayout(messagePanel);
     }
@@ -65,7 +68,7 @@ public class EditableTableViewPanel extends JPanel implements EditableTableView 
 
     private JComponent createEditablePage(Page page) {
         pageData = new EditablePageData((int) dataset.getDatasetid(), version, page, cols());
-        return new EditableTableDataPanel(pageData);
+        return new EditableTableDataPanel(pageData, messagePanel);
     }
 
     // Filter out the first four (version-specific cols)

@@ -182,12 +182,7 @@ public class PaginationPanel extends JPanel {
     private IconButton lastButton(ImageResources res) {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doDisplayLast();
-                } catch (EmfException e) {
-                    messagePanel.setError("Could not display Last Page. Reason: " + e.getMessage());
-                }
-
+                doDisplayLast();
             }
         };
         return new IconButton("Last", "Go to Last Page", res.last("Go to Last Page"), action);
@@ -196,11 +191,7 @@ public class PaginationPanel extends JPanel {
     private IconButton nextButton(ImageResources res) {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doDisplayNext();
-                } catch (EmfException e) {
-                    messagePanel.setError("Could not display Next Page. Reason: " + e.getMessage());
-                }
+                doDisplayNext();
             }
         };
         return new IconButton("Next", "Go to Next Page", res.next("Go to Next Page"), action);
@@ -222,14 +213,34 @@ public class PaginationPanel extends JPanel {
     private IconButton firstButton(ImageResources res) {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doDisplayFirst();
-                } catch (EmfException e) {
-                    messagePanel.setError("Could not display First Page. Reason: " + e.getMessage());
-                }
+                doDisplayFirst();
             }
         };
         return new IconButton("First", "Go to First Page", res.first("Go to First Page"), action);
+    }
+
+    private void doDisplayNext() {
+        try {
+            presenter.doDisplayNext();
+        } catch (EmfException e) {
+            messagePanel.setError("Could not display Next Page. Reason: " + e.getMessage());
+        }
+    }
+
+    private void doDisplayLast() {
+        try {
+            presenter.doDisplayLast();
+        } catch (EmfException e) {
+            messagePanel.setError("Could not display Last Page. Reason: " + e.getMessage());
+        }
+    }
+
+    private void doDisplayFirst() {
+        try {
+            presenter.doDisplayFirst();
+        } catch (EmfException e) {
+            messagePanel.setError("Could not display First Page. Reason: " + e.getMessage());
+        }
     }
 
 }

@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.editor;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 import gov.epa.emissions.framework.ui.SelectableEmfTableData;
@@ -26,9 +27,13 @@ public class EditableTableDataPanel extends JPanel {
 
     private ScrollableTable table;
 
-    public EditableTableDataPanel(SelectableEmfTableData tableData) {
+    private MessagePanel messagePanel;
+
+    public EditableTableDataPanel(SelectableEmfTableData tableData, MessagePanel messagePanel) {
         super.setLayout(new BorderLayout());
         super.add(doLayout(tableData), BorderLayout.CENTER);
+
+        this.messagePanel = messagePanel;
     }
 
     private JPanel doLayout(SelectableEmfTableData tableData) {
@@ -84,8 +89,7 @@ public class EditableTableDataPanel extends JPanel {
 
         Button remove = new Button("Remove", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                tableData.removeSelected();
-                refresh();
+                doRemove(tableData);
             }
         });
         container.add(remove);
@@ -96,16 +100,29 @@ public class EditableTableDataPanel extends JPanel {
         return panel;
     }
 
+    protected void clearMessages() {
+        messagePanel.clear();
+        refresh();
+    }
+
     private void refresh() {
         tableModel.refresh();
         super.revalidate();
     }
 
     private void doAdd(final SelectableEmfTableData tableData) {
+        clearMessages();
+        
         tableData.addBlankRow();
         refresh();
-        
+
         table.moveToBottom();
+        refresh();
+    }
+
+    private void doRemove(final SelectableEmfTableData tableData) {
+        clearMessages();
+        tableData.removeSelected();
         refresh();
     }
 

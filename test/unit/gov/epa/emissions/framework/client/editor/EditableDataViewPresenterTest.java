@@ -142,22 +142,4 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
         return constraint;
     }
 
-    public void testShouldMarkVersionAsFinalChangesOnMarkFinal() throws Exception {
-        Version version = new Version();
-        String table = "table";
-
-        Mock service = mock(DataEditorService.class);
-        Constraint constraint = tokenConstraint(version, table);
-        service.expects(once()).method("closeSession").with(constraint);
-        service.expects(once()).method("markFinal").with(same(version)).will(returnValue(new Version()));
-
-        Mock view = mock(EditableDataView.class);
-        view.expects(once()).method("close").withNoArguments();
-
-        EditableDataViewPresenter p = new EditableDataViewPresenter(version, table, (EditableDataView) view.proxy(),
-                (DataEditorService) service.proxy());
-
-        p.doMarkFinal();
-    }
-
 }

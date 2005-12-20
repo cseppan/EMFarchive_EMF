@@ -34,6 +34,8 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
 
     private EditableTableViewPanel tableView;
 
+    private String table;
+
     public EditableDataViewWindow(EmfDataset dataset) {
         super("Dataset Editor - Dataset: " + dataset.getName());
         setDimension();
@@ -69,6 +71,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
     }
 
     public void display(Version version, String table, DataEditorService service) {
+        this.table = table;
         updateTitle(version, table);
 
         JPanel container = new JPanel(new BorderLayout());
@@ -90,14 +93,17 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
     private JPanel tablePanel(Version version, String table) {
         InternalSource source = source(table, dataset.getInternalSources());
         tableView = new EditableTableViewPanel(dataset, version, source, messagePanel);
+        displayTable(table);
 
+        return tableView;
+    }
+
+    private void displayTable(String table) {
         try {
             presenter.displayTable(tableView);
         } catch (EmfException e) {
             displayError("Could not display table: " + table + ". Reason: " + e.getMessage());
         }
-
-        return tableView;
     }
 
     private InternalSource source(String table, InternalSource[] sources) {
@@ -111,16 +117,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
 
     private JPanel controlPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-
-        panel.add(leftControlPanel(), BorderLayout.LINE_START);
         panel.add(rightControlPanel(), BorderLayout.LINE_END);
-
-        return panel;
-    }
-
-    private JPanel leftControlPanel() {
-        JPanel panel = new JPanel();
-        panel.add(markFinalButton());
 
         return panel;
     }
@@ -138,13 +135,8 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
     private Button closeButton() {
         Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doClose();
-                } catch (EmfException e) {
-                    displayError("Could not Close. Reason: " + e.getMessage());
-                }
+                doClose();
             }
-
         });
         close.setToolTipText("Close without Saving your changes");
         return close;
@@ -153,14 +145,8 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
     private Button saveButton() {
         Button save = new Button("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doSave();
-                    displayMessage("Saved changes.");
-                } catch (EmfException e) {
-                    displayError("Could not Save. Reason: " + e.getMessage());
-                }
+                doSave();
             }
-
         });
         save.setToolTipText("Save your changes");
         return save;
@@ -170,43 +156,59 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
         // TODO: prompts for Discard and Close (if changes exist)
         Button discard = new Button("Discard", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doDiscard();
-                    displayMessage("Discarded changes.");
-                } catch (EmfException e) {
-                    displayError("Could not Discard. Reason: " + e.getMessage());
-                }
+                doDiscard();
             }
-
         });
         discard.setToolTipText("Discard your changes");
         return discard;
-    }
-
-    private Button markFinalButton() {
-        // TODO: prompt for submit changes, save, and mark final - all in one step
-        Button markFinal = new Button("Mark Final", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doMarkFinal();
-                } catch (EmfException e) {
-                    displayError("Could not Mark version as Final. Reason: " + e.getMessage());
-                }
-            }
-
-        });
-        markFinal.setToolTipText("Save changes, Mark version as Final, and Close editor.");
-        return markFinal;
     }
 
     private void displayError(String message) {
         messagePanel.setError(message);
         refreshLayout();
     }
-    
+
     private void displayMessage(String message) {
         messagePanel.setMessage(message);
         refreshLayout();
+    }
+
+    private void doSave() {
+        clearMessages();
+        try {
+            presenter.doSave();
+            displayMessage("Saved changes.");
+        } catch (EmfException e) {
+            displayError("Could not Save. Reason: " + e.getMessage());
+        }
+
+        displayTable(table);
+    }
+
+    private void clearMessages() {
+        messagePanel.clear();
+        refreshLayout();
+    }
+
+    private void doClose() {
+        clearMessages();
+        try {
+            presenter.doClose();
+        } catch (EmfException e) {
+            displayError("Could not Close. Reason: " + e.getMessage());
+        }
+    }
+
+    private void doDiscard() {
+        clearMessages();
+        try {
+            presenter.doDiscard();
+            displayMessage("Discarded changes.");
+        } catch (EmfException e) {
+            displayError("Could not Discard. Reason: " + e.getMessage());
+        }
+
+        displayTable(table);
     }
 
 }

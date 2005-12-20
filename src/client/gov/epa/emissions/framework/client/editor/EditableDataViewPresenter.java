@@ -53,9 +53,4 @@ public class EditableDataViewPresenter {
         service.save(token);
     }
 
-    public void doMarkFinal() throws EmfException {
-        service.markFinal(version);
-        doClose();
-    }
-
 }
