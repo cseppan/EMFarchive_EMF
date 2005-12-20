@@ -70,7 +70,6 @@ public class EditableTableViewPanel extends JPanel implements EditableTableView 
 
     // Filter out the first four (version-specific cols)
     private String[] cols() {
-        // TODO: should these cols come from the Page/Service?
         List cols = new ArrayList();
 
         String[] allCols = source.getCols();

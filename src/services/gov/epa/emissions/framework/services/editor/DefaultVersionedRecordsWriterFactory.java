@@ -11,7 +11,7 @@ public class DefaultVersionedRecordsWriterFactory implements VersionedRecordsWri
 
     public VersionedRecordsWriter create(Datasource datasource, String table, SqlDataTypes sqlTypes)
             throws SQLException {
-        return new DefaultVersionedRecordsWriter(datasource, table, sqlTypes);
+        return new DefaultVersionedRecordsWriter(datasource, table);
     }
 
 }
