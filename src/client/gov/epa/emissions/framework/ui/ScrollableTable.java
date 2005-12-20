@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.ui;
 
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
@@ -46,6 +47,11 @@ public class ScrollableTable extends JScrollPane {
 
     public void disableScrolling() {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+    }
+
+    public void moveToBottom() {
+        JScrollBar vertical = getVerticalScrollBar();
+        vertical.setValue(vertical.getMaximum());
     }
 
 }

@@ -59,7 +59,7 @@ public class EditableTableViewPanel extends JPanel implements EditableTableView 
 
         paginationPanel.updateStatus(page);
 
-        // FIXME: why is Dataset Id int, and not long?
+        // FIXME: why is Dataset Id 'int', and not long?
         pageContainer.add(createEditablePage(page), BorderLayout.CENTER);
     }
 
@@ -80,7 +80,7 @@ public class EditableTableViewPanel extends JPanel implements EditableTableView 
     }
 
     public ChangeSet changeset() {
-        // if not initializes, no changes
+        // if not initialized, no changes
         return pageData != null ? pageData.changeset() : new ChangeSet();
     }
 

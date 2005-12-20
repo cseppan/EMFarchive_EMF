@@ -24,6 +24,8 @@ public class EditableTableDataPanel extends JPanel {
 
     private EmfTableModel tableModel;
 
+    private ScrollableTable table;
+
     public EditableTableDataPanel(SelectableEmfTableData tableData) {
         super.setLayout(new BorderLayout());
         super.add(doLayout(tableData), BorderLayout.CENTER);
@@ -66,7 +68,8 @@ public class EditableTableDataPanel extends JPanel {
 
     private JScrollPane table(TableData tableData) {
         tableModel = new EmfTableModel(tableData);
-        return new ScrollableTable(tableModel);
+        table = new ScrollableTable(tableModel);
+        return table;
     }
 
     private JPanel buttonsPanel(final SelectableEmfTableData tableData) {
@@ -74,8 +77,7 @@ public class EditableTableDataPanel extends JPanel {
 
         Button add = new Button("Add", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                tableData.addBlankRow();
-                refresh();
+                doAdd(tableData);
             }
         });
         container.add(add);
@@ -97,6 +99,14 @@ public class EditableTableDataPanel extends JPanel {
     private void refresh() {
         tableModel.refresh();
         super.revalidate();
+    }
+
+    private void doAdd(final SelectableEmfTableData tableData) {
+        tableData.addBlankRow();
+        refresh();
+        
+        table.moveToBottom();
+        refresh();
     }
 
 }

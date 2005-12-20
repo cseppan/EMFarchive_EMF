@@ -155,6 +155,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
             public void actionPerformed(ActionEvent event) {
                 try {
                     presenter.doSave();
+                    displayMessage("Saved changes.");
                 } catch (EmfException e) {
                     displayError("Could not Save. Reason: " + e.getMessage());
                 }
@@ -171,6 +172,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
             public void actionPerformed(ActionEvent event) {
                 try {
                     presenter.doDiscard();
+                    displayMessage("Discarded changes.");
                 } catch (EmfException e) {
                     displayError("Could not Discard. Reason: " + e.getMessage());
                 }
@@ -199,6 +201,11 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
 
     private void displayError(String message) {
         messagePanel.setError(message);
+        refreshLayout();
+    }
+    
+    private void displayMessage(String message) {
+        messagePanel.setMessage(message);
         refreshLayout();
     }
 

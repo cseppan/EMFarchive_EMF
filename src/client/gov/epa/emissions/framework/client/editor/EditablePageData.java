@@ -141,8 +141,9 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
         record.setVersion(version.getVersion());
         record.setDeleteVersions("");
         List tokens = new ArrayList();
-        for (int i = 0; i < cols.length; i++)
+        for (int i = 0; i < cols.length - 1; i++)
             tokens.add("");
+        tokens.add("!");
         record.setTokens((String[]) tokens.toArray(new String[0]));
 
         rows.add(row(record));
@@ -163,4 +164,5 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
     public ChangeSet changeset() {
         return changeset;
     }
+
 }

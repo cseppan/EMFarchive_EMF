@@ -6,4 +6,5 @@ public interface EditableTableView extends TableView {
     void observe(EditableTablePresenter presenter);
 
     ChangeSet changeset();
+
 }

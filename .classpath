@@ -60,11 +60,11 @@
 	<classpathentry kind="lib" path="lib/dev/jmock/jmock-SNAPSHOT-09262005.jar"/>
 	<classpathentry kind="lib" path="lib/jnlp.jar"/>
 	<classpathentry kind="lib" path="lib/c3p0-0.9.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/emissions-commons-0.1.4.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat/postgresql-8.1-404.jdbc3.jar"/>
 	<classpathentry kind="lib" path="lib/activation.jar"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/saaj-api.jar"/>
 	<classpathentry kind="lib" path="lib/saaj-impl.jar"/>
+	<classpathentry kind="lib" path="lib/epa-commons-0.1.4.jar"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>
