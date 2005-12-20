@@ -37,7 +37,9 @@ public class ImporterFactory {
 
     public Importer create(EmfDataset dataset, File folder, String filename) throws ImporterException {
         DatasetType datasetType = dataset.getDatasetType();
-
+        String[] filePatterns = new String[1];
+        filePatterns[0]=filename;
+                
         // FIXME: Get the specific type of importer for the filetype. Use a
         // Factory pattern
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_ORL) >= 0) {
@@ -51,19 +53,19 @@ public class ImporterFactory {
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_SHAPEFILES) >= 0) {
-            return new ShapeFilesImporter(folder, filename, dataset);
+            return new ShapeFilesImporter(folder,filePatterns,dataset,datasource,sqlDataTypes);
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_EXTERNALFILES) >= 0) {
-            return new ExternalFilesImporter(folder, filename, dataset);
+            return new ExternalFilesImporter(folder,filePatterns,dataset,datasource,sqlDataTypes);
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_MODELREADYEMISSIONSFILES) >= 0) {
-            return new ModelReadyEmissionsFilesImporter(folder, filename, dataset);
+            return new ModelReadyEmissionsFilesImporter(folder,filePatterns,dataset,datasource,sqlDataTypes);
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_METEOROLOGYFILES) >= 0) {
-            return new MeteorologyFilesImporter(folder, filename, dataset);
+            return new MeteorologyFilesImporter(folder,filePatterns,dataset,datasource,sqlDataTypes);
         }
 
         return null;
