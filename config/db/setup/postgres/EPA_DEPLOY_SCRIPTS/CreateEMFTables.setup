@@ -117,29 +117,31 @@ ALTER TABLE emf.emf_properties OWNER TO emf;
 --emf.emf_properties
 --
 -- emf.dataset_types
-CREATE SEQUENCE emf.datasettypes_dataset_type_id_seq
+CREATE SEQUENCE emf.dataset_types_dataset_type_id_seq
   INCREMENT 1
   MINVALUE 1
   MAXVALUE 9223372036854775807
   START 200
   CACHE 1;
-ALTER TABLE emf.datasettypes_dataset_type_id_seq OWNER TO emf;
---
-CREATE TABLE emf.datasettypes
+ALTER TABLE emf.dataset_types_dataset_type_id_seq OWNER TO emf;
+
+
+CREATE TABLE emf.dataset_types
 (
-  dataset_type_id int4 NOT NULL DEFAULT nextval('emf.datasettypes_dataset_type_id_seq'::text),
+  dataset_type_id int4 NOT NULL DEFAULT nextval('emf.dataset_types_dataset_type_id_seq'::text),
   name varchar(255) NOT NULL,
   description text NOT NULL,
-  minfiles int4 NOT NULL DEFAULT 0,
-  maxfiles int4 NOT NULL DEFAULT 0,
-  min_columns int4 NOT NULL DEFAULT 0,
-  max_columns int4 NOT NULL DEFAULT 0,
+  minfiles int4 NOT NULL DEFAULT 1,
+  maxfiles int4 NOT NULL DEFAULT 1,
   "external" bool NOT NULL DEFAULT false,
-  CONSTRAINT datasettypes_pkey PRIMARY KEY (dataset_type_id),
-  CONSTRAINT datasettypes_dataset_type_id_key UNIQUE (dataset_type_id)
+  importer_class_name varchar(255),
+  exporter_class_name varchar(255),
+  CONSTRAINT dataset_types_pkey PRIMARY KEY (dataset_type_id),
+  CONSTRAINT dataset_types_dataset_type_id_key UNIQUE (dataset_type_id)
 ) 
 WITHOUT OIDS;
-ALTER TABLE emf.datasettypes OWNER TO emf;
+ALTER TABLE emf.dataset_types OWNER TO emf;
+
 -- emf.dataset_types
 --
 -- emf.datasets
@@ -216,7 +218,7 @@ CREATE TABLE emf.dataset_types_keywords
   list_index int4,
   keyword_id int4 NOT NULL,
   CONSTRAINT dataset_types_keywords_pkey PRIMARY KEY (id),
-  CONSTRAINT dataset_types_keywords_to_datasetstypes FOREIGN KEY (dataset_type_id) REFERENCES emf.datasettypes (dataset_type_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT dataset_types_keywords_to_datasetstypes FOREIGN KEY (dataset_type_id) REFERENCES emf.dataset_types (dataset_type_id) ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT dataset_types_keywords_to_emf_keywords FOREIGN KEY (keyword_id) REFERENCES emf.emf_keywords (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;

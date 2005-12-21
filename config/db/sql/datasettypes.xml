@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<dataset>
-  <datasettypes name="ORL Nonpoint Inventory" id="0" description="ORL Nonpoint Inventory" minfiles="1" maxfiles="1" uid="1882552005caf5c00105caf5c29f0001"/>
-  <datasettypes name="ORL Nonroad Inventory" id="0" description="ORL Nonroad Inventory" minfiles="1" maxfiles="1" uid="1882552005caf5c00105caf5c2c70002"/>
-  <datasettypes name="ORL Onroad Inventory" id="0" description="ORL Onroad Inventory" minfiles="1" maxfiles="1" uid="1882552005caf78b0105caf78db80001"/>
-  <datasettypes name="ORL Point Inventory" id="0" description="ORL Point Inventory" minfiles="1" maxfiles="1" uid="1882552005caf78b0105caf78e120002"/>
-</dataset>

@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.PostgresDbUpdate;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
@@ -63,7 +64,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     protected void tearDown() throws Exception {
         service.closeSession(token);
 
-        DbUpdate dbUpdate = new DbUpdate(datasource.getConnection());
+        DbUpdate dbUpdate = new PostgresDbUpdate(datasource.getConnection());
         dbUpdate.dropTable(datasource.getName(), dataset.getName());
 
         DataModifier modifier = datasource.dataModifier();

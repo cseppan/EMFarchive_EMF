@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.db.DbUpdate;
+import gov.epa.emissions.commons.db.PostgresDbUpdate;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
@@ -26,7 +27,7 @@ public class DatasetPersistenceTest extends HibernateTestCase {
     }
 
     protected void tearDown() throws Exception {
-        DbUpdate emissionsUpdate = new DbUpdate(emissions().getConnection());
+        DbUpdate emissionsUpdate = new PostgresDbUpdate(emissions().getConnection());
         emissionsUpdate.deleteAll(emissions().getName(), "versions");
 
         ExImDbUpdate eximUpdate = new ExImDbUpdate();

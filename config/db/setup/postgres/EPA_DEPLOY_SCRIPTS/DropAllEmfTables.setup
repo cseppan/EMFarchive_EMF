@@ -26,8 +26,8 @@ DROP TABLE emf.dataset_types_keywords;
 -- emf ... KEYWORDS framework
 --
 -- emf.dataset_types
-DROP TABLE emf.DATASETTYPES CASCADE;
-DROP SEQUENCE emf.datasettypes_dataset_type_id_seq;
+DROP TABLE emf.dataset_types CASCADE;
+DROP SEQUENCE emf.dataset_types_dataset_type_id_seq;
 -- emf.dataset_types
 --
 -- emf.datasets must

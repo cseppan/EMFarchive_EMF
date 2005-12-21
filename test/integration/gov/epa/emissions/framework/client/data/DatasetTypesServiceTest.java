@@ -19,6 +19,7 @@ public class DatasetTypesServiceTest extends ServicesTestCase {
 
     public void testShouldReturnCompleteListOfDatasetTypes() throws EmfException {
         DatasetType[] types = services.getDatasetTypes();
+        System.out.println("Number of datasets returned = " + types.length);
         assertTrue(types.length >= 8);
     }
 

@@ -1,19 +1,18 @@
 ---- DatasetTypes
-DROP TABLE emf.DATASETTYPES CASCADE;
-DROP SEQUENCE emf.datasettypes_dataset_type_id_seq;
+DROP TABLE emf.dataset_types CASCADE;
+DROP SEQUENCE emf.dataset_types_dataset_type_id_seq;
 
-CREATE SEQUENCE emf.datasettypes_dataset_type_id_seq
+CREATE SEQUENCE emf.dataset_types_dataset_type_id_seq
   INCREMENT 1
   MINVALUE 1
   MAXVALUE 9223372036854775807
   START 200
   CACHE 1;
-ALTER TABLE emf.datasettypes_dataset_type_id_seq OWNER TO emf;
+ALTER TABLE emf.dataset_types_dataset_type_id_seq OWNER TO emf;
 
-
-CREATE TABLE emf.datasettypes
+CREATE TABLE emf.dataset_types
 (
-  dataset_type_id int4 NOT NULL DEFAULT nextval('emf.datasettypes_dataset_type_id_seq'::text),
+  dataset_type_id int4 NOT NULL DEFAULT nextval('emf.dataset_types_dataset_type_id_seq'::text),
   name varchar(255) NOT NULL,
   description text NOT NULL,
   minfiles int4 NOT NULL DEFAULT 1,
@@ -21,21 +20,21 @@ CREATE TABLE emf.datasettypes
   "external" bool NOT NULL DEFAULT false,
   importer_class_name varchar(255),
   exporter_class_name varchar(255),
-  CONSTRAINT datasettypes_pkey PRIMARY KEY (dataset_type_id),
-  CONSTRAINT datasettypes_dataset_type_id_key UNIQUE (dataset_type_id)
+  CONSTRAINT dataset_types_pkey PRIMARY KEY (dataset_type_id),
+  CONSTRAINT dataset_types_dataset_type_id_key UNIQUE (dataset_type_id)
 ) 
 WITHOUT OIDS;
-ALTER TABLE emf.datasettypes OWNER TO emf;
+ALTER TABLE emf.dataset_types OWNER TO emf;
 
 ---- Load Data
-delete from emf.datasettypes;
-insert into emf.datasettypes values(1,'ORL Nonpoint Inventory','ORL Nonpoint Inventory', '1', '1', 8, 12);
-insert into emf.datasettypes values(2,'ORL Nonroad Inventory','ORL Nonroad Inventory', '1', '1', 4, 8);
-insert into emf.datasettypes values(3,'ORL Onroad Inventory','ORL Onroad Inventory', '1', '1', 4, 5);
-insert into emf.datasettypes values(4,'ORL Point Inventory','ORL Point Inventory', '1', '1', 23, 28);
-insert into emf.datasettypes values(5,'Shapefile','Shapefile', '3', '-1','-1','-1', true);
-insert into emf.datasettypes values(6,'External File','External File', '1', '-1','-1','-1', true);
-insert into emf.datasettypes values(7,'Meteorology File','Meteorology File', '1', '-1','-1','-1', true);
-insert into emf.datasettypes values(8,'Model Ready Emissions File','Model Ready Emissions', '1', '-1','-1','-1', true);
-insert into emf.datasettypes values(9,'Temporal Cross Reference','Temporal Cross Reference', '1', '1','12','12', false);
-insert into emf.datasettypes values(10,'Temporal Profile','Temporal Profile', '1', '1','26','26', false);
+delete from emf.dataset_types;
+insert into emf.dataset_types values(1,'ORL Nonpoint Inventory','ORL Nonpoint Inventory', '1', '1', false, '', '');
+insert into emf.dataset_types values(2,'ORL Nonroad Inventory','ORL Nonroad Inventory', '1', '1', false, '', '');
+insert into emf.dataset_types values(3,'ORL Onroad Inventory','ORL Onroad Inventory', '1', '1', false, '', '');
+insert into emf.dataset_types values(4,'ORL Point Inventory','ORL Point Inventory', '1', '1', false, '', '');
+insert into emf.dataset_types values(5,'Shapefile','Shapefile', '3', '-1', true, 'gov.epa.emissions.commons.io.external.ShapeFilesImporter', '');
+insert into emf.dataset_types values(6,'External File','External File', '1', '-1', true, 'gov.epa.emissions.commons.io.external.ExternalFilesImporter', '');
+insert into emf.dataset_types values(7,'Meteorology File','Meteorology File', '1', '-1', true, 'gov.epa.emissions.commons.io.external.MeteorologyFilesImporter', '');
+insert into emf.dataset_types values(8,'Model Ready Emissions File','Model Ready Emissions', '1', '-1',true, 'gov.epa.emissions.commons.io.external.ModelReadyEmissionsFilesImporter', '');
+insert into emf.dataset_types values(9,'Temporal Cross Reference','Temporal Cross Reference', '1', '1',false, '', '');
+insert into emf.dataset_types values(10,'Temporal Profile','Temporal Profile', '1', '1',false, '', '');

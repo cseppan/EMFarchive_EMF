@@ -21,7 +21,7 @@ CREATE TABLE emf.dataset_types_keywords
   list_index int4,
   keyword_id int4 NOT NULL,
   CONSTRAINT dataset_types_keywords_pkey PRIMARY KEY (id),
-  CONSTRAINT dataset_types_keywords_to_datasetstypes FOREIGN KEY (dataset_type_id) REFERENCES emf.datasettypes (dataset_type_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT dataset_types_keywords_to_datasetstypes FOREIGN KEY (dataset_type_id) REFERENCES emf.dataset_types (dataset_type_id) ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT dataset_types_keywords_to_emf_keywords FOREIGN KEY (keyword_id) REFERENCES emf.emf_keywords (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
