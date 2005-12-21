@@ -16,4 +16,6 @@ public interface TableData {
 
     List elements(int[] selected);
 
+    void setValueAt(Object value, int row, int col);
+
 }

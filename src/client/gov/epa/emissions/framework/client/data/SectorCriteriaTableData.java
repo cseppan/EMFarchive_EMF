@@ -57,14 +57,6 @@ public class SectorCriteriaTableData extends AbstractTableData implements Select
         return new EditableRow(source);
     }
 
-    public void setValueAt(Object value, int row, int col) {
-        if (!isEditable(col))
-            return;
-
-        EditableRow editableRow = (EditableRow) rows.get(row);
-        editableRow.setValueAt(value, col);
-    }
-
     private SectorCriteria[] getSelected() {
         List selected = new ArrayList();
 

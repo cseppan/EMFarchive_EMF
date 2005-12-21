@@ -58,14 +58,6 @@ public class KeywordsTableData extends AbstractTableData implements SelectableEm
         return new EditableRow(source);
     }
 
-    public void setValueAt(Object value, int row, int col) {
-        if (!isEditable(col))
-            return;
-
-        EditableRow editableRow = (EditableRow) rows.get(row);
-        editableRow.setValueAt(value, col);
-    }
-
     private KeyVal[] getSelected() {
         List selected = new ArrayList();
 

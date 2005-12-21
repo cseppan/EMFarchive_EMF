@@ -64,8 +64,8 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
     }
 
     public void setValueAt(Object value, int row, int col) {
-        Row rowObj = (Row) rows.get(row);
-        rowObj.setValueAt(value, col);
+        if (isCellEditable(row, col))
+            tableData.setValueAt(value, row, col);
     }
 
 }

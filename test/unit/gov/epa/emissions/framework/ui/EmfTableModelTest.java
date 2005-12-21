@@ -100,4 +100,35 @@ public class EmfTableModelTest extends MockObjectTestCase {
         model = new EmfTableModel((TableData) tableData.proxy());
         assertEquals(Integer.class, model.getColumnClass(2));
     }
+
+    public void testShouldDelegateSetValueToTableDataOnSetValueAt() {
+        Object value = "val";
+        int row = 2;
+        int col = 3;
+
+        Mock tableData = mock(TableData.class);
+        tableData.stubs().method("rows").withNoArguments().will(returnValue(null));
+        tableData.stubs().method("columns").withNoArguments().will(returnValue(null));
+        tableData.expects(once()).method("setValueAt").with(eq(value), eq(new Integer(row)), eq(new Integer(col)));
+        tableData.stubs().method("isEditable").with(eq(new Integer(col))).will(returnValue(Boolean.TRUE));
+
+        model = new EmfTableModel((TableData) tableData.proxy());
+
+        model.setValueAt(value, row, col);
+    }
+
+    public void testShouldNotSetValueOnTableDataWhenCellIsUneditableOnSetValueAt() {
+        Object value = "val";
+        int row = 2;
+        int col = 3;
+
+        Mock tableData = mock(TableData.class);
+        tableData.stubs().method("rows").withNoArguments().will(returnValue(null));
+        tableData.stubs().method("columns").withNoArguments().will(returnValue(null));
+        tableData.stubs().method("isEditable").with(eq(new Integer(col))).will(returnValue(Boolean.FALSE));
+
+        model = new EmfTableModel((TableData) tableData.proxy());
+
+        model.setValueAt(value, row, col);
+    }
 }

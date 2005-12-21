@@ -170,14 +170,6 @@ public class PaginationPanel extends JPanel {
         return slider;
     }
 
-    private void displayPage(int record) {
-        try {
-            presenter.doDisplayPageWithRecord(record);
-        } catch (EmfException e) {
-            messagePanel.setError("Could not display Page with record: " + record + ". Reason: " + e.getMessage());
-        }
-    }
-
     // FIXME: change messages about 'page' to 'range' ??
     private IconButton lastButton(ImageResources res) {
         Action action = new AbstractAction() {
@@ -200,12 +192,9 @@ public class PaginationPanel extends JPanel {
     private IconButton prevButton(ImageResources res) {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doDisplayPrevious();
-                } catch (EmfException e) {
-                    messagePanel.setError("Could not display Previous Page. Reason: " + e.getMessage());
-                }
+                doDisplayPrevious();
             }
+
         };
         return new IconButton("Prev", "Go to Previous Page", res.prev("Go to Previous Page"), action);
     }
@@ -219,23 +208,52 @@ public class PaginationPanel extends JPanel {
         return new IconButton("First", "Go to First Page", res.first("Go to First Page"), action);
     }
 
+    private void doDisplayPrevious() {
+        clearMessages();
+        try {
+            presenter.doDisplayPrevious();
+        } catch (EmfException e) {
+            setErrorMessage("Could not display Previous Page. Reason: " + e.getMessage());
+        }
+    }
+
     private void doDisplayNext() {
+        clearMessages();
         try {
             presenter.doDisplayNext();
         } catch (EmfException e) {
-            messagePanel.setError("Could not display Next Page. Reason: " + e.getMessage());
+            setErrorMessage("Could not display Next Page. Reason: " + e.getMessage());
+        }
+    }
+
+    private void setErrorMessage(String message) {
+        messagePanel.setError(message);
+    }
+
+    private void clearMessages() {
+        messagePanel.clear();
+    }
+
+    private void displayPage(int record) {
+        clearMessages();
+        try {
+            presenter.doDisplayPageWithRecord(record);
+        } catch (EmfException e) {
+            messagePanel.setError("Could not display Page with record: " + record + ". Reason: " + e.getMessage());
         }
     }
 
     private void doDisplayLast() {
+        clearMessages();
         try {
             presenter.doDisplayLast();
         } catch (EmfException e) {
-            messagePanel.setError("Could not display Last Page. Reason: " + e.getMessage());
+            setErrorMessage("Could not display Last Page. Reason: " + e.getMessage());
         }
     }
 
     private void doDisplayFirst() {
+        clearMessages();
         try {
             presenter.doDisplayFirst();
         } catch (EmfException e) {

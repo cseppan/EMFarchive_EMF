@@ -83,8 +83,7 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
         if (!isEditable(col))
             return;
 
-        EditableRow editableRow = (EditableRow) rows.get(row);
-        editableRow.setValueAt(value, col);
+        super.setValueAt(value, row, col);
 
         if (col != 0) // not Select
             addUpdated(row);
@@ -94,11 +93,13 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
         EditableRow editableRow = (EditableRow) rows.get(row);
         VersionedRecord record = (VersionedRecord) editableRow.source();
 
-        if (changeset.containsNew(record))// ignore changes to new records
+        if (changeset.containsNew(record)) {// ignore changes to new records
             return;
+        }
 
-        if (!changeset.containsUpdated(record))
+        if (!changeset.containsUpdated(record)) {
             changeset.addUpdated(record);
+        }
     }
 
     private VersionedRecord[] getSelected() {

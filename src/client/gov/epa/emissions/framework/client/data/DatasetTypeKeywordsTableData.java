@@ -37,14 +37,6 @@ public class DatasetTypeKeywordsTableData extends AbstractTableData implements S
         rows.add(row(new Keyword(keyword), masterKeywords));
     }
 
-    public void setValueAt(Object value, int row, int col) {
-        if (!isEditable(col))
-            return;
-
-        EditableRow editableRow = (EditableRow) rows.get(row);
-        editableRow.setValueAt(value, col);
-    }
-
     public Keyword[] sources() {
         List sources = sourcesList();
         return (Keyword[]) sources.toArray(new Keyword[0]);
