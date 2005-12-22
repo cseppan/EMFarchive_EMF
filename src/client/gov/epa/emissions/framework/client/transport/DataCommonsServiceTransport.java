@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.io.Sector;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataCommonsService;
@@ -161,5 +162,65 @@ public class DataCommonsServiceTransport implements DataCommonsService {
     private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
         LOG.error(message, fault);
         throw new EmfException(extractMessage(fault.getMessage()));
+    }
+
+    public Sector getSectorLock(User user, Sector sector) throws EmfException {
+        Sector modifiedSector=null;
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            call.setOperationName(mappings.qname("getSectorLock"));
+            call.addParameter("user", mappings.user(),ParameterMode.IN);
+            call.addParameter("sector", mappings.sector(), ParameterMode.IN);
+            call.setReturnType(mappings.sector());
+
+            modifiedSector = (Sector) call.invoke(new Object[] {user, sector });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not get sector lock: " + sector.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not get sector lock: " + sector.getName(), e);
+        }
+        return modifiedSector;
+    }
+
+    public Sector updateSector(User user, Sector sector) throws EmfException {
+        Sector modifiedSector=null;
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            call.setOperationName(mappings.qname("updateSector"));
+            call.addParameter("user", mappings.user(),ParameterMode.IN);
+            call.addParameter("sector", mappings.sector(), ParameterMode.IN);
+            call.setReturnType(mappings.sector());
+
+            modifiedSector = (Sector) call.invoke(new Object[] {user, sector });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not update locked Sector: " + sector.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not update locked Sector: " + sector.getName(), e);
+        }
+        return modifiedSector;
+    }
+
+    public Sector releaseSectorLock(User user, Sector sector) throws EmfException {
+        Sector modifiedSector=null;
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            call.setOperationName(mappings.qname("releaseSectorLock"));
+            call.addParameter("user", mappings.user(),ParameterMode.IN);
+            call.addParameter("sector", mappings.sector(), ParameterMode.IN);
+            call.setReturnType(mappings.sector());
+
+            modifiedSector = (Sector) call.invoke(new Object[] {user, sector });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not release sector lock: " + sector.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not release sector lock: " + sector.getName(), e);
+        }
+        return modifiedSector;
     }
 }

@@ -11,4 +11,5 @@ public class DataCommonsServiceImplTest extends DataCommonsServiceTestCase {
         super.setUpService(new DataCommonsServiceImpl(sessionFactory));
     }
 
+    
 }

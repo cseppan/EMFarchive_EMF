@@ -2,9 +2,11 @@ package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.io.Sector;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.Country;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -175,5 +177,89 @@ public class DataCommonsDAO {
         }
 
     }
+
+    public static Sector getSectorLock(User user, Sector sector, Session session) {
+        log.debug("getting sector lock: " + sector.getName() + " for user: " + user.getFullName());
+        Sector modifiedSector;
+        Transaction tx = null;
+
+        sector.setUsername(user.getFullName());
+        sector.setLockDate(new Date());
+        
+        log.debug("Sector params: " + sector.getUsername() + " :lock date: " + sector.getLockDate());
+        
+        try {
+            tx = session.beginTransaction();
+            session.update(sector);
+            tx.commit();
+            modifiedSector = sectors(sector.getId(),session);
+            log.debug("getting sector lock: " + sector.getId());
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
+        }
+        return modifiedSector;
+    }
+
+    public static Sector releaseSectorLock(User user, Sector sector, Session session) {
+        log.debug("releasing sector lock: " + sector.getId());
+        Sector modifiedSector;
+        Transaction tx = null;
+
+        sector.setUsername(null);
+        sector.setLockDate(null);
+        
+        try {
+            tx = session.beginTransaction();
+            session.update(sector);
+            tx.commit();
+            modifiedSector = sectors(sector.getId(),session);
+            log.debug("releasing sector lock: " + sector.getId());
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
+        }
+        return modifiedSector;        
+    }
+
+    public static Sector updateSector(User user, Sector sector, Session session) {
+        log.debug("updating sector with lock: " + sector.getId());
+        Sector modifiedSector;
+        Transaction tx = null;
+
+        sector.setUsername(user.getFullName());
+        sector.setLockDate(new Date());
+        
+        try {
+            tx = session.beginTransaction();
+            session.update(sector);
+            sector.setUsername(null);            
+            sector.setLockDate(null);
+            session.update(sector);
+            tx.commit();
+            modifiedSector = sectors(sector.getId(),session);
+            log.debug("updating sector with lock: " + sector.getId());
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
+        }
+        return modifiedSector;        
+    }
+
+    private static Sector sectors(long id,Session session) {
+        List sectors = DataCommonsDAO.getSectors(session);
+        Iterator iter = sectors.iterator();
+        while (iter.hasNext()){
+            Sector sector = (Sector)iter.next();
+            if (sector.getId()==id){
+                return sector;
+            }
+        }
+        return null;
+    }
+
 
 }

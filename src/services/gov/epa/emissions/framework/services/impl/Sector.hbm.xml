@@ -10,6 +10,8 @@
  	</id>
 	<property name="name"			column="name"			type="java.lang.String"		not-null="true"/>
 	<property name="description" 	column="description"	type="java.lang.String"		not-null="false"/>
+	<property name="username" 	column="username"	type="java.lang.String"		not-null="false"/>
+    <property name="lockDate"		column="lock_date" 	type="java.util.Date"		not-null="false"	length="4"/>        
 	
 	<array name="sectorCriteria" table="sectorcriteria">
     <key column="sector_id"/>

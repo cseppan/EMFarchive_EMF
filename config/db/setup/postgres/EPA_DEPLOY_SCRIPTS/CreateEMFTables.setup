@@ -65,6 +65,8 @@ CREATE TABLE emf.sectors
   id int4 NOT NULL DEFAULT nextval('emf.sectors_id_seq'::text),
   name varchar(255) NOT NULL,
   description text,
+  username varchar(255),
+  lock_date timestamp,
   CONSTRAINT sectors_id_key UNIQUE (id),
   CONSTRAINT sectors_pk PRIMARY KEY (id)
 ) 

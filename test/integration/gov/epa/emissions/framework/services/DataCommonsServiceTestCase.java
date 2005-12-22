@@ -1,16 +1,22 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.Sector;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.db.PostgresDbUpdate;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
 
     private DataCommonsService service;
+    private UserService userService;
 
-    protected void setUpService(DataCommonsService service) {
+    protected void setUpService(DataCommonsService service)  throws Exception{
         this.service = service;
+
+        ServiceLocator serviceLocator = serviceLocator();
+        userService = serviceLocator.userService();
     }
 
     public void testShouldReturnCompleteListOfSectors() throws EmfException {
@@ -64,6 +70,59 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         }
 
         return null;
+    }
+    
+    public void testShouldGetSectorLock() throws EmfException{
+            User user = userService.getUser("emf");
+            Sector[] sectors = service.getSectors();
+            Sector sector = sectors[0];
+            
+            Sector modifiedSector = service.getSectorLock(user,sector);
+            
+            //Sector object returned from the lock call
+            assertEquals(modifiedSector.getUsername(),user.getFullName());
+
+            //Sector object returned directly from the sector table
+            Sector modifiedSector2 = sectors(sector.getId());
+            assertEquals(modifiedSector2.getUsername(),user.getFullName());            
+    }
+    
+    public void testShouldReleaseSectorLock() throws EmfException{
+        User user = userService.getUser("emf");
+        Sector[] sectors = service.getSectors();
+        Sector sector = sectors[0];
+        
+        Sector modifiedSector = service.releaseSectorLock(user,sector);
+
+        //Sector object returned from the lock call
+        assertEquals(modifiedSector.getUsername(),null);
+
+        //Sector object returned directly from the sector table
+        Sector modifiedSector2 = sectors(sector.getId());
+        assertEquals(modifiedSector2.getUsername(),null);            
+}
+
+    public void testShouldUpdateSectorWithLocking() throws EmfException{
+        User user = userService.getUser("emf");
+
+        Sector[] sectors = service.getSectors();
+        Sector sector = sectors[0];
+        String name = sector.getName();
+        
+        Sector modifiedSector1 = service.getSectorLock(user,sector);
+        assertEquals(modifiedSector1.getUsername(),user.getFullName());
+        modifiedSector1.setName("TEST");
+        
+        Sector modifiedSector2 = service.updateSector(user,modifiedSector1);
+        assertEquals("TEST", modifiedSector1.getName());
+        assertEquals(modifiedSector2.getUsername(),null);
+
+        // restore
+        Sector modifiedSector = service.getSectorLock(user,sector);
+        modifiedSector.setName(name);
+        Sector modifiedSector3 = service.updateSector(user,modifiedSector);
+        assertEquals(sector.getName(), modifiedSector3.getName());
+        
     }
 
 }
