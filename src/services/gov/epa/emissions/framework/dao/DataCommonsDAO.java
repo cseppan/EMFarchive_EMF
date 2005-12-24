@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.Country;
+import gov.epa.emissions.framework.services.EMFConstants;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -204,7 +205,7 @@ public class DataCommonsDAO {
         if (modifiedSector.getUsername()!= null){
             // get the time difference between now and when the lock was acquired by the other user
            long timeDifference = new Date().getTime() - modifiedSector.getLockDate().getTime();
-           if (timeDifference>12*60*60*1000){
+           if (timeDifference>EMFConstants.EMF_LOCK_TIMEOUT_VALUE){
                modifiedSector = grabLock(user,modifiedSector,session);
            }
         }else{

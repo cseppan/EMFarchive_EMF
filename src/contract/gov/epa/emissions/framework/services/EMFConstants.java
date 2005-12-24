@@ -34,4 +34,5 @@ public final class EMFConstants {
 
     public static final int PAGE_SIZE = 10;
 
+    public static final long EMF_LOCK_TIMEOUT_VALUE = 12*60*60*1000;
 }
