@@ -71,6 +71,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
 
         return null;
     }
+   
     
     public void testShouldGetSectorLock() throws EmfException{
             User user = userService.getUser("emf");

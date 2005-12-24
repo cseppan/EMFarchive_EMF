@@ -178,11 +178,44 @@ public class DataCommonsDAO {
 
     }
 
+    /**
+     * This method will check if the current sector record has a lock.  If it does it will
+     * return the sector object with the lock parameters to the current user indicating who is using this object.
+     * If the lock is older than 12 hours then the current user will be given the lock.
+     * 
+     * If there is no lock, this user will grab the lock and a modified record indicating the ownership of the lock is
+     * set back to the GUI.
+     * 
+     * The client will cross check those paramters in the returned sector object against the current user in the GUI.  If the user
+     * is the same the GUI will allow the user to edit.  If not the GUI will switch to view mode and a dialog will display the Full Name
+     * of the user who has the lock and the date the lock was acquired.
+     * 
+     */
     public static Sector getSectorLock(User user, Sector sector, Session session) {
         log.debug("getting sector lock: " + sector.getName() + " for user: " + user.getFullName());
         Sector modifiedSector;
-        Transaction tx = null;
 
+        // get the record for this object from the database and check if there is a lock in place
+        // if there is a lock then return the sector object with the lock parameters to the client
+        // if there is no lock then grab the lock for this user.
+        
+        modifiedSector = DataCommonsDAO.sectors(sector.getId(),session);
+        
+        if (modifiedSector.getUsername()!= null){
+            // get the time difference between now and when the lock was acquired by the other user
+           long timeDifference = new Date().getTime() - modifiedSector.getLockDate().getTime();
+           if (timeDifference>12*60*60*1000){
+               modifiedSector = grabLock(user,modifiedSector,session);
+           }
+        }else{
+            modifiedSector = grabLock(user,modifiedSector,session);        
+        }
+        return modifiedSector;
+    }
+
+    private static Sector grabLock(User user, Sector sector, Session session) {
+        Transaction tx = null;
+        Sector modifiedSector;
         sector.setUsername(user.getFullName());
         sector.setLockDate(new Date());
         
@@ -198,7 +231,7 @@ public class DataCommonsDAO {
             log.error(e);
             tx.rollback();
             throw e;
-        }
+        }            
         return modifiedSector;
     }
 
