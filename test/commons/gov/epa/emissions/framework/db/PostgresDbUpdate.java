@@ -21,7 +21,7 @@ public class PostgresDbUpdate {
     protected DatabaseConnection connection;
 
     public PostgresDbUpdate() throws Exception {
-        this(new PostgresDbConfig("test/test.conf"));
+        this(new PostgresDbConfig("test/postgres.conf"));
     }
 
     public PostgresDbUpdate(PostgresDbConfig config) throws Exception {

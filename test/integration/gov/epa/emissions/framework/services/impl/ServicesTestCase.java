@@ -31,7 +31,7 @@ public abstract class ServicesTestCase extends TestCase {
 
     protected Properties config() throws IOException, FileNotFoundException {
         String folder = "test";
-        File conf = new File(folder, "test.conf");
+        File conf = new File(folder, "postgres.conf");
 
         if (!conf.exists() || !conf.isFile()) {
             String error = "File: " + conf + " does not exist. Please copy either of the two TEMPLATE files "

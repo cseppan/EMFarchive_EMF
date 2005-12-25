@@ -24,7 +24,7 @@ public class LocalHibernateConfiguration {
     }
 
     private Map testsConfig() throws Exception {
-        return new Config("test/test.conf").properties();
+        return new Config("test/postgres.conf").properties();
     }
 
     public SessionFactory factory() {
