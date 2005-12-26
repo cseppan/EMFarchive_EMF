@@ -71,7 +71,7 @@ public class ImporterFactory {
         return null;
     }
 
-    private Importer temporalImporter(EmfDataset dataset, File file) throws ImporterException {
+    private Importer temporalImporter(EmfDataset dataset, File file) {
         DatasetType datasetType = dataset.getDatasetType();
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_TEMPORALCROSSREFERENCE) >= 0) {
@@ -88,7 +88,7 @@ public class ImporterFactory {
     }
 
     // FIXME: use a better scheme than rely on 'type names'
-    private Importer orlImporter(EmfDataset dataset, File file) throws ImporterException {
+    private Importer orlImporter(EmfDataset dataset, File file) {
 
         DatasetType datasetType = dataset.getDatasetType();
 

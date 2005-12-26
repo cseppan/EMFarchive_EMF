@@ -12,17 +12,20 @@ public class StatusServiceImpl implements StatusService {
 
     private HibernateSessionFactory sessionFactory;
 
+    private StatusDAO dao;
+
     public StatusServiceImpl() {
         this(HibernateSessionFactory.get());
     }
 
     public StatusServiceImpl(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+        dao = new StatusDAO();
     }
 
     public Status[] getAll(String userName) {
         Session session = sessionFactory.getSession();
-        List allStats = StatusDAO.getMessages(userName, session);
+        List allStats = dao.getMessages(userName, session);
         session.flush();
         session.close();
 
@@ -32,8 +35,7 @@ public class StatusServiceImpl implements StatusService {
     public void create(Status status) {
         Session session = sessionFactory.getSession();
 
-        // FIXME: replace static w/ instance methods
-        StatusDAO.insertStatusMessage(status, session);
+        dao.insertStatusMessage(status, session);
         session.flush();
         session.close();
     }

@@ -17,8 +17,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -137,19 +135,6 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         button.setIcon(icon);
 
         return button;
-    }
-
-    private String formatDatasetName(String name) {
-        Pattern p = Pattern.compile("\\W");
-        Matcher m = p.matcher(name);
-        String result = m.replaceAll("_");
-
-        if (Character.isDigit(result.charAt(0))) {
-            result = result.replace(result.charAt(0), '_');
-            result = "DS" + result;
-        }
-
-        return result;
     }
 
     private void registerForEditEvents(JTextField name, JTextField directory, JTextField filename) {
