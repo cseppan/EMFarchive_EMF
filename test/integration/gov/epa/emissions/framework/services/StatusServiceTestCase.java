@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.framework.db.PostgresDbUpdate;
+import gov.epa.emissions.commons.db.PostgresDbUpdate;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 import gov.epa.emissions.framework.services.impl.StatusServiceImpl;

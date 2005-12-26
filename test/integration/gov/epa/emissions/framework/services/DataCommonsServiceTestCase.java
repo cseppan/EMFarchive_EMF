@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.commons.db.PostgresDbUpdate;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.db.PostgresDbUpdate;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 public abstract class DataCommonsServiceTestCase extends ServicesTestCase {

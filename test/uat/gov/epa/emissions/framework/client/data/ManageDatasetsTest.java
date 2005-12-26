@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.db.PostgresDbUpdate;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 import gov.epa.emissions.framework.client.console.ConsoleActions;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.exim.ImportActions;
-import gov.epa.emissions.framework.db.PostgresDbUpdate;
 
 import java.util.Random;
 

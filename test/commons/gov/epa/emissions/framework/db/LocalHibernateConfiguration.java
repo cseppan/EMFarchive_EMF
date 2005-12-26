@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.db;
 
-import gov.epa.emissions.commons.Config;
+import gov.epa.emissions.commons.db.PostgresDbConfig;
 
 import java.util.Map;
 import java.util.Properties;
@@ -24,7 +24,7 @@ public class LocalHibernateConfiguration {
     }
 
     private Map testsConfig() throws Exception {
-        return new Config("test/postgres.conf").properties();
+        return new PostgresDbConfig("test/postgres.conf").properties();
     }
 
     public SessionFactory factory() {
