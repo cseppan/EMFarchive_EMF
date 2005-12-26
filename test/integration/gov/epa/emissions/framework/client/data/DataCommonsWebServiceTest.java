@@ -5,9 +5,7 @@ import gov.epa.emissions.framework.services.DataCommonsServiceTestCase;
 
 public class DataCommonsWebServiceTest extends DataCommonsServiceTestCase {
 
-    protected void setUp() throws Exception {
-        super.setUp();
-        
+    protected void doSetUp() throws Exception {
         ServiceLocator serviceLocator = serviceLocator();
         super.setUpService(serviceLocator.dataCommonsService());
     }

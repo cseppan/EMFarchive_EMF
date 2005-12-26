@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.VersionedImporter;
 import gov.epa.emissions.commons.io.external.ExternalFilesImporter;
 import gov.epa.emissions.commons.io.external.MeteorologyFilesImporter;
 import gov.epa.emissions.commons.io.external.ModelReadyEmissionsFilesImporter;
@@ -23,14 +24,11 @@ import java.io.File;
 
 public class ImporterFactory {
 
-    private DbServer dbServer;
-
     private Datasource datasource;
 
     private SqlDataTypes sqlDataTypes;
 
     public ImporterFactory(DbServer dbServer) {
-        this.dbServer = dbServer;
         datasource = dbServer.getEmissionsDatasource();
         sqlDataTypes = dbServer.getSqlDataTypes();
     }
@@ -38,34 +36,36 @@ public class ImporterFactory {
     public Importer create(EmfDataset dataset, File folder, String filename) throws ImporterException {
         DatasetType datasetType = dataset.getDatasetType();
         String[] filePatterns = new String[1];
-        filePatterns[0]=filename;
-                
+        filePatterns[0] = filename;
+
         // FIXME: Get the specific type of importer for the filetype. Use a
         // Factory pattern
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_ORL) >= 0) {
             File file = new File(folder, filename);
-            return orlImporter(dataset, file);
+            Importer orlImporter = orlImporter(dataset, file);
+            return new VersionedImporter(orlImporter, dataset, datasource);
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_TEMPORAL) >= 0) {
             File file = new File(folder, filename);
-            return temporalImporter(dataset, file);
+            Importer temporalImporter = temporalImporter(dataset, file);
+            return new VersionedImporter(temporalImporter, dataset, datasource);
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_SHAPEFILES) >= 0) {
-            return new ShapeFilesImporter(folder,filePatterns,dataset,datasource,sqlDataTypes);
+            return new ShapeFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_EXTERNALFILES) >= 0) {
-            return new ExternalFilesImporter(folder,filePatterns,dataset,datasource,sqlDataTypes);
+            return new ExternalFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_MODELREADYEMISSIONSFILES) >= 0) {
-            return new ModelReadyEmissionsFilesImporter(folder,filePatterns,dataset,datasource,sqlDataTypes);
+            return new ModelReadyEmissionsFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_METEOROLOGYFILES) >= 0) {
-            return new MeteorologyFilesImporter(folder,filePatterns,dataset,datasource,sqlDataTypes);
+            return new MeteorologyFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
         }
 
         return null;

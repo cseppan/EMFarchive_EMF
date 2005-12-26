@@ -10,16 +10,13 @@ public class DatasetTypesServiceTest extends ServicesTestCase {
 
     private DatasetTypeService services;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    protected void doSetUp() throws Exception {
         ServiceLocator serviceLocator = serviceLocator();
         services = serviceLocator.datasetTypeService();
     }
 
     public void testShouldReturnCompleteListOfDatasetTypes() throws EmfException {
         DatasetType[] types = services.getDatasetTypes();
-        System.out.println("Number of datasets returned = " + types.length);
         assertTrue(types.length >= 8);
     }
 
@@ -46,6 +43,9 @@ public class DatasetTypesServiceTest extends ServicesTestCase {
         }
 
         return null;
+    }
+
+    protected void doTearDown() throws Exception {// no op
     }
 
 }

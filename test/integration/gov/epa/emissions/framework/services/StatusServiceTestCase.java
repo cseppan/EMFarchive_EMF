@@ -24,16 +24,15 @@ public abstract class StatusServiceTestCase extends ServicesTestCase {
         status.setMessageType("type");
         status.setUsername("user");
         status.setTimestamp(new Date());
-        
-        helper.create(status);
 
-        try {
-            Status[] results = service.getAll("user");
-            assertEquals(1, results.length);
-        } finally {
-            PostgresDbUpdate update = new PostgresDbUpdate();
-            update.deleteAll("emf.statusmessages");
-        }
+        helper.create(status);
+        Status[] results = service.getAll("user");
+        assertEquals(1, results.length);
+    }
+
+    protected void doTearDown() throws Exception {
+        PostgresDbUpdate update = new PostgresDbUpdate();
+        update.deleteAll("emf.statusmessages");
     }
 
 }

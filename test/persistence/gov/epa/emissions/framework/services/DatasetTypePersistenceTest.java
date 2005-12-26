@@ -19,9 +19,8 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
         drop("NAME");
     }
 
-    protected void tearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         drop("NAME");
-        super.tearDown();
     }
 
     public void testVerifySimplePropertiesAreStored() throws Exception {

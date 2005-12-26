@@ -10,6 +10,9 @@ import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
+import gov.epa.emissions.commons.io.DataFormatFactory;
+import gov.epa.emissions.commons.io.VersionedDataFormatFactory;
+import gov.epa.emissions.commons.io.VersionedImporter;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
 import gov.epa.emissions.framework.EmfException;
@@ -48,9 +51,9 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
     private void doImport() throws ImporterException {
         File file = new File("test/data/orl/nc", "midsize-nonpoint.txt");
-        ORLNonPointImporter importer = new ORLNonPointImporter(file, dataset, datasource, dataTypes());
-
-        importer.run();
+        DataFormatFactory formatFactory = new VersionedDataFormatFactory(0);
+        ORLNonPointImporter importer = new ORLNonPointImporter(file, dataset, datasource, dataTypes(), formatFactory);
+        new VersionedImporter(importer, dataset, datasource).run();
     }
 
     private void setTestValues(EmfDataset dataset) {
@@ -61,7 +64,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         dataset.setAccessedDateTime(new Date());
     }
 
-    protected void tearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         service.closeSession(token);
 
         DbUpdate dbUpdate = new PostgresDbUpdate(datasource.getConnection());
@@ -69,7 +72,6 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         DataModifier modifier = datasource.dataModifier();
         modifier.dropAll("versions");
-        super.tearDown();
     }
 
     public void testShouldReturnExactlyTenPages() throws EmfException {
@@ -191,7 +193,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version[] updated = service.getVersions(dataset.getDatasetid());
         assertEquals(2, updated.length);
         assertEquals("v 1", updated[1].getName());
-        assertTrue("Derived version (loaded from db) should be final on being marked 'final'", updated[1].isFinalVersion());
+        assertTrue("Derived version (loaded from db) should be final on being marked 'final'", updated[1]
+                .isFinalVersion());
     }
 
     public void testChangeSetWithNewRecordsResultsInNewVersion() throws Exception {
@@ -332,7 +335,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         EditToken token = new EditToken(versionOne, table);
         service.openSession(token);
-        
+
         Page page = service.getPage(token, 1);
 
         ChangeSet changeset = new ChangeSet();
@@ -371,7 +374,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         EditToken token = new EditToken(versionOne, table);
         service.openSession(token);
-        
+
         // page 1 changes
         ChangeSet page1ChangeSet = new ChangeSet();
         page1ChangeSet.setVersion(versionOne);
@@ -408,7 +411,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         EditToken token = new EditToken(versionOne, table);
         service.openSession(token);
-        
+
         // page 1 changes
         ChangeSet page1ChangeSet = new ChangeSet();
         page1ChangeSet.setVersion(versionOne);

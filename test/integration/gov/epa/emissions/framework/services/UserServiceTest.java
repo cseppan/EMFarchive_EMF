@@ -7,9 +7,7 @@ import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 public class UserServiceTest extends ServicesTestCase {
     private UserService service;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    protected void doSetUp() throws Exception {
         ServiceLocator serviceLocator = serviceLocator();
         service = serviceLocator.userService();
     }
@@ -57,6 +55,9 @@ public class UserServiceTest extends ServicesTestCase {
         assertEquals("modified-name", result.getFullName());
 
         service.deleteUser("test-user");
+    }
+
+    protected void doTearDown() throws Exception {// no op
     }
 
 }

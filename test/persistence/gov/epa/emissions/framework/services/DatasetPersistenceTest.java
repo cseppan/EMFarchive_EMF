@@ -26,7 +26,7 @@ public class DatasetPersistenceTest extends HibernateTestCase {
         datasetName = "A1" + new Random().nextLong();
     }
 
-    protected void tearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         DbUpdate emissionsUpdate = new PostgresDbUpdate(emissions().getConnection());
         emissionsUpdate.deleteAll(emissions().getName(), "versions");
 

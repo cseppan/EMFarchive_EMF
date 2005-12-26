@@ -17,7 +17,6 @@ public class LoginPresenter {
     }
 
     public User doLogin(String username, String password) throws EmfException {
-        // FIXME: replace statics w/ objects
         try {
             userAdmin.authenticate(username, new PasswordGenerator().encrypt(password));
         } catch (CommonsException e) {

@@ -15,9 +15,8 @@ public abstract class HibernateTestCase extends PersistenceTestCase {
         sessionFactory = new LocalHibernateConfiguration().factory();
     }
 
-    protected void tearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         sessionFactory.close();
-        super.tearDown();
     }
 
     protected Session session() {

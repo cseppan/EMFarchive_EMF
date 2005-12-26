@@ -4,9 +4,7 @@ import gov.epa.emissions.framework.services.StatusServiceTestCase;
 
 public class StatusServiceImplTest extends StatusServiceTestCase {
 
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    protected void doSetUp() throws Exception {
         HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
         super.setUpService(new StatusServiceImpl(sessionFactory), sessionFactory);
     }

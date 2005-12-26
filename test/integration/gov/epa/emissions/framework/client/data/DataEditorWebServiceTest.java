@@ -5,9 +5,7 @@ import gov.epa.emissions.framework.services.DataEditorServiceTestCase;
 
 public class DataEditorWebServiceTest extends DataEditorServiceTestCase {
 
-    protected void setUp() throws Exception {
-        super.setUp();
-        
+    protected void doSetUp() throws Exception {
         ServiceLocator serviceLocator = serviceLocator();
         super.setUpService(serviceLocator.dataEditorService());
     }

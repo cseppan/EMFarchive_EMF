@@ -52,7 +52,7 @@ public class ExportTask implements Runnable {
         log.info("starting export - file: " + file.getName() + " of type: " + dataset.getDatasetTypeName());
         try {
             setStartStatus();
-            exporter.export(dataset.getDefaultVersion(),file);
+            exporter.export(file);
 
             loggingServices.setAccessLog(accesslog);
             dataServices.updateDataset(dataset);

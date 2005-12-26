@@ -183,6 +183,7 @@ public class DataEditorServiceImpl implements DataEditorService {
         try {
             cache.init(token);
         } catch (SQLException e) {
+            e.printStackTrace();
             log.error("Could not initialize editing Session for Dataset: " + token.datasetId() + ", Version: "
                     + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
             throw new EmfException("Could not initialize editing Session for Dataset: " + token.datasetId()

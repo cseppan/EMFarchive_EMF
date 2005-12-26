@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Exporter;
+import gov.epa.emissions.commons.io.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.orl.ORLNonPointExporter;
 import gov.epa.emissions.commons.io.orl.ORLNonRoadExporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadExporter;
@@ -35,14 +36,15 @@ public class ExporterFactory {
 
         // FIXME: matching w/ names is weak. Updating the name property of
         // DatasetType would break this Factory
+        VersionedDataFormatFactory formatFactory = new VersionedDataFormatFactory(dataset.getDefaultVersion());
         if (name.equals("ORL Nonpoint Inventory"))
-            return new ORLNonPointExporter(dataset, datasource, sqlTypes);
+            return new ORLNonPointExporter(dataset, datasource, sqlTypes, formatFactory);
         if (name.equals("ORL Nonroad Inventory"))
-            return new ORLNonRoadExporter(dataset, datasource, sqlTypes);
+            return new ORLNonRoadExporter(dataset, datasource, sqlTypes, formatFactory);
         if (name.equals("ORL Onroad Inventory"))
-            return new ORLOnRoadExporter(dataset, datasource, sqlTypes);
+            return new ORLOnRoadExporter(dataset, datasource, sqlTypes, formatFactory);
         if (name.equals("ORL Point Inventory"))
-            return new ORLPointExporter(dataset, datasource, sqlTypes);
+            return new ORLPointExporter(dataset, datasource, sqlTypes, formatFactory);
 
         if (name.equals(EMFConstants.DATASETTYPE_NAME_TEMPORALCROSSREFERENCE))
             return new TemporalReferenceExporter(dataset, datasource, sqlTypes);

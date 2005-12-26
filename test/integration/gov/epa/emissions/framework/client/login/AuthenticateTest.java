@@ -10,9 +10,7 @@ public class AuthenticateTest extends ServicesTestCase {
 
     private UserService emfUserAdmin;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    protected void doSetUp() throws Exception {
         ServiceLocator serviceLocator = serviceLocator();
         emfUserAdmin = serviceLocator.userService();
     }
@@ -39,6 +37,9 @@ public class AuthenticateTest extends ServicesTestCase {
         }
 
         fail("should have failed on unknown username");
+    }
+
+    protected void doTearDown() throws Exception {// no op
     }
 
 }

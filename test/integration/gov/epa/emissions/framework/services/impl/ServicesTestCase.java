@@ -25,9 +25,12 @@ public abstract class ServicesTestCase extends TestCase {
 
     private DatabaseSetup dbSetup;
 
-    protected void setUp() throws Exception {
+    final protected void setUp() throws Exception {
         dbSetup = new DatabaseSetup(config());
+        doSetUp();
     }
+
+    abstract protected void doSetUp() throws Exception;
 
     protected Properties config() throws IOException, FileNotFoundException {
         String folder = "test";
@@ -45,9 +48,12 @@ public abstract class ServicesTestCase extends TestCase {
         return properties;
     }
 
-    protected void tearDown() throws Exception {
+    final protected void tearDown() throws Exception {
+        doTearDown();
         dbSetup.tearDown();
     }
+
+    abstract protected void doTearDown() throws Exception;
 
     protected Datasource emissions() {
         return dbServer().getEmissionsDatasource();

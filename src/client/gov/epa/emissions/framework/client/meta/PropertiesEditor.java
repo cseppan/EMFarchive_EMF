@@ -86,9 +86,6 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
     }
 
     private JPanel createInfoTab(EmfDataset dataset, EmfConsole parentConsole) {
-        ServiceLocator serviceLocator = session.serviceLocator();
-        DataEditorService dataEditorService = serviceLocator.dataEditorService();
-
         InfoTab view = new InfoTab(parentConsole);
         InfoTabPresenter presenter = new InfoTabPresenter(view, dataset);
         presenter.doDisplay();
@@ -110,8 +107,6 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
     private JPanel createLogsTab(EmfDataset dataset, EmfConsole parentConsole) {
         try {
             LogsTab view = new LogsTab(parentConsole);
-
-            // FIXME: activate the presenter on tab-click
             LogsTabPresenter presenter = new LogsTabPresenter(view, dataset, session.loggingService());
             presenter.doDisplay();
 

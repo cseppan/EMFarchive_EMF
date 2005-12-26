@@ -22,9 +22,7 @@ public class ExImServiceTest extends ServicesTestCase {
 
     private EmfDataset dataset;
 
-    protected void setUp() throws Exception {
-        super.setUp();
-        
+    protected void doSetUp() throws Exception {
         ServiceLocator serviceLocator = serviceLocator();
 
         eximService = serviceLocator.eximService();
@@ -49,7 +47,7 @@ public class ExImServiceTest extends ServicesTestCase {
         return null;
     }
 
-    protected void tearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         ExImDbUpdate dbUpdate = new ExImDbUpdate();
         dbUpdate.deleteAllDatasets();
     }
