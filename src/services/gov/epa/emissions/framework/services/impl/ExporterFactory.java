@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Exporter;
-import gov.epa.emissions.commons.io.VersionedDataFormatFactory;
+import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.orl.ORLNonPointExporter;
 import gov.epa.emissions.commons.io.orl.ORLNonRoadExporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadExporter;
