@@ -7,7 +7,6 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.external.ExternalFilesImporter;
 import gov.epa.emissions.commons.io.external.MeteorologyFilesImporter;
 import gov.epa.emissions.commons.io.external.ModelReadyEmissionsFilesImporter;
-import gov.epa.emissions.commons.io.external.ShapeFilesImporter;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
@@ -17,12 +16,17 @@ import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
 import gov.epa.emissions.commons.io.orl.ORLPointImporter;
 import gov.epa.emissions.commons.io.temporal.TemporalProfileImporter;
 import gov.epa.emissions.commons.io.temporal.TemporalReferenceImporter;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.io.File;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ImporterFactory {
+    private static Log log = LogFactory.getLog(ImporterFactory.class);
 
     private Datasource datasource;
 
@@ -33,11 +37,26 @@ public class ImporterFactory {
         sqlDataTypes = dbServer.getSqlDataTypes();
     }
 
+    /*
+     * TODO:  After all importers constructors are changed to have same signatures, remove all these if statements
+     * 
+     */
     public Importer create(EmfDataset dataset, File folder, String filename) throws ImporterException {
         DatasetType datasetType = dataset.getDatasetType();
         String[] filePatterns = new String[1];
         filePatterns[0] = filename;
 
+        Importer importer = null;
+        
+        try {
+            importer = new ReflectionHelper().getImporterInstance(folder, filePatterns, dataset, datasource, sqlDataTypes);
+        } catch (EmfException e) {
+            log.error("Failed to create importer: " + e.getMessage());
+            throw new ImporterException("Failed to create importer: " + e.getMessage());
+        }
+        
+        
+        
         // FIXME: Get the specific type of importer for the filetype. Use a
         // Factory pattern
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_ORL) >= 0) {
@@ -53,7 +72,8 @@ public class ImporterFactory {
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_SHAPEFILES) >= 0) {
-            return new ShapeFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
+            //return new ShapeFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
+            return importer;
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_EXTERNALFILES) >= 0) {
