@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.DatasetTypeService;
 import gov.epa.emissions.framework.services.ExImService;
@@ -27,5 +28,7 @@ public interface EmfSession {
     LoggingService loggingService();
 
     DatasetTypeService datasetTypesService();
+
+    DataCommonsService dataCommonsService();
 
 }

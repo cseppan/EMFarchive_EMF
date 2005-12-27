@@ -15,7 +15,7 @@ import gov.epa.emissions.framework.client.data.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.client.data.SectorsManagerPresenter;
 import gov.epa.emissions.framework.client.data.SectorsManagerWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.ui.CascadeLayout;
 import gov.epa.emissions.framework.ui.ViewLayout;
@@ -47,7 +47,7 @@ public class ManageMenu extends JMenu {
 
         super.add(createDatasets(parent, messagePanel));
         super.add(createDatasetTypes(session.serviceLocator(), parent, messagePanel));
-        super.add(createSectors(session.dataService(), parent, messagePanel));
+        super.add(createSectors(session.dataCommonsService(), parent, messagePanel));
         super.addSeparator();
 
         addUsers(session.getUser());
@@ -112,14 +112,14 @@ public class ManageMenu extends JMenu {
         return menuItem;
     }
 
-    private JMenuItem createSectors(final DataService dataServices, final EmfConsole parent,
+    private JMenuItem createSectors(final DataCommonsService service, final EmfConsole parent,
             final MessagePanel messagePanel) {
         JMenuItem menuItem = new JMenuItem("Sectors");
         menuItem.setName("sectors");
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    displaySectors(dataServices, parent);
+                    displaySectors(service, parent);
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
                 }
@@ -142,7 +142,7 @@ public class ManageMenu extends JMenu {
         presenter.doDisplay();
     }
 
-    protected void displaySectors(DataService dataServices, EmfConsole parent) throws EmfException {
+    protected void displaySectors(DataCommonsService service, EmfConsole parent) throws EmfException {
         if (viewLayout.activate("Sectors Manager"))
             return;
 
@@ -151,7 +151,7 @@ public class ManageMenu extends JMenu {
         parent.addToDesktop(view);
 
         ViewLayout sectorsLayout = new CascadeLayout(view);
-        SectorsManagerPresenter presenter = new SectorsManagerPresenter(view, dataServices, sectorsLayout);
+        SectorsManagerPresenter presenter = new SectorsManagerPresenter(view, service, sectorsLayout);
         presenter.doDisplay();
     }
 

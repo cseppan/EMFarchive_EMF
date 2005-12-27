@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
@@ -41,7 +41,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
 
     private EmfConsole parentConsole;
 
-    private DataService dataServices;
+    private DataCommonsService service;
 
     public SectorsManagerWindow(EmfConsole parentConsole) {
         super("Sector Manager", new Dimension(475, 300), parentConsole.desktop());
@@ -55,15 +55,15 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
         this.presenter = presenter;
     }
 
-    public void display(DataService dataServices) throws EmfException {
-        this.dataServices = dataServices;
-        doLayout(dataServices.getSectors());
+    public void display(DataCommonsService service) throws EmfException {
+        this.service = service;
+        doLayout(service.getSectors());
         super.display();
     }
 
     public void refresh() {
         try {
-            doLayout(dataServices.getSectors());
+            doLayout(service.getSectors());
         } catch (EmfException e) {
             messagePanel.setError("Could not refresh. Problem communicating with remote services.");
         }

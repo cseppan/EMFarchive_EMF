@@ -11,7 +11,7 @@ import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.Country;
-import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -73,7 +73,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private ChangeObserver changeObserver;
 
-    public SummaryTab(EmfDataset dataset, DataService dataServices, MessagePanel messagePanel) throws EmfException {
+    public SummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel) throws EmfException {
         super.setName("summary");
         this.dataset = dataset;
         this.messagePanel = messagePanel;
@@ -81,16 +81,16 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         super.setLayout(new BorderLayout());
         SummaryTabComboBoxChangesListener comboxBoxListener = new SummaryTabComboBoxChangesListener();
         super.add(createOverviewSection(comboxBoxListener), BorderLayout.PAGE_START);
-        super.add(createLowerSection(dataServices, comboxBoxListener), BorderLayout.CENTER);
+        super.add(createLowerSection(service, comboxBoxListener), BorderLayout.CENTER);
 
         listenForKeyEvents(new SummaryTabKeyListener());
     }
 
-    private JPanel createLowerSection(DataService dataServices, SummaryTabComboBoxChangesListener comboxBoxListener)
+    private JPanel createLowerSection(DataCommonsService service, SummaryTabComboBoxChangesListener comboxBoxListener)
             throws EmfException {
         JPanel lowerPanel = new JPanel(new FlowLayout());
 
-        lowerPanel.add(createTimeSpaceSection(dataServices, comboxBoxListener));
+        lowerPanel.add(createTimeSpaceSection(service, comboxBoxListener));
         lowerPanel.add(createStatusSection());
 
         return lowerPanel;
@@ -147,8 +147,8 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         return DATE_FORMATTER.format(date);
     }
 
-    private JPanel createTimeSpaceSection(DataService dataServices, SummaryTabComboBoxChangesListener comboxBoxListener)
-            throws EmfException {
+    private JPanel createTimeSpaceSection(DataCommonsService service,
+            SummaryTabComboBoxChangesListener comboxBoxListener) throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -183,7 +183,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         layoutGenerator.addLabelWidgetPair("Temporal Resolution", temporalResolutionsCombo, panel);
 
         // sectors
-        sectors = new DefaultComboBoxModel(sectorNames(dataset.getSector(), dataServices.getSectors()));
+        sectors = new DefaultComboBoxModel(sectorNames(dataset.getSector(), service.getSectors()));
         JComboBox sectorsCombo = new JComboBox(sectors);
         sectorsCombo.setSelectedItem(dataset.getSector());
         sectorsCombo.setName("sectors");
@@ -204,7 +204,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         layoutGenerator.addLabelWidgetPair("Region", regionsCombo, panel);
 
         // country
-        countries = new DefaultComboBoxModel(countryNames(dataset.getCountry(), dataServices.getCountries()));
+        countries = new DefaultComboBoxModel(countryNames(dataset.getCountry(), service.getCountries()));
         JComboBox countriesCombo = new JComboBox(countries);
         countriesCombo.setSelectedItem(dataset.getCountry());
         countriesCombo.setName("countries");

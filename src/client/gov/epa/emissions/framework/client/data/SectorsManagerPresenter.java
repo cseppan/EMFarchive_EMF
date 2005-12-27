@@ -2,26 +2,26 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 public class SectorsManagerPresenter {
 
     private SectorsManagerView view;
 
-    private DataService services;
+    private DataCommonsService service;
 
     private ViewLayout viewLayout;
 
-    public SectorsManagerPresenter(SectorsManagerView view, DataService services, ViewLayout viewLayout) {
+    public SectorsManagerPresenter(SectorsManagerView view, DataCommonsService service, ViewLayout viewLayout) {
         this.view = view;
-        this.services = services;
+        this.service = service;
         this.viewLayout = viewLayout;
     }
 
     public void doDisplay() throws EmfException {
         view.observe(this);
-        view.display(services);
+        view.display(service);
     }
 
     public void doClose() {
@@ -33,7 +33,7 @@ public class SectorsManagerPresenter {
             return;
 
         viewLayout.add(updateSectorView, sector.getName());
-        UpdateSectorPresenter p = new UpdateSectorPresenter(updateSectorView, sector, services);
+        UpdateSectorPresenter p = new UpdateSectorPresenter(updateSectorView, sector, service);
         p.doDisplay();
     }
 

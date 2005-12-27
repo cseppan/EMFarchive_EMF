@@ -60,7 +60,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     private JPanel createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
         try {
-            SummaryTab view = new SummaryTab(dataset, session.dataService(), messagePanel);
+            SummaryTab view = new SummaryTab(dataset, session.dataCommonsService(), messagePanel);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
