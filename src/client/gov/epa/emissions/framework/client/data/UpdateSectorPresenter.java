@@ -28,12 +28,14 @@ public class UpdateSectorPresenter {
         view.display(sector);
     }
 
-    public void doClose() {
+    public void doClose() throws EmfException {
+        service.releaseSectorLock(session.user(), sector);
         view.close();
     }
 
     public void doSave(SectorsManagerView sectorManager) throws EmfException {
-        service.updateSector(sector);
+        sector = service.updateSector(session.user(), sector);
+
         sectorManager.refresh();
         doClose();
     }

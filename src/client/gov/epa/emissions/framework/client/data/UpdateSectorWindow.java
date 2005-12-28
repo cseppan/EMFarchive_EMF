@@ -134,7 +134,11 @@ public class UpdateSectorWindow extends DisposableInteralFrame implements Update
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                presenter.doClose();
+                try {
+                    presenter.doClose();
+                } catch (EmfException e) {
+                    messagePanel.setError("Could not close. Reason: " + e.getMessage());
+                }
             }
         };
 
