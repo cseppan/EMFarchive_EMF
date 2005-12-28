@@ -40,20 +40,15 @@ public class ImporterFactory {
      */
     public Importer create(EmfDataset dataset, File folder, String filename) throws ImporterException {
         DatasetType datasetType = dataset.getDatasetType();
-        String[] filePatterns = new String[1];
-        filePatterns[0] = filename;
+        String[] filePatterns = new String[] { filename };
 
-        // FIXME: Get the specific type of importer for the filetype. Use a
-        // Factory pattern
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_ORL) >= 0) {
-            File file = new File(folder, filename);
-            Importer orlImporter = orlImporter(dataset, file);
+            Importer orlImporter = orlImporter(dataset, folder, filePatterns);
             return new VersionedImporter(orlImporter, dataset, datasource);
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_TEMPORAL) >= 0) {
-            File file = new File(folder, filename);
-            Importer temporalImporter = temporalImporter(dataset, file);
+            Importer temporalImporter = temporalImporter(dataset, folder, filePatterns);
             return new VersionedImporter(temporalImporter, dataset, datasource);
         }
 
@@ -65,16 +60,16 @@ public class ImporterFactory {
         }
     }
 
-    private Importer temporalImporter(EmfDataset dataset, File file) {
+    private Importer temporalImporter(EmfDataset dataset, File folder, String[] filenames) throws ImporterException {
         DatasetType datasetType = dataset.getDatasetType();
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_TEMPORALCROSSREFERENCE) >= 0) {
-            return new TemporalReferenceImporter(file, dataset, datasource, sqlDataTypes);
+            return new TemporalReferenceImporter(folder, filenames, dataset, datasource, sqlDataTypes);
         }
 
         // Temporal Profile
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_TEMPORALPROFILE) >= 0) {
-            return new TemporalProfileImporter(file, dataset, datasource, sqlDataTypes);
+            return new TemporalProfileImporter(folder, filenames, dataset, datasource, sqlDataTypes);
         }
 
         // If no datasetType match then throw exception
@@ -82,18 +77,18 @@ public class ImporterFactory {
     }
 
     // FIXME: use a better scheme than rely on 'type names'
-    private Importer orlImporter(EmfDataset dataset, File file) {
+    private Importer orlImporter(EmfDataset dataset, File folder, String[] filenames) throws ImporterException {
 
         DatasetType datasetType = dataset.getDatasetType();
 
         if (datasetType.getName().equals("ORL Nonpoint Inventory"))
-            return new ORLNonPointImporter(file, dataset, datasource, sqlDataTypes);
+            return new ORLNonPointImporter(folder, filenames, dataset, datasource, sqlDataTypes);
         if (datasetType.getName().equals("ORL Nonroad Inventory"))
-            return new ORLNonRoadImporter(file, dataset, datasource, sqlDataTypes);
+            return new ORLNonRoadImporter(folder, filenames, dataset, datasource, sqlDataTypes);
         if (datasetType.getName().equals("ORL Onroad Inventory"))
-            return new ORLOnRoadImporter(file, dataset, datasource, sqlDataTypes);
+            return new ORLOnRoadImporter(folder, filenames, dataset, datasource, sqlDataTypes);
         if (datasetType.getName().equals("ORL Point Inventory"))
-            return new ORLPointImporter(file, dataset, datasource, sqlDataTypes);
+            return new ORLPointImporter(folder, filenames, dataset, datasource, sqlDataTypes);
 
         throw new RuntimeException("Dataset Type - " + datasetType.getName() + " unsupported");
     }

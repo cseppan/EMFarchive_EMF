@@ -52,7 +52,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     private void doImport() throws ImporterException {
         File file = new File("test/data/orl/nc", "midsize-nonpoint.txt");
         DataFormatFactory formatFactory = new VersionedDataFormatFactory(0);
-        ORLNonPointImporter importer = new ORLNonPointImporter(file, dataset, datasource, dataTypes(), formatFactory);
+        ORLNonPointImporter importer = new ORLNonPointImporter(file.getParentFile(), new String[] { file.getName() },
+                dataset, datasource, dataTypes(), formatFactory);
         new VersionedImporter(importer, dataset, datasource).run();
     }
 

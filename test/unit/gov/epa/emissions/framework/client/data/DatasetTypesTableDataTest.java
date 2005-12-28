@@ -21,29 +21,23 @@ public class DatasetTypesTableDataTest extends TestCase {
         type1.setDescription("desc1");
         type1.setMinfiles(1);
         type1.setMaxfiles(3);
-        type1.setMinColumns(3);
-        type1.setMaxColumns(5);
 
         type2 = new DatasetType();
         type2.setName("name2");
         type2.setDescription("desc2");
         type2.setMinfiles(3);
         type2.setMaxfiles(3);
-        type2.setMinColumns(5);
-        type2.setMaxColumns(5);
 
         data = new DatasetTypesTableData(new DatasetType[] { type1, type2 });
     }
 
     public void testShouldHaveFiveColumns() {
         String[] columns = data.columns();
-        assertEquals(6, columns.length);
+        assertEquals(4, columns.length);
         assertEquals("Name", columns[0]);
         assertEquals("Description", columns[1]);
         assertEquals("Min Files", columns[2]);
         assertEquals("Max Files", columns[3]);
-        assertEquals("Min Cols", columns[4]);
-        assertEquals("Max Cols", columns[5]);
     }
 
     public void testShouldHaveAppropriateColumnClassDefinedForAllColumns() {
@@ -51,8 +45,6 @@ public class DatasetTypesTableDataTest extends TestCase {
         assertEquals(String.class, data.getColumnClass(1));
         assertEquals(Integer.class, data.getColumnClass(2));
         assertEquals(Integer.class, data.getColumnClass(3));
-        assertEquals(Integer.class, data.getColumnClass(4));
-        assertEquals(Integer.class, data.getColumnClass(5));
     }
 
     public void testAllColumnsShouldBeEditable() {
@@ -77,8 +69,6 @@ public class DatasetTypesTableDataTest extends TestCase {
         assertEquals("desc1", row.getValueAt(1));
         assertEquals(new Integer(1), row.getValueAt(2));
         assertEquals(new Integer(3), row.getValueAt(3));
-        assertEquals(new Integer(3), row.getValueAt(4));
-        assertEquals(new Integer(5), row.getValueAt(5));
     }
 
     public void testShouldReturnARowRepresentingADatasetTypeEntry() {

@@ -16,7 +16,7 @@ public class DatasetTypesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Description", "Min Files", "Max Files", "Min Cols", "Max Cols" };
+        return new String[] { "Name", "Description", "Min Files", "Max Files" };
     }
 
     public Class getColumnClass(int col) {
@@ -40,8 +40,7 @@ public class DatasetTypesTableData extends AbstractTableData {
         for (int i = 0; i < types.length; i++) {
             DatasetType element = types[i];
             Object[] values = { element.getName(), element.getDescription(), new Integer(element.getMinfiles()),
-                    new Integer(element.getMaxfiles()), new Integer(element.getMinColumns()),
-                    new Integer(element.getMaxColumns()) };
+                    new Integer(element.getMaxfiles()) };
 
             Row row = new ViewableRow(element, values);
             rows.add(row);
