@@ -13,7 +13,7 @@ public interface EmfSession {
 
     ServiceLocator serviceLocator();
 
-    User getUser();
+    User user();
 
     ExImService eximService();
 

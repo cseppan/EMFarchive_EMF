@@ -36,7 +36,7 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
         user.setUsername("user");
         EmfSession session = new DefaultEmfSession(user, (ServiceLocator) locator.proxy());
 
-        assertEquals(user, session.getUser());
+        assertEquals(user, session.user());
     }
 
     public void testGetServiceLocator() throws Exception {

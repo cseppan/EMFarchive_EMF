@@ -50,7 +50,7 @@ public class ManageMenu extends JMenu {
         super.add(createSectors(session.dataCommonsService(), parent, messagePanel));
         super.addSeparator();
 
-        addUsers(session.getUser());
+        addUsers(session.user());
         super.add(createMyProfile(session));
     }
 
@@ -151,7 +151,7 @@ public class ManageMenu extends JMenu {
         parent.addToDesktop(view);
 
         ViewLayout sectorsLayout = new CascadeLayout(view);
-        SectorsManagerPresenter presenter = new SectorsManagerPresenter(view, service, sectorsLayout);
+        SectorsManagerPresenter presenter = new SectorsManagerPresenter(session, view, service, sectorsLayout);
         presenter.doDisplay();
     }
 
@@ -172,7 +172,7 @@ public class ManageMenu extends JMenu {
         if (viewLayout.activate("My Profile"))
             return;
 
-        MyProfileWindow myProfileView = new MyProfileWindow(session.getUser(), parent.desktop());
+        MyProfileWindow myProfileView = new MyProfileWindow(session.user(), parent.desktop());
         viewLayout.add(myProfileView, "My Profile");
         parent.addToDesktop(myProfileView);
 
@@ -187,12 +187,12 @@ public class ManageMenu extends JMenu {
         try {
             UserService userServices = session.userService();
 
-            UsersManager usesrManagerView = new UsersManager(session.getUser(), userServices, parent);
+            UsersManager usesrManagerView = new UsersManager(session.user(), userServices, parent);
             viewLayout.add(usesrManagerView, "Users Manager");
             parent.addToDesktop(usesrManagerView);
 
             ViewLayout userManagerViewLayout = new CascadeLayout(usesrManagerView);
-            UsersManagerPresenter presenter = new UsersManagerPresenter(session.getUser(), userServices,
+            UsersManagerPresenter presenter = new UsersManagerPresenter(session.user(), userServices,
                     userManagerViewLayout);
             presenter.display(usesrManagerView);
         } catch (Exception e) {

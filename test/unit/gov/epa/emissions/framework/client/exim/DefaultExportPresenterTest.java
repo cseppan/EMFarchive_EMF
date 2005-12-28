@@ -21,7 +21,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
     protected void setUp() {
         session = mock(EmfSession.class);
 
-        session.stubs().method("getUser").withNoArguments().will(returnValue(null));
+        session.stubs().method("user").withNoArguments().will(returnValue(null));
         session.stubs().method("eximService").withNoArguments().will(returnValue(null));
 
         folder = "foo/blah";
@@ -43,7 +43,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         model.expects(once()).method("startExportWithOverwrite").with(
                 new Constraint[] { eq(user), eq(datasets), eq(folder), eq(purpose) });
 
-        session.stubs().method("getUser").withNoArguments().will(returnValue(user));
+        session.stubs().method("user").withNoArguments().will(returnValue(user));
         session.stubs().method("eximService").withNoArguments().will(returnValue(model.proxy()));
         session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
 
@@ -66,7 +66,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         model.expects(once()).method("startExport").with(
                 new Constraint[] { eq(user), eq(datasets), eq(folder), eq(description) });
 
-        session.stubs().method("getUser").withNoArguments().will(returnValue(user));
+        session.stubs().method("user").withNoArguments().will(returnValue(user));
         session.stubs().method("eximService").withNoArguments().will(returnValue(model.proxy()));
         session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
 
@@ -92,7 +92,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldRegisterWithViewOnObserve() {
-        session.stubs().method("getUser").withNoArguments().will(returnValue(null));
+        session.stubs().method("user").withNoArguments().will(returnValue(null));
         session.stubs().method("eximService").withNoArguments().will(returnValue(null));
 
         ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());

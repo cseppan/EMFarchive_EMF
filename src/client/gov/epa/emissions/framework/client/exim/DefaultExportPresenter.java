@@ -45,8 +45,8 @@ public class DefaultExportPresenter implements ExportPresenter {
 
         ExImService services = session.eximService();
         if (overwrite)
-            services.startExportWithOverwrite(session.getUser(), datasets, folder, purpose);
+            services.startExportWithOverwrite(session.user(), datasets, folder, purpose);
         else
-            services.startExport(session.getUser(), datasets, folder, purpose);
+            services.startExport(session.user(), datasets, folder, purpose);
     }
 }

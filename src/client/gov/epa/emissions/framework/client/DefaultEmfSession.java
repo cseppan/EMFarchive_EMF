@@ -28,7 +28,7 @@ public class DefaultEmfSession implements EmfSession {
         return serviceLocator;
     }
 
-    public User getUser() {
+    public User user() {
         return user;
     }
 

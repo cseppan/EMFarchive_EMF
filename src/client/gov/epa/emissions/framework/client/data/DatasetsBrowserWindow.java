@@ -168,7 +168,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         // windowLayoutManager.add(importView); //FIXME: needs layout
         desktop.add(importView);
 
-        ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session.getUser(), session
+        ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session.user(), session
                 .eximService(), session.dataService(), this);
         presenter.doNew(importView, importPresenter);
     }

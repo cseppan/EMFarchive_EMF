@@ -142,8 +142,17 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
         // TODO: move it into Presenter - look at UserManagerWindow
         for (Iterator iter = sectors.iterator(); iter.hasNext();) {
             Sector sector = (Sector) iter.next();
-            presenter.doUpdate(sector, updateSectorView());
+            try {
+                presenter.doUpdate(sector, updateSectorView());
+            } catch (EmfException e) {
+                setError("Could not update Sector: " + sector.getName() + ". Reason: " + e.getMessage());
+            }
         }
+    }
+
+    private void setError(String message) {
+        messagePanel.setError(message);
+        super.refreshLayout();
     }
 
     // generic. Could be moved into 'SortFilterSelectModel' ? - FIXME
