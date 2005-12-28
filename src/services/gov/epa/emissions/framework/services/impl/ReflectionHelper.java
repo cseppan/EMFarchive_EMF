@@ -9,35 +9,38 @@ import gov.epa.emissions.framework.EmfException;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 public class ReflectionHelper {
     private static Log log = LogFactory.getLog(ReflectionHelper.class);
-  
+
     Class fileClass = File.class;
+
     Class fileNamesClass = String[].class;
+
     Class datasetClass = Dataset.class;
+
     Class datasourceClass = Datasource.class;
+
     Class sqlDataTypesClass = SqlDataTypes.class;
-    
+
     public ReflectionHelper() {
         super();
     }
 
-    public Importer getImporterInstance(File folder, String[] filePatterns, Dataset dataset, Datasource datasource, SqlDataTypes sqlDataType) throws EmfException{
+    public Importer getImporterInstance(File folder, String[] filePatterns, Dataset dataset, Datasource datasource,
+            SqlDataTypes sqlDataType) throws EmfException {
         log.debug("Reflection helper");
-        
+
         Importer importer = null;
-        
+
         try {
             String importerName = dataset.getDatasetType().getImporterClassName();
 
             Class importerClass = Class.forName(importerName);
-   
+
             Class[] classParams = new Class[5];
             classParams[0] = fileClass;
             classParams[1] = fileNamesClass;
@@ -53,28 +56,10 @@ public class ReflectionHelper {
             params[2] = dataset;
             params[3] = datasource;
             params[4] = sqlDataType;
-            
+
             importer = (Importer) importerConstructor.newInstance(params);
 
-        } catch (SecurityException e) {
-            log.error("Reflection exception: " + e.getMessage());
-            throw new EmfException("Reflection exception: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.error("Reflection exception: " + e.getMessage());
-            throw new EmfException("Reflection exception: " + e.getMessage());
-        } catch (ClassNotFoundException e) {
-            log.error("Reflection exception: " + e.getMessage());
-            throw new EmfException("Reflection exception: " + e.getMessage());
-        } catch (NoSuchMethodException e) {
-            log.error("Reflection exception: " + e.getMessage());
-            throw new EmfException("Reflection exception: " + e.getMessage());
-        } catch (InstantiationException e) {
-            log.error("Reflection exception: " + e.getMessage());
-            throw new EmfException("Reflection exception: " + e.getMessage());
-        } catch (IllegalAccessException e) {
-            log.error("Reflection exception: " + e.getMessage());
-            throw new EmfException("Reflection exception: " + e.getMessage());
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             log.error("Reflection exception: " + e.getMessage());
             throw new EmfException("Reflection exception: " + e.getMessage());
         }
@@ -84,16 +69,17 @@ public class ReflectionHelper {
         return importer;
     }
 
-    public Exporter getExporterInstance(File folder, String[] filePatterns, Dataset dataset, Datasource datasource, SqlDataTypes sqlDataType) throws EmfException{
+    public Exporter getExporterInstance(File folder, String[] filePatterns, Dataset dataset, Datasource datasource,
+            SqlDataTypes sqlDataType) throws EmfException {
         log.debug("Reflection helper");
-        
+
         Exporter exporter = null;
-        
+
         try {
             String exporterName = dataset.getDatasetType().getExporterClassName();
 
             Class exporterClass = Class.forName(exporterName);
-   
+
             Class[] classParams = new Class[5];
             classParams[0] = fileClass;
             classParams[1] = fileNamesClass;
@@ -109,28 +95,10 @@ public class ReflectionHelper {
             params[2] = dataset;
             params[3] = datasource;
             params[4] = sqlDataType;
-            
+
             exporter = (Exporter) exporterConstructor.newInstance(params);
 
-        } catch (SecurityException e) {
-            log.error("Reflection exception: " + e.getMessage());
-            throw new EmfException("Reflection exception: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.error("Reflection exception: " + e.getMessage());
-            throw new EmfException("Reflection exception: " + e.getMessage());
-        } catch (ClassNotFoundException e) {
-            log.error("Reflection exception: " + e.getMessage());
-            throw new EmfException("Reflection exception: " + e.getMessage());
-        } catch (NoSuchMethodException e) {
-            log.error("Reflection exception: " + e.getMessage());
-            throw new EmfException("Reflection exception: " + e.getMessage());
-        } catch (InstantiationException e) {
-            log.error("Reflection exception: " + e.getMessage());
-            throw new EmfException("Reflection exception: " + e.getMessage());
-        } catch (IllegalAccessException e) {
-            log.error("Reflection exception: " + e.getMessage());
-            throw new EmfException("Reflection exception: " + e.getMessage());
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             log.error("Reflection exception: " + e.getMessage());
             throw new EmfException("Reflection exception: " + e.getMessage());
         }

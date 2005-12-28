@@ -35,7 +35,7 @@ public class ImporterFactory {
     }
 
     /*
-     * TODO:  After all importers constructors are changed to have same signatures, remove all these if statements
+     * TODO: After all importers constructors are changed to have same signatures, remove all these if statements
      * 
      */
     public Importer create(EmfDataset dataset, File folder, String filename) throws ImporterException {
@@ -43,17 +43,6 @@ public class ImporterFactory {
         String[] filePatterns = new String[1];
         filePatterns[0] = filename;
 
-        Importer importer = null;
-        
-        try {
-            importer = new ReflectionHelper().getImporterInstance(folder, filePatterns, dataset, datasource, sqlDataTypes);
-        } catch (EmfException e) {
-            log.error("Failed to create importer: " + e.getMessage());
-            throw new ImporterException("Failed to create importer: " + e.getMessage());
-        }
-        
-        
-        
         // FIXME: Get the specific type of importer for the filetype. Use a
         // Factory pattern
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_ORL) >= 0) {
@@ -68,27 +57,12 @@ public class ImporterFactory {
             return new VersionedImporter(temporalImporter, dataset, datasource);
         }
 
-        if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_SHAPEFILES) >= 0) {
-            //return new ShapeFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
-            return importer;
+        try {// External
+            return new ReflectionHelper().getImporterInstance(folder, filePatterns, dataset, datasource, sqlDataTypes);
+        } catch (EmfException e) {
+            log.error("Failed to create importer: " + e.getMessage());
+            throw new ImporterException("Failed to create importer: " + e.getMessage());
         }
-
-        if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_EXTERNALFILES) >= 0) {
-//            return new ExternalFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
-            return importer;
-        }
-
-        if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_MODELREADYEMISSIONSFILES) >= 0) {
-//            return new ModelReadyEmissionsFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
-            return importer;
-        }
-
-        if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_METEOROLOGYFILES) >= 0) {
-//            return new MeteorologyFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
-            return importer;
-        }
-
-        return null;
     }
 
     private Importer temporalImporter(EmfDataset dataset, File file) {
