@@ -4,9 +4,6 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.external.ExternalFilesImporter;
-import gov.epa.emissions.commons.io.external.MeteorologyFilesImporter;
-import gov.epa.emissions.commons.io.external.ModelReadyEmissionsFilesImporter;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
@@ -77,15 +74,18 @@ public class ImporterFactory {
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_EXTERNALFILES) >= 0) {
-            return new ExternalFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
+//            return new ExternalFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
+            return importer;
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_MODELREADYEMISSIONSFILES) >= 0) {
-            return new ModelReadyEmissionsFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
+//            return new ModelReadyEmissionsFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
+            return importer;
         }
 
         if (datasetType.getName().indexOf(EMFConstants.DATASETTYPE_NAME_METEOROLOGYFILES) >= 0) {
-            return new MeteorologyFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
+//            return new MeteorologyFilesImporter(folder, filePatterns, dataset, datasource, sqlDataTypes);
+            return importer;
         }
 
         return null;
