@@ -33,7 +33,7 @@ public class ExImServiceImpl implements ExImService {
 
     private static Log log = LogFactory.getLog(ExImServiceImpl.class);
 
-    private ImporterFactory importerFactory;
+    private VersionedImporterFactory importerFactory;
 
     private ExporterFactory exporterFactory;
 
@@ -65,7 +65,7 @@ public class ExImServiceImpl implements ExImService {
         DbServer dbServer = new PostgresDbServer(datasource.getConnection(), EMFConstants.EMF_REFERENCE_SCHEMA,
                 EMFConstants.EMF_EMISSIONS_SCHEMA);
 
-        importerFactory = new ImporterFactory(dbServer);
+        importerFactory = new VersionedImporterFactory(dbServer);
         exporterFactory = new ExporterFactory(dbServer);
 
         // TODO: thread pooling policy
