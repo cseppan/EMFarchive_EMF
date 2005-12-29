@@ -26,11 +26,7 @@ public class ReflectionHelper {
 
     Class sqlDataTypesClass = SqlDataTypes.class;
 
-    public ReflectionHelper() {
-        super();
-    }
-
-    public Importer getImporterInstance(File folder, String[] filePatterns, Dataset dataset, Datasource datasource,
+    public Importer createImporter(File folder, String[] filePatterns, Dataset dataset, Datasource datasource,
             SqlDataTypes sqlDataType) throws EmfException {
         log.debug("Reflection helper");
 
@@ -69,7 +65,7 @@ public class ReflectionHelper {
         return importer;
     }
 
-    public Exporter getExporterInstance(File folder, String[] filePatterns, Dataset dataset, Datasource datasource,
+    public Exporter createExporter(File folder, String[] filePatterns, Dataset dataset, Datasource datasource,
             SqlDataTypes sqlDataType) throws EmfException {
         log.debug("Reflection helper");
 
@@ -80,12 +76,8 @@ public class ReflectionHelper {
 
             Class exporterClass = Class.forName(exporterName);
 
-            Class[] classParams = new Class[5];
-            classParams[0] = fileClass;
-            classParams[1] = fileNamesClass;
-            classParams[2] = datasetClass;
-            classParams[3] = datasourceClass;
-            classParams[4] = sqlDataTypesClass;
+            Class[] classParams = new Class[] { fileClass, fileNamesClass, datasetClass, datasourceClass,
+                    sqlDataTypesClass };
 
             Constructor exporterConstructor = exporterClass.getDeclaredConstructor(classParams);
 
