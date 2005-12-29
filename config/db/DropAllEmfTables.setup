@@ -1,0 +1,43 @@
+--emissions.versions
+DROP TABLE emissions.versions;
+--emissions.versions
+--
+-- emf.users
+DROP TABLE emf.users CASCADE;
+--emf.users
+--
+--emf. status, countries, properties, sectors,sector criteria
+DROP TABLE emf.statusmessages;
+DROP TABLE emf.emf_properties;
+--
+DROP SEQUENCE emf.countries_id_seq;
+DROP TABLE emf.countries;
+--
+DROP SEQUENCE emf.sectors_id_seq;
+DROP TABLE emf.sectors CASCADE;
+--
+DROP TABLE emf.sectorcriteria;
+--emf. status, countries, properties, sectors,sector criteria
+--
+-- emf ... KEYWORDS framework
+DROP TABLE emf.datasets_keywords;
+DROP TABLE emf.emf_keywords CASCADE;
+DROP TABLE emf.dataset_types_keywords;
+-- emf ... KEYWORDS framework
+--
+-- emf.dataset_types
+DROP TABLE emf.dataset_types CASCADE;
+DROP SEQUENCE emf.dataset_types_dataset_type_id_seq;
+-- emf.dataset_types
+--
+-- emf.datasets must
+DROP TABLE emf.datasets CASCADE;
+DROP TABLE emf.datasettables CASCADE;
+DROP TABLE emf.dataset_access_logs CASCADE;
+--emf.datasets
+--
+-- emf internal and external sources
+DROP TABLE emf.external_sources;
+DROP TABLE emf.internal_sources;
+-- emf internal and external sources
+--

@@ -1,3 +1,0 @@
-DROP SCHEMA emf;
-DROP SCHEMA emissions;
-DROP SCHEMA reference;
