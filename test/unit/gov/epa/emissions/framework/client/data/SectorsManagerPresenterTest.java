@@ -38,7 +38,7 @@ public class SectorsManagerPresenterTest extends MockObjectTestCase {
         p.doClose();
     }
 
-    public void testShouldDisplayUpdateSectorViewOnUpdate() throws Exception {
+    public void testShouldDisplayEditSectorViewOnEdit() throws Exception {
         Mock view = mock(SectorsManagerView.class);
 
         Sector sector = new Sector();
@@ -63,7 +63,28 @@ public class SectorsManagerPresenterTest extends MockObjectTestCase {
         SectorsManagerPresenter p = new SectorsManagerPresenter((EmfSession) session.proxy(), (SectorsManagerView) view
                 .proxy(), (DataCommonsService) service.proxy(), (ViewLayout) layout.proxy());
 
-        p.doUpdate(sector, updateProxy);
+        p.doEdit(sector, updateProxy);
+    }
+
+    public void testShouldShowDisplaySectorViewOnView() throws Exception {
+        Mock view = mock(SectorsManagerView.class);
+
+        Sector sector = new Sector();
+        sector.setName("name");
+
+        Mock displaySectorView = mock(DisplaySectorView.class);
+        displaySectorView.expects(once()).method("observe").with(new IsInstanceOf(DisplaySectorPresenter.class));
+        displaySectorView.expects(once()).method("display").with(same(sector));
+        DisplaySectorView displayProxy = (DisplaySectorView) displaySectorView.proxy();
+
+        Mock layout = mock(ViewLayout.class);
+        layout.expects(once()).method("add").with(eq(displayProxy), new IsInstanceOf(Object.class));
+        layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
+
+        SectorsManagerPresenter p = new SectorsManagerPresenter(null, (SectorsManagerView) view.proxy(), null,
+                (ViewLayout) layout.proxy());
+
+        p.doView(sector, displayProxy);
     }
 
     public void testShouldActivateAlreadyDisplayedViewOnRepeatedUpdateOfSameView() throws Exception {
@@ -91,10 +112,10 @@ public class SectorsManagerPresenterTest extends MockObjectTestCase {
         SectorsManagerPresenter p = new SectorsManagerPresenter((EmfSession) session.proxy(), (SectorsManagerView) view
                 .proxy(), (DataCommonsService) service.proxy(), (ViewLayout) layout.proxy());
 
-        p.doUpdate(sector, updateProxy);
+        p.doEdit(sector, updateProxy);
 
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.TRUE));
-        p.doUpdate(sector, updateProxy);
+        p.doEdit(sector, updateProxy);
     }
 
 }

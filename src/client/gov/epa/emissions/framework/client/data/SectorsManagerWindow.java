@@ -123,29 +123,46 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     }
 
     private JPanel createCrudPanel() {
-        JButton updateButton = new JButton("Update");
-        updateButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                updateSectors();
-            }
-        });
-
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
-        crudPanel.add(updateButton);
+
+        JButton viewButton = new JButton("View");
+        viewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                viewSectors();
+            }
+        });
+        crudPanel.add(viewButton);
+
+        JButton editButton = new JButton("Edit");
+        editButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                editSectors();
+            }
+        });
+        crudPanel.add(editButton);
 
         return crudPanel;
     }
 
-    private void updateSectors() {
+    private void viewSectors() {
+        List sectors = selected();
+        // TODO: move it into Presenter - look at UserManagerWindow
+        for (Iterator iter = sectors.iterator(); iter.hasNext();) {
+            Sector sector = (Sector) iter.next();
+            presenter.doView(sector, displaySectorView());
+        }
+    }
+
+    private void editSectors() {
         List sectors = selected();
         // TODO: move it into Presenter - look at UserManagerWindow
         for (Iterator iter = sectors.iterator(); iter.hasNext();) {
             Sector sector = (Sector) iter.next();
             try {
-                presenter.doUpdate(sector, updateSectorView());
+                presenter.doEdit(sector, editSectorView());
             } catch (EmfException e) {
-                setError("Could not update Sector: " + sector.getName() + ". Reason: " + e.getMessage());
+                setError("Could not edit Sector: " + sector.getName() + ". Reason: " + e.getMessage());
             }
         }
     }
@@ -170,7 +187,20 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     }
 
     // FIXME: this table refresh sequence applies to every CRUD panel. Refactor
-    private EditSectorView updateSectorView() {
+    private DisplaySectorWindow displaySectorView() {
+        DisplaySectorWindow view = new DisplaySectorWindow();
+        desktop.add(view);
+
+        view.addInternalFrameListener(new InternalFrameAdapter() {
+            public void internalFrameClosed(InternalFrameEvent event) {
+                doTableRefresh();
+            }
+        });
+
+        return view;
+    }
+
+    private EditSectorView editSectorView() {
         EditSectorWindow view = new EditSectorWindow(this);
         desktop.add(view);
 
