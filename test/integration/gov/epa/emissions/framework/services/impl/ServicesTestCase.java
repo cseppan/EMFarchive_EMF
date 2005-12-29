@@ -1,12 +1,12 @@
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.commons.db.DatabaseSetup;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.PostgresDbUpdate;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.db.EmfDatabaseSetup;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
 import gov.epa.emissions.framework.db.LocalHibernateConfiguration;
 
@@ -17,16 +17,18 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 import junit.framework.TestCase;
 
 import org.hibernate.SessionFactory;
 
 public abstract class ServicesTestCase extends TestCase {
 
-    private DatabaseSetup dbSetup;
+    private EmfDatabaseSetup dbSetup;
 
     final protected void setUp() throws Exception {
-        dbSetup = new DatabaseSetup(config());
+        dbSetup = new EmfDatabaseSetup(config());
         doSetUp();
     }
 
@@ -57,6 +59,10 @@ public abstract class ServicesTestCase extends TestCase {
 
     protected Datasource emissions() {
         return dbServer().getEmissionsDatasource();
+    }
+
+    protected DataSource emf() {
+        return dbSetup.emfDatasource();
     }
 
     protected DbServer dbServer() {

@@ -17,6 +17,10 @@ public class ViewableRow implements Row {
         }
     }
 
+    public ViewableRow(RowSource source) {
+        this(source, source.values());
+    }
+
     public Object getValueAt(int column) {
         Column columnHolder = (Column) columns.get(new Integer(column));
         return columnHolder.value;

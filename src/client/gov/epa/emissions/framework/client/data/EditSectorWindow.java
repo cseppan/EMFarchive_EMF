@@ -21,7 +21,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.border.EtchedBorder;
 
 public class EditSectorWindow extends DisposableInteralFrame implements EditSectorView {
 
@@ -90,7 +89,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements EditSect
     private JPanel createCriteriaPanel(Sector sector) {
         criteriaTableData = new SectorCriteriaTableData(sector.getSectorCriteria());
         JPanel panel = new SectorCriteriaPanel("Criteria", criteriaTableData);
-        panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        panel.setBorder(BorderFactory.createTitledBorder("Criteria"));
 
         return panel;
     }

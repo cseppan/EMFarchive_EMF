@@ -1,20 +1,15 @@
-package gov.epa.emissions.framework.client.exim;
+package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
-import gov.epa.emissions.framework.services.DatasetTypeService;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.ExImService;
-import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 import java.io.File;
 import java.util.Random;
 
 //FIXME: revisit this test. Does not Assert !
-public class ExImServiceTest extends ServicesTestCase {
+public abstract class ExImServiceTestCase extends ServicesTestCase {
 
     protected ExImService eximService;
 
@@ -22,18 +17,17 @@ public class ExImServiceTest extends ServicesTestCase {
 
     private EmfDataset dataset;
 
-    protected void doSetUp() throws Exception {
-        ServiceLocator serviceLocator = serviceLocator();
+    protected void setUpService(ExImService eximService, UserService userService, DatasetTypeService datasetTypeService)
+            throws Exception {
+        this.eximService = eximService;
+        this.userService = userService;
 
-        eximService = serviceLocator.eximService();
-        userService = serviceLocator.userService();
-        
         dataset = new EmfDataset();
         Random random = new Random();
         dataset.setName("ORL NonPoint - ExImServicesTest" + random.nextInt());
         dataset.setCreator("creator");
 
-        DatasetType datasetType = orlNonPointType(serviceLocator.datasetTypeService());
+        DatasetType datasetType = orlNonPointType(datasetTypeService);
         dataset.setDatasetType(datasetType);
     }
 

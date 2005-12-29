@@ -18,7 +18,11 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
     private HibernateSessionFactory sessionFactory;
 
     public DatasetTypeServiceImpl() {
-        sessionFactory = HibernateSessionFactory.get();
+        this(HibernateSessionFactory.get());
+    }
+
+    public DatasetTypeServiceImpl(HibernateSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     public DatasetType[] getDatasetTypes() throws EmfException {

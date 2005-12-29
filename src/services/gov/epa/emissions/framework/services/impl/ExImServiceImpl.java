@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.security.User;
@@ -14,12 +13,8 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.StringTokenizer;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -29,7 +24,7 @@ import org.hibernate.Session;
 import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
-public class ExImServiceImpl implements ExImService {
+public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     private static Log log = LogFactory.getLog(ExImServiceImpl.class);
 
@@ -45,12 +40,17 @@ public class ExImServiceImpl implements ExImService {
 
     private HibernateSessionFactory sessionFactory;
 
-    public ExImServiceImpl() throws NamingException, SQLException {
-        sessionFactory = HibernateSessionFactory.get();
+    public ExImServiceImpl() throws Exception {
+        init(dbServer, HibernateSessionFactory.get());
+    }
 
-        // TODO: should we move this into an abstract super class ?
-        Context ctx = new InitialContext();
-        DataSource datasource = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
+    public ExImServiceImpl(DataSource datasource, DbServer dbServer, HibernateSessionFactory sessionFactory) {
+        super(datasource, dbServer);
+        init(dbServer, sessionFactory);
+    }
+
+    private void init(DbServer dbServer, HibernateSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
 
         // FIXME: Get base directory
         File mountPoint = new File(getValue(EMFConstants.EMF_DATA_ROOT_FOLDER));
@@ -59,11 +59,6 @@ public class ExImServiceImpl implements ExImService {
 
         baseImportFolder = importFolder.getAbsolutePath();
         baseExportFolder = exportFolder.getAbsolutePath();
-
-        // FIXME: we should not hard-code the db server. Also, read the
-        // datasource names from properties
-        DbServer dbServer = new PostgresDbServer(datasource.getConnection(), EMFConstants.EMF_REFERENCE_SCHEMA,
-                EMFConstants.EMF_EMISSIONS_SCHEMA);
 
         importerFactory = new VersionedImporterFactory(dbServer);
         exporterFactory = new ExporterFactory(dbServer);
@@ -133,8 +128,8 @@ public class ExImServiceImpl implements ExImService {
 
             validateDatasetName(dataset);
             Services svcHolder = new Services();
-            svcHolder.setDataSvc(new DataServiceImpl());
-            svcHolder.setStatusSvc(new StatusServiceImpl());
+            svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
+            svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
 
             Importer importer = importerFactory.create(dataset, path, fileName);
             ImportTask eximTask = new ImportTask(user, fileName, dataset, svcHolder, importer);
@@ -142,10 +137,10 @@ public class ExImServiceImpl implements ExImService {
             threadPool.execute(eximTask);
         } catch (Exception e) {
             log.error("Exception attempting to start import of file: " + fileName, e);
-            String message="Import failed - Dataset Type does not match file type";
-            
-            if (e.getMessage()!=null){
-                message=e.getMessage();
+            String message = "Import failed - Dataset Type does not match file type";
+
+            if (e.getMessage() != null) {
+                message = e.getMessage();
             }
             throw new EmfException(message);
         }
@@ -167,9 +162,9 @@ public class ExImServiceImpl implements ExImService {
                 // FIXME: Default is overwrite
                 File file = validateExportFile(path, getCleanDatasetName(dataset.getName()), true);
                 Services svcHolder = new Services();
-                svcHolder.setLogSvc(new LoggingServiceImpl());
-                svcHolder.setStatusSvc(new StatusServiceImpl());
-                svcHolder.setDataSvc(new DataServiceImpl());
+                svcHolder.setLogSvc(new LoggingServiceImpl(sessionFactory));
+                svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
+                svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
                 Exporter exporter = exporterFactory.create(dataset);
                 AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
                         .getAccessedDateTime(), "Version " + dataset.getDefaultVersion(), purpose, dirName);
@@ -193,18 +188,18 @@ public class ExImServiceImpl implements ExImService {
             for (int i = 0; i < datasets.length; i++) {
 
                 EmfDataset dataset = datasets[i];
-                
-                //if dataset is not exportable throw exception
-                if (isExportable(dataset)){
+
+                // if dataset is not exportable throw exception
+                if (isExportable(dataset)) {
                     // FIXME: Default is overwrite
                     File file = validateExportFile(path, getCleanDatasetName(dataset.getName()), false);
                     Services svcHolder = new Services();
-                    svcHolder.setLogSvc(new LoggingServiceImpl());
-                    svcHolder.setStatusSvc(new StatusServiceImpl());
-                    svcHolder.setDataSvc(new DataServiceImpl());
+                    svcHolder.setLogSvc(new LoggingServiceImpl(sessionFactory));
+                    svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
+                    svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
                     Exporter exporter = exporterFactory.create(dataset);
                     AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
-                              .getAccessedDateTime(), "Version " + dataset.getDefaultVersion(), purpose, dirName);
+                            .getAccessedDateTime(), "Version " + dataset.getDefaultVersion(), purpose, dirName);
                     ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);
                     threadPool.execute(eximTask);
                 }
@@ -223,11 +218,9 @@ public class ExImServiceImpl implements ExImService {
 
         String datasetType = dataset.getDatasetType().getName();
 
-        if (!((datasetType.equals("Shapefile")) ||
-            (datasetType.equals("External File")) ||
-            (datasetType.equals("Meteorology File")) ||
-            (datasetType.equals("Model Ready Emissions File")))){
-            
+        if (!((datasetType.equals("Shapefile")) || (datasetType.equals("External File"))
+                || (datasetType.equals("Meteorology File")) || (datasetType.equals("Model Ready Emissions File")))) {
+
             exportable = true;
         }
         return exportable;

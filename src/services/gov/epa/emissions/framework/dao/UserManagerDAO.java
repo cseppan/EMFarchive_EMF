@@ -11,8 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -21,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
 public class UserManagerDAO {
     private static Log log = LogFactory.getLog(UserManagerDAO.class);
 
-    DataSource ds = null;
+    DataSource datasource = null;
 
     private static final String GET_USER_QUERY = "select * from emf.users where user_name=?";
 
@@ -33,116 +31,74 @@ public class UserManagerDAO {
 
     private static final String DELETE_USER_QUERY = "DELETE FROM emf.users where user_name=?";
 
-    public UserManagerDAO() throws InfrastructureException {
-        try {
-            Context ctx = new InitialContext();
-            log.debug("BEFORE: Is datasource null? " + (ds == null));
-            ds = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
-            log.debug("AFTER: Is datasource null? " + (ds == null));
-        } catch (Exception ex) {
-            log.error("could not initialize EMF datasource", ex);
-            throw new InfrastructureException("Server configuration error");
-        }
+    public UserManagerDAO(DataSource datasource) {
+        this.datasource = datasource;
     }
 
     public boolean isNewUser(String userName) throws InfrastructureException {
-        log.debug("Verify if this is a new user: " + userName);
         boolean newuser = true;
         try {
-            if (ds != null) {
-                Connection conn = ds.getConnection();
-                log.debug("Is connection null? " + (conn == null));
+            Connection conn = datasource.getConnection();
+            PreparedStatement selectStmt = conn.prepareStatement(GET_USER_QUERY);
+            selectStmt.setString(1, userName);
 
-                if (conn != null) {
-                    PreparedStatement selectStmt = conn.prepareStatement(GET_USER_QUERY);
-                    log.debug("Is statement null? " + (selectStmt == null));
-                    log.debug("The query string " + GET_USER_QUERY);
+            ResultSet rst = selectStmt.executeQuery();
+            if (rst.next())
+                newuser = false;
 
-                    selectStmt.setString(1, userName);
-
-                    ResultSet rst = selectStmt.executeQuery();
-                    log.debug("Is result set null? " + (rst == null));
-
-                    if (rst.next())
-                        newuser = false;
-
-                    // Close the result set, statement and the connection
-                    rst.close();
-                    selectStmt.close();
-                    conn.close();
-                }// conn not null
-            }// ds not null
+            // Close the result set, statement and the connection
+            rst.close();
+            selectStmt.close();
+            conn.close();
         } catch (SQLException ex) {
             log.error(ex);
             throw new InfrastructureException("Database error");
         }
-        log.debug("Verify if this is a new user: " + userName);
+
         return newuser;
     }
 
     public User getUser(String userName) throws EmfException {
-        log.debug("in getUser for username= " + userName);
-
-        User emfUser = null;
-
         try {
-            if (ds != null) {
-                Connection conn = ds.getConnection();
-                log.debug("Is connection null? " + (conn == null));
+            Connection conn = datasource.getConnection();
+            PreparedStatement selectStmt = conn.prepareStatement(GET_USER_QUERY);
+            selectStmt.setString(1, userName);
 
-                if (conn != null) {
-                    PreparedStatement selectStmt = conn.prepareStatement(GET_USER_QUERY);
-                    log.debug("Is statement null? " + (selectStmt == null));
-                    log.debug("The query string " + GET_USER_QUERY);
+            ResultSet rst = selectStmt.executeQuery();
 
-                    selectStmt.setString(1, userName);
-
-                    ResultSet rst = selectStmt.executeQuery();
-                    log.debug("Is result set null? " + (rst == null));
-
-                    while (rst.next()) {
-                        log.debug("An rst record found ");
-                        emfUser = createUser(rst);
-                    }// while
-
-                    // Close the result set, statement and the connection
-                    rst.close();
-                    selectStmt.close();
-                    conn.close();
-                }// conn not null
-            }// ds not null
+            try {
+                if (rst.next())
+                    return extractUser(rst);
+            } finally {
+                rst.close();
+                selectStmt.close();
+                conn.close();
+            }
         } catch (SQLException ex) {
             log.error(ex);
             throw new InfrastructureException("Database error");
         }
 
-        if (emfUser != null) {
-            log.debug("End of getUser with fullname= " + emfUser.getFullName());
-        } else {
-            log.error("User Data error: No record found for username= " + userName);
-        }
+        log.error("User Data error: No record found for username= " + userName);
+        return null;
+    }
 
-        log.debug("in getUser for username= " + userName);
-        return emfUser;
-    }// getUser
-
-    private User createUser(ResultSet rst) throws EmfException {
-        User emfUser;
-        emfUser = new User();
+    private User extractUser(ResultSet rst) throws EmfException {
+        User user = new User();
         try {
-            emfUser.setAcctDisabled(rst.getBoolean("acctdisabled"));
-            emfUser.setAffiliation(rst.getString("affiliation"));
-            emfUser.setEmail(rst.getString("emailaddr"));
-            emfUser.setFullName(rst.getString("fullname"));
-            emfUser.setInAdminGroup(rst.getBoolean("inadmingrp"));
-            emfUser.setEncryptedPassword(rst.getString("user_pass"));
-            emfUser.setUsername(rst.getString("user_name"));
-            emfUser.setPhone(rst.getString("workphone"));
+            user.setAcctDisabled(rst.getBoolean("acctdisabled"));
+            user.setAffiliation(rst.getString("affiliation"));
+            user.setEmail(rst.getString("emailaddr"));
+            user.setFullName(rst.getString("fullname"));
+            user.setInAdminGroup(rst.getBoolean("inadmingrp"));
+            user.setEncryptedPassword(rst.getString("user_pass"));
+            user.setUsername(rst.getString("user_name"));
+            user.setPhone(rst.getString("workphone"));
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
 
-        return emfUser;
+        return user;
     }
 
     public List getUsers() throws EmfException {
@@ -152,8 +108,8 @@ public class UserManagerDAO {
         User emfUser = null;
 
         try {
-            if (ds != null) {
-                Connection conn = ds.getConnection();
+            if (datasource != null) {
+                Connection conn = datasource.getConnection();
                 log.debug("Is connection null? " + (conn == null));
 
                 if (conn != null) {
@@ -166,7 +122,7 @@ public class UserManagerDAO {
 
                     while (rst.next()) {
                         log.debug("An rst record found ");
-                        emfUser = createUser(rst);
+                        emfUser = extractUser(rst);
 
                         users.add(emfUser);
                         log.debug(emfUser.getUsername());
@@ -190,8 +146,8 @@ public class UserManagerDAO {
     public void deleteUser(String userName) throws InfrastructureException {
         log.debug("Begin delete user");
         try {
-            if (ds != null) {
-                Connection conn = ds.getConnection();
+            if (datasource != null) {
+                Connection conn = datasource.getConnection();
                 log.debug("Is connection null? " + (conn == null));
 
                 if (conn != null) {
@@ -218,8 +174,8 @@ public class UserManagerDAO {
     public void updateUser(User user) throws InfrastructureException {
         log.debug("Begin update user");
         try {
-            if (ds != null) {
-                Connection conn = ds.getConnection();
+            if (datasource != null) {
+                Connection conn = datasource.getConnection();
                 log.debug("Is connection null? " + (conn == null));
 
                 if (conn != null) {
@@ -254,8 +210,8 @@ public class UserManagerDAO {
     public void insertUser(User user) throws InfrastructureException {
         log.debug("Begin insert user");
         try {
-            if (ds != null) {
-                Connection conn = ds.getConnection();
+            if (datasource != null) {
+                Connection conn = datasource.getConnection();
                 log.debug("Is connection null? " + (conn == null));
 
                 if (conn != null) {

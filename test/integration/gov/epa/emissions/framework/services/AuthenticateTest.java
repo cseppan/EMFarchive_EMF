@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.login;
+package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.security.PasswordGenerator;
 import gov.epa.emissions.framework.EmfException;

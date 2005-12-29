@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.db.PostgresDbUpdate;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
@@ -13,11 +12,9 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
 
     private UserService userService;
 
-    protected void setUpService(DataCommonsService service) throws Exception {
+    protected void setUpService(DataCommonsService service, UserService userService) throws Exception {
         this.service = service;
-
-        ServiceLocator serviceLocator = serviceLocator();
-        userService = serviceLocator.userService();
+        this.userService = userService;
     }
 
     public void testShouldReturnCompleteListOfSectors() throws EmfException {
@@ -54,10 +51,10 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         String name = sector.getName();
         sector.setName("TEST");
         service.updateSector(sector);
-
+        
         Sector modifiedSector = sectors(sector.getId());
         assertEquals("TEST", modifiedSector.getName());
-
+       
         // restore
         modifiedSector.setName(name);
         service.updateSector(modifiedSector);
@@ -123,7 +120,6 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         modifiedSector.setName(name);
         Sector modifiedSector3 = service.updateSector(user, modifiedSector);
         assertEquals(sector.getName(), modifiedSector3.getName());
-
     }
 
     protected void doTearDown() throws Exception {// no op

@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.TableData;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -25,7 +26,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SpringLayout;
-import javax.swing.border.EtchedBorder;
 
 public class DisplaySectorWindow extends DisposableInteralFrame implements DisplaySectorView {
 
@@ -67,8 +67,7 @@ public class DisplaySectorWindow extends DisposableInteralFrame implements Displ
     }
 
     private String lockStatus(Sector sector) {
-        //FIXME: replace w/ Sector.isLocked()
-        if (sector.getUsername() == null || sector.getLockDate() == null)
+        if (!sector.isLocked())
             return "";
 
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
@@ -96,9 +95,9 @@ public class DisplaySectorWindow extends DisposableInteralFrame implements Displ
 
     private JPanel createCriteriaPanel(Sector sector) {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        panel.setBorder(BorderFactory.createTitledBorder("Criteria"));
 
-        SectorCriteriaTableData tableData = new SectorCriteriaTableData(sector.getSectorCriteria());
+        TableData tableData = new ViewableSectorCriteriaTableData(sector.getSectorCriteria());
         JTable table = new JTable(new EmfTableModel(tableData));
         table.setRowHeight(20);
 
