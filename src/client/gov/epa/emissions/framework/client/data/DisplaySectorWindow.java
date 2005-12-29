@@ -3,22 +3,27 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
-import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.SpringLayout;
 import javax.swing.border.EtchedBorder;
 
@@ -30,14 +35,8 @@ public class DisplaySectorWindow extends DisposableInteralFrame implements Displ
 
     private SingleLineMessagePanel messagePanel;
 
-    private TextField name;
-
-    private TextArea description;
-
-    private SectorCriteriaTableData criteriaTableData;
-
     public DisplaySectorWindow() {
-        super("Update Sector", new Dimension(600, 500));
+        super("View Sector", new Dimension(600, 500));
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -49,7 +48,7 @@ public class DisplaySectorWindow extends DisposableInteralFrame implements Displ
     }
 
     public void display(Sector sector) {
-        super.setTitle("Update Sector: " + sector.getName());
+        super.setTitle("View Sector: " + sector.getName());
         layout.removeAll();
         doLayout(layout, sector);
 
@@ -60,19 +59,31 @@ public class DisplaySectorWindow extends DisposableInteralFrame implements Displ
     private void doLayout(JPanel layout, Sector sector) {
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
-        layout.add(createInputPanel(sector));
+        layout.add(createBasicDataPanel(sector));
         layout.add(createCriteriaPanel(sector));
         layout.add(createButtonsPanel());
+
+        messagePanel.setMessage(lockStatus(sector));
     }
 
-    private JPanel createInputPanel(Sector sector) {
+    private String lockStatus(Sector sector) {
+        //FIXME: replace w/ Sector.isLocked()
+        if (sector.getUsername() == null || sector.getLockDate() == null)
+            return "";
+
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+        return "Locked by " + sector.getUsername() + " at " + dateFormat.format(sector.getLockDate());
+    }
+
+    private JPanel createBasicDataPanel(Sector sector) {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        name = new TextField("name", sector.getName(), 20);
+        Label name = new Label("name", sector.getName());
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
-        description = new TextArea("description", sector.getDescription(), 40);
+        TextArea description = new TextArea("description", sector.getDescription(), 40);
+        description.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Description", new ScrollableTextArea(description), panel);
 
         // Lay out the panel.
@@ -84,9 +95,14 @@ public class DisplaySectorWindow extends DisposableInteralFrame implements Displ
     }
 
     private JPanel createCriteriaPanel(Sector sector) {
-        criteriaTableData = new SectorCriteriaTableData(sector.getSectorCriteria());
-        JPanel panel = new SectorCriteriaPanel("Criteria", criteriaTableData);
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+
+        SectorCriteriaTableData tableData = new SectorCriteriaTableData(sector.getSectorCriteria());
+        JTable table = new JTable(new EmfTableModel(tableData));
+        table.setRowHeight(20);
+
+        panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
         return panel;
     }
