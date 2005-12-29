@@ -129,7 +129,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
+            throw new EmfException("Database error: " + e);
         }
         return lockedSector;
     }
@@ -143,7 +143,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
+            throw new EmfException("Database error: " + e);
         }
         return lockedSector;
     }
@@ -157,7 +157,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
+            throw new EmfException("Database error: " + e);
         }
         return lockedSector;
     }

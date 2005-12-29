@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.dao;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.EMFConstants;
 
@@ -205,7 +206,7 @@ public class DataCommonsDAO {
         if (modifiedSector.getUsername()!= null){
             // get the time difference between now and when the lock was acquired by the other user
            long timeDifference = new Date().getTime() - modifiedSector.getLockDate().getTime();
-           if (timeDifference>EMFConstants.EMF_LOCK_TIMEOUT_VALUE){
+           if ((modifiedSector.getUsername().equals(user.getFullName())) || (timeDifference>EMFConstants.EMF_LOCK_TIMEOUT_VALUE)){
                modifiedSector = grabLock(user,modifiedSector,session);
            }
         }else{
@@ -236,51 +237,64 @@ public class DataCommonsDAO {
         return modifiedSector;
     }
 
-    public static Sector releaseSectorLock(User user, Sector sector, Session session) {
+    public static Sector releaseSectorLock(User user, Sector sector, Session session) throws EmfException {
         log.debug("releasing sector lock: " + sector.getId());
         Sector modifiedSector;
         Transaction tx = null;
 
-        sector.setUsername(null);
-        sector.setLockDate(null);
+        modifiedSector = DataCommonsDAO.sectors(sector.getId(),session);
         
-        try {
-            tx = session.beginTransaction();
-            session.update(sector);
-            tx.commit();
-            modifiedSector = sectors(sector.getId(),session);
-            log.debug("releasing sector lock: " + sector.getId());
-        } catch (HibernateException e) {
-            log.error(e);
-            tx.rollback();
-            throw e;
+        if (modifiedSector.getUsername().equals(user.getFullName())){
+            modifiedSector.setUsername(null);
+            modifiedSector.setLockDate(null);
+            
+            try {
+                tx = session.beginTransaction();
+                session.update(modifiedSector);
+                tx.commit();
+                modifiedSector = sectors(modifiedSector.getId(),session);
+                log.debug("releasing sector lock: " + modifiedSector.getId());
+            } catch (HibernateException e) {
+                log.error(e);
+                tx.rollback();
+                throw e;
+            }
+            return modifiedSector;        
+
         }
-        return modifiedSector;        
+            throw new EmfException("Failed operation: Cannot update without owning lock");
     }
 
-    public static Sector updateSector(User user, Sector sector, Session session) {
+    public static Sector updateSector(User user, Sector sector, Session session) throws EmfException {
         log.debug("updating sector with lock: " + sector.getId());
         Sector modifiedSector;
         Transaction tx = null;
 
-        sector.setUsername(user.getFullName());
-        sector.setLockDate(new Date());
-        
-        try {
-            tx = session.beginTransaction();
-            session.update(sector);
-            sector.setUsername(null);            
-            sector.setLockDate(null);
-            session.update(sector);
-            tx.commit();
-            modifiedSector = sectors(sector.getId(),session);
-            log.debug("updating sector with lock: " + sector.getId());
-        } catch (HibernateException e) {
-            log.error(e);
-            tx.rollback();
-            throw e;
+        modifiedSector = DataCommonsDAO.sectors(sector.getId(),session);
+
+        if (modifiedSector.getUsername().equals(user.getFullName())){
+            modifiedSector.setUsername(user.getFullName());
+            modifiedSector.setLockDate(new Date());
+            
+            try {
+                tx = session.beginTransaction();
+                session.update(modifiedSector);
+                modifiedSector.setUsername(null);            
+                modifiedSector.setLockDate(null);
+                session.update(modifiedSector);
+                tx.commit();
+                modifiedSector = sectors(sector.getId(),session);
+                log.debug("updating sector with lock: " + sector.getId());
+            } catch (HibernateException e) {
+                log.error(e);
+                tx.rollback();
+                throw e;
+            }
+            return modifiedSector;        
+            
         }
-        return modifiedSector;        
+        throw new EmfException("Failed operation: Cannot update without owning lock");
+
     }
 
     private static Sector sectors(long id,Session session) {
