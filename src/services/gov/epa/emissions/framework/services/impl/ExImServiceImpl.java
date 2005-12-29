@@ -30,7 +30,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     private VersionedImporterFactory importerFactory;
 
-    private ExporterFactory exporterFactory;
+    private VersionedExporterFactory exporterFactory;
 
     private String baseImportFolder = null;
 
@@ -60,8 +60,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         baseImportFolder = importFolder.getAbsolutePath();
         baseExportFolder = exportFolder.getAbsolutePath();
 
-        importerFactory = new VersionedImporterFactory(dbServer);
-        exporterFactory = new ExporterFactory(dbServer);
+        importerFactory = new VersionedImporterFactory(dbServer.getEmissionsDatasource(), dbServer.getSqlDataTypes());
+        exporterFactory = new VersionedExporterFactory(dbServer.getEmissionsDatasource(), dbServer.getSqlDataTypes());
 
         // TODO: thread pooling policy
         threadPool = new PooledExecutor(new BoundedBuffer(10), 20);

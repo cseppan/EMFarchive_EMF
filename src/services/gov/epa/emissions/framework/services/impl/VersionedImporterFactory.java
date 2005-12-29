@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.DataFormatFactory;
 import gov.epa.emissions.commons.io.Dataset;
@@ -24,9 +23,9 @@ public class VersionedImporterFactory {
 
     private SqlDataTypes sqlDataTypes;
 
-    public VersionedImporterFactory(DbServer dbServer) {
-        datasource = dbServer.getEmissionsDatasource();
-        sqlDataTypes = dbServer.getSqlDataTypes();
+    public VersionedImporterFactory(Datasource datasource, SqlDataTypes sqlDataTypes) {
+        this.datasource = datasource;
+        this.sqlDataTypes = sqlDataTypes;
     }
 
     public Importer create(EmfDataset dataset, File folder, String filename) throws ImporterException {

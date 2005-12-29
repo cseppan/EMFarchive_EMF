@@ -158,9 +158,12 @@
 		<junit printsummary="yes" haltonfailure="yes">
 			<classpath refid="classpath" />
 			<formatter type="xml" />
-			<batchtest fork="yes" todir="${reports.integrationtests.dir}">
+			<batchtest fork="yes" haltonfailure="yes" todir="${reports.integrationtests.dir}">
 				<fileset dir="${test.integration.dir}">
 					<include name="**/emissions/framework/**/*Test.java" />
+					<exclude name="**/emissions/framework/**/DataEditorWebServiceTest.java" />
+					<exclude name="**/emissions/framework/**/DataEditorServiceImplTest.java" />
+					<exclude name="**/emissions/framework/**/DataCommonsServiceImplTest.java" />
 				</fileset>
 			</batchtest>
 		</junit>

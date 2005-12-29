@@ -9,11 +9,6 @@
         <!-- Connection -->
         <property name="connection.datasource">java:comp/env/jdbc/EMFDB</property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
-        <!-- implicitly use Tomcat's default connection pooling
-        <property name="hibernate.c3p0.min_size">5</property>
-        <property name="hibernate.c3p0.max_size">20</property>
-        <property name="hibernate.c3p0.timeout">1800</property>
-        -->
         
         <!-- Transactions/Cache -->
         <property name="hibernate.transaction.auto_close_session">false</property>

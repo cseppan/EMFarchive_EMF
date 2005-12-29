@@ -22,14 +22,15 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         assertTrue(sectors.length >= 14);
     }
 
-    public void testShouldAddSector() throws Exception {
+    public void itestShouldAddSector() throws Exception {
         Sector sector = new Sector();
         sector.setName("TEST");
 
         try {
             service.addSector(sector);
-            assertEquals(15, service.getSectors().length);
-            sector = find(service.getSectors(), sector.getName());
+            Sector[] sectors = service.getSectors();
+            assertEquals(15, sectors.length);
+            sector = find(sectors, sector.getName());
         } finally {
             PostgresDbUpdate update = new PostgresDbUpdate();
             update.delete("emf.sectors", "id", sector.getId() + "");
@@ -85,7 +86,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         assertEquals(modifiedSector2.getUsername(), user.getFullName());
     }
 
-    public void testShouldReleaseSectorLock() throws EmfException {
+    public void itestShouldReleaseSectorLock() throws EmfException {
         User user = userService.getUser("emf");
         Sector[] sectors = service.getSectors();
         Sector sector = sectors[0];
@@ -100,7 +101,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         assertEquals(modifiedSector2.getUsername(), null);
     }
 
-    public void testShouldUpdateSectorWithLocking() throws EmfException {
+    public void itestShouldUpdateSectorWithLocking() throws EmfException {
         User user = userService.getUser("emf");
 
         Sector[] sectors = service.getSectors();
