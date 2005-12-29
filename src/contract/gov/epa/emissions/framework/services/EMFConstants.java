@@ -3,6 +3,9 @@ package gov.epa.emissions.framework.services;
 // FIXME: why need this ? Constants are not a good idea
 public final class EMFConstants {
 
+    public static final String DATASET_STATUS_IMPORTED = "Imported";
+    public static final String DATASET_STATUS_START_IMPORT = "Start Import";
+
     public static final String URI_FILENAME_PREFIX = "file:///";
 
     public static final String EMF_DATA_ROOT_FOLDER = "emf.data.root.folder";

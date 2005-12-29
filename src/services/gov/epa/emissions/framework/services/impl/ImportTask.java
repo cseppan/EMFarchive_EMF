@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.impl;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Status;
 
@@ -42,12 +43,12 @@ public class ImportTask implements Runnable {
 
         try {
             setStartStatus();
-
             dataServices.insertDataset(dataset);
+            dataset.setStatus(EMFConstants.DATASET_STATUS_START_IMPORT);
             importer.run();
 
             // if no errors then insert the dataset into the database
-            dataset.setStatus(DatasetStatus.IMPORTED);
+            dataset.setStatus(EMFConstants.DATASET_STATUS_IMPORTED);
             dataServices.updateDataset(dataset);
             
             setStatus("Completed import for " + dataset.getDatasetTypeName() + ":" + fileName);
