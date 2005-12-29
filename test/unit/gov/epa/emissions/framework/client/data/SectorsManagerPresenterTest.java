@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
+import java.util.Date;
+
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -54,16 +56,22 @@ public class SectorsManagerPresenterTest extends MockObjectTestCase {
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
 
         User user = new User();
+        user.setFullName("name");
+        
+        //locking sector
+        sector.setUsername(user.getFullName());
+        sector.setLockDate(new Date());
+        
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("getSectorLock").with(same(user), same(sector)).will(returnValue(sector));
 
         Mock session = mock(EmfSession.class);
-        session.expects(once()).method("user").withNoArguments().will(returnValue(user));
+        session.stubs().method("user").withNoArguments().will(returnValue(user));
 
         SectorsManagerPresenter p = new SectorsManagerPresenter((EmfSession) session.proxy(), (SectorsManagerView) view
                 .proxy(), (DataCommonsService) service.proxy(), (ViewLayout) layout.proxy());
 
-        p.doEdit(sector, updateProxy);
+        p.doEdit(sector, updateProxy, null);
     }
 
     public void testShouldShowDisplaySectorViewOnView() throws Exception {
@@ -103,19 +111,25 @@ public class SectorsManagerPresenterTest extends MockObjectTestCase {
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
 
         User user = new User();
+        user.setFullName("name");
+        
+        //locking sector
+        sector.setUsername(user.getFullName());
+        sector.setLockDate(new Date());
+
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("getSectorLock").with(same(user), same(sector)).will(returnValue(sector));
 
         Mock session = mock(EmfSession.class);
-        session.expects(once()).method("user").withNoArguments().will(returnValue(user));
+        session.stubs().method("user").withNoArguments().will(returnValue(user));
 
         SectorsManagerPresenter p = new SectorsManagerPresenter((EmfSession) session.proxy(), (SectorsManagerView) view
                 .proxy(), (DataCommonsService) service.proxy(), (ViewLayout) layout.proxy());
 
-        p.doEdit(sector, updateProxy);
+        p.doEdit(sector, updateProxy, null);
 
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.TRUE));
-        p.doEdit(sector, updateProxy);
+        p.doEdit(sector, updateProxy, null);
     }
 
 }

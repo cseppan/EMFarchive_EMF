@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.services.DataCommonsService;
 
 public class EditSectorPresenter {
 
-    private EditSectorView view;
+    private EditSectorView editView;
 
     private Sector sector;
 
@@ -15,22 +15,32 @@ public class EditSectorPresenter {
 
     private EmfSession session;
 
-    public EditSectorPresenter(EmfSession session, EditSectorView view, Sector sector, DataCommonsService service) {
+    private DisplaySectorView displayView;
+
+    public EditSectorPresenter(EmfSession session, EditSectorView editView, DisplaySectorView displayView,
+            Sector sector, DataCommonsService service) {
         this.session = session;
-        this.view = view;
+        this.editView = editView;
+        this.displayView = displayView;
         this.sector = sector;
         this.service = service;
     }
 
     public void doDisplay() throws EmfException {
         sector = service.getSectorLock(session.user(), sector);
-        view.observe(this);
-        view.display(sector);
+        
+        if (!sector.isLocked(session.user())) {// view mode, locked by another user
+            new DisplaySectorPresenter(displayView, sector).doDisplay();
+            return;
+        }
+
+        editView.observe(this);
+        editView.display(sector);
     }
 
     public void doClose() throws EmfException {
         service.releaseSectorLock(session.user(), sector);
-        view.close();
+        editView.close();
     }
 
     public void doSave(SectorsManagerView sectorManager) throws EmfException {

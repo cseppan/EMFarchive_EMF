@@ -160,7 +160,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
         for (Iterator iter = sectors.iterator(); iter.hasNext();) {
             Sector sector = (Sector) iter.next();
             try {
-                presenter.doEdit(sector, editSectorView());
+                presenter.doEdit(sector, editSectorView(), displaySectorView());
             } catch (EmfException e) {
                 setError("Could not edit Sector: " + sector.getName() + ". Reason: " + e.getMessage());
             }

@@ -35,6 +35,7 @@ public class VersionedImporterFactory {
             Importer importer = create(dataset, folder, filePatterns);
             return new VersionedImporter(importer, dataset, datasource);
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("Failed to create importer: " + e.getMessage());
             throw new ImporterException("Failed to create importer: " + e.getMessage());
         }

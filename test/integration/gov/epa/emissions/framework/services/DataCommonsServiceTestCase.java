@@ -22,7 +22,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         assertTrue(sectors.length >= 14);
     }
 
-    public void itestShouldAddSector() throws Exception {
+    public void testShouldAddSector() throws Exception {
         Sector sector = new Sector();
         sector.setName("TEST");
 
@@ -86,7 +86,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         assertEquals(modifiedSector2.getUsername(), user.getFullName());
     }
 
-    public void itestShouldReleaseSectorLock() throws EmfException {
+    public void testShouldReleaseSectorLock() throws EmfException {
         User user = userService.getUser("emf");
         Sector[] sectors = service.getSectors();
         Sector sector = sectors[0];
@@ -101,7 +101,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         assertEquals(modifiedSector2.getUsername(), null);
     }
 
-    public void itestShouldUpdateSectorWithLocking() throws EmfException {
+    public void testShouldUpdateSectorWithLocking() throws EmfException {
         User user = userService.getUser("emf");
 
         Sector[] sectors = service.getSectors();

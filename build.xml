@@ -168,6 +168,20 @@
 			</batchtest>
 		</junit>
 	</target>
+	
+	<target name="integration-tests-long" depends="compile" description="Integration of Client and Web Services">
+		<junit printsummary="yes" haltonfailure="yes">
+			<classpath refid="classpath" />
+			<formatter type="xml" />
+			<batchtest fork="yes" haltonfailure="yes" todir="${reports.integrationtests.dir}">
+				<fileset dir="${test.integration.dir}">
+					<include name="**/emissions/framework/**/DataEditorWebServiceTest.java" />
+					<include name="**/emissions/framework/**/DataEditorServiceImplTest.java" />
+					<include name="**/emissions/framework/**/DataCommonsServiceImplTest.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
 
 	<target name="persistence-tests" depends="compile" description="Tests Persistence using Hibernate">
 		<junit printsummary="yes" haltonfailure="yes">
