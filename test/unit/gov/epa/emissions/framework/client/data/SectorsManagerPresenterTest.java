@@ -44,10 +44,10 @@ public class SectorsManagerPresenterTest extends MockObjectTestCase {
         Sector sector = new Sector();
         sector.setName("name");
 
-        Mock updateSectorView = mock(UpdateSectorView.class);
-        updateSectorView.expects(once()).method("observe").with(new IsInstanceOf(UpdateSectorPresenter.class));
+        Mock updateSectorView = mock(EditSectorView.class);
+        updateSectorView.expects(once()).method("observe").with(new IsInstanceOf(EditSectorPresenter.class));
         updateSectorView.expects(once()).method("display").with(same(sector));
-        UpdateSectorView updateProxy = (UpdateSectorView) updateSectorView.proxy();
+        EditSectorView updateProxy = (EditSectorView) updateSectorView.proxy();
 
         Mock layout = mock(ViewLayout.class);
         layout.expects(once()).method("add").with(eq(updateProxy), new IsInstanceOf(Object.class));
@@ -72,10 +72,10 @@ public class SectorsManagerPresenterTest extends MockObjectTestCase {
         Sector sector = new Sector();
         sector.setName("name");
 
-        Mock updateSectorView = mock(UpdateSectorView.class);
-        updateSectorView.expects(once()).method("observe").with(new IsInstanceOf(UpdateSectorPresenter.class));
+        Mock updateSectorView = mock(EditSectorView.class);
+        updateSectorView.expects(once()).method("observe").with(new IsInstanceOf(EditSectorPresenter.class));
         updateSectorView.expects(once()).method("display").with(same(sector));
-        UpdateSectorView updateProxy = (UpdateSectorView) updateSectorView.proxy();
+        EditSectorView updateProxy = (EditSectorView) updateSectorView.proxy();
 
         Mock layout = mock(ViewLayout.class);
         layout.expects(once()).method("add").with(eq(updateProxy), new IsInstanceOf(Object.class));

@@ -33,12 +33,12 @@ public class SectorsManagerPresenter {
         view.close();
     }
 
-    public void doUpdate(Sector sector, UpdateSectorView updateSectorView) throws EmfException {
+    public void doUpdate(Sector sector, EditSectorView updateSectorView) throws EmfException {
         if (viewLayout.activate(sector.getName()))
             return;
 
         viewLayout.add(updateSectorView, sector.getName());
-        UpdateSectorPresenter p = new UpdateSectorPresenter(session, updateSectorView, sector, service);
+        EditSectorPresenter p = new EditSectorPresenter(session, updateSectorView, sector, service);
         p.doDisplay();
     }
 

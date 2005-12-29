@@ -9,9 +9,9 @@ import gov.epa.emissions.framework.services.DataCommonsService;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class UpdateDatasetTypePresenter {
+public class EditDatasetTypePresenter {
 
-    private UpdateDatasetTypeView view;
+    private EditDatasetTypeView view;
 
     private DatasetType type;
 
@@ -19,7 +19,7 @@ public class UpdateDatasetTypePresenter {
 
     private DataCommonsService interdataServices;
 
-    public UpdateDatasetTypePresenter(UpdateDatasetTypeView view, DatasetType type,
+    public EditDatasetTypePresenter(EditDatasetTypeView view, DatasetType type,
             DatasetTypeService datasetTypesServices, DataCommonsService interdataServices) {
         this.view = view;
         this.type = type;

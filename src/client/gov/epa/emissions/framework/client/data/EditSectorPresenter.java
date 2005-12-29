@@ -5,9 +5,9 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataCommonsService;
 
-public class UpdateSectorPresenter {
+public class EditSectorPresenter {
 
-    private UpdateSectorView view;
+    private EditSectorView view;
 
     private Sector sector;
 
@@ -15,7 +15,7 @@ public class UpdateSectorPresenter {
 
     private EmfSession session;
 
-    public UpdateSectorPresenter(EmfSession session, UpdateSectorView view, Sector sector, DataCommonsService service) {
+    public EditSectorPresenter(EmfSession session, EditSectorView view, Sector sector, DataCommonsService service) {
         this.session = session;
         this.view = view;
         this.sector = sector;

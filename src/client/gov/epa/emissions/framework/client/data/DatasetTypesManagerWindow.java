@@ -157,8 +157,8 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         return elements;
     }
 
-    private UpdateDatasetTypeView updateView() {
-        UpdateDatasetTypeWindow view = new UpdateDatasetTypeWindow(this);
+    private EditDatasetTypeView updateView() {
+        EditDatasetTypeWindow view = new EditDatasetTypeWindow(this);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {

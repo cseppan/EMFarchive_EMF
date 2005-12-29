@@ -51,10 +51,10 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         type.setName("name");
 
         Keyword[] keywords = new Keyword[0];
-        Mock updateView = mock(UpdateDatasetTypeView.class);
-        updateView.expects(once()).method("observe").with(new IsInstanceOf(UpdateDatasetTypePresenter.class));
+        Mock updateView = mock(EditDatasetTypeView.class);
+        updateView.expects(once()).method("observe").with(new IsInstanceOf(EditDatasetTypePresenter.class));
         updateView.expects(once()).method("display").with(same(type), same(keywords));
-        UpdateDatasetTypeView updateProxy = (UpdateDatasetTypeView) updateView.proxy();
+        EditDatasetTypeView updateProxy = (EditDatasetTypeView) updateView.proxy();
 
         Mock layout = mock(ViewLayout.class);
         layout.expects(once()).method("add").with(eq(updateProxy), new IsInstanceOf(Object.class));
@@ -79,10 +79,10 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         type.setName("name");
 
         Keyword[] keywords = new Keyword[0];
-        Mock updateView = mock(UpdateDatasetTypeView.class);
-        updateView.expects(once()).method("observe").with(new IsInstanceOf(UpdateDatasetTypePresenter.class));
+        Mock updateView = mock(EditDatasetTypeView.class);
+        updateView.expects(once()).method("observe").with(new IsInstanceOf(EditDatasetTypePresenter.class));
         updateView.expects(once()).method("display").with(same(type), same(keywords));
-        UpdateDatasetTypeView updateProxy = (UpdateDatasetTypeView) updateView.proxy();
+        EditDatasetTypeView updateProxy = (EditDatasetTypeView) updateView.proxy();
 
         Mock layout = mock(ViewLayout.class);
         layout.expects(once()).method("add").with(eq(updateProxy), new IsInstanceOf(Object.class));
