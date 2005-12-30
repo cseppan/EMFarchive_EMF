@@ -254,4 +254,16 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return baseExportFolder;
     }
 
+    public void startMultipleFileImport(User user, String folderPath, String fileName, EmfDataset dataset) throws EmfException {
+
+        // The fileName is a regular expression that maps to a collection of files.
+        
+        /// Loop through the collection and start import for the file
+        
+        // TODO Auto-generated method stub
+        if (false)
+            throw new EmfException(""); // placeholder
+       
+    }
+
 }

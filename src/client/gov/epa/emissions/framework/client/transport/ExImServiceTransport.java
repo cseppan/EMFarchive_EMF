@@ -122,4 +122,11 @@ public class ExImServiceTransport implements ExImService {
         throw new EmfException(extractMessage(fault.getMessage()));
     }
 
+    public void startMultipleFileImport(User user, String folderPath, String fileName, EmfDataset dataset)
+            throws EmfException {
+        // TODO Auto-generated method stub
+        if (false)
+            throw new EmfException(""); // placeholder
+    }
+
 }
