@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.commons.io.Lockable;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
@@ -122,57 +123,13 @@ public class DataCommonsDAO {
 
     }
 
-    /**
-     * This method will check if the current sector record has a lock. If it does it will return the sector object with
-     * the lock parameters to the current user indicating who is using this object. If the lock is older than 12 hours
-     * then the current user will be given the lock.
-     * 
-     * If there is no lock, this user will grab the lock and a modified record indicating the ownership of the lock is
-     * set back to the GUI.
-     * 
-     * The client will cross check those paramters in the returned sector object against the current user in the GUI. If
-     * the user is the same the GUI will allow the user to edit. If not the GUI will switch to view mode and a dialog
-     * will display the Full Name of the user who has the lock and the date the lock was acquired.
-     * 
-     */
-    public Sector getSectorLock(User user, Sector sector, Session session) {
-        Sector current = sector(sector.getId(), session);
-        if (!current.isLocked()) {
-            grabLock(user, current, session);
-            return current;
-        }
-
-        long elapsed = new Date().getTime() - current.getLockDate().getTime();
-
-        if ((user.getFullName().equals(current.getUsername())) || (elapsed > EMFConstants.EMF_LOCK_TIMEOUT_VALUE)) {
-            grabLock(user, current, session);
-        }
-
-        return current;
-    }
-
-    private void grabLock(User user, Sector sector, Session session) {
-        sector.setUsername(user.getFullName());
-        sector.setLockDate(new Date());
+    private void grabLock(User user, Lockable lockable, Session session) {
+        lockable.setUsername(user.getFullName());
+        lockable.setLockDate(new Date());
 
         Transaction tx = session.beginTransaction();
         try {
-            session.update(sector);
-            tx.commit();
-        } catch (HibernateException e) {
-            log.error(e);
-            tx.rollback();
-            throw e;
-        }
-    }
-
-    private void grabLock(User user, DatasetType type, Session session) {
-        type.setUsername(user.getFullName());
-        type.setLockDate(new Date());
-
-        Transaction tx = session.beginTransaction();
-        try {
-            session.update(type);
+            session.update(lockable);
             tx.commit();
         } catch (HibernateException e) {
             log.error(e);
@@ -182,8 +139,11 @@ public class DataCommonsDAO {
     }
 
     public Sector releaseSectorLock(Sector sector, Session session) throws EmfException {
-        Sector current = sector(sector.getId(), session);
+        Sector current = sector(sector, session);
+        return (Sector) releaseLock(current, session);
+    }
 
+    private Lockable releaseLock(Lockable current, Session session) throws EmfException {
         if (!current.isLocked())
             throw new EmfException("Cannot update without owning lock");
 
@@ -204,7 +164,7 @@ public class DataCommonsDAO {
     }
 
     public Sector updateSector(User user, Sector sector, Session session) throws EmfException {
-        Sector current = sector(sector.getId(), session);
+        Sector current = sector(sector, session);
         if (!current.isLocked(user))
             throw new EmfException("Cannot update without owning lock");
 
@@ -222,11 +182,11 @@ public class DataCommonsDAO {
         return releaseSectorLock(current, session);
     }
 
-    private Sector sector(long id, Session session) {
+    private Sector sector(Sector target, Session session) {
         List sectors = getSectors(session);
         for (Iterator iter = sectors.iterator(); iter.hasNext();) {
             Sector sector = (Sector) iter.next();
-            if (sector.getId() == id)
+            if (sector.equals(target))
                 return sector;
         }
 
@@ -237,8 +197,30 @@ public class DataCommonsDAO {
         return session.createQuery("SELECT dataset_type FROM DatasetType as dataset_type ORDER BY name").list();
     }
 
+    /**
+     * This method will check if the current sector record has a lock. If it does it will return the sector object with
+     * the lock parameters to the current user indicating who is using this object. If the lock is older than 12 hours
+     * then the current user will be given the lock.
+     * 
+     * If there is no lock, this user will grab the lock and a modified record indicating the ownership of the lock is
+     * set back to the GUI.
+     * 
+     * The client will cross check those paramters in the returned sector object against the current user in the GUI. If
+     * the user is the same the GUI will allow the user to edit. If not the GUI will switch to view mode and a dialog
+     * will display the Full Name of the user who has the lock and the date the lock was acquired.
+     * 
+     */
+    public Sector getSectorLock(User user, Sector sector, Session session) {
+        Sector current = sector(sector, session);
+        return (Sector) getLocked(user, session, current);
+    }
+
     public DatasetType getDatasetTypeLock(User user, DatasetType type, Session session) {
         DatasetType current = type(type, session);
+        return (DatasetType) getLocked(user, session, current);
+    }
+
+    private Lockable getLocked(User user, Session session, Lockable current) {
         if (!current.isLocked()) {
             grabLock(user, current, session);
             return current;
@@ -254,14 +236,19 @@ public class DataCommonsDAO {
     }
 
     private DatasetType type(DatasetType target, Session session) {
-        List sectors = getDatasetTypes(session);
-        for (Iterator iter = sectors.iterator(); iter.hasNext();) {
+        List list = getDatasetTypes(session);
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
             DatasetType type = (DatasetType) iter.next();
-            if (type.getDatasettypeid() == target.getDatasettypeid())
+            if (type.equals(target))
                 return type;
         }
 
         return null;
+    }
+
+    public DatasetType releaseDatasetTypeLock(DatasetType locked, Session session) throws EmfException {
+        DatasetType current = type(locked, session);
+        return (DatasetType) releaseLock(current, session);
     }
 
 }

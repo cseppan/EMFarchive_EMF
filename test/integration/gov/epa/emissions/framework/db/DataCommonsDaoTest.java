@@ -45,11 +45,11 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         assertTrue(types.size() >= 10);
     }
 
-    private Sector sectors(long id) {
+    private Sector sectors(Sector target) {
         List sectors = dao.getSectors(session);
         for (Iterator iter = sectors.iterator(); iter.hasNext();) {
             Sector element = (Sector) iter.next();
-            if (element.getId() == id)
+            if (element.equals(target))
                 return element;
         }
 
@@ -60,7 +60,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         List list = dao.getDatasetTypes(session);
         for (Iterator iter = list.iterator(); iter.hasNext();) {
             DatasetType element = (DatasetType) iter.next();
-            if (element.getDatasettypeid() == target.getDatasettypeid())
+            if (element.equals(target))
                 return element;
         }
 
@@ -75,7 +75,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         Sector lockedSector = dao.getSectorLock(user, sector, session);
         assertEquals(lockedSector.getUsername(), user.getFullName());
 
-        Sector sectorLoadedFromDb = sectors(sector.getId());
+        Sector sectorLoadedFromDb = sectors(sector);
         assertEquals(sectorLoadedFromDb.getUsername(), user.getFullName());
     }
 
@@ -113,8 +113,21 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         Sector releasedSector = dao.releaseSectorLock(lockedSector, session);
         assertFalse("Should have released lock", releasedSector.isLocked());
 
-        Sector sectorLoadedFromDb = sectors(sector.getId());
+        Sector sectorLoadedFromDb = sectors(sector);
         assertFalse("Should have released lock", sectorLoadedFromDb.isLocked());
+    }
+    
+    public void testShouldReleaseDatasetTypeLock() throws EmfException {
+        User user = userDao.getUser("emf");
+        List list = dao.getDatasetTypes(session);
+        DatasetType type = (DatasetType) list.get(0);
+        
+        DatasetType locked = dao.getDatasetTypeLock(user, type, session);
+        DatasetType released = dao.releaseDatasetTypeLock(locked, session);
+        assertFalse("Should have released lock", released.isLocked());
+        
+        DatasetType loadedFromDb = types(type);
+        assertFalse("Should have released lock", loadedFromDb.isLocked());
     }
 
     public void testShouldFailToReleaseSectorLockIfNotObtained() {
