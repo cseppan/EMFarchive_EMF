@@ -90,7 +90,6 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
             sectors = dao.getSectors(session);
-            session.flush();
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
@@ -104,7 +103,6 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
             lockedSector = dao.getSectorLock(user, sector, session);
-            session.flush();
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
@@ -118,7 +116,6 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
             lockedSector = dao.updateSector(user, sector, session);
-            session.flush();
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
@@ -132,7 +129,6 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
             lockedSector = dao.releaseSectorLock(sector, session);
-            session.flush();
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);

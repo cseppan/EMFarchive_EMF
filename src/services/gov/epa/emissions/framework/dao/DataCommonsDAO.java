@@ -90,22 +90,6 @@ public class DataCommonsDAO {
         return session.createQuery("SELECT sector FROM Sector as sector ORDER BY name").list();
     }
 
-    public void updateSector(Sector sector, Session session) {
-        log.debug("updating sector: " + sector.getId());
-        Transaction tx = null;
-
-        try {
-            tx = session.beginTransaction();
-            session.update(sector);
-            tx.commit();
-            log.debug("updating sector: " + sector.getId());
-        } catch (HibernateException e) {
-            log.error(e);
-            tx.rollback();
-            throw e;
-        }
-    }
-
     public void updateCountry(Country country, Session session) {
         log.debug("updating country: " + country.getId());
         Transaction tx = null;
@@ -128,21 +112,6 @@ public class DataCommonsDAO {
         try {
             tx = session.beginTransaction();
             session.save(country);
-            tx.commit();
-        } catch (HibernateException e) {
-            log.error(e);
-            tx.rollback();
-            throw e;
-        }
-
-    }
-
-    public void insertSector(Sector sector, Session session) {
-        Transaction tx = null;
-
-        try {
-            tx = session.beginTransaction();
-            session.save(sector);
             tx.commit();
         } catch (HibernateException e) {
             log.error(e);
@@ -200,57 +169,41 @@ public class DataCommonsDAO {
         Sector current = sector(sector.getId(), session);
 
         if (!current.isLocked())
-            return current;
+            throw new EmfException("Cannot update without owning lock");
 
-        if (!current.getUsername().equals(sector.getUsername())) {
-            throw new EmfException("Failed operation: Cannot update without owning lock");
-        }
-
-        current.setUsername(null);
-        current.setLockDate(null);
         Transaction tx = session.beginTransaction();
         try {
+            current.setUsername(null);
+            current.setLockDate(null);
             session.update(current);
+
             tx.commit();
-            current = sector(current.getId(), session);
         } catch (HibernateException e) {
             log.error(e);
             tx.rollback();
             throw e;
         }
+
         return current;
     }
 
     public Sector updateSector(User user, Sector sector, Session session) throws EmfException {
-        log.debug("updating sector with lock: " + sector.getId());
-        Sector modifiedSector;
-        Transaction tx = null;
+        Sector current = sector(sector.getId(), session);
+        if (!current.isLocked(user))
+            throw new EmfException("Cannot update without owning lock");
 
-        modifiedSector = sector(sector.getId(), session);
-
-        if (modifiedSector.getUsername().equals(user.getFullName())) {
-            modifiedSector.setUsername(user.getFullName());
-            modifiedSector.setLockDate(new Date());
-
-            try {
-                tx = session.beginTransaction();
-                session.update(modifiedSector);
-                modifiedSector.setUsername(null);
-                modifiedSector.setLockDate(null);
-                session.update(modifiedSector);
-                tx.commit();
-                modifiedSector = sector(sector.getId(), session);
-                log.debug("updating sector with lock: " + sector.getId());
-            } catch (HibernateException e) {
-                log.error(e);
-                tx.rollback();
-                throw e;
-            }
-            return modifiedSector;
-
+        Transaction tx = session.beginTransaction();
+        try {
+            current.setLockDate(new Date());
+            session.update(current);
+            tx.commit();
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
         }
-        throw new EmfException("Failed operation: Cannot update without owning lock");
 
+        return releaseSectorLock(current, session);
     }
 
     private Sector sector(long id, Session session) {

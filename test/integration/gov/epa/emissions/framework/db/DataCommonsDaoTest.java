@@ -75,7 +75,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         assertFalse("Should have released lock", sectorLoadedFromDb.isLocked());
     }
 
-    public void testShouldUpdateSectorWithLocking() throws EmfException {
+    public void testShouldUpdateSector() throws EmfException {
         List sectors = dao.getSectors(session);
         Sector sector = (Sector) sectors.get(0);
         String name = sector.getName();
@@ -89,7 +89,6 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         Sector modifiedSector2 = dao.updateSector(user, modifiedSector1, session);
         assertEquals("TEST", modifiedSector1.getName());
         assertEquals(modifiedSector2.getUsername(), null);
-        dao.releaseSectorLock(modifiedSector2, session);
 
         // restore
         Sector modifiedSector = dao.getSectorLock(user, sector, session);
@@ -97,6 +96,5 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         
         Sector modifiedSector3 = dao.updateSector(user, modifiedSector, session);
         assertEquals(sector.getName(), modifiedSector3.getName());
-        dao.releaseSectorLock(modifiedSector3, session);
     }
 }
