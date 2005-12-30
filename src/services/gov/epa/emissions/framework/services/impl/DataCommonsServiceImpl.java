@@ -112,49 +112,82 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
 
     public Sector updateSector(User user, Sector sector) throws EmfException {
-        Sector lockedSector;
+        Sector locked;
         try {
             Session session = sessionFactory.getSession();
-            lockedSector = dao.updateSector(user, sector, session);
+            locked = dao.updateSector(user, sector, session);
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
             throw new EmfException("Database error: " + e);
         }
-        return lockedSector;
+        return locked;
     }
 
     public Sector releaseSectorLock(User user, Sector sector) throws EmfException {
-        Sector lockedSector;
+        Sector locked;
         Session session = sessionFactory.getSession();
         try {
-            lockedSector = dao.releaseSectorLock(sector, session);
+            locked = dao.releaseSectorLock(sector, session);
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
             throw new EmfException("Database error: " + e);
         }
-        return lockedSector;
+        return locked;
     }
 
-    public DatasetType[] getDatasetTypes() {
-        // TODO Auto-generated method stub
-        return null;
+    public DatasetType[] getDatasetTypes() throws EmfException {
+        List list;
+        try {
+            Session session = sessionFactory.getSession();
+            list = dao.getDatasetTypes(session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Database error: " + e);
+            throw new EmfException("Error communicating with the server");
+        }
+
+        return (DatasetType[]) list.toArray(new DatasetType[0]);
     }
 
-    public DatasetType getDatasetTypeLock(User user, DatasetType type) {
-        // TODO Auto-generated method stub
-        return null;
+    public DatasetType getDatasetTypeLock(User user, DatasetType type) throws EmfException {
+        DatasetType locked;
+        try {
+            Session session = sessionFactory.getSession();
+            locked = dao.getDatasetTypeLock(user, type, session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Database error: " + e);
+            throw new EmfException("Database error: " + e);
+        }
+        return locked;
     }
 
-    public DatasetType updateDatasetType(User user, DatasetType type) {
-        // TODO Auto-generated method stub
-        return null;
+    public DatasetType updateDatasetType(User user, DatasetType type) throws EmfException {
+        DatasetType locked;
+        try {
+            Session session = sessionFactory.getSession();
+            locked = dao.updateDatasetType(user, type, session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Database error: " + e);
+            throw new EmfException("Database error: " + e);
+        }
+        return locked;
     }
 
-    public DatasetType releaseDatasetTypeLock(User user, DatasetType type) {
-        // TODO Auto-generated method stub
-        return null;
+    public DatasetType releaseDatasetTypeLock(User user, DatasetType type) throws EmfException {
+        DatasetType locked;
+        Session session = sessionFactory.getSession();
+        try {
+            locked = dao.releaseDatasetTypeLock(type, session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Database error: " + e);
+            throw new EmfException("Database error: " + e);
+        }
+        return locked;
     }
 
 }

@@ -231,7 +231,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
 
             mappings.register(call);
             call.setOperationName(mappings.qname("getDatasetTypes"));
-            call.setReturnType(mappings.sectors());
+            call.setReturnType(mappings.datasetTypes());
 
             return (DatasetType[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {

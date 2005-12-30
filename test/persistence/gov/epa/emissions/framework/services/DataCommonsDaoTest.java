@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.db;
+package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Sector;
@@ -45,7 +45,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         assertTrue(types.size() >= 10);
     }
 
-    private Sector sectors(Sector target) {
+    private Sector currentSector(Sector target) {
         List sectors = dao.getSectors(session);
         for (Iterator iter = sectors.iterator(); iter.hasNext();) {
             Sector element = (Sector) iter.next();
@@ -56,7 +56,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         return null;
     }
 
-    private DatasetType types(DatasetType target) {
+    private DatasetType currentDatasetType(DatasetType target) {
         List list = dao.getDatasetTypes(session);
         for (Iterator iter = list.iterator(); iter.hasNext();) {
             DatasetType element = (DatasetType) iter.next();
@@ -75,7 +75,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         Sector lockedSector = dao.getSectorLock(user, sector, session);
         assertEquals(lockedSector.getUsername(), user.getFullName());
 
-        Sector sectorLoadedFromDb = sectors(sector);
+        Sector sectorLoadedFromDb = currentSector(sector);
         assertEquals(sectorLoadedFromDb.getUsername(), user.getFullName());
     }
 
@@ -87,7 +87,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         DatasetType locked = dao.getDatasetTypeLock(user, type, session);
         assertEquals(locked.getUsername(), user.getFullName());
 
-        DatasetType loadedFromDb = types(type);
+        DatasetType loadedFromDb = currentDatasetType(type);
         assertEquals(loadedFromDb.getUsername(), user.getFullName());
     }
 
@@ -113,7 +113,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         Sector releasedSector = dao.releaseSectorLock(lockedSector, session);
         assertFalse("Should have released lock", releasedSector.isLocked());
 
-        Sector sectorLoadedFromDb = sectors(sector);
+        Sector sectorLoadedFromDb = currentSector(sector);
         assertFalse("Should have released lock", sectorLoadedFromDb.isLocked());
     }
 
@@ -126,7 +126,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         DatasetType released = dao.releaseDatasetTypeLock(locked, session);
         assertFalse("Should have released lock", released.isLocked());
 
-        DatasetType loadedFromDb = types(type);
+        DatasetType loadedFromDb = currentDatasetType(type);
         assertFalse("Should have released lock", loadedFromDb.isLocked());
     }
 
