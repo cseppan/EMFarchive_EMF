@@ -116,16 +116,16 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         Sector sectorLoadedFromDb = sectors(sector);
         assertFalse("Should have released lock", sectorLoadedFromDb.isLocked());
     }
-    
+
     public void testShouldReleaseDatasetTypeLock() throws EmfException {
         User user = userDao.getUser("emf");
         List list = dao.getDatasetTypes(session);
         DatasetType type = (DatasetType) list.get(0);
-        
+
         DatasetType locked = dao.getDatasetTypeLock(user, type, session);
         DatasetType released = dao.releaseDatasetTypeLock(locked, session);
         assertFalse("Should have released lock", released.isLocked());
-        
+
         DatasetType loadedFromDb = types(type);
         assertFalse("Should have released lock", loadedFromDb.isLocked());
     }
@@ -165,5 +165,28 @@ public class DataCommonsDaoTest extends ServicesTestCase {
 
         Sector modifiedSector3 = dao.updateSector(user, modifiedSector, session);
         assertEquals(sector.getName(), modifiedSector3.getName());
+    }
+
+    public void testShouldUpdateDatasetType() throws EmfException {
+        List types = dao.getDatasetTypes(session);
+        DatasetType type = (DatasetType) types.get(0);
+        String name = type.getName();
+
+        User user = userDao.getUser("emf");
+
+        DatasetType modified1 = dao.getDatasetTypeLock(user, type, session);
+        assertEquals(modified1.getUsername(), user.getFullName());
+        modified1.setName("TEST");
+
+        DatasetType modified2 = dao.updateDatasetType(user, modified1, session);
+        assertEquals("TEST", modified1.getName());
+        assertEquals(modified2.getUsername(), null);
+
+        // restore
+        DatasetType modified = dao.getDatasetTypeLock(user, type, session);
+        modified.setName(name);
+
+        DatasetType modified3 = dao.updateDatasetType(user, modified, session);
+        assertEquals(type.getName(), modified3.getName());
     }
 }
