@@ -9,18 +9,18 @@ import gov.epa.emissions.framework.services.DataCommonsService;
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
-public class EditDatasetTypePresenterTest extends MockObjectTestCase {
+public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
 
-    public void testShouldDisplayViewOnDisplay() throws Exception {
+    public void testShouldDisplayViewAfterObtainingLockForDatasetTypeOnDisplay() throws Exception {
         DatasetType type = new DatasetType();
 
         Mock interdata = mock(DataCommonsService.class);
         Keyword[] keywords = new Keyword[0];
         interdata.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
 
-        Mock view = mock(EditDatasetTypeView.class);
-        EditDatasetTypePresenter presenter = new EditDatasetTypePresenter((EditDatasetTypeView) view.proxy(), type,
-                null, (DataCommonsService) interdata.proxy());
+        Mock view = mock(EditableDatasetTypeView.class);
+        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenter((EditableDatasetTypeView) view
+                .proxy(), type, null, (DataCommonsService) interdata.proxy());
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(same(type), same(keywords));
 
@@ -29,11 +29,11 @@ public class EditDatasetTypePresenterTest extends MockObjectTestCase {
 
     public void testShouldCloseViewOnClose() {
         DatasetType type = new DatasetType();
-        Mock view = mock(EditDatasetTypeView.class);
+        Mock view = mock(EditableDatasetTypeView.class);
         view.expects(once()).method("close");
 
-        EditDatasetTypePresenter presenter = new EditDatasetTypePresenter((EditDatasetTypeView) view.proxy(), type,
-                null, null);
+        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenter((EditableDatasetTypeView) view
+                .proxy(), type, null, null);
 
         presenter.doClose();
     }
@@ -52,11 +52,11 @@ public class EditDatasetTypePresenterTest extends MockObjectTestCase {
         Mock services = mock(DatasetTypeService.class);
         services.expects(once()).method("updateDatasetType").with(same(typeProxy));
 
-        Mock view = mock(EditDatasetTypeView.class);
+        Mock view = mock(EditableDatasetTypeView.class);
         view.expects(once()).method("close");
 
-        EditDatasetTypePresenter presenter = new EditDatasetTypePresenter((EditDatasetTypeView) view.proxy(),
-                typeProxy, (DatasetTypeService) services.proxy(), null);
+        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenter((EditableDatasetTypeView) view
+                .proxy(), typeProxy, (DatasetTypeService) services.proxy(), null);
 
         Mock managerView = mock(DatasetTypesManagerView.class);
         managerView.expects(once()).method("refresh").withNoArguments();
@@ -72,8 +72,8 @@ public class EditDatasetTypePresenterTest extends MockObjectTestCase {
         type.expects(once()).method("setName").with(same(name));
         type.expects(once()).method("setDescription").with(same(desc));
 
-        EditDatasetTypePresenter presenter = new EditDatasetTypePresenter(null, ((DatasetType) type.proxy()), null,
-                null);
+        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenter(null, ((DatasetType) type.proxy()),
+                null, null);
         Mock managerView = mock(DatasetTypesManagerView.class);
 
         Keyword key1 = new Keyword("1");

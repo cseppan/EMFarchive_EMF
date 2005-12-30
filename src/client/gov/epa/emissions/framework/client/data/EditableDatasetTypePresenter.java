@@ -9,27 +9,27 @@ import gov.epa.emissions.framework.services.DataCommonsService;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class EditDatasetTypePresenter {
+public class EditableDatasetTypePresenter {
 
-    private EditDatasetTypeView view;
+    private EditableDatasetTypeView view;
 
     private DatasetType type;
 
-    private DatasetTypeService datasetTypesServices;
+    private DatasetTypeService datasetTypesService;
 
-    private DataCommonsService interdataServices;
+    private DataCommonsService dataCommonsService;
 
-    public EditDatasetTypePresenter(EditDatasetTypeView view, DatasetType type,
-            DatasetTypeService datasetTypesServices, DataCommonsService interdataServices) {
+    public EditableDatasetTypePresenter(EditableDatasetTypeView view, DatasetType type,
+            DatasetTypeService datasetTypesService, DataCommonsService dataCommonsService) {
         this.view = view;
         this.type = type;
-        this.datasetTypesServices = datasetTypesServices;
-        this.interdataServices = interdataServices;
+        this.datasetTypesService = datasetTypesService;
+        this.dataCommonsService = dataCommonsService;
     }
 
     public void doDisplay() throws EmfException {
         view.observe(this);
-        view.display(type, interdataServices.getKeywords());
+        view.display(type, dataCommonsService.getKeywords());
     }
 
     public void doClose() {
@@ -39,7 +39,7 @@ public class EditDatasetTypePresenter {
     public void doSave(String name, String description, Keyword[] keywords, DatasetTypesManagerView manager)
             throws EmfException {
         update(name, description, keywords);
-        datasetTypesServices.updateDatasetType(type);
+        datasetTypesService.updateDatasetType(type);
 
         manager.refresh();
         doClose();

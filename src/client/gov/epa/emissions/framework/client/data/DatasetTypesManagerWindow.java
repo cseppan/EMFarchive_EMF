@@ -191,7 +191,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         return view;
     }
 
-    private EditDatasetTypeView editableView() {
+    private EditableDatasetTypeView editableView() {
         EditDatasetTypeWindow view = new EditDatasetTypeWindow(this);
         desktop.add(view);
 

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
@@ -119,7 +120,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
             Call call = callFactory.createCall();
 
             mappings.register(call);
-            
+
             call.setOperationName(mappings.qname("addSector"));
             call.addParameter("sector", mappings.sector(), ParameterMode.IN);
             call.setReturnType(Constants.XSD_ANY);
@@ -165,17 +166,17 @@ public class DataCommonsServiceTransport implements DataCommonsService {
     }
 
     public Sector getSectorLock(User user, Sector sector) throws EmfException {
-        Sector modifiedSector=null;
+        Sector modifiedSector = null;
         try {
             Call call = callFactory.createCall();
 
             mappings.register(call);
             call.setOperationName(mappings.qname("getSectorLock"));
-            call.addParameter("user", mappings.user(),ParameterMode.IN);
+            call.addParameter("user", mappings.user(), ParameterMode.IN);
             call.addParameter("sector", mappings.sector(), ParameterMode.IN);
             call.setReturnType(mappings.sector());
 
-            modifiedSector = (Sector) call.invoke(new Object[] {user, sector });
+            modifiedSector = (Sector) call.invoke(new Object[] { user, sector });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Could not get sector lock: " + sector.getName(), fault);
         } catch (Exception e) {
@@ -185,42 +186,120 @@ public class DataCommonsServiceTransport implements DataCommonsService {
     }
 
     public Sector updateSector(User user, Sector sector) throws EmfException {
-        Sector modifiedSector=null;
         try {
             Call call = callFactory.createCall();
 
             mappings.register(call);
             call.setOperationName(mappings.qname("updateSector"));
-            call.addParameter("user", mappings.user(),ParameterMode.IN);
+            call.addParameter("user", mappings.user(), ParameterMode.IN);
             call.addParameter("sector", mappings.sector(), ParameterMode.IN);
             call.setReturnType(mappings.sector());
 
-            modifiedSector = (Sector) call.invoke(new Object[] {user, sector });
+            return (Sector) call.invoke(new Object[] { user, sector });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Could not update locked Sector: " + sector.getName(), fault);
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not update locked Sector: " + sector.getName(), e);
         }
-        return modifiedSector;
+
+        return null;
     }
 
     public Sector releaseSectorLock(User user, Sector sector) throws EmfException {
-        Sector modifiedSector=null;
+        Sector modifiedSector = null;
         try {
             Call call = callFactory.createCall();
 
             mappings.register(call);
             call.setOperationName(mappings.qname("releaseSectorLock"));
-            call.addParameter("user", mappings.user(),ParameterMode.IN);
+            call.addParameter("user", mappings.user(), ParameterMode.IN);
             call.addParameter("sector", mappings.sector(), ParameterMode.IN);
             call.setReturnType(mappings.sector());
 
-            modifiedSector = (Sector) call.invoke(new Object[] {user, sector });
+            modifiedSector = (Sector) call.invoke(new Object[] { user, sector });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Could not release sector lock: " + sector.getName(), fault);
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not release sector lock: " + sector.getName(), e);
         }
         return modifiedSector;
+    }
+
+    public DatasetType[] getDatasetTypes() throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            call.setOperationName(mappings.qname("getDatasetTypes"));
+            call.setReturnType(mappings.sectors());
+
+            return (DatasetType[]) call.invoke(new Object[] {});
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not fetch DatasetTypes", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not fetch DatasetTypes", e);
+        }
+
+        return null;
+    }
+
+    public DatasetType getDatasetTypeLock(User user, DatasetType type) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            call.setOperationName(mappings.qname("getDatasetTypeLock"));
+            mappings.addParam(call, "user", mappings.user());
+            mappings.addParam(call, "type", mappings.datasetType());
+            mappings.setReturnType(call, mappings.datasetType());
+
+            return (DatasetType) call.invoke(new Object[] { user, type });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not get DatasetType lock: " + type.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not get DatasetType lock: " + type.getName(), e);
+        }
+
+        return null;
+    }
+
+    public DatasetType updateDatasetType(User user, DatasetType type) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            call.setOperationName(mappings.qname("updateDatasetType"));
+            mappings.addParam(call, "user", mappings.user());
+            mappings.addParam(call, "type", mappings.datasetType());
+            mappings.setReturnType(call, mappings.datasetType());
+
+            return (DatasetType) call.invoke(new Object[] { user, type });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not update DatasetType: " + type.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not update DatasetType: " + type.getName(), e);
+        }
+
+        return null;
+    }
+
+    public DatasetType releaseDatasetTypeLock(User user, DatasetType type) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            call.setOperationName(mappings.qname("releaseDatasetTypeLock"));
+            mappings.addParam(call, "user", mappings.user());
+            mappings.addParam(call, "type", mappings.datasetType());
+            mappings.setReturnType(call, mappings.datasetType());
+
+            return (DatasetType) call.invoke(new Object[] { user, type });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not release DatasetType lock: " + type.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not release DatasetType lock: " + type.getName(), e);
+        }
+
+        return null;
     }
 }

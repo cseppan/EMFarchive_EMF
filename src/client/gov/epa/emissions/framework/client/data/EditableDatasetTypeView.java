@@ -4,9 +4,9 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.ManagedView;
 
-public interface EditDatasetTypeView extends ManagedView {
+public interface EditableDatasetTypeView extends ManagedView {
 
-    void observe(EditDatasetTypePresenter presenter);
+    void observe(EditableDatasetTypePresenter presenter);
 
     void display(DatasetType type, Keyword[] masterKeywords);
 

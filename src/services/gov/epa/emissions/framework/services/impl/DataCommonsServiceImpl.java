@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.impl;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
@@ -124,7 +125,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         Sector lockedSector;
         try {
             Session session = sessionFactory.getSession();
-            lockedSector = DataCommonsDAO.getSectorLock(user,sector, session);
+            lockedSector = DataCommonsDAO.getSectorLock(user, sector, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -138,7 +139,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         Sector lockedSector;
         try {
             Session session = sessionFactory.getSession();
-            lockedSector=DataCommonsDAO.updateSector(user,sector, session);
+            lockedSector = DataCommonsDAO.updateSector(user, sector, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -152,7 +153,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         Sector lockedSector;
         try {
             Session session = sessionFactory.getSession();
-            lockedSector=DataCommonsDAO.releaseSectorLock(user,sector, session);
+            lockedSector = DataCommonsDAO.releaseSectorLock(user, sector, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -160,6 +161,26 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             throw new EmfException("Database error: " + e);
         }
         return lockedSector;
+    }
+
+    public DatasetType[] getDatasetTypes() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public DatasetType getDatasetTypeLock(User user, DatasetType type) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public DatasetType updateDatasetType(User user, DatasetType type) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public DatasetType releaseDatasetTypeLock(User user, DatasetType type) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

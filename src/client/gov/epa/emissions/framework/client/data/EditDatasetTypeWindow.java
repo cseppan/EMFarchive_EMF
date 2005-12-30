@@ -24,9 +24,9 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.border.EtchedBorder;
 
-public class EditDatasetTypeWindow extends DisposableInteralFrame implements EditDatasetTypeView {
+public class EditDatasetTypeWindow extends DisposableInteralFrame implements EditableDatasetTypeView {
 
-    private EditDatasetTypePresenter presenter;
+    private EditableDatasetTypePresenter presenter;
 
     private JPanel layout;
 
@@ -49,7 +49,7 @@ public class EditDatasetTypeWindow extends DisposableInteralFrame implements Edi
         super.getContentPane().add(layout);
     }
 
-    public void observe(EditDatasetTypePresenter presenter) {
+    public void observe(EditableDatasetTypePresenter presenter) {
         this.presenter = presenter;
     }
 

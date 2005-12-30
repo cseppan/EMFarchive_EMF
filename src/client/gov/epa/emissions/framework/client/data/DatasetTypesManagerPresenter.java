@@ -28,12 +28,12 @@ public class DatasetTypesManagerPresenter {
         view.close();
     }
 
-    public void doEdit(DatasetType type, EditDatasetTypeView editableView) throws EmfException {
+    public void doEdit(DatasetType type, EditableDatasetTypeView editableView) throws EmfException {
         if (viewLayout.activate("Edit" + type.getName()))
             return;
 
         viewLayout.add(editableView, "Edit" + type.getName());
-        EditDatasetTypePresenter p = new EditDatasetTypePresenter(editableView, type, serviceLocator
+        EditableDatasetTypePresenter p = new EditableDatasetTypePresenter(editableView, type, serviceLocator
                 .datasetTypeService(), serviceLocator.dataCommonsService());
         p.doDisplay();
     }
