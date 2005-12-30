@@ -16,7 +16,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         this.userService = userService;
     }
 
-    public void testShouldReturnCompleteListOfSectors() throws EmfException {
+    public void itestShouldReturnCompleteListOfSectors() throws EmfException {
         Sector[] sectors = service.getSectors();
         assertTrue(sectors.length >= 14);
     }
@@ -36,17 +36,15 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         Sector[] sectors = service.getSectors();
         Sector sector = sectors[0];
 
-        Sector modifiedSector = service.getSectorLock(user, sector);
-
-        // Sector object returned from the lock call
-        assertEquals(modifiedSector.getUsername(), user.getFullName());
+        Sector lockedSector = service.getSectorLock(user, sector);
+        assertEquals(lockedSector.getUsername(), user.getFullName());
 
         // Sector object returned directly from the sector table
-        Sector modifiedSector2 = sectors(sector.getId());
-        assertEquals(modifiedSector2.getUsername(), user.getFullName());
+        Sector sectorLoadedFromDb = sectors(sector.getId());
+        assertEquals(sectorLoadedFromDb.getUsername(), user.getFullName());
     }
 
-    public void testShouldReleaseSectorLock() throws EmfException {
+    public void itestShouldReleaseSectorLock() throws EmfException {
         User user = userService.getUser("emf");
         Sector[] sectors = service.getSectors();
         Sector sector = sectors[0];
@@ -61,7 +59,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         assertEquals(modifiedSector2.getUsername(), null);
     }
 
-    public void testShouldUpdateSectorWithLocking() throws EmfException {
+    public void itestShouldUpdateSectorWithLocking() throws EmfException {
         User user = userService.getUser("emf");
 
         Sector[] sectors = service.getSectors();

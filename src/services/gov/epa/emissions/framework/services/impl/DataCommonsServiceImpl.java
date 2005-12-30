@@ -21,19 +21,22 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     private HibernateSessionFactory sessionFactory;
 
+    private DataCommonsDAO dao;
+
     public DataCommonsServiceImpl() {
         this(HibernateSessionFactory.get());
     }
 
     public DataCommonsServiceImpl(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+        dao = new DataCommonsDAO();
     }
 
     public Keyword[] getKeywords() throws EmfException {
         List keywords = null;
         try {
             Session session = sessionFactory.getSession();
-            keywords = DataCommonsDAO.getEmfKeywords(session);
+            keywords = dao.getEmfKeywords(session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -46,7 +49,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addCountry(Country country) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            DataCommonsDAO.insertCountry(country, session);
+            dao.insertCountry(country, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -58,7 +61,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void updateCountry(Country country) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            DataCommonsDAO.updateCountry(country, session);
+            dao.updateCountry(country, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -72,7 +75,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         List countries = null;
         try {
             Session session = sessionFactory.getSession();
-            countries = DataCommonsDAO.getCountries(session);
+            countries = dao.getCountries(session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -82,36 +85,11 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         return (Country[]) countries.toArray(new Country[countries.size()]);
     }
 
-    public void addSector(Sector sector) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            DataCommonsDAO.insertSector(sector, session);
-            session.flush();
-            session.close();
-        } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
-        }
-    }
-
-    public void updateSector(Sector sector) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            DataCommonsDAO.updateSector(sector, session);
-            session.flush();
-            session.close();
-        } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
-        }
-
-    }
-
     public Sector[] getSectors() throws EmfException {
         List sectors;
         try {
             Session session = sessionFactory.getSession();
-            sectors = DataCommonsDAO.getSectors(session);
+            sectors = dao.getSectors(session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -125,7 +103,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         Sector lockedSector;
         try {
             Session session = sessionFactory.getSession();
-            lockedSector = DataCommonsDAO.getSectorLock(user, sector, session);
+            lockedSector = dao.getSectorLock(user, sector, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -139,7 +117,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         Sector lockedSector;
         try {
             Session session = sessionFactory.getSession();
-            lockedSector = DataCommonsDAO.updateSector(user, sector, session);
+            lockedSector = dao.updateSector(user, sector, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -153,7 +131,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         Sector lockedSector;
         try {
             Session session = sessionFactory.getSession();
-            lockedSector = DataCommonsDAO.releaseSectorLock(user, sector, session);
+            lockedSector = dao.releaseSectorLock(user, sector, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
