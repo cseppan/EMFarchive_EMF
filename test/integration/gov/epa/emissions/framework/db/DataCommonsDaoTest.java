@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.db;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
@@ -34,9 +35,14 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         session.close();
     }
 
-    public void testShouldReturnCompleteListOfSectors() {
+    public void testShouldGetAllSectors() {
         List sectors = dao.getSectors(session);
         assertTrue(sectors.size() >= 14);
+    }
+
+    public void testShouldGetAllDatasetTypes() {
+        List types = dao.getDatasetTypes(session);
+        assertTrue(types.size() >= 10);
     }
 
     private Sector sectors(long id) {
@@ -44,6 +50,17 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         for (Iterator iter = sectors.iterator(); iter.hasNext();) {
             Sector element = (Sector) iter.next();
             if (element.getId() == id)
+                return element;
+        }
+
+        return null;
+    }
+
+    private DatasetType types(DatasetType target) {
+        List list = dao.getDatasetTypes(session);
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
+            DatasetType element = (DatasetType) iter.next();
+            if (element.getDatasettypeid() == target.getDatasettypeid())
                 return element;
         }
 
@@ -60,6 +77,18 @@ public class DataCommonsDaoTest extends ServicesTestCase {
 
         Sector sectorLoadedFromDb = sectors(sector.getId());
         assertEquals(sectorLoadedFromDb.getUsername(), user.getFullName());
+    }
+
+    public void testShouldGetDatasetTypeLock() throws EmfException {
+        User user = userDao.getUser("emf");
+        List types = dao.getDatasetTypes(session);
+        DatasetType type = (DatasetType) types.get(0);
+
+        DatasetType locked = dao.getDatasetTypeLock(user, type, session);
+        assertEquals(locked.getUsername(), user.getFullName());
+
+        DatasetType loadedFromDb = types(type);
+        assertEquals(loadedFromDb.getUsername(), user.getFullName());
     }
 
     public void testShouldFailToGetLockWhenAlreadyLockedByAnotherUser() throws EmfException {

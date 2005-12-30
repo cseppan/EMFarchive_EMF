@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
-public abstract class FIXME_DataCommonsWebServiceTestCase extends DataCommonsServiceTestCase {
+public class DataCommonsWebServiceTest extends DataCommonsServiceTestCase {
 
     protected void doSetUp() throws Exception {
         ServiceLocator serviceLocator = serviceLocator();

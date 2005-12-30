@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.dao;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
@@ -165,6 +166,21 @@ public class DataCommonsDAO {
         }
     }
 
+    private void grabLock(User user, DatasetType type, Session session) {
+        type.setUsername(user.getFullName());
+        type.setLockDate(new Date());
+
+        Transaction tx = session.beginTransaction();
+        try {
+            session.update(type);
+            tx.commit();
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
+        }
+    }
+
     public Sector releaseSectorLock(Sector sector, Session session) throws EmfException {
         Sector current = sector(sector.getId(), session);
 
@@ -212,6 +228,37 @@ public class DataCommonsDAO {
             Sector sector = (Sector) iter.next();
             if (sector.getId() == id)
                 return sector;
+        }
+
+        return null;
+    }
+
+    public List getDatasetTypes(Session session) {
+        return session.createQuery("SELECT dataset_type FROM DatasetType as dataset_type ORDER BY name").list();
+    }
+
+    public DatasetType getDatasetTypeLock(User user, DatasetType type, Session session) {
+        DatasetType current = type(type, session);
+        if (!current.isLocked()) {
+            grabLock(user, current, session);
+            return current;
+        }
+
+        long elapsed = new Date().getTime() - current.getLockDate().getTime();
+
+        if ((user.getFullName().equals(current.getUsername())) || (elapsed > EMFConstants.EMF_LOCK_TIMEOUT_VALUE)) {
+            grabLock(user, current, session);
+        }
+
+        return current;
+    }
+
+    private DatasetType type(DatasetType target, Session session) {
+        List sectors = getDatasetTypes(session);
+        for (Iterator iter = sectors.iterator(); iter.hasNext();) {
+            DatasetType type = (DatasetType) iter.next();
+            if (type.getDatasettypeid() == target.getDatasettypeid())
+                return type;
         }
 
         return null;

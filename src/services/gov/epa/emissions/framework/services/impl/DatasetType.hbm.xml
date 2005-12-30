@@ -15,6 +15,8 @@
 	<property name="external"		column="external" 	    type="boolean"			not-null="true"	length="4"/>
 	<property name="importerClassName"	column="importer_class_name" 	type="java.lang.String"	not-null="false"/>
 	<property name="exporterClassName"	column="exporter_class_name" 	type="java.lang.String"	not-null="false"/>
+	<property name="username" 	column="username"	type="java.lang.String"		not-null="false"/>
+    <property name="lockDate"		column="lock_date" 	type="java.util.Date"		not-null="false"	length="4"/>        
 
 	<array name="keywords" table="dataset_types_keywords" cascade="save-update">
       <key column="dataset_type_id" not-null="true"/>

@@ -138,6 +138,8 @@ CREATE TABLE emf.dataset_types
   "external" bool NOT NULL DEFAULT false,
   importer_class_name varchar(255),
   exporter_class_name varchar(255),
+  username varchar(255),
+  lock_date timestamp,
   CONSTRAINT dataset_types_pkey PRIMARY KEY (dataset_type_id),
   CONSTRAINT dataset_types_dataset_type_id_key UNIQUE (dataset_type_id)
 ) 
