@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.ui.RowSource;
 
-public class DatasetTypeKeywordRowSource implements RowSource {
+public class KeywordRowSource implements RowSource {
 
     private Boolean selected;
 
@@ -11,7 +11,7 @@ public class DatasetTypeKeywordRowSource implements RowSource {
 
     private Keywords masterKeywords;
 
-    public DatasetTypeKeywordRowSource(Keyword keyword, Keywords masterKeywords) {
+    public KeywordRowSource(Keyword keyword, Keywords masterKeywords) {
         this.keyword = keyword;
         this.masterKeywords = masterKeywords;
         this.selected = Boolean.FALSE;

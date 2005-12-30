@@ -11,7 +11,7 @@ import javax.swing.table.TableCellEditor;
 
 public class DatasetTypeKeywordsPanel extends JPanel {
 
-    public DatasetTypeKeywordsPanel(DatasetTypeKeywordsTableData tableData, Keyword[] keywords) {
+    public DatasetTypeKeywordsPanel(KeywordsTableData tableData, Keyword[] keywords) {
         ListPanel listPanel = new ListPanel("Keywords", tableData);
         listPanel.setColumnEditor(cellEditor(keywords), 1, "Select from the list");
 

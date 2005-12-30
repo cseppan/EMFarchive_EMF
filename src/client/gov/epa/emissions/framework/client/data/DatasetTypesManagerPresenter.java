@@ -28,13 +28,23 @@ public class DatasetTypesManagerPresenter {
         view.close();
     }
 
-    public void doUpdate(DatasetType type, EditDatasetTypeView updateView) throws EmfException {
+    public void doEdit(DatasetType type, EditDatasetTypeView editableView) throws EmfException {
+        if (viewLayout.activate("Edit" + type.getName()))
+            return;
+
+        viewLayout.add(editableView, "Edit" + type.getName());
+        EditDatasetTypePresenter p = new EditDatasetTypePresenter(editableView, type, serviceLocator
+                .datasetTypeService(), serviceLocator.dataCommonsService());
+        p.doDisplay();
+    }
+
+    public void doView(DatasetType type, ViewableDatasetTypeView viewable) throws EmfException {
         if (viewLayout.activate(type.getName()))
             return;
 
-        viewLayout.add(updateView, type.getName());
-        EditDatasetTypePresenter p = new EditDatasetTypePresenter(updateView, type, serviceLocator
-                .datasetTypeService(), serviceLocator.dataCommonsService());
+        viewLayout.add(viewable, type.getName());
+        ViewableDatasetTypePresenter p = new ViewableDatasetTypePresenter(viewable, type, serviceLocator
+                .dataCommonsService());
         p.doDisplay();
     }
 }

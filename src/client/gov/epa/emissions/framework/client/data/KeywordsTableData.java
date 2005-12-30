@@ -11,12 +11,12 @@ import java.util.Iterator;
 import java.util.List;
 
 //FIXME: very similar to SectorCriteriaTableData. Refactor
-public class DatasetTypeKeywordsTableData extends AbstractTableData implements SelectableEmfTableData {
+public class KeywordsTableData extends AbstractTableData implements SelectableEmfTableData {
     private List rows;
 
     private Keywords masterKeywords;
 
-    public DatasetTypeKeywordsTableData(Keyword[] keywordsList, Keywords masterKeywords) {
+    public KeywordsTableData(Keyword[] keywordsList, Keywords masterKeywords) {
         this.masterKeywords = masterKeywords;
         this.rows = createRows(keywordsList, masterKeywords);
     }
@@ -70,7 +70,7 @@ public class DatasetTypeKeywordsTableData extends AbstractTableData implements S
     }
 
     private EditableRow row(Keyword keyword, Keywords masterKeywords) {
-        RowSource source = new DatasetTypeKeywordRowSource(keyword, masterKeywords);
+        RowSource source = new KeywordRowSource(keyword, masterKeywords);
         return new EditableRow(source);
     }
 
@@ -79,7 +79,7 @@ public class DatasetTypeKeywordsTableData extends AbstractTableData implements S
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            DatasetTypeKeywordRowSource rowSource = (DatasetTypeKeywordRowSource) row.rowSource();
+            KeywordRowSource rowSource = (KeywordRowSource) row.rowSource();
             if (rowSource.isSelected())
                 selected.add(rowSource.source());
         }

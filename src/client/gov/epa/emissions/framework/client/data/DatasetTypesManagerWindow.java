@@ -116,26 +116,47 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private JPanel createCrudPanel() {
-        JButton updateButton = new JButton("Update");
-        updateButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                updateDatasetTypes();
-            }
-        });
-
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
-        crudPanel.add(updateButton);
+
+        JButton viewButton = new JButton("View");
+        viewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                viewDatasetTypes();
+            }
+        });
+        crudPanel.add(viewButton);
+
+        JButton editButton = new JButton("Edit");
+        editButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                editDatasetTypes();
+            }
+        });
+        crudPanel.add(editButton);
 
         return crudPanel;
     }
 
-    private void updateDatasetTypes() {
+    private void viewDatasetTypes() {
         List sectors = selected();
         for (Iterator iter = sectors.iterator(); iter.hasNext();) {
             DatasetType type = (DatasetType) iter.next();
             try {
-                presenter.doUpdate(type, updateView());
+                presenter.doView(type, viewableView());
+            } catch (EmfException e) {
+                messagePanel.setError("Could not display: " + type.getName() + ". Reason: " + e.getMessage());
+                break;
+            }
+        }
+    }
+
+    private void editDatasetTypes() {
+        List sectors = selected();
+        for (Iterator iter = sectors.iterator(); iter.hasNext();) {
+            DatasetType type = (DatasetType) iter.next();
+            try {
+                presenter.doEdit(type, editableView());
             } catch (EmfException e) {
                 messagePanel.setError("Could not display: " + type.getName() + ". Reason: " + e.getMessage());
                 break;
@@ -157,7 +178,20 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         return elements;
     }
 
-    private EditDatasetTypeView updateView() {
+    private ViewableDatasetTypeWindow viewableView() {
+        ViewableDatasetTypeWindow view = new ViewableDatasetTypeWindow();
+        desktop.add(view);
+
+        view.addInternalFrameListener(new InternalFrameAdapter() {
+            public void internalFrameClosed(InternalFrameEvent event) {
+                doTableRefresh();
+            }
+        });
+
+        return view;
+    }
+
+    private EditDatasetTypeView editableView() {
         EditDatasetTypeWindow view = new EditDatasetTypeWindow(this);
         desktop.add(view);
 

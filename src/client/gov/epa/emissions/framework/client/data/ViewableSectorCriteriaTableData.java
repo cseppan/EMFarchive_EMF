@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.SectorCriteria;
 import gov.epa.emissions.framework.ui.AbstractTableData;
-import gov.epa.emissions.framework.ui.RowSource;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
@@ -36,8 +35,7 @@ public class ViewableSectorCriteriaTableData extends AbstractTableData {
     }
 
     private ViewableRow row(SectorCriteria criterion) {
-        RowSource source = new SectorCriterionRowSource(criterion);
-        return new ViewableRow(source);
+        return new ViewableRow(criterion, new Object[] { criterion.getType(), criterion.getCriteria() });
     }
 
     public Class getColumnClass(int col) {

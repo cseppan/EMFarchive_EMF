@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 
 public class KeywordsTableDataTest extends TestCase {
 
-    private KeywordsTableData data;
+    private KeyValueTableData data;
 
     private KeyVal val1;
 
@@ -29,7 +29,7 @@ public class KeywordsTableDataTest extends TestCase {
         val2.setValue("val2");
 
         Keyword[] keywords = { new Keyword("1"), new Keyword("2") };
-        data = new KeywordsTableData(new KeyVal[] { val1, val2 }, new Keywords(keywords));
+        data = new KeyValueTableData(new KeyVal[] { val1, val2 }, new Keywords(keywords));
     }
 
     public void testShouldHaveThreeColumns() {

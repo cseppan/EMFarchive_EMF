@@ -36,7 +36,7 @@ public class EditDatasetTypeWindow extends DisposableInteralFrame implements Edi
 
     private TextArea description;
 
-    private DatasetTypeKeywordsTableData keywordsTableData;
+    private KeywordsTableData keywordsTableData;
 
     private DatasetTypesManagerView manager;
 
@@ -89,7 +89,7 @@ public class EditDatasetTypeWindow extends DisposableInteralFrame implements Edi
     }
 
     private JPanel createKeywordsPanel(DatasetType type, Keyword[] keywords) {
-        keywordsTableData = new DatasetTypeKeywordsTableData(type.getKeywords(), new Keywords(keywords));
+        keywordsTableData = new KeywordsTableData(type.getKeywords(), new Keywords(keywords));
         JPanel panel = new DatasetTypeKeywordsPanel(keywordsTableData, keywords);
         panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 

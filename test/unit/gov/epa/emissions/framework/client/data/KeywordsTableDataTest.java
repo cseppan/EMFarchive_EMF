@@ -7,9 +7,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-public class DatasetTypeKeywordsTableDataTest extends TestCase {
+public class KeywordsTableDataTest extends TestCase {
 
-    private DatasetTypeKeywordsTableData data;
+    private KeywordsTableData data;
 
     private Keyword keyword1;
 
@@ -18,7 +18,7 @@ public class DatasetTypeKeywordsTableDataTest extends TestCase {
     protected void setUp() {
         keyword1 = new Keyword("keyword1");
         keyword2 = new Keyword("keyword2");
-        data = new DatasetTypeKeywordsTableData(new Keyword[] { keyword1, keyword2 },
+        data = new KeywordsTableData(new Keyword[] { keyword1, keyword2 },
                 new Keywords(new Keyword[0]));
     }
 

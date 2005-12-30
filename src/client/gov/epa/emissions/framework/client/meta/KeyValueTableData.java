@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class KeywordsTableData extends AbstractTableData implements SelectableEmfTableData {
+public class KeyValueTableData extends AbstractTableData implements SelectableEmfTableData {
     private List rows;
 
     private Keywords masterKeywords;
 
-    public KeywordsTableData(KeyVal[] values, Keywords masterKeywords) {
+    public KeyValueTableData(KeyVal[] values, Keywords masterKeywords) {
         this.masterKeywords = masterKeywords;
         this.rows = createRows(values, masterKeywords);
     }

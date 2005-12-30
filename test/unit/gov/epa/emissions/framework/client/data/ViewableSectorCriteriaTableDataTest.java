@@ -56,9 +56,8 @@ public class ViewableSectorCriteriaTableDataTest extends TestCase {
         List rows = data.rows();
 
         Row row = (Row) rows.get(0);
-        assertEquals(Boolean.FALSE, row.getValueAt(0));
-        assertEquals("type1", row.getValueAt(1));
-        assertEquals("criterion1", row.getValueAt(2));
+        assertEquals("type1", row.getValueAt(0));
+        assertEquals("criterion1", row.getValueAt(1));
     }
 
     public void testShouldReturnARowRepresentingASectorCriteriaEntry() {

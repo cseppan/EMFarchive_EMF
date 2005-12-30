@@ -13,7 +13,7 @@ import javax.swing.table.TableCellEditor;
 
 public class KeywordsPanel extends JPanel {
 
-    public KeywordsPanel(String label, KeywordsTableData tableData, Keywords masterKeywords) {
+    public KeywordsPanel(String label, KeyValueTableData tableData, Keywords masterKeywords) {
         ListPanel listPanel = new ListPanel(label, tableData);
         listPanel.setColumnEditor(keywordColumnEditor(masterKeywords), 1, "Select from the list");
 

@@ -44,7 +44,7 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         p.doClose();
     }
 
-    public void testShouldDisplayUpdateViewOnUpdate() throws Exception {
+    public void testShouldDisplayEditableOnEdit() throws Exception {
         Mock view = mock(DatasetTypesManagerView.class);
 
         DatasetType type = new DatasetType();
@@ -69,7 +69,35 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(),
                 (ServiceLocator) locator.proxy(), (ViewLayout) layout.proxy());
 
-        p.doUpdate(type, updateProxy);
+        p.doEdit(type, updateProxy);
+    }
+    
+    public void testShouldShowViewableOnView() throws Exception {
+        Mock view = mock(DatasetTypesManagerView.class);
+        
+        DatasetType type = new DatasetType();
+        type.setName("name");
+        
+        Keyword[] keywords = new Keyword[0];
+        Mock viewable = mock(ViewableDatasetTypeView.class);
+        viewable.expects(once()).method("observe").with(new IsInstanceOf(ViewableDatasetTypePresenter.class));
+        viewable.expects(once()).method("display").with(same(type), same(keywords));
+        ViewableDatasetTypeView viewableProxy = (ViewableDatasetTypeView) viewable.proxy();
+        
+        Mock layout = mock(ViewLayout.class);
+        layout.expects(once()).method("add").with(eq(viewableProxy), new IsInstanceOf(Object.class));
+        layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
+        
+        Mock locator = mock(ServiceLocator.class);
+        locator.stubs().method("datasetTypeService").withNoArguments().will(returnValue(null));
+        Mock interdataServices = mock(DataCommonsService.class);
+        interdataServices.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
+        locator.stubs().method("dataCommonsService").withNoArguments().will(returnValue(interdataServices.proxy()));
+        
+        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(),
+                (ServiceLocator) locator.proxy(), (ViewLayout) layout.proxy());
+        
+        p.doView(type, viewableProxy);
     }
 
     public void testShouldActivateAlreadyDisplayedViewOnRepeatedUpdateOfSameView() throws Exception {
@@ -98,9 +126,9 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((DatasetTypesManagerView) view.proxy(),
                 (ServiceLocator) locator.proxy(), (ViewLayout) layout.proxy());
 
-        p.doUpdate(type, updateProxy);
+        p.doEdit(type, updateProxy);
 
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.TRUE));
-        p.doUpdate(type, updateProxy);
+        p.doEdit(type, updateProxy);
     }
 }

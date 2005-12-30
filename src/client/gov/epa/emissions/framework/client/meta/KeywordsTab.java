@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 
 public class KeywordsTab extends JPanel implements KeywordsTabView {
 
-    private KeywordsTableData tableData;
+    private KeyValueTableData tableData;
 
     public KeywordsTab() {
         super.setName("keywordsTab");
@@ -21,7 +21,7 @@ public class KeywordsTab extends JPanel implements KeywordsTabView {
     }
 
     private JPanel createLayout(KeyVal[] values, Keywords masterKeywords) {
-        tableData = new KeywordsTableData(values, masterKeywords);
+        tableData = new KeyValueTableData(values, masterKeywords);
         return new KeywordsPanel("", tableData, masterKeywords);
     }
 
