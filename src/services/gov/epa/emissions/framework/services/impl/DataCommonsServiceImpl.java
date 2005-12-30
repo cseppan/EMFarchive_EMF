@@ -131,7 +131,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         Sector lockedSector;
         try {
             Session session = sessionFactory.getSession();
-            lockedSector = dao.releaseSectorLock(user, sector, session);
+            lockedSector = dao.releaseSectorLock(sector, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
