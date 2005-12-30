@@ -163,7 +163,6 @@
 					<include name="**/emissions/framework/**/*Test.java" />
 					<exclude name="**/emissions/framework/**/DataEditorWebServiceTest.java" />
 					<exclude name="**/emissions/framework/**/DataEditorServiceImplTest.java" />
-					<exclude name="**/emissions/framework/**/DataCommonsServiceImplTest.java" />
 				</fileset>
 			</batchtest>
 		</junit>
@@ -177,7 +176,6 @@
 				<fileset dir="${test.integration.dir}">
 					<include name="**/emissions/framework/**/DataEditorWebServiceTest.java" />
 					<include name="**/emissions/framework/**/DataEditorServiceImplTest.java" />
-					<include name="**/emissions/framework/**/DataCommonsServiceImplTest.java" />
 				</fileset>
 			</batchtest>
 		</junit>

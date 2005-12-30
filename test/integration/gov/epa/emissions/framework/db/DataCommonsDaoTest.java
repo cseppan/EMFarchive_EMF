@@ -62,6 +62,19 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         assertEquals(sectorLoadedFromDb.getUsername(), user.getFullName());
     }
 
+    public void testShouldFailToGetLockWhenAlreadyLockedByAnotherUser() throws EmfException {
+        User emfUser = userDao.getUser("emf");
+        List sectors = dao.getSectors(session);
+        Sector sector = (Sector) sectors.get(0);
+
+        dao.getSectorLock(emfUser, sector, session);
+
+        User adminUser = userDao.getUser("admin");
+        Sector result = dao.getSectorLock(adminUser, sector, session);
+
+        assertTrue(result.isLocked(emfUser));// failed to obtain lock for Admin
+    }
+
     public void testShouldReleaseSectorLock() throws EmfException {
         User user = userDao.getUser("emf");
         List sectors = dao.getSectors(session);
@@ -73,6 +86,20 @@ public class DataCommonsDaoTest extends ServicesTestCase {
 
         Sector sectorLoadedFromDb = sectors(sector.getId());
         assertFalse("Should have released lock", sectorLoadedFromDb.isLocked());
+    }
+
+    public void testShouldFailToReleaseSectorLockIfNotObtained() {
+        List sectors = dao.getSectors(session);
+        Sector sector = (Sector) sectors.get(0);
+
+        try {
+            dao.releaseSectorLock(sector, session);
+        } catch (EmfException e) {
+            assertEquals("Cannot update without owning lock", e.getMessage());
+            return;
+        }
+
+        fail("Should have failed to release lock that was not obtained");
     }
 
     public void testShouldUpdateSector() throws EmfException {
@@ -93,7 +120,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         // restore
         Sector modifiedSector = dao.getSectorLock(user, sector, session);
         modifiedSector.setName(name);
-        
+
         Sector modifiedSector3 = dao.updateSector(user, modifiedSector, session);
         assertEquals(sector.getName(), modifiedSector3.getName());
     }

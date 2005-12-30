@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.InfrastructureException;
 import gov.epa.emissions.framework.dao.UserManagerDAO;
 import gov.epa.emissions.framework.services.UserService;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -19,7 +20,7 @@ public class UserServiceImpl extends EmfServiceImpl implements UserService {
 
     private UserManagerDAO dao;
 
-    public UserServiceImpl(DataSource datasource, DbServer dbServer) {
+    public UserServiceImpl(DataSource datasource, DbServer dbServer) throws EmfException {
         super(datasource, dbServer);
         init(datasource);
     }
@@ -28,8 +29,12 @@ public class UserServiceImpl extends EmfServiceImpl implements UserService {
         init(datasource);
     }
 
-    private void init(DataSource datasource) {
-        dao = new UserManagerDAO(datasource);
+    private void init(DataSource datasource) throws EmfException {
+        try {
+            dao = new UserManagerDAO(datasource);
+        } catch (SQLException e) {
+            throw new EmfException("Could not initialize User Service. Reason: " + e.getMessage());
+        }
     }
 
     private static Log log = LogFactory.getLog(UserServiceImpl.class);
