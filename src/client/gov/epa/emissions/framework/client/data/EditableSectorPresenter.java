@@ -4,10 +4,10 @@ import gov.epa.emissions.framework.EmfException;
 
 public interface EditableSectorPresenter {
 
-    public abstract void doDisplay() throws EmfException;
+    void doDisplay() throws EmfException;
 
-    public abstract void doClose() throws EmfException;
+    void doClose() throws EmfException;
 
-    public abstract void doSave(SectorsManagerView sectorManager) throws EmfException;
+    void doSave(SectorsManagerView sectorManager) throws EmfException;
 
 }

@@ -5,7 +5,10 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.ExternalSource;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.io.KeyVal;
+import gov.epa.emissions.commons.io.Lockable;
+import gov.epa.emissions.commons.io.Mutex;
 import gov.epa.emissions.commons.io.Table;
+import gov.epa.emissions.commons.security.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class EmfDataset implements Dataset {
+public class EmfDataset implements Dataset, Lockable {
 
     private long datasetid;// unique id needed for hibernate persistence
 
@@ -60,22 +63,26 @@ public class EmfDataset implements Dataset {
     private List externalSources;
 
     private List keyValsList;
-    
-    private int defaultVersion;
-    
-    public int getDefaultVersion() {
-        return defaultVersion;
-    }
 
-    public void setDefaultVersion(int defaultVersion) {
-        this.defaultVersion = defaultVersion;
-    }
+    private int defaultVersion;
+
+    private Mutex lock;
 
     public EmfDataset() {
         tables = new ArrayList();
         internalSources = new ArrayList();
         externalSources = new ArrayList();
         keyValsList = new ArrayList();
+
+        lock = new Mutex();
+    }
+
+    public int getDefaultVersion() {
+        return defaultVersion;
+    }
+
+    public void setDefaultVersion(int defaultVersion) {
+        this.defaultVersion = defaultVersion;
     }
 
     public Date getAccessedDateTime() {
@@ -316,11 +323,35 @@ public class EmfDataset implements Dataset {
     }
 
     public void setSummarySource(InternalSource summary) {
-        //TODO: implement Summary
+        // TODO: implement Summary
     }
 
     public InternalSource getSummarySource() {
         return null;
+    }
+
+    public Date getLockDate() {
+        return lock.getLockDate();
+    }
+
+    public void setLockDate(Date lockDate) {
+        lock.setLockDate(lockDate);
+    }
+
+    public String getUsername() {
+        return lock.getUsername();
+    }
+
+    public void setUsername(String username) {
+        lock.setUsername(username);
+    }
+
+    public boolean isLocked(User user) {
+        return lock.isLocked(user);
+    }
+
+    public boolean isLocked() {
+        return lock.isLocked();
     }
 
 }
