@@ -164,7 +164,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void doNewDataset() throws EmfException {
-        ImportWindow importView = new ImportWindow(session.datasetTypesService(), desktop);
+        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktop);
         // windowLayoutManager.add(importView); //FIXME: needs layout
         desktop.add(importView);
 

@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.DatasetTypeService;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
@@ -41,7 +41,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     private EmfConsole parentConsole;
 
-    private DatasetTypeService services;
+    private DataCommonsService service;
 
     public DatasetTypesManagerWindow(EmfConsole parentConsole) {
         super("DatasetType Manager", new Dimension(600, 300), parentConsole.desktop());
@@ -57,7 +57,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     public void refresh() {
         try {
-            doLayout(services.getDatasetTypes());
+            doLayout(service.getDatasetTypes());
         } catch (EmfException e) {
             messagePanel.setError("Could not refresh. Problem communicating with remote services.");
         }
@@ -65,10 +65,10 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         super.refreshLayout();
     }
 
-    public void display(DatasetTypeService services) throws EmfException {
-        this.services = services;
+    public void display(DataCommonsService service) throws EmfException {
+        this.service = service;
 
-        doLayout(services.getDatasetTypes());
+        doLayout(service.getDatasetTypes());
         super.display();
     }
 

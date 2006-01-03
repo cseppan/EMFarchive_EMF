@@ -22,7 +22,7 @@ public class DatasetTypesManagerPresenter {
 
     public void doDisplay() throws EmfException {
         view.observe(this);
-        view.display(serviceLocator().datasetTypeService());
+        view.display(serviceLocator().dataCommonsService());
     }
 
     private ServiceLocator serviceLocator() {

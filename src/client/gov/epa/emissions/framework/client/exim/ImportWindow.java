@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.services.DatasetTypeService;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
 
@@ -43,14 +43,14 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     private DefaultComboBoxModel datasetTypesModel;
 
-    private DatasetTypeService datasetTypesService;
+    private DataCommonsService service;
 
     private JTextField folder;
 
-    public ImportWindow(DatasetTypeService eximServices, JDesktopPane desktop) throws EmfException {
+    public ImportWindow(DataCommonsService service, JDesktopPane desktop) throws EmfException {
         super("Import Dataset", new Dimension(700, 275), desktop);
         super.setName("importWindow");
-        this.datasetTypesService = eximServices;
+        this.service = service;
 
         this.getContentPane().add(createLayout());
     }
@@ -71,7 +71,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        DatasetType[] allDatasetTypes = datasetTypesService.getDatasetTypes();
+        DatasetType[] allDatasetTypes = service.getDatasetTypes();
         DatasetType[] allTypesWithMessage = new DatasetType[allDatasetTypes.length+1];
         copyDatasetTypes(allDatasetTypes,allTypesWithMessage);
         datasetTypesModel = new DefaultComboBoxModel(allTypesWithMessage);

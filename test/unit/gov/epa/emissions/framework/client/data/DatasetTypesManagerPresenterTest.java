@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DatasetTypeService;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 import org.jmock.Mock;
@@ -14,14 +14,14 @@ import org.jmock.core.constraint.IsInstanceOf;
 public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayViewOnDisplay() throws Exception {
-        Mock service = mock(DatasetTypeService.class);
-        DatasetTypeService serviceProxy = (DatasetTypeService) service.proxy();
+        Mock service = mock(DataCommonsService.class);
+        DataCommonsService serviceProxy = (DataCommonsService) service.proxy();
 
         Mock view = mock(DatasetTypesManagerView.class);
         view.expects(once()).method("display").with(same(serviceProxy));
 
         Mock locator = mock(ServiceLocator.class);
-        locator.stubs().method("datasetTypeService").withNoArguments().will(returnValue(serviceProxy));
+        locator.stubs().method("dataCommonsService").withNoArguments().will(returnValue(serviceProxy));
 
         Mock session = mock(EmfSession.class);
         session.stubs().method("serviceLocator").withNoArguments().will(returnValue(locator.proxy()));

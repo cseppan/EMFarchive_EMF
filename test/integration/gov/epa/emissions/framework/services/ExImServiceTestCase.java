@@ -17,7 +17,7 @@ public abstract class ExImServiceTestCase extends ServicesTestCase {
 
     private EmfDataset dataset;
 
-    protected void setUpService(ExImService eximService, UserService userService, DatasetTypeService datasetTypeService)
+    protected void setUpService(ExImService eximService, UserService userService, DataCommonsService commonsService)
             throws Exception {
         this.eximService = eximService;
         this.userService = userService;
@@ -27,11 +27,11 @@ public abstract class ExImServiceTestCase extends ServicesTestCase {
         dataset.setName("ORL NonPoint - ExImServicesTest" + random.nextInt());
         dataset.setCreator("creator");
 
-        DatasetType datasetType = orlNonPointType(datasetTypeService);
+        DatasetType datasetType = orlNonPointType(commonsService);
         dataset.setDatasetType(datasetType);
     }
 
-    private DatasetType orlNonPointType(DatasetTypeService service) throws Exception {
+    private DatasetType orlNonPointType(DataCommonsService service) throws Exception {
         DatasetType[] types = service.getDatasetTypes();
         for (int i = 0; i < types.length; i++) {
             if (types[i].getName().equals("ORL Nonpoint Inventory"))
