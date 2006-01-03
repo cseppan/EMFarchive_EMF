@@ -166,7 +166,6 @@ public class DataCommonsServiceTransport implements DataCommonsService {
     }
 
     public Sector getSectorLock(User user, Sector sector) throws EmfException {
-        Sector modifiedSector = null;
         try {
             Call call = callFactory.createCall();
 
@@ -176,13 +175,14 @@ public class DataCommonsServiceTransport implements DataCommonsService {
             call.addParameter("sector", mappings.sector(), ParameterMode.IN);
             call.setReturnType(mappings.sector());
 
-            modifiedSector = (Sector) call.invoke(new Object[] { user, sector });
+            return (Sector) call.invoke(new Object[] { user, sector });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Could not get sector lock: " + sector.getName(), fault);
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not get sector lock: " + sector.getName(), e);
         }
-        return modifiedSector;
+
+        return null;
     }
 
     public Sector updateSector(User user, Sector sector) throws EmfException {

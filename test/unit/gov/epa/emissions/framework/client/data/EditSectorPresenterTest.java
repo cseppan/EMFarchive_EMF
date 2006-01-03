@@ -84,7 +84,6 @@ public class EditSectorPresenterTest extends MockObjectTestCase {
         User user = new User();
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("updateSector").with(same(user), same(sector)).will(returnValue(sector));
-        service.expects(once()).method("releaseSectorLock").with(same(user), same(sector)).will(returnValue(sector));
 
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(user));

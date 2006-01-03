@@ -28,7 +28,7 @@ public class EditSectorPresenter {
 
     public void doDisplay() throws EmfException {
         sector = service.getSectorLock(session.user(), sector);
-        
+
         if (!sector.isLocked(session.user())) {// view mode, locked by another user
             new DisplaySectorPresenter(displayView, sector).doDisplay();
             return;
@@ -40,6 +40,10 @@ public class EditSectorPresenter {
 
     public void doClose() throws EmfException {
         service.releaseSectorLock(session.user(), sector);
+        closeView();
+    }
+
+    private void closeView() {
         editView.close();
     }
 
@@ -47,7 +51,7 @@ public class EditSectorPresenter {
         sector = service.updateSector(session.user(), sector);
 
         sectorManager.refresh();
-        doClose();
+        closeView();
     }
 
 }
