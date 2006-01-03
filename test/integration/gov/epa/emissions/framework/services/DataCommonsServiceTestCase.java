@@ -106,7 +106,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         modifiedSector1.setName("TEST");
 
         Sector modifiedSector2 = service.updateSector(user, modifiedSector1);
-        assertEquals("TEST", modifiedSector1.getName());
+        assertEquals("TEST", modifiedSector2.getName());
         assertEquals(modifiedSector2.getUsername(), null);
 
         // restore
@@ -128,7 +128,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         modified1.setName("TEST");
 
         DatasetType modified2 = service.updateDatasetType(user, modified1);
-        assertEquals("TEST", modified1.getName());
+        assertEquals("TEST", modified2.getName());
         assertEquals(modified2.getUsername(), null);
 
         // restore

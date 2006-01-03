@@ -49,7 +49,6 @@ public class EditSectorPresenter {
 
     public void doSave(SectorsManagerView sectorManager) throws EmfException {
         sector = service.updateSector(session.user(), sector);
-
         sectorManager.refresh();
         closeView();
     }

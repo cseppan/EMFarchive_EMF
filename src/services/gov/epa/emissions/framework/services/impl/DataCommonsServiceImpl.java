@@ -112,16 +112,16 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
 
     public Sector updateSector(User user, Sector sector) throws EmfException {
-        Sector locked;
+        Sector unlocked;
         try {
             Session session = sessionFactory.getSession();
-            locked = dao.updateSector(user, sector, session);
+            unlocked = dao.updateSector(user, sector, session);
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
             throw new EmfException("Database error: " + e);
         }
-        return locked;
+        return unlocked;
     }
 
     public Sector releaseSectorLock(User user, Sector sector) throws EmfException {

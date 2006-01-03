@@ -103,19 +103,20 @@ public class LockingScheme {
 
     public Lockable update(User user, Lockable target, Session session, List all) throws EmfException {
         Lockable current = current(target, all);
-        update(user, session, current);
-
-        return releaseLock(current, session);
-    }
-
-    private void update(User user, Session session, Lockable current) throws EmfException {
         if (!current.isLocked(user))
             throw new EmfException("Cannot update without owning lock");
+        
+        session.clear();//clear 'loaded' locked object - to make way for updated object
+        doUpdate(session, target);
 
+        return releaseLock(target, session);
+    }
+
+    private void doUpdate(Session session, Lockable target) {
         Transaction tx = session.beginTransaction();
         try {
-            current.setLockDate(new Date());
-            session.update(current);
+            target.setLockDate(new Date());
+            session.update(target);
             tx.commit();
         } catch (HibernateException e) {
             log.error(e);
