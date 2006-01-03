@@ -27,7 +27,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
 
         Mock session = session(user, service.proxy());
 
-        EditableSectorPresenter presenter = new EditableSectorPresenter((EmfSession) session.proxy(),
+        EditableSectorPresenter presenter = new EditableSectorPresenterImpl((EmfSession) session.proxy(),
                 (EditableSectorView) view.proxy(), null, sector);
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(eq(sector));
@@ -54,10 +54,10 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
         Mock session = session(user, service.proxy());
 
         Mock view = mock(ViewableSectorView.class);
-        view.expects(once()).method("observe").with(new IsInstanceOf(ViewableSectorPresenter.class));
+        view.expects(once()).method("observe").with(new IsInstanceOf(ViewableSectorPresenterImpl.class));
         view.expects(once()).method("display").with(eq(sector));
 
-        EditableSectorPresenter presenter = new EditableSectorPresenter((EmfSession) session.proxy(), null,
+        EditableSectorPresenter presenter = new EditableSectorPresenterImpl((EmfSession) session.proxy(), null,
                 (ViewableSectorView) view.proxy(), sector);
 
         presenter.doDisplay();
@@ -74,7 +74,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
 
         Mock session = session(user, service.proxy());
 
-        EditableSectorPresenter presenter = new EditableSectorPresenter((EmfSession) session.proxy(),
+        EditableSectorPresenter presenter = new EditableSectorPresenterImpl((EmfSession) session.proxy(),
                 (EditableSectorView) view.proxy(), null, sector);
 
         presenter.doClose();
@@ -92,7 +92,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
 
         Mock session = session(user, service.proxy());
 
-        EditableSectorPresenter presenter = new EditableSectorPresenter((EmfSession) session.proxy(),
+        EditableSectorPresenter presenter = new EditableSectorPresenterImpl((EmfSession) session.proxy(),
                 (EditableSectorView) view.proxy(), null, sector);
 
         Mock sectorManagerView = mock(SectorsManagerView.class);

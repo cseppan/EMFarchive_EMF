@@ -35,21 +35,31 @@ public class DatasetTypesManagerPresenter {
 
     public void doEdit(DatasetType type, EditableDatasetTypeView editable, ViewableDatasetTypeView viewable)
             throws EmfException {
+        EditableDatasetTypePresenter p = new EditableDatasetTypePresenterImpl(session, editable, viewable, type);
+        edit(type, editable, p);
+    }
+
+    void edit(DatasetType type, EditableDatasetTypeView editable, EditableDatasetTypePresenter presenter)
+            throws EmfException {
         if (viewLayout.activate("Edit" + type.getName()))
             return;
 
         viewLayout.add(editable, "Edit" + type.getName());
-        EditableDatasetTypePresenter p = new EditableDatasetTypePresenter(session, editable, viewable, type);
-        p.doDisplay();
+        presenter.doDisplay();
     }
 
     public void doView(DatasetType type, ViewableDatasetTypeView viewable) throws EmfException {
+        ViewableDatasetTypePresenter p = new ViewableDatasetTypePresenterImpl(viewable, type, serviceLocator()
+                .dataCommonsService());
+        view(type, viewable, p);
+    }
+
+    void view(DatasetType type, ViewableDatasetTypeView viewable, ViewableDatasetTypePresenter presenter)
+            throws EmfException {
         if (viewLayout.activate(type.getName()))
             return;
 
         viewLayout.add(viewable, type.getName());
-        ViewableDatasetTypePresenter p = new ViewableDatasetTypePresenter(viewable, type, serviceLocator()
-                .dataCommonsService());
-        p.doDisplay();
+        presenter.doDisplay();
     }
 }

@@ -1,16 +1,10 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.Keyword;
-import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.commons.security.UserException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DatasetTypeService;
 import gov.epa.emissions.framework.ui.ViewLayout;
-
-import java.util.Date;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -49,105 +43,63 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         p.doClose();
     }
 
-    public void FIXME_testShouldDisplayEditableOnEdit() throws Exception {
-        Mock view = mock(DatasetTypesManagerView.class);
-
+    public void testShouldDisplayEditableOnEdit() throws Exception {
         DatasetType type = new DatasetType();
-        type.setName("name");
 
-        Keyword[] keywords = new Keyword[0];
-        Mock updateView = mock(EditableDatasetTypeView.class);
-        updateView.expects(once()).method("observe").with(new IsInstanceOf(EditableDatasetTypePresenter.class));
-        updateView.expects(once()).method("display").with(same(type), same(keywords));
-        EditableDatasetTypeView updateProxy = (EditableDatasetTypeView) updateView.proxy();
+        Mock editable = mock(EditableDatasetTypeView.class);
+        EditableDatasetTypeView editableProxy = (EditableDatasetTypeView) editable.proxy();
 
         Mock layout = mock(ViewLayout.class);
-        layout.expects(once()).method("add").with(eq(updateProxy), new IsInstanceOf(Object.class));
+        layout.expects(once()).method("add").with(eq(editableProxy), new IsInstanceOf(Object.class));
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
 
-        Mock locator = mock(ServiceLocator.class);
-        locator.stubs().method("datasetTypeService").withNoArguments().will(returnValue(null));
-        Mock interdataServices = mock(DataCommonsService.class);
-        interdataServices.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
-        locator.stubs().method("dataCommonsService").withNoArguments().will(returnValue(interdataServices.proxy()));
+        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter(null, null, (ViewLayout) layout.proxy());
 
-        Mock session = session(type);
-        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((EmfSession) session.proxy(),
-                (DatasetTypesManagerView) view.proxy(), (ViewLayout) layout.proxy());
+        Mock presenter = mock(EditableDatasetTypePresenter.class);
+        presenter.expects(once()).method("doDisplay").withNoArguments();
 
-        p.doEdit(type, updateProxy, null);
+        p.edit(type, editableProxy, (EditableDatasetTypePresenter) presenter.proxy());
     }
 
-    private Mock session(DatasetType type) throws UserException {
-        User user = new User();
-        user.setFullName("name");
-
-        type.setUsername(user.getFullName());
-        type.setLockDate(new Date());
-
-        Mock session1 = mock(EmfSession.class);
-        session1.stubs().method("user").withNoArguments().will(returnValue(user));
-
-        return session1;
-    }
-
-    public void FIXME_testShouldShowViewableOnView() throws Exception {
-        Mock view = mock(DatasetTypesManagerView.class);
-
+    public void testShouldShowViewableOnView() throws Exception {
         DatasetType type = new DatasetType();
         type.setName("name");
 
-        Keyword[] keywords = new Keyword[0];
         Mock viewable = mock(ViewableDatasetTypeView.class);
-        viewable.expects(once()).method("observe").with(new IsInstanceOf(ViewableDatasetTypePresenter.class));
-        viewable.expects(once()).method("display").with(same(type), same(keywords));
         ViewableDatasetTypeView viewableProxy = (ViewableDatasetTypeView) viewable.proxy();
 
         Mock layout = mock(ViewLayout.class);
         layout.expects(once()).method("add").with(eq(viewableProxy), new IsInstanceOf(Object.class));
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
 
-        Mock locator = mock(ServiceLocator.class);
-        locator.stubs().method("datasetTypeService").withNoArguments().will(returnValue(null));
-        Mock interdataServices = mock(DataCommonsService.class);
-        interdataServices.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
-        locator.stubs().method("dataCommonsService").withNoArguments().will(returnValue(interdataServices.proxy()));
+        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter(null, null, (ViewLayout) layout.proxy());
 
-        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter(null, (DatasetTypesManagerView) view.proxy(),
-                (ViewLayout) layout.proxy());
+        Mock presenter = mock(ViewableDatasetTypePresenter.class);
+        presenter.expects(once()).method("doDisplay").withNoArguments();
 
-        p.doView(type, viewableProxy);
+        p.view(type, viewableProxy, (ViewableDatasetTypePresenter) presenter.proxy());
     }
 
-    public void FIXME_testShouldActivateAlreadyDisplayedViewOnRepeatedUpdateOfSameView() throws Exception {
-        Mock view = mock(DatasetTypesManagerView.class);
-
+    public void testShouldActivateAlreadyDisplayedViewOnRepeatedUpdateOfSameView() throws Exception {
         DatasetType type = new DatasetType();
         type.setName("name");
 
-        Keyword[] keywords = new Keyword[0];
         Mock updateView = mock(EditableDatasetTypeView.class);
-        updateView.expects(once()).method("observe").with(new IsInstanceOf(EditableDatasetTypePresenter.class));
-        updateView.expects(once()).method("display").with(same(type), same(keywords));
         EditableDatasetTypeView updateProxy = (EditableDatasetTypeView) updateView.proxy();
 
         Mock layout = mock(ViewLayout.class);
         layout.expects(once()).method("add").with(eq(updateProxy), new IsInstanceOf(Object.class));
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
 
-        Mock locator = mock(ServiceLocator.class);
-        locator.stubs().method("datasetTypeService").withNoArguments().will(returnValue(null));
+        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter(null, null, (ViewLayout) layout.proxy());
 
-        Mock interdataServices = mock(DataCommonsService.class);
-        interdataServices.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
-        locator.stubs().method("dataCommonsService").withNoArguments().will(returnValue(interdataServices.proxy()));
+        Mock presenter = mock(EditableDatasetTypePresenter.class);
+        presenter.expects(once()).method("doDisplay").withNoArguments();
+        EditableDatasetTypePresenter presenterProxy = (EditableDatasetTypePresenter) presenter.proxy();
 
-        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter(null, (DatasetTypesManagerView) view.proxy(),
-                (ViewLayout) layout.proxy());
-
-        p.doEdit(type, updateProxy, null);
+        p.edit(type, updateProxy, presenterProxy);
 
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.TRUE));
-        p.doEdit(type, updateProxy, null);
+        p.edit(type, updateProxy, presenterProxy);
     }
 }

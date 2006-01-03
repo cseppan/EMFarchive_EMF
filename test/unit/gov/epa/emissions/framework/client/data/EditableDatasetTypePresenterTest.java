@@ -33,7 +33,7 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
 
         Mock view = mock(EditableDatasetTypeView.class);
 
-        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenter((EmfSession) session.proxy(),
+        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenterImpl((EmfSession) session.proxy(),
                 (EditableDatasetTypeView) view.proxy(), null, type);
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(same(type), same(keywords));
@@ -63,10 +63,10 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         Mock session = session(user, service.proxy());
 
         Mock view = mock(ViewableDatasetTypeView.class);
-        view.expects(once()).method("observe").with(new IsInstanceOf(ViewableDatasetTypePresenter.class));
+        view.expects(once()).method("observe").with(new IsInstanceOf(ViewableDatasetTypePresenterImpl.class));
         view.expects(once()).method("display").with(eq(type), same(keywords));
 
-        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenter((EmfSession) session.proxy(), null,
+        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenterImpl((EmfSession) session.proxy(), null,
                 (ViewableDatasetTypeView) view.proxy(), type);
 
         presenter.doDisplay();
@@ -83,7 +83,7 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
 
         Mock session = session(user, service.proxy());
 
-        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenter((EmfSession) session.proxy(),
+        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenterImpl((EmfSession) session.proxy(),
                 (EditableDatasetTypeView) view.proxy(), null, type);
 
         presenter.doClose();
@@ -111,7 +111,7 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
 
         Mock session = session(user, service.proxy());
 
-        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenter((EmfSession) session.proxy(),
+        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenterImpl((EmfSession) session.proxy(),
                 (EditableDatasetTypeView) view.proxy(), null, typeProxy);
 
         Mock managerView = mock(DatasetTypesManagerView.class);
@@ -128,7 +128,7 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         type.expects(once()).method("setName").with(same(name));
         type.expects(once()).method("setDescription").with(same(desc));
 
-        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenter(null, null, null, ((DatasetType) type
+        EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenterImpl(null, null, null, ((DatasetType) type
                 .proxy()));
         Mock managerView = mock(DatasetTypesManagerView.class);
 

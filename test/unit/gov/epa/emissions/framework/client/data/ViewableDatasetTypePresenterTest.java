@@ -17,7 +17,7 @@ public class ViewableDatasetTypePresenterTest extends MockObjectTestCase {
         interdata.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
 
         Mock view = mock(ViewableDatasetTypeView.class);
-        ViewableDatasetTypePresenter presenter = new ViewableDatasetTypePresenter((ViewableDatasetTypeView) view
+        ViewableDatasetTypePresenter presenter = new ViewableDatasetTypePresenterImpl((ViewableDatasetTypeView) view
                 .proxy(), type, (DataCommonsService) interdata.proxy());
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(same(type), same(keywords));
@@ -29,7 +29,7 @@ public class ViewableDatasetTypePresenterTest extends MockObjectTestCase {
         Mock view = mock(ViewableDatasetTypeView.class);
         view.expects(once()).method("close");
 
-        ViewableDatasetTypePresenter presenter = new ViewableDatasetTypePresenter((ViewableDatasetTypeView) view
+        ViewableDatasetTypePresenter presenter = new ViewableDatasetTypePresenterImpl((ViewableDatasetTypeView) view
                 .proxy(), null, null);
 
         presenter.doClose();

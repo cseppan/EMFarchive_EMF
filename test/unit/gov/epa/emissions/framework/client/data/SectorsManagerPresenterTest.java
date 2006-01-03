@@ -1,10 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
-import java.util.Date;
-
 import gov.epa.emissions.commons.io.Sector;
-import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
@@ -40,38 +36,24 @@ public class SectorsManagerPresenterTest extends MockObjectTestCase {
         p.doClose();
     }
 
-    public void FIXME_testShouldDisplayEditSectorViewOnEdit() throws Exception {
-        Mock view = mock(SectorsManagerView.class);
-
-        Sector sector = new Sector();
-        sector.setName("name");
-
+    public void testShouldDisplayEditSectorViewOnEdit() throws Exception {
         Mock updateSectorView = mock(EditableSectorView.class);
-        updateSectorView.expects(once()).method("observe").with(new IsInstanceOf(EditableSectorPresenter.class));
-        updateSectorView.expects(once()).method("display").with(same(sector));
         EditableSectorView updateProxy = (EditableSectorView) updateSectorView.proxy();
 
         Mock layout = mock(ViewLayout.class);
         layout.expects(once()).method("add").with(eq(updateProxy), new IsInstanceOf(Object.class));
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
 
-        User user = new User();
-        user.setFullName("name");
-        
-        //locking sector
-        sector.setUsername(user.getFullName());
-        sector.setLockDate(new Date());
-        
-        Mock service = mock(DataCommonsService.class);
-        service.expects(once()).method("getSectorLock").with(same(user), same(sector)).will(returnValue(sector));
+        SectorsManagerPresenter p = new SectorsManagerPresenter(null, null, null, (ViewLayout) layout.proxy());
 
-        Mock session = mock(EmfSession.class);
-        session.stubs().method("user").withNoArguments().will(returnValue(user));
+        Mock presenter = mock(EditableSectorPresenter.class);
+        presenter.expects(once()).method("doDisplay").withNoArguments();
+        EditableSectorPresenter presenterProxy = (EditableSectorPresenter) presenter.proxy();
 
-        SectorsManagerPresenter p = new SectorsManagerPresenter((EmfSession) session.proxy(), (SectorsManagerView) view
-                .proxy(), (DataCommonsService) service.proxy(), (ViewLayout) layout.proxy());
+        Sector sector = new Sector();
+        sector.setName("name");
 
-        p.doEdit(sector, updateProxy, null);
+        p.edit(sector, updateProxy, presenterProxy);
     }
 
     public void testShouldShowDisplaySectorViewOnView() throws Exception {
@@ -81,55 +63,44 @@ public class SectorsManagerPresenterTest extends MockObjectTestCase {
         sector.setName("name");
 
         Mock displaySectorView = mock(ViewableSectorView.class);
-        displaySectorView.expects(once()).method("observe").with(new IsInstanceOf(ViewableSectorPresenter.class));
-        displaySectorView.expects(once()).method("display").with(same(sector));
-        ViewableSectorView displayProxy = (ViewableSectorView) displaySectorView.proxy();
+        ViewableSectorView viewableProxy = (ViewableSectorView) displaySectorView.proxy();
 
         Mock layout = mock(ViewLayout.class);
-        layout.expects(once()).method("add").with(eq(displayProxy), new IsInstanceOf(Object.class));
+        layout.expects(once()).method("add").with(eq(viewableProxy), new IsInstanceOf(Object.class));
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
 
         SectorsManagerPresenter p = new SectorsManagerPresenter(null, (SectorsManagerView) view.proxy(), null,
                 (ViewLayout) layout.proxy());
 
-        p.doView(sector, displayProxy);
+        Mock presenter = mock(ViewableSectorPresenter.class);
+        presenter.expects(once()).method("doDisplay").withNoArguments();
+        ViewableSectorPresenter presenterProxy = (ViewableSectorPresenter) presenter.proxy();
+
+        
+        p.view(sector, viewableProxy, presenterProxy);
     }
 
-    public void FIXME_testShouldActivateAlreadyDisplayedViewOnRepeatedUpdateOfSameView() throws Exception {
-        Mock view = mock(SectorsManagerView.class);
-
+    public void testShouldActivateAlreadyDisplayedViewOnRepeatedUpdateOfSameView() throws Exception {
         Sector sector = new Sector();
         sector.setName("name");
 
         Mock updateSectorView = mock(EditableSectorView.class);
-        updateSectorView.expects(once()).method("observe").with(new IsInstanceOf(EditableSectorPresenter.class));
-        updateSectorView.expects(once()).method("display").with(same(sector));
         EditableSectorView updateProxy = (EditableSectorView) updateSectorView.proxy();
 
         Mock layout = mock(ViewLayout.class);
         layout.expects(once()).method("add").with(eq(updateProxy), new IsInstanceOf(Object.class));
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.FALSE));
 
-        User user = new User();
-        user.setFullName("name");
-        
-        //locking sector
-        sector.setUsername(user.getFullName());
-        sector.setLockDate(new Date());
+        SectorsManagerPresenter p = new SectorsManagerPresenter(null, null, null, (ViewLayout) layout.proxy());
 
-        Mock service = mock(DataCommonsService.class);
-        service.expects(once()).method("getSectorLock").with(same(user), same(sector)).will(returnValue(sector));
+        Mock presenter = mock(EditableSectorPresenter.class);
+        presenter.expects(once()).method("doDisplay").withNoArguments();
+        EditableSectorPresenter presenterProxy = (EditableSectorPresenter) presenter.proxy();
 
-        Mock session = mock(EmfSession.class);
-        session.stubs().method("user").withNoArguments().will(returnValue(user));
-
-        SectorsManagerPresenter p = new SectorsManagerPresenter((EmfSession) session.proxy(), (SectorsManagerView) view
-                .proxy(), (DataCommonsService) service.proxy(), (ViewLayout) layout.proxy());
-
-        p.doEdit(sector, updateProxy, null);
+        p.edit(sector, updateProxy, presenterProxy);
 
         layout.stubs().method("activate").with(new IsInstanceOf(Object.class)).will(returnValue(Boolean.TRUE));
-        p.doEdit(sector, updateProxy, null);
+        p.edit(sector, updateProxy, presenterProxy);
     }
 
 }
