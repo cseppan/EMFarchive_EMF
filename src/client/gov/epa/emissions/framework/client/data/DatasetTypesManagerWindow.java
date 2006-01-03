@@ -156,7 +156,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         for (Iterator iter = sectors.iterator(); iter.hasNext();) {
             DatasetType type = (DatasetType) iter.next();
             try {
-                presenter.doEdit(type, editableView());
+                presenter.doEdit(type, editableView(), viewableView());
             } catch (EmfException e) {
                 messagePanel.setError("Could not display: " + type.getName() + ". Reason: " + e.getMessage());
                 break;
@@ -192,7 +192,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private EditableDatasetTypeView editableView() {
-        EditDatasetTypeWindow view = new EditDatasetTypeWindow(this);
+        EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(this);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {

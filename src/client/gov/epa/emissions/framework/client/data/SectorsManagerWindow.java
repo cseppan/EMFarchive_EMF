@@ -200,7 +200,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
         return view;
     }
 
-    private EditSectorView editSectorView() {
+    private EditableSectorView editSectorView() {
         EditSectorWindow view = new EditSectorWindow(this);
         desktop.add(view);
 

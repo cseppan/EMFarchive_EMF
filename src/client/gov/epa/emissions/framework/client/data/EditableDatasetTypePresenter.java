@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DatasetTypeService;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataCommonsService;
 
 import java.util.Set;
@@ -11,38 +11,58 @@ import java.util.TreeSet;
 
 public class EditableDatasetTypePresenter {
 
-    private EditableDatasetTypeView view;
+    private EditableDatasetTypeView editable;
 
     private DatasetType type;
 
-    private DatasetTypeService datasetTypesService;
+    private EmfSession session;
 
-    private DataCommonsService dataCommonsService;
+    private ViewableDatasetTypeView viewable;
 
-    public EditableDatasetTypePresenter(EditableDatasetTypeView view, DatasetType type,
-            DatasetTypeService datasetTypesService, DataCommonsService dataCommonsService) {
-        this.view = view;
+    public EditableDatasetTypePresenter(EmfSession session, EditableDatasetTypeView editable,
+            ViewableDatasetTypeView viewable, DatasetType type) {
+        this.session = session;
+        this.editable = editable;
+        this.viewable = viewable;
         this.type = type;
-        this.datasetTypesService = datasetTypesService;
-        this.dataCommonsService = dataCommonsService;
     }
 
     public void doDisplay() throws EmfException {
-        view.observe(this);
-        view.display(type, dataCommonsService.getKeywords());
+        type = service().getDatasetTypeLock(session.user(), type);
+
+        if (!type.isLocked(session.user())) {// view mode, locked by another user
+            new ViewableDatasetTypePresenter(viewable, type, dataCommonsService()).doDisplay();
+            return;
+        }
+
+        editable.observe(this);
+        editable.display(type, dataCommonsService().getKeywords());
     }
 
-    public void doClose() {
-        view.close();
+    private DataCommonsService service() {
+        return session.dataCommonsService();
+    }
+
+    private DataCommonsService dataCommonsService() {
+        return session.dataCommonsService();
+    }
+
+    public void doClose() throws EmfException {
+        service().releaseDatasetTypeLock(session.user(), type);
+        closeView();
+    }
+
+    private void closeView() {
+        editable.close();
     }
 
     public void doSave(String name, String description, Keyword[] keywords, DatasetTypesManagerView manager)
             throws EmfException {
         update(name, description, keywords);
-        datasetTypesService.updateDatasetType(type);
+        type = service().updateDatasetType(session.user(), type);
 
         manager.refresh();
-        doClose();
+        closeView();
     }
 
     private void update(String name, String description, Keyword[] keywords) throws EmfException {

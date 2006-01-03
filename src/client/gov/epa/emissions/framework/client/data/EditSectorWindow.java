@@ -22,9 +22,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class EditSectorWindow extends DisposableInteralFrame implements EditSectorView {
+public class EditSectorWindow extends DisposableInteralFrame implements EditableSectorView {
 
-    private EditSectorPresenter presenter;
+    private EditableSectorPresenter presenter;
 
     private JPanel layout;
 
@@ -47,7 +47,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements EditSect
         super.getContentPane().add(layout);
     }
 
-    public void observe(EditSectorPresenter presenter) {
+    public void observe(EditableSectorPresenter presenter) {
         this.presenter = presenter;
     }
 

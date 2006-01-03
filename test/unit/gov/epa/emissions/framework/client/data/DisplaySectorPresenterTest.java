@@ -9,9 +9,9 @@ public class DisplaySectorPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayViewOnDisplay() throws Exception {
         Sector sector = new Sector();
-        Mock view = mock(DisplaySectorView.class);
+        Mock view = mock(ViewableSectorView.class);
 
-        DisplaySectorPresenter presenter = new DisplaySectorPresenter((DisplaySectorView) view.proxy(), sector);
+        ViewableSectorPresenter presenter = new ViewableSectorPresenter((ViewableSectorView) view.proxy(), sector);
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(eq(sector));
 
@@ -20,10 +20,10 @@ public class DisplaySectorPresenterTest extends MockObjectTestCase {
 
     public void testShouldCloseViewOnClose() throws Exception {
         Sector sector = new Sector();
-        Mock view = mock(DisplaySectorView.class);
+        Mock view = mock(ViewableSectorView.class);
         view.expects(once()).method("close");
 
-        DisplaySectorPresenter presenter = new DisplaySectorPresenter((DisplaySectorView) view.proxy(), sector);
+        ViewableSectorPresenter presenter = new ViewableSectorPresenter((ViewableSectorView) view.proxy(), sector);
 
         presenter.doClose();
     }

@@ -24,7 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.border.EtchedBorder;
 
-public class EditDatasetTypeWindow extends DisposableInteralFrame implements EditableDatasetTypeView {
+public class EditableDatasetTypeWindow extends DisposableInteralFrame implements EditableDatasetTypeView {
 
     private EditableDatasetTypePresenter presenter;
 
@@ -40,7 +40,7 @@ public class EditDatasetTypeWindow extends DisposableInteralFrame implements Edi
 
     private DatasetTypesManagerView manager;
 
-    public EditDatasetTypeWindow(DatasetTypesManagerView manager) {
+    public EditableDatasetTypeWindow(DatasetTypesManagerView manager) {
         super("Update DatasetType", new Dimension(600, 500));
 
         this.manager = manager;
@@ -132,7 +132,11 @@ public class EditDatasetTypeWindow extends DisposableInteralFrame implements Edi
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                presenter.doClose();
+                try {
+                    presenter.doClose();
+                } catch (EmfException e) {
+                    messagePanel.setError("Could not close. Reason: " + e.getMessage());
+                }
             }
         };
 

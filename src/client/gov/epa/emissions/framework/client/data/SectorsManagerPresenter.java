@@ -33,24 +33,23 @@ public class SectorsManagerPresenter {
         view.close();
     }
 
-    public void doEdit(Sector sector, EditSectorView editSectorView, DisplaySectorView displaySectorView)
+    public void doEdit(Sector sector, EditableSectorView editSectorView, ViewableSectorView displaySectorView)
             throws EmfException {
         if (viewLayout.activate("Edit " + sector.getName()))
             return;
 
         viewLayout.add(editSectorView, "Edit " + sector.getName());
-        EditSectorPresenter p = new EditSectorPresenter(session, editSectorView, displaySectorView, sector, service);
+        EditableSectorPresenter p = new EditableSectorPresenter(session, editSectorView, displaySectorView, sector);
         p.doDisplay();
     }
 
-    public void doView(Sector sector, DisplaySectorView displaySectorView) {
+    public void doView(Sector sector, ViewableSectorView viewable) {
         if (viewLayout.activate(sector.getName()))
             return;
 
-        viewLayout.add(displaySectorView, sector.getName());
-        DisplaySectorPresenter p = new DisplaySectorPresenter(displaySectorView, sector);
+        viewLayout.add(viewable, sector.getName());
+        ViewableSectorPresenter p = new ViewableSectorPresenter(viewable, sector);
         p.doDisplay();
-
     }
 
 }

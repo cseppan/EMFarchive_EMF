@@ -27,9 +27,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SpringLayout;
 
-public class DisplaySectorWindow extends DisposableInteralFrame implements DisplaySectorView {
+public class DisplaySectorWindow extends DisposableInteralFrame implements ViewableSectorView {
 
-    private DisplaySectorPresenter presenter;
+    private ViewableSectorPresenter presenter;
 
     private JPanel layout;
 
@@ -43,7 +43,7 @@ public class DisplaySectorWindow extends DisposableInteralFrame implements Displ
         super.getContentPane().add(layout);
     }
 
-    public void observe(DisplaySectorPresenter presenter) {
+    public void observe(ViewableSectorPresenter presenter) {
         this.presenter = presenter;
     }
 

@@ -11,11 +11,11 @@ import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 import org.jmock.core.constraint.IsInstanceOf;
 
-public class EditSectorPresenterTest extends MockObjectTestCase {
+public class EditableSectorPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayViewAfterObtainingLockForSectorOnDisplay() throws Exception {
         Sector sector = new Sector();
-        Mock view = mock(EditSectorView.class);
+        Mock view = mock(EditableSectorView.class);
 
         User user = new User();
         user.setFullName("name");
@@ -25,15 +25,22 @@ public class EditSectorPresenterTest extends MockObjectTestCase {
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("getSectorLock").with(same(user), same(sector)).will(returnValue(sector));
 
-        Mock session = mock(EmfSession.class);
-        session.stubs().method("user").withNoArguments().will(returnValue(user));
+        Mock session = session(user, service.proxy());
 
-        EditSectorPresenter presenter = new EditSectorPresenter((EmfSession) session.proxy(), (EditSectorView) view
-                .proxy(), null, sector, (DataCommonsService) service.proxy());
+        EditableSectorPresenter presenter = new EditableSectorPresenter((EmfSession) session.proxy(),
+                (EditableSectorView) view.proxy(), null, sector);
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(eq(sector));
 
         presenter.doDisplay();
+    }
+
+    private Mock session(User user, Object dataCommonsProxy) {
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("user").withNoArguments().will(returnValue(user));
+        session.stubs().method("dataCommonsService").withNoArguments().will(returnValue(dataCommonsProxy));
+        
+        return session;
     }
 
     public void testShouldShowNonEditViewAfterFailingToObtainLockForSectorOnDisplay() throws Exception {
@@ -44,33 +51,31 @@ public class EditSectorPresenterTest extends MockObjectTestCase {
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("getSectorLock").with(same(user), same(sector)).will(returnValue(sector));
 
-        Mock session = mock(EmfSession.class);
-        session.stubs().method("user").withNoArguments().will(returnValue(user));
+        Mock session = session(user, service.proxy());
 
-        Mock view = mock(DisplaySectorView.class);
-        view.expects(once()).method("observe").with(new IsInstanceOf(DisplaySectorPresenter.class));
+        Mock view = mock(ViewableSectorView.class);
+        view.expects(once()).method("observe").with(new IsInstanceOf(ViewableSectorPresenter.class));
         view.expects(once()).method("display").with(eq(sector));
 
-        EditSectorPresenter presenter = new EditSectorPresenter((EmfSession) session.proxy(), null,
-                (DisplaySectorView) view.proxy(), sector, (DataCommonsService) service.proxy());
+        EditableSectorPresenter presenter = new EditableSectorPresenter((EmfSession) session.proxy(), null,
+                (ViewableSectorView) view.proxy(), sector);
 
         presenter.doDisplay();
     }
 
     public void testShouldCloseViewOnClose() throws Exception {
         Sector sector = new Sector();
-        Mock view = mock(EditSectorView.class);
+        Mock view = mock(EditableSectorView.class);
         view.expects(once()).method("close");
 
         User user = new User();
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("releaseSectorLock").with(same(user), same(sector)).will(returnValue(sector));
 
-        Mock session = mock(EmfSession.class);
-        session.stubs().method("user").withNoArguments().will(returnValue(user));
+        Mock session = session(user, service.proxy());
 
-        EditSectorPresenter presenter = new EditSectorPresenter((EmfSession) session.proxy(), (EditSectorView) view
-                .proxy(), null, sector, (DataCommonsService) service.proxy());
+        EditableSectorPresenter presenter = new EditableSectorPresenter((EmfSession) session.proxy(),
+                (EditableSectorView) view.proxy(), null, sector);
 
         presenter.doClose();
     }
@@ -78,18 +83,17 @@ public class EditSectorPresenterTest extends MockObjectTestCase {
     public void testShouldUpdateSectorReleaseLockAndCloseOnSave() throws Exception {
         Sector sector = new Sector();
 
-        Mock view = mock(EditSectorView.class);
+        Mock view = mock(EditableSectorView.class);
         view.expects(once()).method("close");
 
         User user = new User();
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("updateSector").with(same(user), same(sector)).will(returnValue(sector));
 
-        Mock session = mock(EmfSession.class);
-        session.stubs().method("user").withNoArguments().will(returnValue(user));
+        Mock session = session(user, service.proxy());
 
-        EditSectorPresenter presenter = new EditSectorPresenter((EmfSession) session.proxy(), (EditSectorView) view
-                .proxy(), null, sector, (DataCommonsService) service.proxy());
+        EditableSectorPresenter presenter = new EditableSectorPresenter((EmfSession) session.proxy(),
+                (EditableSectorView) view.proxy(), null, sector);
 
         Mock sectorManagerView = mock(SectorsManagerView.class);
         sectorManagerView.expects(once()).method("refresh").withNoArguments();

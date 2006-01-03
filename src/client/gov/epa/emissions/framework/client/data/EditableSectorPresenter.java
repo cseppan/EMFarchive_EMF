@@ -5,50 +5,52 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataCommonsService;
 
-public class EditSectorPresenter {
+public class EditableSectorPresenter {
 
-    private EditSectorView editView;
+    private EditableSectorView editable;
 
     private Sector sector;
 
-    private DataCommonsService service;
-
     private EmfSession session;
 
-    private DisplaySectorView displayView;
+    private ViewableSectorView viewable;
 
-    public EditSectorPresenter(EmfSession session, EditSectorView editView, DisplaySectorView displayView,
-            Sector sector, DataCommonsService service) {
+    public EditableSectorPresenter(EmfSession session, EditableSectorView editable, ViewableSectorView viewable,
+            Sector sector) {
         this.session = session;
-        this.editView = editView;
-        this.displayView = displayView;
+        this.editable = editable;
+        this.viewable = viewable;
         this.sector = sector;
-        this.service = service;
     }
 
     public void doDisplay() throws EmfException {
-        sector = service.getSectorLock(session.user(), sector);
+        sector = service().getSectorLock(session.user(), sector);
 
         if (!sector.isLocked(session.user())) {// view mode, locked by another user
-            new DisplaySectorPresenter(displayView, sector).doDisplay();
+            new ViewableSectorPresenter(viewable, sector).doDisplay();
             return;
         }
 
-        editView.observe(this);
-        editView.display(sector);
+        editable.observe(this);
+        editable.display(sector);
+    }
+
+    private DataCommonsService service() {
+        return session.dataCommonsService();
     }
 
     public void doClose() throws EmfException {
-        service.releaseSectorLock(session.user(), sector);
+        service().releaseSectorLock(session.user(), sector);
         closeView();
     }
 
     private void closeView() {
-        editView.close();
+        editable.close();
     }
 
     public void doSave(SectorsManagerView sectorManager) throws EmfException {
-        sector = service.updateSector(session.user(), sector);
+        sector = service().updateSector(session.user(), sector);
+        
         sectorManager.refresh();
         closeView();
     }

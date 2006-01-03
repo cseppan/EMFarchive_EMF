@@ -2,13 +2,13 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Sector;
 
-public class DisplaySectorPresenter {
+public class ViewableSectorPresenter {
 
-    private DisplaySectorView view;
+    private ViewableSectorView view;
 
     private Sector sector;
 
-    public DisplaySectorPresenter(DisplaySectorView view, Sector sector) {
+    public ViewableSectorPresenter(ViewableSectorView view, Sector sector) {
         this.view = view;
         this.sector = sector;
     }
