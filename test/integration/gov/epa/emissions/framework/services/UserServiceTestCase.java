@@ -47,11 +47,12 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
 
         service.createUser(user);
 
+        User loaded = getUser(user.getUsername());
         try {
-            assertNotNull(service.getUser("test-user"));
+            assertNotNull(loaded);
             assertEquals(initialCount + 1, service.getUsers().length);
         } finally {
-            remove(user);
+            remove(loaded);
         }
     }
 
@@ -129,8 +130,10 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
     }
 
     private void remove(User user) {
+        User loaded = getUser(user.getUsername());
+
         Transaction tx = session.beginTransaction();
-        session.delete(user);
+        session.delete(loaded);
         tx.commit();
     }
 
@@ -145,8 +148,9 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
 
         service.createUser(user);
 
-        user.setFullName("modified-name");
-        service.updateUser(user);
+        User added = getUser(user.getUsername());
+        added.setFullName("modified-name");
+        service.updateUser(added);
 
         try {
             User result = service.getUser("test-user");
@@ -169,9 +173,10 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
         service.createUser(user);
 
         // test
-        service.deleteUser(user);
+        User added = getUser(user.getUsername());
+        service.deleteUser(added);
 
-        User result = getUser(user.getUsername());
+        User result = getUser(added.getUsername());
         assertNull("User should have been deleted", result);
     }
 

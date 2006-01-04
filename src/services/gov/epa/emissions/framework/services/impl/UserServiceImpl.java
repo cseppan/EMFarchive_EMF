@@ -94,8 +94,8 @@ public class UserServiceImpl implements UserService {
             dao.update(user, session);
             session.close();
         } catch (HibernateException e) {
-            LOG.error("Could not update new user - " + user.getFullName() + ". Reason: " + e.getMessage());
-            throw new EmfException("Could not update new user - " + user.getFullName());
+            LOG.error("Could not update user - " + user.getFullName() + ". Reason: " + e.getMessage());
+            throw new EmfException("Could not update user - " + user.getFullName());
         }
     }
 
