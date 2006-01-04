@@ -1,115 +1,112 @@
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.AuthenticationException;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.InfrastructureException;
-import gov.epa.emissions.framework.dao.UserManagerDAO;
+import gov.epa.emissions.framework.dao.UsersDao;
 import gov.epa.emissions.framework.services.UserService;
 
-import java.sql.SQLException;
 import java.util.List;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 
-public class UserServiceImpl extends EmfServiceImpl implements UserService {
+public class UserServiceImpl implements UserService {
 
-    private UserManagerDAO dao;
+    private static Log LOG = LogFactory.getLog(UserServiceImpl.class);
 
-    public UserServiceImpl(DataSource datasource, DbServer dbServer) throws EmfException {
-        super(datasource, dbServer);
-        init(datasource);
+    private HibernateSessionFactory sessionFactory;
+
+    private UsersDao dao;
+
+    public UserServiceImpl() {
+        this(HibernateSessionFactory.get());
     }
 
-    public UserServiceImpl() throws Exception {
-        init(datasource);
+    public UserServiceImpl(HibernateSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+        dao = new UsersDao();
     }
 
-    private void init(DataSource datasource) throws EmfException {
+    public void authenticate(String username, String password) throws EmfException {
         try {
-            dao = new UserManagerDAO(datasource);
-        } catch (SQLException e) {
-            throw new EmfException("Could not initialize User Service. Reason: " + e.getMessage());
-        }
-    }
-
-    private static Log log = LogFactory.getLog(UserServiceImpl.class);
-
-    public void authenticate(String userName, String pwd) throws EmfException {
-        try {
-            User emfUser = dao.get(userName);
-            if (emfUser == null) {
-                log.error("In the manager.  emfUser was NULL");
+            Session session = sessionFactory.getSession();
+            User user = dao.get(username, session);
+            if (user == null)
                 throw new AuthenticationException("Invalid username");
-            }
 
-            if (emfUser.isAcctDisabled()) {
-                log.error("User data error: account disabled: " + userName);
+            if (user.isAcctDisabled())
                 throw new AuthenticationException("Account Disabled");
-            }
 
-            if (!emfUser.getEncryptedPassword().equals(pwd))
+            session.close();
+
+            if (!user.getEncryptedPassword().equals(password))
                 throw new AuthenticationException("Incorrect Password");
-        } catch (InfrastructureException ex) {
-            log.error(ex);
-            throw new EmfException(ex.getMessage());
+        } catch (HibernateException ex) {
+            LOG.error(ex);
+            throw new EmfException("Could not authenticate user: " + username + ". Reason: " + ex.getMessage());
         }
-
-        log.debug("Called authenticate for username= " + userName);
 
     }
 
-    public User getUser(String userName) throws EmfException {
+    public User getUser(String username) throws EmfException {
         try {
-            return dao.get(userName);
-        } catch (InfrastructureException ex) {
-            log.error(ex);
-            throw new EmfException(ex.getMessage());
-        }
-    }
+            Session session = sessionFactory.getSession();
+            User user = dao.get(username, session);
+            session.close();
 
-    public void createUser(User newUser) throws EmfException {
-        try {
-            if (!dao.contains(newUser.getUsername())) {
-                log.error("User data error: Duplicate username: " + newUser.getUsername());
-                throw new EmfException("Duplicate username");
-            }
-
-            dao.add(newUser);
-        } catch (InfrastructureException ex) {
-            log.error(ex);
-            throw new EmfException(ex.getMessage());
-        }
-    }
-
-    public void updateUser(User newUser) throws EmfException {
-        try {
-            dao.update(newUser);
-        } catch (InfrastructureException ex) {
-            log.error(ex);
-            throw new EmfException(ex.getMessage());
-        }
-    }
-
-    public void deleteUser(User user) throws EmfException {
-        try {
-            dao.remove(user.getUsername());
-        } catch (InfrastructureException ex) {
-            throw new EmfException(ex.getMessage());
+            return user;
+        } catch (HibernateException e) {
+            LOG.error("Could not get User - " + username + ". Reason: " + e);
+            throw new EmfException("Could not get User - " + username);
         }
     }
 
     public User[] getUsers() throws EmfException {
         try {
-            List allUsers = dao.all();
-            return (User[]) allUsers.toArray(new User[allUsers.size()]);
-        } catch (InfrastructureException ex) {
-            log.error(ex);
-            throw new EmfException(ex.getMessage());
+            Session session = sessionFactory.getSession();
+            List all = dao.getAll(session);
+            session.close();
+
+            return (User[]) all.toArray(new User[0]);
+        } catch (HibernateException e) {
+            LOG.error("Could not get all Users. Reason: " + e);
+            throw new EmfException("Could not get all Users.");
+        }
+    }
+
+    public void createUser(User user) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.add(user, session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Could not create new user - " + user.getFullName() + ". Reason: " + e.getMessage());
+            throw new EmfException("Could not create new user - " + user.getFullName());
+        }
+    }
+
+    public void updateUser(User user) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.update(user, session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Could not update new user - " + user.getFullName() + ". Reason: " + e.getMessage());
+            throw new EmfException("Could not update new user - " + user.getFullName());
+        }
+    }
+
+    public void deleteUser(User user) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.remove(user, session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Could not delete user - " + user.getFullName() + ". Reason: " + e.getMessage());
+            throw new EmfException("Could not delete user - " + user.getFullName());
         }
     }
 

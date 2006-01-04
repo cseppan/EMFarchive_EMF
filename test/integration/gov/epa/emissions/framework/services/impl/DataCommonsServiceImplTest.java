@@ -7,9 +7,9 @@ public class DataCommonsServiceImplTest extends DataCommonsServiceTestCase {
 
     protected void doSetUp() throws Exception {
         HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
+        
         DataCommonsServiceImpl commonsService = new DataCommonsServiceImpl(sessionFactory);
-
-        UserService userService = new UserServiceImpl(emf(), super.dbServer());
+        UserService userService = new UserServiceImpl(sessionFactory);
 
         super.setUpService(commonsService, userService);
     }

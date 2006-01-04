@@ -10,7 +10,7 @@ public class ExImServiceImplTest extends ExImServiceTestCase {
         HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
 
         ExImService exim = new ExImServiceImpl(emf(), super.dbServer(), sessionFactory);
-        UserService user = new UserServiceImpl(emf(), super.dbServer());
+        UserService user = new UserServiceImpl(sessionFactory);
         DataCommonsServiceImpl commons = new DataCommonsServiceImpl(sessionFactory);
 
         super.setUpService(exim, user, commons);

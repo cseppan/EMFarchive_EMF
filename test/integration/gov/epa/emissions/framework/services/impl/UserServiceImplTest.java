@@ -8,7 +8,7 @@ public class UserServiceImplTest extends UserServiceTestCase {
     protected void doSetUp() throws Exception {
         HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
 
-        UserService userService = new NewUserServiceImpl(sessionFactory);
+        UserService userService = new UserServiceImpl(sessionFactory);
 
         super.setUpService(userService);
     }
