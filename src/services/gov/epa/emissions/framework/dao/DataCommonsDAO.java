@@ -17,6 +17,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
 
 public class DataCommonsDAO {
     private static Log log = LogFactory.getLog(DataCommonsDAO.class);
@@ -122,11 +123,11 @@ public class DataCommonsDAO {
     }
 
     public List getSectors(Session session) {
-        return session.createQuery("SELECT sector FROM Sector as sector ORDER BY name").list();
+        return session.createCriteria(Sector.class).addOrder(Order.asc("name")).list();
     }
 
     public List getDatasetTypes(Session session) {
-        return session.createQuery("SELECT dataset_type FROM DatasetType as dataset_type ORDER BY name").list();
+        return session.createCriteria(DatasetType.class).addOrder(Order.asc("name")).list();
     }
 
     public Sector getSectorLock(User user, Sector sector, Session session) {

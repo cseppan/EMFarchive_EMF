@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.dao;
 import gov.epa.emissions.commons.io.Lockable;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.EMFConstants;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -17,6 +16,8 @@ import org.hibernate.Transaction;
 
 public class LockingScheme {
     private static Log log = LogFactory.getLog(LockingScheme.class);
+
+    public static final long DEFAULT_TIMEOUT = 12 * 60 * 60 * 1000;
 
     /**
      * This method will check if the current sector record has a lock. If it does it will return the sector object with
@@ -44,7 +45,7 @@ public class LockingScheme {
 
         long elapsed = new Date().getTime() - current.getLockDate().getTime();
 
-        if ((user.getFullName().equals(current.getUsername())) || (elapsed > EMFConstants.EMF_LOCK_TIMEOUT_VALUE)) {
+        if ((user.getFullName().equals(current.getUsername())) || (elapsed > DEFAULT_TIMEOUT)) {
             grabLock(user, current, session);
         }
 
@@ -105,8 +106,8 @@ public class LockingScheme {
         Lockable current = current(target, all);
         if (!current.isLocked(user))
             throw new EmfException("Cannot update without owning lock");
-        
-        session.clear();//clear 'loaded' locked object - to make way for updated object
+
+        session.clear();// clear 'loaded' locked object - to make way for updated object
         doUpdate(session, target);
 
         return releaseLock(target, session);

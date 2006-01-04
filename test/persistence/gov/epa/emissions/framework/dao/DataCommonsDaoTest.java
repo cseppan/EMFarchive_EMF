@@ -4,8 +4,6 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.dao.DataCommonsDAO;
-import gov.epa.emissions.framework.dao.UserManagerDAO;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
@@ -18,7 +16,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
 
     private DataCommonsDAO dao;
 
-    private UserManagerDAO userDao;
+    private UsersDao userDao;
 
     private Session session;
 
@@ -27,7 +25,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
     protected void doSetUp() throws Exception {
         sessionFactory = new HibernateSessionFactory(sessionFactory());
         dao = new DataCommonsDAO();
-        userDao = new UserManagerDAO(emf());
+        userDao = new UsersDao();
         session = sessionFactory.getSession();
     }
 
@@ -67,8 +65,8 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         return null;
     }
 
-    public void testShouldGetSectorLock() throws EmfException {
-        User user = userDao.get("emf");
+    public void testShouldGetSectorLock() {
+        User user = userDao.get("emf", session);
         List sectors = dao.getSectors(session);
         Sector sector = (Sector) sectors.get(0);
 
@@ -79,8 +77,8 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         assertEquals(sectorLoadedFromDb.getUsername(), user.getFullName());
     }
 
-    public void testShouldGetDatasetTypeLock() throws EmfException {
-        User user = userDao.get("emf");
+    public void testShouldGetDatasetTypeLock() {
+        User user = userDao.get("emf", session);
         List types = dao.getDatasetTypes(session);
         DatasetType type = (DatasetType) types.get(0);
 
@@ -91,21 +89,21 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         assertEquals(loadedFromDb.getUsername(), user.getFullName());
     }
 
-    public void testShouldFailToGetLockWhenAlreadyLockedByAnotherUser() throws EmfException {
-        User emfUser = userDao.get("emf");
+    public void testShouldFailToGetLockWhenAlreadyLockedByAnotherUser() {
+        User emfUser = userDao.get("emf", session);
         List sectors = dao.getSectors(session);
         Sector sector = (Sector) sectors.get(0);
 
         dao.getSectorLock(emfUser, sector, session);
 
-        User adminUser = userDao.get("admin");
+        User adminUser = userDao.get("admin", session);
         Sector result = dao.getSectorLock(adminUser, sector, session);
 
         assertTrue(result.isLocked(emfUser));// failed to obtain lock for Admin
     }
 
     public void testShouldReleaseSectorLock() throws EmfException {
-        User user = userDao.get("emf");
+        User user = userDao.get("emf", session);
         List sectors = dao.getSectors(session);
         Sector sector = (Sector) sectors.get(0);
 
@@ -118,7 +116,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
     }
 
     public void testShouldReleaseDatasetTypeLock() throws EmfException {
-        User user = userDao.get("emf");
+        User user = userDao.get("emf", session);
         List list = dao.getDatasetTypes(session);
         DatasetType type = (DatasetType) list.get(0);
 
@@ -149,7 +147,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         Sector sector = (Sector) sectors.get(0);
         String name = sector.getName();
 
-        User user = userDao.get("emf");
+        User user = userDao.get("emf", session);
 
         Sector modifiedSector1 = dao.getSectorLock(user, sector, session);
         assertEquals(modifiedSector1.getUsername(), user.getFullName());
@@ -172,7 +170,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         DatasetType type = (DatasetType) types.get(0);
         String name = type.getName();
 
-        User user = userDao.get("emf");
+        User user = userDao.get("emf", session);
 
         DatasetType modified1 = dao.getDatasetTypeLock(user, type, session);
         assertEquals(modified1.getUsername(), user.getFullName());
