@@ -46,6 +46,51 @@ public class UsersDaoTest extends HibernateTestCase {
         }
     }
 
+    public void testShouldGetSpecificUser() throws Exception {
+        UsersDao dao = new UsersDao();
+
+        User user = new User();
+        user.setUsername("user-dao-test");
+        user.setPassword("abc12345");
+        user.setFullName("user dao");
+        user.setAffiliation("test");
+        user.setPhone("123-123-1234");
+        user.setEmail("email@user-test.test");
+
+        dao.add(user, session);
+
+        // test
+        User loaded = dao.get(user.getUsername(), session);
+
+        // assert
+        try {
+            assertEquals(user.getUsername(), loaded.getUsername());
+            assertEquals(user.getFullName(), loaded.getFullName());
+        } finally {
+            remove(loaded);
+        }
+    }
+
+    public void testShouldVerifyIfUserAlreadyExists() throws Exception {
+        UsersDao dao = new UsersDao();
+
+        User user = new User();
+        user.setUsername("user-dao-test");
+        user.setPassword("abc12345");
+        user.setFullName("user dao");
+        user.setAffiliation("test");
+        user.setPhone("123-123-1234");
+        user.setEmail("email@user-test.test");
+
+        dao.add(user, session);
+
+        try {
+            assertTrue("Should contain the added user", dao.contains(user.getUsername(), session));
+        } finally {
+            remove(user);
+        }
+    }
+
     public void testShouldRemoveUser() throws Exception {
         UsersDao dao = new UsersDao();
 

@@ -68,7 +68,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
     }
 
     public void testShouldGetSectorLock() throws EmfException {
-        User user = userDao.getUser("emf");
+        User user = userDao.get("emf");
         List sectors = dao.getSectors(session);
         Sector sector = (Sector) sectors.get(0);
 
@@ -80,7 +80,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
     }
 
     public void testShouldGetDatasetTypeLock() throws EmfException {
-        User user = userDao.getUser("emf");
+        User user = userDao.get("emf");
         List types = dao.getDatasetTypes(session);
         DatasetType type = (DatasetType) types.get(0);
 
@@ -92,20 +92,20 @@ public class DataCommonsDaoTest extends ServicesTestCase {
     }
 
     public void testShouldFailToGetLockWhenAlreadyLockedByAnotherUser() throws EmfException {
-        User emfUser = userDao.getUser("emf");
+        User emfUser = userDao.get("emf");
         List sectors = dao.getSectors(session);
         Sector sector = (Sector) sectors.get(0);
 
         dao.getSectorLock(emfUser, sector, session);
 
-        User adminUser = userDao.getUser("admin");
+        User adminUser = userDao.get("admin");
         Sector result = dao.getSectorLock(adminUser, sector, session);
 
         assertTrue(result.isLocked(emfUser));// failed to obtain lock for Admin
     }
 
     public void testShouldReleaseSectorLock() throws EmfException {
-        User user = userDao.getUser("emf");
+        User user = userDao.get("emf");
         List sectors = dao.getSectors(session);
         Sector sector = (Sector) sectors.get(0);
 
@@ -118,7 +118,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
     }
 
     public void testShouldReleaseDatasetTypeLock() throws EmfException {
-        User user = userDao.getUser("emf");
+        User user = userDao.get("emf");
         List list = dao.getDatasetTypes(session);
         DatasetType type = (DatasetType) list.get(0);
 
@@ -149,7 +149,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         Sector sector = (Sector) sectors.get(0);
         String name = sector.getName();
 
-        User user = userDao.getUser("emf");
+        User user = userDao.get("emf");
 
         Sector modifiedSector1 = dao.getSectorLock(user, sector, session);
         assertEquals(modifiedSector1.getUsername(), user.getFullName());
@@ -172,7 +172,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         DatasetType type = (DatasetType) types.get(0);
         String name = type.getName();
 
-        User user = userDao.getUser("emf");
+        User user = userDao.get("emf");
 
         DatasetType modified1 = dao.getDatasetTypeLock(user, type, session);
         assertEquals(modified1.getUsername(), user.getFullName());

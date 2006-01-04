@@ -38,7 +38,7 @@ public class UserManagerDAO {
         conn = datasource.getConnection();
     }
 
-    public boolean isNewUser(String userName) throws InfrastructureException {
+    public boolean contains(String userName) throws InfrastructureException {
         boolean newuser = true;
         try {
             PreparedStatement selectStmt = conn.prepareStatement(GET_USER_QUERY);
@@ -59,7 +59,7 @@ public class UserManagerDAO {
         return newuser;
     }
 
-    public User getUser(String userName) throws EmfException {
+    public User get(String userName) throws EmfException {
         try {
             PreparedStatement selectStmt = conn.prepareStatement(GET_USER_QUERY);
             selectStmt.setString(1, userName);
@@ -100,7 +100,7 @@ public class UserManagerDAO {
         return user;
     }
 
-    public List getUsers() throws EmfException {
+    public List all() throws EmfException {
         log.debug("In getUsers");
 
         ArrayList users = new ArrayList();
@@ -134,7 +134,7 @@ public class UserManagerDAO {
         return users;
     }
 
-    public void deleteUser(String userName) throws InfrastructureException {
+    public void remove(String userName) throws InfrastructureException {
         log.debug("Begin delete user");
         try {
             PreparedStatement deleteStmt = conn.prepareStatement(DELETE_USER_QUERY);
@@ -154,7 +154,7 @@ public class UserManagerDAO {
         log.debug("End delete user");
     }
 
-    public void updateUser(User user) throws InfrastructureException {
+    public void update(User user) throws InfrastructureException {
         log.debug("Begin update user");
         try {
             PreparedStatement updateStmt = conn.prepareStatement(UPDATE_USER_QUERY);
@@ -182,7 +182,7 @@ public class UserManagerDAO {
         log.debug("End update user");
     }
 
-    public void insertUser(User user) throws InfrastructureException {
+    public void add(User user) throws InfrastructureException {
         log.debug("Begin insert user");
         try {
             PreparedStatement insertStmt = conn.prepareStatement(INSERT_USER_QUERY);
