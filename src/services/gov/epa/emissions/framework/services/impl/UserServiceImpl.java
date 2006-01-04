@@ -95,9 +95,9 @@ public class UserServiceImpl extends EmfServiceImpl implements UserService {
         }
     }
 
-    public void deleteUser(String userName) throws EmfException {
+    public void deleteUser(User user) throws EmfException {
         try {
-            dao.remove(userName);
+            dao.remove(user.getUsername());
         } catch (InfrastructureException ex) {
             throw new EmfException(ex.getMessage());
         }

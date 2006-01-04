@@ -21,8 +21,8 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
     protected void setUp() {
         layoutManager = mock(ViewLayout.class);
         Mock userServices = mock(UserService.class);
-        presenter = new UsersManagerPresenter(null, (UserService) userServices.proxy(),
-                (ViewLayout) layoutManager.proxy());
+        presenter = new UsersManagerPresenter(null, (UserService) userServices.proxy(), (ViewLayout) layoutManager
+                .proxy());
 
         view = mock(UsersManagerView.class);
 
@@ -40,7 +40,6 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
 
     public void testShouldDeleteUserOnNotifyDelete() throws Exception {
         Mock userServices = mock(UserService.class);
-        userServices.expects(once()).method("deleteUser").with(eq("matts"));
 
         User user = new User();
         user.setUsername("joe");
@@ -55,6 +54,9 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
 
         User matts = new User();
         matts.setUsername("matts");
+
+        userServices.expects(once()).method("deleteUser").with(same(matts));
+
         presenter.doDelete(new User[] { matts });
     }
 

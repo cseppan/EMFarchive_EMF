@@ -8,17 +8,16 @@ import gov.epa.emissions.framework.EmfException;
  */
 public interface UserService extends EMFService {
 
-    public void authenticate(String username, String password) throws EmfException;
+    void authenticate(String username, String password) throws EmfException;
 
-    public User getUser(String userName) throws EmfException;
+    User getUser(String username) throws EmfException;
 
-    public User[] getUsers() throws EmfException;
+    User[] getUsers() throws EmfException;
 
-    public void createUser(User newUser) throws EmfException;
+    void createUser(User user) throws EmfException;
 
-    public void updateUser(User newUser) throws EmfException;
+    void updateUser(User user) throws EmfException;
 
-    // FIXME: should use a User object instead
-    public void deleteUser(String userName) throws EmfException;
+    void deleteUser(User user) throws EmfException;
 
 }

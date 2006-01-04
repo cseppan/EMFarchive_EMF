@@ -93,20 +93,20 @@ public class UserServiceTransport implements UserService {
         }
     }
 
-    public void deleteUser(String username) throws EmfException {
+    public void deleteUser(User user) throws EmfException {
         try {
             Call call = callFactory.createCall();
 
             mappings.register(call);
             mappings.setOperation(call, "deleteUser");
-            mappings.addStringParam(call, "username");
+            mappings.addParam(call, "user", mappings.user());
             mappings.setVoidReturnType(call);
 
-            call.invoke(new Object[] { username });
+            call.invoke(new Object[] { user });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not delete user: " + username, fault);
+            throwExceptionOnAxisFault("Could not delete user: " + user.getUsername(), fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not delete user: " + username, e);
+            throwExceptionDueToServiceErrors("Could not delete user: " + user.getUsername(), e);
         }
     }
 

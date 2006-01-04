@@ -64,7 +64,7 @@ public class UsersManagerPresenter {
         if (user.getUsername().equals(userToDelete.getUsername()))
             throw new EmfException("Cannot delete yourself - '" + userToDelete.getUsername() + "'");
 
-        userServices.deleteUser(userToDelete.getUsername());
+        userServices.deleteUser(userToDelete);
     }
 
     public void doRegisterNewUser(RegisterUserDesktopView registerUserView) {
