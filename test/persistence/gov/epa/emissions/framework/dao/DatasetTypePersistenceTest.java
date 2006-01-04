@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services;
+package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.commons.db.PostgresDbUpdate;
 import gov.epa.emissions.commons.io.DatasetType;
@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class DatasetTypePersistenceTest extends HibernateTestCase {
@@ -21,6 +20,8 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
 
     protected void doTearDown() throws Exception {
         drop("NAME");
+
+        super.doTearDown();
     }
 
     public void testVerifySimplePropertiesAreStored() throws Exception {
@@ -50,7 +51,7 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
         assertEquals("key2", loadedType.getKeywords()[1].getName());
     }
 
-    public void FIXME_testVerifyUpdatedKeywordIsStored() throws Exception {
+    public void testVerifyUpdatedKeywordIsStored() throws Exception {
         DatasetType type = new DatasetType();
         type.setDescription("TEST");
         type.setName("NAME");
@@ -73,14 +74,9 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
     }
 
     private DatasetType load(String name) {
-        Session session = session();
-        try {
-            Query query = session.createQuery("SELECT type FROM DatasetType AS type WHERE name='" + name + "'");
-            List list = query.list();
-            return list.size() == 1 ? (DatasetType) list.get(0) : null;
-        } finally {
-            session.close();
-        }
+        Query query = session.createQuery("SELECT type FROM DatasetType AS type WHERE name='" + name + "'");
+        List list = query.list();
+        return list.size() == 1 ? (DatasetType) list.get(0) : null;
     }
 
     private void drop(String name) {
@@ -95,7 +91,6 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
 
     private void save(DatasetType type) {
         Transaction tx = null;
-        Session session = session();
         try {
             tx = session.beginTransaction();
             session.save(type);
@@ -103,14 +98,11 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
         } catch (HibernateException e) {
             tx.rollback();
             throw e;
-        } finally {
-            session.close();
         }
     }
 
     private void update(DatasetType type) {
         Transaction tx = null;
-        Session session = session();
         try {
             tx = session.beginTransaction();
             session.update(type);
@@ -118,8 +110,6 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
         } catch (HibernateException e) {
             tx.rollback();
             throw e;
-        } finally {
-            session.close();
         }
     }
 

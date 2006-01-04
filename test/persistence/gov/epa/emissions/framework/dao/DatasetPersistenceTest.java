@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services;
+package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.PostgresDbUpdate;
@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.HibernateTestCase;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.util.Date;
 import java.util.List;
@@ -14,7 +15,6 @@ import java.util.Random;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class DatasetPersistenceTest extends HibernateTestCase {
@@ -32,6 +32,8 @@ public class DatasetPersistenceTest extends HibernateTestCase {
 
         ExImDbUpdate eximUpdate = new ExImDbUpdate();
         eximUpdate.deleteAllDatasets();
+
+        super.doTearDown();
     }
 
     public void testVerifySimplePropertiesAreStored() throws Exception {
@@ -68,19 +70,13 @@ public class DatasetPersistenceTest extends HibernateTestCase {
     }
 
     private DatasetType load(String name) {
-        Session session = session();
-        try {
-            Query query = session.createQuery("SELECT type FROM DatasetType AS type WHERE name='" + name + "'");
-            List list = query.list();
-            return list.size() == 1 ? (DatasetType) list.get(0) : null;
-        } finally {
-            session.close();
-        }
+        Query query = session.createQuery("SELECT type FROM DatasetType AS type WHERE name='" + name + "'");
+        List list = query.list();
+        return list.size() == 1 ? (DatasetType) list.get(0) : null;
     }
 
     private void save(Object element) {
         Transaction tx = null;
-        Session session = session();
         try {
             tx = session.beginTransaction();
             session.save(element);
@@ -88,14 +84,11 @@ public class DatasetPersistenceTest extends HibernateTestCase {
         } catch (HibernateException e) {
             tx.rollback();
             throw e;
-        } finally {
-            session.close();
         }
     }
 
     private void update(Object element) {
         Transaction tx = null;
-        Session session = session();
         try {
             tx = session.beginTransaction();
             session.update(element);
@@ -103,8 +96,6 @@ public class DatasetPersistenceTest extends HibernateTestCase {
         } catch (HibernateException e) {
             tx.rollback();
             throw e;
-        } finally {
-            session.close();
         }
     }
 

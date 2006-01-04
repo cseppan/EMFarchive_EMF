@@ -20,6 +20,7 @@
         <property name="hibernate.generate_statistics">false</property>
 
 		<!-- Mappings -->
+    	<mapping resource="gov/epa/emissions/framework/services/impl/User.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/impl/Status.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/impl/Sector.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/impl/Country.hbm.xml"/>

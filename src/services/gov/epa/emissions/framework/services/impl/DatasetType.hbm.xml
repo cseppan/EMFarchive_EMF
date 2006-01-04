@@ -12,7 +12,7 @@
 	<property name="description"	column="description" 	type="java.lang.String"	not-null="true"/>
 	<property name="minfiles"		column="minfiles" 		type="integer"			not-null="true"	length="4"/>
 	<property name="maxfiles"		column="maxfiles" 		type="integer"			not-null="true"	length="4"/>
-	<property name="external"		column="external" 	    type="boolean"			not-null="true"	length="4"/>
+	<property name="external"		column="external" 	    type="boolean"			not-null="true"/>
 	<property name="importerClassName"	column="importer_class_name" 	type="java.lang.String"	not-null="false"/>
 	<property name="exporterClassName"	column="exporter_class_name" 	type="java.lang.String"	not-null="false"/>
 	<property name="username" 	column="username"	type="java.lang.String"		not-null="false"/>

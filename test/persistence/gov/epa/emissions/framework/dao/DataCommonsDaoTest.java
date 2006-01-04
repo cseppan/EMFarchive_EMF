@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services;
+package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Sector;
