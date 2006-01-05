@@ -135,7 +135,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         try {
             dao.releaseLockedSector(sector, session);
         } catch (EmfException e) {
-            assertEquals("Cannot update without owning lock", e.getMessage());
+            assertEquals("Cannot release without owning lock", e.getMessage());
             return;
         }
 

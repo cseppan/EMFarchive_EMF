@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.HibernateTestCase;
 
 import java.util.Iterator;
@@ -11,28 +12,29 @@ import org.hibernate.Transaction;
 
 public class UserDaoTest extends HibernateTestCase {
 
-    protected void doTearDown() throws Exception {// no op
+    private UserDao dao;
+
+    private User user;
+
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        dao = new UserDao();
+        user = newUser(dao);
+    }
+
+    protected void doTearDown() throws Exception {
+        remove(user);
     }
 
     public void testShouldFetchAllUsers() {
-        UserDao dao = new UserDao();
-
         List users = dao.getAll(session);
         assertTrue("Should contain at least 2 users", users.size() >= 2);
     }
 
     public void testShouldAddUser() throws Exception {
-        UserDao dao = new UserDao();
-
         List usersBeforeAdd = dao.getAll(session);
-
-        User user = new User();
-        user.setUsername("user-dao-test");
-        user.setPassword("abc12345");
-        user.setFullName("user dao");
-        user.setAffiliation("test");
-        user.setPhone("123-123-1234");
-        user.setEmail("email@user-test.test");
+        User user = newUser("add-user", dao);
 
         // test
         dao.add(user, session);
@@ -47,86 +49,33 @@ public class UserDaoTest extends HibernateTestCase {
     }
 
     public void testShouldGetSpecificUser() throws Exception {
-        UserDao dao = new UserDao();
-
-        User user = new User();
-        user.setUsername("user-dao-test");
-        user.setPassword("abc12345");
-        user.setFullName("user dao");
-        user.setAffiliation("test");
-        user.setPhone("123-123-1234");
-        user.setEmail("email@user-test.test");
-
-        dao.add(user, session);
-
         // test
         User loaded = dao.get(user.getUsername(), session);
 
         // assert
-        try {
-            assertEquals(user.getUsername(), loaded.getUsername());
-            assertEquals(user.getFullName(), loaded.getFullName());
-        } finally {
-            remove(loaded);
-        }
+        assertEquals(user.getUsername(), loaded.getUsername());
+        assertEquals(user.getFullName(), loaded.getFullName());
     }
 
     public void testShouldVerifyIfUserAlreadyExists() throws Exception {
-        UserDao dao = new UserDao();
-
-        User user = new User();
-        user.setUsername("user-dao-test");
-        user.setPassword("abc12345");
-        user.setFullName("user dao");
-        user.setAffiliation("test");
-        user.setPhone("123-123-1234");
-        user.setEmail("email@user-test.test");
-
-        dao.add(user, session);
-
-        try {
-            assertTrue("Should contain the added user", dao.contains(user.getUsername(), session));
-        } finally {
-            remove(user);
-        }
+        assertTrue("Should contain the added user", dao.contains(user.getUsername(), session));
     }
 
     public void testShouldRemoveUser() throws Exception {
-        UserDao dao = new UserDao();
-
-        List usersBeforeAdd = dao.getAll(session);
-
-        User user = new User();
-        user.setUsername("user-dao-test");
-        user.setPassword("abc12345");
-        user.setFullName("user dao");
-        user.setAffiliation("test");
-        user.setPhone("123-123-1234");
-        user.setEmail("email@user-test.test");
-
-        dao.add(user, session);
-
+        List usersBeforeRemove = dao.getAll(session);
         // test
         dao.remove(user, session);
 
         // assert
-        List usersAfterRemove = dao.getAll(session);
-        assertEquals(usersBeforeAdd.size(), usersAfterRemove.size());
+        try {
+            List usersAfterRemove = dao.getAll(session);
+            assertEquals(usersBeforeRemove.size(), usersAfterRemove.size() + 1);
+        } finally {
+            user = newUser(dao);// restore
+        }
     }
 
     public void testShouldUpdateUser() throws Exception {
-        UserDao dao = new UserDao();
-
-        User user = new User();
-        user.setUsername("user-dao-test");
-        user.setPassword("abc12345");
-        user.setFullName("user dao");
-        user.setAffiliation("test");
-        user.setPhone("123-123-1234");
-        user.setEmail("email@user-test.test");
-
-        dao.add(user, session);
-
         // test
         User added = user(user.getUsername());
         added.setFullName("updated name");
@@ -134,24 +83,70 @@ public class UserDaoTest extends HibernateTestCase {
         dao.update(added, session);
 
         // assert
-        try {
-            User updated = user(user.getUsername());
-            assertEquals("updated name", updated.getFullName());
-        } finally {
-            remove(added);
-        }
+        User updated = user(user.getUsername());
+        assertEquals("updated name", updated.getFullName());
     }
 
-    public void testShouldGetLockForEditing() {
-        UserDao dao = new UserDao();
+    public void testShouldObtainLockedUser() {
         User lockOwner = dao.get("admin", session);
-        User user = dao.get("emf", session);
 
         User lockedUser = dao.obtainLocked(lockOwner, user, session);
         assertEquals(lockedUser.getFullName(), user.getFullName());
 
         User userLoadedFromDb = user(lockedUser.getUsername());
         assertEquals(userLoadedFromDb.getFullName(), user.getFullName());
+    }
+
+    public void testShouldUpdateLockedUser() throws Exception {
+        User emf = dao.get("emf", session);
+
+        User modified1 = dao.obtainLocked(emf, user, session);
+        assertEquals(modified1.getLockOwner(), emf.getUsername());
+        modified1.setFullName("TEST");
+
+        User modified2 = dao.updateLocked(modified1, session);
+        assertEquals("TEST", modified1.getFullName());
+        assertEquals(modified2.getLockOwner(), null);
+    }
+
+    public void testShouldReleaseLockOnReleaseLockedUser() throws Exception {
+        User emf = dao.get("emf", session);
+
+        User locked = dao.obtainLocked(emf, user, session);
+        User released = dao.releaseLocked(locked, session);
+        assertFalse("Should have released lock", released.isLocked());
+
+        User loadedFromDb = user(user.getUsername());
+        assertFalse("Should have released lock", loadedFromDb.isLocked());
+    }
+
+    public void testShouldFailToReleaseSectorLockIfNotObtained() {
+        try {
+            dao.releaseLocked(user, session);
+        } catch (EmfException e) {
+            assertEquals("Cannot release without owning lock", e.getMessage());
+            return;
+        }
+
+        fail("Should have failed to release lock that was not obtained");
+    }
+
+    private User newUser(UserDao dao) {
+        return newUser("user-dao-test", dao);
+    }
+
+    private User newUser(String username, UserDao dao) {
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword("abc12345");
+        user.setFullName("user dao");
+        user.setAffiliation("test");
+        user.setPhone("123-123-1234");
+        user.setEmail("email@user-test.test");
+
+        dao.add(user, session);
+
+        return user(user.getUsername());
     }
 
     private User user(String username) {

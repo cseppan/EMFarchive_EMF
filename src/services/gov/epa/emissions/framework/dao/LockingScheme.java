@@ -84,7 +84,7 @@ public class LockingScheme {
 
     private Lockable releaseLock(Lockable current, Session session) throws EmfException {
         if (!current.isLocked())
-            throw new EmfException("Cannot update without owning lock");
+            throw new EmfException("Cannot release without owning lock");
 
         Transaction tx = session.beginTransaction();
         try {

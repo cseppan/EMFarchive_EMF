@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfException;
 
 import java.util.List;
 
@@ -88,5 +89,13 @@ public class UserDao {
 
     public User obtainLocked(User lockOwner, User user, Session session) {
         return (User) lockingScheme.getLocked(lockOwner, user, session, getAll(session));
+    }
+
+    public User updateLocked(User locked, Session session) throws EmfException {
+        return (User) lockingScheme.update(locked, session, getAll(session));
+    }
+
+    public User releaseLocked(User locked, Session session) throws EmfException {
+        return (User) lockingScheme.releaseLock(locked, session, getAll(session));
     }
 }
