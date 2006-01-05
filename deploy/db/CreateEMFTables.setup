@@ -24,6 +24,8 @@ CREATE TABLE emf.users
   emailaddr varchar(255) NOT NULL,
   inadmingrp bool NOT NULL DEFAULT false,
   acctdisabled bool NOT NULL DEFAULT false,
+  lock_owner varchar(255),  
+  lock_date timestamp,
   CONSTRAINT users_pkey PRIMARY KEY (id),
   CONSTRAINT users_username_key UNIQUE (user_name)
 ) 
@@ -65,7 +67,7 @@ CREATE TABLE emf.sectors
   id int4 NOT NULL DEFAULT nextval('emf.sectors_id_seq'::text),
   name varchar(255) NOT NULL,
   description text,
-  username varchar(255),
+  lock_owner varchar(255),
   lock_date timestamp,
   CONSTRAINT sectors_id_key UNIQUE (id),
   CONSTRAINT sectors_pk PRIMARY KEY (id)
@@ -138,7 +140,7 @@ CREATE TABLE emf.dataset_types
   "external" bool NOT NULL DEFAULT false,
   importer_class_name varchar(255),
   exporter_class_name varchar(255),
-  username varchar(255),
+  lock_owner varchar(255),
   lock_date timestamp,
   CONSTRAINT dataset_types_pkey PRIMARY KEY (dataset_type_id),
   CONSTRAINT dataset_types_dataset_type_id_key UNIQUE (dataset_type_id)

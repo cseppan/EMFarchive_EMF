@@ -4,24 +4,24 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false"> 
-  <class name="gov.epa.emissions.commons.io.Sector" table="sectors"> 
- 	<id name="id" type="long" column="id">
-	  <generator class="identity"/>
- 	</id>
-	<property name="name"			column="name"			type="java.lang.String"		not-null="true"/>
-	<property name="description" 	column="description"	type="java.lang.String"		not-null="false"/>
-	<property name="username" 	column="username"	type="java.lang.String"		not-null="false"/>
-    <property name="lockDate"		column="lock_date" 	type="java.util.Date"		not-null="false"	length="4"/>        
-	
-	<array name="sectorCriteria" table="sectorcriteria">
-    <key column="sector_id"/>
-    <list-index column="list_index"/>
-    <composite-element class="gov.epa.emissions.commons.io.SectorCriteria">
-		<property name="type"		column="type" 		not-null="true"/>
-		<property name="criteria"	column="criteria" 	not-null="true"/>
-    </composite-element>
-  </array>
-	
-  </class> 
+    <class name="gov.epa.emissions.commons.io.Sector" table="sectors">
+        <id name="id" type="long" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="name" column="name" type="java.lang.String" not-null="true"/>
+        <property name="description" column="description" type="java.lang.String" not-null="false"/>
+        <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
+        <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
+        
+        <array name="sectorCriteria" table="sectorcriteria">
+            <key column="sector_id"/>
+            <list-index column="list_index"/>
+            <composite-element class="gov.epa.emissions.commons.io.SectorCriteria">
+                <property name="type" column="type" not-null="true"/>
+                <property name="criteria" column="criteria" not-null="true"/>
+            </composite-element>
+        </array>
+        
+    </class>
 </hibernate-mapping>  
 

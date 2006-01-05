@@ -48,11 +48,11 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         Sector sector = sectors[0];
 
         Sector lockedSector = service.getSectorLock(user, sector);
-        assertEquals(lockedSector.getUsername(), user.getFullName());
+        assertEquals(lockedSector.getLockOwner(), user.getFullName());
 
         // Sector object returned directly from the sector table
         Sector sectorLoadedFromDb = currentSector(sector);
-        assertEquals(sectorLoadedFromDb.getUsername(), user.getFullName());
+        assertEquals(sectorLoadedFromDb.getLockOwner(), user.getFullName());
     }
 
     public void testShouldGetLockOnDatasetType() throws EmfException {
@@ -61,11 +61,11 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         DatasetType type = list[0];
 
         DatasetType locked = service.getDatasetTypeLock(user, type);
-        assertEquals(locked.getUsername(), user.getFullName());
+        assertEquals(locked.getLockOwner(), user.getFullName());
 
         // Sector object returned directly from the sector table
         DatasetType loadedFromDb = currentDatasetType(type);
-        assertEquals(loadedFromDb.getUsername(), user.getFullName());
+        assertEquals(loadedFromDb.getLockOwner(), user.getFullName());
     }
 
     public void testShouldReleaseSectorLock() throws EmfException {
@@ -102,12 +102,12 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         String name = sector.getName();
 
         Sector modifiedSector1 = service.getSectorLock(user, sector);
-        assertEquals(modifiedSector1.getUsername(), user.getFullName());
+        assertEquals(modifiedSector1.getLockOwner(), user.getFullName());
         modifiedSector1.setName("TEST");
 
         Sector modifiedSector2 = service.updateSector(user, modifiedSector1);
         assertEquals("TEST", modifiedSector2.getName());
-        assertEquals(modifiedSector2.getUsername(), null);
+        assertEquals(modifiedSector2.getLockOwner(), null);
 
         // restore
         Sector modifiedSector = service.getSectorLock(user, sector);
@@ -124,12 +124,12 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         String name = type.getName();
 
         DatasetType modified1 = service.getDatasetTypeLock(user, type);
-        assertEquals(modified1.getUsername(), user.getFullName());
+        assertEquals(modified1.getLockOwner(), user.getFullName());
         modified1.setName("TEST");
 
         DatasetType modified2 = service.updateDatasetType(user, modified1);
         assertEquals("TEST", modified2.getName());
-        assertEquals(modified2.getUsername(), null);
+        assertEquals(modified2.getLockOwner(), null);
 
         // restore
         DatasetType modified = service.getDatasetTypeLock(user, type);

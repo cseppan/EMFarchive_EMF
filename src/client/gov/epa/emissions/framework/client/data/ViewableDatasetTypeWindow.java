@@ -71,7 +71,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
             return "";
 
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
-        return "Locked by " + type.getUsername() + " at " + dateFormat.format(type.getLockDate());
+        return "Locked by " + type.getLockOwner() + " at " + dateFormat.format(type.getLockDate());
     }
 
     private JPanel createBasicDataPanel(DatasetType type) {

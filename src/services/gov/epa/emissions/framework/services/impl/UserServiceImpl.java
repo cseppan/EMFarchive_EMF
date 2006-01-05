@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.services.impl;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.AuthenticationException;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.dao.UsersDao;
+import gov.epa.emissions.framework.dao.UserDao;
 import gov.epa.emissions.framework.services.UserService;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class UserServiceImpl implements UserService {
 
     private HibernateSessionFactory sessionFactory;
 
-    private UsersDao dao;
+    private UserDao dao;
 
     public UserServiceImpl() {
         this(HibernateSessionFactory.get());
@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     public UserServiceImpl(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-        dao = new UsersDao();
+        dao = new UserDao();
     }
 
     public void authenticate(String username, String password) throws EmfException {

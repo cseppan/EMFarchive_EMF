@@ -4,25 +4,25 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false">
-  <class name="gov.epa.emissions.commons.io.DatasetType" table="dataset_types">
- 	<id name="datasettypeid" type="long" column="dataset_type_id">
-	  <generator class="identity"/>
- 	</id>
-	<property name="name"			column="name"			type="java.lang.String"	not-null="true"	length="255"/>
-	<property name="description"	column="description" 	type="java.lang.String"	not-null="true"/>
-	<property name="minfiles"		column="minfiles" 		type="integer"			not-null="true"	length="4"/>
-	<property name="maxfiles"		column="maxfiles" 		type="integer"			not-null="true"	length="4"/>
-	<property name="external"		column="external" 	    type="boolean"			not-null="true"/>
-	<property name="importerClassName"	column="importer_class_name" 	type="java.lang.String"	not-null="false"/>
-	<property name="exporterClassName"	column="exporter_class_name" 	type="java.lang.String"	not-null="false"/>
-	<property name="username" 	column="username"	type="java.lang.String"		not-null="false"/>
-    <property name="lockDate"		column="lock_date" 	type="java.util.Date"		not-null="false"	length="4"/>        
-
-	<array name="keywords" table="dataset_types_keywords" cascade="save-update">
-      <key column="dataset_type_id" not-null="true"/>
-      <list-index column="list_index"/>
-	  <many-to-many class="gov.epa.emissions.commons.io.Keyword" column="keyword_id"/>
-  	</array>
-	
-  </class> 
+    <class name="gov.epa.emissions.commons.io.DatasetType" table="dataset_types">
+        <id name="datasettypeid" type="long" column="dataset_type_id">
+            <generator class="identity"/>
+        </id>
+        <property name="name" column="name" type="java.lang.String" not-null="true" length="255"/>
+        <property name="description" column="description" type="java.lang.String" not-null="true"/>
+        <property name="minfiles" column="minfiles" type="integer" not-null="true" length="4"/>
+        <property name="maxfiles" column="maxfiles" type="integer" not-null="true" length="4"/>
+        <property name="external" column="external" type="boolean" not-null="true"/>
+        <property name="importerClassName" column="importer_class_name" type="java.lang.String" not-null="false"/>
+        <property name="exporterClassName" column="exporter_class_name" type="java.lang.String" not-null="false"/>
+        <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
+        <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
+        
+        <array name="keywords" table="dataset_types_keywords" cascade="save-update">
+            <key column="dataset_type_id" not-null="true"/>
+            <list-index column="list_index"/>
+            <many-to-many class="gov.epa.emissions.commons.io.Keyword" column="keyword_id"/>
+        </array>
+        
+    </class>
 </hibernate-mapping>

@@ -10,7 +10,13 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class UsersDao {
+public class UserDao {
+
+    private LockingScheme lockingScheme;
+
+    public UserDao() {
+        lockingScheme = new LockingScheme();
+    }
 
     public List getAll(Session session) {
         Transaction tx = null;
@@ -78,5 +84,9 @@ public class UsersDao {
 
     public boolean contains(String username, Session session) {
         return get(username, session) != null;
+    }
+
+    public User getEditable(User lockOwner, User user, Session session) {
+        return (User) lockingScheme.getLock(lockOwner, user, session, getAll(session));
     }
 }

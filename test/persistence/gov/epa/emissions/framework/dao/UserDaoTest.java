@@ -9,20 +9,20 @@ import java.util.List;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 
-public class UsersDaoTest extends HibernateTestCase {
+public class UserDaoTest extends HibernateTestCase {
 
     protected void doTearDown() throws Exception {// no op
     }
 
     public void testShouldFetchAllUsers() {
-        UsersDao dao = new UsersDao();
+        UserDao dao = new UserDao();
 
         List users = dao.getAll(session);
         assertTrue("Should contain at least 2 users", users.size() >= 2);
     }
 
     public void testShouldAddUser() throws Exception {
-        UsersDao dao = new UsersDao();
+        UserDao dao = new UserDao();
 
         List usersBeforeAdd = dao.getAll(session);
 
@@ -47,7 +47,7 @@ public class UsersDaoTest extends HibernateTestCase {
     }
 
     public void testShouldGetSpecificUser() throws Exception {
-        UsersDao dao = new UsersDao();
+        UserDao dao = new UserDao();
 
         User user = new User();
         user.setUsername("user-dao-test");
@@ -72,7 +72,7 @@ public class UsersDaoTest extends HibernateTestCase {
     }
 
     public void testShouldVerifyIfUserAlreadyExists() throws Exception {
-        UsersDao dao = new UsersDao();
+        UserDao dao = new UserDao();
 
         User user = new User();
         user.setUsername("user-dao-test");
@@ -92,7 +92,7 @@ public class UsersDaoTest extends HibernateTestCase {
     }
 
     public void testShouldRemoveUser() throws Exception {
-        UsersDao dao = new UsersDao();
+        UserDao dao = new UserDao();
 
         List usersBeforeAdd = dao.getAll(session);
 
@@ -115,7 +115,7 @@ public class UsersDaoTest extends HibernateTestCase {
     }
 
     public void testShouldUpdateUser() throws Exception {
-        UsersDao dao = new UsersDao();
+        UserDao dao = new UserDao();
 
         User user = new User();
         user.setUsername("user-dao-test");
@@ -140,6 +140,18 @@ public class UsersDaoTest extends HibernateTestCase {
         } finally {
             remove(added);
         }
+    }
+
+    public void testShouldGetLockForEditing() {
+        UserDao dao = new UserDao();
+        User lockOwner = dao.get("admin", session);
+        User user = dao.get("emf", session);
+
+        User lockedUser = dao.getEditable(lockOwner, user, session);
+        assertEquals(lockedUser.getFullName(), user.getFullName());
+
+        User userLoadedFromDb = user(lockedUser.getUsername());
+        assertEquals(userLoadedFromDb.getFullName(), user.getFullName());
     }
 
     private User user(String username) {

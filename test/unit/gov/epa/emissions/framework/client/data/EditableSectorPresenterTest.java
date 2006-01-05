@@ -19,7 +19,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
 
         User user = new User();
         user.setFullName("name");
-        sector.setUsername(user.getFullName());
+        sector.setLockOwner(user.getFullName());
         sector.setLockDate(new Date());
 
         Mock service = mock(DataCommonsService.class);

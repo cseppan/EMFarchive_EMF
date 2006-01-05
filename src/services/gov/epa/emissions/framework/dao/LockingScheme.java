@@ -45,7 +45,7 @@ public class LockingScheme {
 
         long elapsed = new Date().getTime() - current.getLockDate().getTime();
 
-        if ((user.getFullName().equals(current.getUsername())) || (elapsed > DEFAULT_TIMEOUT)) {
+        if ((user.getFullName().equals(current.getLockOwner())) || (elapsed > DEFAULT_TIMEOUT)) {
             grabLock(user, current, session);
         }
 
@@ -63,7 +63,7 @@ public class LockingScheme {
     }
 
     private void grabLock(User user, Lockable lockable, Session session) {
-        lockable.setUsername(user.getFullName());
+        lockable.setLockOwner(user.getFullName());
         lockable.setLockDate(new Date());
 
         Transaction tx = session.beginTransaction();
@@ -88,7 +88,7 @@ public class LockingScheme {
 
         Transaction tx = session.beginTransaction();
         try {
-            current.setUsername(null);
+            current.setLockOwner(null);
             current.setLockDate(null);
             session.update(current);
 

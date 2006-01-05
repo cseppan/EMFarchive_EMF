@@ -20,7 +20,7 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
 
         User user = new User();
         user.setFullName("name");
-        type.setUsername(user.getFullName());
+        type.setLockOwner(user.getFullName());
         type.setLockDate(new Date());
 
         Mock service = mock(DataCommonsService.class);

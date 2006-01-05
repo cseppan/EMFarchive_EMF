@@ -71,7 +71,7 @@ public class DisplaySectorWindow extends DisposableInteralFrame implements Viewa
             return "";
 
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
-        return "Locked by " + sector.getUsername() + " at " + dateFormat.format(sector.getLockDate());
+        return "Locked by " + sector.getLockOwner() + " at " + dateFormat.format(sector.getLockDate());
     }
 
     private JPanel createBasicDataPanel(Sector sector) {
