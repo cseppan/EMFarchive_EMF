@@ -17,7 +17,7 @@ import org.hibernate.Transaction;
 public class LockingScheme {
     private static Log log = LogFactory.getLog(LockingScheme.class);
 
-    public static final long DEFAULT_TIMEOUT = 12 * 60 * 60 * 1000;
+    public static final long DEFAULT_TIMEOUT = 12 * 60 * 60 * 1000;// i.e. 12 hrs
 
     /**
      * This method will check if the current sector record has a lock. If it does it will return the sector object with
@@ -32,12 +32,12 @@ public class LockingScheme {
      * will display the Full Name of the user who has the lock and the date the lock was acquired.
      * 
      */
-    public Lockable getLock(User user, Lockable target, Session session, List all) {
+    public Lockable getLocked(User user, Lockable target, Session session, List all) {
         Lockable current = current(target, all);
-        return getLocked(user, session, current);
+        return getLocked(user, current, session);
     }
 
-    private Lockable getLocked(User user, Session session, Lockable current) {
+    private Lockable getLocked(User user, Lockable current, Session session) {
         if (!current.isLocked()) {
             grabLock(user, current, session);
             return current;
@@ -63,7 +63,7 @@ public class LockingScheme {
     }
 
     private void grabLock(User user, Lockable lockable, Session session) {
-        lockable.setLockOwner(user.getFullName());
+        lockable.setLockOwner(user.getUsername());
         lockable.setLockDate(new Date());
 
         Transaction tx = session.beginTransaction();
@@ -102,9 +102,9 @@ public class LockingScheme {
         return current;
     }
 
-    public Lockable update(User user, Lockable target, Session session, List all) throws EmfException {
+    public Lockable update(Lockable target, Session session, List all) throws EmfException {
         Lockable current = current(target, all);
-        if (!current.isLocked(user))
+        if (!current.isLocked(target.getLockOwner()))
             throw new EmfException("Cannot update without owning lock");
 
         session.clear();// clear 'loaded' locked object - to make way for updated object

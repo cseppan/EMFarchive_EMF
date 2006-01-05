@@ -48,11 +48,11 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         Sector sector = sectors[0];
 
         Sector lockedSector = service.getSectorLock(user, sector);
-        assertEquals(lockedSector.getLockOwner(), user.getFullName());
+        assertEquals(lockedSector.getLockOwner(), user.getUsername());
 
         // Sector object returned directly from the sector table
         Sector sectorLoadedFromDb = currentSector(sector);
-        assertEquals(sectorLoadedFromDb.getLockOwner(), user.getFullName());
+        assertEquals(sectorLoadedFromDb.getLockOwner(), user.getUsername());
     }
 
     public void testShouldGetLockOnDatasetType() throws EmfException {
@@ -61,11 +61,11 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         DatasetType type = list[0];
 
         DatasetType locked = service.getDatasetTypeLock(user, type);
-        assertEquals(locked.getLockOwner(), user.getFullName());
+        assertEquals(locked.getLockOwner(), user.getUsername());
 
         // Sector object returned directly from the sector table
         DatasetType loadedFromDb = currentDatasetType(type);
-        assertEquals(loadedFromDb.getLockOwner(), user.getFullName());
+        assertEquals(loadedFromDb.getLockOwner(), user.getUsername());
     }
 
     public void testShouldReleaseSectorLock() throws EmfException {
@@ -102,7 +102,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         String name = sector.getName();
 
         Sector modifiedSector1 = service.getSectorLock(user, sector);
-        assertEquals(modifiedSector1.getLockOwner(), user.getFullName());
+        assertEquals(modifiedSector1.getLockOwner(), user.getUsername());
         modifiedSector1.setName("TEST");
 
         Sector modifiedSector2 = service.updateSector(user, modifiedSector1);
@@ -124,7 +124,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         String name = type.getName();
 
         DatasetType modified1 = service.getDatasetTypeLock(user, type);
-        assertEquals(modified1.getLockOwner(), user.getFullName());
+        assertEquals(modified1.getLockOwner(), user.getUsername());
         modified1.setName("TEST");
 
         DatasetType modified2 = service.updateDatasetType(user, modified1);

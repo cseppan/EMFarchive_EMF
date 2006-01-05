@@ -130,27 +130,27 @@ public class DataCommonsDAO {
         return session.createCriteria(DatasetType.class).addOrder(Order.asc("name")).list();
     }
 
-    public Sector getSectorLock(User user, Sector sector, Session session) {
-        return (Sector) lockingScheme.getLock(user, sector, session, getSectors(session));
+    public Sector obtainLockedSector(User user, Sector sector, Session session) {
+        return (Sector) lockingScheme.getLocked(user, sector, session, getSectors(session));
     }
 
-    public DatasetType getDatasetTypeLock(User user, DatasetType type, Session session) {
-        return (DatasetType) lockingScheme.getLock(user, type, session, getDatasetTypes(session));
+    public DatasetType obtainLockedDatasetType(User user, DatasetType type, Session session) {
+        return (DatasetType) lockingScheme.getLocked(user, type, session, getDatasetTypes(session));
     }
 
-    public Sector updateSector(User user, Sector sector, Session session) throws EmfException {
-        return (Sector) lockingScheme.update(user, sector, session, getSectors(session));
+    public Sector updateSector(Sector sector, Session session) throws EmfException {
+        return (Sector) lockingScheme.update(sector, session, getSectors(session));
     }
 
-    public DatasetType updateDatasetType(User user, DatasetType type, Session session) throws EmfException {
-        return (DatasetType) lockingScheme.update(user, type, session, getDatasetTypes(session));
+    public DatasetType updateDatasetType(DatasetType type, Session session) throws EmfException {
+        return (DatasetType) lockingScheme.update(type, session, getDatasetTypes(session));
     }
 
-    public Sector releaseSectorLock(Sector locked, Session session) throws EmfException {
+    public Sector releaseLockedSector(Sector locked, Session session) throws EmfException {
         return (Sector) lockingScheme.releaseLock(locked, session, getSectors(session));
     }
 
-    public DatasetType releaseDatasetTypeLock(DatasetType locked, Session session) throws EmfException {
+    public DatasetType releaseLockedDatasetType(DatasetType locked, Session session) throws EmfException {
         return (DatasetType) lockingScheme.releaseLock(locked, session, getDatasetTypes(session));
     }
 

@@ -102,7 +102,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         Sector lockedSector;
         try {
             Session session = sessionFactory.getSession();
-            lockedSector = dao.getSectorLock(user, sector, session);
+            lockedSector = dao.obtainLockedSector(user, sector, session);
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
@@ -115,7 +115,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         Sector unlocked;
         try {
             Session session = sessionFactory.getSession();
-            unlocked = dao.updateSector(user, sector, session);
+            unlocked = dao.updateSector(sector, session);
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
@@ -128,7 +128,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         Sector locked;
         Session session = sessionFactory.getSession();
         try {
-            locked = dao.releaseSectorLock(sector, session);
+            locked = dao.releaseLockedSector(sector, session);
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
@@ -155,7 +155,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         DatasetType locked;
         try {
             Session session = sessionFactory.getSession();
-            locked = dao.getDatasetTypeLock(user, type, session);
+            locked = dao.obtainLockedDatasetType(user, type, session);
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
@@ -168,7 +168,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         DatasetType locked;
         try {
             Session session = sessionFactory.getSession();
-            locked = dao.updateDatasetType(user, type, session);
+            locked = dao.updateDatasetType(type, session);
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
@@ -181,7 +181,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         DatasetType locked;
         Session session = sessionFactory.getSession();
         try {
-            locked = dao.releaseDatasetTypeLock(type, session);
+            locked = dao.releaseLockedDatasetType(type, session);
             session.close();
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);

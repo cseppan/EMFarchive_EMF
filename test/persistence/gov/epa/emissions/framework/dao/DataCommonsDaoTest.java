@@ -70,11 +70,11 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         List sectors = dao.getSectors(session);
         Sector sector = (Sector) sectors.get(0);
 
-        Sector lockedSector = dao.getSectorLock(user, sector, session);
-        assertEquals(lockedSector.getLockOwner(), user.getFullName());
+        Sector lockedSector = dao.obtainLockedSector(user, sector, session);
+        assertEquals(lockedSector.getLockOwner(), user.getUsername());
 
         Sector sectorLoadedFromDb = currentSector(sector);
-        assertEquals(sectorLoadedFromDb.getLockOwner(), user.getFullName());
+        assertEquals(sectorLoadedFromDb.getLockOwner(), user.getUsername());
     }
 
     public void testShouldGetDatasetTypeLock() {
@@ -82,11 +82,11 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         List types = dao.getDatasetTypes(session);
         DatasetType type = (DatasetType) types.get(0);
 
-        DatasetType locked = dao.getDatasetTypeLock(user, type, session);
-        assertEquals(locked.getLockOwner(), user.getFullName());
+        DatasetType locked = dao.obtainLockedDatasetType(user, type, session);
+        assertEquals(locked.getLockOwner(), user.getUsername());
 
         DatasetType loadedFromDb = currentDatasetType(type);
-        assertEquals(loadedFromDb.getLockOwner(), user.getFullName());
+        assertEquals(loadedFromDb.getLockOwner(), user.getUsername());
     }
 
     public void testShouldFailToGetLockWhenAlreadyLockedByAnotherUser() {
@@ -94,10 +94,10 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         List sectors = dao.getSectors(session);
         Sector sector = (Sector) sectors.get(0);
 
-        dao.getSectorLock(emfUser, sector, session);
+        dao.obtainLockedSector(emfUser, sector, session);
 
         User adminUser = userDao.get("admin", session);
-        Sector result = dao.getSectorLock(adminUser, sector, session);
+        Sector result = dao.obtainLockedSector(adminUser, sector, session);
 
         assertTrue(result.isLocked(emfUser));// failed to obtain lock for Admin
     }
@@ -107,8 +107,8 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         List sectors = dao.getSectors(session);
         Sector sector = (Sector) sectors.get(0);
 
-        Sector lockedSector = dao.getSectorLock(user, sector, session);
-        Sector releasedSector = dao.releaseSectorLock(lockedSector, session);
+        Sector lockedSector = dao.obtainLockedSector(user, sector, session);
+        Sector releasedSector = dao.releaseLockedSector(lockedSector, session);
         assertFalse("Should have released lock", releasedSector.isLocked());
 
         Sector sectorLoadedFromDb = currentSector(sector);
@@ -120,8 +120,8 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         List list = dao.getDatasetTypes(session);
         DatasetType type = (DatasetType) list.get(0);
 
-        DatasetType locked = dao.getDatasetTypeLock(user, type, session);
-        DatasetType released = dao.releaseDatasetTypeLock(locked, session);
+        DatasetType locked = dao.obtainLockedDatasetType(user, type, session);
+        DatasetType released = dao.releaseLockedDatasetType(locked, session);
         assertFalse("Should have released lock", released.isLocked());
 
         DatasetType loadedFromDb = currentDatasetType(type);
@@ -133,7 +133,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
         Sector sector = (Sector) sectors.get(0);
 
         try {
-            dao.releaseSectorLock(sector, session);
+            dao.releaseLockedSector(sector, session);
         } catch (EmfException e) {
             assertEquals("Cannot update without owning lock", e.getMessage());
             return;
@@ -149,19 +149,19 @@ public class DataCommonsDaoTest extends ServicesTestCase {
 
         User user = userDao.get("emf", session);
 
-        Sector modifiedSector1 = dao.getSectorLock(user, sector, session);
-        assertEquals(modifiedSector1.getLockOwner(), user.getFullName());
+        Sector modifiedSector1 = dao.obtainLockedSector(user, sector, session);
+        assertEquals(modifiedSector1.getLockOwner(), user.getUsername());
         modifiedSector1.setName("TEST");
 
-        Sector modifiedSector2 = dao.updateSector(user, modifiedSector1, session);
+        Sector modifiedSector2 = dao.updateSector(modifiedSector1, session);
         assertEquals("TEST", modifiedSector1.getName());
         assertEquals(modifiedSector2.getLockOwner(), null);
 
         // restore
-        Sector modifiedSector = dao.getSectorLock(user, sector, session);
+        Sector modifiedSector = dao.obtainLockedSector(user, sector, session);
         modifiedSector.setName(name);
 
-        Sector modifiedSector3 = dao.updateSector(user, modifiedSector, session);
+        Sector modifiedSector3 = dao.updateSector(modifiedSector, session);
         assertEquals(sector.getName(), modifiedSector3.getName());
     }
 
@@ -172,19 +172,19 @@ public class DataCommonsDaoTest extends ServicesTestCase {
 
         User user = userDao.get("emf", session);
 
-        DatasetType modified1 = dao.getDatasetTypeLock(user, type, session);
-        assertEquals(modified1.getLockOwner(), user.getFullName());
+        DatasetType modified1 = dao.obtainLockedDatasetType(user, type, session);
+        assertEquals(modified1.getLockOwner(), user.getUsername());
         modified1.setName("TEST");
 
-        DatasetType modified2 = dao.updateDatasetType(user, modified1, session);
+        DatasetType modified2 = dao.updateDatasetType(modified1, session);
         assertEquals("TEST", modified1.getName());
         assertEquals(modified2.getLockOwner(), null);
 
         // restore
-        DatasetType modified = dao.getDatasetTypeLock(user, type, session);
+        DatasetType modified = dao.obtainLockedDatasetType(user, type, session);
         modified.setName(name);
 
-        DatasetType modified3 = dao.updateDatasetType(user, modified, session);
+        DatasetType modified3 = dao.updateDatasetType(modified, session);
         assertEquals(type.getName(), modified3.getName());
     }
 }

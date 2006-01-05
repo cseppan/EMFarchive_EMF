@@ -50,7 +50,7 @@ public class EditableSectorPresenterImpl implements EditableSectorPresenter {
 
     public void doSave(SectorsManagerView sectorManager) throws EmfException {
         sector = service().updateSector(session.user(), sector);
-        
+
         sectorManager.refresh();
         closeView();
     }

@@ -19,8 +19,8 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         DatasetType type = new DatasetType();
 
         User user = new User();
-        user.setFullName("name");
-        type.setLockOwner(user.getFullName());
+        user.setUsername("name");
+        type.setLockOwner(user.getUsername());
         type.setLockDate(new Date());
 
         Mock service = mock(DataCommonsService.class);
@@ -52,7 +52,7 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
     public void testShouldShowNonEditViewAfterFailingToObtainLockForSectorOnDisplay() throws Exception {
         DatasetType type = new DatasetType();// no lock
         User user = new User();
-        user.setFullName("name");
+        user.setUsername("name");
 
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("getDatasetTypeLock").with(same(user), same(type)).will(returnValue(type));

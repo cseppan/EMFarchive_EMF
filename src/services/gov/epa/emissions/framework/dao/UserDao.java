@@ -86,7 +86,7 @@ public class UserDao {
         return get(username, session) != null;
     }
 
-    public User getEditable(User lockOwner, User user, Session session) {
-        return (User) lockingScheme.getLock(lockOwner, user, session, getAll(session));
+    public User obtainLocked(User lockOwner, User user, Session session) {
+        return (User) lockingScheme.getLocked(lockOwner, user, session, getAll(session));
     }
 }

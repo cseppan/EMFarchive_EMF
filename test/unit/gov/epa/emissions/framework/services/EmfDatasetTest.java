@@ -30,11 +30,11 @@ public class EmfDatasetTest extends TestCase {
         locked.setLockDate(new Date());
 
         User lockedByUser = new User();
-        lockedByUser.setFullName("user");
+        lockedByUser.setUsername("user");
         assertTrue("Should be locked", locked.isLocked(lockedByUser));
 
         User notLockedByUser = new User();
-        notLockedByUser.setFullName("user2");
+        notLockedByUser.setUsername("user2");
         assertFalse("Should not be locked", locked.isLocked(notLockedByUser));
     }
 }

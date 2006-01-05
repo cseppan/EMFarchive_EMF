@@ -18,8 +18,8 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
         Mock view = mock(EditableSectorView.class);
 
         User user = new User();
-        user.setFullName("name");
-        sector.setLockOwner(user.getFullName());
+        user.setUsername("name");
+        sector.setLockOwner(user.getUsername());
         sector.setLockDate(new Date());
 
         Mock service = mock(DataCommonsService.class);
@@ -46,7 +46,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
     public void testShouldShowNonEditViewAfterFailingToObtainLockForSectorOnDisplay() throws Exception {
         Sector sector = new Sector();// no lock
         User user = new User();
-        user.setFullName("name");
+        user.setUsername("name");
 
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("getSectorLock").with(same(user), same(sector)).will(returnValue(sector));

@@ -147,7 +147,7 @@ public class UserDaoTest extends HibernateTestCase {
         User lockOwner = dao.get("admin", session);
         User user = dao.get("emf", session);
 
-        User lockedUser = dao.getEditable(lockOwner, user, session);
+        User lockedUser = dao.obtainLocked(lockOwner, user, session);
         assertEquals(lockedUser.getFullName(), user.getFullName());
 
         User userLoadedFromDb = user(lockedUser.getUsername());
