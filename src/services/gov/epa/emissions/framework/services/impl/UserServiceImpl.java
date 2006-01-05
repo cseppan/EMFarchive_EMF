@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
     public void updateUser(User user) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.update(user, session);
+            dao.updateWithoutLock(user, session);
             session.close();
         } catch (HibernateException e) {
             LOG.error("Could not update user - " + user.getFullName() + ". Reason: " + e.getMessage());
@@ -107,6 +107,36 @@ public class UserServiceImpl implements UserService {
         } catch (HibernateException e) {
             LOG.error("Could not delete user - " + user.getFullName() + ". Reason: " + e.getMessage());
             throw new EmfException("Could not delete user - " + user.getFullName());
+        }
+    }
+
+    public User obtainLocked(User owner, User object) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            User locked = dao.obtainLocked(owner, object, session);
+            session.close();
+
+            return locked;
+        } catch (HibernateException e) {
+            LOG.error("Could not obtain lock for user: " + object.getUsername() + " by owner: " + owner.getUsername()
+                    + ".Reason: " + e);
+            throw new EmfException("Could not obtain lock for user: " + object.getUsername() + " by owner: "
+                    + owner.getUsername());
+        }
+    }
+
+    public User releaseLocked(User object) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            User released = dao.releaseLocked(object, session);
+            session.close();
+
+            return released;
+        } catch (HibernateException e) {
+            LOG.error("Could not release lock for user: " + object.getUsername() + " by owner: "
+                    + object.getLockOwner() + ".Reason: " + e);
+            throw new EmfException("Could not obtain release for user: " + object.getUsername() + " by owner: "
+                    + object.getLockOwner());
         }
     }
 

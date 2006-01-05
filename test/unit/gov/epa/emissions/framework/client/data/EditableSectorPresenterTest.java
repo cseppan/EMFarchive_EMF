@@ -23,7 +23,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
         sector.setLockDate(new Date());
 
         Mock service = mock(DataCommonsService.class);
-        service.expects(once()).method("getSectorLock").with(same(user), same(sector)).will(returnValue(sector));
+        service.expects(once()).method("obtainLockedSector").with(same(user), same(sector)).will(returnValue(sector));
 
         Mock session = session(user, service.proxy());
 
@@ -39,7 +39,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(user));
         session.stubs().method("dataCommonsService").withNoArguments().will(returnValue(dataCommonsProxy));
-        
+
         return session;
     }
 
@@ -49,7 +49,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
         user.setUsername("name");
 
         Mock service = mock(DataCommonsService.class);
-        service.expects(once()).method("getSectorLock").with(same(user), same(sector)).will(returnValue(sector));
+        service.expects(once()).method("obtainLockedSector").with(same(user), same(sector)).will(returnValue(sector));
 
         Mock session = session(user, service.proxy());
 
@@ -69,8 +69,9 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("close");
 
         User user = new User();
+        user.setUsername("user");
         Mock service = mock(DataCommonsService.class);
-        service.expects(once()).method("releaseSectorLock").with(same(user), same(sector)).will(returnValue(sector));
+        service.expects(once()).method("releaseLockedSector").with(same(sector)).will(returnValue(sector));
 
         Mock session = session(user, service.proxy());
 
@@ -88,7 +89,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
 
         User user = new User();
         Mock service = mock(DataCommonsService.class);
-        service.expects(once()).method("updateSector").with(same(user), same(sector)).will(returnValue(sector));
+        service.expects(once()).method("updateSector").with(same(sector)).will(returnValue(sector));
 
         Mock session = session(user, service.proxy());
 

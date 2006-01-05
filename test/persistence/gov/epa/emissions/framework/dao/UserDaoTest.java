@@ -80,7 +80,7 @@ public class UserDaoTest extends HibernateTestCase {
         User added = user(user.getUsername());
         added.setFullName("updated name");
 
-        dao.update(added, session);
+        dao.updateWithoutLock(added, session);
 
         // assert
         User updated = user(user.getUsername());
@@ -88,13 +88,14 @@ public class UserDaoTest extends HibernateTestCase {
     }
 
     public void testShouldObtainLockedUser() {
-        User lockOwner = dao.get("admin", session);
+        User owner = dao.get("admin", session);
 
-        User lockedUser = dao.obtainLocked(lockOwner, user, session);
-        assertEquals(lockedUser.getFullName(), user.getFullName());
+        User locked = dao.obtainLocked(owner, user, session);
+        assertTrue("Should be locked by owner", locked.isLocked(owner));
 
-        User userLoadedFromDb = user(lockedUser.getUsername());
-        assertEquals(userLoadedFromDb.getFullName(), user.getFullName());
+        User userLoadedFromDb = user(locked.getUsername());
+        assertEquals(userLoadedFromDb.getUsername(), user.getUsername());
+        assertTrue("Should be locked by owner", userLoadedFromDb.isLocked(owner));
     }
 
     public void testShouldUpdateLockedUser() throws Exception {
@@ -104,7 +105,7 @@ public class UserDaoTest extends HibernateTestCase {
         assertEquals(modified1.getLockOwner(), emf.getUsername());
         modified1.setFullName("TEST");
 
-        User modified2 = dao.updateLocked(modified1, session);
+        User modified2 = dao.update(modified1, session);
         assertEquals("TEST", modified1.getFullName());
         assertEquals(modified2.getLockOwner(), null);
     }

@@ -128,6 +128,45 @@ public class UserServiceTransport implements UserService {
         return null;
     }
 
+    public User obtainLocked(User owner, User object) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.setOperation(call, "obtainLocked");
+            mappings.addParam(call, "owner", mappings.user());
+            mappings.addParam(call, "object", mappings.user());
+            call.setReturnType(mappings.user());
+
+            return (User) call.invoke(new Object[] { owner, object });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not get User lock: " + object.getUsername(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not get User lock: " + object.getUsername(), e);
+        }
+
+        return null;
+    }
+
+    public User releaseLocked(User object) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.setOperation(call, "releaseLocked");
+            mappings.addParam(call, "object", mappings.user());
+            call.setReturnType(mappings.user());
+
+            return (User) call.invoke(new Object[] { object });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not release User lock: " + object.getUsername(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not release User lock: " + object.getUsername(), e);
+        }
+
+        return null;
+    }
+
     private String extractMessage(String faultReason) {
         return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
     }

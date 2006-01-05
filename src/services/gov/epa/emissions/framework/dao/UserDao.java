@@ -57,7 +57,7 @@ public class UserDao {
         }
     }
 
-    public void update(User user, Session session) {
+    public void updateWithoutLock(User user, Session session) {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
@@ -91,8 +91,8 @@ public class UserDao {
         return (User) lockingScheme.getLocked(lockOwner, user, session, getAll(session));
     }
 
-    public User updateLocked(User locked, Session session) throws EmfException {
-        return (User) lockingScheme.update(locked, session, getAll(session));
+    public User update(User user, Session session) throws EmfException {
+        return (User) lockingScheme.update(user, session, getAll(session));
     }
 
     public User releaseLocked(User locked, Session session) throws EmfException {

@@ -20,4 +20,8 @@ public interface UserService extends EMFService {
 
     void deleteUser(User user) throws EmfException;
 
+    User obtainLocked(User owner, User object) throws EmfException;
+
+    User releaseLocked(User object) throws EmfException;
+
 }

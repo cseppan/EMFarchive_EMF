@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.dao.UserDao;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
@@ -47,7 +48,7 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
 
         service.createUser(user);
 
-        User loaded = getUser(user.getUsername());
+        User loaded = user(user.getUsername());
         try {
             assertNotNull(loaded);
             assertEquals(initialCount + 1, service.getUsers().length);
@@ -129,8 +130,64 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
         fail("should have failed authentication due to invalid user");
     }
 
+    public void testShouldObtainLockedUser() throws EmfException {
+        UserDao dao = new UserDao();
+        User user = newUser(dao);
+
+        try {
+            User owner = service.getUser("emf");
+
+            User locked = service.obtainLocked(owner, user);
+            assertTrue("Should be locked by owner", locked.isLocked(owner));
+            assertEquals(user.getUsername(), locked.getUsername());
+
+            // object returned directly from the table
+            User loadedFromDb = user(locked.getUsername());
+            assertEquals(locked.getLockOwner(), loadedFromDb.getLockOwner());
+        } finally {
+            remove(user, dao);
+        }
+    }
+
+    public void testShouldReleaseLockOnReleaseLockedUser() throws EmfException {
+        UserDao dao = new UserDao();
+        User target = newUser(dao);
+
+        try {
+            User owner = service.getUser("emf");
+
+            User locked = service.obtainLocked(owner, target);
+            User released = service.releaseLocked(locked);
+            assertFalse("Should have released lock", released.isLocked());
+
+            User loadedFromDb = user(locked.getUsername());
+            assertFalse("Should have released lock", loadedFromDb.isLocked());
+        } finally {
+            remove(target, dao);
+        }
+    }
+
+    private void remove(User user, UserDao dao) {
+        User loadedFromDb = user(user.getUsername());
+        dao.remove(loadedFromDb, session);
+    }
+
+    private User newUser(UserDao dao) {
+        User user = new User();
+        user.setUsername("test-user");
+        user.setPassword("abc12345");
+        user.setFullName("user dao");
+        user.setAffiliation("test");
+        user.setPhone("123-123-1234");
+        user.setEmail("email@user-test.test");
+
+        dao.add(user, session);
+
+        return user(user.getUsername());
+    }
+
     private void remove(User user) {
-        User loaded = getUser(user.getUsername());
+        User loaded = user(user.getUsername());
 
         Transaction tx = session.beginTransaction();
         session.delete(loaded);
@@ -148,7 +205,7 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
 
         service.createUser(user);
 
-        User added = getUser(user.getUsername());
+        User added = user(user.getUsername());
         added.setFullName("modified-name");
         service.updateUser(added);
 
@@ -173,14 +230,16 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
         service.createUser(user);
 
         // test
-        User added = getUser(user.getUsername());
+        User added = user(user.getUsername());
         service.deleteUser(added);
 
-        User result = getUser(added.getUsername());
+        User result = user(added.getUsername());
         assertNull("User should have been deleted", result);
     }
 
-    private User getUser(String username) {
+    private User user(String username) {
+        session.clear();
+
         Transaction tx = null;
         try {
             tx = session.beginTransaction();

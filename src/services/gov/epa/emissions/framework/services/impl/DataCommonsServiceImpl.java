@@ -98,43 +98,47 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         return (Sector[]) sectors.toArray(new Sector[sectors.size()]);
     }
 
-    public Sector getSectorLock(User user, Sector sector) throws EmfException {
+    public Sector obtainLockedSector(User owner, Sector sector) throws EmfException {
         Sector lockedSector;
         try {
             Session session = sessionFactory.getSession();
-            lockedSector = dao.obtainLockedSector(user, sector, session);
+            lockedSector = dao.obtainLockedSector(owner, sector, session);
             session.close();
         } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Database error: " + e);
+            LOG.error("Could not obtain lock for sector: " + sector.getName() + " by owner: " + owner.getUsername()
+                    + ".Reason: " + e);
+            throw new EmfException("Could not obtain lock for sector: " + sector.getName() + " by owner: "
+                    + owner.getUsername());
         }
         return lockedSector;
     }
 
-    public Sector updateSector(User user, Sector sector) throws EmfException {
-        Sector unlocked;
+    public Sector updateSector(Sector sector) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            unlocked = dao.updateSector(sector, session);
+            Sector released = dao.updateSector(sector, session);
             session.close();
+
+            return released;
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
             throw new EmfException("Database error: " + e);
         }
-        return unlocked;
     }
 
-    public Sector releaseSectorLock(User user, Sector sector) throws EmfException {
-        Sector locked;
-        Session session = sessionFactory.getSession();
+    public Sector releaseLockedSector(Sector sector) throws EmfException {
         try {
-            locked = dao.releaseLockedSector(sector, session);
+            Session session = sessionFactory.getSession();
+            Sector released = dao.releaseLockedSector(sector, session);
             session.close();
+
+            return released;
         } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Database error: " + e);
+            LOG.error("Could not release lock for sector: " + sector.getName() + " by owner: " + sector.getLockOwner()
+                    + ".Reason: " + e);
+            throw new EmfException("Could not release lock for sector: " + sector.getName() + " by owner: "
+                    + sector.getLockOwner());
         }
-        return locked;
     }
 
     public DatasetType[] getDatasetTypes() throws EmfException {
@@ -151,7 +155,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         return (DatasetType[]) list.toArray(new DatasetType[0]);
     }
 
-    public DatasetType getDatasetTypeLock(User user, DatasetType type) throws EmfException {
+    public DatasetType obtainLockedDatasetType(User user, DatasetType type) throws EmfException {
         DatasetType locked;
         try {
             Session session = sessionFactory.getSession();
@@ -177,7 +181,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         return locked;
     }
 
-    public DatasetType releaseDatasetTypeLock(User user, DatasetType type) throws EmfException {
+    public DatasetType releaseLockedDatasetType(User user, DatasetType type) throws EmfException {
         DatasetType locked;
         Session session = sessionFactory.getSession();
         try {

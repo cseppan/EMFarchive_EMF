@@ -24,7 +24,7 @@ public class EditableSectorPresenterImpl implements EditableSectorPresenter {
     }
 
     public void doDisplay() throws EmfException {
-        sector = service().getSectorLock(session.user(), sector);
+        sector = service().obtainLockedSector(session.user(), sector);
 
         if (!sector.isLocked(session.user())) {// view mode, locked by another user
             new ViewableSectorPresenterImpl(viewable, sector).doDisplay();
@@ -40,7 +40,7 @@ public class EditableSectorPresenterImpl implements EditableSectorPresenter {
     }
 
     public void doClose() throws EmfException {
-        service().releaseSectorLock(session.user(), sector);
+        service().releaseLockedSector(sector);
         closeView();
     }
 
@@ -49,7 +49,7 @@ public class EditableSectorPresenterImpl implements EditableSectorPresenter {
     }
 
     public void doSave(SectorsManagerView sectorManager) throws EmfException {
-        sector = service().updateSector(session.user(), sector);
+        sector = service().updateSector(sector);
 
         sectorManager.refresh();
         closeView();

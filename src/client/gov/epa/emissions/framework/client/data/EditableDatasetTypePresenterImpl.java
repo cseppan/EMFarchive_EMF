@@ -28,7 +28,7 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
     }
 
     public void doDisplay() throws EmfException {
-        type = service().getDatasetTypeLock(session.user(), type);
+        type = service().obtainLockedDatasetType(session.user(), type);
 
         if (!type.isLocked(session.user())) {// view mode, locked by another user
             new ViewableDatasetTypePresenterImpl(viewable, type, dataCommonsService()).doDisplay();
@@ -48,7 +48,7 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
     }
 
     public void doClose() throws EmfException {
-        service().releaseDatasetTypeLock(session.user(), type);
+        service().releaseLockedDatasetType(session.user(), type);
         closeView();
     }
 

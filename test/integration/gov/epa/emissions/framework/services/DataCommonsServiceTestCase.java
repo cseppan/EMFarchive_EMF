@@ -47,7 +47,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         Sector[] sectors = service.getSectors();
         Sector sector = sectors[0];
 
-        Sector lockedSector = service.getSectorLock(user, sector);
+        Sector lockedSector = service.obtainLockedSector(user, sector);
         assertEquals(lockedSector.getLockOwner(), user.getUsername());
 
         // Sector object returned directly from the sector table
@@ -60,7 +60,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         DatasetType[] list = service.getDatasetTypes();
         DatasetType type = list[0];
 
-        DatasetType locked = service.getDatasetTypeLock(user, type);
+        DatasetType locked = service.obtainLockedDatasetType(user, type);
         assertEquals(locked.getLockOwner(), user.getUsername());
 
         // Sector object returned directly from the sector table
@@ -73,8 +73,8 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         Sector[] sectors = service.getSectors();
         Sector sector = sectors[0];
 
-        Sector lockedSector = service.getSectorLock(user, sector);
-        Sector releasedSector = service.releaseSectorLock(user, lockedSector);
+        Sector lockedSector = service.obtainLockedSector(user, sector);
+        Sector releasedSector = service.releaseLockedSector(lockedSector);
         assertFalse("Should have released lock", releasedSector.isLocked());
 
         Sector sectorLoadedFromDb = currentSector(sector);
@@ -86,8 +86,8 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         DatasetType[] list = service.getDatasetTypes();
         DatasetType type = list[0];
 
-        DatasetType locked = service.getDatasetTypeLock(user, type);
-        DatasetType released = service.releaseDatasetTypeLock(user, locked);
+        DatasetType locked = service.obtainLockedDatasetType(user, type);
+        DatasetType released = service.releaseLockedDatasetType(user, locked);
         assertFalse("Should have released lock", released.isLocked());
 
         DatasetType loadedFromDb = currentDatasetType(type);
@@ -101,18 +101,18 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         Sector sector = sectors[0];
         String name = sector.getName();
 
-        Sector modifiedSector1 = service.getSectorLock(user, sector);
+        Sector modifiedSector1 = service.obtainLockedSector(user, sector);
         assertEquals(modifiedSector1.getLockOwner(), user.getUsername());
         modifiedSector1.setName("TEST");
 
-        Sector modifiedSector2 = service.updateSector(user, modifiedSector1);
+        Sector modifiedSector2 = service.updateSector(modifiedSector1);
         assertEquals("TEST", modifiedSector2.getName());
         assertEquals(modifiedSector2.getLockOwner(), null);
 
         // restore
-        Sector modifiedSector = service.getSectorLock(user, sector);
+        Sector modifiedSector = service.obtainLockedSector(user, sector);
         modifiedSector.setName(name);
-        Sector modifiedSector3 = service.updateSector(user, modifiedSector);
+        Sector modifiedSector3 = service.updateSector(modifiedSector);
         assertEquals(sector.getName(), modifiedSector3.getName());
     }
 
@@ -123,7 +123,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         DatasetType type = list[0];
         String name = type.getName();
 
-        DatasetType modified1 = service.getDatasetTypeLock(user, type);
+        DatasetType modified1 = service.obtainLockedDatasetType(user, type);
         assertEquals(modified1.getLockOwner(), user.getUsername());
         modified1.setName("TEST");
 
@@ -132,7 +132,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         assertEquals(modified2.getLockOwner(), null);
 
         // restore
-        DatasetType modified = service.getDatasetTypeLock(user, type);
+        DatasetType modified = service.obtainLockedDatasetType(user, type);
         modified.setName(name);
 
         DatasetType modified3 = service.updateDatasetType(user, modified);

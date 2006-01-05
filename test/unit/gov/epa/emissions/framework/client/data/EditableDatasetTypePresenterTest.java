@@ -24,7 +24,7 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         type.setLockDate(new Date());
 
         Mock service = mock(DataCommonsService.class);
-        service.expects(once()).method("getDatasetTypeLock").with(same(user), same(type)).will(returnValue(type));
+        service.expects(once()).method("obtainLockedDatasetType").with(same(user), same(type)).will(returnValue(type));
 
         Keyword[] keywords = new Keyword[0];
         service.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
@@ -55,7 +55,7 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         user.setUsername("name");
 
         Mock service = mock(DataCommonsService.class);
-        service.expects(once()).method("getDatasetTypeLock").with(same(user), same(type)).will(returnValue(type));
+        service.expects(once()).method("obtainLockedDatasetType").with(same(user), same(type)).will(returnValue(type));
 
         Keyword[] keywords = new Keyword[0];
         service.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
@@ -79,7 +79,7 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
 
         User user = new User();
         Mock service = mock(DataCommonsService.class);
-        service.expects(once()).method("releaseDatasetTypeLock").with(same(user), same(type)).will(returnValue(type));
+        service.expects(once()).method("releaseLockedDatasetType").with(same(user), same(type)).will(returnValue(type));
 
         Mock session = session(user, service.proxy());
 

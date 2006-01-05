@@ -20,19 +20,19 @@ public interface DataCommonsService {
     // Sectors
     Sector[] getSectors() throws EmfException;
 
-    Sector getSectorLock(User user, Sector sector) throws EmfException;
+    Sector obtainLockedSector(User owner, Sector sector) throws EmfException;
 
-    Sector updateSector(User user, Sector sector) throws EmfException;
+    Sector updateSector(Sector sector) throws EmfException;
 
-    Sector releaseSectorLock(User user, Sector sector) throws EmfException;
+    Sector releaseLockedSector(Sector sector) throws EmfException;
 
     // DatasetType
     DatasetType[] getDatasetTypes() throws EmfException;
 
-    DatasetType getDatasetTypeLock(User user, DatasetType type) throws EmfException;
+    DatasetType obtainLockedDatasetType(User owner, DatasetType type) throws EmfException;
 
-    DatasetType updateDatasetType(User user, DatasetType type) throws EmfException;
+    DatasetType updateDatasetType(User owner, DatasetType type) throws EmfException;
 
-    DatasetType releaseDatasetTypeLock(User user, DatasetType type) throws EmfException;
+    DatasetType releaseLockedDatasetType(User owner, DatasetType type) throws EmfException;
 
 }

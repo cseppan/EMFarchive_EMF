@@ -98,23 +98,6 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return null;
     }
 
-    public void updateSector(Sector sector) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
-
-            mappings.register(call);
-            call.setOperationName(mappings.qname("updateSector"));
-            call.addParameter("sector", mappings.sector(), ParameterMode.IN);
-            call.setReturnType(Constants.XSD_ANY);
-
-            call.invoke(new Object[] { sector });
-        } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not update Sector: " + sector.getName(), fault);
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not update Sector: " + sector.getName(), e);
-        }
-    }
-
     public void addSector(Sector sector) throws EmfException {
         try {
             Call call = callFactory.createCall();
@@ -165,12 +148,12 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         throw new EmfException(extractMessage(fault.getMessage()));
     }
 
-    public Sector getSectorLock(User user, Sector sector) throws EmfException {
+    public Sector obtainLockedSector(User user, Sector sector) throws EmfException {
         try {
             Call call = callFactory.createCall();
 
             mappings.register(call);
-            call.setOperationName(mappings.qname("getSectorLock"));
+            call.setOperationName(mappings.qname("obtainLockedSector"));
             call.addParameter("user", mappings.user(), ParameterMode.IN);
             call.addParameter("sector", mappings.sector(), ParameterMode.IN);
             call.setReturnType(mappings.sector());
@@ -185,17 +168,16 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return null;
     }
 
-    public Sector updateSector(User user, Sector sector) throws EmfException {
+    public Sector updateSector(Sector sector) throws EmfException {
         try {
             Call call = callFactory.createCall();
 
             mappings.register(call);
             call.setOperationName(mappings.qname("updateSector"));
-            call.addParameter("user", mappings.user(), ParameterMode.IN);
             call.addParameter("sector", mappings.sector(), ParameterMode.IN);
             call.setReturnType(mappings.sector());
 
-            return (Sector) call.invoke(new Object[] { user, sector });
+            return (Sector) call.invoke(new Object[] { sector });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Could not update locked Sector: " + sector.getName(), fault);
         } catch (Exception e) {
@@ -205,18 +187,17 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return null;
     }
 
-    public Sector releaseSectorLock(User user, Sector sector) throws EmfException {
+    public Sector releaseLockedSector(Sector sector) throws EmfException {
         Sector modifiedSector = null;
         try {
             Call call = callFactory.createCall();
 
             mappings.register(call);
-            call.setOperationName(mappings.qname("releaseSectorLock"));
-            call.addParameter("user", mappings.user(), ParameterMode.IN);
+            call.setOperationName(mappings.qname("releaseLockedSector"));
             call.addParameter("sector", mappings.sector(), ParameterMode.IN);
             call.setReturnType(mappings.sector());
 
-            modifiedSector = (Sector) call.invoke(new Object[] { user, sector });
+            modifiedSector = (Sector) call.invoke(new Object[] { sector });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Could not release sector lock: " + sector.getName(), fault);
         } catch (Exception e) {
@@ -243,12 +224,12 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return null;
     }
 
-    public DatasetType getDatasetTypeLock(User user, DatasetType type) throws EmfException {
+    public DatasetType obtainLockedDatasetType(User user, DatasetType type) throws EmfException {
         try {
             Call call = callFactory.createCall();
 
             mappings.register(call);
-            call.setOperationName(mappings.qname("getDatasetTypeLock"));
+            call.setOperationName(mappings.qname("obtainLockedDatasetType"));
             mappings.addParam(call, "user", mappings.user());
             mappings.addParam(call, "type", mappings.datasetType());
             mappings.setReturnType(call, mappings.datasetType());
@@ -283,12 +264,12 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return null;
     }
 
-    public DatasetType releaseDatasetTypeLock(User user, DatasetType type) throws EmfException {
+    public DatasetType releaseLockedDatasetType(User user, DatasetType type) throws EmfException {
         try {
             Call call = callFactory.createCall();
 
             mappings.register(call);
-            call.setOperationName(mappings.qname("releaseDatasetTypeLock"));
+            call.setOperationName(mappings.qname("releaseLockedDatasetType"));
             mappings.addParam(call, "user", mappings.user());
             mappings.addParam(call, "type", mappings.datasetType());
             mappings.setReturnType(call, mappings.datasetType());
