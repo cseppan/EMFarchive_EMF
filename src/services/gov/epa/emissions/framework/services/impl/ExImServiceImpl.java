@@ -69,13 +69,11 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     }
 
     private String getValue(String root) {
-        log.debug("In ExImServicesImpl:getBaseDirectoryProperty START");
-
         Session session = sessionFactory.getSession();
-        String propvalue = EmfPropertiesDAO.getEmfPropertyValue(root, session);
-        log.debug("In ExImServicesImpl:getBaseDirectoryProperty END");
-        session.flush();
+        EmfPropertiesDAO dao = new EmfPropertiesDAO();
+        String propvalue = dao.getProperty(root, session).getValue();
         session.close();
+
         return propvalue;
     }
 

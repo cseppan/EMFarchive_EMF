@@ -42,7 +42,6 @@ public class DataCommonsDAO {
 
             tx = session.beginTransaction();
 
-            log.debug("The query: " + GET_EMF_KEYWORDS_QUERY);
             Query query = session.createQuery(GET_EMF_KEYWORDS_QUERY);
 
             Iterator iter = query.iterate();
