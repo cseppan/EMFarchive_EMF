@@ -17,6 +17,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class DataCommonsServiceImpl implements DataCommonsService {
+
     private static Log LOG = LogFactory.getLog(DataCommonsServiceImpl.class);
 
     private HibernateSessionFactory sessionFactory;
@@ -33,37 +34,12 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
 
     public Keyword[] getKeywords() throws EmfException {
-        List keywords = null;
         try {
             Session session = sessionFactory.getSession();
-            keywords = dao.getEmfKeywords(session);
-            session.flush();
+            List keywords = dao.getEmfKeywords(session);
             session.close();
-        } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
-        }
-        return (Keyword[]) keywords.toArray(new Keyword[keywords.size()]);
-    }
 
-    public void addCountry(Country country) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            dao.insertCountry(country, session);
-            session.flush();
-            session.close();
-        } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
-        }
-    }
-
-    public void updateCountry(Country country) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            dao.updateCountry(country, session);
-            session.flush();
-            session.close();
+            return (Keyword[]) keywords.toArray(new Keyword[keywords.size()]);
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
             throw new EmfException("Error communicating with the server");
@@ -72,30 +48,31 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
 
     public Country[] getCountries() throws EmfException {
-        List countries = null;
         try {
             Session session = sessionFactory.getSession();
-            countries = dao.getCountries(session);
-            session.flush();
+            List countries = dao.getCountries(session);
             session.close();
+
+            return (Country[]) countries.toArray(new Country[countries.size()]);
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
             throw new EmfException("Error communicating with the server");
         }
-        return (Country[]) countries.toArray(new Country[countries.size()]);
+
     }
 
     public Sector[] getSectors() throws EmfException {
-        List sectors;
         try {
             Session session = sessionFactory.getSession();
-            sectors = dao.getSectors(session);
+            List sectors = dao.getSectors(session);
             session.close();
+
+            return (Sector[]) sectors.toArray(new Sector[sectors.size()]);
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
             throw new EmfException("Error communicating with the server");
         }
-        return (Sector[]) sectors.toArray(new Sector[sectors.size()]);
+
     }
 
     public Sector obtainLockedSector(User owner, Sector sector) throws EmfException {
@@ -142,56 +119,55 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
 
     public DatasetType[] getDatasetTypes() throws EmfException {
-        List list;
         try {
             Session session = sessionFactory.getSession();
-            list = dao.getDatasetTypes(session);
+            List list = dao.getDatasetTypes(session);
             session.close();
+
+            return (DatasetType[]) list.toArray(new DatasetType[0]);
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
             throw new EmfException("Error communicating with the server");
         }
-
-        return (DatasetType[]) list.toArray(new DatasetType[0]);
     }
 
     public DatasetType obtainLockedDatasetType(User user, DatasetType type) throws EmfException {
-        DatasetType locked;
         try {
             Session session = sessionFactory.getSession();
-            locked = dao.obtainLockedDatasetType(user, type, session);
+            DatasetType locked = dao.obtainLockedDatasetType(user, type, session);
             session.close();
+
+            return locked;
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
             throw new EmfException("Database error: " + e);
         }
-        return locked;
     }
 
     public DatasetType updateDatasetType(User user, DatasetType type) throws EmfException {
-        DatasetType locked;
         try {
             Session session = sessionFactory.getSession();
-            locked = dao.updateDatasetType(type, session);
+            DatasetType locked = dao.updateDatasetType(type, session);
             session.close();
+
+            return locked;
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
             throw new EmfException("Database error: " + e);
         }
-        return locked;
     }
 
     public DatasetType releaseLockedDatasetType(User user, DatasetType type) throws EmfException {
-        DatasetType locked;
-        Session session = sessionFactory.getSession();
         try {
-            locked = dao.releaseLockedDatasetType(type, session);
+            Session session = sessionFactory.getSession();
+            DatasetType locked = dao.releaseLockedDatasetType(type, session);
             session.close();
+
+            return locked;
         } catch (HibernateException e) {
             LOG.error("Database error: " + e);
             throw new EmfException("Database error: " + e);
         }
-        return locked;
     }
 
 }

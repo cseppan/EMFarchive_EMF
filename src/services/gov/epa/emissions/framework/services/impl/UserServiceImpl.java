@@ -34,19 +34,19 @@ public class UserServiceImpl implements UserService {
         try {
             Session session = sessionFactory.getSession();
             User user = dao.get(username, session);
+            session.close();
+
             if (user == null)
                 throw new AuthenticationException("Invalid username");
 
             if (user.isAcctDisabled())
                 throw new AuthenticationException("Account Disabled");
 
-            session.close();
-
             if (!user.getEncryptedPassword().equals(password))
                 throw new AuthenticationException("Incorrect Password");
         } catch (HibernateException ex) {
-            LOG.error(ex);
-            throw new EmfException("Could not authenticate user: " + username + ". Reason: " + ex.getMessage());
+            LOG.error("Could not authenticate user: " + username + ". Reason: " + ex.getMessage());
+            throw new EmfException("Could not authenticate user: " + username);
         }
 
     }

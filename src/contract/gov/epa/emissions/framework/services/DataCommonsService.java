@@ -13,10 +13,6 @@ public interface DataCommonsService {
     // Countries
     Country[] getCountries() throws EmfException;
 
-    void addCountry(Country country) throws EmfException;
-
-    void updateCountry(Country country) throws EmfException;
-
     // Sectors
     Sector[] getSectors() throws EmfException;
 

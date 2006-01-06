@@ -92,36 +92,6 @@ public class DataCommonsDAO {
         return countries;
     }
 
-    public void updateCountry(Country country, Session session) {
-        log.debug("updating country: " + country.getId());
-        Transaction tx = null;
-
-        try {
-            tx = session.beginTransaction();
-            session.update(country);
-            tx.commit();
-            log.debug("updating country: " + country.getId());
-        } catch (HibernateException e) {
-            log.error(e);
-            tx.rollback();
-            throw e;
-        }
-    }
-
-    public void insertCountry(Country country, Session session) {
-        Transaction tx = null;
-
-        try {
-            tx = session.beginTransaction();
-            session.save(country);
-            tx.commit();
-        } catch (HibernateException e) {
-            log.error(e);
-            tx.rollback();
-            throw e;
-        }
-    }
-
     public List getSectors(Session session) {
         return session.createCriteria(Sector.class).addOrder(Order.asc("name")).list();
     }
