@@ -43,7 +43,7 @@ public class ImportTask implements Runnable {
 
         try {
             setStartStatus();
-            dataServices.insertDataset(dataset);
+            dataServices.addDataset(dataset);
             dataset.setStatus(EMFConstants.DATASET_STATUS_START_IMPORT);
             importer.run();
 
@@ -56,7 +56,7 @@ public class ImportTask implements Runnable {
             log.error("Problem on attempting to run ExIm on file : " + fileName, e);
             setStatus("Import failure. Reason: " + e.getMessage());
             try {
-                dataServices.deleteDataset(dataset);
+                dataServices.removeDataset(dataset);
             } catch (EmfException e1) {
                 log.error("Problem removing inserted dataset for failed import : " + dataset.getName(), e);
             }

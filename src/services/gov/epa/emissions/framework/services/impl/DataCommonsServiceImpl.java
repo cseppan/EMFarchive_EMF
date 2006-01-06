@@ -76,18 +76,18 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     }
 
     public Sector obtainLockedSector(User owner, Sector sector) throws EmfException {
-        Sector lockedSector;
         try {
             Session session = sessionFactory.getSession();
-            lockedSector = dao.obtainLockedSector(owner, sector, session);
+            Sector lockedSector = dao.obtainLockedSector(owner, sector, session);
             session.close();
+
+            return lockedSector;
         } catch (HibernateException e) {
             LOG.error("Could not obtain lock for sector: " + sector.getName() + " by owner: " + owner.getUsername()
                     + ".Reason: " + e);
             throw new EmfException("Could not obtain lock for sector: " + sector.getName() + " by owner: "
                     + owner.getUsername());
         }
-        return lockedSector;
     }
 
     public Sector updateSector(Sector sector) throws EmfException {

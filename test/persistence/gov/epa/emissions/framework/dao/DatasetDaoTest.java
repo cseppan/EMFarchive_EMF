@@ -37,19 +37,6 @@ public class DatasetDaoTest extends ServicesTestCase {
         assertEquals(0, all.size());
     }
 
-    public void testShouldGetDatasetById() throws Exception {
-        EmfDataset dataset = newDataset();
-
-        try {
-            EmfDataset result = dao.get(dataset.getDatasetid(), session);
-
-            assertEquals(dataset.getDatasetid(), result.getDatasetid());
-            assertEquals(dataset.getName(), result.getName());
-        } finally {
-            remove(dataset);
-        }
-    }
-
     public void testShouldAddDatasetToDatabaseOnAdd() throws Exception {
         EmfDataset dataset = new EmfDataset();
         dataset.setName("dataset-dao-test");

@@ -133,7 +133,6 @@ public class DataCommonsServiceTransport implements DataCommonsService {
     }
 
     public Sector releaseLockedSector(Sector sector) throws EmfException {
-        Sector modifiedSector = null;
         try {
             Call call = callFactory.createCall();
 
@@ -142,13 +141,14 @@ public class DataCommonsServiceTransport implements DataCommonsService {
             mappings.addParam(call, "sector", mappings.sector());
             mappings.setReturnType(call, mappings.sector());
 
-            modifiedSector = (Sector) call.invoke(new Object[] { sector });
+            return (Sector) call.invoke(new Object[] { sector });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Could not release sector lock: " + sector.getName(), fault);
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not release sector lock: " + sector.getName(), e);
         }
-        return modifiedSector;
+
+        return null;
     }
 
     public DatasetType[] getDatasetTypes() throws EmfException {

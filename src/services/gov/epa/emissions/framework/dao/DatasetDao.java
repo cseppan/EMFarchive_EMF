@@ -35,27 +35,6 @@ public class DatasetDao {
         }
     }
 
-    public void updateDefaultVersion(long datasetId, int lastFinalVersion, Session session) {
-        EmfDataset dataset = get(datasetId, session);
-        dataset.setDefaultVersion(lastFinalVersion);
-        updateWithoutLocking(dataset, session);
-    }
-
-    public EmfDataset get(long datasetId, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(EmfDataset.class).add(
-                    Restrictions.eq("datasetid", new Long(datasetId)));
-            tx.commit();
-
-            return (EmfDataset) crit.uniqueResult();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
-    }
-
     public List all(Session session) {
         Transaction tx = null;
         try {

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.impl;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDao;
 import gov.epa.emissions.framework.services.DataService;
@@ -13,7 +14,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class DataServiceImpl implements DataService {
-    private static Log log = LogFactory.getLog(DataServiceImpl.class);
+    private static Log LOG = LogFactory.getLog(DataServiceImpl.class);
 
     private HibernateSessionFactory sessionFactory;
 
@@ -29,79 +30,78 @@ public class DataServiceImpl implements DataService {
     }
 
     public EmfDataset[] getDatasets() throws EmfException {
-        List datasets = null;
         try {
             Session session = sessionFactory.getSession();
-            datasets = dao.all(session);
-            session.flush();
+            List datasets = dao.all(session);
             session.close();
-        } catch (HibernateException e) {
-            log.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
-        }
-        return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
-    }
 
-    public void insertDataset(EmfDataset aDataset) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            dao.add(aDataset, session);
-            session.flush();
-            session.close();
+            return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
         } catch (HibernateException e) {
-            log.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
+            LOG.error("Could not get all Datasets. Reason: " + e);
+            throw new EmfException("Could not get all Datasets");
         }
     }
 
-    public void updateDataset(EmfDataset aDset) throws EmfException {
+    public void addDataset(EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.updateWithoutLocking(aDset, session);
-            session.flush();
+            dao.add(dataset, session);
             session.close();
         } catch (HibernateException e) {
-            log.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
+            LOG.error("Could not get add Dataset - " + dataset.getName() + ". Reason: " + e);
+            throw new EmfException("Could not get add Dataset - " + dataset.getName());
         }
     }
 
-    public EmfDataset getDataset(long datasetId) throws EmfException {
-        EmfDataset dataset = null;
+    public void updateDataset(EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dataset = dao.get(datasetId, session);
-            session.flush();
+            dao.updateWithoutLocking(dataset, session);
             session.close();
         } catch (HibernateException e) {
-            log.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
+            LOG.error("Could not get update Dataset - " + dataset.getName() + ". Reason: " + e);
+            throw new EmfException("Could not get update Dataset - " + dataset.getName());
         }
-        return dataset;
     }
 
-    public void updateDefaultVersion(long datasetId, int lastFinalVersion) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            dao.updateDefaultVersion(datasetId, lastFinalVersion, session);
-            session.flush();
-            session.close();
-        } catch (HibernateException e) {
-            log.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
-        }
-
-    }
-
-    public void deleteDataset(EmfDataset dataset) throws EmfException {
+    public void removeDataset(EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             dao.remove(dataset, session);
-            session.flush();
             session.close();
         } catch (HibernateException e) {
-            log.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
+            LOG.error("Could not get remove Dataset - " + dataset.getName() + ". Reason: " + e);
+            throw new EmfException("Could not get remove Dataset - " + dataset.getName());
+        }
+    }
+
+    public EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            EmfDataset locked = dao.obtainLocked(owner, dataset, session);
+            session.close();
+
+            return locked;
+        } catch (HibernateException e) {
+            LOG.error("Could not obtain lock for Dataset: " + dataset.getName() + " by owner: " + owner.getUsername()
+                    + ".Reason: " + e);
+            throw new EmfException("Could not obtain lock for Dataset: " + dataset.getName() + " by owner: "
+                    + owner.getUsername());
+        }
+    }
+
+    public EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            EmfDataset released = dao.releaseLocked(locked, session);
+            session.close();
+
+            return released;
+        } catch (HibernateException e) {
+            LOG.error("Could not release lock for Dataset: " + locked.getName() + " by owner: " + locked.getLockOwner()
+                    + ".Reason: " + e);
+            throw new EmfException("Could not release lock for Dataset: " + locked.getName() + " by owner: "
+                    + locked.getLockOwner());
         }
     }
 }

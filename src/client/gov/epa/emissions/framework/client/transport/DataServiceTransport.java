@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -68,6 +69,45 @@ public class DataServiceTransport implements DataService {
     private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
         LOG.error(message, fault);
         throw new EmfException(extractMessage(fault.getMessage()));
+    }
+
+    public EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.setOperation(call, "obtainLockedDataset");
+            mappings.addParam(call, "owner", mappings.user());
+            mappings.addParam(call, "dataset", mappings.dataset());
+            mappings.setReturnType(call, mappings.dataset());
+
+            return (EmfDataset) call.invoke(new Object[] { owner, dataset });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not get Dataset lock: " + dataset.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not get sector lock: " + dataset.getName(), e);
+        }
+
+        return null;
+    }
+
+    public EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.setOperation(call, "releaseLockedDataset");
+            mappings.addParam(call, "locked", mappings.dataset());
+            mappings.setReturnType(call, mappings.dataset());
+
+            return (EmfDataset) call.invoke(new Object[] { locked });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not release Dataset lock: " + locked.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not release Dataset lock: " + locked.getName(), e);
+        }
+
+        return null;
     }
 
 }

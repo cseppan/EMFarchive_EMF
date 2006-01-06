@@ -126,7 +126,7 @@ public class EmfDataset implements Dataset, Lockable {
     }
 
     public String getDatasetTypeName() {
-        return datasetType.getName();
+        return datasetType != null ? datasetType.getName() : null;
     }
 
     public DatasetType getDatasetType() {
