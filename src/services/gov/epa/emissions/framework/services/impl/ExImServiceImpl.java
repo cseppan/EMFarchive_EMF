@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.dao.DatasetDAO;
+import gov.epa.emissions.framework.dao.DatasetDao;
 import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.EMFConstants;
@@ -108,7 +108,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     private void validateDatasetName(EmfDataset dataset) throws EmfException {
         log.debug("check if dataset name exists in table: " + dataset.getName());
         Session session = sessionFactory.getSession();
-        boolean dsNameUsed = DatasetDAO.isDatasetNameUsed(dataset.getName(), session);
+        boolean dsNameUsed = new DatasetDao().isDatasetNameUsed(dataset.getName(), session);
         session.flush();
         session.close();
         if (dsNameUsed) {

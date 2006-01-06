@@ -4,11 +4,12 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.HibernateTestCase;
 
-import java.util.Iterator;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 
 public class UserDaoTest extends HibernateTestCase {
 
@@ -151,24 +152,13 @@ public class UserDaoTest extends HibernateTestCase {
     }
 
     private User user(String username) {
-        List all = all();
-        for (Iterator iter = all.iterator(); iter.hasNext();) {
-            User element = (User) iter.next();
-            if (element.getUsername().equals(username))
-                return element;
-        }
-
-        return null;
-    }
-
-    private List all() {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            List all = session.createCriteria(User.class).list();
+            Criteria crit = session.createCriteria(User.class).add(Restrictions.eq("username", username));
             tx.commit();
 
-            return all;
+            return (User) crit.uniqueResult();
         } catch (HibernateException e) {
             tx.rollback();
             throw e;

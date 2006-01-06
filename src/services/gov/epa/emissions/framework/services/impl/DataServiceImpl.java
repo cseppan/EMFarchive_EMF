@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.dao.DatasetDAO;
+import gov.epa.emissions.framework.dao.DatasetDao;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -17,19 +17,22 @@ public class DataServiceImpl implements DataService {
 
     private HibernateSessionFactory sessionFactory;
 
+    private DatasetDao dao;
+
     public DataServiceImpl() {
         this(HibernateSessionFactory.get());
     }
 
     public DataServiceImpl(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+        dao = new DatasetDao();
     }
 
     public EmfDataset[] getDatasets() throws EmfException {
         List datasets = null;
         try {
             Session session = sessionFactory.getSession();
-            datasets = DatasetDAO.getDatasets(session);
+            datasets = dao.all(session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -42,7 +45,7 @@ public class DataServiceImpl implements DataService {
     public void insertDataset(EmfDataset aDataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            DatasetDAO.insertDataset(aDataset, session);
+            dao.insertDataset(aDataset, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -54,7 +57,7 @@ public class DataServiceImpl implements DataService {
     public void updateDataset(EmfDataset aDset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            DatasetDAO.updateDataset(aDset, session);
+            dao.updateDataset(aDset, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -67,7 +70,7 @@ public class DataServiceImpl implements DataService {
         EmfDataset dataset = null;
         try {
             Session session = sessionFactory.getSession();
-            dataset = DatasetDAO.getDataset(datasetId, session);
+            dataset = dao.get(datasetId, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -80,7 +83,7 @@ public class DataServiceImpl implements DataService {
     public void updateDefaultVersion(long datasetId, int lastFinalVersion) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            DatasetDAO.updateDefaultVersion(datasetId, lastFinalVersion, session);
+            dao.updateDefaultVersion(datasetId, lastFinalVersion, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -93,7 +96,7 @@ public class DataServiceImpl implements DataService {
     public void deleteDataset(EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            DatasetDAO.deleteDataset(dataset, session);
+            dao.deleteDataset(dataset, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
