@@ -53,7 +53,7 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public void updateDataset(EmfDataset dataset) throws EmfException {
+    public void updateDatasetWithoutLock(EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             dao.updateWithoutLocking(dataset, session);
@@ -102,6 +102,19 @@ public class DataServiceImpl implements DataService {
                     + ".Reason: " + e);
             throw new EmfException("Could not release lock for Dataset: " + locked.getName() + " by owner: "
                     + locked.getLockOwner());
+        }
+    }
+
+    public EmfDataset updateDataset(EmfDataset dataset) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            EmfDataset released = dao.update(dataset, session);
+            session.close();
+
+            return released;
+        } catch (HibernateException e) {
+            LOG.error("Could not update Dataset: " + dataset.getName() + ".Reason: " + e);
+            throw new EmfException("Could not update Dataset: " + dataset.getName());
         }
     }
 }

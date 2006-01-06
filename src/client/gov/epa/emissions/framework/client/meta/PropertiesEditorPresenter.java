@@ -67,7 +67,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
             throws EmfException {
         summary.doSave();
         keywords.doSave();
-        dataServices.updateDataset(dataset);
+        dataServices.updateDatasetWithoutLock(dataset);
     }
 
     public void set(SummaryTabView summary) {

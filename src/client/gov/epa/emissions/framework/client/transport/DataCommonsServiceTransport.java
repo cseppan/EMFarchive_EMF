@@ -189,17 +189,16 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return null;
     }
 
-    public DatasetType updateDatasetType(User owner, DatasetType type) throws EmfException {
+    public DatasetType updateDatasetType(DatasetType type) throws EmfException {
         try {
             Call call = callFactory.createCall();
 
             mappings.register(call);
             mappings.setOperation(call, "updateDatasetType");
-            mappings.addParam(call, "owner", mappings.user());
             mappings.addParam(call, "type", mappings.datasetType());
             mappings.setReturnType(call, mappings.datasetType());
 
-            return (DatasetType) call.invoke(new Object[] { owner, type });
+            return (DatasetType) call.invoke(new Object[] { type });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Could not update DatasetType: " + type.getName(), fault);
         } catch (Exception e) {

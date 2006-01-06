@@ -27,7 +27,7 @@ public interface DataCommonsService {
 
     DatasetType obtainLockedDatasetType(User owner, DatasetType type) throws EmfException;
 
-    DatasetType updateDatasetType(User owner, DatasetType type) throws EmfException;
+    DatasetType updateDatasetType(DatasetType type) throws EmfException;
 
     DatasetType releaseLockedDatasetType(User owner, DatasetType type) throws EmfException;
 

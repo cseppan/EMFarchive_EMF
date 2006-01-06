@@ -40,7 +40,7 @@ public class DataServiceTransport implements DataService {
         return null;
     }
 
-    public void updateDataset(EmfDataset dataset) throws EmfException {
+    public void updateDatasetWithoutLock(EmfDataset dataset) throws EmfException {
         try {
             Call call = callFactory.createCall();
 
@@ -86,6 +86,25 @@ public class DataServiceTransport implements DataService {
             throwExceptionOnAxisFault("Could not get Dataset lock: " + dataset.getName(), fault);
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not get sector lock: " + dataset.getName(), e);
+        }
+
+        return null;
+    }
+
+    public EmfDataset updateDataset(EmfDataset dataset) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.setOperation(call, "updateDataset");
+            mappings.addParam(call, "dataset", mappings.dataset());
+            mappings.setReturnType(call, mappings.dataset());
+
+            return (EmfDataset) call.invoke(new Object[] { dataset });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not update Dataset: " + dataset.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not update Dataset: " + dataset.getName(), e);
         }
 
         return null;

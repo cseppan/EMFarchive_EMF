@@ -55,7 +55,7 @@ public class ExportTask implements Runnable {
             exporter.export(file);
 
             loggingServices.setAccessLog(accesslog);
-            dataServices.updateDataset(dataset);
+            dataServices.updateDatasetWithoutLock(dataset);
             setStatus("Completed export for " + dataset.getName() + ":" + file.getName());
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + file, e);

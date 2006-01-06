@@ -59,7 +59,7 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
     public void doSave(String name, String description, Keyword[] keywords, DatasetTypesManagerView manager)
             throws EmfException {
         update(name, description, keywords);
-        type = service().updateDatasetType(session.user(), type);
+        type = service().updateDatasetType(type);
 
         manager.refresh();
         closeView();

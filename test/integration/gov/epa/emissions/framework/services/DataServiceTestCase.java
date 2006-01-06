@@ -5,6 +5,8 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
+import java.util.Random;
+
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -77,9 +79,26 @@ public abstract class DataServiceTestCase extends ServicesTestCase {
         }
     }
 
+    public void testShouldUpdateDataset() throws EmfException {
+        User owner = userService.getUser("emf");
+        EmfDataset dataset = newDataset();
+
+        try {
+            EmfDataset locked = service.obtainLockedDataset(owner, dataset);
+            locked.setDescription("TEST dataset");
+
+            EmfDataset released = service.updateDataset(locked);
+            assertEquals("TEST dataset", released.getDescription());
+            assertEquals(released.getLockOwner(), null);
+            assertFalse("Lock should be released on update", released.isLocked());
+        } finally {
+            remove(dataset);
+        }
+    }
+
     private EmfDataset newDataset() {
         EmfDataset dataset = new EmfDataset();
-        dataset.setName("dataset-dao-test");
+        dataset.setName("dataset-dao-test" + new Random().nextInt());
         dataset.setCreator("creator");
 
         Transaction tx = null;

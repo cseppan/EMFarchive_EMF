@@ -144,7 +144,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public DatasetType updateDatasetType(User user, DatasetType type) throws EmfException {
+    public DatasetType updateDatasetType(DatasetType type) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             DatasetType locked = dao.updateDatasetType(type, session);

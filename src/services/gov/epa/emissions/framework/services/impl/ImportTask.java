@@ -49,7 +49,7 @@ public class ImportTask implements Runnable {
 
             // if no errors then insert the dataset into the database
             dataset.setStatus(EMFConstants.DATASET_STATUS_IMPORTED);
-            dataServices.updateDataset(dataset);
+            dataServices.updateDatasetWithoutLock(dataset);
             
             setStatus("Completed import for " + dataset.getDatasetTypeName() + ":" + fileName);
         } catch (Exception e) {

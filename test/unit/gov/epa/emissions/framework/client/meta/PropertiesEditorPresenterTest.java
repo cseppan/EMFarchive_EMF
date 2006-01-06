@@ -82,7 +82,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() throws Exception {
-        dataServices.expects(once()).method("updateDataset").with(eq(dataset));
+        dataServices.expects(once()).method("updateDatasetWithoutLock").with(eq(dataset));
 
         Mock summaryView = mock(SummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
@@ -105,7 +105,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldSaveWithoutPromptingOnSaveIfChangesHaveOccuredInSummaryTab() throws EmfException {
-        dataServices.expects(once()).method("updateDataset").with(eq(dataset));
+        dataServices.expects(once()).method("updateDatasetWithoutLock").with(eq(dataset));
 
         Mock summaryView = mock(SummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
@@ -131,7 +131,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldUpdateDatasetWithChangesFromTabsAndSaveDatasetOnUpdate() throws Exception {
-        dataServices.expects(once()).method("updateDataset").with(eq(dataset));
+        dataServices.expects(once()).method("updateDatasetWithoutLock").with(eq(dataset));
 
         Mock summaryTab = mock(SummaryTabPresenterStub.class);
         summaryTab.expects(once()).method("doSave");
@@ -144,7 +144,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldDisplayErrorMessageOnDatasetsBrowserIfGettingUpdatedDatasetsFailOnSave() throws EmfException {
-        dataServices.expects(once()).method("updateDataset").with(eq(dataset));
+        dataServices.expects(once()).method("updateDatasetWithoutLock").with(eq(dataset));
 
         Mock summaryView = mock(SummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
@@ -170,7 +170,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
         summaryView.expects(once()).method("observeChanges").with(eq(presenter));
 
-        dataServices.expects(once()).method("updateDataset").with(eq(dataset)).will(
+        dataServices.expects(once()).method("updateDatasetWithoutLock").with(eq(dataset)).will(
                 new ThrowStub(new EmfException("update failure")));
         view.expects(once()).method("showError").with(
                 eq("Could not update dataset - " + dataset.getName() + ". Reason: update failure"));

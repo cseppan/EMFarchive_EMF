@@ -127,7 +127,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         assertEquals(modified1.getLockOwner(), owner.getUsername());
         modified1.setName("TEST");
 
-        DatasetType modified2 = service.updateDatasetType(owner, modified1);
+        DatasetType modified2 = service.updateDatasetType(modified1);
         assertEquals("TEST", modified2.getName());
         assertEquals(modified2.getLockOwner(), null);
 
@@ -135,7 +135,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         DatasetType modified = service.obtainLockedDatasetType(owner, type);
         modified.setName(name);
 
-        DatasetType modified3 = service.updateDatasetType(owner, modified);
+        DatasetType modified3 = service.updateDatasetType(modified);
         assertEquals(type.getName(), modified3.getName());
     }
 
