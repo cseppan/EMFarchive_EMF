@@ -30,6 +30,8 @@
   <property name="createdDateTime"		column="created_date_time" 		type="java.util.Date"		not-null="false"	length="4"/>
   <property name="modifiedDateTime"		column="modified_date_time" 	type="java.util.Date"		not-null="false"	length="4"/>
   <property name="accessedDateTime"		column="accessed_date_time" 	type="java.util.Date"		not-null="false"	length="4"/>        
+  <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
+  <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
 
   <map name="tablesMap" table="DATASETTABLES" lazy="false">
     <key column="DATASET_ID"/>

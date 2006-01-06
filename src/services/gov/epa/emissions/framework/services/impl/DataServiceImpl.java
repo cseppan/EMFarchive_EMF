@@ -57,7 +57,7 @@ public class DataServiceImpl implements DataService {
     public void updateDataset(EmfDataset aDset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.update(aDset, session);
+            dao.updateWithoutLocking(aDset, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {

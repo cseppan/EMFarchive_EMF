@@ -172,6 +172,8 @@ CREATE TABLE emf.datasets
   modified_date_time timestamp,
   accessed_date_time timestamp,
   default_version int4 DEFAULT 0,
+  lock_owner varchar(255),
+  lock_date timestamp,
   CONSTRAINT datasets_pkey PRIMARY KEY (dataset_id),
   CONSTRAINT datasets_name_key UNIQUE (name)
 ) 

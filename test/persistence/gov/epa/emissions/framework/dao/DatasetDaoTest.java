@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.dao;
 
+import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
@@ -55,7 +57,7 @@ public class DatasetDaoTest extends ServicesTestCase {
 
         try {
             dao.add(dataset, session);
-            EmfDataset result = dataset(dataset.getName());
+            EmfDataset result = load(dataset);
 
             assertEquals(dataset.getDatasetid(), result.getDatasetid());
             assertEquals(dataset.getName(), result.getName());
@@ -69,8 +71,8 @@ public class DatasetDaoTest extends ServicesTestCase {
         dataset.setCountry("test-country");
 
         try {
-            dao.update(dataset, session);
-            EmfDataset result = dataset(dataset.getName());
+            dao.updateWithoutLocking(dataset, session);
+            EmfDataset result = load(dataset);
 
             assertEquals(dataset.getDatasetid(), result.getDatasetid());
             assertEquals("test-country", result.getCountry());
@@ -83,7 +85,7 @@ public class DatasetDaoTest extends ServicesTestCase {
         EmfDataset dataset = newDataset();
 
         dao.remove(dataset, session);
-        EmfDataset result = dataset(dataset.getName());
+        EmfDataset result = load(dataset);
 
         assertNull("Should be removed from the database on 'remove'", result);
     }
@@ -96,6 +98,90 @@ public class DatasetDaoTest extends ServicesTestCase {
         } finally {
             remove(dataset);
         }
+    }
+
+    public void testShouldObtainLockedDatasetForUpdate() {
+        UserDao userDao = new UserDao();
+        User owner = userDao.get("emf", session);
+        EmfDataset dataset = newDataset();
+
+        try {
+            EmfDataset locked = dao.obtainLocked(owner, dataset, session);
+            assertEquals(locked.getLockOwner(), owner.getUsername());
+
+            EmfDataset loadedFromDb = load(dataset);
+            assertEquals(loadedFromDb.getLockOwner(), owner.getUsername());
+        } finally {
+            remove(dataset);
+        }
+    }
+
+    public void testShouldUpdateDatasetAfterObtainingLock() throws EmfException {
+        UserDao userDao = new UserDao();
+        User owner = userDao.get("emf", session);
+        EmfDataset dataset = newDataset();
+
+        try {
+            EmfDataset locked = dao.obtainLocked(owner, dataset, session);
+            assertEquals(locked.getLockOwner(), owner.getUsername());
+            locked.setName("TEST");
+
+            EmfDataset modified = dao.update(locked, session);
+            assertEquals("TEST", locked.getName());
+            assertEquals(modified.getLockOwner(), null);
+        } finally {
+            remove(dataset);
+        }
+    }
+
+    public void testShouldFailToGetLockWhenAlreadyLockedByAnotherUser() {
+        UserDao userDao = new UserDao();
+        User owner = userDao.get("emf", session);
+        EmfDataset dataset = newDataset();
+
+        try {
+            dao.obtainLocked(owner, dataset, session);
+
+            User user = userDao.get("admin", session);
+            EmfDataset result = dao.obtainLocked(user, dataset, session);
+
+            assertFalse("Should have failed to obtain lock as it's already locked by another user", result
+                    .isLocked(user));// failed to obtain lock for another user
+        } finally {
+            remove(dataset);
+        }
+    }
+
+    public void testShouldReleaseSectorLock() throws EmfException {
+        UserDao userDao = new UserDao();
+        User owner = userDao.get("emf", session);
+        EmfDataset dataset = newDataset();
+
+        try {
+            EmfDataset locked = dao.obtainLocked(owner, dataset, session);
+            EmfDataset releasedSector = dao.releaseLocked(locked, session);
+            assertFalse("Should have released lock", releasedSector.isLocked());
+
+            EmfDataset loadedFromDb = load(dataset);
+            assertFalse("Should have released lock", loadedFromDb.isLocked());
+        } finally {
+            remove(dataset);
+        }
+    }
+
+    public void testShouldFailToReleaseSectorLockIfNotObtained() {
+        EmfDataset dataset = newDataset();
+
+        try {
+            dao.releaseLocked(dataset, session);
+        } catch (EmfException e) {
+            assertEquals("Cannot release without owning lock", e.getMessage());
+            return;
+        } finally {
+            remove(dataset);
+        }
+
+        fail("Should have failed to release lock that was not obtained");
     }
 
     private void remove(EmfDataset dataset) {
@@ -119,15 +205,15 @@ public class DatasetDaoTest extends ServicesTestCase {
             throw e;
         }
 
-        return dataset(dataset.getName());
+        return load(dataset);
     }
 
-    private EmfDataset dataset(String name) {
+    private EmfDataset load(EmfDataset dataset) {
         Transaction tx = null;
 
         try {
             tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(EmfDataset.class).add(Restrictions.eq("name", name));
+            Criteria crit = session.createCriteria(EmfDataset.class).add(Restrictions.eq("name", dataset.getName()));
             tx.commit();
 
             return (EmfDataset) crit.uniqueResult();
