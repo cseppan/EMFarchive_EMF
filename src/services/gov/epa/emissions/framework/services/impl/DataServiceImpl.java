@@ -45,7 +45,7 @@ public class DataServiceImpl implements DataService {
     public void insertDataset(EmfDataset aDataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.insertDataset(aDataset, session);
+            dao.add(aDataset, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -57,7 +57,7 @@ public class DataServiceImpl implements DataService {
     public void updateDataset(EmfDataset aDset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.updateDataset(aDset, session);
+            dao.update(aDset, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {
@@ -96,7 +96,7 @@ public class DataServiceImpl implements DataService {
     public void deleteDataset(EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.deleteDataset(dataset, session);
+            dao.remove(dataset, session);
             session.flush();
             session.close();
         } catch (HibernateException e) {

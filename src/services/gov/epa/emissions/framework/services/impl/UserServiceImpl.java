@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
     public User[] getUsers() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            List all = dao.getAll(session);
+            List all = dao.all(session);
             session.close();
 
             return (User[]) all.toArray(new User[0]);

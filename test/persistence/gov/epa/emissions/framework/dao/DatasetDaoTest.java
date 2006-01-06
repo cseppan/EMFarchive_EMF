@@ -40,8 +40,59 @@ public class DatasetDaoTest extends ServicesTestCase {
 
         try {
             EmfDataset result = dao.get(dataset.getDatasetid(), session);
+
             assertEquals(dataset.getDatasetid(), result.getDatasetid());
             assertEquals(dataset.getName(), result.getName());
+        } finally {
+            remove(dataset);
+        }
+    }
+
+    public void testShouldAddDatasetToDatabaseOnAdd() throws Exception {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("dataset-dao-test");
+        dataset.setCreator("creator");
+
+        try {
+            dao.add(dataset, session);
+            EmfDataset result = dataset(dataset.getName());
+
+            assertEquals(dataset.getDatasetid(), result.getDatasetid());
+            assertEquals(dataset.getName(), result.getName());
+        } finally {
+            remove(dataset);
+        }
+    }
+
+    public void testShouldUpdateDatasetOnUpdate() throws Exception {
+        EmfDataset dataset = newDataset();
+        dataset.setCountry("test-country");
+
+        try {
+            dao.update(dataset, session);
+            EmfDataset result = dataset(dataset.getName());
+
+            assertEquals(dataset.getDatasetid(), result.getDatasetid());
+            assertEquals("test-country", result.getCountry());
+        } finally {
+            remove(dataset);
+        }
+    }
+
+    public void testShouldRemoveDatasetFromDatabaseOnRemove() throws Exception {
+        EmfDataset dataset = newDataset();
+
+        dao.remove(dataset, session);
+        EmfDataset result = dataset(dataset.getName());
+
+        assertNull("Should be removed from the database on 'remove'", result);
+    }
+
+    public void testShouldConfirmDatasetExistsWhenQueriedByName() throws Exception {
+        EmfDataset dataset = newDataset();
+
+        try {
+            assertTrue("Should be able to confirm existence of dataset", dao.exists(dataset.getName(), session));
         } finally {
             remove(dataset);
         }
@@ -73,6 +124,7 @@ public class DatasetDaoTest extends ServicesTestCase {
 
     private EmfDataset dataset(String name) {
         Transaction tx = null;
+
         try {
             tx = session.beginTransaction();
             Criteria crit = session.createCriteria(EmfDataset.class).add(Restrictions.eq("name", name));

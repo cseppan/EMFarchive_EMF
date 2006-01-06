@@ -29,12 +29,12 @@ public class UserDaoTest extends HibernateTestCase {
     }
 
     public void testShouldFetchAllUsers() {
-        List users = dao.getAll(session);
+        List users = dao.all(session);
         assertTrue("Should contain at least 2 users", users.size() >= 2);
     }
 
     public void testShouldAddUser() throws Exception {
-        List usersBeforeAdd = dao.getAll(session);
+        List usersBeforeAdd = dao.all(session);
         User user = newUser("add-user", dao);
 
         // test
@@ -42,7 +42,7 @@ public class UserDaoTest extends HibernateTestCase {
 
         // assert
         try {
-            List usersAfterAdd = dao.getAll(session);
+            List usersAfterAdd = dao.all(session);
             assertEquals(usersBeforeAdd.size() + 1, usersAfterAdd.size());
         } finally {
             remove(user);
@@ -63,13 +63,13 @@ public class UserDaoTest extends HibernateTestCase {
     }
 
     public void testShouldRemoveUser() throws Exception {
-        List usersBeforeRemove = dao.getAll(session);
+        List usersBeforeRemove = dao.all(session);
         // test
         dao.remove(user, session);
 
         // assert
         try {
-            List usersAfterRemove = dao.getAll(session);
+            List usersAfterRemove = dao.all(session);
             assertEquals(usersBeforeRemove.size(), usersAfterRemove.size() + 1);
         } finally {
             user = newUser(dao);// restore

@@ -19,7 +19,7 @@ public class UserDao {
         lockingScheme = new LockingScheme();
     }
 
-    public List getAll(Session session) {
+    public List all(Session session) {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
@@ -88,14 +88,14 @@ public class UserDao {
     }
 
     public User obtainLocked(User lockOwner, User user, Session session) {
-        return (User) lockingScheme.getLocked(lockOwner, user, session, getAll(session));
+        return (User) lockingScheme.getLocked(lockOwner, user, session, all(session));
     }
 
     public User update(User user, Session session) throws EmfException {
-        return (User) lockingScheme.update(user, session, getAll(session));
+        return (User) lockingScheme.update(user, session, all(session));
     }
 
     public User releaseLocked(User locked, Session session) throws EmfException {
-        return (User) lockingScheme.releaseLock(locked, session, getAll(session));
+        return (User) lockingScheme.releaseLock(locked, session, all(session));
     }
 }
