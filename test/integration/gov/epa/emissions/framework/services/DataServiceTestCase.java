@@ -29,6 +29,8 @@ public abstract class DataServiceTestCase extends ServicesTestCase {
 
         sessionFactory = new HibernateSessionFactory(sessionFactory());
         session = sessionFactory.getSession();
+
+        deleteDatasets();
     }
 
     protected void doTearDown() throws Exception {// no op

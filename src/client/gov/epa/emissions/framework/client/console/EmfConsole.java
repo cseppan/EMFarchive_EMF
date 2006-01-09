@@ -52,6 +52,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         this.serviceLocator = session.serviceLocator();
 
         this.windowLayoutManager = new CascadeLayout(this);
+        messagePanel = new SingleLineMessagePanel();
 
         setProperties();
         setLayout(session);
@@ -67,7 +68,6 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         JMenuBar menuBar = createMenuBar(session);
         super.setJMenuBar(menuBar);
 
-        messagePanel = new SingleLineMessagePanel();
         menuBar.add(messagePanel);
     }
 
