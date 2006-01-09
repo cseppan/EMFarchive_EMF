@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.commons.db.PostgresDbUpdate;
+import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 import gov.epa.emissions.framework.services.impl.StatusServiceImpl;
@@ -11,11 +11,11 @@ public abstract class StatusServiceTestCase extends ServicesTestCase {
 
     private StatusService service;
 
-    private StatusServiceImpl helper;
+    private StatusServiceImpl impl;
 
     protected void setUpService(StatusService service, HibernateSessionFactory sessionFactory) {
         this.service = service;
-        helper = new StatusServiceImpl(sessionFactory);
+        impl = new StatusServiceImpl(sessionFactory);
     }
 
     public void testShouldGetAllStatusMessages() throws Exception {
@@ -25,7 +25,7 @@ public abstract class StatusServiceTestCase extends ServicesTestCase {
         status.setUsername("user");
         status.setTimestamp(new Date());
 
-        helper.create(status);
+        impl.create(status);
         Status[] results = service.getAll("user");
         assertEquals(1, results.length);
     }

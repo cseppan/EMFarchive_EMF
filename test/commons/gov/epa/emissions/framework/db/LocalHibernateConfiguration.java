@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.db;
 
-import gov.epa.emissions.commons.db.PostgresDbConfig;
+import gov.epa.emissions.commons.db.postgres.PostgresDbConfig;
 
 import java.util.Map;
 import java.util.Properties;

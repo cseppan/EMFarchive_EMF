@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.dao;
 
-import gov.epa.emissions.commons.db.PostgresDbUpdate;
+import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.HibernateTestCase;

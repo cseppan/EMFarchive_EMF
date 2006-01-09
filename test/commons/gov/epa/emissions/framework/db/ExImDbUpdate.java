@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.db;
 
-import gov.epa.emissions.commons.db.PostgresDbUpdate;
+import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 
 import java.sql.SQLException;
 
