@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Country;
+import gov.epa.emissions.framework.services.Status;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,11 +14,13 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 public class DataCommonsDAO {
     private static Log log = LogFactory.getLog(DataCommonsDAO.class);
@@ -33,7 +36,6 @@ public class DataCommonsDAO {
     }
 
     public List getEmfKeywords(Session session) {
-        log.debug("In get emf keywords");
         Transaction tx = null;
 
         ArrayList allKeywords = null;
@@ -43,7 +45,6 @@ public class DataCommonsDAO {
             tx = session.beginTransaction();
 
             Query query = session.createQuery(GET_EMF_KEYWORDS_QUERY);
-
             Iterator iter = query.iterate();
             while (iter.hasNext()) {
                 Keyword kw = (Keyword) iter.next();
@@ -56,12 +57,10 @@ public class DataCommonsDAO {
             tx.rollback();
             throw e;
         }
-        log.debug("after call to allkeywords: size of list= " + allKeywords.size());
         return allKeywords;
     }
 
     public List getCountries(Session session) {
-        log.debug("In get all Countries with valid session?: " + (session == null));
         ArrayList countries = null;
 
         Transaction tx = null;
@@ -69,7 +68,6 @@ public class DataCommonsDAO {
         try {
             tx = session.beginTransaction();
             countries = new ArrayList();
-            log.debug("The query: " + GET_COUNTRY_QUERY);
             Query query = session.createQuery(GET_COUNTRY_QUERY);
 
             Iterator iter = query.iterate();
@@ -79,14 +77,11 @@ public class DataCommonsDAO {
             }
 
             tx.commit();
-            log.info("Total number of countries retrieved= " + countries.size());
         } catch (HibernateException e) {
             log.error(e);
             tx.rollback();
             throw e;
         }
-
-        log.debug("End getSectors");
 
         return countries;
     }
@@ -121,6 +116,55 @@ public class DataCommonsDAO {
 
     public DatasetType releaseLockedDatasetType(DatasetType locked, Session session) throws EmfException {
         return (DatasetType) lockingScheme.releaseLock(locked, session, getDatasetTypes(session));
+    }
+
+    public List allStatus(String username, Session session) {
+        removeReadStatus(username, session);
+
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(Status.class).add(Restrictions.eq("username", username));
+            List all1 = crit.list();
+            tx.commit();
+
+            return all1;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public void add(Status status, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.save(status);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    private void removeReadStatus(String username, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(Status.class).add(Restrictions.eq("username", username)).add(
+                    Restrictions.eq("msgRead", Boolean.TRUE));
+
+            List read = crit.list();
+            for (Iterator iter = read.iterator(); iter.hasNext();) {
+                Status element = (Status) iter.next();
+                session.delete(element);
+            }
+
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
 }

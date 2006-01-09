@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.framework.dao.StatusDAO;
+import gov.epa.emissions.framework.dao.DataCommonsDAO;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.services.StatusService;
 
@@ -12,7 +12,7 @@ public class StatusServiceImpl implements StatusService {
 
     private HibernateSessionFactory sessionFactory;
 
-    private StatusDAO dao;
+    private DataCommonsDAO dao;
 
     public StatusServiceImpl() {
         this(HibernateSessionFactory.get());
@@ -20,12 +20,12 @@ public class StatusServiceImpl implements StatusService {
 
     public StatusServiceImpl(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-        dao = new StatusDAO();
+        dao = new DataCommonsDAO();
     }
 
     public Status[] getAll(String userName) {
         Session session = sessionFactory.getSession();
-        List allStats = dao.all(userName, session);
+        List allStats = dao.allStatus(userName, session);
         session.flush();
         session.close();
 
