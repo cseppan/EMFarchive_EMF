@@ -88,7 +88,7 @@ public class DatasetDaoTest extends ServicesTestCase {
     }
 
     public void testShouldObtainLockedDatasetForUpdate() {
-        UserDao userDao = new UserDao();
+        UserDAO userDao = new UserDAO();
         User owner = userDao.get("emf", session);
         EmfDataset dataset = newDataset();
 
@@ -104,7 +104,7 @@ public class DatasetDaoTest extends ServicesTestCase {
     }
 
     public void testShouldUpdateDatasetAfterObtainingLock() throws EmfException {
-        UserDao userDao = new UserDao();
+        UserDAO userDao = new UserDAO();
         User owner = userDao.get("emf", session);
         EmfDataset dataset = newDataset();
 
@@ -122,7 +122,7 @@ public class DatasetDaoTest extends ServicesTestCase {
     }
 
     public void testShouldFailToGetLockWhenAlreadyLockedByAnotherUser() {
-        UserDao userDao = new UserDao();
+        UserDAO userDao = new UserDAO();
         User owner = userDao.get("emf", session);
         EmfDataset dataset = newDataset();
 
@@ -140,7 +140,7 @@ public class DatasetDaoTest extends ServicesTestCase {
     }
 
     public void testShouldReleaseSectorLock() throws EmfException {
-        UserDao userDao = new UserDao();
+        UserDAO userDao = new UserDAO();
         User owner = userDao.get("emf", session);
         EmfDataset dataset = newDataset();
 

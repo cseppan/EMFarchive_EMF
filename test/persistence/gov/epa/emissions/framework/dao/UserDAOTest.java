@@ -11,16 +11,16 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class UserDaoTest extends HibernateTestCase {
+public class UserDAOTest extends HibernateTestCase {
 
-    private UserDao dao;
+    private UserDAO dao;
 
     private User user;
 
     protected void setUp() throws Exception {
         super.setUp();
 
-        dao = new UserDao();
+        dao = new UserDAO();
         user = newUser(dao);
     }
 
@@ -133,11 +133,11 @@ public class UserDaoTest extends HibernateTestCase {
         fail("Should have failed to release lock that was not obtained");
     }
 
-    private User newUser(UserDao dao) {
+    private User newUser(UserDAO dao) {
         return newUser("user-dao-test", dao);
     }
 
-    private User newUser(String username, UserDao dao) {
+    private User newUser(String username, UserDAO dao) {
         User user = new User();
         user.setUsername(username);
         user.setPassword("abc12345");

@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.dao.UserDao;
+import gov.epa.emissions.framework.dao.UserDAO;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
@@ -131,7 +131,7 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
     }
 
     public void testShouldObtainLockedUser() throws EmfException {
-        UserDao dao = new UserDao();
+        UserDAO dao = new UserDAO();
         User user = newUser(dao);
 
         try {
@@ -150,7 +150,7 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
     }
 
     public void testShouldReleaseLockOnReleaseLockedUser() throws EmfException {
-        UserDao dao = new UserDao();
+        UserDAO dao = new UserDAO();
         User target = newUser(dao);
 
         try {
@@ -167,12 +167,12 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
         }
     }
 
-    private void remove(User user, UserDao dao) {
+    private void remove(User user, UserDAO dao) {
         User loadedFromDb = user(user.getUsername());
         dao.remove(loadedFromDb, session);
     }
 
-    private User newUser(UserDao dao) {
+    private User newUser(UserDAO dao) {
         User user = new User();
         user.setUsername("test-user");
         user.setPassword("abc12345");

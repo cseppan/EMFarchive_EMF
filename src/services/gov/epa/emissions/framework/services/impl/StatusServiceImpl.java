@@ -25,7 +25,7 @@ public class StatusServiceImpl implements StatusService {
 
     public Status[] getAll(String userName) {
         Session session = sessionFactory.getSession();
-        List allStats = dao.getMessages(userName, session);
+        List allStats = dao.all(userName, session);
         session.flush();
         session.close();
 
@@ -35,7 +35,7 @@ public class StatusServiceImpl implements StatusService {
     public void create(Status status) {
         Session session = sessionFactory.getSession();
 
-        dao.insertStatusMessage(status, session);
+        dao.add(status, session);
         session.flush();
         session.close();
     }

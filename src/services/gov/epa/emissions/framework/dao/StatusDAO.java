@@ -2,50 +2,36 @@ package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.framework.services.Status;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.hibernate.Hibernate;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 
 public class StatusDAO {
-    private static final String GET_STATUS_QUERY = "select stat from Status as stat where stat.username=:username";
 
-    private static final String GET_READ_STATUS_QUERY = "select stat from Status as stat where stat.msgRead=true and stat.username=:username";
-
-    public List getMessages(String userName, Session session) {
-        deleteMessages(userName, session);
-        ArrayList allStatus = new ArrayList();
+    public List all(String username, Session session) {
+        removeRead(username, session);
 
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-
-            Query query = session.createQuery(GET_STATUS_QUERY);
-            query.setParameter("username", userName, Hibernate.STRING);
-
-            Iterator iter = query.iterate();
-            while (iter.hasNext()) {
-                Status aStatus = (Status) iter.next();
-                aStatus.setMsgRead();
-                allStatus.add(aStatus);
-            }
-
+            Criteria crit = session.createCriteria(Status.class).add(Restrictions.eq("username", username));
+            List all1 = crit.list();
             tx.commit();
+
+            return all1;
         } catch (HibernateException e) {
             tx.rollback();
             throw e;
         }
-        return allStatus;
     }
 
-    public void insertStatusMessage(Status status, Session session) {
+    public void add(Status status, Session session) {
         Transaction tx = null;
-
         try {
             tx = session.beginTransaction();
             session.save(status);
@@ -56,19 +42,19 @@ public class StatusDAO {
         }
     }
 
-    private void deleteMessages(String userName, Session session) {
+    private void removeRead(String username, Session session) {
         Transaction tx = null;
-
         try {
-            Query query = session.createQuery(GET_READ_STATUS_QUERY);
-            query.setParameter("username", userName, Hibernate.STRING);
             tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(Status.class).add(Restrictions.eq("username", username)).add(
+                    Restrictions.eq("msgRead", Boolean.TRUE));
 
-            Iterator iter = query.iterate();
-            while (iter.hasNext()) {
-                Status aStatus = (Status) iter.next();
-                session.delete(aStatus);
+            List read = crit.list();
+            for (Iterator iter = read.iterator(); iter.hasNext();) {
+                Status element = (Status) iter.next();
+                session.delete(element);
             }
+
             tx.commit();
         } catch (HibernateException e) {
             tx.rollback();

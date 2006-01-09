@@ -11,11 +11,11 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class UserDao {
+public class UserDAO {
 
     private LockingScheme lockingScheme;
 
-    public UserDao() {
+    public UserDAO() {
         lockingScheme = new LockingScheme();
     }
 

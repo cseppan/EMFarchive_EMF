@@ -12,11 +12,11 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-public class DataCommonsDaoTest extends ServicesTestCase {
+public class DataCommonsDAOTest extends ServicesTestCase {
 
     private DataCommonsDAO dao;
 
-    private UserDao userDao;
+    private UserDAO userDao;
 
     private Session session;
 
@@ -25,7 +25,7 @@ public class DataCommonsDaoTest extends ServicesTestCase {
     protected void doSetUp() throws Exception {
         sessionFactory = new HibernateSessionFactory(sessionFactory());
         dao = new DataCommonsDAO();
-        userDao = new UserDao();
+        userDao = new UserDAO();
         session = sessionFactory.getSession();
     }
 
