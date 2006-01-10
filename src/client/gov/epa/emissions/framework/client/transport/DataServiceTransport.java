@@ -45,7 +45,7 @@ public class DataServiceTransport implements DataService {
             Call call = callFactory.createCall();
 
             mappings.register(call);
-            mappings.setOperation(call, "updateDataset");
+            mappings.setOperation(call, "updateDatasetWithoutLock");
             mappings.addParam(call, "dataset", mappings.dataset());
             mappings.setAnyReturnType(call);
 
