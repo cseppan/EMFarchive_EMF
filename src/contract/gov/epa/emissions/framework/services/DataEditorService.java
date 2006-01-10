@@ -32,6 +32,8 @@ public interface DataEditorService {
     // session
     void openSession(EditToken token) throws EmfException;
 
+    void openSession(EditToken token, int pageSize) throws EmfException;
+
     void closeSession(EditToken token) throws EmfException;
 
     /**

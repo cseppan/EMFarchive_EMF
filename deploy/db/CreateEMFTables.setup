@@ -180,17 +180,6 @@ CREATE TABLE emf.datasets
 WITHOUT OIDS;
 ALTER TABLE emf.datasets OWNER TO emf;
 --
-CREATE TABLE emf.datasettables
-(
-  dataset_id int4 NOT NULL,
-  table_type varchar(255) NOT NULL,
-  table_name varchar(255) NOT NULL,
-  CONSTRAINT dataset_tables_to_datasets FOREIGN KEY (dataset_id)
-      REFERENCES emf.datasets (dataset_id)
-) 
-WITHOUT OIDS;
-ALTER TABLE emf.datasettables OWNER TO emf;
---
 CREATE TABLE emf.dataset_access_logs
 (
   access_log_id serial NOT NULL,

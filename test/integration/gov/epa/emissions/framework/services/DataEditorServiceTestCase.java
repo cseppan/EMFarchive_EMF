@@ -46,11 +46,11 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         doImport();
 
         token = editToken();
-        service.openSession(token);
+        service.openSession(token, 4);
     }
 
     private void doImport() throws ImporterException {
-        File file = new File("test/data/orl/nc", "midsize-nonpoint.txt");
+        File file = new File("test/data/orl/nc", "very-small-nonpoint.txt");
         DataFormatFactory formatFactory = new VersionedDataFormatFactory(0);
         ORLNonPointImporter importer = new ORLNonPointImporter(file.getParentFile(), new String[] { file.getName() },
                 dataset, datasource, dataTypes(), formatFactory);
@@ -76,12 +76,12 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     }
 
     public void testShouldReturnExactlyTenPages() throws EmfException {
-        assertEquals(10, service.getPageCount(token));
+        assertEquals(5, service.getPageCount(token));
 
         Page page = service.getPage(token, 1);
         assertNotNull("Should be able to get Page 1", page);
 
-        assertEquals(100, page.count());
+        assertEquals(4, page.count());
         VersionedRecord[] records = page.getRecords();
         assertEquals(page.count(), records.length);
         for (int i = 0; i < records.length; i++) {
@@ -216,7 +216,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         changeset.addNew(record7);
 
         EditToken token = new EditToken(versionOne, table);
-        service.openSession(token);
+        service.openSession(token, 4);
 
         service.submit(token, changeset, 1);
         service.save(token);
@@ -300,7 +300,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
-        service.openSession(token);
+        service.openSession(token, 4);
         Page page = service.getPage(token, 1);
 
         ChangeSet changeset = new ChangeSet();
@@ -313,10 +313,10 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         service.submit(token, changeset, 1);
 
         // random page browsing
-        assertEquals(10, service.getPageCount(token));
-        service.getPage(token, 6);
-        service.getPage(token, 3);
-        service.getPage(token, 9);
+        assertEquals(5, service.getPageCount(token));
+        service.getPage(token, 2);
+        service.getPage(token, 1);
+        service.getPage(token, 4);
 
         Page result = service.getPage(token, 1);
         VersionedRecord[] records = result.getRecords();
@@ -335,7 +335,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
-        service.openSession(token);
+        service.openSession(token, 4);
 
         Page page = service.getPage(token, 1);
 
@@ -352,9 +352,9 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         service.submit(token, changeset, 1);
 
         // random page browsing
-        assertEquals(10, service.getPageCount(token));
-        service.getPage(token, 5);
-        service.getPage(token, 6);
+        assertEquals(5, service.getPageCount(token));
+        service.getPage(token, 4);
+        service.getPage(token, 2);
 
         Page result = service.getPage(token, 1);
         VersionedRecord[] records = result.getRecords();
@@ -374,7 +374,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
-        service.openSession(token);
+        service.openSession(token, 4);
 
         // page 1 changes
         ChangeSet page1ChangeSet = new ChangeSet();
@@ -386,9 +386,9 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         service.submit(token, page1ChangeSet, 1);
 
         // random page browsing
-        assertEquals(10, service.getPageCount(token));
-        service.getPage(token, 5);
-        service.getPage(token, 6);
+        assertEquals(5, service.getPageCount(token));
+        service.getPage(token, 3);
+        service.getPage(token, 1);
 
         // page 4 changes
         Page page4 = service.getPage(token, 4);
@@ -411,7 +411,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionOne = service.derive(versionZero, "v 1");
 
         EditToken token = new EditToken(versionOne, table);
-        service.openSession(token);
+        service.openSession(token, 4);
 
         // page 1 changes
         ChangeSet page1ChangeSet = new ChangeSet();

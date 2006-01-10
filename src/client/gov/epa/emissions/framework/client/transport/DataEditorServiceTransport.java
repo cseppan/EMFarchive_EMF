@@ -211,6 +211,21 @@ public class DataEditorServiceTransport implements DataEditorService {
         }
     }
 
+    public void openSession(EditToken token, int pageSize) throws EmfException {
+        try {
+            mappings.addParam(call, "token", mappings.editToken());
+            mappings.addIntegerParam(call, "pageSize");
+            mappings.setOperation(call, "openSession");
+            mappings.setVoidReturnType(call);
+
+            call.invoke(new Object[] { token, new Integer(pageSize) });
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not open editing session for " + token.key(), e);
+        } finally {
+            call.removeAllParameters();
+        }
+    }
+
     public void closeSession(EditToken token) throws EmfException {
         try {
             mappings.addParam(call, "token", mappings.editToken());

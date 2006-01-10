@@ -33,12 +33,6 @@
   <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
   <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
 
-  <map name="tablesMap" table="DATASETTABLES" lazy="false">
-    <key column="DATASET_ID"/>
-    <index column="TABLE_TYPE" type="string" />
-    <element column="TABLE_NAME" type="string"/>
-  </map>
-
   <array name="internalSources" table="internal_sources">
     <key column="dataset_id"/>
     <list-index column="list_index"/>

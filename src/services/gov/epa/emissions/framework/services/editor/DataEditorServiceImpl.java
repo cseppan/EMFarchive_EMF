@@ -179,15 +179,25 @@ public class DataEditorServiceImpl implements DataEditorService {
         }
     }
 
+    public void openSession(EditToken token, int pageSize) throws EmfException {
+        try {
+            cache.init(token, pageSize);
+        } catch (SQLException e) {
+            log.error("Could not initialize editing Session for Dataset: " + token.datasetId() + ", Version: "
+                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
+            throw new EmfException("Could not initialize editing Session for Dataset: " + token.datasetId()
+                    + ", Version: " + token.getVersion().getVersion());
+        }
+    }
+
     public void openSession(EditToken token) throws EmfException {
         try {
             cache.init(token);
         } catch (SQLException e) {
-            e.printStackTrace();
             log.error("Could not initialize editing Session for Dataset: " + token.datasetId() + ", Version: "
                     + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
             throw new EmfException("Could not initialize editing Session for Dataset: " + token.datasetId()
-                    + ", Version: " + token.getVersion().getVersion() + ". Reason: " + e.getMessage());
+                    + ", Version: " + token.getVersion().getVersion());
         }
     }
 

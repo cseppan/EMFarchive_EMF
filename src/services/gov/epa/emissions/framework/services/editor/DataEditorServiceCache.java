@@ -93,8 +93,12 @@ public class DataEditorServiceCache {
     }
 
     public void init(EditToken token) throws SQLException {
+        init(token, 100);
+    }
+
+    public void init(EditToken token, int pageSize) throws SQLException {
         initChangesetsMap(token);
-        initReader(token);
+        initReader(token, pageSize);
         initWriter(token);
     }
 
@@ -161,10 +165,10 @@ public class DataEditorServiceCache {
         }
     }
 
-    private void initReader(EditToken token) throws SQLException {
+    private void initReader(EditToken token, int pageSize) throws SQLException {
         if (!readersMap.containsKey(token.key())) {
             ScrollableVersionedRecords records = recordsReader.fetch(token.getVersion(), token.getTable());
-            PageReader reader = new PageReader(100, records);
+            PageReader reader = new PageReader(pageSize, records);
 
             readersMap.put(token.key(), reader);
         }

@@ -7,16 +7,12 @@ import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Lockable;
 import gov.epa.emissions.commons.io.Mutex;
-import gov.epa.emissions.commons.io.Table;
 import gov.epa.emissions.commons.security.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class EmfDataset implements Dataset, Lockable {
 
@@ -44,8 +40,6 @@ public class EmfDataset implements Dataset, Lockable {
 
     private Date endDateTime;
 
-    private List tables;
-
     private String sector;
 
     private String project;
@@ -69,7 +63,6 @@ public class EmfDataset implements Dataset, Lockable {
     private Mutex lock;
 
     public EmfDataset() {
-        tables = new ArrayList();
         internalSources = new ArrayList();
         externalSources = new ArrayList();
         keyValsList = new ArrayList();
@@ -173,34 +166,8 @@ public class EmfDataset implements Dataset, Lockable {
         this.description = description;
     }
 
-    public Table getTable(String tableType) {
-        for (Iterator iter = tables.iterator(); iter.hasNext();) {
-            Table element = (Table) iter.next();
-            if (element.getType().equals(tableType))
-                return element;
-        }
-
-        return null;
-    }
-
-    // TODO: return a list. Also, change the Hibernate mapping
-    public Map getTablesMap() {
-        Map tablesMap = new HashMap();
-
-        for (Iterator iter = tables.iterator(); iter.hasNext();) {
-            Table element = (Table) iter.next();
-            tablesMap.put(element.getType(), element.getName());
-        }
-
-        return tablesMap;
-    }
-
     public void setDatasetType(DatasetType datasetType) {
         this.datasetType = datasetType;
-    }
-
-    public void addTable(Table table) {
-        tables.add(table);
     }
 
     public String getCountry() {
@@ -213,15 +180,6 @@ public class EmfDataset implements Dataset, Lockable {
 
     public String getUnits() {
         return units;
-    }
-
-    public void setTablesMap(Map tablesMap) {
-        tables.clear();
-
-        for (Iterator iter = tablesMap.keySet().iterator(); iter.hasNext();) {
-            String tableType = (String) iter.next();
-            tables.add(new Table((String) tablesMap.get(tableType), tableType));
-        }
     }
 
     public void setCreator(String creator) {
@@ -259,10 +217,6 @@ public class EmfDataset implements Dataset, Lockable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Table[] getTables() {
-        return (Table[]) tables.toArray(new Table[0]);
     }
 
     public boolean equals(Object other) {
