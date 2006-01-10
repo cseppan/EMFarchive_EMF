@@ -19,19 +19,6 @@ public class LockingScheme {
 
     public static final long DEFAULT_TIMEOUT = 12 * 60 * 60 * 1000;// i.e. 12 hrs
 
-    /**
-     * This method will check if the current sector record has a lock. If it does it will return the sector object with
-     * the lock parameters to the current user indicating who is using this object. If the lock is older than 12 hours
-     * then the current user will be given the lock.
-     * 
-     * If there is no lock, this user will grab the lock and a modified record indicating the ownership of the lock is
-     * set back to the GUI.
-     * 
-     * The client will cross check those paramters in the returned sector object against the current user in the GUI. If
-     * the user is the same the GUI will allow the user to edit. If not the GUI will switch to view mode and a dialog
-     * will display the Full Name of the user who has the lock and the date the lock was acquired.
-     * 
-     */
     public Lockable getLocked(User user, Lockable target, Session session, List all) {
         Lockable current = current(target, all);
         return getLocked(user, current, session);

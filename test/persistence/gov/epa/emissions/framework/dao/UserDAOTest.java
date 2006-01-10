@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.dao;
 
+import gov.epa.emissions.commons.db.HibernateTestCase;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.HibernateTestCase;
 
 import java.util.List;
 
