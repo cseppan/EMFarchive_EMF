@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.Exporter;
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
@@ -13,7 +14,8 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
 
 import java.io.File;
-import java.util.StringTokenizer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.sql.DataSource;
 
@@ -158,7 +160,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 EmfDataset dataset = datasets[i];
 
                 // FIXME: Default is overwrite
-                File file = validateExportFile(path, getCleanDatasetName(dataset.getName()), true);
+                File file = validateExportFile(path, getCleanDatasetName(dataset), true);
                 Services svcHolder = new Services();
                 svcHolder.setLogSvc(new LoggingServiceImpl(sessionFactory));
                 svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
@@ -190,7 +192,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 // if dataset is not exportable throw exception
                 if (isExportable(dataset)) {
                     // FIXME: Default is overwrite
-                    File file = validateExportFile(path, getCleanDatasetName(dataset.getName()), false);
+                    File file = validateExportFile(path, getCleanDatasetName(dataset), false);
                     Services svcHolder = new Services();
                     svcHolder.setLogSvc(new LoggingServiceImpl(sessionFactory));
                     svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
@@ -224,24 +226,26 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return exportable;
     }
 
-    private String getCleanDatasetName(String name) {
-        String cleanName = null;
-        StringBuffer sbuf = new StringBuffer();
-
-        StringTokenizer stok = new StringTokenizer(name, " ", true);
-
-        while (stok.hasMoreTokens()) {
-            String tok = stok.nextToken();
-            if (tok.equals(" ")) {
-                tok = "_";
-            }
-
-            sbuf.append(tok);
-
+    private String getCleanDatasetName(EmfDataset dataset) {
+        String name = dataset.getName();
+        String prefix = "", suffix = "";
+        KeyVal[] keyvals = dataset.getKeyVals();
+        String timeformat = "ddMMMyyyy";
+        SimpleDateFormat sdf = new SimpleDateFormat(timeformat);
+        String date = sdf.format(new Date());
+        
+        for(int i = 0; i < keyvals.length; i++) {
+            prefix = keyvals[i].getKeyword().getName().equalsIgnoreCase("EXPORT_PREFIX") ? keyvals[i].getValue():"";
+            suffix = keyvals[i].getKeyword().getName().equalsIgnoreCase("EXPORT_PREFIX") ? keyvals[i].getValue():"";
         }
-        cleanName = sbuf.toString() + ".txt";
 
-        return cleanName;
+        for (int i = 0; i < name.length(); i++) {
+            if (!Character.isLetterOrDigit(name.charAt(i))) {
+                name = name.replace(name.charAt(i), '_');
+            }
+        }
+
+        return prefix + name + "_" + date + suffix;
     }
 
     public String getImportBaseFolder() {
