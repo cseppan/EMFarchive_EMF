@@ -3,12 +3,12 @@ package gov.epa.emissions.framework.client.status;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.TaskRunner;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.Status;
-import gov.epa.emissions.framework.services.StatusService;
 
 public class StatusPresenter {
 
-    private StatusService model;
+    private DataCommonsService service;
 
     private StatusView view;
 
@@ -18,9 +18,9 @@ public class StatusPresenter {
 
     private TaskRunner runner;
 
-    public StatusPresenter(User user, StatusService model, TaskRunner runner) {
+    public StatusPresenter(User user, DataCommonsService servoce, TaskRunner runner) {
         this.user = user;
-        this.model = model;
+        this.service = servoce;
         this.runner = runner;
 
         this.monitor = new StatusMonitor();
@@ -33,7 +33,7 @@ public class StatusPresenter {
     public class StatusMonitor implements Runnable {
         public void run() {
             try {
-                Status[] statuses = model.getAll(user.getUsername());
+                Status[] statuses = service.getStatuses(user.getUsername());
                 view.update(statuses);
             } catch (EmfException e) {
                 view.notifyError(e.getMessage());

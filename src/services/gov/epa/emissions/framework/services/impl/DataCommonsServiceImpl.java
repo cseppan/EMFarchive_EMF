@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DataCommonsDAO;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataCommonsService;
+import gov.epa.emissions.framework.services.Status;
 
 import java.util.List;
 
@@ -41,10 +42,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (Keyword[]) keywords.toArray(new Keyword[keywords.size()]);
         } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
+            LOG.error("Could not get all Keywords. Reason: " + e);
+            throw new EmfException("Could not get all Keywords");
         }
-
     }
 
     public Country[] getCountries() throws EmfException {
@@ -55,10 +55,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (Country[]) countries.toArray(new Country[countries.size()]);
         } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
+            LOG.error("Could not get all Countries. Reason: " + e);
+            throw new EmfException("Could not get all Countries");
         }
-
     }
 
     public Sector[] getSectors() throws EmfException {
@@ -69,10 +68,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (Sector[]) sectors.toArray(new Sector[sectors.size()]);
         } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
+            LOG.error("Could not get all Sectors. Reason: " + e);
+            throw new EmfException("Could not get all Sectors");
         }
-
     }
 
     public Sector obtainLockedSector(User owner, Sector sector) throws EmfException {
@@ -98,8 +96,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return released;
         } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Database error: " + e);
+            LOG.error("Could not update sector: " + sector.getName() + ".Reason: " + e);
+            throw new EmfException("Could not update sector: " + sector.getName());
         }
     }
 
@@ -126,8 +124,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (DatasetType[]) list.toArray(new DatasetType[0]);
         } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Error communicating with the server");
+            LOG.error("Could not get all DatasetTypes. Reason: " + e);
+            throw new EmfException("Could not get all DatasetTypes ");
         }
     }
 
@@ -139,8 +137,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return locked;
         } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Database error: " + e);
+            LOG.error("Could not obtain lock for DatasetType: " + type.getName() + ".Reason: " + e);
+            throw new EmfException("Could not obtain lock for DatasetType: " + type.getName());
         }
     }
 
@@ -152,8 +150,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return locked;
         } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Database error: " + e);
+            LOG.error("Could not update DatasetType: " + type.getName() + ".Reason: " + e);
+            throw new EmfException("Could not update DatasetType: " + type.getName());
         }
     }
 
@@ -165,8 +163,21 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return locked;
         } catch (HibernateException e) {
-            LOG.error("Database error: " + e);
-            throw new EmfException("Database error: " + e);
+            LOG.error("Could not release lock on DatasetType: " + type.getName() + ".Reason: " + e);
+            throw new EmfException("Could not release lock on DatasetType: " + type.getName());
+        }
+    }
+
+    public Status[] getStatuses(String username) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List statuses = dao.getStatuses(username, session);
+            session.close();
+
+            return (Status[]) statuses.toArray(new Status[statuses.size()]);
+        } catch (HibernateException e) {
+            LOG.error("Could not get all Status messages. Reason: " + e);
+            throw new EmfException("Could not get all Status messages");
         }
     }
 

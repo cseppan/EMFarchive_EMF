@@ -118,17 +118,25 @@ public class DataCommonsDAO {
         return (DatasetType) lockingScheme.releaseLock(locked, session, getDatasetTypes(session));
     }
 
-    public List allStatus(String username, Session session) {
+    public List getStatuses(String username, Session session) {
         removeReadStatus(username, session);
 
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
             Criteria crit = session.createCriteria(Status.class).add(Restrictions.eq("username", username));
-            List all1 = crit.list();
+            List all = crit.list();
+
+            // mark read
+            for (Iterator iter = all.iterator(); iter.hasNext();) {
+                Status element = (Status) iter.next();
+                element.setMsgRead();
+                session.save(element);
+
+            }
             tx.commit();
 
-            return all1;
+            return all;
         } catch (HibernateException e) {
             tx.rollback();
             throw e;

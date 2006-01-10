@@ -31,4 +31,7 @@ public interface DataCommonsService {
 
     DatasetType releaseLockedDatasetType(User owner, DatasetType type) throws EmfException;
 
+    // Status
+    Status[] getStatuses(String username) throws EmfException;
+
 }

@@ -15,14 +15,12 @@ import org.hibernate.criterion.Restrictions;
 public abstract class UserServiceTestCase extends ServicesTestCase {
     private UserService service;
 
-    private HibernateSessionFactory sessionFactory;
-
     private Session session;
 
     public void setUpService(UserService service) throws Exception {
         this.service = service;
 
-        sessionFactory = new HibernateSessionFactory(sessionFactory());
+        HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
         session = sessionFactory.getSession();
     }
 

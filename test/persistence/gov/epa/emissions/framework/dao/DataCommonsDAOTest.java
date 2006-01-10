@@ -195,16 +195,39 @@ public class DataCommonsDAOTest extends ServicesTestCase {
         assertEquals(type.getName(), modified3.getName());
     }
 
-    public void testShouldGetAllStatusMessages() {
+    public void testShouldGetStatuses() {
+        clearStatuses();
+
         User emf = userDao.get("emf", session);
         Status status = newStatus(emf);
 
         try {
-            List messages = dao.allStatus(emf.getUsername(), session);
-            assertEquals(1, messages.size());
+            List afterInsert = dao.getStatuses(emf.getUsername(), session);
+            assertEquals(1, afterInsert.size());
         } finally {
             remove(status);
         }
+    }
+
+    private void clearStatuses() {
+        Transaction tx = session.beginTransaction();
+        List all = session.createCriteria(Status.class).list();
+        for (Iterator iter = all.iterator(); iter.hasNext();) {
+            Status element = (Status) iter.next();
+            session.delete(element);
+        }
+        tx.commit();
+    }
+
+    public void testShouldMarkCurrentMessagesAsReadAndRemoveThemOnSubsequentFetchOfStatuses() {
+        User emf = userDao.get("emf", session);
+        newStatus(emf);
+
+        List firstRead = dao.getStatuses(emf.getUsername(), session);
+        assertEquals(1, firstRead.size());
+
+        List secondRead = dao.getStatuses(emf.getUsername(), session);
+        assertEquals(0, secondRead.size());
     }
 
     private Status newStatus(User emf) {
@@ -224,11 +247,11 @@ public class DataCommonsDAOTest extends ServicesTestCase {
         return status;
     }
 
-    public void testShouldClearPreviousReadMessagesOnGetAll() {
+    public void testShouldClearPreviousReadMessagesAnMarkCurrentMessagesAsReadOnGetAll() {
         User emf = userDao.get("emf", session);
         newReadStatus(emf);
 
-        List messages = dao.allStatus(emf.getUsername(), session);
+        List messages = dao.getStatuses(emf.getUsername(), session);
         assertEquals(0, messages.size());
     }
 
@@ -239,7 +262,7 @@ public class DataCommonsDAOTest extends ServicesTestCase {
         dao.add(status, session);
 
         try {
-            List messages = dao.allStatus(emf.getUsername(), session);
+            List messages = dao.getStatuses(emf.getUsername(), session);
             assertEquals(1, messages.size());
         } finally {
             remove(status);

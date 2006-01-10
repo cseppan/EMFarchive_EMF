@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataCommonsService;
+import gov.epa.emissions.framework.services.Status;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
@@ -223,6 +224,26 @@ public class DataCommonsServiceTransport implements DataCommonsService {
             throwExceptionOnAxisFault("Could not release DatasetType lock: " + type.getName(), fault);
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not release DatasetType lock: " + type.getName(), e);
+        }
+
+        return null;
+    }
+
+    public Status[] getStatuses(String username) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+            call.setMaintainSession(true);
+
+            mappings.register(call);
+            mappings.setOperation(call, "getStatuses");
+            mappings.addStringParam(call, "username");
+            mappings.setReturnType(call, mappings.statuses());
+
+            return (Status[]) call.invoke(new Object[] { username });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Could not get all Status messages for user: " + username, fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not get all Status messages for user: " + username, e);
         }
 
         return null;

@@ -53,14 +53,6 @@
 			value="gov.epa.emissions.framework.services.impl.UserServiceImpl"/>
 	</service>
 	
-	<service name="gov.epa.emf.services.StatusService" provider="java:RPC"
-		style="RPC" use="encoded">
-		<parameter name="allowedMethods" value="*"/>
-		<parameter name="scope" value="session"/>
-		<parameter name="className"
-			value="gov.epa.emissions.framework.services.impl.StatusServiceImpl"/>
-	</service>
-	
 	<service name="gov.epa.emf.services.LoggingService" provider="java:RPC"
 		style="RPC" use="encoded">
 		<parameter name="allowedMethods" value="*"/>
@@ -196,7 +188,7 @@
 		innerType="ns1:SectorCriteria"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
-	<arrayMapping qname="ns1:AllStatus"
+	<arrayMapping qname="ns1:Statuses"
 		xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.Status[]"
 		innerType="ns1:Status"

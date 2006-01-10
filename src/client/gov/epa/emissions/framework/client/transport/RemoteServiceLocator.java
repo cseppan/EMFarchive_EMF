@@ -6,7 +6,6 @@ import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.LoggingService;
-import gov.epa.emissions.framework.services.StatusService;
 import gov.epa.emissions.framework.services.UserService;
 
 import javax.xml.rpc.ServiceException;
@@ -16,7 +15,6 @@ import org.apache.axis.client.Service;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-// TODO: find a better package location for locator classes
 public class RemoteServiceLocator implements ServiceLocator {
     private static Log log = LogFactory.getLog(RemoteServiceLocator.class);
 
@@ -36,10 +34,6 @@ public class RemoteServiceLocator implements ServiceLocator {
 
     public UserService userService() {
         return new UserServiceTransport(baseUrl + "/gov.epa.emf.services.UserService");
-    }
-
-    public StatusService statusService() {
-        return new StatusServiceTransport(baseUrl + "/gov.epa.emf.services.StatusService");
     }
 
     public ExImService eximService() {

@@ -1,9 +1,16 @@
 package gov.epa.emissions.framework.services;
 
+import java.util.Date;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
@@ -12,9 +19,14 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
 
     private UserService userService;
 
+    private Session session;
+
     protected void setUpService(DataCommonsService service, UserService userService) throws Exception {
         this.service = service;
         this.userService = userService;
+
+        HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
+        session = sessionFactory.getSession();
     }
 
     public void testShouldReturnCompleteListOfSectors() throws EmfException {
@@ -139,7 +151,40 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         assertEquals(type.getName(), modified3.getName());
     }
 
-    protected void doTearDown() throws Exception {// no op
+    public void testShouldGetAllStatusesAndRemovePreviouslyRead() throws Exception {
+        newStatus();
+
+        Status[] firstRead = service.getStatuses("user");
+        assertEquals(1, firstRead.length);
+
+        Status[] secondRead = service.getStatuses("user");
+        assertEquals(0, secondRead.length);
+    }
+
+    private void newStatus() {
+        Status status = new Status();
+        status.setMessage("test message");
+        status.setMessageType("type");
+        status.setUsername("user");
+        status.setTimestamp(new Date());
+
+        save(status);
+    }
+
+    private void save(Status status) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.save(status);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    protected void doTearDown() throws Exception {
+        session.close();
     }
 
 }

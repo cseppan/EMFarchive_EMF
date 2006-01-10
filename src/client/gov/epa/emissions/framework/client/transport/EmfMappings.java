@@ -76,7 +76,7 @@ public class EmfMappings extends Mappings {
         array(call, VersionedRecord[].class, records());
         array(call, Version[].class, versions());
 
-        array(call, Status[].class, logsw());
+        array(call, Status[].class, statuses());
         array(call, AccessLog[].class, logs());
     }
 
@@ -100,8 +100,8 @@ public class EmfMappings extends Mappings {
         return qname("Sectors");
     }
 
-    public QName logsw() {
-        return qname("AllStatus");
+    public QName statuses() {
+        return qname("Statuses");
     }
 
     public QName status() {
