@@ -61,19 +61,19 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        panel.add(createImportPanel());
+        panel.add(createInputPanel());
         panel.add(createButtonsPanel());
 
         return panel;
     }
 
-    private JPanel createImportPanel() throws EmfException {
+    private JPanel createInputPanel() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         DatasetType[] allDatasetTypes = service.getDatasetTypes();
-        DatasetType[] allTypesWithMessage = new DatasetType[allDatasetTypes.length+1];
-        copyDatasetTypes(allDatasetTypes,allTypesWithMessage);
+        DatasetType[] allTypesWithMessage = new DatasetType[allDatasetTypes.length + 1];
+        copyDatasetTypes(allDatasetTypes, allTypesWithMessage);
         datasetTypesModel = new DefaultComboBoxModel(allTypesWithMessage);
         JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
         datasetTypesComboBox.setName("datasetTypes");
@@ -102,11 +102,11 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     }
 
     private void copyDatasetTypes(DatasetType[] allDatasetTypes, DatasetType[] allTypesWithMessage) {
-        allTypesWithMessage[0]=new DatasetType("Choose a type ...");
+        allTypesWithMessage[0] = new DatasetType("Choose a type ...");
         for (int i = 0; i < allDatasetTypes.length; i++) {
-            allTypesWithMessage[i+1]=allDatasetTypes[i];
+            allTypesWithMessage[i + 1] = allDatasetTypes[i];
         }
-        
+
     }
 
     private JButton importFileButton() {
@@ -125,9 +125,9 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
                 folder.setText(file.getParent());
                 filename.setText(file.getName());
-//For demo #3 changing the filename
-//                name.setText(formatDatasetName(file.getName()));
-              name.setText(file.getName());
+                // For demo #3 changing the filename
+                // name.setText(formatDatasetName(file.getName()));
+                name.setText(file.getName());
             }
         });
 
@@ -146,13 +146,11 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private DocumentListener notifyBeginInput() {
         return new DocumentListener() {
             public void insertUpdate(DocumentEvent event) {
-                if (presenter != null)
-                    presenter.notifyBeginInput();
+                presenter.notifyBeginInput();
             }
 
             public void removeUpdate(DocumentEvent event) {
-                if (presenter != null)
-                    presenter.notifyBeginInput();
+                presenter.notifyBeginInput();
             }
 
             public void changedUpdate(DocumentEvent event) {// ignore
@@ -171,7 +169,6 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
         JButton importButton = new Button("Import", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                clearMessagePanel();
                 doImport();
             }
         });
@@ -195,6 +192,8 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     }
 
     private void doImport() {
+        clearMessagePanel();
+        
         try {
             presenter.doImport(folder.getText(), filename.getText(), name.getText(), (DatasetType) datasetTypesModel
                     .getSelectedItem());

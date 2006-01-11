@@ -17,6 +17,8 @@ import gov.epa.emissions.framework.ui.ScrollableTable;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,24 +75,55 @@ public class VersionsPanel extends JPanel implements VersionsView {
         add(bottomPanel(sources), BorderLayout.PAGE_END);
     }
 
-    private JPanel topPanel(EmfDataset dataset, VersionsSet versionsSet) {
+    private JPanel topPanel(final EmfDataset dataset, VersionsSet versionsSet) {
         JPanel container = new JPanel(new BorderLayout());
 
         JPanel right = new JPanel();
         right.add(new JLabel("Default Version"));
 
-        Integer defaultVersion = new Integer(dataset.getDefaultVersion());
-        ComboBoxModel model = new DefaultComboBoxModel(versionsSet.versions());
+        String[] versions = getVersionNames(versionsSet);
+        ComboBoxModel model = new DefaultComboBoxModel(versions);
         defaultVersionsCombo = new JComboBox(model);
+        String defaultVersion = getDefaultVersion(versionsSet);
         defaultVersionsCombo.setSelectedItem(defaultVersion);
         defaultVersionsCombo.setName("defaultVersions");
         defaultVersionsCombo.setEditable(false);
         defaultVersionsCombo.setPreferredSize(new Dimension(175, 20));
         right.add(defaultVersionsCombo);
 
+        defaultVersionsCombo.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                String version = e.getItem().toString();
+                int versionnum = Integer.parseInt(version.split("-")[0].trim());
+                dataset.setDefaultVersion(versionnum);
+            }
+        });
+
         container.add(right, BorderLayout.LINE_END);
 
         return container;
+    }
+
+    private String getDefaultVersion(VersionsSet versionsSet) {
+        String name = versionsSet.getDefaultVersionName(dataset.getDefaultVersion());
+        return displayableVersion(name, dataset.getDefaultVersion());
+    }
+
+    private String[] getVersionNames(VersionsSet versionsSet) {
+        String[] versionNames = versionsSet.names();
+        Integer[] versionNums = versionsSet.versions();
+
+        List versions = new ArrayList();
+        for (int i = 0; i < versionNames.length; i++) {
+            String version = displayableVersion(versionNames[i], versionNums[i].intValue());
+            versions.add(version);
+        }
+
+        return (String[]) versions.toArray(new String[0]);
+    }
+
+    private String displayableVersion(String name, int version) {
+        return version + " - " + name;
     }
 
     public void reload(Version[] versions) {

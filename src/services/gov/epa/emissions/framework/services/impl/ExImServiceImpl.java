@@ -165,7 +165,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 svcHolder.setLogSvc(new LoggingServiceImpl(sessionFactory));
                 svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
                 svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
-                Exporter exporter = exporterFactory.create(dataset);
+                Exporter exporter = exporterFactory.create(dataset, dataset.getDefaultVersion());
                 AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
                         .getAccessedDateTime(), "Version " + dataset.getDefaultVersion(), purpose, dirName);
                 ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);
@@ -197,7 +197,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                     svcHolder.setLogSvc(new LoggingServiceImpl(sessionFactory));
                     svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
                     svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
-                    Exporter exporter = exporterFactory.create(dataset);
+                    Exporter exporter = exporterFactory.create(dataset, dataset.getDefaultVersion());
                     AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
                             .getAccessedDateTime(), "Version " + dataset.getDefaultVersion(), purpose, dirName);
                     ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);
@@ -226,17 +226,24 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return exportable;
     }
 
-    private String getCleanDatasetName(EmfDataset dataset) {
+    String getCleanDatasetName(EmfDataset dataset) {
         String name = dataset.getName();
         String prefix = "", suffix = "";
         KeyVal[] keyvals = dataset.getKeyVals();
         String timeformat = "ddMMMyyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(timeformat);
         String date = sdf.format(new Date());
-        
-        for(int i = 0; i < keyvals.length; i++) {
-            prefix = keyvals[i].getKeyword().getName().equalsIgnoreCase("EXPORT_PREFIX") ? keyvals[i].getValue():"";
-            suffix = keyvals[i].getKeyword().getName().equalsIgnoreCase("EXPORT_PREFIX") ? keyvals[i].getValue():"";
+
+        for (int i = 0; i < keyvals.length; i++) {
+            prefix = keyvals[i].getKeyword().getName().equalsIgnoreCase("EXPORT_PREFIX") ? keyvals[i].getValue() : "";
+            if (!prefix.equals(""))
+                break;
+        }
+
+        for (int i = 0; i < keyvals.length; i++) {
+            suffix = keyvals[i].getKeyword().getName().equalsIgnoreCase("EXPORT_SUFFIX") ? keyvals[i].getValue() : "";
+            if (!suffix.equals(""))
+                break;
         }
 
         for (int i = 0; i < name.length(); i++) {
@@ -256,16 +263,17 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return baseExportFolder;
     }
 
-    public void startMultipleFileImport(User user, String folderPath, String fileName, EmfDataset dataset) throws EmfException {
+    public void startMultipleFileImport(User user, String folderPath, String fileName, EmfDataset dataset)
+            throws EmfException {
 
         // The fileName is a regular expression that maps to a collection of files.
-        
-        /// Loop through the collection and start import for the file
-        
+
+        // / Loop through the collection and start import for the file
+
         // TODO Auto-generated method stub
         if (false)
             throw new EmfException(""); // placeholder
-       
+
     }
 
 }

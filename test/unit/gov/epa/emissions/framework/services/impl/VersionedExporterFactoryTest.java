@@ -20,7 +20,7 @@ public class VersionedExporterFactoryTest extends MockObjectTestCase {
         EmfDataset dataset = new EmfDataset();
         dataset.setDatasetType(datasetType);
 
-        Exporter exporter = factory.create(dataset);
+        Exporter exporter = factory.create(dataset, dataset.getDefaultVersion());
 
         assertEquals(datasetType.getExporterClassName(), exporter.getClass().getName());
     }
@@ -36,7 +36,7 @@ public class VersionedExporterFactoryTest extends MockObjectTestCase {
         EmfDataset dataset = new EmfDataset();
         dataset.setDatasetType(datasetType);
 
-        Exporter exporter = factory.create(dataset);
+        Exporter exporter = factory.create(dataset, dataset.getDefaultVersion());
 
         assertEquals(datasetType.getExporterClassName(), exporter.getClass().getName());
     }

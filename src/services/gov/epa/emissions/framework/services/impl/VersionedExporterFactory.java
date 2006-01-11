@@ -25,7 +25,7 @@ public class VersionedExporterFactory {
         this.sqlDataTypes = sqlDataTypes;
     }
 
-    public Exporter create(Dataset dataset) throws EmfException {
+    public Exporter create(Dataset dataset, int version) throws EmfException {
         try {
             String exporterName = dataset.getDatasetType().getExporterClassName();
 
@@ -33,7 +33,7 @@ public class VersionedExporterFactory {
 
             Class[] classParams = new Class[] { Dataset.class, Datasource.class, SqlDataTypes.class,
                     DataFormatFactory.class };
-            Object[] params = new Object[] { dataset, datasource, sqlDataTypes, new VersionedDataFormatFactory(0) };
+            Object[] params = new Object[] { dataset, datasource, sqlDataTypes, new VersionedDataFormatFactory(version) };
 
             Constructor exporterConstructor = exporterClass.getDeclaredConstructor(classParams);
             return (Exporter) exporterConstructor.newInstance(params);

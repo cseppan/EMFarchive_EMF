@@ -7,8 +7,6 @@ import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
@@ -24,7 +22,7 @@ public class FileMenu extends JMenu {
     private ViewLayout viewLayout;
 
     // FIXME: where's the associated Presenter ?
-    public FileMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, ViewLayout windowLayoutManager) {
+    public FileMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, ViewLayout viewLayout) {
         super("File");
         super.setName("file");
 
@@ -33,7 +31,7 @@ public class FileMenu extends JMenu {
         super.add(createLogout(session, parent));
         super.add(createExit());
 
-        this.viewLayout = windowLayoutManager;
+        this.viewLayout = viewLayout;
     }
 
     private JMenuItem createExit() {
@@ -88,14 +86,11 @@ public class FileMenu extends JMenu {
         if (viewLayout.activate("Import Dataset - FileMenu"))
             return;
 
-        ServiceLocator serviceLocator = session.serviceLocator();
-        ExImService eximServices = serviceLocator.eximService();
-
-        ImportWindow importView = new ImportWindow(serviceLocator.dataCommonsService(), desktop);
+        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktop);
         viewLayout.add(importView, "Import Dataset - FileMenu");
         desktop.add(importView);
 
-        ImportPresenter presenter = new ImportPresenter(session.user(), eximServices);
+        ImportPresenter presenter = new ImportPresenter(session.user(), session.eximService());
         presenter.display(importView);
     }
 

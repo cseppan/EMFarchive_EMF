@@ -12,13 +12,13 @@ public class ImportPresenter {
 
     private ImportView view;
 
-    private ExImService eximServices;
+    private ExImService service;
 
     private User user;
 
-    public ImportPresenter(User user, ExImService eximServices) {
+    public ImportPresenter(User user, ExImService service) {
         this.user = user;
-        this.eximServices = eximServices;
+        this.service = service;
     }
 
     public void doImport(String directory, String filename, String datasetName, DatasetType type) throws EmfException {
@@ -42,7 +42,7 @@ public class ImportPresenter {
         dataset.setModifiedDateTime(dataset.getCreatedDateTime());
         dataset.setAccessedDateTime(dataset.getCreatedDateTime());
 
-        eximServices.startImport(user, directory, filename, dataset);
+        service.startImport(user, directory, filename, dataset);
     }
 
     public void doDone() {
@@ -53,7 +53,7 @@ public class ImportPresenter {
         this.view = view;
 
         view.register(this);
-        view.setDefaultBaseFolder(eximServices.getImportBaseFolder());
+        view.setDefaultBaseFolder(service.getImportBaseFolder());
 
         view.display();
     }
