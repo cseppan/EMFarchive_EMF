@@ -23,7 +23,7 @@ public class DatasetDaoTest extends ServicesTestCase {
     protected void doTearDown() throws Exception {// no op
     }
 
-    public void testShouldGetAllSectors() {
+    public void testShouldGetAll() {
         List all = dao.all(session);
         assertEquals(0, all.size());
     }
@@ -130,15 +130,15 @@ public class DatasetDaoTest extends ServicesTestCase {
         }
     }
 
-    public void testShouldReleaseSectorLock() throws EmfException {
+    public void testShouldReleaseLock() throws EmfException {
         UserDAO userDao = new UserDAO();
         User owner = userDao.get("emf", session);
         EmfDataset dataset = newDataset();
 
         try {
             EmfDataset locked = dao.obtainLocked(owner, dataset, session);
-            EmfDataset releasedSector = dao.releaseLocked(locked, session);
-            assertFalse("Should have released lock", releasedSector.isLocked());
+            EmfDataset released = dao.releaseLocked(locked, session);
+            assertFalse("Should have released lock", released.isLocked());
 
             EmfDataset loadedFromDb = load(dataset);
             assertFalse("Should have released lock", loadedFromDb.isLocked());
@@ -147,7 +147,7 @@ public class DatasetDaoTest extends ServicesTestCase {
         }
     }
 
-    public void testShouldFailToReleaseSectorLockIfNotObtained() {
+    public void testShouldFailToReleaseLockIfNotObtained() {
         EmfDataset dataset = newDataset();
 
         try {
