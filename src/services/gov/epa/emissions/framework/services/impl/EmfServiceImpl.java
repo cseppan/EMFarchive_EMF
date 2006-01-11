@@ -2,10 +2,9 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
+import gov.epa.emissions.framework.dao.DataSourceFactory;
 import gov.epa.emissions.framework.services.EMFConstants;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 public abstract class EmfServiceImpl {
@@ -14,9 +13,8 @@ public abstract class EmfServiceImpl {
 
     protected DataSource datasource;
 
-    public EmfServiceImpl() throws Exception {// TODO: should we move this into an abstract super class ?
-        Context ctx = new InitialContext();
-        datasource = (DataSource) ctx.lookup("java:/comp/env/jdbc/EMFDB");
+    public EmfServiceImpl() throws Exception {
+        datasource = new DataSourceFactory().get();
 
         // FIXME: we should not hard-code the db server. Also, read the
         // datasource names from properties

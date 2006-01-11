@@ -29,6 +29,7 @@
     	<mapping resource="gov/epa/emissions/framework/services/impl/DatasetAccessLog.hbm.xml"/>    	
     	<mapping resource="gov/epa/emissions/framework/services/impl/EmfProperties.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/impl/Keyword.hbm.xml"/>
+    	<mapping resource="gov/epa/emissions/framework/services/impl/Version.hbm.xml"/>
     
     </session-factory>
     

@@ -65,6 +65,6 @@
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/saaj-api.jar"/>
 	<classpathentry kind="lib" path="lib/saaj-impl.jar"/>
-	<classpathentry kind="lib" path="lib/epa-commons-0.1.4.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Commons"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>
