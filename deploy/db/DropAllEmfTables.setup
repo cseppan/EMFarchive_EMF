@@ -32,7 +32,6 @@ DROP SEQUENCE emf.dataset_types_dataset_type_id_seq;
 --
 -- emf.datasets must
 DROP TABLE emf.datasets CASCADE;
-DROP TABLE emf.datasettables CASCADE;
 DROP TABLE emf.dataset_access_logs CASCADE;
 --emf.datasets
 --
