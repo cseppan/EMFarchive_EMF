@@ -5,9 +5,9 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.version.ChangeSet;
-import gov.epa.emissions.commons.db.version.LockableVersions;
-import gov.epa.emissions.commons.db.version.NewDefaultVersionedRecordsReader;
-import gov.epa.emissions.commons.db.version.NewVersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
 import gov.epa.emissions.framework.EmfException;
@@ -31,11 +31,11 @@ import org.hibernate.Session;
 public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorService {
     private static Log LOG = LogFactory.getLog(DataEditorServiceImpl.class);
 
-    private LockableVersions versions;
+    private Versions versions;
 
-    private NewVersionedRecordsReader reader;
+    private VersionedRecordsReader reader;
 
-    private NewDataEditorServiceCache cache;
+    private DataEditorServiceCache cache;
 
     private HibernateSessionFactory sessionFactory;
 
@@ -56,12 +56,12 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
 
     private void init(DbServer dbServer, Datasource datasource, HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-        versions = new LockableVersions();
+        versions = new Versions();
 
-        reader = new NewDefaultVersionedRecordsReader(datasource);
+        reader = new DefaultVersionedRecordsReader(datasource);
 
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
-        cache = new NewDataEditorServiceCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
+        cache = new DataEditorServiceCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
     }
 
     public Page getPage(EditToken token, int pageNumber) throws EmfException {

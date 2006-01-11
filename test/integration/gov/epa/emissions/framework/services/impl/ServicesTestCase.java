@@ -21,14 +21,19 @@ import javax.sql.DataSource;
 
 import junit.framework.TestCase;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 public abstract class ServicesTestCase extends TestCase {
 
     private EmfDatabaseSetup dbSetup;
+    protected Session session;
 
     final protected void setUp() throws Exception {
         dbSetup = new EmfDatabaseSetup(config());
+        HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
+        session = sessionFactory.getSession();
+
         doSetUp();
     }
 
@@ -52,6 +57,7 @@ public abstract class ServicesTestCase extends TestCase {
 
     final protected void tearDown() throws Exception {
         doTearDown();
+        session.close();
         dbSetup.tearDown();
     }
 

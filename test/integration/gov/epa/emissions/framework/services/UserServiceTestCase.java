@@ -3,29 +3,21 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.UserDAO;
-import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 public abstract class UserServiceTestCase extends ServicesTestCase {
     private UserService service;
 
-    private Session session;
-
     public void setUpService(UserService service) throws Exception {
         this.service = service;
-
-        HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
-        session = sessionFactory.getSession();
     }
 
-    protected void doTearDown() throws Exception {
-        session.close();
+    protected void doTearDown() throws Exception {// no op
     }
 
     public void testGetUserSucceedsForEMFAdministrator() throws Exception {

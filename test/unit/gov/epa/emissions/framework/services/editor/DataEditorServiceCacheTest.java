@@ -1,20 +1,23 @@
 package gov.epa.emissions.framework.services.editor;
 
 import gov.epa.emissions.commons.db.version.ChangeSet;
+import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
 import gov.epa.emissions.framework.services.EditToken;
 
 import java.util.List;
 
+import org.hibernate.Session;
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
 public class DataEditorServiceCacheTest extends MockObjectTestCase {
 
     private DataEditorServiceCache cache;
+
+    private Session session;
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -28,7 +31,7 @@ public class DataEditorServiceCacheTest extends MockObjectTestCase {
 
         Mock writer = mock(VersionedRecordsWriter.class);
         writer.expects(once()).method("close");
-        
+
         Mock writerFactory = mock(VersionedRecordsWriterFactory.class);
         writerFactory.stubs().method("create").withAnyArguments().will(returnValue(writer.proxy()));
 
@@ -43,20 +46,20 @@ public class DataEditorServiceCacheTest extends MockObjectTestCase {
         version.setVersion(3);
         token.setVersion(version);
 
-        cache.init(token);
+        cache.init(token, session);
 
         ChangeSet changeset1 = new ChangeSet();
-        cache.submitChangeSet(token, changeset1, 1);
+        cache.submitChangeSet(token, changeset1, 1, session);
 
         ChangeSet changeset2 = new ChangeSet();
-        cache.submitChangeSet(token, changeset2, 1);
+        cache.submitChangeSet(token, changeset2, 1, session);
 
-        List results = cache.changesets(token, 1);
+        List results = cache.changesets(token, 1, session);
         assertEquals(2, results.size());
         assertEquals(changeset1, results.get(0));
         assertEquals(changeset2, results.get(1));
 
-        cache.close(token);
+        cache.close(token, session);
     }
 
     public void testShouldMaintainSeparateChangeSetListsForEachPage() throws Exception {
@@ -66,23 +69,23 @@ public class DataEditorServiceCacheTest extends MockObjectTestCase {
         version.setVersion(3);
         token.setVersion(version);
 
-        cache.init(token);
+        cache.init(token, session);
 
         ChangeSet changeset1 = new ChangeSet();
-        cache.submitChangeSet(token, changeset1, 1);
+        cache.submitChangeSet(token, changeset1, 1, session);
 
         ChangeSet changeset2 = new ChangeSet();
-        cache.submitChangeSet(token, changeset2, 2);
+        cache.submitChangeSet(token, changeset2, 2, session);
 
-        List resultsPage1 = cache.changesets(token, 1);
+        List resultsPage1 = cache.changesets(token, 1, session);
         assertEquals(1, resultsPage1.size());
         assertEquals(changeset1, resultsPage1.get(0));
 
-        List resultsPage2 = cache.changesets(token, 2);
+        List resultsPage2 = cache.changesets(token, 2, session);
         assertEquals(1, resultsPage2.size());
         assertEquals(changeset2, resultsPage2.get(0));
 
-        cache.close(token);
+        cache.close(token, session);
     }
 
     public void testShouldGetChangesetsForAllPagesByPage() throws Exception {
@@ -92,24 +95,24 @@ public class DataEditorServiceCacheTest extends MockObjectTestCase {
         version.setVersion(3);
         token.setVersion(version);
 
-        cache.init(token);
+        cache.init(token, session);
 
         ChangeSet changeset1Page1 = new ChangeSet();
-        cache.submitChangeSet(token, changeset1Page1, 1);
+        cache.submitChangeSet(token, changeset1Page1, 1, session);
 
         ChangeSet changesetPage2 = new ChangeSet();
-        cache.submitChangeSet(token, changesetPage2, 2);
+        cache.submitChangeSet(token, changesetPage2, 2, session);
 
         ChangeSet changeset2Page1 = new ChangeSet();
-        cache.submitChangeSet(token, changeset2Page1, 1);
+        cache.submitChangeSet(token, changeset2Page1, 1, session);
 
-        List all = cache.changesets(token);
+        List all = cache.changesets(token, session);
         assertEquals(3, all.size());
         assertEquals(changeset1Page1, all.get(0));
         assertEquals(changeset2Page1, all.get(1));
         assertEquals(changesetPage2, all.get(2));
 
-        cache.close(token);
+        cache.close(token, session);
     }
 
     public void testCloseShouldDiscardChangeSetsRelatedToEditToken() throws Exception {
@@ -119,17 +122,17 @@ public class DataEditorServiceCacheTest extends MockObjectTestCase {
         version.setVersion(3);
         token.setVersion(version);
 
-        cache.init(token);
+        cache.init(token, session);
 
         ChangeSet changeset1Page1 = new ChangeSet();
-        cache.submitChangeSet(token, changeset1Page1, 1);
+        cache.submitChangeSet(token, changeset1Page1, 1, session);
 
-        List all = cache.changesets(token);
+        List all = cache.changesets(token, session);
         assertEquals(1, all.size());
 
-        cache.close(token);
+        cache.close(token, session);
 
-        List empty = cache.changesets(token);
+        List empty = cache.changesets(token, session);
         assertEquals(0, empty.size());
     }
 
@@ -140,23 +143,23 @@ public class DataEditorServiceCacheTest extends MockObjectTestCase {
         version.setVersion(3);
         token.setVersion(version);
 
-        cache.init(token);
+        cache.init(token, session);
 
         ChangeSet changeset1 = new ChangeSet();
-        cache.submitChangeSet(token, changeset1, 1);
+        cache.submitChangeSet(token, changeset1, 1, session);
 
         ChangeSet changeset2 = new ChangeSet();
-        cache.submitChangeSet(token, changeset2, 2);
+        cache.submitChangeSet(token, changeset2, 2, session);
 
-        cache.discardChangeSets(token);
+        cache.discardChangeSets(token, session);
 
         // empty
-        List resultsPage1 = cache.changesets(token, 1);
+        List resultsPage1 = cache.changesets(token, 1, session);
         assertEquals(0, resultsPage1.size());
-        List resultsPage2 = cache.changesets(token, 2);
+        List resultsPage2 = cache.changesets(token, 2, session);
         assertEquals(0, resultsPage2.size());
 
-        cache.close(token);
+        cache.close(token, session);
     }
 
 }

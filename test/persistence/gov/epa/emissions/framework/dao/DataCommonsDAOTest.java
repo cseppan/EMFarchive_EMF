@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Status;
-import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 import java.util.Date;
@@ -14,7 +13,6 @@ import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
@@ -24,19 +22,12 @@ public class DataCommonsDAOTest extends ServicesTestCase {
 
     private UserDAO userDao;
 
-    private Session session;
-
-    private HibernateSessionFactory sessionFactory;
-
     protected void doSetUp() throws Exception {
-        sessionFactory = new HibernateSessionFactory(sessionFactory());
         dao = new DataCommonsDAO();
         userDao = new UserDAO();
-        session = sessionFactory.getSession();
     }
 
     protected void doTearDown() throws Exception {// no op
-        session.close();
     }
 
     public void testShouldGetAllSectors() {

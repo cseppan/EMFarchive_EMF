@@ -7,9 +7,9 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
-import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.io.DataFormatFactory;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
@@ -222,9 +222,9 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         service.save(token);
 
         VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
-        int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName()).length;
+        int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName(), session).length;
 
-        VersionedRecord[] records = reader.fetchAll(versionOne, dataset.getName());
+        VersionedRecord[] records = reader.fetchAll(versionOne, dataset.getName(), session);
         assertEquals(versionZeroRecordsCount + 2, records.length);
         int init = records[0].getRecordId();
         for (int i = 1; i < records.length; i++) {
@@ -257,9 +257,9 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         service.save(token);
 
         VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
-        int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName()).length;
+        int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName(), session).length;
 
-        VersionedRecord[] records = reader.fetchAll(versionOne, dataset.getName());
+        VersionedRecord[] records = reader.fetchAll(versionOne, dataset.getName(), session);
         assertEquals(versionZeroRecordsCount + 2, records.length);
         int init = records[0].getRecordId();
         for (int i = 1; i < records.length; i++)
@@ -285,8 +285,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
         VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
 
-        VersionedRecord[] versionZeroRecords = reader.fetchAll(versionZero, dataset.getName());
-        VersionedRecord[] versionOneRecords = reader.fetchAll(versionOne, dataset.getName());
+        VersionedRecord[] versionZeroRecords = reader.fetchAll(versionZero, dataset.getName(), session);
+        VersionedRecord[] versionOneRecords = reader.fetchAll(versionOne, dataset.getName(), session);
 
         assertEquals(versionZeroRecords.length, versionOneRecords.length);
         for (int i = 0; i < versionOneRecords.length; i++)

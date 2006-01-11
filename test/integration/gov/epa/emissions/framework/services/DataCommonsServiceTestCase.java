@@ -1,17 +1,15 @@
 package gov.epa.emissions.framework.services;
 
-import java.util.Date;
-
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
+
+import java.util.Date;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
 
 public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
 
@@ -19,14 +17,9 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
 
     private UserService userService;
 
-    private Session session;
-
     protected void setUpService(DataCommonsService service, UserService userService) throws Exception {
         this.service = service;
         this.userService = userService;
-
-        HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
-        session = sessionFactory.getSession();
     }
 
     public void testShouldReturnCompleteListOfSectors() throws EmfException {
@@ -183,8 +176,7 @@ public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
         }
     }
 
-    protected void doTearDown() throws Exception {
-        session.close();
+    protected void doTearDown() throws Exception {// no op
     }
 
 }
