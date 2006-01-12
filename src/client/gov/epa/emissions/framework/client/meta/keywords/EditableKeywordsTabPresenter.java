@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class KeywordsTabPresenter {
+public class EditableKeywordsTabPresenter {
 
-    private KeywordsTabView view;
+    private EditableKeywordsTabView view;
 
     private EmfDataset dataset;
 
-    public KeywordsTabPresenter(KeywordsTabView view, EmfDataset dataset) {
+    public EditableKeywordsTabPresenter(EditableKeywordsTabView view, EmfDataset dataset) {
         this.view = view;
         this.dataset = dataset;
     }

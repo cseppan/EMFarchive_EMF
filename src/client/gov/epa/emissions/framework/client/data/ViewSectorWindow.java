@@ -27,7 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SpringLayout;
 
-public class DisplaySectorWindow extends DisposableInteralFrame implements ViewableSectorView {
+public class ViewSectorWindow extends DisposableInteralFrame implements ViewableSectorView {
 
     private ViewableSectorPresenter presenter;
 
@@ -35,7 +35,7 @@ public class DisplaySectorWindow extends DisposableInteralFrame implements Viewa
 
     private SingleLineMessagePanel messagePanel;
 
-    public DisplaySectorWindow() {
+    public ViewSectorWindow() {
         super("View Sector", new Dimension(600, 500));
 
         layout = new JPanel();

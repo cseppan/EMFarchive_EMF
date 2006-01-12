@@ -4,6 +4,8 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.data.Keywords;
+import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
+import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -18,7 +20,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
 
     private boolean unsavedChanges;
 
-    private KeywordsTabPresenter keywordsPresenter;
+    private EditableKeywordsTabPresenter keywordsPresenter;
 
     private ServiceLocator serviceLocator;
 
@@ -63,7 +65,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
         doClose();
     }
 
-    void updateDataset(DataService dataServices, SummaryTabPresenter summary, KeywordsTabPresenter keywords)
+    void updateDataset(DataService dataServices, SummaryTabPresenter summary, EditableKeywordsTabPresenter keywords)
             throws EmfException {
         summary.doSave();
         keywords.doSave();
@@ -75,8 +77,8 @@ public class PropertiesEditorPresenter implements ChangeObserver {
         summary.observeChanges(this);
     }
 
-    public void set(KeywordsTabView keywordsView) throws EmfException {
-        keywordsPresenter = new KeywordsTabPresenter(keywordsView, dataset);
+    public void set(EditableKeywordsTabView keywordsView) throws EmfException {
+        keywordsPresenter = new EditableKeywordsTabPresenter(keywordsView, dataset);
 
         Keywords keywords = new Keywords(serviceLocator.dataCommonsService().getKeywords());
         keywordsPresenter.init(keywords);

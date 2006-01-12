@@ -187,8 +187,8 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     }
 
     // FIXME: this table refresh sequence applies to every CRUD panel. Refactor
-    private DisplaySectorWindow displaySectorView() {
-        DisplaySectorWindow view = new DisplaySectorWindow();
+    private ViewSectorWindow displaySectorView() {
+        ViewSectorWindow view = new ViewSectorWindow();
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {

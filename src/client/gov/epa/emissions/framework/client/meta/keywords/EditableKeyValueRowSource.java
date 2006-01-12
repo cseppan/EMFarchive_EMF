@@ -1,11 +1,11 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.ui.RowSource;
 
-public class KeyValueRowSource implements RowSource {
+public class EditableKeyValueRowSource implements RowSource {
 
     private KeyVal source;
 
@@ -13,7 +13,7 @@ public class KeyValueRowSource implements RowSource {
 
     private Keywords masterKeywords;
 
-    public KeyValueRowSource(KeyVal source, Keywords masterKeywords) {
+    public EditableKeyValueRowSource(KeyVal source, Keywords masterKeywords) {
         this.source = source;
         this.masterKeywords = masterKeywords;
         this.selected = Boolean.FALSE;

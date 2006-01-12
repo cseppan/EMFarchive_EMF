@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
@@ -54,7 +54,7 @@ public class EditableKeyValueTableData extends AbstractTableData implements Sele
     }
 
     private EditableRow row(KeyVal keyValue, Keywords keywords) {
-        RowSource source = new KeyValueRowSource(keyValue, keywords);
+        RowSource source = new EditableKeyValueRowSource(keyValue, keywords);
         return new EditableRow(source);
     }
 
@@ -63,7 +63,7 @@ public class EditableKeyValueTableData extends AbstractTableData implements Sele
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            KeyValueRowSource rowSource = (KeyValueRowSource) row.rowSource();
+            EditableKeyValueRowSource rowSource = (EditableKeyValueRowSource) row.rowSource();
             if (rowSource.isSelected())
                 selected.add(rowSource.source());
         }
@@ -86,7 +86,7 @@ public class EditableKeyValueTableData extends AbstractTableData implements Sele
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            KeyValueRowSource rowSource = (KeyValueRowSource) row.rowSource();
+            EditableKeyValueRowSource rowSource = (EditableKeyValueRowSource) row.rowSource();
             sources.add(rowSource.source());
         }
         return sources;

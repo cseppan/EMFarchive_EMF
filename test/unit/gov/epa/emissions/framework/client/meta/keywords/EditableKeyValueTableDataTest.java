@@ -1,8 +1,9 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.data.Keywords;
+import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueTableData;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;

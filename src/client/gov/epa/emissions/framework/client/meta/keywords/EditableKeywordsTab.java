@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.framework.client.data.Keywords;
@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.client.data.Keywords;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-public class EditableKeywordsTab extends JPanel implements KeywordsTabView {
+public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabView {
 
     private EditableKeyValueTableData tableData;
 
@@ -22,7 +22,7 @@ public class EditableKeywordsTab extends JPanel implements KeywordsTabView {
 
     private JPanel createLayout(KeyVal[] values, Keywords masterKeywords) {
         tableData = new EditableKeyValueTableData(values, masterKeywords);
-        return new KeywordsPanel("", tableData, masterKeywords);
+        return new EditableKeywordsPanel("", tableData, masterKeywords);
     }
 
     public KeyVal[] updates() {

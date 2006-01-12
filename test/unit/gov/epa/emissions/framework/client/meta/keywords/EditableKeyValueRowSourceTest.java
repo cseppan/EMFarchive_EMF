@@ -1,17 +1,18 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.data.Keywords;
+import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueRowSource;
 
 import org.jmock.cglib.MockObjectTestCase;
 
-public class KeyValueRowSourceTest extends MockObjectTestCase {
+public class EditableKeyValueRowSourceTest extends MockObjectTestCase {
 
     public void testShouldSetNewKeywordOnKeyValueIfKeywordDoesNotExist() {
         Keyword[] keywords = new Keyword[0];
         KeyVal keyval = new KeyVal();
-        KeyValueRowSource source = new KeyValueRowSource(keyval, new Keywords(keywords));
+        EditableKeyValueRowSource source = new EditableKeyValueRowSource(keyval, new Keywords(keywords));
 
         source.setValueAt(1, "new-key");
 
@@ -22,7 +23,7 @@ public class KeyValueRowSourceTest extends MockObjectTestCase {
     public void testShouldSetExistingKeywordOnKeyValueIfKeywordDoesExist() {
         Keyword[] keywords = { new Keyword("1"), new Keyword("2") };
         KeyVal keyval = new KeyVal();
-        KeyValueRowSource source = new KeyValueRowSource(keyval, new Keywords(keywords));
+        EditableKeyValueRowSource source = new EditableKeyValueRowSource(keyval, new Keywords(keywords));
 
         source.setValueAt(1, "1");
 
@@ -34,7 +35,7 @@ public class KeyValueRowSourceTest extends MockObjectTestCase {
         KeyVal keyval = new KeyVal();
         Keyword keyword = new Keyword("1");
         keyval.setKeyword(keyword);
-        KeyValueRowSource source = new KeyValueRowSource(keyval, null);
+        EditableKeyValueRowSource source = new EditableKeyValueRowSource(keyval, null);
 
         assertSame(keyword.getName(), source.values()[1]);
     }

@@ -5,6 +5,9 @@ import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
+import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
+import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
+import gov.epa.emissions.framework.client.meta.keywords.KeywordsTabPresenterStub;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataService;
@@ -88,12 +91,12 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
         summaryView.expects(once()).method("observeChanges").with(eq(presenter));
 
-        Mock keywordsView = mock(KeywordsTabView.class);
+        Mock keywordsView = mock(EditableKeywordsTabView.class);
         keywordsView.expects(once()).method("display");
         keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[] {}));
 
         presenter.set((SummaryTabView) summaryView.proxy());
-        presenter.set((KeywordsTabView) keywordsView.proxy());
+        presenter.set((EditableKeywordsTabView) keywordsView.proxy());
 
         Mock datasetsBrowser = mock(DatasetsBrowserView.class);
         EmfDataset[] datasets = new EmfDataset[0];
@@ -111,12 +114,12 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
         summaryView.expects(atLeastOnce()).method("observeChanges").with(eq(presenter));
 
-        Mock keywordsView = mock(KeywordsTabView.class);
+        Mock keywordsView = mock(EditableKeywordsTabView.class);
         keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[] {}));
         keywordsView.expects(atLeastOnce()).method("display");
 
         presenter.set((SummaryTabView) summaryView.proxy());
-        presenter.set((KeywordsTabView) keywordsView.proxy());
+        presenter.set((EditableKeywordsTabView) keywordsView.proxy());
 
         Mock datasetsBrowser = mock(DatasetsBrowserView.class);
         EmfDataset[] datasets = new EmfDataset[0];
@@ -140,7 +143,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         keywordsTab.expects(once()).method("doSave");
 
         presenter.updateDataset((DataService) dataServices.proxy(), (SummaryTabPresenter) summaryTab.proxy(),
-                (KeywordsTabPresenter) keywordsTab.proxy());
+                (EditableKeywordsTabPresenter) keywordsTab.proxy());
     }
 
     public void testShouldDisplayErrorMessageOnDatasetsBrowserIfGettingUpdatedDatasetsFailOnSave() throws EmfException {
@@ -150,12 +153,12 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
         summaryView.expects(once()).method("observeChanges").with(eq(presenter));
 
-        Mock keywordsView = mock(KeywordsTabView.class);
+        Mock keywordsView = mock(EditableKeywordsTabView.class);
         keywordsView.expects(once()).method("display");
         keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[] {}));
 
         presenter.set((SummaryTabView) summaryView.proxy());
-        presenter.set((KeywordsTabView) keywordsView.proxy());
+        presenter.set((EditableKeywordsTabView) keywordsView.proxy());
 
         Mock datasetsBrowser = mock(DatasetsBrowserView.class);
         dataServices.stubs().method("getDatasets").will(throwException(new EmfException("failure")));
@@ -175,12 +178,12 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("showError").with(
                 eq("Could not update dataset - " + dataset.getName() + ". Reason: update failure"));
 
-        Mock keywordsView = mock(KeywordsTabView.class);
+        Mock keywordsView = mock(EditableKeywordsTabView.class);
         keywordsView.expects(once()).method("display");
         keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[] {}));
 
         presenter.set((SummaryTabView) summaryView.proxy());
-        presenter.set((KeywordsTabView) keywordsView.proxy());
+        presenter.set((EditableKeywordsTabView) keywordsView.proxy());
 
         presenter.doSave(null);
     }
