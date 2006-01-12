@@ -16,7 +16,6 @@ import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
@@ -33,6 +32,8 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
     private StatusTableModel statusTableModel;
 
     private SimpleDateFormat dateFormat;
+
+    private StatusPresenter presenter;
 
     public StatusWindow(Container parent, JDesktopPane desktop) {
         super("Status", desktop);
@@ -68,6 +69,9 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         getRootPane().setDefaultButton(clearButton);
         container.add(clearButton);
 
+        JButton refreshButton = createRefreshButton();
+        container.add(refreshButton);
+
         panel.add(container, BorderLayout.EAST);
 
         return panel;
@@ -77,15 +81,26 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         JButton button = new JButton(trashIcon());
         button.setName("clear");
         button.setBorderPainted(false);
-        button.setToolTipText("Clears the Status messages");
-        button.setVerticalTextPosition(AbstractButton.BOTTOM);
-        button.setHorizontalTextPosition(AbstractButton.CENTER);
+        button.setToolTipText("Clear the Status messages");
 
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                // FIXME: notify presenter about 'clear', and let the presenter
-                // communicate the action to the 'table-model'
-                statusTableModel.clear();
+                presenter.doClear();
+            }
+        });
+
+        return button;
+    }
+
+    private JButton createRefreshButton() {
+        JButton button = new JButton(refreshIcon());
+        button.setToolTipText("Refresh the Status messages");
+        button.setName("refresh");
+        button.setBorderPainted(false);
+
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                presenter.doRefresh();
             }
         });
 
@@ -94,6 +109,10 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
     private ImageIcon trashIcon() {
         return new ImageResources().trash("Clear Messages");
+    }
+
+    private ImageIcon refreshIcon() {
+        return new ImageResources().refresh("Refresh Status Messages");
     }
 
     private JScrollPane createTable() {
@@ -136,6 +155,14 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
     public void notifyError(String message) {
         messagePanel.setError(message);
+    }
+
+    public void observe(StatusPresenter presenter) {
+        this.presenter = presenter;
+    }
+
+    public void clear() {
+        statusTableModel.clear();
     }
 
 }

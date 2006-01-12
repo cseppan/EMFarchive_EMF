@@ -3,7 +3,6 @@ delete from emf.countries;
 delete from emf.dataset_access_logs;
 delete from emf.dataset_types;
 delete from emf.datasets;
-delete from emf.datasettables;
 delete from emf.emf_properties;
 delete from emf.sectors;
 delete from emf.statusmessages;

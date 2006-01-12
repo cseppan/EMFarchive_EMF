@@ -9,4 +9,8 @@ public interface StatusView extends EmfView {
 
     void notifyError(String message);
 
+    void observe(StatusPresenter presenter);
+
+    void clear();
+
 }

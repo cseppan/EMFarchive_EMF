@@ -29,7 +29,7 @@ public class StatusPresenterTest extends MockObjectTestCase {
         user.setUsername("user");
 
         service = mock(DataCommonsService.class);
-        view = mock(StatusView.class);        
+        view = mock(StatusView.class);
 
         runner = new TaskRunner() {
             public void start(Runnable runnable) {
@@ -50,6 +50,7 @@ public class StatusPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").withNoArguments();
 
         StatusPresenter presenter = new StatusPresenter(user, (DataCommonsService) service.proxy(), runner);
+        view.expects(once()).method("observe").with(same(presenter));
         presenter.display((StatusView) view.proxy());
 
         presenter.stop();
@@ -64,22 +65,56 @@ public class StatusPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").withNoArguments();
 
         StatusPresenter presenter = new StatusPresenter(user, (DataCommonsService) service.proxy(), runner);
+        view.expects(once()).method("observe").with(same(presenter));
         presenter.display((StatusView) view.proxy());
 
         presenter.stop();
     }
-    
+
     public void testShouldStopRunnerOnClose() throws Exception {
         view.expects(once()).method("display").withNoArguments();
 
         Mock runner = mock(TaskRunner.class);
         runner.expects(once()).method("start").with(new IsInstanceOf(StatusMonitor.class));
         runner.expects(once()).method("stop").withNoArguments();
-        
-        StatusPresenter presenter = new StatusPresenter(user, (DataCommonsService) service.proxy(), (TaskRunner) runner.proxy());        
+
+        StatusPresenter presenter = new StatusPresenter(user, (DataCommonsService) service.proxy(), (TaskRunner) runner
+                .proxy());
+        view.expects(once()).method("observe").with(same(presenter));
         presenter.display((StatusView) view.proxy());
 
         presenter.close();
+    }
+
+    public void testShouldUpdateViewOnRefresh() throws Exception {
+        StatusPresenter presenter = displayPresenter();
+
+        Status status = new Status(user.getUsername(), "type", "message", new Date());
+        Status[] messages = new Status[] { status };
+        service.expects(atLeastOnce()).method("getStatuses").with(eq(user.getUsername())).will(returnValue(messages));
+        view.expects(once()).method("update").with(same(messages));
+        
+        presenter.doRefresh();
+    }
+    
+    public void testShouldClearViewOnClear() throws Exception {
+        StatusPresenter presenter = displayPresenter();
+        view.expects(once()).method("clear").withNoArguments();
+        
+        presenter.doClear();
+    }
+
+    private StatusPresenter displayPresenter() {
+        view.expects(once()).method("display").withNoArguments();
+
+        Mock runner = mock(TaskRunner.class);
+        runner.expects(once()).method("start").with(new IsInstanceOf(StatusMonitor.class));
+
+        StatusPresenter presenter = new StatusPresenter(user, (DataCommonsService) service.proxy(), (TaskRunner) runner
+                .proxy());
+        view.expects(once()).method("observe").with(same(presenter));
+        presenter.display((StatusView) view.proxy());
+        return presenter;
     }
 
 }
