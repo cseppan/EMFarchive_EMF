@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
@@ -14,14 +15,14 @@ public class UsersManagerPresenter {
 
     private UserService userServices;
 
-    private User user;
-
     private ViewLayout layoutManager;
 
     private Map updateViewsMap;
 
-    public UsersManagerPresenter(User user, UserService userServices, ViewLayout layoutManager) {
-        this.user = user;
+    private EmfSession session;
+
+    public UsersManagerPresenter(EmfSession session, UserService userServices, ViewLayout layoutManager) {
+        this.session = session;
         this.userServices = userServices;
         this.layoutManager = layoutManager;
 
@@ -61,7 +62,8 @@ public class UsersManagerPresenter {
         if (userToDelete.getUsername().equals("admin"))
             throw new EmfException("Cannot delete EMF super user - '" + userToDelete.getUsername() + "'");
 
-        if (user.getUsername().equals(userToDelete.getUsername()))
+        User loggedIn = session.user();
+        if (loggedIn.getUsername().equals(userToDelete.getUsername()))
             throw new EmfException("Cannot delete yourself - '" + userToDelete.getUsername() + "'");
 
         userServices.deleteUser(userToDelete);
@@ -77,7 +79,13 @@ public class UsersManagerPresenter {
         view.refresh();
     }
 
-    public void doUpdateUser(User updateUser, UpdateUserView updateUserView) {
+    public void doUpdateUser(User updateUser, UpdatableUserView updatableView) throws EmfException {
+        UpdateUserPresenter updatePresenter = new UpdateUserPresenterImpl(session, updateUser, userServices);
+        updateUser(updateUser, updatableView, updatePresenter);
+    }
+
+    void updateUser(User updateUser, UpdatableUserView updatableView, UpdateUserPresenter updatePresenter)
+            throws EmfException {
         view.clearMessage();
 
         if (isUpdateUserViewAlive(updateUser)) {
@@ -85,35 +93,35 @@ public class UsersManagerPresenter {
             return;
         }
 
-        showUpdateUser(updateUser, updateUserView);
+        showUpdateUser(updateUser, updatableView, updatePresenter);
     }
 
     private boolean isUpdateUserViewAlive(User updateUser) {
         return updateViewsMap.containsKey(updateUser) && updateUserView(updateUser).isAlive();
     }
 
-    private UpdateUserView updateUserView(User updateUser) {
-        return (UpdateUserView) updateViewsMap.get(updateUser);
+    private UpdatableUserView updateUserView(User updateUser) {
+        return (UpdatableUserView) updateViewsMap.get(updateUser);
     }
 
-    private void showUpdateUser(User updateUser, UpdateUserView updateUserView) {
-        layoutManager.add(updateUserView, "Update - " + updateUser.getUsername());
+    private void showUpdateUser(User updateUser, UpdatableUserView updateView, UpdateUserPresenter updatePresenter)
+            throws EmfException {
+        layoutManager.add(updateView, "Update - " + updateUser.getUsername());
 
-        UpdateUserPresenter updateUserPresenter = new UpdateUserPresenter(userServices);
-        updateUserPresenter.display(updateUserView);
+        updatePresenter.display(updateView);
 
         view.refresh();
-        updateViewsMap.put(updateUser, updateUserView);
+        updateViewsMap.put(updateUser, updateView);
     }
 
-    public void doUpdateUsers(User[] users) {
+    public void doUpdateUsers(User[] users) throws EmfException {
         if (users.length == 0) {
             view.showMessage("To update, please select at least one User.");
             return;
         }
 
         for (int i = 0; i < users.length; i++) {
-            UpdateUserView updateUserView = view.getUpdateUserView(users[i]);
+            UpdatableUserView updateUserView = view.getUpdateUserView(users[i]);
             doUpdateUser(users[i], updateUserView);
         }
     }

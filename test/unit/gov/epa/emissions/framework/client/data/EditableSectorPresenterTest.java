@@ -17,15 +17,15 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
         Sector sector = new Sector();
         Mock view = mock(EditableSectorView.class);
 
-        User user = new User();
-        user.setUsername("name");
-        sector.setLockOwner(user.getUsername());
+        User owner = new User();
+        owner.setUsername("name");
+        sector.setLockOwner(owner.getUsername());
         sector.setLockDate(new Date());
 
         Mock service = mock(DataCommonsService.class);
-        service.expects(once()).method("obtainLockedSector").with(same(user), same(sector)).will(returnValue(sector));
+        service.expects(once()).method("obtainLockedSector").with(same(owner), same(sector)).will(returnValue(sector));
 
-        Mock session = session(user, service.proxy());
+        Mock session = session(owner, service.proxy());
 
         EditableSectorPresenter presenter = new EditableSectorPresenterImpl((EmfSession) session.proxy(),
                 (EditableSectorView) view.proxy(), null, sector);

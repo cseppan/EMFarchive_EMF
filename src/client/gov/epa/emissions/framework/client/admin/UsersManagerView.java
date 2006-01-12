@@ -15,5 +15,5 @@ public interface UsersManagerView extends EmfView {
 
     boolean promptDelete(User[] users);
 
-    UpdateUserView getUpdateUserView(User user);
+    UpdatableUserView getUpdateUserView(User user);
 }

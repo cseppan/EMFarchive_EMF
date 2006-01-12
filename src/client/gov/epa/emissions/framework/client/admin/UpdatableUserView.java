@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.client.ManagedView;
 
-public interface UpdateUserView extends ManagedView {
+public interface UpdatableUserView extends ManagedView {
 
     void observe(UpdateUserPresenter presenter);
 

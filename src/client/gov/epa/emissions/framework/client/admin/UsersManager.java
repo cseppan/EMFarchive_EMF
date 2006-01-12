@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
@@ -45,14 +46,14 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
     private EmfConsole parentConsole;
 
-    private User user;
-
     private SortFilterSelectionPanel sortFilterSelectPanel;
 
+    private EmfSession session;
+
     // FIXME: this class needs to be refactored into smaller components
-    public UsersManager(User user, UserService userServices, EmfConsole parentConsole) throws Exception {
+    public UsersManager(EmfSession session, UserService userServices, EmfConsole parentConsole) {
         super("User Manager", new Dimension(550, 300), parentConsole.desktop());
-        this.user = user;
+        this.session = session;
         this.parentConsole = parentConsole;
 
         model = new UserManagerTableModel(userServices);
@@ -93,16 +94,24 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
     private void updateUsers() {
         List users = getSelectedUsers();
-        presenter.doUpdateUsers((User[]) users.toArray(new User[0]));
+        try {
+            presenter.doUpdateUsers((User[]) users.toArray(new User[0]));
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
     }
 
     private void updateUser(User updateUser) {
-        UpdateUserView view = getUpdateUserView(updateUser);
-        presenter.doUpdateUser(updateUser, view);
+        UpdatableUserView view = getUpdateUserView(updateUser);
+        try {
+            presenter.doUpdateUser(updateUser, view);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
     }
 
-    public UpdateUserView getUpdateUserView(User updateUser) {
-        UpdateUserWindow view = updateUser.equals(user) ? new DisposableUpdateUserWindow(updateUser)
+    public UpdatableUserView getUpdateUserView(User updateUser) {
+        UpdateUserWindow view = updateUser.equals(session.user()) ? new DisposableUpdateUserWindow(updateUser)
                 : new DisposableUpdateUserWindow(updateUser, new AddAdminOption());
         desktop.add(view);
 

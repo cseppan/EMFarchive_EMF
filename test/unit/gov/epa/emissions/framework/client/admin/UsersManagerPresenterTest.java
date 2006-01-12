@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.commons.security.UserException;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
@@ -18,11 +18,14 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
 
     private Mock layoutManager;
 
+    private Mock session;
+
     protected void setUp() {
         layoutManager = mock(ViewLayout.class);
-        Mock userServices = mock(UserService.class);
-        presenter = new UsersManagerPresenter(null, (UserService) userServices.proxy(), (ViewLayout) layoutManager
-                .proxy());
+        session = mock(EmfSession.class);
+        Mock service = mock(UserService.class);
+        presenter = new UsersManagerPresenter((EmfSession) session.proxy(), (UserService) service.proxy(),
+                (ViewLayout) layoutManager.proxy());
 
         view = mock(UsersManagerView.class);
 
@@ -45,8 +48,10 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
         user.setUsername("joe");
 
         Mock layoutManager = mock(ViewLayout.class);
-        UsersManagerPresenter presenter = new UsersManagerPresenter(user, (UserService) userServices.proxy(),
-                (ViewLayout) layoutManager.proxy());
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("user").withNoArguments().will(returnValue(user));
+        UsersManagerPresenter presenter = new UsersManagerPresenter((EmfSession) session.proxy(),
+                (UserService) userServices.proxy(), (ViewLayout) layoutManager.proxy());
 
         Mock view = createView();
         view.expects(once()).method("refresh").withNoArguments();
@@ -95,12 +100,10 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
         presenter.doRegisterNewUser(viewProxy);
     }
 
-    public void testShouldDisplayUpdateUserViewOnDisplayUpdateUser() throws UserException {
-        Mock updateUserView = mock(UpdateUserView.class);
-        updateUserView.expects(once()).method("observe").with(new IsInstanceOf(UpdateUserPresenter.class));
-        updateUserView.expects(once()).method("display").withNoArguments();
+    public void testShouldDisplayUpdateUserViewOnDisplayUpdateUser() throws Exception {
+        Mock updateUserView = mock(UpdatableUserView.class);
 
-        UpdateUserView viewProxy = (UpdateUserView) updateUserView.proxy();
+        UpdatableUserView viewProxy = (UpdatableUserView) updateUserView.proxy();
         layoutManager.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
 
         view.expects(once()).method("clearMessage").withNoArguments();
@@ -109,83 +112,67 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
         User user = new User();
         user.setUsername("name");
 
-        presenter.doUpdateUser(user, viewProxy);
+        Mock updatePresenter = mock(UpdateUserPresenter.class);
+        updatePresenter.expects(once()).method("display").with(same(viewProxy));
+
+        presenter.updateUser(user, viewProxy, (UpdateUserPresenter) updatePresenter.proxy());
     }
 
     public void testShouldDisplayTheSameUpdateViewAsPreviouslyDisplayedOnSelectingTheSameUserAndClickingUpdate()
-            throws UserException {
+            throws Exception {
         User user = new User();
         user.setUsername("name");
 
         // 1st attempt
-        Mock updateUserView = mock(UpdateUserView.class);
-        UpdateUserView viewProxy = createUpdateView(updateUserView);
+        Mock updateUserView = mock(UpdatableUserView.class);
+        UpdatableUserView viewProxy = (UpdatableUserView) updateUserView.proxy();
+        layoutManager.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
+
+        Mock updatePresenter = mock(UpdateUserPresenter.class);
+        updatePresenter.expects(once()).method("display").with(same(viewProxy));
 
         view.expects(atLeastOnce()).method("clearMessage").withNoArguments();
         view.expects(once()).method("refresh").withNoArguments();
 
-        presenter.doUpdateUser(user, viewProxy);
+        presenter.updateUser(user, viewProxy, (UpdateUserPresenter) updatePresenter.proxy());
 
         // 2nd attempt
         updateUserView.stubs().method("isAlive").withNoArguments().will(returnValue(Boolean.TRUE));
         updateUserView.expects(once()).method("bringToFront").withNoArguments();
 
-        presenter.doUpdateUser(user, viewProxy);
+        presenter.updateUser(user, viewProxy, (UpdateUserPresenter) updatePresenter.proxy());
     }
 
     public void testShouldDisplayNewUpdateViewIfPreviouslyOpenedUpdateViewIsClosedOnClickingOfUpdateButton()
-            throws UserException {
+            throws Exception {
         User user = new User();
         user.setUsername("name");
 
         // 1st attempt
-        Mock view1 = mock(UpdateUserView.class);
-        UpdateUserView view1Proxy = createUpdateView(view1);
+        Mock view1 = mock(UpdatableUserView.class);
+        UpdatableUserView view1Proxy = (UpdatableUserView) view1.proxy();
+        layoutManager.expects(once()).method("add").with(eq(view1Proxy), new IsInstanceOf(String.class));
 
         view.expects(atLeastOnce()).method("clearMessage").withNoArguments();
         view.expects(atLeastOnce()).method("refresh").withNoArguments();
 
-        presenter.doUpdateUser(user, view1Proxy);
+        Mock updatePresenter = mock(UpdateUserPresenter.class);
+        updatePresenter.expects(once()).method("display").with(same(view1Proxy));
+
+        presenter.updateUser(user, view1Proxy, (UpdateUserPresenter) updatePresenter.proxy());
 
         // 2nd attempt - view1 is closed, view2 will be displayed
         view1.stubs().method("isAlive").withNoArguments().will(returnValue(Boolean.FALSE));
 
-        Mock view2 = mock(UpdateUserView.class);
-        UpdateUserView view2Proxy = createUpdateView(view2);
+        Mock view2 = mock(UpdatableUserView.class);
+        UpdatableUserView view2Proxy = (UpdatableUserView) view2.proxy();
+        layoutManager.expects(once()).method("add").with(eq(view2Proxy), new IsInstanceOf(String.class));
+        updatePresenter.expects(once()).method("display").with(same(view2Proxy));
 
-        presenter.doUpdateUser(user, view2Proxy);
+        presenter.updateUser(user, view2Proxy, (UpdateUserPresenter) updatePresenter.proxy());
     }
 
-    private UpdateUserView createUpdateView(Mock updateView) {
-        updateView.expects(once()).method("observe").with(new IsInstanceOf(UpdateUserPresenter.class));
-        updateView.expects(once()).method("display").withNoArguments();
-
-        UpdateUserView viewProxy = (UpdateUserView) updateView.proxy();
-        layoutManager.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
-
-        return viewProxy;
-    }
-
-    public void testShouldDisplayUpdateUserViewForEachUserSelectedOnDisplayUpdateUser() throws UserException {
-        // each user
-        Mock updateUserView = mock(UpdateUserView.class);
-        updateUserView.expects(once()).method("observe").with(new IsInstanceOf(UpdateUserPresenter.class));
-        updateUserView.expects(once()).method("display").withNoArguments();
-
-        UpdateUserView updateUserViewProxy = (UpdateUserView) updateUserView.proxy();
-        layoutManager.expects(once()).method("add").with(eq(updateUserViewProxy), new IsInstanceOf(String.class));
-
-        view.expects(once()).method("clearMessage").withNoArguments();
-        view.expects(once()).method("refresh").withNoArguments();
-
-        User user = new User();
-        user.setUsername("user1");
-        view.expects(once()).method("getUpdateUserView").with(eq(user)).will(returnValue(updateUserViewProxy));
-
-        presenter.doUpdateUsers(new User[] { user });
-    }
-
-    public void testShouldDisplayMessageIfNoUsersAreSelectedForUpdate() {
+    public void testShouldDisplayMessageIfNoUsersAreSelectedForUpdate() throws Exception {
         view.expects(once()).method("showMessage").with(eq("To update, please select at least one User."));
 
         presenter.doUpdateUsers(new User[] {});
@@ -195,7 +182,10 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
         User user = new User();
         user.setUsername("joe");
 
-        UsersManagerPresenter presenter = new UsersManagerPresenter(user, null, null);
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("user").withNoArguments().will(returnValue(user));
+
+        UsersManagerPresenter presenter = new UsersManagerPresenter((EmfSession) session.proxy(), null, null);
         displayView(presenter, createView());
 
         try {
@@ -208,7 +198,7 @@ public class UsersManagerPresenterTest extends MockObjectTestCase {
         fail("should not have allowed deletion of currently logged in user");
     }
 
-    public void testShouldNotDeleteAdminOnNotifyDelete() throws UserException {
+    public void testShouldNotDeleteAdminOnNotifyDelete() throws Exception {
         UsersManagerPresenter presenter = new UsersManagerPresenter(null, null, null);
         displayView(presenter, createView());
 

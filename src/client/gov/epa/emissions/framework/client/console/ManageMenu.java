@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.admin.MyProfileWindow;
 import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
+import gov.epa.emissions.framework.client.admin.UpdateUserPresenterImpl;
 import gov.epa.emissions.framework.client.admin.UsersManager;
 import gov.epa.emissions.framework.client.admin.UsersManagerPresenter;
 import gov.epa.emissions.framework.client.data.DatasetTypesManagerPresenter;
@@ -50,14 +51,14 @@ public class ManageMenu extends JMenu {
         super.addSeparator();
 
         addUsers(session.user());
-        super.add(createMyProfile(session));
+        super.add(createMyProfile(session, messagePanel));
     }
 
-    private JMenuItem createMyProfile(final EmfSession session) {
+    private JMenuItem createMyProfile(final EmfSession session, final MessagePanel messagePanel) {
         JMenuItem menuItem = new JMenuItem("My Profile");
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                displayMyProfile(session);
+                displayMyProfile(session, messagePanel);
             }
         });
 
@@ -166,7 +167,7 @@ public class ManageMenu extends JMenu {
         presenter.doDisplay(datasetsBrowserView);
     }
 
-    private void displayMyProfile(EmfSession session) {
+    private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
         if (viewLayout.activate("My Profile"))
             return;
 
@@ -174,28 +175,27 @@ public class ManageMenu extends JMenu {
         viewLayout.add(myProfileView, "My Profile");
         parent.addToDesktop(myProfileView);
 
-        UpdateUserPresenter presenter = new UpdateUserPresenter(session.userService());
-        presenter.display(myProfileView);
+        UpdateUserPresenter presenter = new UpdateUserPresenterImpl(session, session.user(), session.userService());
+        try {
+            presenter.display(myProfileView);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
     }
 
     public void displayUserManager() {
         if (viewLayout.activate("Users Manager"))
             return;
 
-        try {
-            UserService userServices = session.userService();
+        UserService userServices = session.userService();
 
-            UsersManager usesrManagerView = new UsersManager(session.user(), userServices, parent);
-            viewLayout.add(usesrManagerView, "Users Manager");
-            parent.addToDesktop(usesrManagerView);
+        UsersManager usesrManagerView = new UsersManager(session, userServices, parent);
+        viewLayout.add(usesrManagerView, "Users Manager");
+        parent.addToDesktop(usesrManagerView);
 
-            ViewLayout userManagerViewLayout = new CascadeLayout(usesrManagerView);
-            UsersManagerPresenter presenter = new UsersManagerPresenter(session.user(), userServices,
-                    userManagerViewLayout);
-            presenter.display(usesrManagerView);
-        } catch (Exception e) {
-            // TODO: error handling
-        }
+        ViewLayout userManagerViewLayout = new CascadeLayout(usesrManagerView);
+        UsersManagerPresenter presenter = new UsersManagerPresenter(session, userServices, userManagerViewLayout);
+        presenter.display(usesrManagerView);
     }
 
     public void observe(EmfConsolePresenter presenter) {

@@ -15,7 +15,7 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public abstract class UpdateUserWindow extends EmfInternalFrame implements UpdateUserView {
+public abstract class UpdateUserWindow extends EmfInternalFrame implements UpdatableUserView {
 
     private UpdateUserPresenter presenter;
 
@@ -82,7 +82,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
     private void updateUser() {
         try {
             panel.populateUser();
-            presenter.doSave(user);
+            presenter.doSave();
         } catch (EmfException e) {
             panel.setError(e.getMessage());
             return;
