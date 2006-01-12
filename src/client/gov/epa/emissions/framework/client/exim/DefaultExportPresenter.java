@@ -53,9 +53,9 @@ public class DefaultExportPresenter implements ExportPresenter {
     
     private String getDefaultBaseFolderForImport() {
         UserPreferences up = UserPreferences.getInstance();
-        String preferenceDrive = up.getProperty(up.EMF_OUTPUT_DRIVE);
+        String preferenceDrive = up.getProperty(UserPreferences.EMF_OUTPUT_DRIVE);
         if(preferenceDrive != null && !preferenceDrive.equals(""))
-            return preferenceDrive + ":\\" + up.getProperty(up.EMF_DEFAULT_OUTPUT_DIR);
+            return preferenceDrive + ":\\" + up.getProperty(UserPreferences.EMF_DEFAULT_OUTPUT_DIR);
         
         return session.getMostRecentExportFolder();
     }

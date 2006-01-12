@@ -65,9 +65,9 @@ public class ImportPresenter {
     
     private String getDefaultBaseFolderForImport() throws EmfException {
         UserPreferences up = UserPreferences.getInstance();
-        String preferenceDrive = up.getProperty(up.EMF_INPUT_DRIVE);
+        String preferenceDrive = up.getProperty(UserPreferences.EMF_INPUT_DRIVE);
         if(preferenceDrive != null && !preferenceDrive.equals(""))
-            return preferenceDrive + ":\\" + up.EMF_DEFAULT_INPUT_DIR;
+            return preferenceDrive + ":\\" + up.getProperty(UserPreferences.EMF_DEFAULT_INPUT_DIR);
         
         return service.getImportBaseFolder();
     }
