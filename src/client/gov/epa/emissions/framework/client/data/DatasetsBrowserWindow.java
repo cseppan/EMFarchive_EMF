@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.meta.PropertiesEditor;
+import gov.epa.emissions.framework.client.meta.PropertiesViewWindow;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfDatasetTableData;
@@ -151,19 +152,25 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         combo.setEditable(false);
         combo.setPreferredSize(new Dimension(125, 25));
         combo.setToolTipText("Select one of the options to view/edit a Dataset");
-        
+        panel.add(combo);
+
         combo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 JComboBox cb = (JComboBox) e.getSource();
                 String selected = (String) cb.getSelectedItem();
-                if (selected.equals("Edit Properties"))
-                    doShowEditProperties();
+                selectedOption(selected);
             }
         });
 
-        panel.add(combo);
-
         return panel;
+    }
+
+    private void selectedOption(String option) {
+        if (option.equals("View"))
+            doDisplayPropertiesViewer();
+
+        if (option.equals("Edit Properties"))
+            doDisplayPropertiesEditor();
     }
 
     protected void importDataset() throws EmfException {
@@ -226,14 +233,23 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         return model.elements(selected);
     }
 
-    protected void doShowEditProperties() {
+    protected void doDisplayPropertiesViewer() {
+        List datasets = getSelectedDatasets();
+
+        for (Iterator iter = datasets.iterator(); iter.hasNext();) {
+            PropertiesViewWindow view = new PropertiesViewWindow(session, parentConsole);
+            desktop.add(view);
+            presenter.doDisplayPropertiesView(view, (EmfDataset) iter.next());
+        }
+    }
+
+    protected void doDisplayPropertiesEditor() {
         List datasets = getSelectedDatasets();
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
             PropertiesEditor view = new PropertiesEditor(session, this, parentConsole);
             desktop.add(view);
-
-            presenter.doShowEditProperties(view, (EmfDataset) iter.next());
+            presenter.doDisplayPropertiesEditor(view, (EmfDataset) iter.next());
         }
     }
 

@@ -7,6 +7,8 @@ import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportView;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
+import gov.epa.emissions.framework.client.meta.PropertiesView;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.ViewLayout;
@@ -35,8 +37,6 @@ public class DatasetsBrowserPresenter {
         view.close();
     }
 
-    // FIXME: change other presenters to follow this design
-    // Also, look at doShowMetadata to identify a better pattern
     public void doExport(ExportView exportView, ExportPresenter presenter, EmfDataset[] datasets) {
         if (datasets.length == 0) {
             view.showMessage("To Export, you will need to select at least one Dataset");
@@ -56,27 +56,34 @@ public class DatasetsBrowserPresenter {
         view.clearMessage();
     }
 
-    // TODO: Is this a better style/pattern compared to doNew ?
-    public void doShowEditProperties(PropertiesEditorView propertiesEditorView, EmfDataset dataset) {
+    public void doDisplayPropertiesEditor(PropertiesEditorView propertiesEditorView, EmfDataset dataset) {
         view.clearMessage();
-        if (viewLayout.activate("Properties - " + dataset.getName()))
+        if (viewLayout.activate("Properties Editor - " + dataset.getName()))
             return;
 
-        showPropertiesEditor(propertiesEditorView, dataset);
-    }
-
-    private void showPropertiesEditor(PropertiesEditorView propertiesEditorView, EmfDataset dataset) {
-        viewLayout.add(propertiesEditorView, "Properties - " + dataset.getName());
+        viewLayout.add(propertiesEditorView, "Properties Editor - " + dataset.getName());
 
         PropertiesEditorPresenter presenter = new PropertiesEditorPresenter(dataset, serviceLocator);
         presenter.doDisplay(propertiesEditorView);
     }
 
+    // TODO: Is doDisplayPropertiesEditor a better style/pattern compared to doImport ?
     public void doImport(ImportView importView, ImportPresenter importPresenter) throws EmfException {
         view.clearMessage();
         viewLayout.add(importView, "Datasets Browser - Import");
 
         importPresenter.display(importView);
+    }
+
+    public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) {
+        view.clearMessage();
+        if (viewLayout.activate("Properties View - " + dataset.getName()))
+            return;
+
+        viewLayout.add(propertiesView, "Properties View - " + dataset.getName());
+
+        PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset);
+        presenter.doDisplay(propertiesView);
     }
 
 }

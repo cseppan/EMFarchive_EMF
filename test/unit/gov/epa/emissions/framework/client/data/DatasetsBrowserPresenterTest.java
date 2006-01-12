@@ -8,10 +8,12 @@ import gov.epa.emissions.framework.client.exim.ImportPresenterStub;
 import gov.epa.emissions.framework.client.exim.ImportView;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
+import gov.epa.emissions.framework.client.meta.PropertiesView;
+import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
 import org.jmock.Mock;
@@ -110,7 +112,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         presenter.doExport(null, null, datasets);
     }
 
-    public void testShouldDisplayPropertiesEditorOnClickOfPropertiesButton() {
+    public void testShouldDisplayPropertiesEditorOnSelectionOfEditPropertiesOption() {
         EmfDataset dataset = new EmfDataset();
         dataset.setName("name");
 
@@ -124,7 +126,24 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         layout.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
         layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.FALSE));
 
-        presenter.doShowEditProperties(viewProxy, dataset);
+        presenter.doDisplayPropertiesEditor(viewProxy, dataset);
+    }
+    
+    public void testShouldDisplayPropertiesViewerOnSelectionOfViewPropertiesOption() {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("name");
+        
+        view.expects(once()).method("clearMessage").withNoArguments();
+        
+        Mock metadataView = mock(PropertiesView.class);
+        metadataView.expects(once()).method("observe").with(new IsInstanceOf(PropertiesViewPresenter.class));
+        metadataView.expects(once()).method("display").with(eq(dataset));
+        
+        PropertiesView viewProxy = (PropertiesView) metadataView.proxy();
+        layout.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
+        layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.FALSE));
+        
+        presenter.doDisplayPropertiesView(viewProxy, dataset);
     }
 
     public void testShouldDisplayTheSamePropertiesEditorAsPreviouslyDisplayedOnSelectingTheSameDatasetAndClickingProperties() {
@@ -142,12 +161,12 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.FALSE));
 
         // 1st display
-        presenter.doShowEditProperties(viewProxy, dataset);
+        presenter.doDisplayPropertiesEditor(viewProxy, dataset);
 
         // 2nd attempt
         propertiesEditorView.stubs().method("isAlive").withNoArguments().will(returnValue(Boolean.TRUE));
         layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.TRUE));
-        presenter.doShowEditProperties(viewProxy, dataset);
+        presenter.doDisplayPropertiesEditor(viewProxy, dataset);
     }
 
     public void testShouldDisplayNewPropertiesEditorIfPreviouslyOpenedEditorIsClosedOnClickingOfPropertiesButton() {
@@ -165,7 +184,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         layout.expects(once()).method("add").with(eq(view1Proxy), new IsInstanceOf(String.class));
         layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.FALSE));
 
-        presenter.doShowEditProperties(view1Proxy, dataset);
+        presenter.doDisplayPropertiesEditor(view1Proxy, dataset);
 
         // 2nd attempt - view1 is closed, view2 will be displayed
         layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.FALSE));
@@ -177,6 +196,6 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         PropertiesEditorView view2Proxy = (PropertiesEditorView) view2.proxy();
         layout.expects(once()).method("add").with(eq(view2Proxy), new IsInstanceOf(String.class));
 
-        presenter.doShowEditProperties(view2Proxy, dataset);
+        presenter.doDisplayPropertiesEditor(view2Proxy, dataset);
     }
 }
