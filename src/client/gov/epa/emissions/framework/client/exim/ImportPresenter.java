@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
+import gov.epa.emissions.framework.client.preference.UserPreferences;
 
 import java.util.Date;
 
@@ -53,13 +54,22 @@ public class ImportPresenter {
         this.view = view;
 
         view.register(this);
-        view.setDefaultBaseFolder(service.getImportBaseFolder());
+        view.setDefaultBaseFolder(getDefaultBaseFolderForImport());
 
         view.display();
     }
 
     public void notifyBeginInput() {
         view.clearMessagePanel();
+    }
+    
+    private String getDefaultBaseFolderForImport() throws EmfException {
+        UserPreferences up = UserPreferences.getInstance();
+        String preferenceDrive = up.getProperty(up.EMF_INPUT_DRIVE);
+        if(preferenceDrive != null && !preferenceDrive.equals(""))
+            return preferenceDrive + ":\\" + up.EMF_DEFAULT_INPUT_DIR;
+        
+        return service.getImportBaseFolder();
     }
 
 }

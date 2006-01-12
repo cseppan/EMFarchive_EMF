@@ -76,13 +76,15 @@ public class FileMenu extends JMenu {
                     displayImport(session, desktop);
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
+                } catch (Exception e) {
+                    messagePanel.setError(e.getMessage());
                 }
             }
         });
         return importMenu;
     }
 
-    protected void displayImport(EmfSession session, JDesktopPane desktop) throws EmfException {
+    protected void displayImport(EmfSession session, JDesktopPane desktop) throws EmfException, Exception {
         if (viewLayout.activate("Import Dataset - FileMenu"))
             return;
 

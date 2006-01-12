@@ -1,0 +1,7 @@
+#EMF Property File
+EMFInputDriveLetter=T
+EMFOutputDriveLetter=T
+EMFInputServerDirectory=/data
+EMFOutputServerDirectory=/data
+EMFDefaultInputDirectory=emf_input
+EMFDefaultOutputDirectory=emf_output
