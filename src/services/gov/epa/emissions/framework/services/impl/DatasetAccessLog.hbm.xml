@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false"> 
-  <class name="gov.epa.emissions.framework.services.AccessLog" table="dataset_access_logs"> 
+  <class name="gov.epa.emissions.framework.services.AccessLog" table="dataset_access_logs" schema="emf"> 
  	<id name="accesslogid" type="long" column="access_log_id">
 	  <generator class="identity"/>
  	</id>

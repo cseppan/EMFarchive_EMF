@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false">
-    <class name="gov.epa.emissions.commons.db.version.Version" table="emissions.versions">
+    <class name="gov.epa.emissions.commons.db.version.Version" table="versions" schema="emissions">
         <id name="id" type="long" column="id">
             <generator class="identity"/>
         </id>

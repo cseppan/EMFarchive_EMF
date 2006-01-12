@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false">
-    <class name="gov.epa.emissions.commons.io.DatasetType" table="dataset_types">
+    <class name="gov.epa.emissions.commons.io.DatasetType" table="dataset_types" schema="emf">
         <id name="datasettypeid" type="long" column="dataset_type_id">
             <generator class="identity"/>
         </id>

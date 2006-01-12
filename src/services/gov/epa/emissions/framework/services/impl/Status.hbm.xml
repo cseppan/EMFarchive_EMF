@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false"> 
-  <class name="gov.epa.emissions.framework.services.Status" table="statusmessages"> 
+  <class name="gov.epa.emissions.framework.services.Status" table="statusmessages" schema="emf"> 
  	<id name="statusid" type="long" column="status_id">
 	  <generator class="identity"/>
  	</id>
