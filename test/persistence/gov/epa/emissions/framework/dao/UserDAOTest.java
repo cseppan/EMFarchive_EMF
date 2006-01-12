@@ -64,8 +64,11 @@ public class UserDAOTest extends HibernateTestCase {
 
     public void testShouldRemoveUser() throws Exception {
         List usersBeforeRemove = dao.all(session);
+        User owner = dao.get("admin", session);
+        User locked = dao.obtainLocked(owner, user, session);
+
         // test
-        dao.remove(user, session);
+        dao.remove(locked, session);
 
         // assert
         try {
@@ -76,16 +79,18 @@ public class UserDAOTest extends HibernateTestCase {
         }
     }
 
-    public void testShouldUpdateUser() throws Exception {
-        // test
-        User added = user(user.getUsername());
-        added.setFullName("updated name");
+    public void testShouldFailToRemoveUserIfLockedByAnotherUser() throws Exception {
+        User owner = dao.get("admin", session);
+        dao.obtainLocked(owner, user(user.getUsername()), session);
+        
+        try {
+            user.setLockOwner(null);//erasing existing owner
+            dao.remove(user, session);
+        } catch (Exception e) {
+            return;
+        }
 
-        dao.updateWithoutLock(added, session);
-
-        // assert
-        User updated = user(user.getUsername());
-        assertEquals("updated name", updated.getFullName());
+        fail("Should have failed to remove if locked by another user");
     }
 
     public void testShouldObtainLockedUser() {

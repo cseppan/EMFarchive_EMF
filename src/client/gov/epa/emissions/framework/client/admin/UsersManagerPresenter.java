@@ -66,6 +66,7 @@ public class UsersManagerPresenter {
         if (loggedIn.getUsername().equals(userToDelete.getUsername()))
             throw new EmfException("Cannot delete yourself - '" + userToDelete.getUsername() + "'");
 
+        //FIXME: obtain lock, and then delete
         userServices.deleteUser(userToDelete);
     }
 

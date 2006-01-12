@@ -37,12 +37,13 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
         this.userDataChanged = false;// reset
     }
 
-    public void doClose() {
+    public void doClose() throws EmfException {
         if (userDataChanged) {
             view.closeOnConfirmLosingChanges();
             return;
         }
 
+        service.releaseLocked(user);
         view.close();
     }
 

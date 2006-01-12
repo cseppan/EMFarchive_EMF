@@ -135,7 +135,7 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
             User loadedFromDb = user(locked.getUsername());
             assertEquals(locked.getLockOwner(), loadedFromDb.getLockOwner());
         } finally {
-            remove(user, dao);
+            remove(user);
         }
     }
 
@@ -153,13 +153,8 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
             User loadedFromDb = user(locked.getUsername());
             assertFalse("Should have released lock", loadedFromDb.isLocked());
         } finally {
-            remove(target, dao);
+            remove(target);
         }
-    }
-
-    private void remove(User user, UserDAO dao) {
-        User loadedFromDb = user(user.getUsername());
-        dao.remove(loadedFromDb, session);
     }
 
     private User newUser(UserDAO dao) {
@@ -195,9 +190,11 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
 
         service.createUser(user);
 
-        User added = user(user.getUsername());
-        added.setFullName("modified-name");
-        service.updateUser(added);
+        User owner = service.getUser("emf");
+        User locked = service.obtainLocked(owner, user);
+
+        locked.setFullName("modified-name");
+        service.updateUser(locked);
 
         try {
             User result = service.getUser("test-user");
@@ -209,21 +206,14 @@ public abstract class UserServiceTestCase extends ServicesTestCase {
     }
 
     public void testDeleteUser() throws Exception {
-        User user = new User();
-        user.setUsername("test-user");
-        user.setPassword("user12345");
-        user.setFullName("name");
-        user.setAffiliation("aff");
-        user.setPhone("111-222-3333");
-        user.setEmail("email@email.edu");
+        UserDAO dao = new UserDAO();
+        User user = newUser(dao);
 
-        service.createUser(user);
+        User owner = service.getUser("emf");
+        User locked = service.obtainLocked(owner, user);
+        service.deleteUser(locked);
 
-        // test
-        User added = user(user.getUsername());
-        service.deleteUser(added);
-
-        User result = user(added.getUsername());
+        User result = user(locked.getUsername());
         assertNull("User should have been deleted", result);
     }
 

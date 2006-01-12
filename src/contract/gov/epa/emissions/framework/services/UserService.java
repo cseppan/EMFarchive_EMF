@@ -16,6 +16,9 @@ public interface UserService extends EMFService {
 
     void createUser(User user) throws EmfException;
 
+    /**
+     * should obtain lock before updating. On completion of update, the lock is released implicitly.
+     */
     void updateUser(User user) throws EmfException;
 
     void deleteUser(User user) throws EmfException;

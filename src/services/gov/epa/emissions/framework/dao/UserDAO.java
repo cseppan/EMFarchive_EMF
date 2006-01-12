@@ -46,22 +46,14 @@ public class UserDAO {
     }
 
     public void remove(User user, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            session.delete(user);
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
-    }
+        User loaded = get(user.getUsername(), session);
+        if (!loaded.isLocked(user.getLockOwner()))
+            throw new RuntimeException("Cannot remove unless locked");
 
-    public void updateWithoutLock(User user, Session session) {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            session.update(user);
+            session.delete(loaded);
             tx.commit();
         } catch (HibernateException e) {
             tx.rollback();

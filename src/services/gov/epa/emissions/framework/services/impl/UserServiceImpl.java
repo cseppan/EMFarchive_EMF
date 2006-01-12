@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
     public void updateUser(User user) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.updateWithoutLock(user, session);
+            dao.update(user, session);
             session.close();
         } catch (HibernateException e) {
             LOG.error("Could not update user - " + user.getFullName() + ". Reason: " + e.getMessage());
@@ -105,6 +105,7 @@ public class UserServiceImpl implements UserService {
             dao.remove(user, session);
             session.close();
         } catch (HibernateException e) {
+            e.printStackTrace();
             LOG.error("Could not delete user - " + user.getFullName() + ". Reason: " + e.getMessage());
             throw new EmfException("Could not delete user - " + user.getFullName());
         }

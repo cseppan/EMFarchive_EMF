@@ -8,7 +8,7 @@ public interface UpdateUserPresenter {
 
     void doSave() throws EmfException;
 
-    void doClose();
+    void doClose() throws EmfException;
 
     void onChange();
 

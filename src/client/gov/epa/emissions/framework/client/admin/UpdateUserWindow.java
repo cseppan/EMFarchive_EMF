@@ -52,7 +52,11 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
         };
         Action closeAction = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                presenter.doClose();
+                try {
+                    presenter.doClose();
+                } catch (EmfException e) {
+                    panel.setError(e.getMessage());
+                }
             }
         };
 

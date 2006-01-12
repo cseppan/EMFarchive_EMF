@@ -38,10 +38,14 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldCloseViewOnCloseActionWithNoEdits() throws Exception {
-        UpdateUserPresenter presenter = displayablePresenter();
+        User user = new User();
+        user.setUsername("user");
+
+        UpdateUserPresenter presenter = displayablePresenter(user);
         presenter.display((UpdatableUserView) view.proxy());
 
         view.expects(once()).method("close").withNoArguments();
+        service.expects(once()).method("releaseLocked").with(same(user)).will(returnValue(user));
 
         presenter.doClose();
     }
@@ -65,9 +69,10 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         presenter.display((UpdatableUserView) view.proxy());
 
         service.expects(once()).method("updateUser").with(eq(user));
-        view.expects(once()).method("close").withNoArguments();
-
         presenter.doSave();
+
+        view.expects(once()).method("close").withNoArguments();
+        service.expects(once()).method("releaseLocked").with(same(user)).will(returnValue(user));
         presenter.doClose();
     }
 
