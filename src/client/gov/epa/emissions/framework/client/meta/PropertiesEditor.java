@@ -94,7 +94,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
     }
 
     private JPanel createKeywordsTab() {
-        KeywordsTab view = new KeywordsTab();
+        EditableKeywordsTab view = new EditableKeywordsTab();
         try {
             presenter.set(view);
             return view;

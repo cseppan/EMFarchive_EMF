@@ -92,7 +92,7 @@ public class ImportORLDatasetTest extends UserAcceptanceTestCase {
         });
     }
 
-    public void TODO_testShouldFailIfImportIsAttemptedWithDuplicateName() throws Exception {
+    public void testShouldFailIfImportIsAttemptedWithDuplicateName() throws Exception {
         String name = "ORL Onroad Inventory" + " UAT - " + new Random().nextInt();
         importActions.doImport("ORL Onroad Inventory", name, "nti99.NC.onroad.SMOKE.txt");
 

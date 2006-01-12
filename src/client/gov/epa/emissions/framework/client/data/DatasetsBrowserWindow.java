@@ -26,12 +26,16 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -53,8 +57,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private EmfTableModel model;
 
-    public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole)
-            throws EmfException {
+    public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole) throws EmfException {
         super("Datasets Browser", new Dimension(800, 300), parentConsole.desktop());
         super.setName("datasetsBrowser");
 
@@ -142,45 +145,57 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
 
-        JButton newDataset = new Button("New", new AbstractAction() {
+        String[] options = { "Choose one", "View", "Edit Properties", "Edit Versions" };
+        DefaultComboBoxModel model = new DefaultComboBoxModel(options);
+        JComboBox combo = new JComboBox(model);
+        combo.setEditable(false);
+        combo.setPreferredSize(new Dimension(125, 25));
+        combo.setToolTipText("Select one of the options to view/edit a Dataset");
+        
+        combo.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                JComboBox cb = (JComboBox) e.getSource();
+                String selected = (String) cb.getSelectedItem();
+                if (selected.equals("Edit Properties"))
+                    doShowEditProperties();
+            }
+        });
+
+        panel.add(combo);
+
+        return panel;
+    }
+
+    protected void importDataset() throws EmfException {
+        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktop);
+        desktop.add(importView);
+
+        ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session.user(),
+                session.eximService(), session.dataService(), this);
+        presenter.doImport(importView, importPresenter);
+    }
+
+    private JPanel createRightControlPanel() {
+        JPanel panel = new JPanel();
+
+        JButton importButton = new Button("Import", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    doNewDataset();
+                    importDataset();
                 } catch (EmfException e) {
                     showError("Could not open Import window (for creation of a new dataset)");
                 }
             }
         });
-        panel.add(newDataset);
-
-        JButton properties = new Button("Properties", new AbstractAction() {
-            public void actionPerformed(ActionEvent event) {
-                doShowMetadata();
-            }
-        });
-        panel.add(properties);
-
-        return panel;
-    }
-
-    protected void doNewDataset() throws EmfException {
-        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktop);
-        // windowLayoutManager.add(importView); //FIXME: needs layout
-        desktop.add(importView);
-
-        ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session.user(), session
-                .eximService(), session.dataService(), this);
-        presenter.doNew(importView, importPresenter);
-    }
-
-    private JPanel createRightControlPanel() {
-        JPanel panel = new JPanel();
+        importButton.setToolTipText("Import a new Dataset");
+        panel.add(importButton);
 
         JButton exportButton = new Button("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 exportSelectedDatasets();
             }
         });
+        exportButton.setToolTipText("Export existing Dataset(s)");
         panel.add(exportButton);
 
         JButton closeButton = new Button("Close", new AbstractAction() {
@@ -211,14 +226,14 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         return model.elements(selected);
     }
 
-    protected void doShowMetadata() {
+    protected void doShowEditProperties() {
         List datasets = getSelectedDatasets();
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
             PropertiesEditor view = new PropertiesEditor(session, this, parentConsole);
             desktop.add(view);
 
-            presenter.doShowProperties(view, (EmfDataset) iter.next());
+            presenter.doShowEditProperties(view, (EmfDataset) iter.next());
         }
     }
 

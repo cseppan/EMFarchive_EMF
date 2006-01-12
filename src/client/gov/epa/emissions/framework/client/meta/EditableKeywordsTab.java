@@ -6,11 +6,11 @@ import gov.epa.emissions.framework.client.data.Keywords;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-public class KeywordsTab extends JPanel implements KeywordsTabView {
+public class EditableKeywordsTab extends JPanel implements KeywordsTabView {
 
-    private KeyValueTableData tableData;
+    private EditableKeyValueTableData tableData;
 
-    public KeywordsTab() {
+    public EditableKeywordsTab() {
         super.setName("keywordsTab");
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     }
@@ -21,7 +21,7 @@ public class KeywordsTab extends JPanel implements KeywordsTabView {
     }
 
     private JPanel createLayout(KeyVal[] values, Keywords masterKeywords) {
-        tableData = new KeyValueTableData(values, masterKeywords);
+        tableData = new EditableKeyValueTableData(values, masterKeywords);
         return new KeywordsPanel("", tableData, masterKeywords);
     }
 

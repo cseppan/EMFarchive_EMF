@@ -57,7 +57,7 @@ public class DatasetsBrowserPresenter {
     }
 
     // TODO: Is this a better style/pattern compared to doNew ?
-    public void doShowProperties(PropertiesEditorView propertiesEditorView, EmfDataset dataset) {
+    public void doShowEditProperties(PropertiesEditorView propertiesEditorView, EmfDataset dataset) {
         view.clearMessage();
         if (viewLayout.activate("Properties - " + dataset.getName()))
             return;
@@ -72,7 +72,7 @@ public class DatasetsBrowserPresenter {
         presenter.doDisplay(propertiesEditorView);
     }
 
-    public void doNew(ImportView importView, ImportPresenter importPresenter) throws EmfException {
+    public void doImport(ImportView importView, ImportPresenter importPresenter) throws EmfException {
         view.clearMessage();
         viewLayout.add(importView, "Datasets Browser - Import");
 
