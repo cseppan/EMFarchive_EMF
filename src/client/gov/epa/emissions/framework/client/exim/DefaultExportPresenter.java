@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.preference.UserPreferences;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
 
@@ -50,13 +49,8 @@ public class DefaultExportPresenter implements ExportPresenter {
         else
             services.startExport(session.user(), datasets, folder, purpose);
     }
-    
+
     private String getDefaultBaseFolderForImport() {
-        UserPreferences up = UserPreferences.getInstance();
-        String preferenceDrive = up.getProperty(UserPreferences.EMF_OUTPUT_DRIVE);
-        if(preferenceDrive != null && !preferenceDrive.equals(""))
-            return preferenceDrive + ":\\" + up.getProperty(UserPreferences.EMF_DEFAULT_OUTPUT_DIR);
-        
         return session.getMostRecentExportFolder();
     }
 }

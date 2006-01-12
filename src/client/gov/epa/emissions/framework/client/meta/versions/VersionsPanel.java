@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.editor.NonEditableDataViewWindow;
 import gov.epa.emissions.framework.client.editor.EditableDataViewWindow;
+import gov.epa.emissions.framework.client.meta.NewVersionDialog;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EmfTableModel;

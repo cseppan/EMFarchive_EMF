@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
@@ -22,9 +22,12 @@ public class VersionsPresenter {
         this.service = service;
     }
 
-    public void observe(VersionsView view) {
+    public void display(VersionsView view) throws EmfException {
         this.view = view;
         view.observe(this);
+
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+        view.display(versions, dataset.getInternalSources());
     }
 
     public void doNew(Version base, String name) throws EmfException {

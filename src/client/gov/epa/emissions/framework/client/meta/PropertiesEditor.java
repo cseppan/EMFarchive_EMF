@@ -75,14 +75,9 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         ServiceLocator serviceLocator = session.serviceLocator();
         DataEditorService dataEditorService = serviceLocator.dataEditorService();
 
-        DataTab view = new DataTab(dataset, dataEditorService, parentConsole);
+        DataTab view = new DataTab(parentConsole);
         DataTabPresenter presenter = new DataTabPresenter(view, dataset, dataEditorService);
-        try {
-            presenter.doDisplay();
-        } catch (EmfException e) {
-            showError("Could not load Data Tab. Reason - " + e.getMessage());
-            return createErrorTab("Could not load Data Tab. Reason - " + e.getMessage());
-        }
+        presenter.doDisplay();
 
         return view;
     }

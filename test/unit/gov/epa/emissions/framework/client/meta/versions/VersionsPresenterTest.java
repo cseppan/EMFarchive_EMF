@@ -1,11 +1,12 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.editor.NonEditableDataView;
-import gov.epa.emissions.framework.client.editor.NonEditableDataViewPresenter;
 import gov.epa.emissions.framework.client.editor.EditableDataView;
 import gov.epa.emissions.framework.client.editor.EditableDataViewPresenter;
+import gov.epa.emissions.framework.client.editor.NonEditableDataView;
+import gov.epa.emissions.framework.client.editor.NonEditableDataViewPresenter;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -70,26 +71,37 @@ public class VersionsPresenterTest extends MockObjectTestCase {
 
         Mock service = mock(DataEditorService.class);
         service.expects(once()).method("derive").with(same(version), eq(derivedName)).will(returnValue(derived));
-        DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
         Mock view = mock(VersionsView.class);
         view.expects(once()).method("add").with(same(derived));
 
-        VersionsPresenter presenter = new VersionsPresenter(null, serviceProxy);
-        view.expects(once()).method("observe").with(same(presenter));
-
-        presenter.observe((VersionsView) view.proxy());
+        VersionsPresenter presenter = displayPresenter(service, view);
 
         presenter.doNew(version, derivedName);
     }
 
-    public void testShouldObserveViewOnObserve() {
+    private VersionsPresenter displayPresenter(Mock service, Mock view) throws EmfException {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setDatasetid(1);
+        Version[] versions = new Version[0];
+        InternalSource[] internalSources = new InternalSource[0];
+
+        service.stubs().method("getVersions").with(eq(new Long(dataset.getDatasetid()))).will(returnValue(versions));
+
+        VersionsPresenter presenter = new VersionsPresenter(dataset, (DataEditorService) service.proxy());
+        view.expects(once()).method("observe").with(same(presenter));
+        view.expects(once()).method("display").with(eq(versions), eq(internalSources));
+
+        presenter.display((VersionsView) view.proxy());
+
+        return presenter;
+    }
+
+    public void testShouldObserveAndDisplayViewOnDisplay() throws Exception {
+        Mock service = mock(DataEditorService.class);
         Mock view = mock(VersionsView.class);
 
-        VersionsPresenter presenter = new VersionsPresenter(null, null);
-        view.expects(once()).method("observe").with(same(presenter));
-
-        presenter.observe((VersionsView) view.proxy());
+        displayPresenter(service, view);
     }
 
     public void testShouldMarkVersionAsFinalOnMarkFinal() throws Exception {
@@ -100,17 +112,11 @@ public class VersionsPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("markFinal").with(same(version)).will(returnValue(new Version()));
 
         Version[] versions = {};
-        service.expects(once()).method("getVersions").with(eq(new Long(45))).will(returnValue(versions));
-
-        EmfDataset dataset = new EmfDataset();
-        dataset.setDatasetid(45);
 
         Mock view = mock(VersionsView.class);
-        view.expects(once()).method("reload").with(same(versions));
+        view.expects(once()).method("reload").with(eq(versions));
 
-        VersionsPresenter p = new VersionsPresenter(dataset, (DataEditorService) service.proxy());
-        view.expects(once()).method("observe").with(same(p));
-        p.observe((VersionsView) view.proxy());
+        VersionsPresenter p = displayPresenter(service, view);
 
         p.doMarkFinal(new Version[] { version });
     }

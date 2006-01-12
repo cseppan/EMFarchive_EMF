@@ -24,10 +24,11 @@ public class DataTabPresenterTest extends MockObjectTestCase {
         Mock editorService = mock(DataEditorService.class);
         Version[] versions = new Version[0];
         editorService.stubs().method("getVersions").with(eq(new Long(1))).will(returnValue(versions));
-        view.expects(once()).method("displayVersions").with(same(versions), eq(dataset.getInternalSources()));
 
-        DataTabPresenter presenter = new DataTabPresenter((DataTabView) view.proxy(), dataset,
-                (DataEditorService) editorService.proxy());
+        DataEditorService serviceProxy = (DataEditorService) editorService.proxy();
+        view.expects(once()).method("display").with(same(dataset), same(serviceProxy));
+
+        DataTabPresenter presenter = new DataTabPresenter((DataTabView) view.proxy(), dataset, serviceProxy);
 
         presenter.doDisplay();
     }

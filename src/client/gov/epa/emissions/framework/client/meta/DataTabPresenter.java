@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -11,21 +9,20 @@ public class DataTabPresenter {
 
     private EmfDataset dataset;
 
-    private DataEditorService dataEditorService;
+    private DataEditorService service;
 
-    public DataTabPresenter(DataTabView view, EmfDataset dataset, DataEditorService dataEditorService) {
+    public DataTabPresenter(DataTabView view, EmfDataset dataset, DataEditorService service) {
         this.view = view;
         this.dataset = dataset;
-        this.dataEditorService = dataEditorService;
+        this.service = service;
     }
 
     public void doSave() {
         // No Op
     }
 
-    public void doDisplay() throws EmfException {
-        Version[] versions = dataEditorService.getVersions(dataset.getDatasetid());
-        view.displayVersions(versions, dataset.getInternalSources());
+    public void doDisplay() {
+        view.display(dataset, service);
     }
 
 }

@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 public interface DataTabView {
 
-    void displayVersions(Version[] versions, InternalSource[] sources);
+    void display(EmfDataset dataset, DataEditorService service);
 }

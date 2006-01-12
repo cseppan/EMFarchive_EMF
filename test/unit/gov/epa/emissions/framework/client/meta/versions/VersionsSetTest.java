@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
 import junit.framework.TestCase;

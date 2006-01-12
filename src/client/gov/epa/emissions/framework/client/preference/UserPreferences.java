@@ -7,11 +7,11 @@ import java.util.Properties;
 public class UserPreferences extends Properties {
 
     public static final String EMF_INPUT_DRIVE = "EMFInputDriveLetter";
-    
+
     public static final String EMF_OUTPUT_DRIVE = "EMFOutputDriveLetter";
-    
+
     public static final String EMF_INPUT_PATH = "EMFInputServerDirectory";
-    
+
     public static final String EMF_OUTPUT_PATH = "EMFOutputServerDirectory";
 
     public static final String EMF_DEFAULT_INPUT_DIR = "EMFDefaultInputDirectory";
@@ -21,7 +21,7 @@ public class UserPreferences extends Properties {
     public static final String EMF_PREFERENCE = "EMF_PREFERENCE";
 
     private static UserPreferences userPreferences = null;
-    
+
     public UserPreferences() {
         loadProperties();
     }
@@ -34,13 +34,13 @@ public class UserPreferences extends Properties {
     }
 
     private void loadProperties() {
-            File file = new File(getPropertyFile(EMF_PREFERENCE));
-            try{
+        File file = new File(getPropertyFile(EMF_PREFERENCE));
+        try {
             FileInputStream inStream = new FileInputStream(file);
             load(inStream);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     private String getPropertyFile(String property) {
@@ -54,6 +54,10 @@ public class UserPreferences extends Properties {
     public boolean checkFile(String fileName) {
         File file = new File(fileName);
         return file.exists();
+    }
+
+    public String getInputDrive() {
+        return getProperty(EMF_INPUT_DRIVE);
     }
 
 }
