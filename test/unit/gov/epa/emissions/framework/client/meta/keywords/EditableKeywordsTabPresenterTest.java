@@ -32,7 +32,7 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenter((EditableKeywordsTabView) view.proxy(), (EmfDataset) dataset
                 .proxy());
 
-        presenter.init(keywords);
+        presenter.display(keywords);
     }
 
     public void testShouldDisplayKeyValuesForAllKeywordsOfAssociatedDatasetType() {
@@ -57,7 +57,7 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenter((EditableKeywordsTabView) view.proxy(), (EmfDataset) dataset
                 .proxy());
 
-        presenter.init(keywords);
+        presenter.display(keywords);
     }
 
     private Constraint keyValsConstraint(final Keyword keyword1, final Keyword keyword2, final KeyVal[] values) {

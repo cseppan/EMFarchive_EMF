@@ -8,6 +8,9 @@ import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTabPresenterStub;
+import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
+import gov.epa.emissions.framework.client.meta.summary.SummaryTabPresenterStub;
+import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataService;
@@ -78,16 +81,16 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldAddAsOnChangeListenerToSummaryTabOnAddingSummaryTab() {
-        Mock summaryView = mock(SummaryTabView.class);
+        Mock summaryView = mock(EditableSummaryTabView.class);
         summaryView.expects(once()).method("observeChanges").with(eq(presenter));
 
-        presenter.set((SummaryTabView) summaryView.proxy());
+        presenter.set((EditableSummaryTabView) summaryView.proxy());
     }
 
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() throws Exception {
         dataServices.expects(once()).method("updateDatasetWithoutLock").with(eq(dataset));
 
-        Mock summaryView = mock(SummaryTabView.class);
+        Mock summaryView = mock(EditableSummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
         summaryView.expects(once()).method("observeChanges").with(eq(presenter));
 
@@ -95,7 +98,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         keywordsView.expects(once()).method("display");
         keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[] {}));
 
-        presenter.set((SummaryTabView) summaryView.proxy());
+        presenter.set((EditableSummaryTabView) summaryView.proxy());
         presenter.set((EditableKeywordsTabView) keywordsView.proxy());
 
         Mock datasetsBrowser = mock(DatasetsBrowserView.class);
@@ -110,7 +113,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     public void testShouldSaveWithoutPromptingOnSaveIfChangesHaveOccuredInSummaryTab() throws EmfException {
         dataServices.expects(once()).method("updateDatasetWithoutLock").with(eq(dataset));
 
-        Mock summaryView = mock(SummaryTabView.class);
+        Mock summaryView = mock(EditableSummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
         summaryView.expects(atLeastOnce()).method("observeChanges").with(eq(presenter));
 
@@ -118,7 +121,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[] {}));
         keywordsView.expects(atLeastOnce()).method("display");
 
-        presenter.set((SummaryTabView) summaryView.proxy());
+        presenter.set((EditableSummaryTabView) summaryView.proxy());
         presenter.set((EditableKeywordsTabView) keywordsView.proxy());
 
         Mock datasetsBrowser = mock(DatasetsBrowserView.class);
@@ -127,7 +130,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         datasetsBrowser.expects(once()).method("refresh").with(eq(datasets));
         view.expects(once()).method("close");
 
-        presenter.set((SummaryTabView) summaryView.proxy());
+        presenter.set((EditableSummaryTabView) summaryView.proxy());
         presenter.onChange();
 
         presenter.doSave((DatasetsBrowserView) datasetsBrowser.proxy());
@@ -142,14 +145,14 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         Mock keywordsTab = mock(KeywordsTabPresenterStub.class);
         keywordsTab.expects(once()).method("doSave");
 
-        presenter.updateDataset((DataService) dataServices.proxy(), (SummaryTabPresenter) summaryTab.proxy(),
+        presenter.updateDataset((DataService) dataServices.proxy(), (EditableSummaryTabPresenter) summaryTab.proxy(),
                 (EditableKeywordsTabPresenter) keywordsTab.proxy());
     }
 
     public void testShouldDisplayErrorMessageOnDatasetsBrowserIfGettingUpdatedDatasetsFailOnSave() throws EmfException {
         dataServices.expects(once()).method("updateDatasetWithoutLock").with(eq(dataset));
 
-        Mock summaryView = mock(SummaryTabView.class);
+        Mock summaryView = mock(EditableSummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
         summaryView.expects(once()).method("observeChanges").with(eq(presenter));
 
@@ -157,7 +160,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         keywordsView.expects(once()).method("display");
         keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[] {}));
 
-        presenter.set((SummaryTabView) summaryView.proxy());
+        presenter.set((EditableSummaryTabView) summaryView.proxy());
         presenter.set((EditableKeywordsTabView) keywordsView.proxy());
 
         Mock datasetsBrowser = mock(DatasetsBrowserView.class);
@@ -169,7 +172,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldDisplayErrorMessageOnErrorDuringSave() throws EmfException {
-        Mock summaryView = mock(SummaryTabView.class);
+        Mock summaryView = mock(EditableSummaryTabView.class);
         summaryView.expects(once()).method("updateDataset").with(eq(dataset));
         summaryView.expects(once()).method("observeChanges").with(eq(presenter));
 
@@ -182,7 +185,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         keywordsView.expects(once()).method("display");
         keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[] {}));
 
-        presenter.set((SummaryTabView) summaryView.proxy());
+        presenter.set((EditableSummaryTabView) summaryView.proxy());
         presenter.set((EditableKeywordsTabView) keywordsView.proxy());
 
         presenter.doSave(null);

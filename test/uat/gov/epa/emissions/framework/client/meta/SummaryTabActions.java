@@ -1,7 +1,8 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
-import gov.epa.emissions.framework.client.meta.SummaryTab.FormattedTextField;
+import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
+import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab.FormattedTextField;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -13,11 +14,11 @@ import javax.swing.JTextField;
 
 public class SummaryTabActions {
 
-    private SummaryTab tab;
+    private EditableSummaryTab tab;
 
     private UserAcceptanceTestCase test;
 
-    public SummaryTabActions(SummaryTab tab, UserAcceptanceTestCase test) {
+    public SummaryTabActions(EditableSummaryTab tab, UserAcceptanceTestCase test) {
         this.tab = tab;
         this.test = test;
     }

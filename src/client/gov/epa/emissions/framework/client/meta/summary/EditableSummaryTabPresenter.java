@@ -1,16 +1,16 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.summary;
 
 import java.util.Date;
 
 import gov.epa.emissions.framework.services.EmfDataset;
 
-public class SummaryTabPresenter {
+public class EditableSummaryTabPresenter {
 
-    private SummaryTabView view;
+    private EditableSummaryTabView view;
 
     private EmfDataset dataset;
 
-    public SummaryTabPresenter(EmfDataset dataset, SummaryTabView view) {
+    public EditableSummaryTabPresenter(EmfDataset dataset, EditableSummaryTabView view) {
         this.dataset = dataset;
         this.view = view;
     }

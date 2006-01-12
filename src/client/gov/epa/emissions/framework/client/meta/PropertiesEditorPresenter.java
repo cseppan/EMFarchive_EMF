@@ -6,6 +6,8 @@ import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
+import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
+import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -16,7 +18,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
 
     private PropertiesEditorView view;
 
-    private SummaryTabPresenter summaryPresenter;
+    private EditableSummaryTabPresenter summaryPresenter;
 
     private boolean unsavedChanges;
 
@@ -65,15 +67,15 @@ public class PropertiesEditorPresenter implements ChangeObserver {
         doClose();
     }
 
-    void updateDataset(DataService dataServices, SummaryTabPresenter summary, EditableKeywordsTabPresenter keywords)
+    void updateDataset(DataService dataServices, EditableSummaryTabPresenter summary, EditableKeywordsTabPresenter keywords)
             throws EmfException {
         summary.doSave();
         keywords.doSave();
         dataServices.updateDatasetWithoutLock(dataset);
     }
 
-    public void set(SummaryTabView summary) {
-        summaryPresenter = new SummaryTabPresenter(dataset, summary);
+    public void set(EditableSummaryTabView summary) {
+        summaryPresenter = new EditableSummaryTabPresenter(dataset, summary);
         summary.observeChanges(this);
     }
 
@@ -81,7 +83,7 @@ public class PropertiesEditorPresenter implements ChangeObserver {
         keywordsPresenter = new EditableKeywordsTabPresenter(keywordsView, dataset);
 
         Keywords keywords = new Keywords(serviceLocator.dataCommonsService().getKeywords());
-        keywordsPresenter.init(keywords);
+        keywordsPresenter.display(keywords);
     }
 
     private void clearChanges() {

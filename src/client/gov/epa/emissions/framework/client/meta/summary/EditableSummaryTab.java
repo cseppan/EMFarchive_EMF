@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.summary;
 
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
@@ -45,7 +45,7 @@ import javax.swing.SpringLayout;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 
 //FIXME: super long class..break it up
-public class SummaryTab extends JPanel implements SummaryTabView {
+public class EditableSummaryTab extends JPanel implements EditableSummaryTabView {
 
     private EmfDataset dataset;
 
@@ -73,7 +73,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private ChangeObserver changeObserver;
 
-    public SummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel) throws EmfException {
+    public EditableSummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel) throws EmfException {
         super.setName("summary");
         this.dataset = dataset;
         this.messagePanel = messagePanel;

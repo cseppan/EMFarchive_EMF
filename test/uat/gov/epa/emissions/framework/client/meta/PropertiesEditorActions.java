@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
+import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
 
 import javax.swing.JTabbedPane;
 
@@ -29,7 +30,7 @@ public class PropertiesEditorActions {
     }
 
     public SummaryTabActions summary() {
-        SummaryTab summary = (SummaryTab) test.findByName(tabbedPane(), "summary");
+        EditableSummaryTab summary = (EditableSummaryTab) test.findByName(tabbedPane(), "summary");
         return new SummaryTabActions(summary, test);
     }
 

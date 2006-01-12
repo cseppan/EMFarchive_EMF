@@ -24,7 +24,7 @@ public class EditableKeywordsTabPresenter {
         this.dataset = dataset;
     }
 
-    public void init(Keywords masterKeywords) {
+    public void display(Keywords masterKeywords) {
         view.display(vals(dataset.getDatasetType().getKeywords()), masterKeywords);
     }
 

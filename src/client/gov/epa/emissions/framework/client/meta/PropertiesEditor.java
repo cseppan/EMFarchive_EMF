@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
+import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -61,7 +62,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     private JPanel createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
         try {
-            SummaryTab view = new SummaryTab(dataset, session.dataCommonsService(), messagePanel);
+            EditableSummaryTab view = new EditableSummaryTab(dataset, session.dataCommonsService(), messagePanel);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
