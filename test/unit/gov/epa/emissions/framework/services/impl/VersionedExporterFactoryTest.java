@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.impl;
 
+import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Exporter;
@@ -13,7 +15,7 @@ import org.jmock.cglib.MockObjectTestCase;
 public class VersionedExporterFactoryTest extends MockObjectTestCase {
 
     public void testShouldBeAbleCreateOrlExporter() throws Exception {
-        VersionedExporterFactory factory = new VersionedExporterFactory(null, null);
+        VersionedExporterFactory factory = new VersionedExporterFactory(dbServer(), null);
 
         DatasetType datasetType = new DatasetType();
         datasetType.setExporterClassName(ORLOnRoadExporter.class.getName());
@@ -29,7 +31,7 @@ public class VersionedExporterFactoryTest extends MockObjectTestCase {
         Mock types = mock(SqlDataTypes.class);
         types.stubs().method("intType").withNoArguments().will(returnValue("integer"));
 
-        VersionedExporterFactory factory = new VersionedExporterFactory(null, (SqlDataTypes) types.proxy());
+        VersionedExporterFactory factory = new VersionedExporterFactory(dbServer(), (SqlDataTypes) types.proxy());
 
         DatasetType datasetType = new DatasetType();
         datasetType.setExporterClassName(TemporalProfileExporter.class.getName());
@@ -39,5 +41,12 @@ public class VersionedExporterFactoryTest extends MockObjectTestCase {
         Exporter exporter = factory.create(dataset, dataset.getDefaultVersion());
 
         assertEquals(datasetType.getExporterClassName(), exporter.getClass().getName());
+    }
+    
+    private DbServer dbServer() {
+        Mock datasource = mock(Datasource.class);
+        Mock dbServer = mock(DbServer.class);
+        dbServer.stubs().method("getEmissionsDatasource").withAnyArguments().will(returnValue(datasource.proxy()));
+        return (DbServer) dbServer.proxy();
     }
 }

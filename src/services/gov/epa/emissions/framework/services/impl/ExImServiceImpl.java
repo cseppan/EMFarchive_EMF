@@ -62,8 +62,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         baseImportFolder = importFolder.getAbsolutePath();
         baseExportFolder = exportFolder.getAbsolutePath();
 
-        importerFactory = new VersionedImporterFactory(dbServer.getEmissionsDatasource(), dbServer.getSqlDataTypes());
-        exporterFactory = new VersionedExporterFactory(dbServer.getEmissionsDatasource(), dbServer.getSqlDataTypes());
+        importerFactory = new VersionedImporterFactory(dbServer, dbServer.getSqlDataTypes());
+        exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes());
 
         // TODO: thread pooling policy
         threadPool = new PooledExecutor(new BoundedBuffer(10), 20);

@@ -73,7 +73,7 @@ public class EmfTableModelTest extends MockObjectTestCase {
         assertEquals(dataset1.getStatus(), model.getValueAt(0, 2));
         assertEquals(dataset1.getCreator(), model.getValueAt(0, 3));
         assertEquals(dataset1.getRegion(), model.getValueAt(0, 4));
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         assertEquals(dateFormat.format(dataset1.getStartDateTime()), model.getValueAt(0, 5));
         assertEquals(dateFormat.format(dataset1.getModifiedDateTime()), model.getValueAt(0, 6));
     }

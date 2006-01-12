@@ -41,7 +41,7 @@ public class EmfDatasetTableDataTest extends TestCase {
         assertEquals(1, rows.size());
 
         Row row = (Row) rows.get(0);
-        DateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+        DateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         assertEquals(format.format(startDate), row.getValueAt(5));
         assertEquals(format.format(modifiedDate), row.getValueAt(6));
     }

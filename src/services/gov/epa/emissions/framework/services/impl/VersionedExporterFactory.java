@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.DataFormatFactory;
 import gov.epa.emissions.commons.io.Dataset;
@@ -16,12 +16,12 @@ import org.apache.commons.logging.LogFactory;
 public class VersionedExporterFactory {
     private static Log log = LogFactory.getLog(VersionedExporterFactory.class);
 
-    private Datasource datasource;
+    private DbServer dbServer;
 
     private SqlDataTypes sqlDataTypes;
 
-    public VersionedExporterFactory(Datasource datasource, SqlDataTypes sqlDataTypes) {
-        this.datasource = datasource;
+    public VersionedExporterFactory(DbServer dbServer, SqlDataTypes sqlDataTypes) {
+        this.dbServer = dbServer;
         this.sqlDataTypes = sqlDataTypes;
     }
 
@@ -31,9 +31,9 @@ public class VersionedExporterFactory {
 
             Class exporterClass = Class.forName(exporterName);
 
-            Class[] classParams = new Class[] { Dataset.class, Datasource.class, SqlDataTypes.class,
+            Class[] classParams = new Class[] { Dataset.class, DbServer.class, SqlDataTypes.class,
                     DataFormatFactory.class };
-            Object[] params = new Object[] { dataset, datasource, sqlDataTypes, new VersionedDataFormatFactory(version) };
+            Object[] params = new Object[] { dataset, dbServer, sqlDataTypes, new VersionedDataFormatFactory(version) };
 
             Constructor exporterConstructor = exporterClass.getDeclaredConstructor(classParams);
             return (Exporter) exporterConstructor.newInstance(params);

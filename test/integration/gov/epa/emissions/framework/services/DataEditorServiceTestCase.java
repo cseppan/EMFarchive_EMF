@@ -53,8 +53,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         File file = new File("test/data/orl/nc", "very-small-nonpoint.txt");
         DataFormatFactory formatFactory = new VersionedDataFormatFactory(0);
         ORLNonPointImporter importer = new ORLNonPointImporter(file.getParentFile(), new String[] { file.getName() },
-                dataset, datasource, dataTypes(), formatFactory);
-        new VersionedImporter(importer, dataset, datasource).run();
+                dataset, dbServer(), dataTypes(), formatFactory);
+        new VersionedImporter(importer, dataset, dbServer()).run();
     }
 
     private void setTestValues(EmfDataset dataset) {

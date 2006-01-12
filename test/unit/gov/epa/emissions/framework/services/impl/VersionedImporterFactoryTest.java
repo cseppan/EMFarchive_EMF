@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.impl;
 
+import gov.epa.emissions.commons.db.Datasource;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.importer.Importer;
@@ -17,7 +19,7 @@ public class VersionedImporterFactoryTest extends MockObjectTestCase {
         Mock types = mock(SqlDataTypes.class);
         types.stubs().method(ANYTHING).withAnyArguments().will(returnValue(""));
 
-        VersionedImporterFactory factory = new VersionedImporterFactory(null, (SqlDataTypes) types.proxy());
+        VersionedImporterFactory factory = new VersionedImporterFactory(dbServer(), (SqlDataTypes) types.proxy());
 
         DatasetType datasetType = new DatasetType();
         datasetType.setImporterClassName(ORLOnRoadImporter.class.getName());
@@ -31,10 +33,10 @@ public class VersionedImporterFactoryTest extends MockObjectTestCase {
     }
 
     public void testShouldBeAbleCreateTemporalProfileImporter() throws Exception {
-        Mock types = mock(SqlDataTypes.class);
-        types.stubs().method(ANYTHING).withAnyArguments().will(returnValue(""));
-
-        VersionedImporterFactory factory = new VersionedImporterFactory(null, (SqlDataTypes) types.proxy());
+        Mock sqlTypes = mock(SqlDataTypes.class);
+        sqlTypes.stubs().method(ANYTHING).withAnyArguments().will(returnValue(""));
+        
+        VersionedImporterFactory factory = new VersionedImporterFactory(dbServer(), (SqlDataTypes) sqlTypes.proxy());
 
         DatasetType datasetType = new DatasetType();
         datasetType.setImporterClassName(TemporalProfileImporter.class.getName());
@@ -44,5 +46,12 @@ public class VersionedImporterFactoryTest extends MockObjectTestCase {
         Importer exporter = factory.create(dataset, null, "file");
 
         assertEquals(VersionedImporter.class.getName(), exporter.getClass().getName());
+    }
+
+    private DbServer dbServer() {
+        Mock datasource = mock(Datasource.class);
+        Mock dbServer = mock(DbServer.class);
+        dbServer.stubs().method("getEmissionsDatasource").withAnyArguments().will(returnValue(datasource.proxy()));
+        return (DbServer) dbServer.proxy();
     }
 }
