@@ -155,8 +155,4 @@ public class ViewableUserProfilePanel extends JPanel {
         return panel;
     }
 
-    void setError(String message) {
-        messagePanel.setError(message);
-    }
-
 }

@@ -7,4 +7,5 @@ public interface UserView extends ManagedView {
 
     void display(User user);
 
+    void observe(ViewUserPresenter presenter);
 }

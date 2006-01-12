@@ -4,14 +4,12 @@ import gov.epa.emissions.framework.EmfException;
 
 public interface UpdateUserPresenter {
 
-    void display(UpdatableUserView view) throws EmfException;
-
     void doSave() throws EmfException;
 
     void doClose() throws EmfException;
 
     void onChange();
 
-    void displayViewIfLocked(UpdatableUserView update, UserView view) throws EmfException;
+    void display(UpdatableUserView update, UserView view) throws EmfException;
 
 }

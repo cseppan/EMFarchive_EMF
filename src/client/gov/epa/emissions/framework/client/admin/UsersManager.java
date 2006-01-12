@@ -102,9 +102,10 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     private void updateUser(User updateUser) {
-        UpdatableUserView view = getUpdateUserView(updateUser);
+        UpdatableUserView updatable = getUpdateUserView(updateUser);
+        UserView viewable = getUserView();
         try {
-            presenter.doUpdateUser(updateUser, view);
+            presenter.doUpdateUser(updateUser, updatable, viewable);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -113,6 +114,19 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     public UpdatableUserView getUpdateUserView(User updateUser) {
         UpdateUserWindow view = updateUser.equals(session.user()) ? new DisposableUpdateUserWindow(updateUser)
                 : new DisposableUpdateUserWindow(updateUser, new AddAdminOption());
+        desktop.add(view);
+
+        view.addInternalFrameListener(new InternalFrameAdapter() {
+            public void internalFrameClosed(InternalFrameEvent event) {
+                doSimpleRefresh();
+            }
+        });
+
+        return view;
+    }
+
+    public UserView getUserView() {
+        ViewUserWindow view = new DisposableViewUserWindow();
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {

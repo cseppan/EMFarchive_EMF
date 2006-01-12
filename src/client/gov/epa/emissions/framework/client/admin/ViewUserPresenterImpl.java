@@ -14,6 +14,7 @@ public class ViewUserPresenterImpl implements ViewUserPresenter {
 
     public void display(UserView view) {
         this.view = view;
+        view.observe(this);
         view.display(user);
     }
 

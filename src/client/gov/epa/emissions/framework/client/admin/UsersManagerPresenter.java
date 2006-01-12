@@ -66,7 +66,7 @@ public class UsersManagerPresenter {
         if (loggedIn.getUsername().equals(userToDelete.getUsername()))
             throw new EmfException("Cannot delete yourself - '" + userToDelete.getUsername() + "'");
 
-        //FIXME: obtain lock, and then delete
+        // FIXME: obtain lock, and then delete
         userServices.deleteUser(userToDelete);
     }
 
@@ -80,39 +80,40 @@ public class UsersManagerPresenter {
         view.refresh();
     }
 
-    public void doUpdateUser(User updateUser, UpdatableUserView updatableView) throws EmfException {
+    public void doUpdateUser(User updateUser, UpdatableUserView updatable, UserView viewable) throws EmfException {
         UpdateUserPresenter updatePresenter = new UpdateUserPresenterImpl(session, updateUser, userServices);
-        updateUser(updateUser, updatableView, updatePresenter);
+        updateUser(updateUser, updatable, viewable, updatePresenter);
     }
 
-    void updateUser(User updateUser, UpdatableUserView updatableView, UpdateUserPresenter updatePresenter)
+    void updateUser(User user, UpdatableUserView updatable, UserView viewable, UpdateUserPresenter updatePresenter)
             throws EmfException {
         view.clearMessage();
 
-        if (isUpdateUserViewAlive(updateUser)) {
-            updateUserView(updateUser).bringToFront();
+        // TODO: what about the 'viewable'
+        if (isUpdateUserViewAlive(user)) {
+            updateUserView(user).bringToFront();
             return;
         }
 
-        showUpdateUser(updateUser, updatableView, updatePresenter);
+        showUpdateUser(user, updatable, viewable, updatePresenter);
     }
 
-    private boolean isUpdateUserViewAlive(User updateUser) {
-        return updateViewsMap.containsKey(updateUser) && updateUserView(updateUser).isAlive();
+    private boolean isUpdateUserViewAlive(User user) {
+        return updateViewsMap.containsKey(user) && updateUserView(user).isAlive();
     }
 
-    private UpdatableUserView updateUserView(User updateUser) {
-        return (UpdatableUserView) updateViewsMap.get(updateUser);
+    private UpdatableUserView updateUserView(User user) {
+        return (UpdatableUserView) updateViewsMap.get(user);
     }
 
-    private void showUpdateUser(User updateUser, UpdatableUserView updateView, UpdateUserPresenter updatePresenter)
-            throws EmfException {
-        layoutManager.add(updateView, "Update - " + updateUser.getUsername());
+    private void showUpdateUser(User updateUser, UpdatableUserView updatable, UserView viewable,
+            UpdateUserPresenter updatePresenter) throws EmfException {
+        layoutManager.add(updatable, "Update - " + updateUser.getUsername());
 
-        updatePresenter.display(updateView);
+        updatePresenter.display(updatable, viewable);
 
         view.refresh();
-        updateViewsMap.put(updateUser, updateView);
+        updateViewsMap.put(updateUser, updatable);
     }
 
     public void doUpdateUsers(User[] users) throws EmfException {
@@ -122,8 +123,9 @@ public class UsersManagerPresenter {
         }
 
         for (int i = 0; i < users.length; i++) {
-            UpdatableUserView updateUserView = view.getUpdateUserView(users[i]);
-            doUpdateUser(users[i], updateUserView);
+            UpdatableUserView updatable = view.getUpdateUserView(users[i]);
+            UserView viewable = view.getUserView();
+            doUpdateUser(users[i], updatable, viewable);
         }
     }
 

@@ -15,6 +15,7 @@ public class ViewUserPresenterTest extends MockObjectTestCase {
 
         Mock view = mock(UserView.class);
         view.expects(once()).method("display").with(same(user));
+        view.expects(once()).method("observe").with(same(presenter));
 
         presenter.display((UserView) view.proxy());
     }
@@ -27,6 +28,7 @@ public class ViewUserPresenterTest extends MockObjectTestCase {
 
         Mock view = mock(UserView.class);
         view.expects(once()).method("display").with(same(user));
+        view.expects(once()).method("observe").with(same(presenter));
         presenter.display((UserView) view.proxy());
 
         view.expects(once()).method("close").withNoArguments();

@@ -8,6 +8,7 @@ import java.util.Date;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
+import org.jmock.core.constraint.IsInstanceOf;
 
 public class UpdateUserPresenterTest extends MockObjectTestCase {
 
@@ -34,13 +35,13 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayViewAfterObtainingLockOnDisplay() throws Exception {
         UpdateUserPresenter presenter = displayablePresenter();
 
-        presenter.display((UpdatableUserView) view.proxy());
+        presenter.display((UpdatableUserView) view.proxy(), null);
     }
 
     public void testShouldShowNonEditViewAfterFailingToObtainLockOfUserOnDisplay() throws Exception {
         User user = new User();// no lock
         user.setUsername("user");
-        
+
         User owner = new User();
         owner.setUsername("owner");
 
@@ -54,8 +55,9 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
 
         UpdateUserPresenter presenter = new UpdateUserPresenterImpl((EmfSession) session.proxy(), user,
                 (UserService) service.proxy());
-        
-        presenter.displayViewIfLocked(null, (UserView)userView.proxy());
+        userView.expects(once()).method("observe").with(new IsInstanceOf(ViewUserPresenter.class));
+
+        presenter.display(null, (UserView) userView.proxy());
     }
 
     public void testShouldCloseViewOnCloseActionWithNoEdits() throws Exception {
@@ -63,7 +65,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         user.setUsername("user");
 
         UpdateUserPresenter presenter = displayablePresenter(user);
-        presenter.display((UpdatableUserView) view.proxy());
+        presenter.display((UpdatableUserView) view.proxy(), null);
 
         view.expects(once()).method("close").withNoArguments();
         service.expects(once()).method("releaseLocked").with(same(user)).will(returnValue(user));
@@ -73,7 +75,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
 
     public void testShouldConfirmLosingChangesOnCloseAfterEdits() throws Exception {
         UpdateUserPresenter presenter = displayablePresenter();
-        presenter.display((UpdatableUserView) view.proxy());
+        presenter.display((UpdatableUserView) view.proxy(), null);
 
         view.expects(once()).method("closeOnConfirmLosingChanges").withNoArguments();
 
@@ -87,7 +89,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         user.setFullName("Joey Moey");
 
         UpdateUserPresenter presenter = displayablePresenter(user);
-        presenter.display((UpdatableUserView) view.proxy());
+        presenter.display((UpdatableUserView) view.proxy(), null);
 
         service.expects(once()).method("updateUser").with(eq(user));
         presenter.doSave();

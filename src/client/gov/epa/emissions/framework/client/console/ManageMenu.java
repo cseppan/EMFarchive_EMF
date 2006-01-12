@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
 import gov.epa.emissions.framework.client.admin.UpdateUserPresenterImpl;
 import gov.epa.emissions.framework.client.admin.UsersManager;
 import gov.epa.emissions.framework.client.admin.UsersManagerPresenter;
+import gov.epa.emissions.framework.client.admin.ViewMyProfileWindow;
 import gov.epa.emissions.framework.client.data.DatasetTypesManagerPresenter;
 import gov.epa.emissions.framework.client.data.DatasetTypesManagerWindow;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserPresenter;
@@ -168,16 +169,20 @@ public class ManageMenu extends JMenu {
     }
 
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
-        if (viewLayout.activate("My Profile"))
+        if (viewLayout.activate("Update - My Profile") || viewLayout.activate("View - My Profile"))
             return;
 
-        UpdateMyProfileWindow myProfileView = new UpdateMyProfileWindow(session.user(), parent.desktop());
-        viewLayout.add(myProfileView, "My Profile");
-        parent.addToDesktop(myProfileView);
+        UpdateMyProfileWindow updatable = new UpdateMyProfileWindow(session.user(), parent.desktop());
+        viewLayout.add(updatable, "Update - My Profile");
+        parent.addToDesktop(updatable);
+
+        ViewMyProfileWindow viewable = new ViewMyProfileWindow(parent.desktop());
+        viewLayout.add(viewable, "View - My Profile");
+        parent.addToDesktop(viewable);
 
         UpdateUserPresenter presenter = new UpdateUserPresenterImpl(session, session.user(), session.userService());
         try {
-            presenter.display(myProfileView);
+            presenter.display(updatable, viewable);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
