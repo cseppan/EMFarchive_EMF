@@ -15,7 +15,7 @@ public class EmfDatasetTableData extends AbstractTableData {
     private DateFormat dateFormat;
 
     public EmfDatasetTableData(EmfDataset[] datasets) {
-        dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+        dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         this.rows = createRows(datasets);
     }
 

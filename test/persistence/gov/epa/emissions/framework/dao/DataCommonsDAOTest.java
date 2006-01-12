@@ -283,7 +283,6 @@ public class DataCommonsDAOTest extends ServicesTestCase {
 
             return (Status) crit.uniqueResult();
         } catch (HibernateException e) {
-            e.printStackTrace();
             tx.rollback();
             throw e;
         }

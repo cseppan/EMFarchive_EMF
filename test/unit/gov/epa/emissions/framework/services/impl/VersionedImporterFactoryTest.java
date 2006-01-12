@@ -23,6 +23,7 @@ public class VersionedImporterFactoryTest extends MockObjectTestCase {
         datasetType.setImporterClassName(ORLOnRoadImporter.class.getName());
         EmfDataset dataset = new EmfDataset();
         dataset.setDatasetType(datasetType);
+        dataset.setName("name");
 
         Importer importer = factory.create(dataset, null, "file");
 
