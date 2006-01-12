@@ -12,4 +12,6 @@ public interface UpdateUserPresenter {
 
     void onChange();
 
+    void displayViewIfLocked(UpdatableUserView update, UserView view) throws EmfException;
+
 }

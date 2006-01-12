@@ -13,7 +13,7 @@ import org.jmock.core.constraint.IsInstanceOf;
 
 public class EditableSectorPresenterTest extends MockObjectTestCase {
 
-    public void testShouldDisplayViewAfterObtainingLockForSectorOnDisplay() throws Exception {
+    public void testShouldDisplayViewAfterObtainingLockOnDisplay() throws Exception {
         Sector sector = new Sector();
         Mock view = mock(EditableSectorView.class);
 

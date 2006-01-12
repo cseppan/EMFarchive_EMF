@@ -2,8 +2,8 @@ package gov.epa.emissions.framework.client.data;
 
 public interface ViewableSectorPresenter {
 
-    public abstract void doDisplay();
+    void doDisplay();
 
-    public abstract void doClose();
+    void doClose();
 
 }

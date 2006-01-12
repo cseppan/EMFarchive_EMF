@@ -9,7 +9,7 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
 
     private UserService service;
 
-    private UpdatableUserView view;
+    private UpdatableUserView updateView;
 
     private boolean userDataChanged;
 
@@ -26,10 +26,24 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
     public void display(UpdatableUserView view) throws EmfException {
         user = service.obtainLocked(session.user(), user);
 
-        this.view = view;
+        this.updateView = view;
         view.observe(this);
 
         view.display();
+    }
+
+    public void displayViewIfLocked(UpdatableUserView update, UserView view) throws EmfException {
+        user = service.obtainLocked(session.user(), user);
+
+        if (!user.isLocked(session.user())) {// view mode, locked by another user
+            new ViewUserPresenterImpl(user).display(view);
+            return;
+        }
+
+        this.updateView = update;
+        updateView.observe(this);
+
+        updateView.display();
     }
 
     public void doSave() throws EmfException {
@@ -39,12 +53,12 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
 
     public void doClose() throws EmfException {
         if (userDataChanged) {
-            view.closeOnConfirmLosingChanges();
+            updateView.closeOnConfirmLosingChanges();
             return;
         }
 
         service.releaseLocked(user);
-        view.close();
+        updateView.close();
     }
 
     public void onChange() {

@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.admin;
 
-import java.util.Date;
-
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.UserService;
+
+import java.util.Date;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
@@ -35,6 +35,27 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         UpdateUserPresenter presenter = displayablePresenter();
 
         presenter.display((UpdatableUserView) view.proxy());
+    }
+
+    public void testShouldShowNonEditViewAfterFailingToObtainLockOfUserOnDisplay() throws Exception {
+        User user = new User();// no lock
+        user.setUsername("user");
+        
+        User owner = new User();
+        owner.setUsername("owner");
+
+        service.expects(once()).method("obtainLocked").with(same(owner), same(user)).will(returnValue(user));
+
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("user").withNoArguments().will(returnValue(owner));
+
+        Mock userView = mock(UserView.class);
+        userView.expects(once()).method("display").with(same(user));
+
+        UpdateUserPresenter presenter = new UpdateUserPresenterImpl((EmfSession) session.proxy(), user,
+                (UserService) service.proxy());
+        
+        presenter.displayViewIfLocked(null, (UserView)userView.proxy());
     }
 
     public void testShouldCloseViewOnCloseActionWithNoEdits() throws Exception {
