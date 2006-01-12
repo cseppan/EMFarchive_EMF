@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.admin;
 
-
 public class DisposableViewUserWindow extends ViewUserWindow {
 
     public void close() {

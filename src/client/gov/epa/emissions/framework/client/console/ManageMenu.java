@@ -169,15 +169,10 @@ public class ManageMenu extends JMenu {
     }
 
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
-        if (viewLayout.activate("Update - My Profile") || viewLayout.activate("View - My Profile"))
-            return;
-
         UpdateMyProfileWindow updatable = new UpdateMyProfileWindow(session.user(), parent.desktop());
-        viewLayout.add(updatable, "Update - My Profile");
         parent.addToDesktop(updatable);
 
         ViewMyProfileWindow viewable = new ViewMyProfileWindow(parent.desktop());
-        viewLayout.add(viewable, "View - My Profile");
         parent.addToDesktop(viewable);
 
         UpdateUserPresenter presenter = new UpdateUserPresenterImpl(session, session.user(), session.userService());

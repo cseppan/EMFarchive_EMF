@@ -6,9 +6,6 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.UserService;
 import gov.epa.emissions.framework.ui.ViewLayout;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class UsersManagerPresenter {
 
     private UsersManagerView view;
@@ -17,16 +14,12 @@ public class UsersManagerPresenter {
 
     private ViewLayout layoutManager;
 
-    private Map updateViewsMap;
-
     private EmfSession session;
 
     public UsersManagerPresenter(EmfSession session, UserService userServices, ViewLayout layoutManager) {
         this.session = session;
         this.userServices = userServices;
         this.layoutManager = layoutManager;
-
-        updateViewsMap = new HashMap();
     }
 
     public void doCloseView() {
@@ -89,21 +82,7 @@ public class UsersManagerPresenter {
             throws EmfException {
         view.clearMessage();
 
-        // TODO: what about the 'viewable'
-        if (isUpdateUserViewAlive(user)) {
-            updateUserView(user).bringToFront();
-            return;
-        }
-
         showUpdateUser(user, updatable, viewable, updatePresenter);
-    }
-
-    private boolean isUpdateUserViewAlive(User user) {
-        return updateViewsMap.containsKey(user) && updateUserView(user).isAlive();
-    }
-
-    private UpdatableUserView updateUserView(User user) {
-        return (UpdatableUserView) updateViewsMap.get(user);
     }
 
     private void showUpdateUser(User updateUser, UpdatableUserView updatable, UserView viewable,
@@ -113,7 +92,6 @@ public class UsersManagerPresenter {
         updatePresenter.display(updatable, viewable);
 
         view.refresh();
-        updateViewsMap.put(updateUser, updatable);
     }
 
     public void doUpdateUsers(User[] users) throws EmfException {

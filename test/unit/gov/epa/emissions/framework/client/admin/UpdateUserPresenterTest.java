@@ -57,7 +57,10 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
                 (UserService) service.proxy());
         userView.expects(once()).method("observe").with(new IsInstanceOf(ViewUserPresenter.class));
 
-        presenter.display(null, (UserView) userView.proxy());
+        Mock updatable = mock(UpdatableUserView.class);
+        updatable.expects(once()).method("close").withNoArguments();
+        
+        presenter.display((UpdatableUserView) updatable.proxy(), (UserView) userView.proxy());
     }
 
     public void testShouldCloseViewOnCloseActionWithNoEdits() throws Exception {

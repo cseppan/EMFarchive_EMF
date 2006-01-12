@@ -28,6 +28,7 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
 
         if (!user.isLocked(session.user())) {// view mode, locked by another user
             new ViewUserPresenterImpl(user).display(view);
+            update.close();// close the unnecessary
             return;
         }
 

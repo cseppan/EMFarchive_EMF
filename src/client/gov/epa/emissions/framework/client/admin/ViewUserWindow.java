@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,17 +24,19 @@ public abstract class ViewUserWindow extends EmfInternalFrame implements UserVie
     private SingleLineMessagePanel messagePanel;
 
     public ViewUserWindow() {
-        super("User: ");
+        super("User: ", new Dimension(350, 425));
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
-        super.setResizable(false);
     }
 
     public void display(User user) {
-        super.setTitle("User: " + user.getUsername());
         doLayout(user);
+
+        super.setTitle("User: " + user.getUsername());
+        super.dimensions(layout.getSize());
+        super.setResizable(false);
 
         super.display();
     }
