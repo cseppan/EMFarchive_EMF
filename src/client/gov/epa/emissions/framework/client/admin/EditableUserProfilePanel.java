@@ -24,7 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-public class UserProfilePanel extends JPanel {
+public class EditableUserProfilePanel extends JPanel {
 
     private Widget username;
 
@@ -49,7 +49,7 @@ public class UserProfilePanel extends JPanel {
     private User user;
 
     // FIXME: one to many params ?
-    public UserProfilePanel(User user, Widget usernameWidget, Action okAction, Action cancelAction,
+    public EditableUserProfilePanel(User user, Widget usernameWidget, Action okAction, Action cancelAction,
             AdminOption adminOption, PopulateUserStrategy populateUserStrategy) {
         this.user = user;
         this.adminOption = adminOption;

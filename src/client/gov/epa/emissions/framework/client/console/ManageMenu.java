@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
-import gov.epa.emissions.framework.client.admin.MyProfileWindow;
+import gov.epa.emissions.framework.client.admin.UpdateMyProfileWindow;
 import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
 import gov.epa.emissions.framework.client.admin.UpdateUserPresenterImpl;
 import gov.epa.emissions.framework.client.admin.UsersManager;
@@ -171,7 +171,7 @@ public class ManageMenu extends JMenu {
         if (viewLayout.activate("My Profile"))
             return;
 
-        MyProfileWindow myProfileView = new MyProfileWindow(session.user(), parent.desktop());
+        UpdateMyProfileWindow myProfileView = new UpdateMyProfileWindow(session.user(), parent.desktop());
         viewLayout.add(myProfileView, "My Profile");
         parent.addToDesktop(myProfileView);
 

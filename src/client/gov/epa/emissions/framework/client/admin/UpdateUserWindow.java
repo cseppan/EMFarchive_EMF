@@ -23,7 +23,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
 
     private String windowTitle;
 
-    private UserProfilePanel panel;
+    private EditableUserProfilePanel panel;
 
     public UpdateUserWindow(User user, AdminOption adminOption) {
         super("Update User: " + user.getUsername());
@@ -44,7 +44,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
         this(user, new NoAdminOption());
     }
 
-    private UserProfilePanel createLayout(AdminOption adminOption) {
+    private EditableUserProfilePanel createLayout(AdminOption adminOption) {
         Action saveAction = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 updateUser();
@@ -64,9 +64,9 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
         return createUserProfilePanel(username, saveAction, closeAction, adminOption);
     }
 
-    private UserProfilePanel createUserProfilePanel(Widget username, Action saveAction, Action closeAction,
+    private EditableUserProfilePanel createUserProfilePanel(Widget username, Action saveAction, Action closeAction,
             AdminOption adminOption) {
-        UserProfilePanel panel = new UserProfilePanel(user, username, saveAction, closeAction, adminOption,
+        EditableUserProfilePanel panel = new EditableUserProfilePanel(user, username, saveAction, closeAction, adminOption,
                 new PopulateUserOnUpdateStrategy(user));
 
         panel.addEditListener(new KeyAdapter() {

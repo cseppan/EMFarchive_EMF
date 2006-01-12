@@ -25,7 +25,7 @@ public class RegisterUserPanel extends JPanel {
 
     private RegisterCancelStrategy cancelStrategy;
 
-    private UserProfilePanel panel;
+    private EditableUserProfilePanel panel;
 
     private User user;
 
@@ -59,7 +59,7 @@ public class RegisterUserPanel extends JPanel {
 
         user = new User();
         Widget username = new TextFieldWidget("username", user.getUsername(), 10);
-        panel = new UserProfilePanel(user, username, okAction, cancelAction, adminOption,
+        panel = new EditableUserProfilePanel(user, username, okAction, cancelAction, adminOption,
                 new PopulateUserOnRegisterStrategy(user));
         this.add(panel);
     }

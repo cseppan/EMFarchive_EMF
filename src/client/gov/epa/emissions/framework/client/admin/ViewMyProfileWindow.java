@@ -1,19 +1,15 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.commons.security.User;
-
 import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JDesktopPane;
 
-//FIXME: refactor the common behavior b/w this and ReusableInternalFrame
-public class MyProfileWindow extends UpdateUserWindow {
+public class ViewMyProfileWindow extends ViewUserWindow {
 
     private JDesktopPane desktop;
 
-    public MyProfileWindow(User user, JDesktopPane desktop) {
-        super(user);
+    public ViewMyProfileWindow(JDesktopPane desktop) {
         this.desktop = desktop;
     }
 
