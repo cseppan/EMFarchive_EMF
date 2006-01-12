@@ -55,10 +55,10 @@ insert into emf.dataset_types values(20,'Gridding Cross Reference','Gridding Cro
 insert into emf.dataset_types values(21,'Spatial Surrogates','Spatial Surrogates', '1', '1', false, 'gov.epa.emissions.commons.io.spatial.SpatialSurrogatesImporter', 'gov.epa.emissions.commons.io.spatial.SpatialSurrogatesExporter');
 insert into emf.dataset_types values(22,'Speciation Cross-Reference','Speciation Cross-Reference', '1', '1', false, 'gov.epa.emissions.commons.io.speciation.SpeciationCrossReferenceImporter', 'gov.epa.emissions.commons.io.speciation.SpeciationCrossReferenceExporter');
 insert into emf.dataset_types values(23,'Chem Speciation Profile','Chem Speciation Profile', '1', '1', false, 'gov.epa.emissions.commons.io.speciation.SpeciationProfileImporter', 'gov.epa.emissions.commons.io.speciation.SpeciationProfileExporter');
-insert into emf.dataset_types values(24,'NIF3.0 Point Inventory','NIF3.0 Point Inventory', '1', '-1', false, 'gov.epa.emissions.commons.io.nif.point.NIFPointImporter', '');
-insert into emf.dataset_types values(25,'NIF3.0 Onroad Inventory','NIF3.0 Onroad Inventory', '1', '-1', false, 'gov.epa.emissions.commons.io.nif.onroad.NIFOnRoadImporter', '');
-insert into emf.dataset_types values(26,'NIF3.0 Nonpoint Inventory','NIF3.0 Nonpoint Inventory', '1', '-1', false, 'gov.epa.emissions.commons.io.nif.nonpointNonroad.NIFNonPointImporter', '');
-insert into emf.dataset_types values(27,'NIF3.0 Nonpoint Nonroad Inventory','NIF3.0 Nonpoint Nonroad Inventory', '1', '-1', false, 'gov.epa.emissions.commons.io.nif.nonpointNonroad.NIFNonRoadImporter', '');
+insert into emf.dataset_types values(24,'NIF3.0 Point Inventory','NIF3.0 Point Inventory', '6', '7', false, 'gov.epa.emissions.commons.io.nif.point.NIFPointImporter', '');
+insert into emf.dataset_types values(25,'NIF3.0 Onroad Inventory','NIF3.0 Onroad Inventory', '2', '3', false, 'gov.epa.emissions.commons.io.nif.onroad.NIFOnRoadImporter', '');
+insert into emf.dataset_types values(26,'NIF3.0 Nonpoint Inventory','NIF3.0 Nonpoint Inventory', '2', '4', false, 'gov.epa.emissions.commons.io.nif.nonpointNonroad.NIFNonPointImporter', '');
+insert into emf.dataset_types values(27,'NIF3.0 Nonroad Inventory','NIF3.0 Nonroad Inventory', '2', '4', false, 'gov.epa.emissions.commons.io.nif.nonpointNonroad.NIFNonRoadImporter', '');
 
 -- emf.dataset_types
 --
