@@ -26,7 +26,6 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -51,7 +50,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private JTextField folder;
     
     private JCheckBox box;
-
+    
     public ImportWindow(DataCommonsService service, JDesktopPane desktop) throws EmfException {
         super("Import Dataset", new Dimension(700, 275), desktop);
         super.setName("importWindow");
@@ -82,11 +81,6 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         datasetTypesModel = new DefaultComboBoxModel(allTypesWithMessage);
         JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
         datasetTypesComboBox.setName("datasetTypes");
-        datasetTypesComboBox.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e) {
-                boxChecked();
-            }
-        });
         layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesPanel(datasetTypesComboBox), panel);
 
         name = new TextField("name", 35);
@@ -111,9 +105,14 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         return panel;
     }
     
-    private JPanel datasetTypesPanel(JComponent c) {
+    private JPanel datasetTypesPanel(JComboBox cb) {
         JPanel panel = new JPanel(new FlowLayout());
-        panel.add(c);
+        cb.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boxChecked();
+            }
+        });
+        panel.add(cb);
         box = new JCheckBox("Create Multiple Datasets");
         box.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent event) {
@@ -126,18 +125,17 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     }
     
     private void boxChecked() {
+        enableAll();
         if(box.isSelected()) {
             name.setEnabled(false);
             checkMinFiles();
-        } else {
-            enableAll();
-        }
+        }             
     }
     
     private void checkMinFiles() {
         DatasetType dt = (DatasetType)datasetTypesModel.getSelectedItem();
-        if(dt.getMinfiles() > 1 && box.isSelected()){
-            String message = "Sorry. You cannot create multiple datasets.";
+        if(dt.getMinfiles() > 1){
+            String message = "Sorry. You cannot create multiple datasets on this dataset type.";
             messagePanel.setError(message);
             folder.setEnabled(false);
             filename.setEnabled(false);
