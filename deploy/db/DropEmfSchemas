@@ -1,3 +1,3 @@
-DROP SCHEMA emf;
-DROP SCHEMA emissions;
-DROP SCHEMA reference;
+DROP SCHEMA emf CASCADE;
+DROP SCHEMA emissions CASCADE;
+DROP SCHEMA reference CASCADE;
