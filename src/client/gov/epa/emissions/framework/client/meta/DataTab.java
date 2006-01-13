@@ -4,8 +4,8 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.client.meta.versions.VersionsPanel;
-import gov.epa.emissions.framework.client.meta.versions.VersionsPresenter;
+import gov.epa.emissions.framework.client.meta.versions.EditVersionsPanel;
+import gov.epa.emissions.framework.client.meta.versions.EditVersionsPresenter;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -42,9 +42,9 @@ public class DataTab extends JPanel implements DataTabView {
         return container;
     }
 
-    private VersionsPanel versionsPanel(EmfDataset dataset, DataEditorService service, MessagePanel messagePanel) {
-        VersionsPanel versionsPanel = new VersionsPanel(dataset, messagePanel, parentConsole);
-        VersionsPresenter versionsPresenter = new VersionsPresenter(dataset, service);
+    private EditVersionsPanel versionsPanel(EmfDataset dataset, DataEditorService service, MessagePanel messagePanel) {
+        EditVersionsPanel versionsPanel = new EditVersionsPanel(dataset, messagePanel, parentConsole);
+        EditVersionsPresenter versionsPresenter = new EditVersionsPresenter(dataset, service);
         try {
             versionsPresenter.display(versionsPanel);
         } catch (EmfException e) {

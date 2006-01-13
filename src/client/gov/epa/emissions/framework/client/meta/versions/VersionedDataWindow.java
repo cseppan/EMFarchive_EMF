@@ -17,17 +17,17 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class VersionsEditorWindow extends ReusableInteralFrame implements VersionsEditorView {
+public class VersionedDataWindow extends ReusableInteralFrame implements VersionedDataView {
 
     private EmfConsole parentConsole;
 
     private SingleLineMessagePanel messagePanel;
 
-    private VersionsEditorPresenter presenter;
+    private VersionedDataPresenter presenter;
 
     private JPanel layout;
 
-    public VersionsEditorWindow(EmfConsole parentConsole) {
+    public VersionedDataWindow(EmfConsole parentConsole) {
         super("Versions Editor", new Dimension(600, 400), parentConsole.desktop());
 
         this.parentConsole = parentConsole;
@@ -48,15 +48,15 @@ public class VersionsEditorWindow extends ReusableInteralFrame implements Versio
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
-        VersionsPanel versionsPanel = createVersionsPanel(dataset, service, messagePanel);
+        EditVersionsPanel versionsPanel = createVersionsPanel(dataset, service, messagePanel);
         container.add(versionsPanel);
 
         return container;
     }
 
-    private VersionsPanel createVersionsPanel(EmfDataset dataset, DataEditorService service, MessagePanel messagePanel) {
-        VersionsPanel versionsPanel = new VersionsPanel(dataset, messagePanel, parentConsole);
-        VersionsPresenter versionsPresenter = new VersionsPresenter(dataset, service);
+    private EditVersionsPanel createVersionsPanel(EmfDataset dataset, DataEditorService service, MessagePanel messagePanel) {
+        EditVersionsPanel versionsPanel = new EditVersionsPanel(dataset, messagePanel, parentConsole);
+        EditVersionsPresenter versionsPresenter = new EditVersionsPresenter(dataset, service);
         try {
             versionsPresenter.display(versionsPanel);
         } catch (EmfException e) {
@@ -85,7 +85,7 @@ public class VersionsEditorWindow extends ReusableInteralFrame implements Versio
         return panel;
     }
 
-    public void observe(VersionsEditorPresenter presenter) {
+    public void observe(VersionedDataPresenter presenter) {
         this.presenter = presenter;
     }
 }

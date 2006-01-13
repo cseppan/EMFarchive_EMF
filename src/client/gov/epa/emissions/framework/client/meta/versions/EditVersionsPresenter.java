@@ -9,20 +9,20 @@ import gov.epa.emissions.framework.client.editor.EditableDataViewPresenter;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
-public class VersionsPresenter {
+public class EditVersionsPresenter {
 
     private DataEditorService service;
 
-    private VersionsView view;
+    private EditVersionsView view;
 
     private EmfDataset dataset;
 
-    public VersionsPresenter(EmfDataset dataset, DataEditorService service) {
+    public EditVersionsPresenter(EmfDataset dataset, DataEditorService service) {
         this.dataset = dataset;
         this.service = service;
     }
 
-    public void display(VersionsView view) throws EmfException {
+    public void display(EditVersionsView view) throws EmfException {
         this.view = view;
         view.observe(this);
 

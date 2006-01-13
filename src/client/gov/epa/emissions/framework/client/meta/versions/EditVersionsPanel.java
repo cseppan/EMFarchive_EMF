@@ -32,13 +32,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.CompoundBorder;
 
-public class VersionsPanel extends JPanel implements VersionsView {
+public class EditVersionsPanel extends JPanel implements EditVersionsView {
 
     private VersionsTableData tableData;
 
     private MessagePanel messagePanel;
 
-    private VersionsPresenter presenter;
+    private EditVersionsPresenter presenter;
 
     private EmfDataset dataset;
 
@@ -50,7 +50,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     private JComboBox defaultVersionsCombo;
 
-    public VersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole) {
+    public EditVersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole) {
         super.setLayout(new BorderLayout());
         setBorder();
 
@@ -65,7 +65,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
         super.setBorder(border);
     }
 
-    public void observe(VersionsPresenter presenter) {
+    public void observe(EditVersionsPresenter presenter) {
         this.presenter = presenter;
     }
 

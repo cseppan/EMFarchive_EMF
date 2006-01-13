@@ -10,8 +10,8 @@ import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
-import gov.epa.emissions.framework.client.meta.versions.VersionsEditorPresenter;
-import gov.epa.emissions.framework.client.meta.versions.VersionsEditorView;
+import gov.epa.emissions.framework.client.meta.versions.VersionedDataPresenter;
+import gov.epa.emissions.framework.client.meta.versions.VersionedDataView;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataEditorService;
@@ -159,11 +159,11 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         Object editorServiceProxy = service.proxy();
         serviceLocator.stubs().method("dataEditorService").withNoArguments().will(returnValue(editorServiceProxy));
 
-        Mock editorView = mock(VersionsEditorView.class);
-        editorView.expects(once()).method("observe").with(new IsInstanceOf(VersionsEditorPresenter.class));
+        Mock editorView = mock(VersionedDataView.class);
+        editorView.expects(once()).method("observe").with(new IsInstanceOf(VersionedDataPresenter.class));
         editorView.expects(once()).method("display").with(eq(dataset), same(editorServiceProxy));
 
-        VersionsEditorView viewProxy = (VersionsEditorView) editorView.proxy();
+        VersionedDataView viewProxy = (VersionedDataView) editorView.proxy();
         layout.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
         layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.FALSE));
 

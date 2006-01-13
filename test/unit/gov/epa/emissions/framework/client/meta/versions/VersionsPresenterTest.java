@@ -28,7 +28,7 @@ public class VersionsPresenterTest extends MockObjectTestCase {
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
         dataView.expects(once()).method("observe").with(new IsInstanceOf(NonEditableDataViewPresenter.class));
 
-        VersionsPresenter presenter = new VersionsPresenter(null, serviceProxy);
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, serviceProxy);
         presenter.doView(version, table, (NonEditableDataView) dataView.proxy());
     }
 
@@ -44,7 +44,7 @@ public class VersionsPresenterTest extends MockObjectTestCase {
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
         dataView.expects(once()).method("observe").with(new IsInstanceOf(EditableDataViewPresenter.class));
 
-        VersionsPresenter presenter = new VersionsPresenter(null, serviceProxy);
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, serviceProxy);
         presenter.doEdit(version, table, (EditableDataView) dataView.proxy());
     }
 
@@ -52,7 +52,7 @@ public class VersionsPresenterTest extends MockObjectTestCase {
         Version version = new Version();
         version.markFinal();
 
-        VersionsPresenter presenter = new VersionsPresenter(null, null);
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null);
 
         try {
             presenter.doEdit(version, null, null);
@@ -72,15 +72,15 @@ public class VersionsPresenterTest extends MockObjectTestCase {
         Mock service = mock(DataEditorService.class);
         service.expects(once()).method("derive").with(same(version), eq(derivedName)).will(returnValue(derived));
 
-        Mock view = mock(VersionsView.class);
+        Mock view = mock(EditVersionsView.class);
         view.expects(once()).method("add").with(same(derived));
 
-        VersionsPresenter presenter = displayPresenter(service, view);
+        EditVersionsPresenter presenter = displayPresenter(service, view);
 
         presenter.doNew(version, derivedName);
     }
 
-    private VersionsPresenter displayPresenter(Mock service, Mock view) throws EmfException {
+    private EditVersionsPresenter displayPresenter(Mock service, Mock view) throws EmfException {
         EmfDataset dataset = new EmfDataset();
         dataset.setDatasetid(1);
         Version[] versions = new Version[0];
@@ -88,18 +88,18 @@ public class VersionsPresenterTest extends MockObjectTestCase {
 
         service.stubs().method("getVersions").with(eq(new Long(dataset.getDatasetid()))).will(returnValue(versions));
 
-        VersionsPresenter presenter = new VersionsPresenter(dataset, (DataEditorService) service.proxy());
+        EditVersionsPresenter presenter = new EditVersionsPresenter(dataset, (DataEditorService) service.proxy());
         view.expects(once()).method("observe").with(same(presenter));
         view.expects(once()).method("display").with(eq(versions), eq(internalSources));
 
-        presenter.display((VersionsView) view.proxy());
+        presenter.display((EditVersionsView) view.proxy());
 
         return presenter;
     }
 
     public void testShouldObserveAndDisplayViewOnDisplay() throws Exception {
         Mock service = mock(DataEditorService.class);
-        Mock view = mock(VersionsView.class);
+        Mock view = mock(EditVersionsView.class);
 
         displayPresenter(service, view);
     }
@@ -113,10 +113,10 @@ public class VersionsPresenterTest extends MockObjectTestCase {
 
         Version[] versions = {};
 
-        Mock view = mock(VersionsView.class);
+        Mock view = mock(EditVersionsView.class);
         view.expects(once()).method("reload").with(eq(versions));
 
-        VersionsPresenter p = displayPresenter(service, view);
+        EditVersionsPresenter p = displayPresenter(service, view);
 
         p.doMarkFinal(new Version[] { version });
     }
@@ -126,7 +126,7 @@ public class VersionsPresenterTest extends MockObjectTestCase {
         version.setVersion(2);
         version.markFinal();
 
-        VersionsPresenter p = new VersionsPresenter(null, null);
+        EditVersionsPresenter p = new EditVersionsPresenter(null, null);
 
         try {
             p.doMarkFinal(new Version[] { version });

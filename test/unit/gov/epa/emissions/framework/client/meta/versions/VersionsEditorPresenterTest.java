@@ -9,36 +9,36 @@ import org.jmock.MockObjectTestCase;
 public class VersionsEditorPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayViewOnDisplay() {
-        Mock view = mock(VersionsEditorView.class);
+        Mock view = mock(VersionedDataView.class);
         EmfDataset dataset = new EmfDataset();
         DataEditorService service = (DataEditorService) mock(DataEditorService.class).proxy();
 
         view.expects(once()).method("display").with(same(dataset), same(service));
 
-        VersionsEditorPresenter p = new VersionsEditorPresenter(dataset, service);
+        VersionedDataPresenter p = new VersionedDataPresenter(dataset, service);
         view.expects(once()).method("observe").with(same(p));
 
-        p.display((VersionsEditorView) view.proxy());
+        p.display((VersionedDataView) view.proxy());
     }
 
     public void testShouldCloseViewOnClose() {
-        Mock view = mock(VersionsEditorView.class);
-        VersionsEditorPresenter p = displayPresenter(view);
+        Mock view = mock(VersionedDataView.class);
+        VersionedDataPresenter p = displayPresenter(view);
 
         view.expects(once()).method("close").withNoArguments();
         p.doClose();
     }
 
-    private VersionsEditorPresenter displayPresenter(Mock view) {
+    private VersionedDataPresenter displayPresenter(Mock view) {
         EmfDataset dataset = new EmfDataset();
         DataEditorService service = (DataEditorService) mock(DataEditorService.class).proxy();
 
         view.expects(once()).method("display").with(same(dataset), same(service));
 
-        VersionsEditorPresenter p = new VersionsEditorPresenter(dataset, service);
+        VersionedDataPresenter p = new VersionedDataPresenter(dataset, service);
         view.expects(once()).method("observe").with(same(p));
 
-        p.display((VersionsEditorView) view.proxy());
+        p.display((VersionedDataView) view.proxy());
 
         return p;
     }
