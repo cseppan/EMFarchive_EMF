@@ -39,7 +39,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
     private SectorsManagerView sectorManager;
 
     public EditSectorWindow(SectorsManagerView sectorManager) {
-        super("Edit Sector", new Dimension(600, 500));
+        super("Edit Sector", new Dimension(550, 400));
 
         this.sectorManager = sectorManager;
         layout = new JPanel();
@@ -52,7 +52,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
     }
 
     public void display(Sector sector) {
-        super.setTitle("Update Sector: " + sector.getName());
+        super.setTitle("Edit Sector: " + sector.getName());
         layout.removeAll();
         doLayout(layout, sector);
 
@@ -73,10 +73,13 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         name = new TextField("name", sector.getName(), 20);
-        layoutGenerator.addLabelWidgetPair("Name", name, panel);
+        layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         description = new TextArea("description", sector.getDescription(), 40);
-        layoutGenerator.addLabelWidgetPair("Description", new ScrollableTextArea(description), panel);
+        ScrollableTextArea descTextArea = new ScrollableTextArea(description);
+        descTextArea.setMinimumSize(new Dimension(80,80));
+        //.descTextAredescTextArea.setHorizontalScroll
+        layoutGenerator.addLabelWidgetPair("Description:", descTextArea, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
@@ -88,7 +91,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
 
     private JPanel createCriteriaPanel(Sector sector) {
         criteriaTableData = new SectorCriteriaTableData(sector.getSectorCriteria());
-        JPanel panel = new SectorCriteriaPanel("Criteria", criteriaTableData);
+        JPanel panel = new SectorCriteriaPanel("", criteriaTableData);
         panel.setBorder(BorderFactory.createTitledBorder("Criteria"));
 
         return panel;
@@ -100,7 +103,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
         JPanel container = new JPanel();
         FlowLayout layout = new FlowLayout();
         layout.setHgap(20);
-        layout.setVgap(25);
+        layout.setVgap(10);
         container.setLayout(layout);
 
         Button saveButton = new Button("Save", saveAction(sector));

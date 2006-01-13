@@ -41,7 +41,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     private DatasetTypesManagerView manager;
 
     public EditableDatasetTypeWindow(DatasetTypesManagerView manager) {
-        super("Update DatasetType", new Dimension(600, 500));
+        super("Edit Dataset Type", new Dimension(600, 500));
 
         this.manager = manager;
         layout = new JPanel();
@@ -54,7 +54,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     }
 
     public void display(DatasetType type, Keyword[] keywords) {
-        super.setTitle("Update DatasetType: " + type.getName());
+        super.setTitle("Edit Dataset Type: " + type.getName());
         layout.removeAll();
         doLayout(layout, type, keywords);
 
@@ -74,15 +74,17 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        name = new TextField("name", type.getName(), 20);
-        layoutGenerator.addLabelWidgetPair("Name", name, panel);
+        name = new TextField("name", type.getName(), 40);
+        layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         description = new TextArea("description", type.getDescription(), 40);
-        layoutGenerator.addLabelWidgetPair("Description", new ScrollableTextArea(description), panel);
+        ScrollableTextArea descScrollableTextArea = new ScrollableTextArea(description);
+        descScrollableTextArea.setMinimumSize(new Dimension(80,80));
+        layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
-                5, 5, // initialX, initialY
+                5, 0, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
