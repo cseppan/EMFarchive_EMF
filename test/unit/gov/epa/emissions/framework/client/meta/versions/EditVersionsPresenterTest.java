@@ -14,7 +14,7 @@ import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.constraint.IsInstanceOf;
 
-public class VersionsPresenterTest extends MockObjectTestCase {
+public class EditVersionsPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayTableViewOnView() throws Exception {
         Version version = new Version();

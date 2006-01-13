@@ -1,0 +1,206 @@
+package gov.epa.emissions.framework.client.meta.versions;
+
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.Label;
+import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.editor.NonEditableDataViewWindow;
+import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.ui.Border;
+import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.ScrollableTable;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.CompoundBorder;
+
+public class VersionsPanel extends JPanel implements VersionsView {
+
+    private VersionsTableData tableData;
+
+    private MessagePanel messagePanel;
+
+    private VersionsViewPresenter presenter;
+
+    private EmfDataset dataset;
+
+    private EmfConsole parentConsole;
+
+    private EmfTableModel tableModel;
+
+    private JPanel tablePanel;
+
+    private JComboBox defaultVersionsCombo;
+
+    public VersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole) {
+        super.setLayout(new BorderLayout());
+        setBorder();
+
+        this.dataset = dataset;
+        this.messagePanel = messagePanel;
+        this.parentConsole = parentConsole;
+    }
+
+    private void setBorder() {
+        javax.swing.border.Border outer = BorderFactory.createEmptyBorder(5, 2, 5, 2);
+        CompoundBorder border = BorderFactory.createCompoundBorder(outer, new Border("Versions"));
+        super.setBorder(border);
+    }
+
+    public void observe(VersionsViewPresenter presenter) {
+        this.presenter = presenter;
+    }
+
+    public void display(Version[] versions, InternalSource[] sources) {
+        VersionsSet versionsSet = new VersionsSet(versions);
+        add(topPanel(versionsSet), BorderLayout.PAGE_START);
+        add(tablePanel(versions), BorderLayout.CENTER);
+        add(bottomPanel(sources), BorderLayout.PAGE_END);
+    }
+
+    private JPanel topPanel(VersionsSet versionsSet) {
+        JPanel container = new JPanel(new BorderLayout());
+
+        JPanel right = new JPanel();
+        right.add(new JLabel("Default Version"));
+        
+        String name = versionsSet.getDefaultVersionName(dataset.getDefaultVersion());
+        right.add(new JLabel(displayableVersion(name, dataset)));
+
+        container.add(right, BorderLayout.LINE_END);
+
+        return container;
+    }
+
+    private String displayableVersion(String name, EmfDataset dataset) {
+        return dataset.getDefaultVersion() + " - " + name;
+    }
+
+    public void reload(Version[] versions) {
+        tablePanel.removeAll();
+
+        // reload table
+        ScrollableTable table = createTable(versions);
+        tablePanel.add(table, BorderLayout.CENTER);
+
+        // reload default version list
+        VersionsSet versionsSet = new VersionsSet(versions);
+        ComboBoxModel model = new DefaultComboBoxModel(versionsSet.finalVersions());
+        defaultVersionsCombo.setModel(model);
+
+        refreshLayout();
+    }
+
+    public void add(Version version) {
+        tableData.add(version);
+        tableModel.refresh();
+    }
+
+    private JPanel tablePanel(Version[] versions) {
+        ScrollableTable table = createTable(versions);
+
+        tablePanel = new JPanel(new BorderLayout());
+        tablePanel.add(table, BorderLayout.CENTER);
+
+        return tablePanel;
+    }
+
+    private ScrollableTable createTable(Version[] versions) {
+        tableData = new VersionsTableData(versions);
+        tableModel = new EmfTableModel(tableData);
+
+        ScrollableTable table = new ScrollableTable(tableModel);
+        table.disableScrolling();
+        return table;
+    }
+
+    private JPanel bottomPanel(InternalSource[] sources) {
+        JPanel container = new JPanel(new BorderLayout());
+        container.add(rightControlPanel(sources), BorderLayout.LINE_END);
+
+        return container;
+    }
+
+    private JPanel rightControlPanel(InternalSource[] sources) {
+        JPanel panel = new JPanel();
+
+        panel.add(new Label("Table:"));
+
+        DefaultComboBoxModel tablesModel = new DefaultComboBoxModel(tableNames(sources));
+        final JComboBox tableCombo = new JComboBox(tablesModel);
+        tableCombo.setName("tables");
+        tableCombo.setEditable(false);
+        tableCombo.setPreferredSize(new Dimension(175, 20));
+        panel.add(tableCombo);
+
+        Button view = new Button("View", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doView(tableCombo);
+            }
+        });
+        panel.add(view);
+
+        return panel;
+    }
+
+    private void doView(final JComboBox tableCombo) {
+        clear();
+
+        String table = (String) tableCombo.getSelectedItem();
+        Version[] versions = tableData.selected();
+        if (versions.length < 1) {
+            displayError("Please select at least one Version");
+            return;
+        }
+
+        for (int i = 0; i < versions.length; i++)
+            showView(table, versions[i]);
+    }
+
+    private void showView(String table, Version version) {
+        NonEditableDataViewWindow view = new NonEditableDataViewWindow(dataset);
+        parentConsole.addToDesktop(view);
+        try {
+            presenter.doView(version, table, view);
+        } catch (EmfException e) {
+            displayError("Could not open Viewer. Reason: " + e.getMessage());
+        }
+    }
+
+    private void displayError(String message) {
+        messagePanel.setError(message);
+        refreshLayout();
+    }
+
+    private void refreshLayout() {
+        super.validate();
+    }
+
+    private void clear() {
+        messagePanel.clear();
+        refreshLayout();
+    }
+
+    private String[] tableNames(InternalSource[] sources) {
+        List tables = new ArrayList();
+        for (int i = 0; i < sources.length; i++)
+            tables.add(sources[i].getTable());
+
+        return (String[]) tables.toArray(new String[0]);
+    }
+
+}

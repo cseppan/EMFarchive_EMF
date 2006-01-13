@@ -75,7 +75,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         ServiceLocator serviceLocator = session.serviceLocator();
         DataEditorService dataEditorService = serviceLocator.dataEditorService();
 
-        DataTab view = new DataTab(parentConsole);
+        EditableDataTab view = new EditableDataTab(parentConsole);
         DataTabPresenter presenter = new DataTabPresenter(view, dataset, dataEditorService);
         presenter.doDisplay();
 

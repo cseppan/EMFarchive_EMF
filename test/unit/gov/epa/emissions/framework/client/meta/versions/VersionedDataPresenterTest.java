@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
-public class VersionsEditorPresenterTest extends MockObjectTestCase {
+public class VersionedDataPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayViewOnDisplay() {
         Mock view = mock(VersionedDataView.class);
