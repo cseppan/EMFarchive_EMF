@@ -40,8 +40,9 @@ public class UserPreferences extends Properties {
         String fileName = System.getProperty(property);
         if (fileName == null)
         {
-            System.err.println("The user preferences property '" + property + "' was not set.");
-            return null;
+            fileName="C:\\EMFPrefs.txt";
+            //System.err.println("The user preferences property '" + property + "' was not set.");
+            //return null;
         }
         if (!checkFile(fileName)) {
             System.err.println("The specified user preferences file '" + fileName + "' does not exist.");
