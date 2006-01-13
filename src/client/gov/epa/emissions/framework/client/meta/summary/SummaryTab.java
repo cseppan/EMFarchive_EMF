@@ -78,11 +78,11 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Status", new Label("status", dataset.getStatus()), panel);
-        layoutGenerator.addLabelWidgetPair("Last Modified Date", new Label("lastModifiedDate", format(dataset
+        layoutGenerator.addLabelWidgetPair("Last Modified Date", new Label("lastModifiedDate", formatDate(dataset
                 .getModifiedDateTime())), panel);
-        layoutGenerator.addLabelWidgetPair("Last Accessed Date", new Label("lastAccessedDate", format(dataset
+        layoutGenerator.addLabelWidgetPair("Last Accessed Date", new Label("lastAccessedDate", formatDate(dataset
                 .getAccessedDateTime())), panel);
-        layoutGenerator.addLabelWidgetPair("Creation Date", new Label("creationDate", format(dataset
+        layoutGenerator.addLabelWidgetPair("Creation Date", new Label("creationDate", formatDate(dataset
                 .getCreatedDateTime())), panel);
 
         // Lay out the panel.
@@ -93,10 +93,6 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         return panel;
     }
 
-    private String format(Date date) {
-        return DATE_FORMATTER.format(date);
-    }
-
     private JPanel createTimeSpaceSection() {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
@@ -105,11 +101,11 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         // time period
         JPanel startDatePanel = new JPanel();
         startDatePanel.add(new JLabel("Start"));
-        startDatePanel.add(new JLabel(DATE_FORMATTER.format(dataset.getStartDateTime())));
+        startDatePanel.add(new JLabel(formatDate(dataset.getStartDateTime())));
 
         JPanel endDatePanel = new JPanel();
         endDatePanel.add(new JLabel("End  "));
-        endDatePanel.add(new JLabel(DATE_FORMATTER.format(dataset.getStopDateTime())));
+        endDatePanel.add(new JLabel(formatDate(dataset.getStopDateTime())));
 
         JPanel datesPanel = new JPanel();
         datesPanel.setLayout(new BoxLayout(datesPanel, BoxLayout.Y_AXIS));
@@ -128,6 +124,10 @@ public class SummaryTab extends JPanel implements SummaryTabView {
                 10, 10);// xPad, yPad
 
         return panel;
+    }
+
+    private String formatDate(Date date) {
+        return date != null ? DATE_FORMATTER.format(date) : "";
     }
 
     private JPanel createOverviewSection() {
