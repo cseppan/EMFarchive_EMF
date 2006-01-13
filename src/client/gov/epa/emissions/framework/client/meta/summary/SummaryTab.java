@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
+//import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -26,7 +26,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private EmfDataset dataset;
 
-    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy");
+    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 
     public SummaryTab(EmfDataset dataset) {
         super.setName("summary");
@@ -61,14 +61,14 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
         JCheckBox subscribed = new JCheckBox("Subscribed?", true);
         subscribed.setToolTipText("TBD");
-        panel.add(subscribed);
+ //       panel.add(subscribed);
 
-        panel.add(new JLabel("Subscribed Users"));
+//        panel.add(new JLabel("Subscribed Users"));
         DefaultComboBoxModel subscribedUsersModel = new DefaultComboBoxModel(new String[0]);
         JComboBox subscribedUsers = new JComboBox(subscribedUsersModel);
         subscribedUsers.setName("subscribedUser");
         subscribedUsers.setPreferredSize(new Dimension(100, 20));
-        panel.add(subscribedUsers);
+ //       panel.add(subscribedUsers);
 
         return panel;
     }
@@ -77,12 +77,12 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Status", new Label("status", dataset.getStatus()), panel);
-        layoutGenerator.addLabelWidgetPair("Last Modified Date", new Label("lastModifiedDate", formatDate(dataset
+        layoutGenerator.addLabelWidgetPair("Status:", new Label("status", dataset.getStatus()), panel);
+        layoutGenerator.addLabelWidgetPair("Last Modified Date:", new Label("lastModifiedDate", formatDate(dataset
                 .getModifiedDateTime())), panel);
-        layoutGenerator.addLabelWidgetPair("Last Accessed Date", new Label("lastAccessedDate", formatDate(dataset
+        layoutGenerator.addLabelWidgetPair("Last Accessed Date:", new Label("lastAccessedDate", formatDate(dataset
                 .getAccessedDateTime())), panel);
-        layoutGenerator.addLabelWidgetPair("Creation Date", new Label("creationDate", formatDate(dataset
+        layoutGenerator.addLabelWidgetPair("Creation Date:", new Label("creationDate", formatDate(dataset
                 .getCreatedDateTime())), panel);
 
         // Lay out the panel.
@@ -99,27 +99,29 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // time period
-        JPanel startDatePanel = new JPanel();
-        startDatePanel.add(new JLabel("Start"));
-        startDatePanel.add(new JLabel(formatDate(dataset.getStartDateTime())));
+//        JPanel startDatePanel = new JPanel();
+//        startDatePanel.add(new JLabel("Time Period Start:"));
+//        startDatePanel.add(new JLabel(formatDate(dataset.getStartDateTime())));
+//
+//        JPanel endDatePanel = new JPanel();
+//        endDatePanel.add(new JLabel("Time Period End:  "));
+//        endDatePanel.add(new JLabel(formatDate(dataset.getStopDateTime())));
+//
+//        JPanel datesPanel = new JPanel();
+//        datesPanel.setLayout(new BoxLayout(datesPanel, BoxLayout.Y_AXIS));
+//        datesPanel.add(startDatePanel);
+//        datesPanel.add(endDatePanel);
 
-        JPanel endDatePanel = new JPanel();
-        endDatePanel.add(new JLabel("End  "));
-        endDatePanel.add(new JLabel(formatDate(dataset.getStopDateTime())));
-
-        JPanel datesPanel = new JPanel();
-        datesPanel.setLayout(new BoxLayout(datesPanel, BoxLayout.Y_AXIS));
-        datesPanel.add(startDatePanel);
-        datesPanel.add(endDatePanel);
-
-        layoutGenerator.addLabelWidgetPair("Time Period", datesPanel, panel);
-        layoutGenerator.addLabelWidgetPair("Temporal Resolution", new JLabel(dataset.getTemporalResolution()), panel);
-        layoutGenerator.addLabelWidgetPair("Sector", new JLabel(dataset.getSector()), panel);
-        layoutGenerator.addLabelWidgetPair("Region", new JLabel(dataset.getRegion()), panel);
-        layoutGenerator.addLabelWidgetPair("Country", new JLabel(dataset.getCountry()), panel);
+//        layoutGenerator.addLabelWidgetPair("", datesPanel, panel);
+        layoutGenerator.addLabelWidgetPair("Time Period Start:", new JLabel(formatDate(dataset.getStartDateTime())), panel);
+        layoutGenerator.addLabelWidgetPair("Time Period End:", new JLabel(formatDate(dataset.getStopDateTime())), panel);
+        layoutGenerator.addLabelWidgetPair("Temporal Resolution:", new JLabel(dataset.getTemporalResolution()), panel);
+        layoutGenerator.addLabelWidgetPair("Sector:", new JLabel(dataset.getSector()), panel);
+        layoutGenerator.addLabelWidgetPair("Region:", new JLabel(dataset.getRegion()), panel);
+        layoutGenerator.addLabelWidgetPair("Country:", new JLabel(dataset.getCountry()), panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -136,16 +138,16 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // name
-        layoutGenerator.addLabelWidgetPair("Name", new JLabel(dataset.getName()), panel);
+        layoutGenerator.addLabelWidgetPair("Name:", new JLabel(dataset.getName()), panel);
 
         // description
         TextArea description = new TextArea("description", dataset.getDescription());
         description.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Description", new ScrollableTextArea(description), panel);
+        layoutGenerator.addLabelWidgetPair("Description:", new ScrollableTextArea(description), panel);
 
-        layoutGenerator.addLabelWidgetPair("Project", new JLabel(dataset.getProject()), panel);
-        layoutGenerator.addLabelWidgetPair("Creator", new JLabel(dataset.getCreator()), panel);
-        layoutGenerator.addLabelWidgetPair("Dataset Type", new JLabel(dataset.getDatasetTypeName()), panel);
+        layoutGenerator.addLabelWidgetPair("Project:", new JLabel(dataset.getProject()), panel);
+        layoutGenerator.addLabelWidgetPair("Creator:", new JLabel(dataset.getCreator()), panel);
+        layoutGenerator.addLabelWidgetPair("Dataset Type:", new JLabel(dataset.getDatasetTypeName()), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
