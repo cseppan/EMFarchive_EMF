@@ -10,8 +10,11 @@ import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
+import gov.epa.emissions.framework.client.meta.versions.VersionsEditorPresenter;
+import gov.epa.emissions.framework.client.meta.versions.VersionsEditorView;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataCommonsService;
+import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.ViewLayout;
@@ -38,11 +41,11 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         layout = mock(ViewLayout.class);
 
         dataServices = mock(DataService.class);
-        Mock interdataServices = mock(DataCommonsService.class);
+        Mock dataCommonsService = mock(DataCommonsService.class);
         serviceLocator = mock(ServiceLocator.class);
         serviceLocator.stubs().method("dataService").withNoArguments().will(returnValue(dataServices.proxy()));
         serviceLocator.stubs().method("dataCommonsService").withNoArguments().will(
-                returnValue(interdataServices.proxy()));
+                returnValue(dataCommonsService.proxy()));
 
         presenter = new DatasetsBrowserPresenter((ServiceLocator) serviceLocator.proxy(), (ViewLayout) layout.proxy());
 
@@ -128,22 +131,43 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         presenter.doDisplayPropertiesEditor(viewProxy, dataset);
     }
-    
+
     public void testShouldDisplayPropertiesViewerOnSelectionOfViewPropertiesOption() {
         EmfDataset dataset = new EmfDataset();
         dataset.setName("name");
-        
+
         view.expects(once()).method("clearMessage").withNoArguments();
-        
-        Mock metadataView = mock(PropertiesView.class);
-        metadataView.expects(once()).method("observe").with(new IsInstanceOf(PropertiesViewPresenter.class));
-        metadataView.expects(once()).method("display").with(eq(dataset));
-        
-        PropertiesView viewProxy = (PropertiesView) metadataView.proxy();
+
+        Mock propsView = mock(PropertiesView.class);
+        propsView.expects(once()).method("observe").with(new IsInstanceOf(PropertiesViewPresenter.class));
+        propsView.expects(once()).method("display").with(eq(dataset));
+
+        PropertiesView viewProxy = (PropertiesView) propsView.proxy();
         layout.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
         layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.FALSE));
-        
+
         presenter.doDisplayPropertiesView(viewProxy, dataset);
+    }
+
+    public void testShouldDisplayVersionsEditorOnSelectionOfEditDataOption() {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("name");
+
+        view.expects(once()).method("clearMessage").withNoArguments();
+
+        Mock service = mock(DataEditorService.class);
+        Object editorServiceProxy = service.proxy();
+        serviceLocator.stubs().method("dataEditorService").withNoArguments().will(returnValue(editorServiceProxy));
+
+        Mock editorView = mock(VersionsEditorView.class);
+        editorView.expects(once()).method("observe").with(new IsInstanceOf(VersionsEditorPresenter.class));
+        editorView.expects(once()).method("display").with(eq(dataset), same(editorServiceProxy));
+
+        VersionsEditorView viewProxy = (VersionsEditorView) editorView.proxy();
+        layout.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
+        layout.expects(once()).method("activate").with(new IsInstanceOf(String.class)).will(returnValue(Boolean.FALSE));
+
+        presenter.doDisplayVersionsEditor(viewProxy, dataset);
     }
 
     public void testShouldDisplayTheSamePropertiesEditorAsPreviouslyDisplayedOnSelectingTheSameDatasetAndClickingProperties() {

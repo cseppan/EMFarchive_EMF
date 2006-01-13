@@ -28,7 +28,7 @@ public class VersionsEditorWindow extends ReusableInteralFrame implements Versio
     private JPanel layout;
 
     public VersionsEditorWindow(EmfConsole parentConsole) {
-        super("Versions Editor", new Dimension(500, 300), parentConsole.desktop());
+        super("Versions Editor", new Dimension(600, 400), parentConsole.desktop());
 
         this.parentConsole = parentConsole;
         layout = new JPanel();
@@ -36,11 +36,11 @@ public class VersionsEditorWindow extends ReusableInteralFrame implements Versio
     }
 
     public void display(EmfDataset dataset, DataEditorService service) {
-        super.setLayout(new BorderLayout());
+        layout.setLayout(new BorderLayout());
 
         messagePanel = new SingleLineMessagePanel();
-        super.add(messagePanel, BorderLayout.PAGE_START);
-        super.add(createLayout(dataset, service, messagePanel), BorderLayout.CENTER);
+        layout.add(messagePanel, BorderLayout.PAGE_START);
+        layout.add(createLayout(dataset, service, messagePanel), BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.PAGE_END);
     }
 

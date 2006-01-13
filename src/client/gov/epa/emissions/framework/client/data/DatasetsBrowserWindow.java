@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.meta.PropertiesEditor;
 import gov.epa.emissions.framework.client.meta.PropertiesViewWindow;
+import gov.epa.emissions.framework.client.meta.versions.VersionsEditorWindow;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfDatasetTableData;
@@ -146,7 +147,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
 
-        String[] options = { "Choose one", "View", "Edit Properties", "Edit Versions" };
+        String[] options = { "Choose one", "View", "Edit Properties", "Edit Data" };
         DefaultComboBoxModel model = new DefaultComboBoxModel(options);
         JComboBox combo = new JComboBox(model);
         combo.setEditable(false);
@@ -171,6 +172,9 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         if (option.equals("Edit Properties"))
             doDisplayPropertiesEditor();
+
+        if (option.equals("Edit Data"))
+            doDisplayVersionsEditor();
     }
 
     protected void importDataset() throws EmfException {
@@ -250,6 +254,16 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             PropertiesEditor view = new PropertiesEditor(session, this, parentConsole);
             desktop.add(view);
             presenter.doDisplayPropertiesEditor(view, (EmfDataset) iter.next());
+        }
+    }
+
+    protected void doDisplayVersionsEditor() {
+        List datasets = getSelectedDatasets();
+
+        for (Iterator iter = datasets.iterator(); iter.hasNext();) {
+            VersionsEditorWindow view = new VersionsEditorWindow(parentConsole);
+            desktop.add(view);
+            presenter.doDisplayVersionsEditor(view, (EmfDataset) iter.next());
         }
     }
 

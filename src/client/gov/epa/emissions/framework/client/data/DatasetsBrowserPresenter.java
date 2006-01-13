@@ -9,6 +9,8 @@ import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
+import gov.epa.emissions.framework.client.meta.versions.VersionsEditorPresenter;
+import gov.epa.emissions.framework.client.meta.versions.VersionsEditorView;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.ViewLayout;
@@ -79,11 +81,20 @@ public class DatasetsBrowserPresenter {
         view.clearMessage();
         if (viewLayout.activate("Properties View - " + dataset.getName()))
             return;
-
         viewLayout.add(propertiesView, "Properties View - " + dataset.getName());
 
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset);
         presenter.doDisplay(propertiesView);
+    }
+
+    public void doDisplayVersionsEditor(VersionsEditorView versionsView, EmfDataset dataset) {
+        view.clearMessage();
+        if (viewLayout.activate("Versions Editor - " + dataset.getName()))
+            return;
+        viewLayout.add(versionsView, "Versions Editor - " + dataset.getName());
+
+        VersionsEditorPresenter presenter = new VersionsEditorPresenter(dataset, serviceLocator.dataEditorService());
+        presenter.display(versionsView);
     }
 
 }

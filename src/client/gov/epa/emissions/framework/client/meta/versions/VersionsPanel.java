@@ -226,7 +226,6 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
         DefaultComboBoxModel tablesModel = new DefaultComboBoxModel(tableNames(sources));
         final JComboBox tableCombo = new JComboBox(tablesModel);
-        tableCombo.setSelectedItem("Select Table");
         tableCombo.setName("tables");
         tableCombo.setEditable(false);
         tableCombo.setPreferredSize(new Dimension(175, 20));
@@ -253,11 +252,6 @@ public class VersionsPanel extends JPanel implements VersionsView {
         clear();
 
         String table = (String) tableCombo.getSelectedItem();
-        if (table.equals("Select Table")) {
-            displayError("Please select a Table");
-            return;
-        }
-
         Version[] versions = tableData.selected();
         if (versions.length < 1) {
             displayError("Please select at least one Version");
@@ -291,11 +285,6 @@ public class VersionsPanel extends JPanel implements VersionsView {
         clear();
 
         String table = (String) tableCombo.getSelectedItem();
-        if (table.equals("Select Table")) {
-            displayError("Please select a Table");
-            return;
-        }
-
         Version[] versions = tableData.selected();
         if (versions.length != 1) {
             displayError("Please select one Version");
@@ -322,7 +311,6 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     private String[] tableNames(InternalSource[] sources) {
         List tables = new ArrayList();
-        tables.add("Select Table");
         for (int i = 0; i < sources.length; i++)
             tables.add(sources[i].getTable());
 
