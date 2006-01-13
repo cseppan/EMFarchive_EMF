@@ -8,10 +8,12 @@ import gov.epa.emissions.framework.ui.TableData;
 import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.Insets;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JButton;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
@@ -64,7 +66,9 @@ public class ListPanel extends JPanel {
     private JPanel buttonsPanel(final SelectableEmfTableData tableData) {
         JPanel container = new JPanel();
 
-        Label add = new Label("Add", "<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Add</a></html>");
+ //       Label add = new Label("Add", "<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Add</a></html>");
+        JButton add = new JButton("Add");
+        add.setMargin(new Insets(2,2,2,2));
         add.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event) {
                 tableData.addBlankRow();
@@ -73,7 +77,9 @@ public class ListPanel extends JPanel {
         });
         container.add(add);
 
-        Label remove = new Label("Remove", "<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Remove</a></html>");
+//       Label remove = new Label("Remove", "<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Remove</a></html>");
+        JButton remove = new JButton("Remove");
+        remove.setMargin(new Insets(2,2,2,2));
         remove.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event) {
                 tableData.removeSelected();
@@ -83,7 +89,7 @@ public class ListPanel extends JPanel {
         container.add(remove);
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(container, BorderLayout.EAST);
+        panel.add(container, BorderLayout.WEST);
 
         return panel;
     }
