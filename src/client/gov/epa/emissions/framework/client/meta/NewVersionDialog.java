@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+
 public class NewVersionDialog extends Dialog {
 
     private TextField name;

@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.ui.ImageResources;
+import gov.epa.emissions.framework.ui.TextAreaTableCellRenderer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -119,6 +120,10 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         statusTableModel = new StatusTableModel();
         JTable table = new JTable(statusTableModel);
         table.setName("statusMessages");
+        //FIXME: code put in for the demo
+        table.setRowHeight(36);
+        table.setDefaultRenderer(Object.class, new TextAreaTableCellRenderer());
+        
         setColumnWidths(table.getColumnModel());
         table.setPreferredScrollableViewportSize(this.getSize());
 
