@@ -82,6 +82,11 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         datasetTypesModel = new DefaultComboBoxModel(allTypesWithMessage);
         JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
         datasetTypesComboBox.setName("datasetTypes");
+        datasetTypesComboBox.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                boxChecked();
+            }
+        });
         layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesPanel(datasetTypesComboBox), panel);
 
         name = new TextField("name", 35);
@@ -123,11 +128,27 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private void boxChecked() {
         if(box.isSelected()) {
             name.setEnabled(false);
-            name.setVisible(false);
+            checkMinFiles();
         } else {
-            name.setEnabled(true);
-            name.setVisible(true);
+            enableAll();
         }
+    }
+    
+    private void checkMinFiles() {
+        DatasetType dt = (DatasetType)datasetTypesModel.getSelectedItem();
+        if(dt.getMinfiles() > 1 && box.isSelected()){
+            String message = "Sorry. You cannot create multiple datasets.";
+            messagePanel.setError(message);
+            folder.setEnabled(false);
+            filename.setEnabled(false);
+        } 
+    }
+    
+    private void enableAll(){
+        messagePanel.clear();
+        name.setEnabled(true);
+        folder.setEnabled(true);
+        filename.setEnabled(true);
     }
 
     private void copyDatasetTypes(DatasetType[] allDatasetTypes, DatasetType[] allTypesWithMessage) {
