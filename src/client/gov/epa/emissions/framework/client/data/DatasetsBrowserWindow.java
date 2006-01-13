@@ -174,7 +174,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             doDisplayPropertiesEditor();
 
         if (option.equals("Edit Data"))
-            doDisplayVersionsEditor();
+            doDisplayVersionedData();
     }
 
     protected void importDataset() throws EmfException {
@@ -251,19 +251,23 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         List datasets = getSelectedDatasets();
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
-            PropertiesEditor view = new PropertiesEditor(session, this, parentConsole);
+            PropertiesEditor view = new PropertiesEditor(session, parentConsole);
             desktop.add(view);
-            presenter.doDisplayPropertiesEditor(view, (EmfDataset) iter.next());
+            try {
+                presenter.doDisplayPropertiesEditor(view, (EmfDataset) iter.next());
+            } catch (EmfException e) {
+                showError(e.getMessage());
+            }
         }
     }
 
-    protected void doDisplayVersionsEditor() {
+    protected void doDisplayVersionedData() {
         List datasets = getSelectedDatasets();
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
             VersionedDataWindow view = new VersionedDataWindow(parentConsole);
             desktop.add(view);
-            presenter.doDisplayVersionsEditor(view, (EmfDataset) iter.next());
+            presenter.doDisplayVersionedData(view, (EmfDataset) iter.next());
         }
     }
 

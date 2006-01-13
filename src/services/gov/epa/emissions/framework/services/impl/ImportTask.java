@@ -20,7 +20,7 @@ public class ImportTask implements Runnable {
 
     private StatusServiceImpl statusServices = null;
 
-    private DataServiceImpl dataServices = null;
+    private DataServiceImpl dataService = null;
 
     private Importer importer;
 
@@ -32,7 +32,7 @@ public class ImportTask implements Runnable {
         this.user = user;
         this.fileName = fileName;
         this.dataset = dataset;
-        this.dataServices = services.getData();
+        this.dataService = services.getData();
         this.statusServices = services.getStatus();
 
         this.importer = importer;
@@ -43,20 +43,20 @@ public class ImportTask implements Runnable {
 
         try {
             setStartStatus();
-            dataServices.addDataset(dataset);
+            dataService.addDataset(dataset);
             dataset.setStatus(EMFConstants.DATASET_STATUS_START_IMPORT);
             importer.run();
 
             // if no errors then insert the dataset into the database
             dataset.setStatus(EMFConstants.DATASET_STATUS_IMPORTED);
-            dataServices.updateDatasetWithoutLock(dataset);
+            dataService.updateDatasetWithoutLock(dataset);
             
             setStatus("Completed import for " + dataset.getDatasetTypeName() + ":" + fileName);
         } catch (Exception e) {
             log.error("Problem on attempting to run ExIm on file : " + fileName, e);
             setStatus("Import failure. Reason: " + e.getMessage());
             try {
-                dataServices.removeDataset(dataset);
+                dataService.removeDataset(dataset);
             } catch (EmfException e1) {
                 log.error("Problem removing inserted dataset for failed import : " + dataset.getName(), e);
             }

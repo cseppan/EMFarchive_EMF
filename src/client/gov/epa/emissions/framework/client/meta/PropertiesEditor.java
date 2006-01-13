@@ -7,7 +7,6 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -34,12 +33,9 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     private EmfSession session;
 
-    private DatasetsBrowserView datasetsBrowser;
-
-    public PropertiesEditor(EmfSession session, DatasetsBrowserView datasetsBrowser, EmfConsole parentConsole) {
+    public PropertiesEditor(EmfSession session, EmfConsole parentConsole) {
         super("Properties Editor", new Dimension(700, 550));
         this.session = session;
-        this.datasetsBrowser = datasetsBrowser;
         this.parentConsole = parentConsole;
     }
 
@@ -138,7 +134,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
         Button save = new Button("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                presenter.doSave(datasetsBrowser);
+                presenter.doSave();
             }
         });
         buttonsPanel.add(save);

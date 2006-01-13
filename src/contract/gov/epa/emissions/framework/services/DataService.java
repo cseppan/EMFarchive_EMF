@@ -7,8 +7,6 @@ public interface DataService {
 
     EmfDataset[] getDatasets() throws EmfException;
 
-    void updateDatasetWithoutLock(EmfDataset dataset) throws EmfException;
-
     EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException;
 
     EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException;
