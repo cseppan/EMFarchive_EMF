@@ -36,7 +36,7 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
     private SingleLineMessagePanel messagePanel;
 
     public ViewSectorWindow() {
-        super("View Sector", new Dimension(600, 500));
+        super("View Sector", new Dimension(550, 400));
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -79,12 +79,14 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         Label name = new Label("name", sector.getName());
-        layoutGenerator.addLabelWidgetPair("Name", name, panel);
+        layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         TextArea description = new TextArea("description", sector.getDescription(), 40);
         description.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Description", new ScrollableTextArea(description), panel);
-
+        ScrollableTextArea descTextArea = new ScrollableTextArea(description);
+        descTextArea.setMinimumSize(new Dimension(80,80));
+        layoutGenerator.addLabelWidgetPair("Description:", descTextArea, panel);
+ 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
@@ -112,7 +114,7 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
         JPanel container = new JPanel();
         FlowLayout layout = new FlowLayout();
         layout.setHgap(20);
-        layout.setVgap(25);
+        layout.setVgap(10);
         container.setLayout(layout);
 
         Button closeButton = new Button("Close", closeAction());
