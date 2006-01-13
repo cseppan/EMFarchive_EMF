@@ -92,7 +92,7 @@ public class FileMenu extends JMenu {
         viewLayout.add(importView, "Import Dataset - FileMenu");
         desktop.add(importView);
 
-        ImportPresenter presenter = new ImportPresenter(session.user(), session.eximService());
+        ImportPresenter presenter = new ImportPresenter(session, session.user(), session.eximService());
         presenter.display(importView);
     }
 

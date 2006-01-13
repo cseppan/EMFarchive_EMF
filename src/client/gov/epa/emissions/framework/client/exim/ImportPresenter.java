@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
 
@@ -15,10 +16,13 @@ public class ImportPresenter {
     private ExImService service;
 
     private User user;
+    
+    private EmfSession session;
 
-    public ImportPresenter(User user, ExImService service) {
+    public ImportPresenter(EmfSession session, User user, ExImService service) {
         this.user = user;
         this.service = service;
+        this.session = session;
     }
 
     public void doImport(String directory, String filename, String datasetName, DatasetType type) throws EmfException {
@@ -41,18 +45,18 @@ public class ImportPresenter {
         dataset.setModifiedDateTime(dataset.getCreatedDateTime());
         dataset.setAccessedDateTime(dataset.getCreatedDateTime());
 
-        service.startImport(user, directory, filename, dataset);
+        service.startImport(user, translateToServerDir(directory), filename, dataset);
     }
 
     public void doDone() {
         view.close();
     }
 
-    public void display(ImportView view) throws EmfException {
+    public void display(ImportView view) {
         this.view = view;
 
         view.register(this);
-        view.setDefaultBaseFolder(getDefaultBaseFolderForImport());
+        view.setDefaultBaseFolder(getDefaultBaseFolder());
 
         view.display();
     }
@@ -61,8 +65,19 @@ public class ImportPresenter {
         view.clearMessagePanel();
     }
 
-    private String getDefaultBaseFolderForImport() throws EmfException {
-        return service.getImportBaseFolder();
+//    private String getDefaultBaseFolderForImport() throws EmfException {
+//        return service.getImportBaseFolder();
+//    }
+    
+    private String getDefaultBaseFolder() {
+        return session.preferences().getInputDir();
+    }
+    
+    private String translateToServerDir(String dir) {
+        if(dir.equalsIgnoreCase(getDefaultBaseFolder()))
+            return session.preferences().getServerInputDir();
+        
+        return dir;
     }
 
 }

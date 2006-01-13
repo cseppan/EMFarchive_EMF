@@ -181,7 +181,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktop);
         desktop.add(importView);
 
-        ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session.user(),
+        ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session, session.user(),
                 session.eximService(), session.dataService(), this);
         presenter.doImport(importView, importPresenter);
     }

@@ -68,7 +68,7 @@ public class DatasetsBrowserPresenter {
         presenter.doDisplay(propertiesEditorView);
     }
 
-    public void doImport(ImportView importView, ImportPresenter importPresenter) throws EmfException {
+    public void doImport(ImportView importView, ImportPresenter importPresenter) {
         view.clearMessage();
         importPresenter.display(importView);
     }

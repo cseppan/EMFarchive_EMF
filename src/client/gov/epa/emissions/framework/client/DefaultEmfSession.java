@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.preference.UserPreferences;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataService;
@@ -16,11 +17,18 @@ public class DefaultEmfSession implements EmfSession {
     private ServiceLocator serviceLocator;
 
     private String mostRecentExportFolder;
+    
+    private UserPreferences preferences;
 
     public DefaultEmfSession(User user, ServiceLocator locator) throws EmfException {
         serviceLocator = locator;
+        this.preferences = new UserPreferences();
         this.user = user;
         mostRecentExportFolder = locator.eximService().getExportBaseFolder();
+    }
+    
+    public UserPreferences preferences() {
+        return preferences;
     }
 
     public ServiceLocator serviceLocator() {

@@ -28,6 +28,7 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
         locator = mock(ServiceLocator.class);
         locator.stubs().method("eximService").will(returnValue(eximServices.proxy()));
 
+        System.setProperty("EMF_PREFERENCE", "test/data/preference/emfpreference.txt");
         session = new DefaultEmfSession(null, (ServiceLocator) locator.proxy());
     }
 

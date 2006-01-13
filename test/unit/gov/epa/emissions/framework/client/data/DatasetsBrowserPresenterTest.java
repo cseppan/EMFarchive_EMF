@@ -87,7 +87,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         presenter.doExport(exportViewProxy, (ExportPresenter) exportPresenter.proxy(), datasets);
     }
 
-    public void testShouldDisplayImportViewOnClickOfNewButton() throws EmfException {
+    public void testShouldDisplayImportViewOnClickOfNewButton() {
         view.expects(once()).method("clearMessage").withNoArguments();
 
         Mock importView = mock(ImportView.class);

@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.ExImService;
@@ -15,9 +16,9 @@ public class DatasetsBrowserAwareImportPresenter extends ImportPresenter {
 
     private DatasetsBrowserView browser;
 
-    public DatasetsBrowserAwareImportPresenter(User user, ExImService eximServices, DataService dataServices,
+    public DatasetsBrowserAwareImportPresenter(EmfSession session, User user, ExImService eximServices, DataService dataServices,
             DatasetsBrowserView browser) {
-        super(user, eximServices);
+        super(session, user, eximServices);
         this.dataServices = dataServices;
         this.browser = browser;
     }

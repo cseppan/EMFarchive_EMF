@@ -24,7 +24,7 @@ public class DefaultExportPresenter implements ExportPresenter {
     public void display(ExportView view) {
         this.view = view;
         view.observe(this);
-        view.setMostRecentUsedFolder(getDefaultBaseFolderForImport());
+        view.setMostRecentUsedFolder(getDefaultBaseFolder());
 
         view.display();
     }
@@ -45,12 +45,23 @@ public class DefaultExportPresenter implements ExportPresenter {
 
         ExImService services = session.eximService();
         if (overwrite)
-            services.startExportWithOverwrite(session.user(), datasets, folder, purpose);
+            services.startExportWithOverwrite(session.user(), datasets, translateToServerDir(folder), purpose);
         else
-            services.startExport(session.user(), datasets, folder, purpose);
+            services.startExport(session.user(), datasets, translateToServerDir(folder), purpose);
     }
 
-    private String getDefaultBaseFolderForImport() {
-        return session.getMostRecentExportFolder();
+//    private String getDefaultBaseFolderForImport() {
+//        return session.getMostRecentExportFolder();
+//    }
+    
+    private String getDefaultBaseFolder() {
+        return session.preferences().getOutputDir();
+    }
+    
+    private String translateToServerDir(String dir) {
+        if(dir.equalsIgnoreCase(getDefaultBaseFolder()))
+            return session.preferences().getServerOutputDir();
+        
+        return dir;
     }
 }

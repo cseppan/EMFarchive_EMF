@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.preference;
 
+import gov.epa.emissions.framework.EmfException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -20,26 +22,17 @@ public class UserPreferences extends Properties {
 
     public static final String EMF_PREFERENCE = "EMF_PREFERENCE";
 
-    private static UserPreferences userPreferences = null;
-
-    public UserPreferences() {
+    public UserPreferences() throws EmfException {
         loadProperties();
     }
 
-    public static UserPreferences getInstance() {
-        if (userPreferences == null) {
-            userPreferences = new UserPreferences();
-        }
-        return userPreferences;
-    }
-
-    private void loadProperties() {
+    private void loadProperties() throws EmfException {
         File file = new File(getPropertyFile(EMF_PREFERENCE));
         try {
             FileInputStream inStream = new FileInputStream(file);
             load(inStream);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            throw new EmfException("Cannot load user preferences file.");
         }
     }
 
@@ -56,8 +49,20 @@ public class UserPreferences extends Properties {
         return file.exists();
     }
 
-    public String getInputDrive() {
-        return getProperty(EMF_INPUT_DRIVE);
+    public String getInputDir() {
+        return getProperty(EMF_INPUT_DRIVE) + ":\\" + getProperty(EMF_DEFAULT_INPUT_DIR);
+    }
+    
+    public String getOutputDir() {
+        return getProperty(EMF_OUTPUT_DRIVE) + ":\\" + getProperty(EMF_DEFAULT_OUTPUT_DIR);
+    }
+    
+    public String getServerInputDir() {
+        return getProperty(EMF_INPUT_PATH) + "/" + getProperty(EMF_DEFAULT_INPUT_DIR);
+    }
+    
+    public String getServerOutputDir() {
+        return getProperty(EMF_OUTPUT_PATH) + "/" + getProperty(EMF_DEFAULT_OUTPUT_DIR);
     }
 
 }
