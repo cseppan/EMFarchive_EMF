@@ -36,7 +36,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
     private SingleLineMessagePanel messagePanel;
 
     public ViewableDatasetTypeWindow() {
-        super("View DatasetType", new Dimension(600, 500));
+        super("View Dataset Type", new Dimension(550, 400));
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -48,7 +48,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
     }
 
     public void display(DatasetType type, Keyword[] keywords) {
-        super.setTitle("View DatasetType: " + type.getName());
+        super.setTitle("View Dataset Type: " + type.getName());
         layout.removeAll();
         doLayout(layout, type, keywords);
 
@@ -78,15 +78,17 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Name", new Label("name", type.getName()), panel);
+        layoutGenerator.addLabelWidgetPair("Name:", new Label("name", type.getName()), panel);
 
         TextArea description = new TextArea("description", type.getDescription(), 40);
         description.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Description", new ScrollableTextArea(description), panel);
+        ScrollableTextArea descScrollableTextArea = new ScrollableTextArea(description);
+        descScrollableTextArea.setMinimumSize(new Dimension(80,80));
+        layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
-                5, 5, // initialX, initialY
+                5, 0, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
@@ -107,6 +109,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private JPanel createButtonsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
         Button closeButton = new Button("Close", closeAction());
         panel.add(closeButton, BorderLayout.LINE_END);
