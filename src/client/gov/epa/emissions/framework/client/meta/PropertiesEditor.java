@@ -10,8 +10,6 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -50,7 +48,6 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         tabbedPane.setName("tabbedPane");
 
         tabbedPane.addTab("Summary", createSummaryTab(dataset, messagePanel));
-        tabbedPane.addTab("Data", createDataTab(dataset, parentConsole));
         tabbedPane.addTab("Keywords", createKeywordsTab());
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
         tabbedPane.addTab("Info", createInfoTab(dataset, parentConsole));
@@ -69,17 +66,6 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
             showError("Could not load Summary Tab. Reason - " + e.getMessage());
             return createErrorTab("Could not load Summary Tab. Reason - " + e.getMessage());
         }
-    }
-
-    private JPanel createDataTab(EmfDataset dataset, EmfConsole parentConsole) {
-        ServiceLocator serviceLocator = session.serviceLocator();
-        DataEditorService dataEditorService = serviceLocator.dataEditorService();
-
-        EditableDataTab view = new EditableDataTab(parentConsole);
-        DataTabPresenter presenter = new DataTabPresenter(view, dataset, dataEditorService);
-        presenter.doDisplay();
-
-        return view;
     }
 
     private JPanel createInfoTab(EmfDataset dataset, EmfConsole parentConsole) {
