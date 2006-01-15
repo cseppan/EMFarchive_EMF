@@ -36,4 +36,8 @@ public final class EMFConstants {
     public static final String DATASETTYPE_NAME_TEMPORALPROFILE = "Temporal Profile";
 
     public static final int PAGE_SIZE = 10;
+    
+    //Axis and Hibernate Runtime Exception message strings
+    public static final String CONNECTION_REFUSED="Connection refused: connect";
+    
 }

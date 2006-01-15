@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
 
@@ -31,8 +33,8 @@ public class ExImServiceTransport implements ExImService {
 
             mappings.addParam(call, "user", mappings.user());
             mappings.addParam(call, "folderpath", mappings.string());
-            mappings.addParam(call, "filename", mappings.string());
-            mappings.addParam(call, "dataset", mappings.datasetType());
+            mappings.addParam(call, "filename", mappings.strings());
+            mappings.addParam(call, "dataset", mappings.dataset());
 
             mappings.setAnyReturnType(call);
 
@@ -41,7 +43,7 @@ public class ExImServiceTransport implements ExImService {
             LOG.error("Axis Fault details", fault);
             throw new EmfException(extractMessage(fault.getMessage()));
         } catch (Exception e) {
-            LOG.error("Error communicating with WS end point", e);
+            LOG.error("Error communicating with server", e);
         }
     }
 
@@ -119,14 +121,36 @@ public class ExImServiceTransport implements ExImService {
 
     private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
         LOG.error(message, fault);
-        throw new EmfException(extractMessage(fault.getMessage()));
+        String msg=extractMessage(fault.getMessage());
+        
+        if (fault.getCause()!=null){
+            if (fault.getCause().getMessage().equals(EMFConstants.CONNECTION_REFUSED)){
+                msg="EMF server not responding";
+            }            
+        }
+        throw new EmfException(msg);
     }
 
-    public void startMultipleFileImport(User user, String folderPath, String fileName, EmfDataset dataset)
-            throws EmfException {
-        // TODO Auto-generated method stub
-        if (false)
-            throw new EmfException(""); // placeholder
-    }
+    public void startMultipleFileImport(User user, String folderPath, String[] fileName, DatasetType datasetType) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+            mappings.register(call);
 
+            mappings.setOperation(call, "startMultipleFileImport");
+
+            mappings.addParam(call, "user", mappings.user());
+            mappings.addParam(call, "folderpath", mappings.string());
+            mappings.addParam(call, "filename", mappings.strings());
+            mappings.addParam(call, "dataset", mappings.datasetType());
+
+            mappings.setAnyReturnType(call);
+
+            call.invoke(new Object[] { user, folderPath, fileName, datasetType });
+        } catch (AxisFault fault) {
+            LOG.error("Axis Fault details", fault);
+            throw new EmfException(extractMessage(fault.getMessage()));
+        } catch (Exception e) {
+            LOG.error("Error communicating with server", e);
+        }
+    }
 }

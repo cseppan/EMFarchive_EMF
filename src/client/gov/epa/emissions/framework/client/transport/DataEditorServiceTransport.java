@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EditToken;
 
 import java.net.MalformedURLException;
@@ -42,11 +43,19 @@ public class DataEditorServiceTransport implements DataEditorService {
         log.error(message, e);
         throw new EmfException(message, e.getMessage(), e);
     }
-
+    
     private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
         log.error(message, fault);
-        throw new EmfException(extractMessage(fault.getMessage()));
+        String msg=extractMessage(fault.getMessage());
+        
+        if (fault.getCause()!=null){
+            if (fault.getCause().getMessage().equals(EMFConstants.CONNECTION_REFUSED)){
+                msg="EMF server not responding";
+            }            
+        }
+        throw new EmfException(msg);
     }
+
 
     public Page getPage(EditToken token, int pageNumber) throws EmfException {
         try {
