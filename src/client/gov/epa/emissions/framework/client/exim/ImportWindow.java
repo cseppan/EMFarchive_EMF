@@ -239,12 +239,22 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         this.presenter = presenter;
     }
 
+/**
+ * If the checkbox is selected then start importing multiple datasets of the datasetType specified
+ * The fileName is a regular expression for multiple datasets
+ * 
+ */
     private void doImport() {
         clearMessagePanel();
         
         try {
-            presenter.doImport(folder.getText(), filename.getText(), name.getText(), (DatasetType) datasetTypesModel
-                    .getSelectedItem());
+            if(box.isSelected()) {
+                presenter.doImport(folder.getText(), filename.getText(), (DatasetType) datasetTypesModel.getSelectedItem());                                
+            }else{
+                presenter.doImport(folder.getText(), filename.getText(), name.getText(), (DatasetType) datasetTypesModel
+                        .getSelectedItem());                
+            }
+
             String message = "Started import. Please monitor the Status window to track your Import request.";
             messagePanel.setMessage(message);
         } catch (EmfException e) {

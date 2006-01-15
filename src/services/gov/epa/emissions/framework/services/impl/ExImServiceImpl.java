@@ -1,9 +1,12 @@
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.KeyVal;
+import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
 import gov.epa.emissions.commons.io.importer.Importer;
+import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDao;
@@ -29,6 +32,8 @@ import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     private static Log log = LogFactory.getLog(ExImServiceImpl.class);
+        
+    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
 
     private VersionedImporterFactory importerFactory;
 
@@ -263,17 +268,46 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return baseExportFolder;
     }
 
-    public void startMultipleFileImport(User user, String folderPath, String fileName, EmfDataset dataset)
-            throws EmfException {
+    public void startMultipleFileImport(User user, String folderPath, String[] fileNames, DatasetType datasetType) throws EmfException {
+        log.debug("multiple datasets import: " + datasetType.getName());
+        String[] fileNamesForImport=null;
+        
+        try {
+            File folder = validatePath(folderPath);
 
-        // The fileName is a regular expression that maps to a collection of files.
+            if (fileNames.length==1) {
+                String fileName = fileNames[0];
 
-        // / Loop through the collection and start import for the file
+                // The fileName is a regular expression that maps to a collection of files.
+                FilePatternMatcher fpm = new FilePatternMatcher(fileName);
+                String[] allFilesInFolder = folder.list();
+                fileNamesForImport = fpm.matchingNames(allFilesInFolder);                
+            }
 
-        // TODO Auto-generated method stub
-        if (false)
-            throw new EmfException(""); // placeholder
-
+            // Loop through the collection and start import for the file
+            for (int i = 0; i < fileNamesForImport.length; i++) {
+                String fileName = fileNamesForImport[i];
+                log.debug("#### Filename: " + fileName);
+                String importFileName = fileName + DATE_FORMATTER.format(new Date());
+                log.debug("modified filename: " + importFileName);
+                EmfDataset dataset = new EmfDataset();
+                dataset.setName(importFileName);
+                dataset.setCreator(user.getFullName());
+                dataset.setDatasetType(datasetType);
+                dataset.setCreatedDateTime(new Date());
+                dataset.setModifiedDateTime(new Date());
+                dataset.setAccessedDateTime(new Date());
+                
+                startImport(user, folderPath, fileName, dataset);            
+            }
+            
+        } catch (ImporterException e) {
+            log.error("Exception attempting to start export of file to folder: " + folderPath, e);
+            throw new EmfException(e.getMessage());
+       }
+        
+       
     }
+
 
 }

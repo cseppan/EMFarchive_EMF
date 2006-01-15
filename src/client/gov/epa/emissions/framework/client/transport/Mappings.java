@@ -78,6 +78,10 @@ public class Mappings {
         return Constants.XSD_STRING;
     }
 
+    public QName strings() {
+        return Constants.XSD_ANY;
+    }
+
     public void setReturnType(Call call, QName name) {
         call.setReturnType(name);
     }

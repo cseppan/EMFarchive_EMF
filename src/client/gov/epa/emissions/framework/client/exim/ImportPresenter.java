@@ -25,6 +25,20 @@ public class ImportPresenter {
         this.session = session;
     }
 
+    public void doImport(String directory, String filename, DatasetType type) throws EmfException {
+        if (directory.length() == 0)
+            throw new EmfException("Folder should be specified");
+
+        if (filename.length() == 0)
+            throw new EmfException("Filename should be specified");
+
+        if (type.getName().equals("Choose a type ..."))
+            throw new EmfException("Dataset Type should be selected");
+
+        service.startMultipleFileImport(user,translateToServerDir(directory), new String[]{filename}, type);
+
+    }
+
     public void doImport(String directory, String filename, String datasetName, DatasetType type) throws EmfException {
         if (datasetName.length() == 0)
             throw new EmfException("Dataset Name should be specified");

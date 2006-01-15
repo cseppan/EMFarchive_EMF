@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
@@ -15,13 +16,16 @@ public abstract class ExImServiceTestCase extends ServicesTestCase {
 
     private UserService userService;
 
+    private DataCommonsService dataCommonsService;
+    
     private EmfDataset dataset;
 
     protected void setUpService(ExImService eximService, UserService userService, DataCommonsService commonsService)
             throws Exception {
         this.eximService = eximService;
         this.userService = userService;
-
+        this.dataCommonsService=commonsService;
+        
         dataset = new EmfDataset();
         Random random = new Random();
         dataset.setName("ORL NonPoint - ExImServicesTest" + random.nextInt());
@@ -55,6 +59,29 @@ public abstract class ExImServiceTestCase extends ServicesTestCase {
         eximService.startImport(user, repository.getAbsolutePath(), filename, dataset);
 
         // FIXME: verify that import is complete
+    }
+
+    public void testMultipleExternalFileImport() throws EmfException{
+        User user = userService.getUser("emf");
+
+        File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
+
+        String[] fileNames = new String[]{"*.txt"};
+        
+        eximService.startMultipleFileImport(user,repository.getAbsolutePath(), fileNames, externalDatasetType(dataCommonsService));
+    }
+    
+    private DatasetType externalDatasetType(DataCommonsService service) throws EmfException {
+        DatasetType[] types = service.getDatasetTypes();
+        for (int i = 0; i < types.length; i++) {
+            if (types[i].getName().equals("External File")){
+                System.out.println("FOUND DatasetType: " + types[i].getName());
+                return types[i];                
+            }
+        }
+
+        return null;
+
     }
 
     public void testExportWithOverwrite() throws Exception {
