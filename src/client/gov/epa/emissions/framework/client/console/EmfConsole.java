@@ -117,10 +117,9 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         return new FileMenu(session, this, messagePanel, windowLayoutManager);
     }
 
-    public void close() {
+    public void doClose() {
         // TODO: auto logout of a session
         presenter.close();
-        super.close();
     }
 
     private JMenuItem createDisabledMenuItem(String name) {

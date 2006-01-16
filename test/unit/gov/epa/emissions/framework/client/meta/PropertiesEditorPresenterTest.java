@@ -124,6 +124,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         presenter = new PropertiesEditorPresenterImpl(dataset, (ServiceLocator) locator.proxy(), (EmfSession) session
                 .proxy());
         view.expects(once()).method("notifyLockFailure").with(same(dataset));
+        view.expects(once()).method("observe").with(same(presenter));
 
         presenter.doDisplay((PropertiesEditorView) view.proxy());
     }

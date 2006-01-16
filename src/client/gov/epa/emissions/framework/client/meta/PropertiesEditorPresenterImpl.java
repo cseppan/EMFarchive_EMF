@@ -35,6 +35,9 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
     }
 
     public void doDisplay(PropertiesEditorView view) throws EmfException {
+        this.view = view;
+        view.observe(this);
+
         dataset = serviceLocator.dataService().obtainLockedDataset(session.user(), dataset);
 
         if (!dataset.isLocked(session.user())) {// view mode, locked by another user
@@ -42,16 +45,12 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
             return;
         }
 
-        this.view = view;
-        view.observe(this);
         view.display(dataset);
     }
 
     public void doClose() {
-        if (unsavedChanges) {
-            if (!view.shouldContinueLosingUnsavedChanges())
-                return;
-        }
+        if (unsavedChanges && !view.shouldContinueLosingUnsavedChanges())
+            return;
 
         view.close();
     }

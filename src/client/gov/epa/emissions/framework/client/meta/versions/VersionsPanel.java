@@ -14,7 +14,6 @@ import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,7 +143,6 @@ public class VersionsPanel extends JPanel implements VersionsView {
         final JComboBox tableCombo = new JComboBox(tablesModel);
         tableCombo.setName("tables");
         tableCombo.setEditable(false);
-        tableCombo.setPreferredSize(new Dimension(175, 20));
         panel.add(tableCombo);
 
         Button view = new Button("View", new AbstractAction() {

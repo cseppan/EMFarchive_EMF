@@ -7,6 +7,8 @@ import java.awt.Point;
 import java.beans.PropertyVetoException;
 
 import javax.swing.JInternalFrame;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 
 public abstract class EmfInternalFrame extends JInternalFrame implements ManagedView {
 
@@ -15,7 +17,16 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
                 true, // closable
                 true, // maximizable
                 true);// iconifiable
+
+        this.addInternalFrameListener(new InternalFrameAdapter() {
+            public void internalFrameClosing(InternalFrameEvent arg0) {
+                close();
+                super.internalFrameClosing(arg0);
+            }
+        });
     }
+
+    abstract public void close();
 
     public EmfInternalFrame(String title, Dimension dimension) {
         this(title);

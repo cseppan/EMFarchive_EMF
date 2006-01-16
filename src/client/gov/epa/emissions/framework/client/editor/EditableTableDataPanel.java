@@ -61,14 +61,27 @@ public class EditableTableDataPanel extends JPanel {
         JPanel buttonsPanel = buttonsPanel(tableData);
         panel.add(buttonsPanel);
 
-        JPanel notesLabelPanel = new JPanel(new BorderLayout());
-        notesLabelPanel.add(new JLabel("Notes"), BorderLayout.LINE_START);
-        panel.add(notesLabelPanel);
+        panel.add(notesPanel());
 
         TextArea notes = new TextArea("Notes", "");
         panel.add(new ScrollableTextArea(notes));
 
         return panel;
+    }
+
+    private JPanel notesPanel() {
+        JPanel container = new JPanel(new BorderLayout());
+
+        JPanel labelsPanel = new JPanel();
+        labelsPanel.add(new JLabel("Notes"));
+        
+        JLabel comingSoon = new JLabel("(Coming Soon)");
+        comingSoon.setForeground(Color.BLUE);
+        labelsPanel.add(comingSoon);
+        
+        container.add(labelsPanel, BorderLayout.LINE_START);
+        
+        return container;
     }
 
     private JScrollPane table(TableData tableData) {

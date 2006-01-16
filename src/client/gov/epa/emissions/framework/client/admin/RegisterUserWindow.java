@@ -5,8 +5,6 @@ import gov.epa.emissions.framework.client.login.LaunchLoginOnCancelStrategy;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
 import java.awt.Point;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 public class RegisterUserWindow extends EmfFrame implements RegisterUserView {
 
@@ -23,16 +21,9 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView {
         this.setSize(view.getSize());
         this.setLocation(new Point(400, 200));
         display();
-
-        this.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent event) {
-                doClose();
-                super.windowClosing(event);
-            }
-        });
     }
 
-    private void doClose() {
+    protected void doClose() {
         RegisterUserPresenter presenter = view.getPresenter();
         if (presenter != null)
             onCancelStrategy.execute(presenter);

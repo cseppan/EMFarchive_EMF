@@ -77,8 +77,8 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
 
         description = new TextArea("description", sector.getDescription(), 40);
         ScrollableTextArea descTextArea = new ScrollableTextArea(description);
-        descTextArea.setMinimumSize(new Dimension(80,80));
-        //.descTextAredescTextArea.setHorizontalScroll
+        descTextArea.setMinimumSize(new Dimension(80, 80));
+        // .descTextAredescTextArea.setHorizontalScroll
         layoutGenerator.addLabelWidgetPair("Description:", descTextArea, panel);
 
         // Lay out the panel.
@@ -131,6 +131,16 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
         };
 
         return action;
+    }
+
+    public void close() {
+        try {
+            presenter.doClose();
+        } catch (EmfException e) {
+            messagePanel.setError("Could not close. Reason: " + e.getMessage());
+            return;
+        }
+        super.close();
     }
 
     private Action closeAction() {

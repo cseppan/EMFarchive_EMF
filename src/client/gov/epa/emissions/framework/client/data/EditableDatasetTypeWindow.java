@@ -79,7 +79,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
         description = new TextArea("description", type.getDescription(), 40);
         ScrollableTextArea descScrollableTextArea = new ScrollableTextArea(description);
-        descScrollableTextArea.setMinimumSize(new Dimension(80,80));
+        descScrollableTextArea.setMinimumSize(new Dimension(80, 80));
         layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, panel);
 
         // Lay out the panel.
@@ -129,6 +129,17 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         };
 
         return action;
+    }
+
+    public void close() {
+        try {
+            presenter.doClose();
+        } catch (EmfException e) {
+            messagePanel.setError("Could not close. Reason: " + e.getMessage());
+            return;
+        }
+
+        super.close();
     }
 
     private Action closeAction() {

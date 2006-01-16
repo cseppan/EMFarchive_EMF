@@ -3,11 +3,13 @@ package gov.epa.emissions.framework.client;
 import gov.epa.emissions.framework.ui.Position;
 
 import java.awt.Point;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JRootPane;
 
-public class EmfFrame extends JFrame implements EmfView {
+public abstract class EmfFrame extends JFrame implements EmfView {
 
     public EmfFrame(String name, String title) {
         super(title);
@@ -16,6 +18,16 @@ public class EmfFrame extends JFrame implements EmfView {
         super.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
 
         super.setResizable(false);
+
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent event) {
+                close();
+                super.windowClosing(event);
+            }
+        });
+    }
+
+    protected void doClose() {// needs to be overridden, if needed
     }
 
     public Position getPosition() {
@@ -27,7 +39,8 @@ public class EmfFrame extends JFrame implements EmfView {
         super.setLocation(new Point(position.x(), position.y()));
     }
 
-    public void close() {
+    final public void close() {
+        doClose();
         super.dispose();
     }
 
