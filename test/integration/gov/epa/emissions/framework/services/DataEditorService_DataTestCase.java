@@ -7,14 +7,16 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
-import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
+import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.DataFormatFactory;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
@@ -22,7 +24,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.Random;
 
-public abstract class DataEditorServiceTestCase extends ServicesTestCase {
+public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
 
     private DataEditorService service;
 
@@ -34,12 +36,15 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
 
     private EditToken token;
 
-    protected void setUpService(DataEditorService service) throws Exception {
+    private UserService userService;
+
+    protected void setUpService(DataEditorService service, UserService userService) throws Exception {
         this.service = service;
+        this.userService = userService;
         datasource = emissions();
 
         dataset = new EmfDataset();
-        table = "test";
+        table = "test" + new Date().getTime();
         dataset.setName(table);
         setTestValues(dataset);
 
@@ -105,15 +110,29 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         assertTrue(numberOfPages >= 1);
     }
 
-    private EditToken editToken() {
-        Version version = new Version();
-        version.setDatasetId(dataset.getDatasetid());
-        version.setVersion(0);
-        version.setName("v0");
-        version.setPath("");
-        version.markFinal();
+    private EditToken editToken() throws EmfException {
+        Version version = versionZero();
+        return editToken(version);
+    }
 
-        return new EditToken(version, dataset.getName());
+    private EditToken editToken(Version version) throws EmfException {
+        return editToken(version, dataset.getName());
+    }
+
+    private EditToken editToken(Version version, String table) throws EmfException {
+        EditToken result = new EditToken(version, table);
+        result.setUser(owner());
+
+        return result;
+    }
+
+    private Version versionZero() {
+        Versions versions = new Versions();
+        return versions.get(dataset.getDatasetid(), 0, session);
+    }
+
+    private User owner() throws EmfException {
+        return userService.getUser("emf");
     }
 
     /**
@@ -121,7 +140,6 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
      * contain the record with record id that was supplied.
      */
     public void testShouldReturnOnlyOnePage() throws EmfException {
-        EditToken token = editToken();
         int numberOfRecords = service.getTotalRecords(token);
 
         Page page = service.getPageWithRecord(token, numberOfRecords - 1);
@@ -137,7 +155,6 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
     }
 
     public void testShouldReturnNoPage() throws EmfException {
-        EditToken token = editToken();
         int numberOfRecords = service.getTotalRecords(token);
 
         Page page = service.getPageWithRecord(token, numberOfRecords + 1);
@@ -152,53 +169,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         assertTrue(!found);
     }
 
-    public void testShouldHaveVersionZeroAfterDatasetImport() throws Exception {
-        Version[] versions = service.getVersions(dataset.getDatasetid());
-
-        assertNotNull("Should return versions of imported dataset", versions);
-        assertEquals(1, versions.length);
-
-        Version versionZero = versions[0];
-        assertEquals(0, versionZero.getVersion());
-        assertEquals(dataset.getDatasetid(), versionZero.getDatasetId());
-    }
-
-    public void testShouldDeriveVersionFromAFinalVersion() throws Exception {
-        Version[] versions = service.getVersions(dataset.getDatasetid());
-
-        Version versionZero = versions[0];
-        Version derived = service.derive(versionZero, "v 1");
-
-        assertNotNull("Should be able to derive from a Final version", derived);
-        assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
-        assertEquals(1, derived.getVersion());
-        assertEquals("0", derived.getPath());
-        assertFalse("Derived version should be non-final", derived.isFinalVersion());
-    }
-
-    public void testShouldBeAbleToMarkADerivedVersionAsFinal() throws Exception {
-        Version[] versions = service.getVersions(dataset.getDatasetid());
-        Version versionZero = versions[0];
-        Version derived = service.derive(versionZero, "v 1");
-        assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
-        assertEquals("v 1", derived.getName());
-
-        Version finalVersion = service.markFinal(derived);
-
-        assertNotNull("Should be able to mark a 'derived' as a Final version", derived);
-        assertEquals(derived.getDatasetId(), finalVersion.getDatasetId());
-        assertEquals(derived.getVersion(), finalVersion.getVersion());
-        assertEquals("0", finalVersion.getPath());
-        assertTrue("Derived version should be final on being marked 'final'", finalVersion.isFinalVersion());
-
-        Version[] updated = service.getVersions(dataset.getDatasetid());
-        assertEquals(2, updated.length);
-        assertEquals("v 1", updated[1].getName());
-        assertTrue("Derived version (loaded from db) should be final on being marked 'final'", updated[1]
-                .isFinalVersion());
-    }
-
-    public void testChangeSetWithNewRecordsResultsInNewVersion() throws Exception {
+    public void FIXME_testChangeSetWithNewRecordsResultsInNewVersion() throws Exception {
         Version[] versions = service.getVersions(dataset.getDatasetid());
 
         Version versionZero = versions[0];
@@ -215,46 +186,11 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         record7.setDatasetId((int) dataset.getDatasetid());
         changeset.addNew(record7);
 
-        EditToken token = new EditToken(versionOne, table);
-        service.openSession(token, 4);
+        EditToken token = editToken(versionOne, table);
+        EditToken locked = service.openSession(token, 4);
 
-        service.submit(token, changeset, 1);
-        service.save(token);
-
-        VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
-        int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName(), session).length;
-
-        VersionedRecord[] records = reader.fetchAll(versionOne, dataset.getName(), session);
-        assertEquals(versionZeroRecordsCount + 2, records.length);
-        int init = records[0].getRecordId();
-        for (int i = 1; i < records.length; i++) {
-            assertEquals(++init, records[i].getRecordId());
-        }
-    }
-
-    public void testShouldBeAbleToSubmitMultipleChangeSetsForSameVersion() throws Exception {
-        Version[] versions = service.getVersions(dataset.getDatasetid());
-
-        Version versionZero = versions[0];
-        Version versionOne = service.derive(versionZero, "v 1");
-
-        EditToken token = new EditToken(versionOne, table);
-
-        ChangeSet changeset1 = new ChangeSet();
-        changeset1.setVersion(versionOne);
-        VersionedRecord record6 = new VersionedRecord();
-        record6.setDatasetId((int) dataset.getDatasetid());
-        changeset1.addNew(record6);
-        service.submit(token, changeset1, 1);
-
-        ChangeSet changeset2 = new ChangeSet();
-        changeset2.setVersion(versionOne);
-        VersionedRecord record7 = new VersionedRecord();
-        record7.setDatasetId((int) dataset.getDatasetid());
-        changeset2.addNew(record7);
-        service.submit(token, changeset2, 1);
-
-        service.save(token);
+        service.submit(locked, changeset, 1);
+        service.save(locked);
 
         VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
         int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName(), session).length;
@@ -264,6 +200,45 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         int init = records[0].getRecordId();
         for (int i = 1; i < records.length; i++)
             assertEquals(++init, records[i].getRecordId());
+
+        service.closeSession(locked);
+    }
+
+    public void FIXME_testShouldBeAbleToSubmitMultipleChangeSetsForSameVersion() throws Exception {
+        Version[] versions = service.getVersions(dataset.getDatasetid());
+
+        Version versionZero = versions[0];
+        Version versionOne = service.derive(versionZero, "v 1");
+
+        EditToken token = editToken(versionOne, table);
+        EditToken locked = service.openSession(token, 4);
+
+        ChangeSet changeset1 = new ChangeSet();
+        changeset1.setVersion(versionOne);
+        VersionedRecord record6 = new VersionedRecord();
+        record6.setDatasetId((int) dataset.getDatasetid());
+        changeset1.addNew(record6);
+        service.submit(locked, changeset1, 1);
+
+        ChangeSet changeset2 = new ChangeSet();
+        changeset2.setVersion(versionOne);
+        VersionedRecord record7 = new VersionedRecord();
+        record7.setDatasetId((int) dataset.getDatasetid());
+        changeset2.addNew(record7);
+        service.submit(locked, changeset2, 1);
+
+        service.save(locked);
+
+        VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
+        int versionZeroRecordsCount = reader.fetchAll(versionZero, dataset.getName(), session).length;
+
+        VersionedRecord[] records = reader.fetchAll(versionOne, dataset.getName(), session);
+        assertEquals(versionZeroRecordsCount + 2, records.length);
+        int init = records[0].getRecordId();
+        for (int i = 1; i < records.length; i++)
+            assertEquals(++init, records[i].getRecordId());
+
+        service.closeSession(locked);
     }
 
     public void testShouldDiscardChangesOnDiscard() throws Exception {
@@ -272,7 +247,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionZero = versions[0];
         Version versionOne = service.derive(versionZero, "v 1");
 
-        EditToken token = new EditToken(versionOne, table);
+        EditToken token = editToken(versionOne, table);
 
         ChangeSet changeset1 = new ChangeSet();
         changeset1.setVersion(versionOne);
@@ -299,8 +274,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionZero = versions[0];
         Version versionOne = service.derive(versionZero, "v 1");
 
-        EditToken token = new EditToken(versionOne, table);
-        service.openSession(token, 4);
+        EditToken token = editToken(versionOne, table);
+        EditToken locked = service.openSession(token, 4);
         Page page = service.getPage(token, 1);
 
         ChangeSet changeset = new ChangeSet();
@@ -326,6 +301,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         for (int i = 0; i < page1Records.length; i++)
             assertEquals(page1Records[i].getRecordId(), records[i].getRecordId());
         assertEquals(record6.getRecordId(), records[records.length - 1].getRecordId());
+
+        service.closeSession(locked);
     }
 
     public void testShouldApplyChangeSetToPageOnRepeatFetchOfSamePage() throws Exception {
@@ -334,8 +311,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionZero = versions[0];
         Version versionOne = service.derive(versionZero, "v 1");
 
-        EditToken token = new EditToken(versionOne, table);
-        service.openSession(token, 4);
+        EditToken token = editToken(versionOne, table);
+        EditToken locked = service.openSession(token, 4);
 
         Page page = service.getPage(token, 1);
 
@@ -366,6 +343,8 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         for (int i = 3; i < page1Records.length; i++)
             assertEquals(page1Records[i].getRecordId(), records[i - 1].getRecordId());
         assertEquals(record6.getRecordId(), records[records.length - 1].getRecordId());
+
+        service.closeSession(locked);
     }
 
     public void testShouldApplyChangeSetToMultiplePages() throws Exception {
@@ -373,7 +352,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionZero = versions[0];
         Version versionOne = service.derive(versionZero, "v 1");
 
-        EditToken token = new EditToken(versionOne, table);
+        EditToken token = editToken(versionOne, table);
         service.openSession(token, 4);
 
         // page 1 changes
@@ -410,7 +389,7 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         Version versionZero = versions[0];
         Version versionOne = service.derive(versionZero, "v 1");
 
-        EditToken token = new EditToken(versionOne, table);
+        EditToken token = editToken(versionOne, table);
         service.openSession(token, 4);
 
         // page 1 changes
@@ -431,19 +410,4 @@ public abstract class DataEditorServiceTestCase extends ServicesTestCase {
         assertEquals(recordsBeforeSave + 1, service.getTotalRecords(token));
     }
 
-    public void testShouldMarkFinalAndRetrieveVersions() throws Exception {
-        Version[] versions = service.getVersions(dataset.getDatasetid());
-        Version versionZero = versions[0];
-        Version derived = service.derive(versionZero, "v 1");
-        assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
-        assertEquals("v 1", derived.getName());
-
-        Version finalVersion = service.markFinal(derived);
-        assertEquals(derived.getDatasetId(), finalVersion.getDatasetId());
-        assertEquals(derived.getVersion(), finalVersion.getVersion());
-
-        Version[] updatedVersions = service.getVersions(dataset.getDatasetid());
-        assertEquals(versionZero.getVersion(), updatedVersions[0].getVersion());
-        assertEquals(finalVersion.getVersion(), updatedVersions[1].getVersion());
-    }
 }

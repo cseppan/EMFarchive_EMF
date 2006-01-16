@@ -19,7 +19,6 @@ public class LockableVersions {
     public LockableVersions(Versions versions) {
         this.versions = versions;
         lockingScheme = new LockingScheme();
-
     }
 
     public Version obtainLocked(User owner, Version version, Session session) {

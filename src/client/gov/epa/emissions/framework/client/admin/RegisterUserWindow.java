@@ -25,8 +25,7 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView {
 
     protected void doClose() {
         RegisterUserPresenter presenter = view.getPresenter();
-        if (presenter != null)
-            onCancelStrategy.execute(presenter);
+        onCancelStrategy.execute(presenter);
     }
 
     public void observe(RegisterUserPresenter presenter) {
