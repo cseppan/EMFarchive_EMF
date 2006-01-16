@@ -49,17 +49,23 @@ public class TablePresenterDelegate {
     }
 
     public void doDisplay(int pageNumber) throws EmfException {
+        if(pageNumber() == pageNumber)
+            return;
+        
         page = service.getPage(editToken(), pageNumber);
 
         view.display(page);
     }
 
     public void doDisplayFirst() throws EmfException {
-        doDisplay(1);
+        if (pageNumber() != 1)
+            doDisplay(1);
     }
 
     public void doDisplayLast() throws EmfException {
-        doDisplay(pageCount());
+        int pageCount = pageCount();
+        if (pageNumber() != pageCount)
+            doDisplay(pageCount);
     }
 
     private int pageCount() throws EmfException {
