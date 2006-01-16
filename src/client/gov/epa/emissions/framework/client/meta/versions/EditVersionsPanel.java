@@ -74,6 +74,10 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         add(topPanel(dataset, versionsSet), BorderLayout.PAGE_START);
         add(tablePanel(versions), BorderLayout.CENTER);
         add(bottomPanel(sources), BorderLayout.PAGE_END);
+        if (dataset.getInternalSources().length == 0)
+        {
+            displayError("Versions cannot be edited for external files.");
+        }
     }
 
     private JPanel topPanel(final EmfDataset dataset, VersionsSet versionsSet) {
@@ -177,18 +181,27 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     private JPanel leftControlPanel() {
         JPanel panel = new JPanel();
 
-        Button view = new Button("New", new AbstractAction() {
+        Button newButton = new Button("New", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doNew(tableData.getValues());
             }
         });
-        panel.add(view);
-
+        newButton.setToolTipText("Create a new version");
+        panel.add(newButton);
+        if (dataset.getInternalSources().length == 0)
+        {
+            newButton.setEnabled(false);
+        }
         Button markFinal = new Button("Mark Final", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doMarkFinal(tableData.selected());
             }
         });
+        markFinal.setToolTipText("Mark the selected versions as final so that no more edits can be made");
+        if (dataset.getInternalSources().length == 0)
+        {
+            markFinal.setEnabled(false);
+        }
         panel.add(markFinal);
 
         return panel;
@@ -204,7 +217,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             try {
                 presenter.doNew(dialog.version(), dialog.name());
             } catch (EmfException e) {
-                displayError("Could not create new Version: " + dialog.name() + ". Reason: " + e.getMessage());
+                displayError("Could not create new version: " + dialog.name() + ". Reason: " + e.getMessage());
             }
         }
     }
@@ -215,7 +228,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         try {
             presenter.doMarkFinal(versions);
         } catch (EmfException e) {
-            displayError("Could not mark Final. Reason: " + e.getMessage());
+            displayError("Could not mark as final. Reason: " + e.getMessage());
         }
     }
 
@@ -235,6 +248,11 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
                 doView(tableCombo);
             }
         });
+        view.setToolTipText("View the specified table for the selected versions");
+        if (dataset.getInternalSources().length == 0)
+        {
+            view.setEnabled(false);
+        }
         panel.add(view);
 
         Button edit = new Button("Edit", new AbstractAction() {
@@ -242,6 +260,11 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
                 doEdit(tableCombo);
             }
         });
+        edit.setToolTipText("Edit the specified table for the selected versions");
+        if (dataset.getInternalSources().length == 0)
+        {
+            edit.setEnabled(false);
+        }
         panel.add(edit);
 
         return panel;
@@ -253,7 +276,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         String table = (String) tableCombo.getSelectedItem();
         Version[] versions = tableData.selected();
         if (versions.length < 1) {
-            displayError("Please select at least one Version");
+            displayError("Please select at least one version");
             return;
         }
 
@@ -265,9 +288,12 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         NonEditableDataViewWindow view = new NonEditableDataViewWindow(dataset);
         parentConsole.addToDesktop(view);
         try {
-            presenter.doView(version, table, view);
+            if (dataset.getInternalSources().length > 0)
+               presenter.doView(version, table, view);
+            else
+               displayError("Could not open viewer. Reason: This is an external file.");
         } catch (EmfException e) {
-            displayError("Could not open Viewer. Reason: " + e.getMessage());
+            displayError("Could not open viewer. Reason: " + e.getMessage());
         }
     }
 
@@ -286,7 +312,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         String table = (String) tableCombo.getSelectedItem();
         Version[] versions = tableData.selected();
         if (versions.length != 1) {
-            displayError("Please select one Version");
+            displayError("Please select one version");
             return;
         }
 
@@ -297,9 +323,12 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         EditableDataViewWindow view = new EditableDataViewWindow(dataset);
         parentConsole.addToDesktop(view);
         try {
-            presenter.doEdit(version, table, view);
+            if (dataset.getInternalSources().length > 0)
+               presenter.doEdit(version, table, view);
+            else
+                displayError("Could not open editor. Reason: This is an external file.");
         } catch (EmfException e) {
-            displayError("Could not open Editor. Reason: " + e.getMessage());
+            displayError("Could not open editor. Reason: " + e.getMessage());
         }
     }
 
