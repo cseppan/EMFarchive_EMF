@@ -8,16 +8,21 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EditToken;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Dimensions;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class EditableDataViewWindow extends DisposableInteralFrame implements EditableDataView {
@@ -220,6 +225,19 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
         }
 
         super.close();
+    }
+
+    public void notifyLockFailure(EditToken token) {
+        Version version = token.getVersion();
+        String message = "Cannot edit Version: " + version.getName() + "(" + version.getVersion() + ") of Dataset: "
+                + dataset.getName() + " since it is locked by " + version.getLockOwner() + " at "
+                + format(version.getLockDate());
+        JOptionPane.showMessageDialog(this, message);
+    }
+
+    private String format(Date lockDate) {
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+        return dateFormat.format(lockDate);
     }
 
 }

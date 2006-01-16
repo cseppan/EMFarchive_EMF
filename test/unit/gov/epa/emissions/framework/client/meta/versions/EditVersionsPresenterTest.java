@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.editor.EditableDataViewPresenter;
 import gov.epa.emissions.framework.client.editor.NonEditableDataView;
 import gov.epa.emissions.framework.client.editor.NonEditableDataViewPresenter;
 import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EditToken;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.jmock.Mock;
@@ -38,7 +39,7 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         String table = "table";
 
         Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("openSession").withAnyArguments();
+        service.expects(once()).method("openSession").withAnyArguments().will(returnValue(token()));
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
         Mock dataView = mock(EditableDataView.class);
@@ -50,6 +51,13 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
 
         EditVersionsPresenter presenter = new EditVersionsPresenter(null, (EmfSession) session.proxy(), serviceProxy);
         presenter.doEdit(version, table, (EditableDataView) dataView.proxy());
+    }
+
+    private EditToken token() {
+        Mock mock = mock(EditToken.class);
+        mock.stubs().method("isLocked").will(returnValue(Boolean.TRUE));
+
+        return (EditToken) mock.proxy();
     }
 
     public void testShouldRaiseErrorOnEditWhenVersionIsFinal() throws Exception {

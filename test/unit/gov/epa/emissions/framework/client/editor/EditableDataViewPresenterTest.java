@@ -23,7 +23,8 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
 
         Mock service = mock(DataEditorService.class);
         Constraint constraint = tokenConstraint(version, table);
-        service.expects(once()).method("openSession").with(constraint);
+        EditToken token = token();
+        service.expects(once()).method("openSession").with(constraint).will(returnValue(token));
 
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
@@ -40,27 +41,11 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
         p.display();
     }
 
-    public void testShouldNotifyViewOfFailureIfOpeningSessionFailsDueToLockFailureOnDisplay() throws Exception {
-        Version version = new Version();
-        String table = "table";
+    private EditToken token() {
+        Mock mock = mock(EditToken.class);
+        mock.stubs().method("isLocked").will(returnValue(Boolean.TRUE));
 
-        Mock service = mock(DataEditorService.class);
-        Constraint constraint = tokenConstraint(version, table);
-        service.expects(once()).method("openSession").with(constraint);
-
-        DataEditorService serviceProxy = (DataEditorService) service.proxy();
-
-        Mock view = mock(EditableDataView.class);
-        view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
-
-        Mock session = mock(EmfSession.class);
-        session.stubs().method("user").withNoArguments().will(returnValue(null));
-
-        EditableDataViewPresenter p = new EditableDataViewPresenter((EmfSession) session.proxy(), version, table,
-                (EditableDataView) view.proxy(), serviceProxy);
-        view.expects(once()).method("observe").with(same(p));
-
-        p.display();
+        return (EditToken) mock.proxy();
     }
 
     public void testShouldCloseViewAndCloseDataEditSessionOnClose() throws Exception {
@@ -79,7 +64,8 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
         Version version = new Version();
         String table = "table";
 
-        service.expects(once()).method("openSession").with(new IsInstanceOf(EditToken.class));
+        EditToken token = token();
+        service.expects(once()).method("openSession").with(new IsInstanceOf(EditToken.class)).will(returnValue(token));
 
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(null));

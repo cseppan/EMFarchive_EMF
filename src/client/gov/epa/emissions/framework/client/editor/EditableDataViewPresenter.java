@@ -34,7 +34,12 @@ public class EditableDataViewPresenter {
         token = new EditToken(version, table);
         token.setUser(session.user());
         
-        service.openSession(token);
+        token = service.openSession(token);
+        if(!token.isLocked(session.user())) {
+            view.notifyLockFailure(token);
+            return;
+        }
+            
         view.observe(this);
         view.display(version, table, service);
     }

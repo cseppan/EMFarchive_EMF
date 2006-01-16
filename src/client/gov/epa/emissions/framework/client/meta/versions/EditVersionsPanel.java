@@ -74,8 +74,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         add(topPanel(dataset, versionsSet), BorderLayout.PAGE_START);
         add(tablePanel(versions), BorderLayout.CENTER);
         add(bottomPanel(sources), BorderLayout.PAGE_END);
-        if (dataset.getInternalSources().length == 0)
-        {
+        if (dataset.getInternalSources().length == 0) {
             displayError("Versions cannot be edited for external files.");
         }
     }
@@ -188,8 +187,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         });
         newButton.setToolTipText("Create a new version");
         panel.add(newButton);
-        if (dataset.getInternalSources().length == 0)
-        {
+        if (dataset.getInternalSources().length == 0) {
             newButton.setEnabled(false);
         }
         Button markFinal = new Button("Mark Final", new AbstractAction() {
@@ -198,8 +196,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             }
         });
         markFinal.setToolTipText("Mark the selected versions as final so that no more edits can be made");
-        if (dataset.getInternalSources().length == 0)
-        {
+        if (dataset.getInternalSources().length == 0) {
             markFinal.setEnabled(false);
         }
         panel.add(markFinal);
@@ -243,31 +240,39 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         tableCombo.setEditable(false);
         panel.add(tableCombo);
 
+        Button view = viewButton(tableCombo);
+        if (dataset.getInternalSources().length == 0) {
+            view.setEnabled(false);
+        }
+        panel.add(view);
+
+        Button edit = editButton(tableCombo);
+        if (dataset.getInternalSources().length == 0) {
+            edit.setEnabled(false);
+        }
+        panel.add(edit);
+
+        return panel;
+    }
+
+    private Button viewButton(final JComboBox tableCombo) {
         Button view = new Button("View", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doView(tableCombo);
             }
         });
         view.setToolTipText("View the specified table for the selected versions");
-        if (dataset.getInternalSources().length == 0)
-        {
-            view.setEnabled(false);
-        }
-        panel.add(view);
+        return view;
+    }
 
+    private Button editButton(final JComboBox tableCombo) {
         Button edit = new Button("Edit", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit(tableCombo);
             }
         });
         edit.setToolTipText("Edit the specified table for the selected versions");
-        if (dataset.getInternalSources().length == 0)
-        {
-            edit.setEnabled(false);
-        }
-        panel.add(edit);
-
-        return panel;
+        return edit;
     }
 
     private void doView(final JComboBox tableCombo) {
@@ -289,9 +294,9 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         parentConsole.addToDesktop(view);
         try {
             if (dataset.getInternalSources().length > 0)
-               presenter.doView(version, table, view);
+                presenter.doView(version, table, view);
             else
-               displayError("Could not open viewer. Reason: This is an external file.");
+                displayError("Could not open viewer. Reason: This is an external file.");
         } catch (EmfException e) {
             displayError("Could not open viewer. Reason: " + e.getMessage());
         }
@@ -324,7 +329,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         parentConsole.addToDesktop(view);
         try {
             if (dataset.getInternalSources().length > 0)
-               presenter.doEdit(version, table, view);
+                presenter.doEdit(version, table, view);
             else
                 displayError("Could not open editor. Reason: This is an external file.");
         } catch (EmfException e) {
