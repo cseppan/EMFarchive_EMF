@@ -34,14 +34,14 @@ public class PropertiesViewWindow extends DisposableInteralFrame implements Prop
     private EmfSession session;
 
     public PropertiesViewWindow(EmfSession session, EmfConsole parentConsole) {
-        super("Properties View", new Dimension(700, 500));
+        super("Dataset Properties View", new Dimension(700, 500));
         this.session = session;
         this.parentConsole = parentConsole;
     }
 
     public void display(EmfDataset dataset) {
-        super.setTitle("Properties View: " + dataset.getName());
-        super.setName("Properties View: " + dataset.getName());
+        super.setTitle("Dataset Properties View: " + dataset.getName());
+        super.setName("Dataset Properties View: " + dataset.getName());
 
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
@@ -62,7 +62,7 @@ public class PropertiesViewWindow extends DisposableInteralFrame implements Prop
         tabbedPane.addTab("Data", createDataTab(dataset, parentConsole));
         tabbedPane.addTab("Keywords", createKeywordsTab());
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
-        tabbedPane.addTab("Info", createInfoTab(dataset, parentConsole));
+        tabbedPane.addTab("Tables", createInfoTab(dataset, parentConsole));
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 

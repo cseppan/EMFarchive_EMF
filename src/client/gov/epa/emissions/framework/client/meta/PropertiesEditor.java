@@ -37,7 +37,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
     private EmfSession session;
 
     public PropertiesEditor(EmfSession session, EmfConsole parentConsole) {
-        super("Properties Editor", new Dimension(700, 550));
+        super("Dataset Properties Editor", new Dimension(700, 550));
         this.session = session;
         this.parentConsole = parentConsole;
     }
@@ -49,7 +49,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         tabbedPane.addTab("Summary", createSummaryTab(dataset, messagePanel));
         tabbedPane.addTab("Keywords", createKeywordsTab());
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
-        tabbedPane.addTab("Info", createInfoTab(dataset, parentConsole));
+        tabbedPane.addTab("Tables", createInfoTab(dataset, parentConsole));
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -109,8 +109,8 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
     }
 
     public void display(EmfDataset dataset) {
-        super.setTitle("Properties Editor: " + dataset.getName());
-        super.setName("Properties Editor: " + dataset.getName());
+        super.setTitle("Dataset Properties Editor: " + dataset.getName());
+        super.setName("Dataset Properties Editor: " + dataset.getName());
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 
