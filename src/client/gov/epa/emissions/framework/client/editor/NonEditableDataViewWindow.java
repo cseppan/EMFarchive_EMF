@@ -80,7 +80,7 @@ public class NonEditableDataViewWindow extends DisposableInteralFrame implements
     }
 
     private void updateTitle(Version version, String table) {
-        super.setTitle(super.getTitle() + " - " + version.getName() + " - " + table);
+        super.setTitle(super.getTitle() + " / " + version.getName() + " / " + table);
         labelPanel.add(new JLabel("    Version:    " + version.getName()));
         labelPanel.add(new JLabel("    Table:       " + table));
     }

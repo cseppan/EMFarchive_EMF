@@ -42,7 +42,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
     private String table;
 
     public EditableDataViewWindow(EmfDataset dataset) {
-        super("Dataset Editor - Dataset: " + dataset.getName());
+        super("Data Editor: " + dataset.getName());
         setDimension();
         this.dataset = dataset;
 
@@ -90,7 +90,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
     }
 
     private void updateTitle(Version version, String table) {
-        super.setTitle(super.getTitle() + ". Version: " + version.getName() + ". Table: " + table);
+        super.setTitle(super.getTitle() + " / " + version.getName() + " / " + table);
         labelPanel.add(new JLabel("    Version:    " + version.getName()));
         labelPanel.add(new JLabel("    Table:       " + table));
     }
