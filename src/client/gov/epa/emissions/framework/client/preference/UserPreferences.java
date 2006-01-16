@@ -33,22 +33,19 @@ public class UserPreferences extends Properties {
 
     private void loadProperties() throws EmfException {
         File file = new File(getPropertyFile(EMF_PREFERENCE));
+        if(!file.exists())
+            file = new File(System.getProperty("user.home"), "EMFPrefs.txt");
         try {
             FileInputStream inStream = new FileInputStream(file);
             load(inStream);
         } catch (Exception e) {
+            log.error("Cannot load user preferences file.");
             throw new EmfException("Cannot load user preferences file.");
         }
     }
 
     private String getPropertyFile(String property) {
-        String fileName = System.getProperty(property);
-        if (fileName == null)
-        {
-            log.error("The specified user preferences file '" + fileName + "' does not exist.");
-            fileName="C:\\EMFPrefs.txt";
-        }
-        return fileName.trim();
+        return System.getProperty(property);
     }
 
     public boolean checkFile(String fileName) {

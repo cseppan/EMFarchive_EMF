@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
 
+import java.io.File;
 import java.util.Date;
 
 public class DefaultExportPresenter implements ExportPresenter {
@@ -24,7 +25,13 @@ public class DefaultExportPresenter implements ExportPresenter {
     public void display(ExportView view) {
         this.view = view;
         view.observe(this);
-        view.setMostRecentUsedFolder(getDefaultBaseFolder());
+        String defaultBaseFolder = "";
+        try {
+            defaultBaseFolder= getDefaultBaseFolder();
+        } catch (EmfException e) {
+            System.err.println(e.getMessage());
+        }
+        view.setMostRecentUsedFolder(defaultBaseFolder);
 
         view.display();
     }
@@ -54,14 +61,23 @@ public class DefaultExportPresenter implements ExportPresenter {
 //        return session.getMostRecentExportFolder();
 //    }
     
-    private String getDefaultBaseFolder() {
-        return session.preferences().getOutputDir();
+    private String getDefaultBaseFolder() throws EmfException {
+        return validateDir(session.preferences().getOutputDir());
     }
     
-    private String translateToServerDir(String dir) {
+    private String translateToServerDir(String dir) throws EmfException {
         if(dir.equalsIgnoreCase(getDefaultBaseFolder()))
             return session.preferences().getServerOutputDir();
         
+        return dir;
+    }
+    
+    private String validateDir(String dir) throws EmfException {
+        File tempDir = new File(dir);
+        if (!tempDir.isDirectory()) {
+            throw new EmfException("Invalid Directory Picked Up.");
+        }
+
         return dir;
     }
 }

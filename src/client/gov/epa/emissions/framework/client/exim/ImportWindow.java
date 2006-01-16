@@ -128,6 +128,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         enableAll();
         if(box.isSelected()) {
             name.setEnabled(false);
+            name.setVisible(false);
             checkMinFiles();
         }             
     }
@@ -145,6 +146,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private void enableAll(){
         messagePanel.clear();
         name.setEnabled(true);
+        name.setVisible(true);
         folder.setEnabled(true);
         filename.setEnabled(true);
     }

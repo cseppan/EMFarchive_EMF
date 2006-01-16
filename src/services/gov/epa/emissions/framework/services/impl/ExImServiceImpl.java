@@ -142,8 +142,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             threadPool.execute(eximTask);
         } catch (Exception e) {
             log.error("Exception attempting to start import of file: " + fileName, e);
-            String message = "Import failed - Dataset Type does not match file type";
-            throw new EmfException(message);
+            throw new EmfException("Failed import file: " + e.getMessage());
         }
 
         log.debug("In ExImServicesImpl:startImport END");
