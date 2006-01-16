@@ -52,7 +52,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private JCheckBox box;
     
     public ImportWindow(DataCommonsService service, JDesktopPane desktop) throws EmfException {
-        super("Import Dataset", new Dimension(700, 275), desktop);
+        super("Import Dataset", new Dimension(650, 300), desktop);
         super.setName("importWindow");
         this.service = service;
 
@@ -81,10 +81,12 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         datasetTypesModel = new DefaultComboBoxModel(allTypesWithMessage);
         JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
         datasetTypesComboBox.setName("datasetTypes");
-        layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesPanel(datasetTypesComboBox), panel);
-
-        name = new TextField("name", 35);
-        layoutGenerator.addLabelWidgetPair("Dataset Name", name, panel);
+        layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesComboBox, panel);
+        datasetTypesComboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boxChecked();
+            }
+        });
 
         JPanel chooser = new JPanel(new BorderLayout());
         folder = new TextField("folder", 35);
@@ -95,9 +97,20 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         filename = new TextField("filename", 35);
         layoutGenerator.addLabelWidgetPair("Filename", filename, panel);
 
+        name = new TextField("name", 35);
+        layoutGenerator.addLabelWidgetPair("Dataset Name", name, panel);
+
+        box = new JCheckBox("Create Multiple Datasets");
+        box.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent event) {
+                boxChecked();
+            }
+        });
+        layoutGenerator.addLabelWidgetPair("", box, panel);
+
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
-                5, 5, // initialX, initialY
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+                20, 0, // initialX, initialY
                 10, 10);// xPad, yPad
 
         registerForEditEvents(name, folder, filename);// edit-awareness
@@ -105,24 +118,24 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         return panel;
     }
     
-    private JPanel datasetTypesPanel(JComboBox cb) {
-        JPanel panel = new JPanel(new FlowLayout());
-        cb.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                boxChecked();
-            }
-        });
-        panel.add(cb);
-        box = new JCheckBox("Create Multiple Datasets");
-        box.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent event) {
-                boxChecked();
-            }
-        });
-        panel.add(box);
-        
-        return panel;
-    }
+//    private JPanel datasetTypesPanel(JComboBox cb) {
+//        JPanel panel = new JPanel(new FlowLayout());
+//        cb.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                boxChecked();
+//            }
+//        });
+//        panel.add(cb);
+//        box = new JCheckBox("Create Multiple Datasets");
+//        box.addActionListener(new ActionListener(){
+//            public void actionPerformed(ActionEvent event) {
+//                boxChecked();
+//            }
+//        });
+//        panel.add(box);
+//        
+//        return panel;
+//    }
     
     private void boxChecked() {
         enableAll();
