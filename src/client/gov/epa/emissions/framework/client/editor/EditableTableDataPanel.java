@@ -93,22 +93,24 @@ public class EditableTableDataPanel extends JPanel {
     private JPanel buttonsPanel(final SelectableEmfTableData tableData) {
         JPanel container = new JPanel();
 
-        Button add = new Button("Add", new AbstractAction() {
+        Button add = new Button("Add Row", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doAdd(tableData);
             }
         });
         container.add(add);
+        add.setToolTipText("Add a row to this table");
 
-        Button remove = new Button("Remove", new AbstractAction() {
+        Button remove = new Button("Remove Rows", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doRemove(tableData);
             }
         });
         container.add(remove);
+        remove.setToolTipText("Remove the selected rows from this table");
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(container, BorderLayout.LINE_END);
+        panel.add(container, BorderLayout.WEST);
 
         return panel;
     }
