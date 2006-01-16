@@ -38,13 +38,13 @@ insert into emf.dataset_types values(3,'ORL Onroad Inventory (MBINV)','ORL Onroa
 insert into emf.dataset_types values(4,'ORL Point Inventory (PTINV)','ORL Point Inventory (PTINV)', '1', '1', false, 'gov.epa.emissions.commons.io.orl.ORLPointImporter', 'gov.epa.emissions.commons.io.orl.ORLPointExporter');
 insert into emf.dataset_types values(5,'Shapefile','Shapefile', '3', '-1', true, 'gov.epa.emissions.commons.io.external.ShapeFilesImporter', '');
 insert into emf.dataset_types values(6,'External File','External File', '1', '-1', true, 'gov.epa.emissions.commons.io.external.ExternalFilesImporter', '');
-insert into emf.dataset_types values(7,'Meteorology File (MET/RADLIST)','Meteorology File (MET/RADLIST)', '1', '-1', true, 'gov.epa.emissions.commons.io.external.MeteorologyFilesImporter', '');
+insert into emf.dataset_types values(7,'Meteorology File','Meteorology File', '1', '-1', true, 'gov.epa.emissions.commons.io.external.MeteorologyFilesImporter', '');
 insert into emf.dataset_types values(8,'Model Ready Emissions File','Model Ready Emissions', '1', '-1',true, 'gov.epa.emissions.commons.io.external.ModelReadyEmissionsFilesImporter', '');
 insert into emf.dataset_types values(9,'Temporal Cross Reference (A/M/PTREF)','Temporal Cross Reference (A/M/PTREF)', '1', '1',false, 'gov.epa.emissions.commons.io.temporal.TemporalReferenceImporter', 'gov.epa.emissions.commons.io.temporal.TemporalReferenceExporter');
 insert into emf.dataset_types values(10,'Temporal Profile (A/M/PTPRO)','Temporal Profile (A/M/PTPRO)', '1', '1',false, 'gov.epa.emissions.commons.io.temporal.TemporalProfileImporter', 'gov.epa.emissions.commons.io.temporal.TemporalProfileExporter');
 insert into emf.dataset_types values(11,'Comma Separated Values (CSV)','Comma Separated Values (CSV)', '1', '1', false, 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 insert into emf.dataset_types values(12,'Text file (Line-based)','Text file (Line-based)', '1', '1', false, 'gov.epa.emissions.commons.io.generic.LineImporter', 'gov.epa.emissions.commons.io.generic.LineExporter');
-insert into emf.dataset_types values(13,'CEM Hour-Specific Point Inventory (PTHOUR)','CEM Hour-Specific Point Inventory (PTHOUR)', '1', '1', false, 'gov.epa.emissions.commons.io.other.CEMHourSpecInventFileFormat', 'gov.epa.emissions.commons.io.other.CEMHourSpecInventoryExporter');
+insert into emf.dataset_types values(13,'CEM Hour-Specific Point Inventory (PTHOUR)','CEM Hour-Specific Point Inventory (PTHOUR)', '1', '1', false, 'gov.epa.emissions.commons.io.other.CEMHourSpecInventoryImporter', 'gov.epa.emissions.commons.io.other.CEMHourSpecInventoryExporter');
 insert into emf.dataset_types values(14,'Country, state, and county names and data (COSTCY)','Country, state, and county names and data (COSTCY)', '1', '1', false, 'gov.epa.emissions.commons.io.other.CountryStateCountyDataImporter', 'gov.epa.emissions.commons.io.other.CountryStateCountyDataExporter');
 insert into emf.dataset_types values(15,'Day-Specific Point Inventory (PTDAY)','Day-Specific Point Inventory (PTDAY)', '1', '1', false, 'gov.epa.emissions.commons.io.other.DaySpecPointInventoryImporter', 'gov.epa.emissions.commons.io.other.DaySpecPointInventoryExporter');
 insert into emf.dataset_types values(16,'Inventory Table Data (INVTABLE)','Inventory Table Data (INVTABLE)', '1', '1', false, 'gov.epa.emissions.commons.io.other.InventoryTableImporter', 'gov.epa.emissions.commons.io.other.InventoryTableExporter');
@@ -63,6 +63,11 @@ insert into emf.dataset_types values(28,'IDA Activity','IDA Activity', '1', '1',
 insert into emf.dataset_types values(29,'IDA Mobile','IDA Mobile', '1', '1', false, 'gov.epa.emissions.commons.io.ida.IDAMobileImporter', '');
 insert into emf.dataset_types values(30,'IDA Area','IDA Area', '1', '1', false, 'gov.epa.emissions.commons.io.ida.IDANonPointNonRoadImporter', '');
 insert into emf.dataset_types values(31,'IDA Point','IDA Point', '1', '1', false, 'gov.epa.emissions.commons.io.ida.IDAPointImporter', '');
+insert into emf.dataset_types values(32,'Shapefile Catalog (CSV)','Shapefile Catalog (CSV)','1', '1', false, 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
+insert into emf.dataset_types values(33,'Surrogate Tool Control Variables (CSV)','Surrogate Tool Control Variables (CSV)','1', '1', false, 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
+insert into emf.dataset_types values(34,'Surrogate Specifications (CSV)','Surrogate Specifications (CSV)','1', '1', false, 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
+insert into emf.dataset_types values(35,'Surrogate Tool Generation Controls (CSV)','Surrogate Tool Generation Controls (CSV)','1', '1', false, 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
+insert into emf.dataset_types values(36,'Surrogate Code Mapping (CSV)','Surrogate Code Mapping (CSV)','1', '1', false, 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
 
 -- emf.dataset_types
 --
