@@ -184,15 +184,13 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         return dateFormat.format(lockDate);
     }
 
-    public void close() {
+    public void windowClosing() {
         try {
             presenter.doClose();
         } catch (EmfException e) {
             showError("Could not close. Reason - " + e.getMessage());
             return;
         }
-
-        super.close();
     }
 
 }

@@ -34,7 +34,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
         JPanel container = new JPanel();
         panel = createLayout(adminOption);
         container.add(panel);
-        
+
         super.getContentPane().add(container);
         super.dimensions(panel.getSize());
         super.setResizable(false);
@@ -66,8 +66,8 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
 
     private EditableUserProfilePanel createUserProfilePanel(Widget username, Action saveAction, Action closeAction,
             AdminOption adminOption) {
-        EditableUserProfilePanel panel = new EditableUserProfilePanel(user, username, saveAction, closeAction, adminOption,
-                new PopulateUserOnUpdateStrategy(user));
+        EditableUserProfilePanel panel = new EditableUserProfilePanel(user, username, saveAction, closeAction,
+                adminOption, new PopulateUserOnUpdateStrategy(user));
 
         panel.addEditListener(new KeyAdapter() {
             public void keyTyped(KeyEvent event) {

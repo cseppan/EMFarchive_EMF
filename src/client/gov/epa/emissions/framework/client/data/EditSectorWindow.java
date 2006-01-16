@@ -133,7 +133,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
         return action;
     }
 
-    public void close() {
+    public void windowClosing() {
         try {
             presenter.doClose();
         } catch (EmfException e) {

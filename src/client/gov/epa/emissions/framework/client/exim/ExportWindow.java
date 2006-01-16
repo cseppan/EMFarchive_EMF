@@ -59,10 +59,6 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         this.presenter = presenter;
     }
 
-    public void close() {
-        this.dispose();
-    }
-
     private JPanel createLayout() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));

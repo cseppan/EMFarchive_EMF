@@ -211,7 +211,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
         displayTable(table);
     }
 
-    public void close() {
+    public void windowClosing() {
         try {
             doClose();
         } catch (EmfException e) {

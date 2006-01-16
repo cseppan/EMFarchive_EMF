@@ -32,4 +32,8 @@ public class ViewMyProfileWindow extends ViewUserWindow {
             desktop.add(this);
         }
     }
+
+    public void windowClosing() {
+        close();
+    }
 }

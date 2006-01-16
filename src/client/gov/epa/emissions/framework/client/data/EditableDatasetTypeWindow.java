@@ -131,7 +131,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         return action;
     }
 
-    public void close() {
+    public void windowClosing() {
         try {
             presenter.doClose();
         } catch (EmfException e) {

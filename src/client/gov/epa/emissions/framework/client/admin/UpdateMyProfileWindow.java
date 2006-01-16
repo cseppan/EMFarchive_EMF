@@ -36,4 +36,8 @@ public class UpdateMyProfileWindow extends UpdateUserWindow {
             desktop.add(this);
         }
     }
+
+    public void windowClosing() {
+        close();
+    }
 }

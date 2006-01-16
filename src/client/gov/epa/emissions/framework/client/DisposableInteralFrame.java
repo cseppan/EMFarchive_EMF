@@ -12,7 +12,11 @@ public abstract class DisposableInteralFrame extends EmfInternalFrame {
         super(title, dimension);
     }
 
-    public void close() {
+    public void windowClosing() {
+        close();
+    }
+
+    final public void close() {
         super.dispose();
     }
 

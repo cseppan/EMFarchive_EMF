@@ -20,6 +20,10 @@ public abstract class ReusableInteralFrame extends EmfInternalFrame {
         this.desktop = desktop;
     }
 
+    public void windowClosing() {
+        close();
+    }
+
     public void close() {
         super.setVisible(false);
     }

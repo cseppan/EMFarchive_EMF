@@ -19,14 +19,14 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
                 true);// iconifiable
 
         this.addInternalFrameListener(new InternalFrameAdapter() {
-            public void internalFrameClosing(InternalFrameEvent arg0) {
-                close();
-                super.internalFrameClosing(arg0);
+            public void internalFrameClosing(InternalFrameEvent event) {
+                windowClosing();
+                super.internalFrameClosing(event);
             }
         });
     }
 
-    abstract public void close();
+    abstract public void windowClosing();
 
     public EmfInternalFrame(String title, Dimension dimension) {
         this(title);
