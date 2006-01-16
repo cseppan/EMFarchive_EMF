@@ -135,7 +135,11 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
     private Button closeButton() {
         Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                doClose();
+                try {
+                    doClose();
+                } catch (EmfException e) {
+                    displayError("Could not Close. Reason: " + e.getMessage());
+                }
             }
         });
         close.setToolTipText("Close without Saving your changes");
@@ -190,13 +194,9 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
         refreshLayout();
     }
 
-    private void doClose() {
+    private void doClose() throws EmfException {
         clearMessages();
-        try {
-            presenter.doClose();
-        } catch (EmfException e) {
-            displayError("Could not Close. Reason: " + e.getMessage());
-        }
+        presenter.doClose();
     }
 
     private void doDiscard() {
@@ -209,6 +209,17 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
         }
 
         displayTable(table);
+    }
+
+    public void close() {
+        try {
+            doClose();
+        } catch (EmfException e) {
+            displayError("Could not Close. Reason: " + e.getMessage());
+            return;
+        }
+
+        super.close();
     }
 
 }

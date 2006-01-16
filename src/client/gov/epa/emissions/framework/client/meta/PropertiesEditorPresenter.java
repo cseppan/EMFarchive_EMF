@@ -8,7 +8,7 @@ public interface PropertiesEditorPresenter {
 
     void doDisplay(PropertiesEditorView view) throws EmfException;
 
-    void doClose();
+    void doClose() throws EmfException;
 
     void doSave();
 

@@ -144,7 +144,11 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
         Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                presenter.doClose();
+                try {
+                    presenter.doClose();
+                } catch (EmfException e) {
+                    showError("Could not close. Reason - " + e.getMessage());
+                }
             }
         });
         getRootPane().setDefaultButton(close);
@@ -178,6 +182,17 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
     private String format(Date lockDate) {
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
         return dateFormat.format(lockDate);
+    }
+
+    public void close() {
+        try {
+            presenter.doClose();
+        } catch (EmfException e) {
+            showError("Could not close. Reason - " + e.getMessage());
+            return;
+        }
+
+        super.close();
     }
 
 }

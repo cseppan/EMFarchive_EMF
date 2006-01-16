@@ -48,15 +48,16 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         view.display(dataset);
     }
 
-    public void doClose() {
+    public void doClose() throws EmfException {
         if (unsavedChanges && !view.shouldContinueLosingUnsavedChanges())
             return;
 
+        dataService().releaseLockedDataset(dataset);
         view.close();
     }
 
     public void doSave() {
-        DataService service = serviceLocator.dataService();
+        DataService service = dataService();
         try {
             updateDataset(service, summaryPresenter, keywordsPresenter);
         } catch (EmfException e) {
@@ -65,7 +66,11 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         }
 
         clearChanges();
-        doClose();
+        view.close();
+    }
+
+    private DataService dataService() {
+        return serviceLocator.dataService();
     }
 
     void updateDataset(DataService service, EditableSummaryTabPresenter summary, EditableKeywordsTabPresenter keywords)

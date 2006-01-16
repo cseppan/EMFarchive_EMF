@@ -56,9 +56,10 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         presenter = new PropertiesEditorPresenterImpl(dataset, (ServiceLocator) locator.proxy(), null);
     }
 
-    public void testShouldCloseViewOnNotifyClose() throws Exception {
+    public void testShouldCloseViewAndReleaseLockOnNotifyClose() throws Exception {
         displayPresenter();
         view.expects(once()).method("close");
+        dataService.expects(once()).method("releaseLockedDataset").with(same(dataset)).will(returnValue(dataset));
 
         presenter.doClose();
     }
@@ -136,6 +137,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         presenter.onChange();
         view.expects(once()).method("shouldContinueLosingUnsavedChanges").withNoArguments().will(
                 returnValue(Boolean.TRUE));
+        dataService.expects(once()).method("releaseLockedDataset").with(same(dataset)).will(returnValue(dataset));
 
         presenter.doClose();
     }
