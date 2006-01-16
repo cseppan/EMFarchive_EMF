@@ -20,10 +20,11 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+//import java.awt.event.MouseAdapter;
+//import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -149,24 +150,20 @@ public class LoginWindow extends EmfFrame implements LoginView {
 
     private JPanel createLoginOptionsPanel() {
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(new BorderLayout());
 
-        JLabel forgotPassword = new JLabel("    Forgot your Password?");
+        JButton forgotPassword = new JButton("Reset Password");
         forgotPassword.setEnabled(false);
-        forgotPassword.setToolTipText("To be implemented");
+        forgotPassword.setToolTipText("Not yet implemented");
         JPanel forgotPasswordPanel = new JPanel(new BorderLayout());
         forgotPasswordPanel.add(forgotPassword);
 
-        panel.add(forgotPasswordPanel);
-
-        JLabel register = new JLabel("<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Not yet registered ?</a></html>");
-        register.setName("registerUser");
-        register.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent arg0) {
+        JButton register = new Button("Register New User", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
                 try {
                     launchRegisterUser();
-                } catch (Exception e) {
-                    messagePanel.setError(e.getMessage());
+                } catch (Exception exc) {
+                    messagePanel.setError(exc.getMessage());
                 }
                 close();
             }
@@ -176,8 +173,9 @@ public class LoginWindow extends EmfFrame implements LoginView {
         JPanel registerPanel = new JPanel(new BorderLayout());
         registerPanel.add(register);
 
-        panel.add(registerPanel);
-
+        panel.add(registerPanel, BorderLayout.WEST);
+        panel.add(forgotPasswordPanel, BorderLayout.EAST);
+        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         return panel;
     }
 
