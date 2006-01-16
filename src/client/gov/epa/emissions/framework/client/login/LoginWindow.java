@@ -81,7 +81,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
         layout.setVgap(15);
         container.setLayout(layout);
 
-        JButton signIn = new Button("Sign In", new AbstractAction() {
+        JButton signIn = new Button("Log In", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doSignIn();
             }
@@ -127,8 +127,8 @@ public class LoginWindow extends EmfFrame implements LoginView {
         GridLayout labelsLayoutManager = new GridLayout(2, 1);
         labelsLayoutManager.setVgap(15);
         JPanel labelsPanel = new JPanel(labelsLayoutManager);
-        labelsPanel.add(new JLabel("Username"));
-        labelsPanel.add(new JLabel("Password"));
+        labelsPanel.add(new JLabel("EMF Username"));
+        labelsPanel.add(new JLabel("EMF Password"));
 
         panel.add(labelsPanel);
 
