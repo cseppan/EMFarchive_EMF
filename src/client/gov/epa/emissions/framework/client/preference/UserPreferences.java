@@ -6,7 +6,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class UserPreferences extends Properties {
+
+    private static Log log = LogFactory.getLog(UserPreferences.class);
 
     public static final String EMF_INPUT_DRIVE = "EMFInputDriveLetter";
 
@@ -40,12 +45,8 @@ public class UserPreferences extends Properties {
         String fileName = System.getProperty(property);
         if (fileName == null)
         {
+            log.error("The specified user preferences file '" + fileName + "' does not exist.");
             fileName="C:\\EMFPrefs.txt";
-            //System.err.println("The user preferences property '" + property + "' was not set.");
-            //return null;
-        }
-        if (!checkFile(fileName)) {
-            System.err.println("The specified user preferences file '" + fileName + "' does not exist.");
         }
         return fileName.trim();
     }

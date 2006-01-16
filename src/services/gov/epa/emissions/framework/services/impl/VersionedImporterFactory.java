@@ -36,8 +36,8 @@ public class VersionedImporterFactory {
             return new VersionedImporter(importer, dataset, dbServer);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("Failed to create importer: " + e.getMessage());
-            throw new ImporterException("Failed to create importer: " + e.getMessage());
+            log.error("Failed to create importer: " + e.getCause().getMessage());
+            throw new ImporterException("Failed to create importer: " + e.getCause().getMessage());
         }
     }
 
