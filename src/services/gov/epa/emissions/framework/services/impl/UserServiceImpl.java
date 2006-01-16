@@ -14,7 +14,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class UserServiceImpl implements UserService {
-
     private static Log LOG = LogFactory.getLog(UserServiceImpl.class);
 
     private HibernateSessionFactory sessionFactory;
@@ -78,13 +77,18 @@ public class UserServiceImpl implements UserService {
     }
 
     public void createUser(User user) throws EmfException {
+        User existingUser = this.getUser(user.getUsername());
+        if (existingUser != null){
+            throw new EmfException("Could not create new user - '" + user.getUsername() + "' already taken");
+        }
+        
         try {
             Session session = sessionFactory.getSession();
             dao.add(user, session);
             session.close();
         } catch (HibernateException e) {
-            LOG.error("Could not create new user - " + user.getFullName() + ". Reason: " + e.getMessage());
-            throw new EmfException("Could not create new user - " + user.getFullName());
+            LOG.error("Could not create new user - " + user.getUsername() + ". Reason: " + e.getMessage());
+            throw new EmfException("Could not create new user - " + user.getUsername());
         }
     }
 
