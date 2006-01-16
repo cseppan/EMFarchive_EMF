@@ -17,8 +17,6 @@ import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.jmock.Mock;
@@ -125,21 +123,9 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
         presenter = new PropertiesEditorPresenterImpl(dataset, (ServiceLocator) locator.proxy(), (EmfSession) session
                 .proxy());
+        view.expects(once()).method("notifyLockFailure").with(same(dataset));
 
-        try {
-            presenter.doDisplay((PropertiesEditorView) view.proxy());
-        } catch (EmfException e) {
-            assertEquals("Dataset cannot be edited as it is locked by another user (" + owner.getFullName() + ") at "
-                    + format(dataset.getLockDate()), e.getMessage());
-            return;
-        }
-
-        fail("Should have failed to display as lock was not obtained");
-    }
-
-    private String format(Date lockDate) {
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
-        return dateFormat.format(lockDate);
+        presenter.doDisplay((PropertiesEditorView) view.proxy());
     }
 
     public void testShouldContinueToCloseIfUserOkaysLosingUnsavedChanges() throws Exception {

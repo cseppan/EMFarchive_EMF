@@ -1,9 +1,5 @@
 package gov.epa.emissions.framework.client.meta;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -42,18 +38,13 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         dataset = serviceLocator.dataService().obtainLockedDataset(session.user(), dataset);
 
         if (!dataset.isLocked(session.user())) {// view mode, locked by another user
-            throw new EmfException("Dataset cannot be edited as it is locked by another user ("
-                    + dataset.getLockOwner() + ") at " + format(dataset.getLockDate()));
+            view.notifyLockFailure(dataset);
+            return;
         }
 
         this.view = view;
         view.observe(this);
         view.display(dataset);
-    }
-
-    private String format(Date lockDate) {
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
-        return dateFormat.format(lockDate);
     }
 
     public void doClose() {

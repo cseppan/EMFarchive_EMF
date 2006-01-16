@@ -16,6 +16,9 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
@@ -164,6 +167,17 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
         int option = JOptionPane.showConfirmDialog(this,
                 "Would you like to Close(without saving and lose the updates)?", "Close", JOptionPane.YES_NO_OPTION);
         return (option == 0);
+    }
+
+    public void notifyLockFailure(EmfDataset dataset) {
+        String message = "Cannote edit Properties of Dataset: " + dataset.getName() + " since it is locked by "
+                + dataset.getLockOwner() + " at " + format(dataset.getLockDate());
+        JOptionPane.showConfirmDialog(this, message, "Ok", JOptionPane.OK_OPTION);
+    }
+
+    private String format(Date lockDate) {
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+        return dateFormat.format(lockDate);
     }
 
 }

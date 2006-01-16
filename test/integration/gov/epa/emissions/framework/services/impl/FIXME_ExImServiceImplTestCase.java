@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.ExImServiceTestCase;
 import gov.epa.emissions.framework.services.UserService;
 
-public class ExImServiceImplTest extends ExImServiceTestCase {
+public abstract class FIXME_ExImServiceImplTestCase extends ExImServiceTestCase {
 
     protected void doSetUp() throws Exception {
         HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());

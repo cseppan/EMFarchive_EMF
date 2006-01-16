@@ -13,4 +13,6 @@ public interface PropertiesEditorView extends ManagedView {
 
     boolean shouldContinueLosingUnsavedChanges();
 
+    void notifyLockFailure(EmfDataset dataset);
+
 }
