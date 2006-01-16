@@ -175,7 +175,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
         try {
             presenter.doView(version, table, view);
         } catch (EmfException e) {
-            displayError("Could not open Viewer. Reason: " + e.getMessage());
+            displayError(e.getMessage());
         }
     }
 

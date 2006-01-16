@@ -298,7 +298,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             else
                 displayError("Could not open viewer. Reason: This is an external file.");
         } catch (EmfException e) {
-            displayError("Could not open viewer. Reason: " + e.getMessage());
+            displayError(e.getMessage());
         }
     }
 

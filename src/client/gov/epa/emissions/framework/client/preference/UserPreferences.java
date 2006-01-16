@@ -32,30 +32,21 @@ public class UserPreferences extends Properties {
     }
 
     private void loadProperties() throws EmfException {
-        String filePath=getPropertyFile(EMF_PREFERENCE);
-        // if the property is not defined, look in the default location
-        File file;
-        if (filePath == null)
-        {
-            file = new File(System.getProperty("user.home"), "EMFPrefs.txt");
-        }
-        else
-        {
-            file = new File(filePath);
-        }
-        if(!file.exists())
-            file = new File(System.getProperty("user.home"), "EMFPrefs.txt");
         try {
-            FileInputStream inStream = new FileInputStream(file);
+            FileInputStream inStream = new FileInputStream(getFile());
             load(inStream);
         } catch (Exception e) {
-            log.error("Cannot load user preferences file: "+file);
-            throw new EmfException("Cannot load user preferences file");
+            log.error("Cannot load user preferences file.");
+            throw new EmfException("Cannot load user preferences file.");
         }
     }
 
-    private String getPropertyFile(String property) {
-        return System.getProperty(property);
+    private File getFile() {
+        String property = System.getProperty(EMF_PREFERENCE);
+        if (property != null && new File(property).exists())
+            return new File(property);
+
+        return new File(System.getProperty("user.home"), "EMFPrefs.txt");
     }
 
     public boolean checkFile(String fileName) {
@@ -66,15 +57,15 @@ public class UserPreferences extends Properties {
     public String getInputDir() {
         return getProperty(EMF_INPUT_DRIVE) + ":\\" + getProperty(EMF_DEFAULT_INPUT_DIR);
     }
-    
+
     public String getOutputDir() {
         return getProperty(EMF_OUTPUT_DRIVE) + ":\\" + getProperty(EMF_DEFAULT_OUTPUT_DIR);
     }
-    
+
     public String getServerInputDir() {
         return getProperty(EMF_INPUT_PATH) + "/" + getProperty(EMF_DEFAULT_INPUT_DIR);
     }
-    
+
     public String getServerOutputDir() {
         return getProperty(EMF_OUTPUT_PATH) + "/" + getProperty(EMF_DEFAULT_OUTPUT_DIR);
     }

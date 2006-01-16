@@ -9,8 +9,6 @@ public class EditToken {
 
     private Version version;
 
-    private User user;
-
     public EditToken() {// needed by Axis
     }
 
@@ -41,14 +39,6 @@ public class EditToken {
 
     public long datasetId() {
         return version.getDatasetId();
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
     }
 
     public boolean isLocked(User user) {

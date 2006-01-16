@@ -16,7 +16,6 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
-import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
@@ -36,11 +35,8 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
 
     private EditToken token;
 
-    private UserService userService;
-
-    protected void setUpService(DataEditorService service, UserService userService) throws Exception {
+    protected void setUpService(DataEditorService service) throws Exception {
         this.service = service;
-        this.userService = userService;
         datasource = emissions();
 
         dataset = new EmfDataset();
@@ -110,18 +106,17 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         assertTrue(numberOfPages >= 1);
     }
 
-    private EditToken editToken() throws EmfException {
+    private EditToken editToken() {
         Version version = versionZero();
         return editToken(version);
     }
 
-    private EditToken editToken(Version version) throws EmfException {
+    private EditToken editToken(Version version) {
         return editToken(version, dataset.getName());
     }
 
-    private EditToken editToken(Version version, String table) throws EmfException {
+    private EditToken editToken(Version version, String table) {
         EditToken result = new EditToken(version, table);
-        result.setUser(owner());
 
         return result;
     }
@@ -129,10 +124,6 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
     private Version versionZero() {
         Versions versions = new Versions();
         return versions.get(dataset.getDatasetid(), 0, session);
-    }
-
-    private User owner() throws EmfException {
-        return userService.getUser("emf");
     }
 
     /**

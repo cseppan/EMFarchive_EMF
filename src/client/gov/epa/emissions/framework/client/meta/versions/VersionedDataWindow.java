@@ -61,7 +61,7 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
     private EditVersionsPanel createVersionsPanel(EmfDataset dataset, EmfSession session, DataEditorService service,
             MessagePanel messagePanel) {
         EditVersionsPanel versionsPanel = new EditVersionsPanel(dataset, messagePanel, parentConsole);
-        EditVersionsPresenter versionsPresenter = new EditVersionsPresenter(dataset, session, service);
+        EditVersionsPresenter versionsPresenter = new EditVersionsPresenter(dataset, service);
         try {
             versionsPresenter.display(versionsPanel);
         } catch (EmfException e) {

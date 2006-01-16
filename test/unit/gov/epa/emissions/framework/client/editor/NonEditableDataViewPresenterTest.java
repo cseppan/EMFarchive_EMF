@@ -25,7 +25,8 @@ public class NonEditableDataViewPresenterTest extends MockObjectTestCase {
         Mock view = mock(NonEditableDataView.class);
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
 
-        NonEditableDataViewPresenter p = new NonEditableDataViewPresenter(version, table, (NonEditableDataView) view.proxy(), serviceProxy);
+        NonEditableDataViewPresenter p = new NonEditableDataViewPresenter(version, table, (NonEditableDataView) view.proxy(),
+                serviceProxy);
         view.expects(once()).method("observe").with(same(p));
 
         p.display();

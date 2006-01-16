@@ -230,6 +230,7 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             return (EditToken) call.invoke(new Object[] { token, new Integer(pageSize) });
         } catch (Exception e) {
+            e.printStackTrace();
             throwExceptionDueToServiceErrors("Could not open editing session for " + token.key(), e);
         } finally {
             call.removeAllParameters();

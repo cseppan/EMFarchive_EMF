@@ -11,8 +11,6 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
-import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 import java.io.File;
@@ -31,11 +29,8 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
 
     private EditToken token;
 
-    private UserService userService;
-
-    protected void setUpService(DataEditorService service, UserService userService) throws Exception {
+    protected void setUpService(DataEditorService service) throws Exception {
         this.service = service;
-        this.userService = userService;
         datasource = emissions();
 
         dataset = new EmfDataset();
@@ -75,18 +70,17 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
         modifier.dropAll("versions");
     }
 
-    private EditToken editToken() throws EmfException {
+    private EditToken editToken() {
         Version version = versionZero();
         return editToken(version);
     }
 
-    private EditToken editToken(Version version) throws EmfException {
+    private EditToken editToken(Version version) {
         return editToken(version, dataset.getName());
     }
 
-    private EditToken editToken(Version version, String table) throws EmfException {
+    private EditToken editToken(Version version, String table) {
         EditToken result = new EditToken(version, table);
-        result.setUser(owner());
 
         return result;
     }
@@ -94,10 +88,6 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
     private Version versionZero() {
         Versions versions = new Versions();
         return versions.get(dataset.getDatasetid(), 0, session);
-    }
-
-    private User owner() throws EmfException {
-        return userService.getUser("emf");
     }
 
     public void testShouldHaveVersionZeroAfterDatasetImport() throws Exception {
@@ -144,32 +134,6 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
         assertEquals("v 1", updated[1].getName());
         assertTrue("Derived version (loaded from db) should be final on being marked 'final'", updated[1]
                 .isFinalVersion());
-    }
-
-    public void testOpeningSessionShouldObtainLockOnVersion() throws Exception {
-        Version[] versions = service.getVersions(dataset.getDatasetid());
-        Version versionZero = versions[0];
-        Version derived = service.derive(versionZero, "v 1");
-
-        EditToken token = editToken(derived);
-        EditToken locked = service.openSession(token, 4);
-
-        Version lockedVersion = locked.getVersion();
-        assertTrue("Version should be locked on opening session", lockedVersion.isLocked(owner()));
-    }
-
-    public void testClosingSessionShouldReleaseLockOnVersion() throws Exception {
-        Version[] versions = service.getVersions(dataset.getDatasetid());
-        Version versionZero = versions[0];
-        Version derived = service.derive(versionZero, "v 1");
-
-        EditToken token = editToken(derived);
-        EditToken locked = service.openSession(token, 4);
-
-        service.closeSession(locked);
-
-        Version released = editToken().getVersion();
-        assertFalse("Version should be released on closing session", released.isLocked(owner()));
     }
 
     public void testShouldMarkFinalAndRetrieveVersions() throws Exception {

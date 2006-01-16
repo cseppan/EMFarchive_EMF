@@ -34,8 +34,8 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(null));
 
-        EditableDataViewPresenter p = new EditableDataViewPresenter((EmfSession) session.proxy(), version, table,
-                (EditableDataView) view.proxy(), serviceProxy);
+        EditableDataViewPresenter p = new EditableDataViewPresenter(version, table, (EditableDataView) view.proxy(),
+                serviceProxy);
         view.expects(once()).method("observe").with(same(p));
 
         p.display();
@@ -73,8 +73,8 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
 
-        EditableDataViewPresenter p = new EditableDataViewPresenter((EmfSession) session.proxy(), version, table,
-                (EditableDataView) view.proxy(), serviceProxy);
+        EditableDataViewPresenter p = new EditableDataViewPresenter(version, table, (EditableDataView) view.proxy(),
+                serviceProxy);
         view.expects(once()).method("observe").with(same(p));
         p.display();
 
@@ -119,8 +119,7 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
         Mock service = mock(DataEditorService.class);
         service.stubs().method("getPage").withAnyArguments().will(returnValue(new Page()));
 
-        EditableDataViewPresenter p = new EditableDataViewPresenter(null, version, table, null,
-                (DataEditorService) service.proxy());
+        EditableDataViewPresenter p = new EditableDataViewPresenter(version, table, null, (DataEditorService) service.proxy());
 
         p.displayTable((EditableTableView) tableView.proxy());
     }

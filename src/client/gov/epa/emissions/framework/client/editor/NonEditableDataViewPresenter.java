@@ -17,12 +17,14 @@ public class NonEditableDataViewPresenter {
 
     private EditToken token;
 
-    public NonEditableDataViewPresenter(Version version, String table, NonEditableDataView view, DataEditorService service) {
+    public NonEditableDataViewPresenter(Version version, String table, NonEditableDataView view,
+            DataEditorService service) {
         this.version = version;
         this.table = table;
-        token = new EditToken(version, table);
         this.view = view;
         this.service = service;
+
+        token = new EditToken(version, table);
     }
 
     public void display() throws EmfException {

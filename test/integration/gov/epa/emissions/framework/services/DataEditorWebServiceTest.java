@@ -6,7 +6,7 @@ public class DataEditorWebServiceTest extends DataEditorService_DataTestCase {
 
     protected void doSetUp() throws Exception {
         ServiceLocator locator = serviceLocator();
-        super.setUpService(locator.dataEditorService(), locator.userService());
+        super.setUpService(locator.dataEditorService());
     }
 
 }

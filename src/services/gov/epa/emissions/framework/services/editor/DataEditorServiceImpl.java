@@ -11,7 +11,6 @@ import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
-import gov.epa.emissions.framework.dao.LockableVersions;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EditToken;
 import gov.epa.emissions.framework.services.impl.EmfServiceImpl;
@@ -38,8 +37,6 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
 
     private HibernateSessionFactory sessionFactory;
 
-    private LockableVersions lockableVersions;
-
     public DataEditorServiceImpl() throws Exception {
         try {
             init(dbServer, dbServer.getEmissionsDatasource(), HibernateSessionFactory.get());
@@ -58,8 +55,6 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     private void init(DbServer dbServer, Datasource datasource, HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         versions = new Versions();
-        lockableVersions = new LockableVersions(versions);
-
         reader = new DefaultVersionedRecordsReader(datasource);
 
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
@@ -207,15 +202,10 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     public EditToken openSession(EditToken token, int pageSize) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-
-            EditToken locked = obtainLock(token, session);
-            if (!locked.isLocked(token.getUser()))
-                return token;
-
-            cache.init(locked, pageSize, session);
+            cache.init(token, pageSize, session);
             session.close();
 
-            return locked;
+            return token;
         } catch (SQLException e) {
             LOG.error("Could not initialize editing Session for Dataset: " + token.datasetId() + ", Version: "
                     + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
@@ -227,11 +217,6 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     public EditToken openSession(EditToken token) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-
-            EditToken locked = obtainLock(token, session);
-            if (!locked.isLocked(token.getUser()))
-                return token;
-
             cache.init(token, session);
             session.close();
 
@@ -244,13 +229,6 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
     }
 
-    private EditToken obtainLock(EditToken token, Session session) {
-        Version locked = lockableVersions.obtainLocked(token.getUser(), token.getVersion(), session);
-        token.setVersion(locked);
-
-        return token;
-    }
-
     /**
      * This method is for cleaning up session specific objects within this service.
      */
@@ -260,14 +238,9 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public void closeSession(EditToken token) throws EmfException {
-        // TODO: if no open session, don't close, but raise error
         try {
             Session session = sessionFactory.getSession();
             cache.close(token, session);
-
-            // TODO: if never locked, it should not be released?
-            lockableVersions.releaseLocked(token.getVersion(), session);
-
             session.close();
         } catch (Exception e) {
             LOG.error("Could not close editing Session for Dataset: " + token.datasetId() + ", Version: "
