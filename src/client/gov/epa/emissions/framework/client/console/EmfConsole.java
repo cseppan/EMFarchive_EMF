@@ -145,7 +145,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         about.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 JOptionPane.showMessageDialog(EmfConsole.this,
-                        "\nEmissions Modeling Framework (EMF)\nVersion: pre-alpha", "EMF",
+                        "\nEmissions Modeling Framework (EMF)\nVersion: Beta 1 (1/17/2006)", "EMF",
                         JOptionPane.INFORMATION_MESSAGE);
             }
         });
