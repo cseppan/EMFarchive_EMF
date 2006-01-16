@@ -21,13 +21,14 @@ public abstract class EmfFrame extends JFrame implements EmfView {
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent event) {
-                close();
+                EmfFrame.this.windowClosing();
                 super.windowClosing(event);
             }
         });
     }
 
-    protected void doClose() {// needs to be overridden, if needed
+    protected void windowClosing() {// needs to be overridden, if needed
+        super.dispose();
     }
 
     public Position getPosition() {
@@ -40,7 +41,6 @@ public abstract class EmfFrame extends JFrame implements EmfView {
     }
 
     final public void close() {
-        doClose();
         super.dispose();
     }
 

@@ -51,4 +51,8 @@ public class EditToken {
         return user;
     }
 
+    public boolean isLocked(User user) {
+        return version.isLocked(user);
+    }
+
 }

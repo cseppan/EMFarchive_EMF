@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
@@ -35,31 +36,32 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
         this.getContentPane().add(layout);
     }
 
-    public void display(EmfDataset dataset, DataEditorService service) {
+    public void display(EmfDataset dataset, EmfSession session, DataEditorService service) {
         layout.setLayout(new BorderLayout());
         this.setTitle("Dataset Versions Editor: "+dataset.getName());
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel, BorderLayout.PAGE_START);
-        layout.add(createLayout(dataset, service, messagePanel), BorderLayout.CENTER);
+        layout.add(createLayout(dataset, session, service, messagePanel), BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.PAGE_END);
 
         super.display();
     }
 
-    private JPanel createLayout(EmfDataset dataset, DataEditorService service, MessagePanel messagePanel) {
+    private JPanel createLayout(EmfDataset dataset, EmfSession session, DataEditorService service,
+            MessagePanel messagePanel) {
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
-        EditVersionsPanel versionsPanel = createVersionsPanel(dataset, service, messagePanel);
+        EditVersionsPanel versionsPanel = createVersionsPanel(dataset, session, service, messagePanel);
         container.add(versionsPanel);
 
         return container;
     }
 
-    private EditVersionsPanel createVersionsPanel(EmfDataset dataset, DataEditorService service,
+    private EditVersionsPanel createVersionsPanel(EmfDataset dataset, EmfSession session, DataEditorService service,
             MessagePanel messagePanel) {
         EditVersionsPanel versionsPanel = new EditVersionsPanel(dataset, messagePanel, parentConsole);
-        EditVersionsPresenter versionsPresenter = new EditVersionsPresenter(dataset, service);
+        EditVersionsPresenter versionsPresenter = new EditVersionsPresenter(dataset, session, service);
         try {
             versionsPresenter.display(versionsPanel);
         } catch (EmfException e) {

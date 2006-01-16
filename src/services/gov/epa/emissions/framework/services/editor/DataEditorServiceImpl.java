@@ -8,7 +8,6 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
-import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
@@ -19,7 +18,6 @@ import gov.epa.emissions.framework.services.impl.EmfServiceImpl;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -159,15 +157,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     public void save(EditToken token) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-
-            VersionedRecordsWriter writer = cache.writer(token);
-            List list = cache.changesets(token, session);
-            for (Iterator iter = list.iterator(); iter.hasNext();) {
-                ChangeSet element = (ChangeSet) iter.next();
-                writer.update(element);
-            }
-            cache.reload(token, session);
-
+            cache.save(token, session);
             session.close();
         } catch (Exception e) {
             LOG.error("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
@@ -205,6 +195,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public void close() throws EmfException {
+        // TODO: release/flush locks?
         try {
             cache.invalidate();
         } catch (SQLException e) {
@@ -218,12 +209,32 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
             Session session = sessionFactory.getSession();
 
             EditToken locked = obtainLock(token, session);
-            if (!locked.getVersion().isLocked(token.getUser()))
+            if (!locked.isLocked(token.getUser()))
                 return token;
 
             cache.init(locked, pageSize, session);
-
             session.close();
+
+            return locked;
+        } catch (SQLException e) {
+            LOG.error("Could not initialize editing Session for Dataset: " + token.datasetId() + ", Version: "
+                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
+            throw new EmfException("Could not initialize editing Session for Dataset: " + token.datasetId()
+                    + ", Version: " + token.getVersion().getVersion());
+        }
+    }
+
+    public EditToken openSession(EditToken token) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+
+            EditToken locked = obtainLock(token, session);
+            if (!locked.isLocked(token.getUser()))
+                return token;
+
+            cache.init(token, session);
+            session.close();
+
             return token;
         } catch (SQLException e) {
             LOG.error("Could not initialize editing Session for Dataset: " + token.datasetId() + ", Version: "
@@ -238,21 +249,6 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         token.setVersion(locked);
 
         return token;
-    }
-
-    public EditToken openSession(EditToken token) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            cache.init(token, session);
-            session.close();
-
-            return token;
-        } catch (SQLException e) {
-            LOG.error("Could not initialize editing Session for Dataset: " + token.datasetId() + ", Version: "
-                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
-            throw new EmfException("Could not initialize editing Session for Dataset: " + token.datasetId()
-                    + ", Version: " + token.getVersion().getVersion());
-        }
     }
 
     /**

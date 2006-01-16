@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EditToken;
 
@@ -29,8 +30,34 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
         Mock view = mock(EditableDataView.class);
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
 
-        EditableDataViewPresenter p = new EditableDataViewPresenter(version, table, (EditableDataView) view.proxy(),
-                serviceProxy);
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("user").withNoArguments().will(returnValue(null));
+
+        EditableDataViewPresenter p = new EditableDataViewPresenter((EmfSession) session.proxy(), version, table,
+                (EditableDataView) view.proxy(), serviceProxy);
+        view.expects(once()).method("observe").with(same(p));
+
+        p.display();
+    }
+
+    public void testShouldNotifyViewOfFailureIfOpeningSessionFailsDueToLockFailureOnDisplay() throws Exception {
+        Version version = new Version();
+        String table = "table";
+
+        Mock service = mock(DataEditorService.class);
+        Constraint constraint = tokenConstraint(version, table);
+        service.expects(once()).method("openSession").with(constraint);
+
+        DataEditorService serviceProxy = (DataEditorService) service.proxy();
+
+        Mock view = mock(EditableDataView.class);
+        view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
+
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("user").withNoArguments().will(returnValue(null));
+
+        EditableDataViewPresenter p = new EditableDataViewPresenter((EmfSession) session.proxy(), version, table,
+                (EditableDataView) view.proxy(), serviceProxy);
         view.expects(once()).method("observe").with(same(p));
 
         p.display();
@@ -40,43 +67,52 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
         Mock view = mock(EditableDataView.class);
         view.expects(once()).method("close").withNoArguments();
 
-        Version version = new Version();
-        String table = "table";
-
         Mock service = mock(DataEditorService.class);
-        Constraint constraint = tokenConstraint(version, table);
-        service.expects(once()).method("closeSession").with(constraint);
+        service.expects(once()).method("closeSession").with(new IsInstanceOf(EditToken.class));
 
-        EditableDataViewPresenter p = new EditableDataViewPresenter(version, table, (EditableDataView) view.proxy(),
-                (DataEditorService) service.proxy());
+        EditableDataViewPresenter p = displayPresenter(view, service);
 
         p.doClose();
     }
 
-    public void testShouldDiscardChangesOnDiscard() throws Exception {
+    private EditableDataViewPresenter displayPresenter(Mock view, Mock service) throws EmfException {
         Version version = new Version();
         String table = "table";
 
-        Mock services = mock(DataEditorService.class);
-        Constraint constraint = tokenConstraint(version, table);
-        services.expects(once()).method("discard").with(constraint);
+        service.expects(once()).method("openSession").with(new IsInstanceOf(EditToken.class));
 
-        EditableDataViewPresenter p = new EditableDataViewPresenter(version, table, null, (DataEditorService) services
-                .proxy());
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("user").withNoArguments().will(returnValue(null));
+
+        DataEditorService serviceProxy = (DataEditorService) service.proxy();
+        view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
+
+        EditableDataViewPresenter p = new EditableDataViewPresenter((EmfSession) session.proxy(), version, table,
+                (EditableDataView) view.proxy(), serviceProxy);
+        view.expects(once()).method("observe").with(same(p));
+        p.display();
+
+        return p;
+    }
+
+    public void testShouldDiscardChangesOnDiscard() throws Exception {
+        Mock view = mock(EditableDataView.class);
+
+        Mock service = mock(DataEditorService.class);
+        service.expects(once()).method("discard").with(new IsInstanceOf(EditToken.class));
+
+        EditableDataViewPresenter p = displayPresenter(view, service);
 
         p.doDiscard();
     }
 
     public void testShouldSaveChangesOnSave() throws Exception {
-        Version version = new Version();
-        String table = "table";
+        Mock view = mock(EditableDataView.class);
 
         Mock service = mock(DataEditorService.class);
-        Constraint constraint = tokenConstraint(version, table);
-        service.expects(once()).method("save").with(constraint);
+        service.expects(once()).method("save").with(new IsInstanceOf(EditToken.class));
 
-        EditableDataViewPresenter p = new EditableDataViewPresenter(version, table, null, (DataEditorService) service
-                .proxy());
+        EditableDataViewPresenter p = displayPresenter(view, service);
 
         Mock tableView = displayTableView(service, p);
         ChangeSet changeset = new ChangeSet();
@@ -97,22 +133,19 @@ public class EditableDataViewPresenterTest extends MockObjectTestCase {
         Mock service = mock(DataEditorService.class);
         service.stubs().method("getPage").withAnyArguments().will(returnValue(new Page()));
 
-        EditableDataViewPresenter p = new EditableDataViewPresenter(version, table, null, (DataEditorService) service
-                .proxy());
+        EditableDataViewPresenter p = new EditableDataViewPresenter(null, version, table, null,
+                (DataEditorService) service.proxy());
 
         p.displayTable((EditableTableView) tableView.proxy());
     }
 
     public void testShouldSubmitAnyChangesAndSaveChangesOnSave() throws Exception {
-        Version version = new Version();
-        String table = "table";
+        Mock view = mock(EditableDataView.class);
 
         Mock service = mock(DataEditorService.class);
-        Constraint constraint = tokenConstraint(version, table);
-        service.expects(once()).method("save").with(constraint);
+        service.expects(once()).method("save").with(new IsInstanceOf(EditToken.class));
 
-        EditableDataViewPresenter p = new EditableDataViewPresenter(version, table, null, (DataEditorService) service
-                .proxy());
+        EditableDataViewPresenter p = displayPresenter(view, service);
 
         Mock tableView = displayTableView(service, p);
 

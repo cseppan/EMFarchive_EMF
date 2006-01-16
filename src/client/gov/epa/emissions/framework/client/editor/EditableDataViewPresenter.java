@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EditToken;
 
@@ -19,15 +20,20 @@ public class EditableDataViewPresenter {
 
     private EditableTablePresenter tablePresenter;
 
-    public EditableDataViewPresenter(Version version, String table, EditableDataView view, DataEditorService service) {
+    private EmfSession session;
+
+    public EditableDataViewPresenter(EmfSession session, Version version, String table, EditableDataView view, DataEditorService service) {
+        this.session = session;
         this.version = version;
         this.table = table;
-        token = new EditToken(version, table);
         this.view = view;
         this.service = service;
     }
 
     public void display() throws EmfException {
+        token = new EditToken(version, table);
+        token.setUser(session.user());
+        
         service.openSession(token);
         view.observe(this);
         view.display(version, table, service);

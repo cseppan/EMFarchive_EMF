@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.constraint.IsInstanceOf;
+import org.jmock.core.constraint.IsNull;
 
 public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
@@ -117,9 +118,8 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         Mock editorPresenter = mock(PropertiesEditorPresenter.class);
         editorPresenter.expects(once()).method("doDisplay").with(same(editorViewProxy));
-        
-        presenter.doDisplayPropertiesEditor(editorViewProxy,
-                (PropertiesEditorPresenter) editorPresenter.proxy());
+
+        presenter.doDisplayPropertiesEditor(editorViewProxy, (PropertiesEditorPresenter) editorPresenter.proxy());
     }
 
     public void testShouldDisplayPropertiesViewerOnSelectionOfViewPropertiesOption() {
@@ -149,7 +149,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         Mock editorView = mock(VersionedDataView.class);
         editorView.expects(once()).method("observe").with(new IsInstanceOf(VersionedDataPresenter.class));
-        editorView.expects(once()).method("display").with(eq(dataset), same(editorServiceProxy));
+        editorView.expects(once()).method("display").with(eq(dataset), new IsNull(), same(editorServiceProxy));
 
         VersionedDataView viewProxy = (VersionedDataView) editorView.proxy();
 

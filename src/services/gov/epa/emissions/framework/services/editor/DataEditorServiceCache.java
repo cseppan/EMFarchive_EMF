@@ -188,4 +188,15 @@ public class DataEditorServiceCache {
         }
     }
 
+    public void save(EditToken token, Session session) throws Exception {
+        VersionedRecordsWriter writer = writer(token);
+        List list = changesets(token, session);
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
+            ChangeSet element = (ChangeSet) iter.next();
+            writer.update(element);
+        }
+
+        reload(token, session);
+    }
+
 }

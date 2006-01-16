@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -13,9 +14,10 @@ public class VersionedDataPresenterTest extends MockObjectTestCase {
         EmfDataset dataset = new EmfDataset();
         DataEditorService service = (DataEditorService) mock(DataEditorService.class).proxy();
 
-        view.expects(once()).method("display").with(same(dataset), same(service));
+        EmfSession session = (EmfSession) mock(EmfSession.class).proxy();
+        view.expects(once()).method("display").with(same(dataset), same(session), same(service));
 
-        VersionedDataPresenter p = new VersionedDataPresenter(dataset, service);
+        VersionedDataPresenter p = new VersionedDataPresenter(dataset, session, service);
         view.expects(once()).method("observe").with(same(p));
 
         p.display((VersionedDataView) view.proxy());
@@ -33,9 +35,10 @@ public class VersionedDataPresenterTest extends MockObjectTestCase {
         EmfDataset dataset = new EmfDataset();
         DataEditorService service = (DataEditorService) mock(DataEditorService.class).proxy();
 
-        view.expects(once()).method("display").with(same(dataset), same(service));
+        EmfSession session = (EmfSession) mock(EmfSession.class).proxy();
+        view.expects(once()).method("display").with(same(dataset), same(session), same(service));
 
-        VersionedDataPresenter p = new VersionedDataPresenter(dataset, service);
+        VersionedDataPresenter p = new VersionedDataPresenter(dataset, session, service);
         view.expects(once()).method("observe").with(same(p));
 
         p.display((VersionedDataView) view.proxy());
