@@ -32,15 +32,25 @@ public class UserPreferences extends Properties {
     }
 
     private void loadProperties() throws EmfException {
-        File file = new File(getPropertyFile(EMF_PREFERENCE));
+        String filePath=getPropertyFile(EMF_PREFERENCE);
+        // if the property is not defined, look in the default location
+        File file;
+        if (filePath == null)
+        {
+            file = new File(System.getProperty("user.home"), "EMFPrefs.txt");
+        }
+        else
+        {
+            file = new File(filePath);
+        }
         if(!file.exists())
             file = new File(System.getProperty("user.home"), "EMFPrefs.txt");
         try {
             FileInputStream inStream = new FileInputStream(file);
             load(inStream);
         } catch (Exception e) {
-            log.error("Cannot load user preferences file.");
-            throw new EmfException("Cannot load user preferences file.");
+            log.error("Cannot load user preferences file: "+file);
+            throw new EmfException("Cannot load user preferences file");
         }
     }
 
