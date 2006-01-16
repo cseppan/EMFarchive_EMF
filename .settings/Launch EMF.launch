@@ -2,7 +2,7 @@
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="gov.epa.emissions.framework.client.Launcher"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="EMF"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DEMF_PREFERENCE=c:\awork\emf\emfpreference.txt"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DEMF_PREFERENCE=&quot;C:\Documents and Settings\rhavaldar\emfpreference.txt&quot;"/>
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>

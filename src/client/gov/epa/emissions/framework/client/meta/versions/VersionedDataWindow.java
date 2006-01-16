@@ -42,6 +42,8 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
         layout.add(messagePanel, BorderLayout.PAGE_START);
         layout.add(createLayout(dataset, service, messagePanel), BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.PAGE_END);
+
+        super.display();
     }
 
     private JPanel createLayout(EmfDataset dataset, DataEditorService service, MessagePanel messagePanel) {
@@ -54,7 +56,8 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
         return container;
     }
 
-    private EditVersionsPanel createVersionsPanel(EmfDataset dataset, DataEditorService service, MessagePanel messagePanel) {
+    private EditVersionsPanel createVersionsPanel(EmfDataset dataset, DataEditorService service,
+            MessagePanel messagePanel) {
         EditVersionsPanel versionsPanel = new EditVersionsPanel(dataset, messagePanel, parentConsole);
         EditVersionsPresenter versionsPresenter = new EditVersionsPresenter(dataset, service);
         try {

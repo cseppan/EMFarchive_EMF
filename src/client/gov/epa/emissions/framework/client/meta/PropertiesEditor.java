@@ -172,7 +172,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
     public void notifyLockFailure(EmfDataset dataset) {
         String message = "Cannote edit Properties of Dataset: " + dataset.getName() + " since it is locked by "
                 + dataset.getLockOwner() + " at " + format(dataset.getLockDate());
-        JOptionPane.showConfirmDialog(this, message, "Ok", JOptionPane.OK_OPTION);
+        JOptionPane.showMessageDialog(this, message);
     }
 
     private String format(Date lockDate) {

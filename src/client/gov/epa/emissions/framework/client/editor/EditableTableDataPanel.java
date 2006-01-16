@@ -95,7 +95,7 @@ public class EditableTableDataPanel extends JPanel {
         container.add(remove);
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(container, BorderLayout.LINE_START);
+        panel.add(container, BorderLayout.LINE_END);
 
         return panel;
     }

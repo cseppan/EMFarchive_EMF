@@ -28,8 +28,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.Iterator;
 import java.util.List;
 
@@ -147,21 +145,21 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
 
-        String[] options = { "Choose one", "View", "Edit Properties", "Edit Data" };
+        String[] options = { "View", "Edit Properties", "Edit Data" };
         DefaultComboBoxModel model = new DefaultComboBoxModel(options);
-        JComboBox combo = new JComboBox(model);
+        final JComboBox combo = new JComboBox(model);
         combo.setEditable(false);
         combo.setPreferredSize(new Dimension(125, 25));
-        combo.setToolTipText("Select one of the options to view/edit a Dataset");
+        combo.setToolTipText("Select one of the options and click Go to view/edit a Dataset");
         panel.add(combo);
 
-        combo.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                JComboBox cb = (JComboBox) e.getSource();
-                String selected = (String) cb.getSelectedItem();
+        Button goButton = new Button("Go", new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                String selected = (String) combo.getSelectedItem();
                 selectedOption(selected);
             }
         });
+        panel.add(goButton);
 
         return panel;
     }
@@ -181,8 +179,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktop);
         desktop.add(importView);
 
-        ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session, session.user(),
-                session.eximService(), session.dataService(), this);
+        ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session, session.user(), session
+                .eximService(), session.dataService(), this);
         presenter.doImport(importView, importPresenter);
     }
 

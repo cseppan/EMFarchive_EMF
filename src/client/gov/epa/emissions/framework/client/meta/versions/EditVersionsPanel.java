@@ -228,7 +228,6 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         final JComboBox tableCombo = new JComboBox(tablesModel);
         tableCombo.setName("tables");
         tableCombo.setEditable(false);
-        tableCombo.setPreferredSize(new Dimension(175, 20));
         panel.add(tableCombo);
 
         Button view = new Button("View", new AbstractAction() {
