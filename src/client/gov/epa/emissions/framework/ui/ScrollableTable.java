@@ -19,7 +19,7 @@ public class ScrollableTable extends JScrollPane {
 
     private JTable table(EmfTableModel tableModel) {
         JTable table = new JTable(tableModel);
-        table.setRowHeight(25);
+        table.setRowHeight(18);
 
         enableScrolling(table);
         setColWidthsBasedOnColNames(table);
