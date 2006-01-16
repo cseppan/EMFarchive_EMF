@@ -33,7 +33,7 @@ public class NonEditableDataViewWindow extends DisposableInteralFrame implements
     private JPanel labelPanel;
 
     public NonEditableDataViewWindow(EmfDataset dataset) {
-        super("Dataset Viewer - Dataset: " + dataset.getName());
+        super("Data Viewer: " + dataset.getName());
         setDimension();
         this.dataset = dataset;
 
@@ -80,7 +80,7 @@ public class NonEditableDataViewWindow extends DisposableInteralFrame implements
     }
 
     private void updateTitle(Version version, String table) {
-        super.setTitle(super.getTitle() + ". Version: " + version.getName() + ". Table: " + table);
+        super.setTitle(super.getTitle() + " - " + version.getName() + " - " + table);
         labelPanel.add(new JLabel("    Version:    " + version.getName()));
         labelPanel.add(new JLabel("    Table:       " + table));
     }
