@@ -43,19 +43,18 @@ public class DataEditorServiceTransport implements DataEditorService {
         log.error(message, e);
         throw new EmfException(message, e.getMessage(), e);
     }
-    
+
     private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
         log.error(message, fault);
-        String msg=extractMessage(fault.getMessage());
-        
-        if (fault.getCause()!=null){
-            if (fault.getCause().getMessage().equals(EMFConstants.CONNECTION_REFUSED)){
-                msg="EMF server not responding";
-            }            
+        String msg = extractMessage(fault.getMessage());
+
+        if (fault.getCause() != null) {
+            if (fault.getCause().getMessage().equals(EMFConstants.CONNECTION_REFUSED)) {
+                msg = "EMF server not responding";
+            }
         }
         throw new EmfException(msg);
     }
-
 
     public Page getPage(EditToken token, int pageNumber) throws EmfException {
         try {
@@ -206,33 +205,37 @@ public class DataEditorServiceTransport implements DataEditorService {
         }
     }
 
-    public void openSession(EditToken token) throws EmfException {
+    public EditToken openSession(EditToken token) throws EmfException {
         try {
             mappings.addParam(call, "token", mappings.editToken());
             mappings.setOperation(call, "openSession");
-            mappings.setVoidReturnType(call);
+            mappings.setReturnType(call, mappings.editToken());
 
-            call.invoke(new Object[] { token });
+            return (EditToken) call.invoke(new Object[] { token });
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not open editing session for " + token.key(), e);
         } finally {
             call.removeAllParameters();
         }
+
+        return null;
     }
 
-    public void openSession(EditToken token, int pageSize) throws EmfException {
+    public EditToken openSession(EditToken token, int pageSize) throws EmfException {
         try {
             mappings.addParam(call, "token", mappings.editToken());
             mappings.addIntegerParam(call, "pageSize");
             mappings.setOperation(call, "openSession");
-            mappings.setVoidReturnType(call);
+            mappings.setReturnType(call, mappings.editToken());
 
-            call.invoke(new Object[] { token, new Integer(pageSize) });
+            return (EditToken) call.invoke(new Object[] { token, new Integer(pageSize) });
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not open editing session for " + token.key(), e);
         } finally {
             call.removeAllParameters();
         }
+
+        return null;
     }
 
     public void closeSession(EditToken token) throws EmfException {

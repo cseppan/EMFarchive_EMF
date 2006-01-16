@@ -30,9 +30,9 @@ public interface DataEditorService {
     Version markFinal(Version derived) throws EmfException;
 
     // session
-    void openSession(EditToken token) throws EmfException;
+    EditToken openSession(EditToken token) throws EmfException;
 
-    void openSession(EditToken token, int pageSize) throws EmfException;
+    EditToken openSession(EditToken token, int pageSize) throws EmfException;
 
     void closeSession(EditToken token) throws EmfException;
 

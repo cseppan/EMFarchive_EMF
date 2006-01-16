@@ -210,11 +210,13 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
     }
 
-    public void openSession(EditToken token, int pageSize) throws EmfException {
+    public EditToken openSession(EditToken token, int pageSize) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             cache.init(token, pageSize, session);
             session.close();
+            
+            return token;
         } catch (SQLException e) {
             LOG.error("Could not initialize editing Session for Dataset: " + token.datasetId() + ", Version: "
                     + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
@@ -223,11 +225,13 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
     }
 
-    public void openSession(EditToken token) throws EmfException {
+    public EditToken openSession(EditToken token) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             cache.init(token, session);
             session.close();
+
+            return token;
         } catch (SQLException e) {
             LOG.error("Could not initialize editing Session for Dataset: " + token.datasetId() + ", Version: "
                     + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);

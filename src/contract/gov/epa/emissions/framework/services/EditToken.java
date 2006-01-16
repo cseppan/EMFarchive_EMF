@@ -1,12 +1,15 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
 
 public class EditToken {
 
     private String table;
 
     private Version version;
+
+    private User user;
 
     public EditToken() {// needed by Axis
     }
@@ -38,6 +41,14 @@ public class EditToken {
 
     public long datasetId() {
         return version.getDatasetId();
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 
 }
