@@ -51,6 +51,8 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     
     private JCheckBox box;
     
+    private static File lastFolder = null;
+    
     public ImportWindow(DataCommonsService service, JDesktopPane desktop) throws EmfException {
         super("Import Dataset", new Dimension(650, 300), desktop);
         super.setName("importWindow");
@@ -110,7 +112,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
-                20, 0, // initialX, initialY
+                20, 10, // initialX, initialY
                 10, 10);// xPad, yPad
 
         registerForEditEvents(name, folder, filename);// edit-awareness
@@ -175,7 +177,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private JButton importFileButton() {
         Button button = new Button("Choose File", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
-                FileChooser chooser = new FileChooser("Import File", new File(folder.getText()), ImportWindow.this);
+                FileChooser chooser = new FileChooser("Select File", new File(folder.getText()), ImportWindow.this);
                 File file = chooser.choose();
                 if (file == null)
                     return;
@@ -183,6 +185,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
                 if (file.isDirectory()) {
                     folder.setText(file.getAbsolutePath());
                     filename.setText("");
+                    lastFolder = file;
                     return;
                 }
 
@@ -191,6 +194,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
                 // For demo #3 changing the filename
                 // name.setText(formatDatasetName(file.getName()));
                 name.setText(file.getName());
+                lastFolder = file.getParentFile();
             }
         });
 
@@ -283,6 +287,9 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     }
 
     public void setDefaultBaseFolder(String folder) {
-        this.folder.setText(folder);
+        if (lastFolder == null)
+           this.folder.setText(folder);
+        else
+           this.folder.setText(lastFolder.getAbsolutePath());
     }
 }
