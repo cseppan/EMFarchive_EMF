@@ -13,7 +13,9 @@ public class DefaultExportPresenter implements ExportPresenter {
     private ExportView view;
 
     private EmfSession session;
-
+    
+    private static String lastFolder = null;
+    
     public DefaultExportPresenter(EmfSession session) {
         this.session = session;
     }
@@ -25,7 +27,20 @@ public class DefaultExportPresenter implements ExportPresenter {
     public void display(ExportView view) {
         this.view = view;
         view.observe(this);
-        view.setMostRecentUsedFolder(getDefaultBaseFolder());
+        String defaultBaseFolder = "";
+        try {
+            if (lastFolder == null)
+            {
+               defaultBaseFolder = getDefaultBaseFolder();
+            }
+            else
+            {
+                defaultBaseFolder = lastFolder;
+            }
+         } catch (EmfException e) {
+            System.err.println(e.getMessage());
+        }
+        view.setMostRecentUsedFolder(defaultBaseFolder);
 
         view.display();
     }
@@ -43,6 +58,9 @@ public class DefaultExportPresenter implements ExportPresenter {
             datasets[i].setAccessedDateTime(new Date());
         }
         session.setMostRecentExportFolder(folder);
+        
+        File dir = new File(folder);
+        if (dir.isDirectory()) lastFolder = folder;
 
         ExImService services = session.eximService();
         if (overwrite)
@@ -55,22 +73,22 @@ public class DefaultExportPresenter implements ExportPresenter {
 //        return session.getMostRecentExportFolder();
 //    }
     
-    private String getDefaultBaseFolder() {
-        return validateDir(session.preferences().getOutputDir());
-    }
-    
-    private String translateToServerDir(String dir) {
+    private String translateToServerDir(String dir) throws EmfException {
         if(dir.equalsIgnoreCase(getDefaultBaseFolder()))
             return session.preferences().getServerOutputDir();
         
         return dir;
     }
     
-    private String validateDir(String dir) {
-        File tempDir = new File(dir);
-        if (!tempDir.isDirectory()) 
-            dir = "";
-
-        return dir;
-    }
+    private String getDefaultBaseFolder() throws EmfException {
+        String defaultExportFolder = session.preferences().getOutputDir();
+        if (defaultExportFolder != null)
+        {
+            File tempDir = new File(defaultExportFolder);
+            if (!tempDir.isDirectory()) {
+                throw new EmfException("Default export directory does not exist ("+defaultExportFolder+")");
+            }
+        }
+        return defaultExportFolder;
+    }    
 }
