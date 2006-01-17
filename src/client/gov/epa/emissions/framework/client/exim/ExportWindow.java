@@ -37,7 +37,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private TextArea purpose;
 
     public ExportWindow(EmfDataset[] datasets) {
-        super(title(datasets), new Dimension(600, 300));
+        super(title(datasets), new Dimension(600, 350));
         super.setName("exportWindow");
         this.datasets = datasets;
 
@@ -50,7 +50,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
             buf.append(datasets[i].getName());
             if (i + 1 <= datasets.length)
                 buf.append(", ");
-        }
+         }
 
         return buf.toString();
     }
@@ -79,7 +79,9 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         TextArea datasetNames = new TextArea("datasets", getDatasetsLabel(datasets));
         datasetNames.setLineWrap(false);
         datasetNames.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Datasets", new ScrollableTextArea(datasetNames), panel);
+        ScrollableTextArea dsArea = new ScrollableTextArea(datasetNames);
+        dsArea.setMinimumSize(new Dimension(75,75));
+        layoutGenerator.addLabelWidgetPair("Datasets", dsArea, panel);
 
         // folder
         folder = new JTextField(40);
