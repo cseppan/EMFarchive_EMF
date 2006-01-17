@@ -177,25 +177,8 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private JButton importFileButton() {
         Button button = new Button("Choose File", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
-                FileChooser chooser = new FileChooser("Select File", new File(folder.getText()), ImportWindow.this);
-                File file = chooser.choose();
-                if (file == null)
-                    return;
-
-                if (file.isDirectory()) {
-                    folder.setText(file.getAbsolutePath());
-                    filename.setText("");
-                    lastFolder = file;
-                    return;
-                }
-
-                folder.setText(file.getParent());
-                filename.setText(file.getName());
-                // For demo #3 changing the filename
-                // name.setText(formatDatasetName(file.getName()));
-                name.setText(file.getName());
-                lastFolder = file.getParentFile();
-            }
+                selectFile();
+            } 
         });
 
         Icon icon = new ImageResources().open("Import a File");
@@ -204,6 +187,30 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         return button;
     }
 
+    private void selectFile() {
+        FileChooser chooser = new FileChooser(
+                "Select File", new File(folder.getText()), ImportWindow.this);
+        
+        chooser.setTitle("Select a "+datasetTypesModel.getSelectedItem().toString()+" File");
+        File file = chooser.choose();
+        if (file == null)
+            return;
+
+        if (file.isDirectory()) {
+            folder.setText(file.getAbsolutePath());
+            filename.setText("");
+            lastFolder = file;
+            return;
+        }
+
+        folder.setText(file.getParent());
+        filename.setText(file.getName());
+        // For demo #3 changing the filename
+        // name.setText(formatDatasetName(file.getName()));
+        name.setText(file.getName());
+        lastFolder = file.getParentFile();
+    }
+    
     private void registerForEditEvents(JTextField name, JTextField directory, JTextField filename) {
         name.getDocument().addDocumentListener(notifyBeginInput());
         directory.getDocument().addDocumentListener(notifyBeginInput());
