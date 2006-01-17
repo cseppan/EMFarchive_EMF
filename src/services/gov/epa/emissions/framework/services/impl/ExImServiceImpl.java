@@ -106,7 +106,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
         if (!file.exists() || !file.isDirectory()) {
             log.error("Folder " + folderPath + " does not exist");
-            throw new EmfException("Folder does not exist");
+            throw new EmfException("Folder does not exist: "+folderPath);
         }
         log.debug("check if folder exists " + folderPath);
         return file;
