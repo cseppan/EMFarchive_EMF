@@ -35,9 +35,40 @@ public class UserPreferences extends Properties {
         try {
             FileInputStream inStream = new FileInputStream(getFile());
             load(inStream);
+            if (getProperty(EMF_INPUT_DRIVE) == null)
+            {
+                log.error("Cannot load user preference "+ EMF_INPUT_DRIVE+" from "+
+                        getFile().getAbsolutePath());
+            }
+            if (getProperty(EMF_DEFAULT_INPUT_DIR) == null)
+            {
+                log.error("Cannot load user preference "+ EMF_DEFAULT_INPUT_DIR+" from "+
+                        getFile().getAbsolutePath());
+           }
+
+            if (getProperty(EMF_OUTPUT_DRIVE) == null)
+            {
+                log.error("Cannot load user preference "+ EMF_OUTPUT_DRIVE+" from "+
+                        getFile().getAbsolutePath());
+            }
+            if (getProperty(EMF_DEFAULT_OUTPUT_DIR) == null)
+            {
+                log.error("Cannot load user preference "+ EMF_DEFAULT_OUTPUT_DIR+" from "+
+                        getFile().getAbsolutePath());
+            }
+            if (getProperty(EMF_OUTPUT_PATH) == null)
+            {
+                log.error("Cannot load user preference "+ EMF_OUTPUT_PATH+" from "+
+                        getFile().getAbsolutePath());
+            }
+            if (getProperty(EMF_INPUT_PATH) == null) {
+                log.error("Cannot load user preference "+ EMF_INPUT_PATH+" from "+
+                        getFile().getAbsolutePath());
+            }
+
         } catch (Exception e) {
-            log.error("Cannot load user preferences file.");
-            throw new EmfException("Cannot load user preferences file.");
+            log.error("Cannot load user preferences file "+ getFile().getAbsolutePath());
+            throw new EmfException("Cannot load user preferences file");
         }
     }
 
