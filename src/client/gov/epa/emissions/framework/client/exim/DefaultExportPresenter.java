@@ -25,13 +25,7 @@ public class DefaultExportPresenter implements ExportPresenter {
     public void display(ExportView view) {
         this.view = view;
         view.observe(this);
-        String defaultBaseFolder = "";
-        try {
-            defaultBaseFolder= getDefaultBaseFolder();
-        } catch (EmfException e) {
-            System.err.println(e.getMessage());
-        }
-        view.setMostRecentUsedFolder(defaultBaseFolder);
+        view.setMostRecentUsedFolder(getDefaultBaseFolder());
 
         view.display();
     }
@@ -61,22 +55,21 @@ public class DefaultExportPresenter implements ExportPresenter {
 //        return session.getMostRecentExportFolder();
 //    }
     
-    private String getDefaultBaseFolder() throws EmfException {
+    private String getDefaultBaseFolder() {
         return validateDir(session.preferences().getOutputDir());
     }
     
-    private String translateToServerDir(String dir) throws EmfException {
+    private String translateToServerDir(String dir) {
         if(dir.equalsIgnoreCase(getDefaultBaseFolder()))
             return session.preferences().getServerOutputDir();
         
         return dir;
     }
     
-    private String validateDir(String dir) throws EmfException {
+    private String validateDir(String dir) {
         File tempDir = new File(dir);
-        if (!tempDir.isDirectory()) {
-            throw new EmfException("Invalid Directory Picked Up.");
-        }
+        if (!tempDir.isDirectory()) 
+            dir = "";
 
         return dir;
     }
