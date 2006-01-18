@@ -1,7 +1,9 @@
 #EMF Property File
-EMFInputDriveLetter=T
-EMFOutputDriveLetter=T
-EMFInputServerDirectory=/data
-EMFOutputServerDirectory=/data
-EMFDefaultInputDirectory=emf_input
-EMFDefaultOutputDirectory=emf_output
+local.input.drive=T:\\
+remote.input.drive=/data
+
+local.output.drive=T:\\
+remote.output.drive=/data
+
+default.input.folder=emf_input
+default.output.folder=emf_output

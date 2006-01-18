@@ -317,8 +317,8 @@
 
 	<!--  =============END Client Distribution ====================================== -->
 
-	<!--  =============START Tomcat Deployment Targets ====================================== -->
-	<target name="app-prepare" depends="clean, init, compile">
+	<!--  =============START SERVICES Distribution ====================================== -->
+	<target name="services-dist-prepare" depends="clean, init, compile">
 		<copy todir="${build.dist.dir}">
 			<fileset dir="${web.dir}" />
 		</copy>
@@ -330,10 +330,12 @@
 		</copy>
 	</target>
 
-	<target name="app-dist" depends="clean, init, app-prepare" description="Create binary distribution">
+	<target name="app-dist" depends="clean, init, services-dist-prepare" description="Create EMF Services(server) binary distribution">
 		<jar jarfile="${build.home}/${app.name}.war" basedir="${build.dist.dir}" />
 	</target>
+	<!--  =============END Services Distribution ====================================== -->
 
+	<!--  =============START Tomcat Deployment Targets ====================================== -->
 	<target name="apps-list" description="List installed applications ">
 		<list url="${tomcat.manager.url}" username="${tomcat.manager.username}" password="${tomcat.manager.password}" />
 	</target>
@@ -360,8 +362,6 @@
 	</target>
 
 	<!--  ===============END  Tomcat Deployment Targets ====================================== -->
-
-
 
 	<!--  ===============START  Coverage Targets =============================== -->
 	<path id="cobertura.classpath">
@@ -472,7 +472,7 @@
 		</copy>
 	</target>
 
-	<!-- Analysis Engine -->	
+	<!-- Analysis Engine -->
 	<target name="analysisengine.basedir.check">
 		<property name="analysisengine.basedir" value="${basedir}/../AnalysisEngine" />
 		<available file="${analysisengine.basedir}" property="analysisengine.basedir.present" />

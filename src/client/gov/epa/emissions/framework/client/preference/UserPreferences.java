@@ -9,67 +9,27 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class UserPreferences extends Properties {
+public class UserPreferences {
 
     private static Log log = LogFactory.getLog(UserPreferences.class);
 
-    public static final String EMF_INPUT_DRIVE = "EMFInputDriveLetter";
-
-    public static final String EMF_OUTPUT_DRIVE = "EMFOutputDriveLetter";
-
-    public static final String EMF_INPUT_PATH = "EMFInputServerDirectory";
-
-    public static final String EMF_OUTPUT_PATH = "EMFOutputServerDirectory";
-
-    public static final String EMF_DEFAULT_INPUT_DIR = "EMFDefaultInputDirectory";
-
-    public static final String EMF_DEFAULT_OUTPUT_DIR = "EMFDefaultOutputDirectory";
-
     public static final String EMF_PREFERENCE = "EMF_PREFERENCE";
 
-    public UserPreferences() throws EmfException {
-        loadProperties();
-    }
+    private Properties props;
 
-    private void loadProperties() throws EmfException {
+    public UserPreferences() throws EmfException {
+        props = new Properties();
         try {
             FileInputStream inStream = new FileInputStream(getFile());
-            load(inStream);
-            if (getProperty(EMF_INPUT_DRIVE) == null)
-            {
-                log.error("Cannot load user preference "+ EMF_INPUT_DRIVE+" from "+
-                        getFile().getAbsolutePath());
-            }
-            if (getProperty(EMF_DEFAULT_INPUT_DIR) == null)
-            {
-                log.error("Cannot load user preference "+ EMF_DEFAULT_INPUT_DIR+" from "+
-                        getFile().getAbsolutePath());
-           }
-
-            if (getProperty(EMF_OUTPUT_DRIVE) == null)
-            {
-                log.error("Cannot load user preference "+ EMF_OUTPUT_DRIVE+" from "+
-                        getFile().getAbsolutePath());
-            }
-            if (getProperty(EMF_DEFAULT_OUTPUT_DIR) == null)
-            {
-                log.error("Cannot load user preference "+ EMF_DEFAULT_OUTPUT_DIR+" from "+
-                        getFile().getAbsolutePath());
-            }
-            if (getProperty(EMF_OUTPUT_PATH) == null)
-            {
-                log.error("Cannot load user preference "+ EMF_OUTPUT_PATH+" from "+
-                        getFile().getAbsolutePath());
-            }
-            if (getProperty(EMF_INPUT_PATH) == null) {
-                log.error("Cannot load user preference "+ EMF_INPUT_PATH+" from "+
-                        getFile().getAbsolutePath());
-            }
-
+            props.load(inStream);
         } catch (Exception e) {
-            log.error("Cannot load user preferences file "+ getFile().getAbsolutePath());
+            log.error("Cannot load user preferences file " + getFile().getAbsolutePath());
             throw new EmfException("Cannot load user preferences file");
         }
+    }
+
+    public UserPreferences(Properties props) {
+        this.props = props;
     }
 
     private File getFile() {
@@ -85,20 +45,31 @@ public class UserPreferences extends Properties {
         return file.exists();
     }
 
-    public String getInputDir() {
-        return getProperty(EMF_INPUT_DRIVE) + ":\\" + getProperty(EMF_DEFAULT_INPUT_DIR);
+    private String property(String name) {
+        return props.getProperty(name);
     }
 
-    public String getOutputDir() {
-        return getProperty(EMF_OUTPUT_DRIVE) + ":\\" + getProperty(EMF_DEFAULT_OUTPUT_DIR);
+    public String inputFolder() {
+        return property("local.input.drive") + property("default.input.folder");
     }
 
-    public String getServerInputDir() {
-        return getProperty(EMF_INPUT_PATH) + "/" + getProperty(EMF_DEFAULT_INPUT_DIR);
+    public String outputFolder() {
+        return property("local.output.drive") + property("default.output.folder");
     }
 
-    public String getServerOutputDir() {
-        return getProperty(EMF_OUTPUT_PATH) + "/" + getProperty(EMF_DEFAULT_OUTPUT_DIR);
+    public String mapLocalInputPathToRemote(String localPath) {
+        String local = inputFolder();
+        String remote = property("remote.input.drive") + property("default.input.folder");
+
+        String path = remote + localPath.substring(local.length());
+        return path.replace('\\', '/');
     }
 
+    public String mapLocalOutputPathToRemote(String localPath) {
+        String local = outputFolder();
+        String remote = property("remote.output.drive") + property("default.output.folder");
+
+        String path = remote + localPath.substring(local.length());
+        return path.replace('\\', '/');
+    }
 }

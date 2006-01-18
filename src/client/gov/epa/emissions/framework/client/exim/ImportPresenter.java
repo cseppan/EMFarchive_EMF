@@ -36,8 +36,7 @@ public class ImportPresenter {
         if (type.getName().equals("Choose a type ..."))
             throw new EmfException("Dataset Type should be selected");
 
-        service.startMultipleFileImport(user, translateToServerDir(directory), new String[] { filename }, type);
-
+        service.startMultipleFileImport(user, mapToRemote(directory), new String[] { filename }, type);
     }
 
     public void doImport(String directory, String filename, String datasetName, DatasetType type) throws EmfException {
@@ -60,7 +59,7 @@ public class ImportPresenter {
         dataset.setModifiedDateTime(dataset.getCreatedDateTime());
         dataset.setAccessedDateTime(dataset.getCreatedDateTime());
 
-        service.startImport(user, translateToServerDir(directory), filename, dataset);
+        service.startImport(user, mapToRemote(directory), filename, dataset);
     }
 
     public void doDone() {
@@ -80,28 +79,16 @@ public class ImportPresenter {
         view.clearMessagePanel();
     }
 
-    // private String getDefaultBaseFolderForImport() throws EmfException {
-    // return service.getImportBaseFolder();
-    // }
-
     private String getDefaultBaseFolder() {
-        return validateDir(session.preferences().getInputDir());
-        
+        String folder = session.preferences().inputFolder();
+        if (!new File(folder).isDirectory())
+            folder = "";//default, if unspecified
+
+        return folder;
     }
 
-    private String translateToServerDir(String dir) {
-        if (dir.equalsIgnoreCase(getDefaultBaseFolder()))
-            return session.preferences().getServerInputDir();
-
-        return dir;
-    }
-
-    private String validateDir(String dir) {
-        File tempDir = new File(dir);
-        if (!tempDir.isDirectory()) 
-            dir = "";
-
-        return dir;
+    private String mapToRemote(String dir) {
+        return session.preferences().mapLocalInputPathToRemote(dir);
     }
 
 }
