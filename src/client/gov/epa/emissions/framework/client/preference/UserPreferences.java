@@ -11,6 +11,18 @@ import org.apache.commons.logging.LogFactory;
 
 public class UserPreferences {
 
+    private static final String DEFAULT_INPUT_FOLDER = "default.input.folder";
+
+    private static final String REMOTE_OUTPUT_DRIVE = "remote.output.drive";
+
+    private static final String DEFAULT_OUTPUT_FOLDER = "default.output.folder";
+
+    private static final String LOCAL_OUTPUT_DRIVE = "local.output.drive";
+
+    private static final String REMOTE_INPUT_DRIVE = "remote.input.drive";
+
+    private static final String LOCAL_INPUT_DRIVE = "local.input.drive";
+
     private static Log log = LogFactory.getLog(UserPreferences.class);
 
     public static final String EMF_PREFERENCE = "EMF_PREFERENCE";
@@ -50,24 +62,24 @@ public class UserPreferences {
     }
 
     public String inputFolder() {
-        return property("local.input.drive") + property("default.input.folder");
+        return property(LOCAL_INPUT_DRIVE) + property(DEFAULT_INPUT_FOLDER);
     }
 
     public String outputFolder() {
-        return property("local.output.drive") + property("default.output.folder");
+        return property(LOCAL_OUTPUT_DRIVE) + property(DEFAULT_OUTPUT_FOLDER);
     }
 
     public String mapLocalInputPathToRemote(String localPath) {
-        String local = inputFolder();
-        String remote = property("remote.input.drive") + property("default.input.folder");
+        String local = property(LOCAL_INPUT_DRIVE);
+        String remote = property(REMOTE_INPUT_DRIVE);
 
         String path = remote + localPath.substring(local.length());
         return path.replace('\\', '/');
     }
 
     public String mapLocalOutputPathToRemote(String localPath) {
-        String local = outputFolder();
-        String remote = property("remote.output.drive") + property("default.output.folder");
+        String local = property(LOCAL_OUTPUT_DRIVE);
+        String remote = property(REMOTE_OUTPUT_DRIVE);
 
         String path = remote + localPath.substring(local.length());
         return path.replace('\\', '/');
