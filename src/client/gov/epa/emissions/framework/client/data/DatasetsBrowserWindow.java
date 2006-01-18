@@ -23,6 +23,7 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfDatasetTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ImageResources;
+import gov.epa.mims.analysisengine.table.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -89,12 +90,19 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private JScrollPane createSortFilterPane(EmfConsole parentConsole) {
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
+        SortCriteria sortCriteria = sortCriteria();
+        panel.sort(sortCriteria );
         panel.getTable().setName("datasetsTable");
 
         JScrollPane scrollPane = new JScrollPane(panel);
         panel.setPreferredSize(new Dimension(450, 120));
 
         return scrollPane;
+    }
+
+    private SortCriteria sortCriteria() {
+        String[] columnNames = {"Last Modified Date"};
+        return new SortCriteria(columnNames ,new boolean []{false},new boolean []{true});
     }
 
     private JPanel createTopPanel() {

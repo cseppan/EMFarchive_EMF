@@ -73,7 +73,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private ChangeObserver changeObserver;
 
-    public EditableSummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel) throws EmfException {
+    public EditableSummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel)
+            throws EmfException {
         super.setName("summary");
         this.dataset = dataset;
         this.messagePanel = messagePanel;
@@ -111,14 +112,14 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
         JCheckBox subscribed = new JCheckBox("Subscribed?", true);
         subscribed.setToolTipText("TBD");
-//        panel.add(subscribed);
+        // panel.add(subscribed);
 
-//       panel.add(new JLabel("Subscribed Users"));
+        // panel.add(new JLabel("Subscribed Users"));
         DefaultComboBoxModel subscribedUsersModel = new DefaultComboBoxModel(new String[0]);
         JComboBox subscribedUsers = new JComboBox(subscribedUsersModel);
         subscribedUsers.setName("subscribedUser");
         subscribedUsers.setPreferredSize(new Dimension(100, 20));
-//        panel.add(subscribedUsers);
+        // panel.add(subscribedUsers);
 
         return panel;
     }
@@ -154,24 +155,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // time period
-//        JPanel startDatePanel = new JPanel();
-//        startDatePanel.add(new JLabel("Start:"));
         startDateTime = new FormattedTextField("startDateTime", dataset.getStartDateTime(), DATE_FORMATTER);
-//        startDateTime.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
-//        startDatePanel.add(startDateTime);
-//
-//        JPanel endDatePanel = new JPanel();
-//        endDatePanel.add(new JLabel("End:  "));
         endDateTime = new FormattedTextField("endDateTime", dataset.getStopDateTime(), DATE_FORMATTER);
-//        endDatePanel.add(endDateTime);
-//
-//        JPanel datesPanel = new JPanel();
-//        datesPanel.setLayout(new BoxLayout(datesPanel, BoxLayout.Y_AXIS));
-//        datesPanel.add(startDatePanel);
-//        datesPanel.add(endDatePanel);
-//
-//        layoutGenerator.addLabelWidgetPair("Time Period:", datesPanel, panel);
-
         layoutGenerator.addLabelWidgetPair("Time Period Start:", startDateTime, panel);
         layoutGenerator.addLabelWidgetPair("Time Period End:", endDateTime, panel);
 
@@ -190,7 +175,6 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         JComboBox sectorsCombo = new JComboBox(sectors);
         sectorsCombo.setSelectedItem(dataset.getSector());
         sectorsCombo.setName("sectors");
-        sectorsCombo.setEditable(true);
         sectorsCombo.setPreferredSize(new Dimension(175, 20));
         sectorsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Sector:", sectorsCombo, panel);
@@ -331,7 +315,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
             super(format);
             super.setName(name);
             super.setValue(value);
-            super.setColumns(8);
+            super.setColumns(10);
 
             super.setInputVerifier(new FormattedTextFieldVerifier());
         }
@@ -343,6 +327,9 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
             JFormattedTextField ftf = (JFormattedTextField) input;
             AbstractFormatter formatter = ftf.getFormatter();
             String text = ftf.getText();
+            if (text.trim().length() == 0) {// need not validate empty field
+                return true;
+            }
             try {
                 formatter.stringToValue(text);
                 messagePanel.clear();

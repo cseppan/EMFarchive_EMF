@@ -55,12 +55,13 @@ public class EmfTableModelTest extends MockObjectTestCase {
         assertEquals(7, model.getColumnCount());
 
         assertEquals("Name", model.getColumnName(0));
-        assertEquals("Type", model.getColumnName(1));
-        assertEquals("Status", model.getColumnName(2));
-        assertEquals("Creator", model.getColumnName(3));
-        assertEquals("Region", model.getColumnName(4));
-        assertEquals("Start Date", model.getColumnName(5));
-        assertEquals("Last Modified Date", model.getColumnName(6));
+        assertEquals("Last Modified Date", model.getColumnName(1));
+        assertEquals("Type", model.getColumnName(2));
+        assertEquals("Status", model.getColumnName(3));
+        assertEquals("Creator", model.getColumnName(4));
+        assertEquals("Region", model.getColumnName(5));
+        assertEquals("Start Date", model.getColumnName(6));
+        
     }
 
     public void testShouldReturnRowsEqualingNumberOfDatasets() {
@@ -68,14 +69,16 @@ public class EmfTableModelTest extends MockObjectTestCase {
     }
 
     public void testShouldReturnUserAttributesAtSpecifiedIndex() {
-        assertEquals(dataset1.getName(), model.getValueAt(0, 0));
-        assertEquals(dataset1.getDatasetTypeName(), model.getValueAt(0, 1));
-        assertEquals(dataset1.getStatus(), model.getValueAt(0, 2));
-        assertEquals(dataset1.getCreator(), model.getValueAt(0, 3));
-        assertEquals(dataset1.getRegion(), model.getValueAt(0, 4));
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-        assertEquals(dateFormat.format(dataset1.getStartDateTime()), model.getValueAt(0, 5));
-        assertEquals(dateFormat.format(dataset1.getModifiedDateTime()), model.getValueAt(0, 6));
+        
+        assertEquals(dataset1.getName(), model.getValueAt(0, 0));
+        assertEquals(dateFormat.format(dataset1.getModifiedDateTime()), model.getValueAt(0, 1));
+        assertEquals(dataset1.getDatasetTypeName(), model.getValueAt(0, 2));
+        assertEquals(dataset1.getStatus(), model.getValueAt(0, 3));
+        assertEquals(dataset1.getCreator(), model.getValueAt(0, 4));
+        assertEquals(dataset1.getRegion(), model.getValueAt(0, 5));
+        assertEquals(dateFormat.format(dataset1.getStartDateTime()), model.getValueAt(0, 6));
+        
     }
 
     public void testShouldMarkEmailColumnAsEditable() {

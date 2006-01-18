@@ -20,7 +20,7 @@ public class EmfDatasetTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Type", "Status", "Creator", "Region", "Start Date", "Last Modified Date" };
+        return new String[] { "Name", "Last Modified Date", "Type", "Status", "Creator", "Region", "Start Date" };
     }
 
     public List rows() {
@@ -32,9 +32,9 @@ public class EmfDatasetTableData extends AbstractTableData {
 
         for (int i = 0; i < datasets.length; i++) {
             EmfDataset dataset = datasets[i];
-            Object[] values = { dataset.getName(), dataset.getDatasetTypeName(), dataset.getStatus(),
-                    dataset.getCreator(), dataset.getRegion(), formatStartDate(dataset.getStartDateTime()),
-                    format(dataset.getModifiedDateTime()) };
+            Object[] values = { dataset.getName(), format(dataset.getModifiedDateTime()), dataset.getDatasetTypeName(),
+                    dataset.getStatus(), dataset.getCreator(), dataset.getRegion(),
+                    formatStartDate(dataset.getStartDateTime()) };
 
             Row row = new ViewableRow(dataset, values);
             rows.add(row);
@@ -56,9 +56,11 @@ public class EmfDatasetTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        if (col == 5 || col == 6)
+        if (col == 1 || col == 6)
             return Date.class;
-
+        if (col < 0 || col > 6) {
+            throw new IllegalArgumentException("Allowed values are between 0 and 6, but the value is " + col);
+        }
         return String.class;
     }
 
