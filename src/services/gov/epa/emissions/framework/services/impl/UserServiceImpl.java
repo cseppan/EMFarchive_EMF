@@ -31,12 +31,9 @@ public class UserServiceImpl implements UserService {
 
     public void authenticate(String username, String password) throws EmfException {
         try {
-            Session session = sessionFactory.getSession();
-            User user = dao.get(username, session);
-            session.close();
-
+            User user = getUser(username);
             if (user == null)
-                throw new AuthenticationException("Invalid username");
+                throw new AuthenticationException("User " + username + " does not exist");
 
             if (user.isAcctDisabled())
                 throw new AuthenticationException("Account Disabled");
@@ -47,7 +44,6 @@ public class UserServiceImpl implements UserService {
             LOG.error("Could not authenticate user: " + username + ". Reason: " + ex.getMessage());
             throw new EmfException("Could not authenticate user: " + username);
         }
-
     }
 
     public User getUser(String username) throws EmfException {
@@ -78,10 +74,11 @@ public class UserServiceImpl implements UserService {
 
     public void createUser(User user) throws EmfException {
         User existingUser = this.getUser(user.getUsername());
-        if (existingUser != null){
-            throw new EmfException("Could not create new user - '" + user.getUsername() + "' already taken");
+        if (existingUser != null) {
+            throw new EmfException("Could not create new user. The username '" + user.getUsername()
+                    + "' is already taken");
         }
-        
+
         try {
             Session session = sessionFactory.getSession();
             dao.add(user, session);
@@ -109,7 +106,6 @@ public class UserServiceImpl implements UserService {
             dao.remove(user, session);
             session.close();
         } catch (HibernateException e) {
-            e.printStackTrace();
             LOG.error("Could not delete user - " + user.getFullName() + ". Reason: " + e.getMessage());
             throw new EmfException("Could not delete user - " + user.getFullName());
         }

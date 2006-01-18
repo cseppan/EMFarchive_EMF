@@ -25,11 +25,6 @@ insert into emf.sectors values (13, 'On Road','On Road');
 insert into emf.sectors values (14, 'Biogenic','Biogenic');
 --emf.sectors
 --
---emf.emf_properties
-insert into emf.emf_properties values (1,'emf.data.root.folder','C:\\UNC_CEP\\emf_data');
-insert into emf.emf_properties values (2,'emf.data.import.folder','');
-insert into emf.emf_properties values (3,'emf.data.export.folder','');
---emf.emf_properties
 --
 -- emf.dataset_types
 insert into emf.dataset_types values(1,'ORL Nonpoint Inventory (ARINV)','ORL Nonpoint Inventory (ARINV)', '1', '1', false, 'gov.epa.emissions.commons.io.orl.ORLNonPointImporter', 'gov.epa.emissions.commons.io.orl.ORLNonPointExporter');
