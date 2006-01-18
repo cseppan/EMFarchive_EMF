@@ -3,12 +3,12 @@ package gov.epa.emissions.framework.client.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataAccessToken;
 
-public class TablePresenterDelegate {
+public class TablePaginator {
 
-    private DataEditorService service;
+    private DataAccessService service;
 
     private String table;
 
@@ -18,7 +18,7 @@ public class TablePresenterDelegate {
 
     private TableView view;
 
-    public TablePresenterDelegate(Version version, String table, TableView view, DataEditorService service) {
+    public TablePaginator(Version version, String table, TableView view, DataAccessService service) {
         page = new Page();// page 0, uninitialized
 
         this.version = version;
@@ -49,9 +49,9 @@ public class TablePresenterDelegate {
     }
 
     public void doDisplay(int pageNumber) throws EmfException {
-        if(pageNumber() == pageNumber)
+        if (pageNumber() == pageNumber)
             return;
-        
+
         page = service.getPage(editToken(), pageNumber);
 
         view.display(page);

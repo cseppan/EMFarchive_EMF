@@ -2,16 +2,16 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.DataAccessService;
 
-public class NonEditableTablePresenter implements TablePresenter {
+public class ViewableTablePresenter implements TablePresenter {
 
     private NonEditableTableView view;
 
-    private TablePresenterDelegate delegate;
+    private TablePaginator delegate;
 
-    public NonEditableTablePresenter(Version version, String table, NonEditableTableView view, DataEditorService service) {
-        delegate = new TablePresenterDelegate(version, table, view, service);
+    public ViewableTablePresenter(Version version, String table, NonEditableTableView view, DataAccessService service) {
+        delegate = new TablePaginator(version, table, view, service);
         this.view = view;
     }
 

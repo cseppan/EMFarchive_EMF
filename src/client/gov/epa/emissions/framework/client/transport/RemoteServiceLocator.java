@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.LoggingService;
 import gov.epa.emissions.framework.services.UserService;
@@ -54,6 +55,10 @@ public class RemoteServiceLocator implements ServiceLocator {
 
     public DataEditorService dataEditorService() {
         return new DataEditorServiceTransport(call, baseUrl + "/gov.epa.emf.services.DataEditorService");
+    }
+
+    public DataViewService dataViewService() {
+        return new DataViewServiceTransport(call, baseUrl + "/gov.epa.emf.services.DataViewService");
     }
 
     /*

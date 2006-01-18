@@ -41,7 +41,7 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
         doImport();
 
         token = editToken();
-        service.openSession(token, 4);
+        service.openSession(token);
     }
 
     private void doImport() throws ImporterException {

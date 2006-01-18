@@ -10,7 +10,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTab;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTab;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -77,10 +77,10 @@ public class PropertiesViewWindow extends DisposableInteralFrame implements Prop
 
     private JPanel createDataTab(EmfDataset dataset, EmfConsole parentConsole) {
         ServiceLocator serviceLocator = session.serviceLocator();
-        DataEditorService dataEditorService = serviceLocator.dataEditorService();
+        DataViewService dataViewService = serviceLocator.dataViewService();
 
         DataTab view = new DataTab(parentConsole);
-        DataTabPresenter presenter = new DataTabPresenter(view, dataset, dataEditorService);
+        DataTabPresenter presenter = new DataTabPresenter(view, dataset, dataViewService);
         presenter.doDisplay();
 
         return view;

@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Dimensions;
 
@@ -66,7 +66,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         this.presenter = presenter;
     }
 
-    public void display(Version version, String table, DataEditorService service) {
+    public void display(Version version, String table, DataAccessService service) {
         updateTitle(version, table);
 
         JPanel container = new JPanel(new BorderLayout());
@@ -85,9 +85,9 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         labelPanel.add(new JLabel("    Table:       " + table));
     }
 
-    private JPanel tablePanel(Version version, String table, DataEditorService service) {
+    private JPanel tablePanel(Version version, String table, DataAccessService service) {
         NonEditableTableViewPanel tableView = new NonEditableTableViewPanel(source(table, dataset.getInternalSources()), messagePanel);
-        TablePresenter tablePresenter = new NonEditableTablePresenter(version, table, tableView, service);
+        TablePresenter tablePresenter = new ViewableTablePresenter(version, table, tableView, service);
         tablePresenter.observe();
 
         try {

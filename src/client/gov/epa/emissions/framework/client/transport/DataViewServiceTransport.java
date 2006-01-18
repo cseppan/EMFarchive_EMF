@@ -1,12 +1,11 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataViewService;
+import gov.epa.emissions.framework.services.EMFConstants;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,19 +15,19 @@ import org.apache.axis.client.Call;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class DataEditorServiceTransport implements DataEditorService {
-    private static Log log = LogFactory.getLog(DataEditorServiceTransport.class);
+public class DataViewServiceTransport implements DataViewService {
+    private static Log log = LogFactory.getLog(DataViewServiceTransport.class);
 
     private Call call = null;
 
     private EmfMappings mappings;
 
-    public DataEditorServiceTransport(Call call, String endPoint) {
+    public DataViewServiceTransport(Call call, String endPoint) {
         this.call = call;
         try {
             call.setTargetEndpointAddress(new URL(endPoint));
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Could not connect to Data Editor service at " + endPoint);
+            throw new RuntimeException("Could not connect to DataView service at " + endPoint);
         }
 
         mappings = new EmfMappings();
@@ -137,74 +136,6 @@ public class DataEditorServiceTransport implements DataEditorService {
         return -1;
     }
 
-    public void close() throws EmfException {
-        try {
-            mappings.setOperation(call, "close");
-            mappings.setAnyReturnType(call);
-
-            call.invoke(new Object[0]);
-        } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get count: ", fault);
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get count: ", e);
-        } finally {
-            call.removeAllParameters();
-        }
-    }
-
-    public Version derive(Version baseVersion, String name) throws EmfException {
-        try {
-            mappings.addParam(call, "baseVersion", mappings.version());
-            mappings.addStringParam(call, "name");
-            mappings.setOperation(call, "derive");
-            mappings.setReturnType(call, mappings.version());
-
-            return (Version) call.invoke(new Object[] { baseVersion, name });
-        } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get derive Version from base Version: " + baseVersion.getVersion()
-                    + " for Dataset: " + baseVersion.getDatasetId(), fault);
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get derive Version from base Version: "
-                    + baseVersion.getVersion() + " for Dataset: " + baseVersion.getDatasetId(), e);
-        } finally {
-            call.removeAllParameters();
-        }
-
-        return null;
-    }
-
-    public void submit(DataAccessToken token, ChangeSet changeset, int pageNumber) throws EmfException {
-        try {
-            mappings.addParam(call, "token", mappings.dataAccessToken());
-            mappings.addParam(call, "changeset", mappings.changeset());
-            mappings.addIntegerParam(call, "pageNumber");
-            mappings.setOperation(call, "submit");
-            mappings.setVoidReturnType(call);
-
-            call.invoke(new Object[] { token, changeset, new Integer(pageNumber) });
-        } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not submit changes for " + token, fault);
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not submit changes for " + token, e);
-        } finally {
-            call.removeAllParameters();
-        }
-    }
-
-    public void discard(DataAccessToken token) throws EmfException {
-        try {
-            mappings.addParam(call, "token", mappings.dataAccessToken());
-            mappings.setOperation(call, "discard");
-            mappings.setVoidReturnType(call);
-
-            call.invoke(new Object[] { token });
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not discard changes for " + token, e);
-        } finally {
-            call.removeAllParameters();
-        }
-    }
-
     public DataAccessToken openSession(DataAccessToken token) throws EmfException {
         try {
             mappings.addParam(call, "token", mappings.dataAccessToken());
@@ -213,7 +144,7 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             return (DataAccessToken) call.invoke(new Object[] { token });
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not open editing session for " + token.key(), e);
+            throwExceptionDueToServiceErrors("Could not open session for " + token.key(), e);
         } finally {
             call.removeAllParameters();
         }
@@ -229,45 +160,10 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             call.invoke(new Object[] { token });
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not close editing session for " + token.key(), e);
+            throwExceptionDueToServiceErrors("Could not close session for " + token.key(), e);
         } finally {
             call.removeAllParameters();
         }
-    }
-
-    public void save(DataAccessToken token) throws EmfException {
-        try {
-            mappings.addParam(call, "token", mappings.dataAccessToken());
-            mappings.setOperation(call, "save");
-            mappings.setVoidReturnType(call);
-
-            call.invoke(new Object[] { token });
-        } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not save changes for " + token, fault);
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not save changes for " + token, e);
-        } finally {
-            call.removeAllParameters();
-        }
-    }
-
-    public Version markFinal(Version derived) throws EmfException {
-        try {
-            mappings.addParam(call, "derived", mappings.version());
-            mappings.setOperation(call, "markFinal");
-            mappings.setReturnType(call, mappings.version());
-
-            return (Version) call.invoke(new Object[] { derived });
-        } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to mark a derived Version: " + derived.getVersion() + " as Final", fault);
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to mark a derived Version: " + derived.getVersion() + " as Final",
-                    e);
-        } finally {
-            call.removeAllParameters();
-        }
-
-        return null;
     }
 
     public Version[] getVersions(long datasetId) throws EmfException {

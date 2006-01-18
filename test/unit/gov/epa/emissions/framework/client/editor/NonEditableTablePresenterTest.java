@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Dataset;
+import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataAccessToken;
 
@@ -14,7 +15,7 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
     public void testShouldObserveViewOnObserve() {
         Mock view = mock(NonEditableTableView.class);
 
-        TablePresenter p = new NonEditableTablePresenter(null, "table", (NonEditableTableView) view.proxy(), null);
+        TablePresenter p = new ViewableTablePresenter(null, "table", (NonEditableTableView) view.proxy(), null);
         view.expects(once()).method("observe").with(same(p));
 
         p.observe();
@@ -25,7 +26,7 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         Version version = new Version();
         services.stubs().method("getTotalRecords").with(isA(DataAccessToken.class)).will(returnValue(new Integer(28)));
 
-        TablePresenter p = new NonEditableTablePresenter(version, "table", null, (DataEditorService) services
+        TablePresenter p = new ViewableTablePresenter(version, "table", null, (DataAccessService) services
                 .proxy());
 
         assertEquals(28, p.totalRecords());
@@ -43,8 +44,8 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new NonEditableTablePresenter(new Version(), "table", (NonEditableTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", (NonEditableTableView) view
+                .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayNext();
     }
@@ -60,8 +61,8 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new NonEditableTablePresenter(new Version(), "table", (NonEditableTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", (NonEditableTableView) view
+                .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplay(21);
     }
@@ -78,8 +79,8 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new NonEditableTablePresenter(new Version(), "table", (NonEditableTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", (NonEditableTableView) view
+                .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayPageWithRecord(21);
     }
@@ -95,8 +96,8 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new NonEditableTablePresenter(new Version(), "table", (NonEditableTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", (NonEditableTableView) view
+                .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayFirst();
     }
@@ -113,8 +114,8 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new NonEditableTablePresenter(new Version(), "table", (NonEditableTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", (NonEditableTableView) view
+                .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayFirst();
         p.doDisplayPrevious();
@@ -133,8 +134,8 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new NonEditableTablePresenter(new Version(), "table", (NonEditableTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", (NonEditableTableView) view
+                .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayLast();
         p.doDisplayNext();
@@ -152,8 +153,8 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new NonEditableTablePresenter(new Version(), "table", (NonEditableTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", (NonEditableTableView) view
+                .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayLast();
     }
@@ -173,8 +174,8 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new NonEditableTablePresenter(new Version(), "table", (NonEditableTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", (NonEditableTableView) view
+                .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayNext();
         p.doDisplayNext();
@@ -200,8 +201,8 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new NonEditableTablePresenter(new Version(), "table", (NonEditableTableView) view
-                .proxy(), (DataEditorService) services.proxy());
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", (NonEditableTableView) view
+                .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayNext();
         p.doDisplayNext();

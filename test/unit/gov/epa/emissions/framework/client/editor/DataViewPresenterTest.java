@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataAccessToken;
 
@@ -20,7 +21,7 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         Constraint constraint = tokenConstraint(version, table);
         service.expects(once()).method("openSession").with(constraint);
 
-        DataEditorService serviceProxy = (DataEditorService) service.proxy();
+        DataAccessService serviceProxy = (DataAccessService) service.proxy();
 
         Mock view = mock(DataView.class);
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
@@ -44,7 +45,7 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("closeSession").with(constraint);
 
         DataViewPresenter p = new DataViewPresenter(version, table, (DataView) view.proxy(),
-                (DataEditorService) service.proxy());
+                (DataAccessService) service.proxy());
 
         p.doClose();
     }

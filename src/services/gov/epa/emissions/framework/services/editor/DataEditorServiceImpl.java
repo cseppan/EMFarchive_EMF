@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.editor;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
@@ -11,13 +10,12 @@ import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
-import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.impl.EmfServiceImpl;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -36,6 +34,8 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     private DataAccessCache cache;
 
     private HibernateSessionFactory sessionFactory;
+
+    private DataAccessServiceImpl access;
 
     public DataEditorServiceImpl() throws Exception {
         try {
@@ -59,53 +59,24 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
 
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
         cache = new DataAccessCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
+
+        access = new DataAccessServiceImpl(cache, sessionFactory);
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
-        RecordsFilter filter = new RecordsFilter();
-
-        PageReader reader = cache.reader(token);
-        try {
-            Page page = reader.page(pageNumber);
-            Session session = sessionFactory.getSession();
-            List changesets = cache.changesets(token, pageNumber, session);
-            session.close();
-
-            return filter.filter(page, changesets);
-        } catch (Exception e) {
-            LOG.error("Could not get Page: " + pageNumber + " for Dataset: " + token.datasetId() + ". Reason: " + e);
-            throw new EmfException("Could not get Page: " + pageNumber + " for Dataset: " + token.datasetId());
-        }
+        return access.getPage(token, pageNumber);
     }
 
     public int getPageCount(DataAccessToken token) throws EmfException {
-        try {
-            PageReader reader = cache.reader(token);
-            return reader.totalPages();
-        } catch (SQLException e) {
-            LOG.error("Failed to get page count: " + e.getMessage());
-            throw new EmfException(e.getMessage());
-        }
+        return access.getPageCount(token);
     }
 
     public Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException {
-        try {
-            PageReader reader = cache.reader(token);
-            return reader.pageByRecord(recordId);
-        } catch (SQLException ex) {
-            LOG.error("Initialize reader: " + ex.getMessage());
-            throw new EmfException("Page Reader error: " + ex.getMessage());
-        }
+        return access.getPageWithRecord(token, recordId);
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {
-        try {
-            PageReader reader = cache.reader(token);
-            return reader.totalRecords();
-        } catch (SQLException e) {
-            LOG.error("Failed to get total records count: " + e.getMessage());
-            throw new EmfException(e.getMessage());
-        }
+        return access.getTotalRecords(token);
     }
 
     public Version derive(Version baseVersion, String name) throws EmfException {
@@ -176,27 +147,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public Version[] getVersions(long datasetId) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            Version[] results = versions.get(datasetId, session);
-            session.close();
-
-            return results;
-        } catch (HibernateException e) {
-            LOG.error("Could not get all versions of Dataset : " + datasetId + ". Reason: " + e);
-            throw new EmfException("Could not get all versions of Dataset : " + datasetId);
-
-        }
-    }
-
-    public void close() throws EmfException {
-        // TODO: release/flush locks?
-        try {
-            cache.invalidate();
-        } catch (SQLException e) {
-            LOG.error("Could not close DataEditor Service. Reason: " + e.getMessage());
-            throw new EmfException("Could not close DataEditor Service");
-        }
+        return access.getVersions(datasetId);
     }
 
     public DataAccessToken openSession(DataAccessToken token, int pageSize) throws EmfException {
@@ -215,39 +166,19 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public DataAccessToken openSession(DataAccessToken token) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            cache.init(token, session);
-            session.close();
+        return access.openSession(token);
+    }
 
-            return token;
-        } catch (SQLException e) {
-            LOG.error("Could not initialize editing Session for Dataset: " + token.datasetId() + ", Version: "
-                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
-            throw new EmfException("Could not initialize editing Session for Dataset: " + token.datasetId()
-                    + ", Version: " + token.getVersion().getVersion());
-        }
+    public void closeSession(DataAccessToken token) throws EmfException {
+        access.closeSession(token);
     }
 
     /**
      * This method is for cleaning up session specific objects within this service.
      */
     protected void finalize() throws Throwable {
-        this.close();
+        access.shutdown();
         super.finalize();
-    }
-
-    public void closeSession(DataAccessToken token) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            cache.close(token, session);
-            session.close();
-        } catch (Exception e) {
-            LOG.error("Could not close editing Session for Dataset: " + token.datasetId() + ", Version: "
-                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
-            throw new EmfException("Could not close editing Session for Dataset: " + token.datasetId() + ", Version: "
-                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage());
-        }
     }
 
 }

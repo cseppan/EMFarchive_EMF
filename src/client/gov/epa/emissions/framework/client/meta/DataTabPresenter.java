@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 public class DataTabPresenter {
@@ -9,9 +9,9 @@ public class DataTabPresenter {
 
     private EmfDataset dataset;
 
-    private DataEditorService service;
+    private DataAccessService service;
 
-    public DataTabPresenter(DataTabView view, EmfDataset dataset, DataEditorService service) {
+    public DataTabPresenter(DataTabView view, EmfDataset dataset, DataAccessService service) {
         this.view = view;
         this.dataset = dataset;
         this.service = service;

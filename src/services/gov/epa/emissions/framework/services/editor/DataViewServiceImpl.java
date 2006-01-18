@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 public class DataViewServiceImpl extends EmfServiceImpl implements DataViewService {
     private static Log LOG = LogFactory.getLog(DataViewServiceImpl.class);
 
-    private DataAccessService access;
+    private DataAccessServiceImpl access;
 
     public DataViewServiceImpl() throws Exception {
         try {
@@ -43,7 +43,7 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
         DataAccessCache cache = new DataAccessCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
 
-        access = new DataAccessService(cache, sessionFactory);
+        access = new DataAccessServiceImpl(cache, sessionFactory);
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {

@@ -16,8 +16,8 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 
-public class DataAccessService {
-    private static Log LOG = LogFactory.getLog(DataAccessService.class);
+public class DataAccessServiceImpl {
+    private Log LOG = LogFactory.getLog(DataAccessServiceImpl.class);
 
     private DataAccessCache cache;
 
@@ -25,7 +25,7 @@ public class DataAccessService {
 
     private Versions versions;
 
-    public DataAccessService(DataAccessCache cache, HibernateSessionFactory sessionFactory) {
+    public DataAccessServiceImpl(DataAccessCache cache, HibernateSessionFactory sessionFactory) {
         this.cache = cache;
         this.sessionFactory = sessionFactory;
         versions = new Versions();

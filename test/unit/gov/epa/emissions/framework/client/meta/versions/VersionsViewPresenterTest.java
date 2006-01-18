@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
+import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -20,7 +21,7 @@ public class VersionsViewPresenterTest extends MockObjectTestCase {
 
         Mock service = mock(DataEditorService.class);
         service.expects(once()).method("openSession").withAnyArguments();
-        DataEditorService serviceProxy = (DataEditorService) service.proxy();
+        DataAccessService serviceProxy = (DataAccessService) service.proxy();
 
         Mock dataView = mock(DataView.class);
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
@@ -38,7 +39,7 @@ public class VersionsViewPresenterTest extends MockObjectTestCase {
 
         service.stubs().method("getVersions").with(eq(new Long(dataset.getDatasetid()))).will(returnValue(versions));
 
-        VersionsViewPresenter presenter = new VersionsViewPresenter(dataset, (DataEditorService) service.proxy());
+        VersionsViewPresenter presenter = new VersionsViewPresenter(dataset, (DataAccessService) service.proxy());
         view.expects(once()).method("observe").with(same(presenter));
         view.expects(once()).method("display").with(eq(versions), eq(internalSources));
 

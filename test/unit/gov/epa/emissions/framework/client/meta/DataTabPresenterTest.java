@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -25,7 +26,7 @@ public class DataTabPresenterTest extends MockObjectTestCase {
         Version[] versions = new Version[0];
         editorService.stubs().method("getVersions").with(eq(new Long(1))).will(returnValue(versions));
 
-        DataEditorService serviceProxy = (DataEditorService) editorService.proxy();
+        DataAccessService serviceProxy = (DataAccessService) editorService.proxy();
         view.expects(once()).method("display").with(same(dataset), same(serviceProxy));
 
         DataTabPresenter presenter = new DataTabPresenter((DataTabView) view.proxy(), dataset, serviceProxy);

@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
-import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Dimensions;
@@ -75,7 +75,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         this.presenter = presenter;
     }
 
-    public void display(Version version, String table, DataEditorService service) {
+    public void display(Version version, String table, DataAccessService service) {
         this.table = table;
         updateTitle(version, table);
 
