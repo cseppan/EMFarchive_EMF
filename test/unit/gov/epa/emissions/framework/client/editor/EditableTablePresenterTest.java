@@ -6,7 +6,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.EditToken;
+import gov.epa.emissions.framework.services.DataAccessToken;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -28,7 +28,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
     public void testShouldFetchTotalRecords() throws Exception {
         Mock services = mock(DataEditorService.class);
         Version version = new Version();
-        services.stubs().method("getTotalRecords").with(isA(EditToken.class)).will(returnValue(new Integer(28)));
+        services.stubs().method("getTotalRecords").with(isA(DataAccessToken.class)).will(returnValue(new Integer(28)));
 
         TablePresenter p = new EditableTablePresenter(version, "table", null, (DataEditorService) services.proxy());
 
@@ -38,8 +38,8 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
     public void testShouldDisplayFirstPageOnFirstNextCall() throws Exception {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
-        services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
-        services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
+        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(returnValue(page));
+        services.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
@@ -57,7 +57,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
     public void testShouldDisplaySpecifiedPage() throws Exception {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
-        services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(21))).will(returnValue(page));
+        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(21))).will(returnValue(page));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
@@ -75,7 +75,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
     public void testShouldDisplayPageWithRecord() throws Exception {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
-        services.stubs().method("getPageWithRecord").with(isA(EditToken.class), eq(new Integer(21))).will(
+        services.stubs().method("getPageWithRecord").with(isA(DataAccessToken.class), eq(new Integer(21))).will(
                 returnValue(page));
 
         Mock view = mock(EditablePageManagerView.class);
@@ -94,7 +94,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
     public void testShouldDisplayFirstPage() throws Exception {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
-        services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
+        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(returnValue(page));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
@@ -113,7 +113,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
         page.setNumber(1);
-        services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
+        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(returnValue(page));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
@@ -133,8 +133,8 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
         page.setNumber(20);
-        services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(20))).will(returnValue(page));
-        services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
+        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(20))).will(returnValue(page));
+        services.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
@@ -153,8 +153,8 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
     public void testShouldDisplayLastPage() throws Exception {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
-        services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(20))).will(returnValue(page));
-        services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
+        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(20))).will(returnValue(page));
+        services.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
@@ -173,10 +173,10 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock services = mock(DataEditorService.class);
         Page page = new Page();
         page.setNumber(1);
-        services.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(
+        services.expects(once()).method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(
                 returnValue(page));
-        services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(returnValue(page));
-        services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
+        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(2))).will(returnValue(page));
+        services.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
@@ -196,10 +196,10 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock service = mock(DataEditorService.class);
         Page page = new Page();
         page.setNumber(1);
-        service.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(1)))
+        service.expects(once()).method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1)))
                 .will(returnValue(page));
-        service.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(returnValue(page));
-        service.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
+        service.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(2))).will(returnValue(page));
+        service.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
@@ -219,7 +219,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         
         view.stubs().method("changeset").withNoArguments().will(onConsecutiveCalls(pageZeroChanges, pageOneChanges));
 
-        service.expects(once()).method("submit").with(new IsInstanceOf(EditToken.class), same(page1Changes),
+        service.expects(once()).method("submit").with(new IsInstanceOf(DataAccessToken.class), same(page1Changes),
                 eq(new Integer(page.getNumber())));
 
         p.doDisplayNext();// page 1
@@ -230,10 +230,10 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock service = mock(DataEditorService.class);
         Page page2 = new Page();
         page2.setNumber(2);
-        service.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(1)))
+        service.expects(once()).method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1)))
         .will(returnValue(page2));
-        service.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(returnValue(page2));
-        service.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
+        service.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(2))).will(returnValue(page2));
+        service.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
         
         Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page2));
@@ -253,7 +253,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         
         view.stubs().method("changeset").withNoArguments().will(onConsecutiveCalls(pageZeroChanges, pageTwoChanges));
         
-        service.expects(once()).method("submit").with(new IsInstanceOf(EditToken.class), same(page2Changes),
+        service.expects(once()).method("submit").with(new IsInstanceOf(DataAccessToken.class), same(page2Changes),
                 eq(new Integer(page2.getNumber())));
         
         p.doDisplay(2);// page 2
@@ -262,15 +262,15 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayFirstPageOnDisplayPreviousAfterTwoConsecutiveNextCalls() throws Exception {
         Mock services = mock(DataEditorService.class);
-        services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
+        services.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
         Page page1 = new Page();
         page1.setNumber(1);
-        services.expects(atLeastOnce()).method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(
+        services.expects(atLeastOnce()).method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(
                 returnValue(page1));
         Page page2 = new Page();
         page2.setNumber(2);
-        services.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(
+        services.expects(once()).method("getPage").with(isA(DataAccessToken.class), eq(new Integer(2))).will(
                 returnValue(page2));
 
         Mock view = mock(EditablePageManagerView.class);

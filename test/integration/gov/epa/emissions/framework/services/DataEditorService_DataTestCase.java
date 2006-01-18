@@ -33,7 +33,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
 
     private String table;
 
-    private EditToken token;
+    private DataAccessToken token;
 
     protected void setUpService(DataEditorService service) throws Exception {
         this.service = service;
@@ -106,17 +106,17 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         assertTrue(numberOfPages >= 1);
     }
 
-    private EditToken editToken() {
+    private DataAccessToken editToken() {
         Version version = versionZero();
         return editToken(version);
     }
 
-    private EditToken editToken(Version version) {
+    private DataAccessToken editToken(Version version) {
         return editToken(version, dataset.getName());
     }
 
-    private EditToken editToken(Version version, String table) {
-        EditToken result = new EditToken(version, table);
+    private DataAccessToken editToken(Version version, String table) {
+        DataAccessToken result = new DataAccessToken(version, table);
 
         return result;
     }
@@ -177,8 +177,8 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         record7.setDatasetId((int) dataset.getDatasetid());
         changeset.addNew(record7);
 
-        EditToken token = editToken(versionOne, table);
-        EditToken locked = service.openSession(token, 4);
+        DataAccessToken token = editToken(versionOne, table);
+        DataAccessToken locked = service.openSession(token, 4);
 
         service.submit(locked, changeset, 1);
         service.save(locked);
@@ -201,8 +201,8 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Version versionZero = versions[0];
         Version versionOne = service.derive(versionZero, "v 1");
 
-        EditToken token = editToken(versionOne, table);
-        EditToken locked = service.openSession(token, 4);
+        DataAccessToken token = editToken(versionOne, table);
+        DataAccessToken locked = service.openSession(token, 4);
 
         ChangeSet changeset1 = new ChangeSet();
         changeset1.setVersion(versionOne);
@@ -238,7 +238,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Version versionZero = versions[0];
         Version versionOne = service.derive(versionZero, "v 1");
 
-        EditToken token = editToken(versionOne, table);
+        DataAccessToken token = editToken(versionOne, table);
 
         ChangeSet changeset1 = new ChangeSet();
         changeset1.setVersion(versionOne);
@@ -265,8 +265,8 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Version versionZero = versions[0];
         Version versionOne = service.derive(versionZero, "v 1");
 
-        EditToken token = editToken(versionOne, table);
-        EditToken locked = service.openSession(token, 4);
+        DataAccessToken token = editToken(versionOne, table);
+        DataAccessToken locked = service.openSession(token, 4);
         Page page = service.getPage(token, 1);
 
         ChangeSet changeset = new ChangeSet();
@@ -302,8 +302,8 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Version versionZero = versions[0];
         Version versionOne = service.derive(versionZero, "v 1");
 
-        EditToken token = editToken(versionOne, table);
-        EditToken locked = service.openSession(token, 4);
+        DataAccessToken token = editToken(versionOne, table);
+        DataAccessToken locked = service.openSession(token, 4);
 
         Page page = service.getPage(token, 1);
 
@@ -343,7 +343,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Version versionZero = versions[0];
         Version versionOne = service.derive(versionZero, "v 1");
 
-        EditToken token = editToken(versionOne, table);
+        DataAccessToken token = editToken(versionOne, table);
         service.openSession(token, 4);
 
         // page 1 changes
@@ -380,7 +380,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Version versionZero = versions[0];
         Version versionOne = service.derive(versionZero, "v 1");
 
-        EditToken token = editToken(versionOne, table);
+        DataAccessToken token = editToken(versionOne, table);
         service.openSession(token, 4);
 
         // page 1 changes

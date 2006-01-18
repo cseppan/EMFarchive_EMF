@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.EditToken;
+import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Dimensions;
 
@@ -227,7 +227,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         super.close();
     }
 
-    public void notifyLockFailure(EditToken token) {
+    public void notifyLockFailure(DataAccessToken token) {
         Version version = token.getVersion();
         String message = "Cannot edit Version: " + version.getName() + "(" + version.getVersion() + ") of Dataset: "
                 + dataset.getName() + " since it is locked by " + version.getLockOwner() + " at "

@@ -6,7 +6,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EMFConstants;
-import gov.epa.emissions.framework.services.EditToken;
+import gov.epa.emissions.framework.services.DataAccessToken;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -56,9 +56,9 @@ public class DataEditorServiceTransport implements DataEditorService {
         throw new EmfException(msg);
     }
 
-    public Page getPage(EditToken token, int pageNumber) throws EmfException {
+    public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
         try {
-            mappings.addParam(call, "token", mappings.editToken());
+            mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.addIntegerParam(call, "pageNumber");
 
             mappings.setOperation(call, "getPage");
@@ -76,10 +76,10 @@ public class DataEditorServiceTransport implements DataEditorService {
         return null;
     }
 
-    public int getPageCount(EditToken token) throws EmfException {
+    public int getPageCount(DataAccessToken token) throws EmfException {
         try {
             mappings.setOperation(call, "getPageCount");
-            mappings.addParam(call, "token", mappings.editToken());
+            mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.setIntegerReturnType(call);
 
             Integer cnt = (Integer) call.invoke(new Object[] { token });
@@ -96,14 +96,14 @@ public class DataEditorServiceTransport implements DataEditorService {
         return -1;
     }
 
-    public Page getPageWithRecord(EditToken token, int recordId) throws EmfException {
+    public Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException {
         Page page = null;
 
         try {
             mappings.setOperation(call, "getPageWithRecord");
             mappings.setReturnType(call, mappings.page());
 
-            mappings.addParam(call, "token", mappings.editToken());
+            mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.addIntegerParam(call, "recordId");
 
             page = (Page) call.invoke(new Object[] { token, new Integer(recordId) });
@@ -118,10 +118,10 @@ public class DataEditorServiceTransport implements DataEditorService {
         return page;
     }
 
-    public int getTotalRecords(EditToken token) throws EmfException {
+    public int getTotalRecords(DataAccessToken token) throws EmfException {
         try {
             mappings.setOperation(call, "getTotalRecords");
-            mappings.addParam(call, "token", mappings.editToken());
+            mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.setIntegerReturnType(call);
 
             Integer cnt = (Integer) call.invoke(new Object[] { token });
@@ -173,9 +173,9 @@ public class DataEditorServiceTransport implements DataEditorService {
         return null;
     }
 
-    public void submit(EditToken token, ChangeSet changeset, int pageNumber) throws EmfException {
+    public void submit(DataAccessToken token, ChangeSet changeset, int pageNumber) throws EmfException {
         try {
-            mappings.addParam(call, "token", mappings.editToken());
+            mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.addParam(call, "changeset", mappings.changeset());
             mappings.addIntegerParam(call, "pageNumber");
             mappings.setOperation(call, "submit");
@@ -191,9 +191,9 @@ public class DataEditorServiceTransport implements DataEditorService {
         }
     }
 
-    public void discard(EditToken token) throws EmfException {
+    public void discard(DataAccessToken token) throws EmfException {
         try {
-            mappings.addParam(call, "token", mappings.editToken());
+            mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.setOperation(call, "discard");
             mappings.setVoidReturnType(call);
 
@@ -205,13 +205,13 @@ public class DataEditorServiceTransport implements DataEditorService {
         }
     }
 
-    public EditToken openSession(EditToken token) throws EmfException {
+    public DataAccessToken openSession(DataAccessToken token) throws EmfException {
         try {
-            mappings.addParam(call, "token", mappings.editToken());
+            mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.setOperation(call, "openSession");
-            mappings.setReturnType(call, mappings.editToken());
+            mappings.setReturnType(call, mappings.dataAccessToken());
 
-            return (EditToken) call.invoke(new Object[] { token });
+            return (DataAccessToken) call.invoke(new Object[] { token });
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not open editing session for " + token.key(), e);
         } finally {
@@ -221,14 +221,14 @@ public class DataEditorServiceTransport implements DataEditorService {
         return null;
     }
 
-    public EditToken openSession(EditToken token, int pageSize) throws EmfException {
+    public DataAccessToken openSession(DataAccessToken token, int pageSize) throws EmfException {
         try {
-            mappings.addParam(call, "token", mappings.editToken());
+            mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.addIntegerParam(call, "pageSize");
             mappings.setOperation(call, "openSession");
-            mappings.setReturnType(call, mappings.editToken());
+            mappings.setReturnType(call, mappings.dataAccessToken());
 
-            return (EditToken) call.invoke(new Object[] { token, new Integer(pageSize) });
+            return (DataAccessToken) call.invoke(new Object[] { token, new Integer(pageSize) });
         } catch (Exception e) {
             e.printStackTrace();
             throwExceptionDueToServiceErrors("Could not open editing session for " + token.key(), e);
@@ -239,9 +239,9 @@ public class DataEditorServiceTransport implements DataEditorService {
         return null;
     }
 
-    public void closeSession(EditToken token) throws EmfException {
+    public void closeSession(DataAccessToken token) throws EmfException {
         try {
-            mappings.addParam(call, "token", mappings.editToken());
+            mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.setOperation(call, "closeSession");
             mappings.setVoidReturnType(call);
 
@@ -253,9 +253,9 @@ public class DataEditorServiceTransport implements DataEditorService {
         }
     }
 
-    public void save(EditToken token) throws EmfException {
+    public void save(DataAccessToken token) throws EmfException {
         try {
-            mappings.addParam(call, "token", mappings.editToken());
+            mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.setOperation(call, "save");
             mappings.setVoidReturnType(call);
 

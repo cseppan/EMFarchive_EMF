@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
-import gov.epa.emissions.framework.services.EditToken;
+import gov.epa.emissions.framework.services.DataAccessToken;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ public class DataEditorServiceCacheTest extends MockObjectTestCase {
     }
 
     public void testShouldMaintainListOfChangeSetsPerPage() throws Exception {
-        EditToken token = new EditToken();
+        DataAccessToken token = new DataAccessToken();
         Version version = new Version();
         version.setDatasetId(2);
         version.setVersion(3);
@@ -63,7 +63,7 @@ public class DataEditorServiceCacheTest extends MockObjectTestCase {
     }
 
     public void testShouldMaintainSeparateChangeSetListsForEachPage() throws Exception {
-        EditToken token = new EditToken();
+        DataAccessToken token = new DataAccessToken();
         Version version = new Version();
         version.setDatasetId(2);
         version.setVersion(3);
@@ -89,7 +89,7 @@ public class DataEditorServiceCacheTest extends MockObjectTestCase {
     }
 
     public void testShouldGetChangesetsForAllPagesByPage() throws Exception {
-        EditToken token = new EditToken();
+        DataAccessToken token = new DataAccessToken();
         Version version = new Version();
         version.setDatasetId(2);
         version.setVersion(3);
@@ -116,7 +116,7 @@ public class DataEditorServiceCacheTest extends MockObjectTestCase {
     }
 
     public void testCloseShouldDiscardChangeSetsRelatedToEditToken() throws Exception {
-        EditToken token = new EditToken();
+        DataAccessToken token = new DataAccessToken();
         Version version = new Version();
         version.setDatasetId(2);
         version.setVersion(3);
@@ -137,7 +137,7 @@ public class DataEditorServiceCacheTest extends MockObjectTestCase {
     }
 
     public void testShouldDiscardChangeSetsOfAllPagesOnDiscard() throws Exception {
-        EditToken token = new EditToken();
+        DataAccessToken token = new DataAccessToken();
         Version version = new Version();
         version.setDatasetId(2);
         version.setVersion(3);

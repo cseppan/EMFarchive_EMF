@@ -150,8 +150,8 @@
 		languageSpecificType="java:gov.epa.emissions.commons.db.version.Version"
 		qname="ns1:Version" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 	<beanMapping
-		languageSpecificType="java:gov.epa.emissions.framework.services.EditToken"
-		qname="ns1:EditToken" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		languageSpecificType="java:gov.epa.emissions.framework.services.DataAccessToken"
+		qname="ns1:DataAccessToken" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.commons.db.version.ChangeSet"
 		qname="ns1:ChangeSet" xmlns:ns1="urn:gov.epa.services.EmfService"/>

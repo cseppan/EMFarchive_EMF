@@ -7,7 +7,7 @@ import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.EditToken;
+import gov.epa.emissions.framework.services.DataAccessToken;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -23,7 +23,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         Mock service = mock(DataEditorService.class);
         Constraint constraint = tokenConstraint(version, table);
-        EditToken token = token();
+        DataAccessToken token = token();
         service.expects(once()).method("openSession").with(constraint).will(returnValue(token));
 
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
@@ -41,11 +41,11 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         p.display();
     }
 
-    private EditToken token() {
-        Mock mock = mock(EditToken.class);
+    private DataAccessToken token() {
+        Mock mock = mock(DataAccessToken.class);
         mock.stubs().method("isLocked").will(returnValue(Boolean.TRUE));
 
-        return (EditToken) mock.proxy();
+        return (DataAccessToken) mock.proxy();
     }
 
     public void testShouldCloseViewAndCloseDataEditSessionOnClose() throws Exception {
@@ -53,7 +53,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("close").withNoArguments();
 
         Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("closeSession").with(new IsInstanceOf(EditToken.class));
+        service.expects(once()).method("closeSession").with(new IsInstanceOf(DataAccessToken.class));
 
         DataEditorPresenter p = displayPresenter(view, service);
 
@@ -64,8 +64,8 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Version version = new Version();
         String table = "table";
 
-        EditToken token = token();
-        service.expects(once()).method("openSession").with(new IsInstanceOf(EditToken.class)).will(returnValue(token));
+        DataAccessToken token = token();
+        service.expects(once()).method("openSession").with(new IsInstanceOf(DataAccessToken.class)).will(returnValue(token));
 
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(null));
@@ -85,7 +85,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Mock view = mock(DataEditorView.class);
 
         Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("discard").with(new IsInstanceOf(EditToken.class));
+        service.expects(once()).method("discard").with(new IsInstanceOf(DataAccessToken.class));
 
         DataEditorPresenter p = displayPresenter(view, service);
 
@@ -96,7 +96,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Mock view = mock(DataEditorView.class);
 
         Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("save").with(new IsInstanceOf(EditToken.class));
+        service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class));
 
         DataEditorPresenter p = displayPresenter(view, service);
 
@@ -128,7 +128,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Mock view = mock(DataEditorView.class);
 
         Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("save").with(new IsInstanceOf(EditToken.class));
+        service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class));
 
         DataEditorPresenter p = displayPresenter(view, service);
 
@@ -137,7 +137,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         ChangeSet changeset = new ChangeSet();
         changeset.addDeleted(new VersionedRecord());
         tableView.stubs().method("changeset").withNoArguments().will(returnValue(changeset));
-        service.expects(once()).method("submit").with(new IsInstanceOf(EditToken.class), same(changeset), ANYTHING);
+        service.expects(once()).method("submit").with(new IsInstanceOf(DataAccessToken.class), same(changeset), ANYTHING);
 
         p.doSave();
     }
@@ -156,7 +156,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
     private Constraint tokenConstraint(Version version, String table) {
         Constraint propertyConstraint = and(new HasPropertyWithValue("version", same(version)),
                 new HasPropertyWithValue("table", eq(table)));
-        Constraint constraint = and(new IsInstanceOf(EditToken.class), propertyConstraint);
+        Constraint constraint = and(new IsInstanceOf(DataAccessToken.class), propertyConstraint);
         return constraint;
     }
 

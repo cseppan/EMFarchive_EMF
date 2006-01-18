@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.EditToken;
+import gov.epa.emissions.framework.services.DataAccessToken;
 
 public class TablePresenterDelegate {
 
@@ -81,8 +81,8 @@ public class TablePresenterDelegate {
         return service.getTotalRecords(editToken());
     }
 
-    EditToken editToken() {
-        return new EditToken(version, table);
+    DataAccessToken editToken() {
+        return new DataAccessToken(version, table);
     }
 
 }

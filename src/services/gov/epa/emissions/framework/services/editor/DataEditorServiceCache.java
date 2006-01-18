@@ -7,7 +7,7 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
-import gov.epa.emissions.framework.services.EditToken;
+import gov.epa.emissions.framework.services.DataAccessToken;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -49,12 +49,12 @@ public class DataEditorServiceCache {
         changesetsMap = new HashMap();
     }
 
-    public PageReader reader(EditToken token) {
+    public PageReader reader(DataAccessToken token) {
         return (PageReader) readersMap.get(token.key());
 
     }
 
-    public VersionedRecordsWriter writer(EditToken token) {
+    public VersionedRecordsWriter writer(DataAccessToken token) {
         return (VersionedRecordsWriter) writersMap.get(token.key());
     }
 
@@ -62,7 +62,7 @@ public class DataEditorServiceCache {
      * Keeps a two-level mapping. First map, ChangeSetMap is a map of tokens and PageChangeSetMap. PageChangeSetMap maps
      * Page Number to Change Sets (of that Page)
      */
-    public List changesets(EditToken token, int pageNumber, Session session) throws SQLException {
+    public List changesets(DataAccessToken token, int pageNumber, Session session) throws SQLException {
         Map map = pageChangesetsMap(token, session);
         Integer pageKey = pageChangesetsKey(pageNumber);
         if (!map.containsKey(pageKey)) {
@@ -72,18 +72,18 @@ public class DataEditorServiceCache {
         return (List) map.get(pageKey);
     }
 
-    public void submitChangeSet(EditToken token, ChangeSet changeset, int pageNumber, Session session)
+    public void submitChangeSet(DataAccessToken token, ChangeSet changeset, int pageNumber, Session session)
             throws SQLException {
         List list = changesets(token, pageNumber, session);
         list.add(changeset);
     }
 
-    public void discardChangeSets(EditToken token, Session session) throws SQLException {
+    public void discardChangeSets(DataAccessToken token, Session session) throws SQLException {
         Map pageChangsetsMap = pageChangesetsMap(token, session);
         pageChangsetsMap.clear();
     }
 
-    public List changesets(EditToken token, Session session) throws SQLException {
+    public List changesets(DataAccessToken token, Session session) throws SQLException {
         List all = new ArrayList();
         Map pageChangesetsMap = pageChangesetsMap(token, session);
         Set keys = new TreeSet(pageChangesetsMap.keySet());
@@ -95,11 +95,11 @@ public class DataEditorServiceCache {
         return all;
     }
 
-    public void init(EditToken token, Session session) throws SQLException {
+    public void init(DataAccessToken token, Session session) throws SQLException {
         init(token, 100, session);
     }
 
-    public void init(EditToken token, int pageSize, Session session) throws SQLException {
+    public void init(DataAccessToken token, int pageSize, Session session) throws SQLException {
         initChangesetsMap(token);
         initReader(token, pageSize, session);
         initWriter(token);
@@ -111,28 +111,28 @@ public class DataEditorServiceCache {
         changesetsMap.clear();
     }
 
-    public void reload(EditToken token, Session session) throws SQLException {
+    public void reload(DataAccessToken token, Session session) throws SQLException {
         close(token, session);
         init(token, session);
     }
 
-    public void close(EditToken token, Session session) throws SQLException {
+    public void close(DataAccessToken token, Session session) throws SQLException {
         removeChangesets(token, session);
         closeReader(token);
         closeWriter(token);
     }
 
-    private void closeReader(EditToken token) throws SQLException {
+    private void closeReader(DataAccessToken token) throws SQLException {
         PageReader reader = (PageReader) readersMap.remove(token.key());
         reader.close();
     }
 
-    private void closeWriter(EditToken token) throws SQLException {
+    private void closeWriter(DataAccessToken token) throws SQLException {
         VersionedRecordsWriter writer = (VersionedRecordsWriter) writersMap.remove(token.key());
         writer.close();
     }
 
-    private void removeChangesets(EditToken token, Session session) throws SQLException {
+    private void removeChangesets(DataAccessToken token, Session session) throws SQLException {
         discardChangeSets(token, session);
         changesetsMap.remove(token.key());
     }
@@ -161,19 +161,19 @@ public class DataEditorServiceCache {
         return new Integer(pageNumber);
     }
 
-    private Map pageChangesetsMap(EditToken token, Session session) throws SQLException {
+    private Map pageChangesetsMap(DataAccessToken token, Session session) throws SQLException {
         init(token, session);
         return (Map) changesetsMap.get(token.key());
     }
 
-    private void initWriter(EditToken token) throws SQLException {
+    private void initWriter(DataAccessToken token) throws SQLException {
         if (!writersMap.containsKey(token.key())) {
             VersionedRecordsWriter writer = writerFactory.create(datasource, token.getTable(), sqlTypes);
             writersMap.put(token.key(), writer);
         }
     }
 
-    private void initReader(EditToken token, int pageSize, Session session) throws SQLException {
+    private void initReader(DataAccessToken token, int pageSize, Session session) throws SQLException {
         if (!readersMap.containsKey(token.key())) {
             ScrollableVersionedRecords records = recordsReader.fetch(token.getVersion(), token.getTable(), session);
             PageReader reader = new PageReader(pageSize, records);
@@ -182,13 +182,13 @@ public class DataEditorServiceCache {
         }
     }
 
-    private void initChangesetsMap(EditToken token) {
+    private void initChangesetsMap(DataAccessToken token) {
         if (!changesetsMap.containsKey(token.key())) {
             changesetsMap.put(token.key(), new HashMap());
         }
     }
 
-    public void save(EditToken token, Session session) throws Exception {
+    public void save(DataAccessToken token, Session session) throws Exception {
         VersionedRecordsWriter writer = writer(token);
         List list = changesets(token, session);
         for (Iterator iter = list.iterator(); iter.hasNext();) {

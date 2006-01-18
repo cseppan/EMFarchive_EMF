@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.EditToken;
+import gov.epa.emissions.framework.services.DataAccessToken;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -52,7 +52,7 @@ public class DataViewPresenterTest extends MockObjectTestCase {
     private Constraint tokenConstraint(Version version, String table) {
         Constraint propertyConstraint = and(new HasPropertyWithValue("version", same(version)),
                 new HasPropertyWithValue("table", eq(table)));
-        Constraint constraint = and(new IsInstanceOf(EditToken.class), propertyConstraint);
+        Constraint constraint = and(new IsInstanceOf(DataAccessToken.class), propertyConstraint);
         return constraint;
     }
 

@@ -27,7 +27,7 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
 
     private String table;
 
-    private EditToken token;
+    private DataAccessToken token;
 
     protected void setUpService(DataEditorService service) throws Exception {
         this.service = service;
@@ -70,17 +70,17 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
         modifier.dropAll("versions");
     }
 
-    private EditToken editToken() {
+    private DataAccessToken editToken() {
         Version version = versionZero();
         return editToken(version);
     }
 
-    private EditToken editToken(Version version) {
+    private DataAccessToken editToken(Version version) {
         return editToken(version, dataset.getName());
     }
 
-    private EditToken editToken(Version version, String table) {
-        EditToken result = new EditToken(version, table);
+    private DataAccessToken editToken(Version version, String table) {
+        DataAccessToken result = new DataAccessToken(version, table);
 
         return result;
     }

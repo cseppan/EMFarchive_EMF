@@ -3,16 +3,16 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 
-public class EditToken {
+public class DataAccessToken {
 
     private String table;
 
     private Version version;
 
-    public EditToken() {// needed by Axis
+    public DataAccessToken() {// needed by Axis
     }
 
-    public EditToken(Version version, String table) {
+    public DataAccessToken(Version version, String table) {
         this.version = version;
         this.table = table;
     }

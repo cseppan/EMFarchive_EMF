@@ -14,7 +14,7 @@ import gov.epa.emissions.commons.io.SectorCriteria;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.Country;
-import gov.epa.emissions.framework.services.EditToken;
+import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Status;
 
@@ -49,7 +49,7 @@ public class EmfMappings extends Mappings {
         bean(call, Page.class, page());
         bean(call, VersionedRecord.class, record());
         bean(call, Version.class, version());
-        bean(call, EditToken.class, editToken());
+        bean(call, DataAccessToken.class, dataAccessToken());
         bean(call, ChangeSet.class, changeset());
 
         bean(call, Status.class, status());
@@ -168,8 +168,8 @@ public class EmfMappings extends Mappings {
         return qname("Versions");
     }
 
-    public QName editToken() {
-        return qname("EditToken");
+    public QName dataAccessToken() {
+        return qname("DataAccessToken");
     }
 
     public QName changeset() {

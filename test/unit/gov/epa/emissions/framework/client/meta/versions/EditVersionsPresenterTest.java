@@ -9,7 +9,7 @@ import gov.epa.emissions.framework.client.editor.DataEditorPresenter;
 import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.EditToken;
+import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.jmock.Mock;
@@ -53,11 +53,11 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         presenter.doEdit(version, table, (DataEditorView) dataView.proxy());
     }
 
-    private EditToken token() {
-        Mock mock = mock(EditToken.class);
+    private DataAccessToken token() {
+        Mock mock = mock(DataAccessToken.class);
         mock.stubs().method("isLocked").will(returnValue(Boolean.TRUE));
 
-        return (EditToken) mock.proxy();
+        return (DataAccessToken) mock.proxy();
     }
 
     public void testShouldRaiseErrorOnEditWhenVersionIsFinal() throws Exception {
