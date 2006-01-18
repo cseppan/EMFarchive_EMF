@@ -24,7 +24,6 @@ public class DefaultEmfSession implements EmfSession {
         serviceLocator = locator;
         this.preferences = new UserPreferences();
         this.user = user;
-        mostRecentExportFolder = locator.eximService().getExportBaseFolder();
     }
     
     public UserPreferences preferences() {

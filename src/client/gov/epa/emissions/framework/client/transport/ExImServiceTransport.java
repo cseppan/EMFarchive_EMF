@@ -47,38 +47,6 @@ public class ExImServiceTransport implements ExImService {
         }
     }
 
-    public String getImportBaseFolder() throws EmfException {
-        try {
-            Call call = callFactory.createCall();
-            mappings.setOperation(call, "getImportBaseFolder");
-            mappings.setStringReturnType(call);
-
-            return (String) call.invoke(new Object[0]);
-        } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not fetch Base Folder for Import", fault);
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not fetch Base Folder for Import", e);
-        }
-
-        return null;
-    }
-
-    public String getExportBaseFolder() throws EmfException {
-        try {
-            Call call = callFactory.createCall();
-            mappings.setOperation(call, "getExportBaseFolder");
-            mappings.setStringReturnType(call);
-
-            return (String) call.invoke(new Object[0]);
-        } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not fetch Base Folder for Export", fault);
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not fetch Base Folder for Export", e);
-        }
-
-        return null;
-    }
-
     public void startExport(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException {
         doExport("startExport", user, datasets, folder, purpose);
     }
@@ -121,17 +89,18 @@ public class ExImServiceTransport implements ExImService {
 
     private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
         LOG.error(message, fault);
-        String msg=extractMessage(fault.getMessage());
-        
-        if (fault.getCause()!=null){
-            if (fault.getCause().getMessage().equals(EMFConstants.CONNECTION_REFUSED)){
-                msg="EMF server not responding";
-            }            
+        String msg = extractMessage(fault.getMessage());
+
+        if (fault.getCause() != null) {
+            if (fault.getCause().getMessage().equals(EMFConstants.CONNECTION_REFUSED)) {
+                msg = "EMF server not responding";
+            }
         }
         throw new EmfException(msg);
     }
 
-    public void startMultipleFileImport(User user, String folderPath, String[] fileName, DatasetType datasetType) throws EmfException {
+    public void startMultipleFileImport(User user, String folderPath, String[] fileName, DatasetType datasetType)
+            throws EmfException {
         try {
             Call call = callFactory.createCall();
             mappings.register(call);

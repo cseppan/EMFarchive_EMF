@@ -12,8 +12,6 @@ import org.jmock.MockObjectTestCase;
 
 public class DefaultEmfSessionTest extends MockObjectTestCase {
 
-    private String folder;
-
     private EmfSession session;
 
     private Mock locator;
@@ -22,9 +20,6 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
 
     protected void setUp() throws Exception {
         eximServices = mock(ExImService.class);
-        folder = "folder/blah";
-        eximServices.stubs().method("getExportBaseFolder").will(returnValue(folder));
-
         locator = mock(ServiceLocator.class);
         locator.stubs().method("eximService").will(returnValue(eximServices.proxy()));
 
@@ -100,8 +95,6 @@ public class DefaultEmfSessionTest extends MockObjectTestCase {
     }
 
     public void testShouldReturnDefaultExportFolderAsTheMostRecentExportFolderOnFirstInvocationOnly() {
-        assertEquals(folder, session.getMostRecentExportFolder());
-
         session.setMostRecentExportFolder("folder/baz");
         assertEquals("folder/baz", session.getMostRecentExportFolder());
     }

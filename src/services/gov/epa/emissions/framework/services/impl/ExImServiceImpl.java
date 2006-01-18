@@ -10,9 +10,7 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDao;
-import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.AccessLog;
-import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
 
@@ -32,16 +30,12 @@ import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     private static Log log = LogFactory.getLog(ExImServiceImpl.class);
-        
+
     public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MMddyy_HHmm");
 
     private VersionedImporterFactory importerFactory;
 
     private VersionedExporterFactory exporterFactory;
-
-    private String baseImportFolder = null;
-
-    private String baseExportFolder = null;
 
     private PooledExecutor threadPool;
 
@@ -59,29 +53,12 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     private void init(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
 
-        // FIXME: Get base directory
-        File mountPoint = new File(getValue(EMFConstants.EMF_DATA_ROOT_FOLDER));
-        File importFolder = new File(mountPoint, getValue(EMFConstants.EMF_DATA_IMPORT_FOLDER));
-        File exportFolder = new File(mountPoint, getValue(EMFConstants.EMF_DATA_EXPORT_FOLDER));
-
-        baseImportFolder = importFolder.getAbsolutePath();
-        baseExportFolder = exportFolder.getAbsolutePath();
-
         importerFactory = new VersionedImporterFactory(dbServer, dbServer.getSqlDataTypes());
         exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes());
 
         // TODO: thread pooling policy
         threadPool = new PooledExecutor(new BoundedBuffer(10), 20);
         threadPool.setMinimumPoolSize(3);
-    }
-
-    private String getValue(String root) {
-        Session session = sessionFactory.getSession();
-        EmfPropertiesDAO dao = new EmfPropertiesDAO();
-        String propvalue = dao.getProperty(root, session).getValue();
-        session.close();
-
-        return propvalue;
     }
 
     private File validateExportFile(File path, String fileName, boolean overwrite) throws EmfException {
@@ -106,7 +83,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
         if (!file.exists() || !file.isDirectory()) {
             log.error("Folder " + folderPath + " does not exist");
-            throw new EmfException("Folder does not exist: "+folderPath);
+            throw new EmfException("Folder does not exist: " + folderPath);
         }
         log.debug("check if folder exists " + folderPath);
         return file;
@@ -255,28 +232,21 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return prefix + name + "_" + date + suffix;
     }
 
-    public String getImportBaseFolder() {
-        return baseImportFolder;
-    }
-
-    public String getExportBaseFolder() {
-        return baseExportFolder;
-    }
-
-    public void startMultipleFileImport(User user, String folderPath, String[] fileNames, DatasetType datasetType) throws EmfException {
+    public void startMultipleFileImport(User user, String folderPath, String[] fileNames, DatasetType datasetType)
+            throws EmfException {
         log.debug("multiple datasets import: " + datasetType.getName());
-        String[] fileNamesForImport=null;
-        
+        String[] fileNamesForImport = null;
+
         try {
             File folder = validatePath(folderPath);
 
-            if (fileNames.length==1) {
+            if (fileNames.length == 1) {
                 String fileName = fileNames[0];
 
                 // The fileName is a regular expression that maps to a collection of files.
                 FilePatternMatcher fpm = new FilePatternMatcher(fileName);
                 String[] allFilesInFolder = folder.list();
-                fileNamesForImport = fpm.matchingNames(allFilesInFolder);                
+                fileNamesForImport = fpm.matchingNames(allFilesInFolder);
             }
 
             // Loop through the collection and start import for the file
@@ -292,17 +262,15 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 dataset.setCreatedDateTime(new Date());
                 dataset.setModifiedDateTime(new Date());
                 dataset.setAccessedDateTime(new Date());
-                
-                startImport(user, folderPath, fileName, dataset);            
+
+                startImport(user, folderPath, fileName, dataset);
             }
-            
+
         } catch (ImporterException e) {
             log.error("Exception attempting to start export of file to folder: " + folderPath, e);
             throw new EmfException(e.getMessage());
-       }
-        
-       
-    }
+        }
 
+    }
 
 }
