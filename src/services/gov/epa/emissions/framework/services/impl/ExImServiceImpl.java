@@ -33,7 +33,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     private static Log log = LogFactory.getLog(ExImServiceImpl.class);
         
-    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss");
+    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MMddyy_HHmm");
 
     private VersionedImporterFactory importerFactory;
 
@@ -283,7 +283,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             for (int i = 0; i < fileNamesForImport.length; i++) {
                 String fileName = fileNamesForImport[i];
                 log.debug("#### Filename: " + fileName);
-                String importFileName = fileName + DATE_FORMATTER.format(new Date());
+                String importFileName = fileName + "_" + DATE_FORMATTER.format(new Date());
                 log.debug("modified filename: " + importFileName);
                 EmfDataset dataset = new EmfDataset();
                 dataset.setName(importFileName);
