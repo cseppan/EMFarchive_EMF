@@ -13,9 +13,9 @@ import org.hibernate.Session;
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
-public class DataEditorServiceCacheTest extends MockObjectTestCase {
+public class DataAccessCacheTest extends MockObjectTestCase {
 
-    private DataEditorServiceCache cache;
+    private DataAccessCache cache;
 
     private Session session;
 
@@ -35,7 +35,7 @@ public class DataEditorServiceCacheTest extends MockObjectTestCase {
         Mock writerFactory = mock(VersionedRecordsWriterFactory.class);
         writerFactory.stubs().method("create").withAnyArguments().will(returnValue(writer.proxy()));
 
-        cache = new DataEditorServiceCache((VersionedRecordsReader) reader.proxy(),
+        cache = new DataAccessCache((VersionedRecordsReader) reader.proxy(),
                 (VersionedRecordsWriterFactory) writerFactory.proxy(), null, null);
     }
 

@@ -21,7 +21,7 @@ import java.util.TreeSet;
 
 import org.hibernate.Session;
 
-public class DataEditorServiceCache {
+public class DataAccessCache {
 
     private Map readersMap;
 
@@ -37,7 +37,7 @@ public class DataEditorServiceCache {
 
     private VersionedRecordsWriterFactory writerFactory;
 
-    public DataEditorServiceCache(VersionedRecordsReader reader, VersionedRecordsWriterFactory writerFactory,
+    public DataAccessCache(VersionedRecordsReader reader, VersionedRecordsWriterFactory writerFactory,
             Datasource datasource, SqlDataTypes sqlTypes) {
         recordsReader = reader;
         this.writerFactory = writerFactory;

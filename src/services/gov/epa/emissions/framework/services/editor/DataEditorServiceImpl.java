@@ -33,7 +33,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
 
     private VersionedRecordsReader reader;
 
-    private DataEditorServiceCache cache;
+    private DataAccessCache cache;
 
     private HibernateSessionFactory sessionFactory;
 
@@ -58,7 +58,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         reader = new DefaultVersionedRecordsReader(datasource);
 
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
-        cache = new DataEditorServiceCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
+        cache = new DataAccessCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {

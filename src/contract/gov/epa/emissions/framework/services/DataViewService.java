@@ -13,7 +13,6 @@ public interface DataViewService {
 
     int getTotalRecords(DataAccessToken token) throws EmfException;
 
-    // version-related
     Version[] getVersions(long datasetId) throws EmfException;
 
     // session
