@@ -50,7 +50,7 @@ public class ClientBatchFile {
 
     public static void main(String[] args) {
         try {
-            String fileName = "C:/Parthee/EMFClient.bat";
+            String fileName = System.getProperty("user.home") + "/EMFClient.bat";
             String preferenceFile="";
             new ClientBatchFile(fileName).create(preferenceFile);
         } catch (Exception e) {
