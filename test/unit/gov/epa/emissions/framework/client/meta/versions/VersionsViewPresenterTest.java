@@ -3,8 +3,8 @@ package gov.epa.emissions.framework.client.meta.versions;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.editor.NonEditableDataView;
-import gov.epa.emissions.framework.client.editor.NonEditableDataViewPresenter;
+import gov.epa.emissions.framework.client.editor.DataView;
+import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -22,12 +22,12 @@ public class VersionsViewPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("openSession").withAnyArguments();
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
-        Mock dataView = mock(NonEditableDataView.class);
+        Mock dataView = mock(DataView.class);
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
-        dataView.expects(once()).method("observe").with(new IsInstanceOf(NonEditableDataViewPresenter.class));
+        dataView.expects(once()).method("observe").with(new IsInstanceOf(DataViewPresenter.class));
 
         VersionsViewPresenter presenter = new VersionsViewPresenter(null, serviceProxy);
-        presenter.doView(version, table, (NonEditableDataView) dataView.proxy());
+        presenter.doView(version, table, (DataView) dataView.proxy());
     }
 
     private VersionsViewPresenter displayPresenter(Mock service, Mock view) throws EmfException {

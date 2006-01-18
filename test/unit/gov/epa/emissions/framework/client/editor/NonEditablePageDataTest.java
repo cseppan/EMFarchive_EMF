@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 public class NonEditablePageDataTest extends TestCase {
 
     public void testShouldReturnStringAsColumnClassForAllColumns() {
-        NonEditablePageData data = new NonEditablePageData(new Page(), null);
+        ViewablePage data = new ViewablePage(new Page(), null);
 
         assertEquals(String.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
@@ -20,7 +20,7 @@ public class NonEditablePageDataTest extends TestCase {
     public void testShouldDisplayAllColumns() {
         String[] cols = new String[] { "col1", "col2", "col3" };
 
-        NonEditablePageData data = new NonEditablePageData(new Page(), cols);
+        ViewablePage data = new ViewablePage(new Page(), cols);
 
         String[] columns = data.columns();
         assertEquals(3, columns.length);
@@ -32,7 +32,7 @@ public class NonEditablePageDataTest extends TestCase {
     public void testShouldMarkAllColumnsAsNotEditable() {
         String[] cols = new String[] { "col1", "col2", "col3" };
 
-        NonEditablePageData data = new NonEditablePageData(new Page(), cols);
+        ViewablePage data = new ViewablePage(new Page(), cols);
 
         assertFalse("All columns should not be editable", data.isEditable(0));
         assertFalse("All columns should not be editable", data.isEditable(1));
@@ -50,7 +50,7 @@ public class NonEditablePageDataTest extends TestCase {
         record2.setTokens(new String[] { "11", "12", "13" });
         page.add(record2);
 
-        NonEditablePageData data = new NonEditablePageData(page, cols);
+        ViewablePage data = new ViewablePage(page, cols);
 
         List rows = data.rows();
         assertNotNull("Should have 2 rows", rows);
@@ -68,7 +68,7 @@ public class NonEditablePageDataTest extends TestCase {
         record2.setTokens(new String[] { "11", "12", "13" });
         page.add(record2);
 
-        NonEditablePageData data = new NonEditablePageData(page, cols);
+        ViewablePage data = new ViewablePage(page, cols);
 
         List rows = data.rows();
 

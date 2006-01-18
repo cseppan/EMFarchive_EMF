@@ -6,7 +6,6 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
-import gov.epa.emissions.framework.ui.SelectableEmfTableData;
 import gov.epa.emissions.framework.ui.TableData;
 
 import java.awt.BorderLayout;
@@ -19,9 +18,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
-public class EditableTableDataPanel extends JPanel {
+public class EditablePagePanel extends JPanel {
 
     private EmfTableModel tableModel;
 
@@ -29,14 +29,14 @@ public class EditableTableDataPanel extends JPanel {
 
     private MessagePanel messagePanel;
 
-    public EditableTableDataPanel(SelectableEmfTableData tableData, MessagePanel messagePanel) {
+    public EditablePagePanel(EditablePage page, MessagePanel messagePanel) {
         super.setLayout(new BorderLayout());
-        super.add(doLayout(tableData), BorderLayout.CENTER);
+        super.add(doLayout(page), BorderLayout.CENTER);
 
         this.messagePanel = messagePanel;
     }
 
-    private JPanel doLayout(SelectableEmfTableData tableData) {
+    private JPanel doLayout(EditablePage tableData) {
         JPanel container = new JPanel(new BorderLayout());
 
         container.add(table(tableData), BorderLayout.CENTER);
@@ -47,14 +47,14 @@ public class EditableTableDataPanel extends JPanel {
     }
 
     private void setBorder() {
-        javax.swing.border.Border outer = BorderFactory.createEmptyBorder(10, 5, 10, 5);
-        javax.swing.border.Border inner = BorderFactory.createLineBorder(Color.GRAY);
+        Border outer = BorderFactory.createEmptyBorder(10, 5, 10, 5);
+        Border inner = BorderFactory.createLineBorder(Color.GRAY);
         CompoundBorder border = BorderFactory.createCompoundBorder(outer, inner);
 
         super.setBorder(border);
     }
 
-    private JPanel bottomPanel(SelectableEmfTableData tableData) {
+    private JPanel bottomPanel(EditablePage tableData) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -74,13 +74,13 @@ public class EditableTableDataPanel extends JPanel {
 
         JPanel labelsPanel = new JPanel();
         labelsPanel.add(new JLabel("Notes"));
-        
+
         JLabel comingSoon = new JLabel("(Coming Soon)");
         comingSoon.setForeground(Color.BLUE);
         labelsPanel.add(comingSoon);
-        
+
         container.add(labelsPanel, BorderLayout.LINE_START);
-        
+
         return container;
     }
 
@@ -90,7 +90,7 @@ public class EditableTableDataPanel extends JPanel {
         return table;
     }
 
-    private JPanel buttonsPanel(final SelectableEmfTableData tableData) {
+    private JPanel buttonsPanel(final EditablePage tableData) {
         JPanel container = new JPanel();
 
         Button add = new Button("Add Row", new AbstractAction() {
@@ -125,9 +125,9 @@ public class EditableTableDataPanel extends JPanel {
         super.revalidate();
     }
 
-    private void doAdd(final SelectableEmfTableData tableData) {
+    private void doAdd(final EditablePage tableData) {
         clearMessages();
-        
+
         tableData.addBlankRow();
         refresh();
 
@@ -135,7 +135,7 @@ public class EditableTableDataPanel extends JPanel {
         refresh();
     }
 
-    private void doRemove(final SelectableEmfTableData tableData) {
+    private void doRemove(final EditablePage tableData) {
         clearMessages();
         tableData.removeSelected();
         refresh();

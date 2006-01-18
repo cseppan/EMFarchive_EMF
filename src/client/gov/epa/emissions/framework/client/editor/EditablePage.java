@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class EditablePageData extends AbstractTableData implements SelectableEmfTableData {
+public class EditablePage extends AbstractTableData implements SelectableEmfTableData {
     private List rows;
 
     private String[] cols;
@@ -25,7 +25,7 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
 
     private ChangeSet changeset;
 
-    public EditablePageData(int datasetId, Version version, Page page, String[] cols) {
+    public EditablePage(int datasetId, Version version, Page page, String[] cols) {
         this.datasetId = datasetId;
         this.version = version;
         this.cols = cols;
@@ -75,7 +75,7 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
     }
 
     private EditableRow row(VersionedRecord record) {
-        RowSource source = new EditablePageDataRowSource(record);
+        RowSource source = new EditablePageRowSource(record);
         return new EditableRow(source);
     }
 
@@ -107,7 +107,7 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            EditablePageDataRowSource rowSource = (EditablePageDataRowSource) row.rowSource();
+            EditablePageRowSource rowSource = (EditablePageRowSource) row.rowSource();
             if (rowSource.isSelected())
                 selected.add(rowSource.source());
         }
@@ -130,7 +130,7 @@ public class EditablePageData extends AbstractTableData implements SelectableEmf
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            EditablePageDataRowSource rowSource = (EditablePageDataRowSource) row.rowSource();
+            EditablePageRowSource rowSource = (EditablePageRowSource) row.rowSource();
             sources.add(rowSource.source());
         }
         return sources;

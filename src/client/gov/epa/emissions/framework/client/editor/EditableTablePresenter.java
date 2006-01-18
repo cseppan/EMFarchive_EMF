@@ -7,13 +7,13 @@ import gov.epa.emissions.framework.services.DataEditorService;
 
 public class EditableTablePresenter implements TablePresenter {
 
-    private EditableTableView view;
+    private EditablePageManagerView view;
 
     private TablePresenterDelegate delegate;
 
     private DataEditorService service;
 
-    public EditableTablePresenter(Version version, String table, EditableTableView view, DataEditorService service) {
+    public EditableTablePresenter(Version version, String table, EditablePageManagerView view, DataEditorService service) {
         this.service = service;
         this.view = view;
 

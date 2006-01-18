@@ -81,7 +81,7 @@ public class NonEditableTableViewPanel extends JPanel implements NonEditableTabl
 
         paginationPanel.updateStatus(page);
 
-        tableModel = new EmfTableModel(new NonEditablePageData(page, cols()));
+        tableModel = new EmfTableModel(new ViewablePage(page, cols()));
         JScrollPane table = new ScrollableTable(tableModel);
         pageContainer.add(table, BorderLayout.CENTER);
     }

@@ -25,23 +25,23 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class EditableDataViewWindow extends DisposableInteralFrame implements EditableDataView {
+public class DataEditor extends DisposableInteralFrame implements DataEditorView {
 
     private JPanel layout;
 
     private MessagePanel messagePanel;
 
-    private EditableDataViewPresenter presenter;
+    private DataEditorPresenter presenter;
 
     private EmfDataset dataset;
 
     private JPanel labelPanel;
 
-    private EditableTableViewPanel tableView;
+    private EditablePageContainer tableView;
 
     private String table;
 
-    public EditableDataViewWindow(EmfDataset dataset) {
+    public DataEditor(EmfDataset dataset) {
         super("Data Editor: " + dataset.getName());
         setDimension();
         this.dataset = dataset;
@@ -71,7 +71,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
         return panel;
     }
 
-    public void observe(EditableDataViewPresenter presenter) {
+    public void observe(DataEditorPresenter presenter) {
         this.presenter = presenter;
     }
 
@@ -97,7 +97,7 @@ public class EditableDataViewWindow extends DisposableInteralFrame implements Ed
 
     private JPanel tablePanel(Version version, String table) {
         InternalSource source = source(table, dataset.getInternalSources());
-        tableView = new EditableTableViewPanel(dataset, version, source, messagePanel);
+        tableView = new EditablePageContainer(dataset, version, source, messagePanel);
         displayTable(table);
 
         return tableView;

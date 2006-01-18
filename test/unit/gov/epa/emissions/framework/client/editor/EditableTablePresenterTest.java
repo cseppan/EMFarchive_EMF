@@ -17,9 +17,9 @@ import org.jmock.core.stub.ReturnStub;
 public class EditableTablePresenterTest extends MockObjectTestCase {
 
     public void testShouldObserveViewOnObserve() {
-        Mock view = mock(EditableTableView.class);
+        Mock view = mock(EditablePageManagerView.class);
 
-        TablePresenter p = new EditableTablePresenter(null, "table", (EditableTableView) view.proxy(), null);
+        TablePresenter p = new EditableTablePresenter(null, "table", (EditablePageManagerView) view.proxy(), null);
         view.expects(once()).method("observe").with(same(p));
 
         p.observe();
@@ -41,14 +41,14 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(EditableTableView.class);
+        Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) services.proxy());
 
         p.doDisplayNext();
@@ -59,14 +59,14 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Page page = new Page();
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(21))).will(returnValue(page));
 
-        Mock view = mock(EditableTableView.class);
+        Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) services.proxy());
 
         p.doDisplay(21);
@@ -78,14 +78,14 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPageWithRecord").with(isA(EditToken.class), eq(new Integer(21))).will(
                 returnValue(page));
 
-        Mock view = mock(EditableTableView.class);
+        Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) services.proxy());
 
         p.doDisplayPageWithRecord(21);
@@ -96,14 +96,14 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Page page = new Page();
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
 
-        Mock view = mock(EditableTableView.class);
+        Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) services.proxy());
 
         p.doDisplayFirst();
@@ -115,14 +115,14 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         page.setNumber(1);
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(1))).will(returnValue(page));
 
-        Mock view = mock(EditableTableView.class);
+        Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) services.proxy());
 
         p.doDisplayFirst();
@@ -136,14 +136,14 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(20))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(EditableTableView.class);
+        Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) services.proxy());
 
         p.doDisplayLast();
@@ -156,14 +156,14 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(20))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(EditableTableView.class);
+        Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) services.proxy());
 
         p.doDisplayLast();
@@ -178,14 +178,14 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(EditableTableView.class);
+        Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) services.proxy());
 
         p.doDisplayNext();
@@ -201,13 +201,13 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         service.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(returnValue(page));
         service.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(EditableTableView.class);
+        Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) service.proxy());
 
         //changes
@@ -235,13 +235,13 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         service.stubs().method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(returnValue(page2));
         service.stubs().method("getPageCount").with(isA(EditToken.class)).will(returnValue(new Integer(20)));
         
-        Mock view = mock(EditableTableView.class);
+        Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page2));
         
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
         
-        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) service.proxy());
         
         //changes
@@ -273,7 +273,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         services.expects(once()).method("getPage").with(isA(EditToken.class), eq(new Integer(2))).will(
                 returnValue(page2));
 
-        Mock view = mock(EditableTableView.class);
+        Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page1));
         view.expects(once()).method("display").with(eq(page2));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
@@ -281,7 +281,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditableTableView) view.proxy(),
+        TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) services.proxy());
 
         p.doDisplayNext();

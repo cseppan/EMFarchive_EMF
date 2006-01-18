@@ -10,9 +10,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-public class EditablePageDataTest extends TestCase {
+public class EditablePageTest extends TestCase {
 
-    private EditablePageData data;
+    private EditablePage data;
 
     private String[] cols;
 
@@ -41,7 +41,7 @@ public class EditablePageDataTest extends TestCase {
         datasetId = 2;
         version = new Version();
         version.setVersion(34);
-        data = new EditablePageData(datasetId, version, page, cols);
+        data = new EditablePage(datasetId, version, page, cols);
     }
 
     public void testShouldHaveThreeColumns() {

@@ -9,13 +9,13 @@ import gov.epa.emissions.framework.ui.ViewableRow;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NonEditablePageData extends AbstractTableData {
+public class ViewablePage extends AbstractTableData {
 
     private List rows;
 
     private String[] cols;
 
-    public NonEditablePageData(Page page, String[] cols) {
+    public ViewablePage(Page page, String[] cols) {
         this.cols = cols;
         this.rows = createRows(page);
     }

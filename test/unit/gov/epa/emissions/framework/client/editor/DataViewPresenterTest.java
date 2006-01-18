@@ -10,7 +10,7 @@ import org.jmock.core.Constraint;
 import org.jmock.core.constraint.HasPropertyWithValue;
 import org.jmock.core.constraint.IsInstanceOf;
 
-public class NonEditableDataViewPresenterTest extends MockObjectTestCase {
+public class DataViewPresenterTest extends MockObjectTestCase {
 
     public void testShouldLoadTablesOfDatasetOnDisplay() throws Exception {
         Version version = new Version();
@@ -22,10 +22,10 @@ public class NonEditableDataViewPresenterTest extends MockObjectTestCase {
 
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
-        Mock view = mock(NonEditableDataView.class);
+        Mock view = mock(DataView.class);
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
 
-        NonEditableDataViewPresenter p = new NonEditableDataViewPresenter(version, table, (NonEditableDataView) view.proxy(),
+        DataViewPresenter p = new DataViewPresenter(version, table, (DataView) view.proxy(),
                 serviceProxy);
         view.expects(once()).method("observe").with(same(p));
 
@@ -33,7 +33,7 @@ public class NonEditableDataViewPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldCloseViewAndCloseDataEditSessionOnClose() throws Exception {
-        Mock view = mock(NonEditableDataView.class);
+        Mock view = mock(DataView.class);
         view.expects(once()).method("close").withNoArguments();
 
         Version version = new Version();
@@ -43,7 +43,7 @@ public class NonEditableDataViewPresenterTest extends MockObjectTestCase {
         Constraint constraint = tokenConstraint(version, table);
         service.expects(once()).method("closeSession").with(constraint);
 
-        NonEditableDataViewPresenter p = new NonEditableDataViewPresenter(version, table, (NonEditableDataView) view.proxy(),
+        DataViewPresenter p = new DataViewPresenter(version, table, (DataView) view.proxy(),
                 (DataEditorService) service.proxy());
 
         p.doClose();

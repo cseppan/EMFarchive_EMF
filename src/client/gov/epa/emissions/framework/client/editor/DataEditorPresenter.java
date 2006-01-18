@@ -5,9 +5,9 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EditToken;
 
-public class EditableDataViewPresenter {
+public class DataEditorPresenter {
 
-    private EditableDataView view;
+    private DataEditorView view;
 
     private DataEditorService service;
 
@@ -19,7 +19,7 @@ public class EditableDataViewPresenter {
 
     private EditableTablePresenter tablePresenter;
 
-    public EditableDataViewPresenter(Version version, String table, EditableDataView view, DataEditorService service) {
+    public DataEditorPresenter(Version version, String table, DataEditorView view, DataEditorService service) {
         this.version = version;
         this.table = table;
         this.view = view;
@@ -34,7 +34,7 @@ public class EditableDataViewPresenter {
         view.display(version, table, service);
     }
 
-    public void displayTable(EditableTableView tableView) throws EmfException {
+    public void displayTable(EditablePageManagerView tableView) throws EmfException {
         tablePresenter = new EditableTablePresenter(version, table, tableView, service);
         tablePresenter.observe();
         tablePresenter.doDisplayFirst();

@@ -16,7 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-public class EditableTableViewPanel extends JPanel implements EditableTableView {
+public class EditablePageContainer extends JPanel implements EditablePageManagerView {
 
     private InternalSource source;
 
@@ -28,11 +28,11 @@ public class EditableTableViewPanel extends JPanel implements EditableTableView 
 
     private Version version;
 
-    private EditablePageData pageData;
+    private EditablePage editablePage;
 
     private MessagePanel messagePanel;
 
-    public EditableTableViewPanel(EmfDataset dataset, Version version, InternalSource source, MessagePanel messagePanel) {
+    public EditablePageContainer(EmfDataset dataset, Version version, InternalSource source, MessagePanel messagePanel) {
         super(new BorderLayout());
         super.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
@@ -67,8 +67,8 @@ public class EditableTableViewPanel extends JPanel implements EditableTableView 
     }
 
     private JComponent createEditablePage(Page page) {
-        pageData = new EditablePageData((int) dataset.getDatasetid(), version, page, cols());
-        return new EditableTableDataPanel(pageData, messagePanel);
+        editablePage = new EditablePage((int) dataset.getDatasetid(), version, page, cols());
+        return new EditablePagePanel(editablePage, messagePanel);
     }
 
     // Filter out the first four (version-specific cols)
@@ -84,7 +84,7 @@ public class EditableTableViewPanel extends JPanel implements EditableTableView 
 
     public ChangeSet changeset() {
         // if not initialized, no changes
-        return pageData != null ? pageData.changeset() : new ChangeSet();
+        return editablePage != null ? editablePage.changeset() : new ChangeSet();
     }
 
 }

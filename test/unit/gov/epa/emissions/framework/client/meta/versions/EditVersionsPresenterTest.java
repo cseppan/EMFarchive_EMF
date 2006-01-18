@@ -4,10 +4,10 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.editor.EditableDataView;
-import gov.epa.emissions.framework.client.editor.EditableDataViewPresenter;
-import gov.epa.emissions.framework.client.editor.NonEditableDataView;
-import gov.epa.emissions.framework.client.editor.NonEditableDataViewPresenter;
+import gov.epa.emissions.framework.client.editor.DataEditorView;
+import gov.epa.emissions.framework.client.editor.DataEditorPresenter;
+import gov.epa.emissions.framework.client.editor.DataView;
+import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EditToken;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -26,12 +26,12 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("openSession").withAnyArguments();
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
-        Mock dataView = mock(NonEditableDataView.class);
+        Mock dataView = mock(DataView.class);
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
-        dataView.expects(once()).method("observe").with(new IsInstanceOf(NonEditableDataViewPresenter.class));
+        dataView.expects(once()).method("observe").with(new IsInstanceOf(DataViewPresenter.class));
 
         EditVersionsPresenter presenter = new EditVersionsPresenter(null, serviceProxy);
-        presenter.doView(version, table, (NonEditableDataView) dataView.proxy());
+        presenter.doView(version, table, (DataView) dataView.proxy());
     }
 
     public void testShouldDisplayEditableTableViewOnEdit() throws Exception {
@@ -42,15 +42,15 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("openSession").withAnyArguments().will(returnValue(token()));
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
-        Mock dataView = mock(EditableDataView.class);
+        Mock dataView = mock(DataEditorView.class);
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
-        dataView.expects(once()).method("observe").with(new IsInstanceOf(EditableDataViewPresenter.class));
+        dataView.expects(once()).method("observe").with(new IsInstanceOf(DataEditorPresenter.class));
 
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(null));
 
         EditVersionsPresenter presenter = new EditVersionsPresenter(null, serviceProxy);
-        presenter.doEdit(version, table, (EditableDataView) dataView.proxy());
+        presenter.doEdit(version, table, (DataEditorView) dataView.proxy());
     }
 
     private EditToken token() {

@@ -20,19 +20,19 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class NonEditableDataViewWindow extends DisposableInteralFrame implements NonEditableDataView {
+public class DataViewer extends DisposableInteralFrame implements DataView {
 
     private JPanel layout;
 
     private MessagePanel messagePanel;
 
-    private NonEditableDataViewPresenter presenter;
+    private DataViewPresenter presenter;
 
     private EmfDataset dataset;
 
     private JPanel labelPanel;
 
-    public NonEditableDataViewWindow(EmfDataset dataset) {
+    public DataViewer(EmfDataset dataset) {
         super("Data Viewer: " + dataset.getName());
         setDimension();
         this.dataset = dataset;
@@ -62,7 +62,7 @@ public class NonEditableDataViewWindow extends DisposableInteralFrame implements
         return panel;
     }
 
-    public void observe(NonEditableDataViewPresenter presenter) {
+    public void observe(DataViewPresenter presenter) {
         this.presenter = presenter;
     }
 
