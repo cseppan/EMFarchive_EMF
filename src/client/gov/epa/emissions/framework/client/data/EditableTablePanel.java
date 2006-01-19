@@ -1,31 +1,32 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.gui.EditableTable;
+import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.SelectableEmfTableData;
 import gov.epa.emissions.framework.ui.TableData;
 
 import java.awt.BorderLayout;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.Insets;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JButton;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-public class ListPanel extends JPanel {
+public class EditableTablePanel extends JPanel implements Editor{
 
     private EmfTableModel tableModel;
 
-    private JTable table;
+    private EditableTable table;
 
-    public ListPanel(String label, SelectableEmfTableData tableData) {
+    public EditableTablePanel(String label, SelectableEmfTableData tableData) {
         super.setLayout(new BorderLayout());
         super.add(doLayout(label, tableData), BorderLayout.CENTER);
     }
@@ -51,9 +52,7 @@ public class ListPanel extends JPanel {
 
     private JScrollPane table(TableData tableData) {
         tableModel = new EmfTableModel(tableData);
-
-        table = new JTable(tableModel);
-        table.setRowHeight(20);
+        table = new EditableTable(tableModel);
 
         return new JScrollPane(table);
     }
@@ -112,6 +111,10 @@ public class ListPanel extends JPanel {
     public void invalidate() {
         setColumnWidths(table.getColumnModel());
         super.invalidate();
+    }
+
+    public void commit() {
+        table.commit();
     }
 
 }

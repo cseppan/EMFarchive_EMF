@@ -7,7 +7,7 @@ import abbot.tester.JTableTester;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
-import gov.epa.emissions.framework.client.meta.PropertiesEditor;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditor;
 
 public class DatasetsBrowserActions {
 
@@ -95,9 +95,9 @@ public class DatasetsBrowserActions {
         return export();
     }
 
-    public PropertiesEditor properties(String datasetName) {
+    public DatasetPropertiesEditor properties(String datasetName) {
         testcase.click(browser, "properties");
-        return (PropertiesEditor) testcase.findInternalFrame(console, "Properties Editor: " + datasetName);
+        return (DatasetPropertiesEditor) testcase.findInternalFrame(console, "Properties Editor: " + datasetName);
     }
 
     public void refreshUntilDatasetIsListed(String dataset) {

@@ -40,6 +40,8 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private DatasetTypesManagerView manager;
 
+    private DatasetTypeKeywordsPanel keywordsPanel;
+
     public EditableDatasetTypeWindow(DatasetTypesManagerView manager) {
         super("Edit Dataset Type", new Dimension(600, 500));
 
@@ -92,10 +94,10 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private JPanel createKeywordsPanel(DatasetType type, Keyword[] keywords) {
         keywordsTableData = new KeywordsTableData(type.getKeywords(), new Keywords(keywords));
-        JPanel panel = new DatasetTypeKeywordsPanel(keywordsTableData, keywords);
-        panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        keywordsPanel = new DatasetTypeKeywordsPanel(keywordsTableData, keywords);
+        keywordsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 
-        return panel;
+        return keywordsPanel;
     }
 
     private JPanel createButtonsPanel() {
@@ -121,6 +123,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
+                    keywordsPanel.commit();
                     presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), manager);
                 } catch (EmfException e) {
                     messagePanel.setError("Could not save. Reason: " + e.getMessage());

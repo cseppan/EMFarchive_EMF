@@ -34,10 +34,6 @@ public class Mappings {
         return mapper.qname("ns1:" + name);
     }
 
-    protected void registerTable(Call call) {
-        mapper.registerMappingForTable(call);
-    }
-
     public void addParam(Call call, String id, QName name) {
         call.addParameter(id, name, ParameterMode.IN);
     }

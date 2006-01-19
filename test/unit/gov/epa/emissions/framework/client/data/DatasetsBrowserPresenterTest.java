@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportPresenterStub;
 import gov.epa.emissions.framework.client.exim.ImportView;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
-import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditorView;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataPresenter;
@@ -113,8 +113,8 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         view.expects(once()).method("clearMessage").withNoArguments();
 
-        Mock editorView = mock(PropertiesEditorView.class);
-        PropertiesEditorView editorViewProxy = (PropertiesEditorView) editorView.proxy();
+        Mock editorView = mock(DatasetPropertiesEditorView.class);
+        DatasetPropertiesEditorView editorViewProxy = (DatasetPropertiesEditorView) editorView.proxy();
 
         Mock editorPresenter = mock(PropertiesEditorPresenter.class);
         editorPresenter.expects(once()).method("doDisplay").with(same(editorViewProxy));

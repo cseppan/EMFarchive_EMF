@@ -9,11 +9,11 @@ import abbot.tester.JTabbedPaneTester;
 
 public class PropertiesEditorActions {
 
-    private PropertiesEditor editor;
+    private DatasetPropertiesEditor editor;
 
     private UserAcceptanceTestCase test;
 
-    public PropertiesEditorActions(PropertiesEditor editor, UserAcceptanceTestCase test) {
+    public PropertiesEditorActions(DatasetPropertiesEditor editor, UserAcceptanceTestCase test) {
         this.editor = editor;
         this.test = test;
     }

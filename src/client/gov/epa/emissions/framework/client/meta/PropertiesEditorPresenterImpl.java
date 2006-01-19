@@ -16,7 +16,7 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
 
     private EmfDataset dataset;
 
-    private PropertiesEditorView view;
+    private DatasetPropertiesEditorView view;
 
     private EditableSummaryTabPresenter summaryPresenter;
 
@@ -34,7 +34,7 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         this.session = session;
     }
 
-    public void doDisplay(PropertiesEditorView view) throws EmfException {
+    public void doDisplay(DatasetPropertiesEditorView view) throws EmfException {
         this.view = view;
         view.observe(this);
 

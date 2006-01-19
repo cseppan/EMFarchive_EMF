@@ -118,8 +118,6 @@
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.EmfDataset"
 		qname="ns1:EmfDataset" xmlns:ns1="urn:gov.epa.services.EmfService"/>
-	<beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Table"
-		qname="ns1:Table" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.commons.io.InternalSource"
 		qname="ns1:InternalSource" xmlns:ns1="urn:gov.epa.services.EmfService"/>

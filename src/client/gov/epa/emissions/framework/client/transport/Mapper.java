@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.transport;
 
-import gov.epa.emissions.commons.io.Table;
-
 import javax.xml.namespace.QName;
 
 import org.apache.axis.client.Call;
@@ -23,10 +21,5 @@ public class Mapper {
     public void registerArrayMapping(Call call, Class cls, QName qname) {
         call.registerTypeMapping(cls, qname, new ArraySerializerFactory(cls, qname),
                 new ArrayDeserializerFactory(qname));
-    }
-
-    public void registerMappingForTable(Call call) {
-        QName tableQName = qname("ns1:Table");
-        registerBeanMapping(call, Table.class, tableQName);
     }
 }

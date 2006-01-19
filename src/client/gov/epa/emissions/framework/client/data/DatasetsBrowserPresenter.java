@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportView;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenterImpl;
-import gov.epa.emissions.framework.client.meta.PropertiesEditorView;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditorView;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataPresenter;
@@ -55,13 +55,13 @@ public class DatasetsBrowserPresenter {
         view.clearMessage();
     }
 
-    public void doDisplayPropertiesEditor(PropertiesEditorView propertiesEditorView, EmfDataset dataset)
+    public void doDisplayPropertiesEditor(DatasetPropertiesEditorView propertiesEditorView, EmfDataset dataset)
             throws EmfException {
         PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, serviceLocator, session);
         doDisplayPropertiesEditor(propertiesEditorView, presenter);
     }
 
-    void doDisplayPropertiesEditor(PropertiesEditorView propertiesEditorView, PropertiesEditorPresenter presenter)
+    void doDisplayPropertiesEditor(DatasetPropertiesEditorView propertiesEditorView, PropertiesEditorPresenter presenter)
             throws EmfException {
         view.clearMessage();
         presenter.doDisplay(propertiesEditorView);

@@ -15,7 +15,7 @@ import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
-import gov.epa.emissions.framework.client.meta.PropertiesEditor;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditor;
 import gov.epa.emissions.framework.client.meta.PropertiesViewWindow;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataWindow;
 import gov.epa.emissions.framework.services.DataService;
@@ -257,7 +257,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         List datasets = getSelectedDatasets();
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
-            PropertiesEditor view = new PropertiesEditor(session, parentConsole);
+            DatasetPropertiesEditor view = new DatasetPropertiesEditor(session, parentConsole);
             desktop.add(view);
             try {
                 presenter.doDisplayPropertiesEditor(view, (EmfDataset) iter.next());

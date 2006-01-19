@@ -26,7 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-public class PropertiesEditor extends DisposableInteralFrame implements PropertiesEditorView {
+public class DatasetPropertiesEditor extends DisposableInteralFrame implements DatasetPropertiesEditorView {
 
     private PropertiesEditorPresenter presenter;
 
@@ -36,7 +36,9 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
     private EmfSession session;
 
-    public PropertiesEditor(EmfSession session, EmfConsole parentConsole) {
+    private EditableKeywordsTab keywordsTab;
+
+    public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole) {
         super("Dataset Properties Editor", new Dimension(700, 550));
         this.session = session;
         this.parentConsole = parentConsole;
@@ -76,10 +78,10 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
     }
 
     private JPanel createKeywordsTab() {
-        EditableKeywordsTab view = new EditableKeywordsTab();
+        keywordsTab = new EditableKeywordsTab();
         try {
-            presenter.set(view);
-            return view;
+            presenter.set(keywordsTab);
+            return keywordsTab;
         } catch (EmfException e) {
             showError("Could not load Keyword Tab. Reason - " + e.getMessage());
             return createErrorTab("Could not load Keyword Tab. Reason - " + e.getMessage());
@@ -137,6 +139,7 @@ public class PropertiesEditor extends DisposableInteralFrame implements Properti
 
         Button save = new Button("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
+                keywordsTab.commit();
                 presenter.doSave();
             }
         });

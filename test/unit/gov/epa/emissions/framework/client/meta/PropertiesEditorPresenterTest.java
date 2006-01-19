@@ -42,7 +42,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         dataset.setName("test");
         dataset.setDatasetType(new DatasetType());
 
-        view = mock(PropertiesEditorView.class);
+        view = mock(DatasetPropertiesEditorView.class);
 
         dataService = mock(DataService.class);
         dataCommonsService = mock(DataCommonsService.class);
@@ -82,7 +82,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(eq(dataset));
 
-        presenter.doDisplay((PropertiesEditorView) view.proxy());
+        presenter.doDisplay((DatasetPropertiesEditorView) view.proxy());
     }
 
     public void testShouldDisplayViewOnDisplayAfterObtainingLock() throws Exception {
@@ -103,7 +103,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(eq(dataset));
 
-        presenter.doDisplay((PropertiesEditorView) view.proxy());
+        presenter.doDisplay((DatasetPropertiesEditorView) view.proxy());
     }
 
     public void testShouldRaiseErrorOnDisplayIfFailedToObtainLock() throws Exception {
@@ -127,7 +127,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("notifyLockFailure").with(same(dataset));
         view.expects(once()).method("observe").with(same(presenter));
 
-        presenter.doDisplay((PropertiesEditorView) view.proxy());
+        presenter.doDisplay((DatasetPropertiesEditorView) view.proxy());
     }
 
     public void testShouldContinueToCloseIfUserOkaysLosingUnsavedChanges() throws Exception {

@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.gui.Editor;
+
 import java.awt.BorderLayout;
 
 import javax.swing.DefaultCellEditor;
@@ -7,14 +9,16 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.table.TableCellEditor;
 
-public class SectorCriteriaPanel extends JPanel {
+public class SectorCriteriaPanel extends JPanel implements  Editor{
+
+    private EditableTablePanel editableTablePanel;
 
     public SectorCriteriaPanel(String label, SectorCriteriaTableData tableData) {
-        ListPanel listPanel = new ListPanel(label, tableData);
-        listPanel.setColumnEditor(typesCellEditor(), 1, "Select from the list");
+        editableTablePanel = new EditableTablePanel(label, tableData);
+        editableTablePanel.setColumnEditor(typesCellEditor(), 1, "Select from the list");
 
         super.setLayout(new BorderLayout());
-        super.add(listPanel, BorderLayout.CENTER);
+        super.add(editableTablePanel, BorderLayout.CENTER);
     }
 
     private TableCellEditor typesCellEditor() {
@@ -27,4 +31,7 @@ public class SectorCriteriaPanel extends JPanel {
         return new DefaultCellEditor(comboBox);
     }
 
+    public void commit() {
+        editableTablePanel.commit();
+    }
 }

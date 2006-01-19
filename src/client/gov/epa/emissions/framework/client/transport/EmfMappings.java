@@ -27,7 +27,6 @@ public class EmfMappings extends Mappings {
     public void register(Call call) {
         registerBeans(call);
         registerArrays(call);
-        registerTable(call);
     }
 
     private void registerBeans(Call call) {

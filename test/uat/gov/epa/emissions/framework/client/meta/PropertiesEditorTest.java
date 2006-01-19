@@ -37,7 +37,7 @@ public class PropertiesEditorTest extends UserAcceptanceTestCase {
     public void testShouldDisplayPropertiesOfSelectedDataset() throws Exception {
         browserActions.selectLast();
 
-        PropertiesEditor props = browserActions.properties(dataset);
+        DatasetPropertiesEditor props = browserActions.properties(dataset);
         assertNotNull("Properties Editor should be opened", props);
 
         PropertiesEditorActions editorActions = new PropertiesEditorActions(props, this);
@@ -54,7 +54,7 @@ public class PropertiesEditorTest extends UserAcceptanceTestCase {
     public void testShouldDisplaySummaryPropertiesOnSummaryTab() throws Exception {
         browserActions.selectLast();
 
-        PropertiesEditor props = browserActions.properties(dataset);
+        DatasetPropertiesEditor props = browserActions.properties(dataset);
         assertNotNull("Properties Editor should be opened", props);
 
         PropertiesEditorActions editorActions = new PropertiesEditorActions(props, this);

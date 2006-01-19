@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 
 public interface PropertiesEditorPresenter {
 
-    void doDisplay(PropertiesEditorView view) throws EmfException;
+    void doDisplay(DatasetPropertiesEditorView view) throws EmfException;
 
     void doClose() throws EmfException;
 
