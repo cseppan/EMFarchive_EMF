@@ -40,7 +40,8 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
 
         doImport();
 
-        token = editToken();
+        Version v1 = new Versions().derive(versionZero(), "v1", session);
+        token = token(v1);
         service.openSession(token);
     }
 
@@ -70,16 +71,11 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
         modifier.dropAll("versions");
     }
 
-    private DataAccessToken editToken() {
-        Version version = versionZero();
-        return editToken(version);
+    private DataAccessToken token(Version version) {
+        return token(version, dataset.getName());
     }
 
-    private DataAccessToken editToken(Version version) {
-        return editToken(version, dataset.getName());
-    }
-
-    private DataAccessToken editToken(Version version, String table) {
+    private DataAccessToken token(Version version, String table) {
         DataAccessToken result = new DataAccessToken(version, table);
 
         return result;
@@ -94,7 +90,7 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
         Version[] versions = service.getVersions(dataset.getDatasetid());
 
         assertNotNull("Should return versions of imported dataset", versions);
-        assertEquals(1, versions.length);
+        assertEquals(2, versions.length);
 
         Version versionZero = versions[0];
         assertEquals(0, versionZero.getVersion());
@@ -109,7 +105,7 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
 
         assertNotNull("Should be able to derive from a Final version", derived);
         assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
-        assertEquals(1, derived.getVersion());
+        assertEquals(2, derived.getVersion());
         assertEquals("0", derived.getPath());
         assertFalse("Derived version should be non-final", derived.isFinalVersion());
     }
@@ -130,9 +126,9 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
         assertTrue("Derived version should be final on being marked 'final'", finalVersion.isFinalVersion());
 
         Version[] updated = service.getVersions(dataset.getDatasetid());
-        assertEquals(2, updated.length);
-        assertEquals("v 1", updated[1].getName());
-        assertTrue("Derived version (loaded from db) should be final on being marked 'final'", updated[1]
+        assertEquals(3, updated.length);
+        assertEquals("v 1", updated[2].getName());
+        assertTrue("Derived version (loaded from db) should be final on being marked 'final'", updated[2]
                 .isFinalVersion());
     }
 
@@ -149,6 +145,6 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
 
         Version[] updatedVersions = service.getVersions(dataset.getDatasetid());
         assertEquals(versionZero.getVersion(), updatedVersions[0].getVersion());
-        assertEquals(finalVersion.getVersion(), updatedVersions[1].getVersion());
+        assertEquals(finalVersion.getVersion(), updatedVersions[2].getVersion());
     }
 }

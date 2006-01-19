@@ -166,6 +166,10 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public DataAccessToken openSession(DataAccessToken token) throws EmfException {
+        Version current = access.currentVersion(token.getVersion());
+        if(current.isFinalVersion())
+            throw new EmfException("Can only edit non-final Version.");
+        
         return access.openSession(token);
     }
 

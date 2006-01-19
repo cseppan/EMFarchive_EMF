@@ -17,7 +17,7 @@ import org.hibernate.Transaction;
 public class LockingScheme {
     private static Log log = LogFactory.getLog(LockingScheme.class);
 
-    public static final long DEFAULT_TIMEOUT = 12 * 60 * 60 * 1000;// i.e. 12 hrs
+    public static final long DEFAULT_TIMEOUT = 1 * 60 * 60 * 1000;// i.e. 1 hrs
 
     public Lockable getLocked(User user, Lockable target, Session session, List all) {
         Lockable current = current(target, all);
