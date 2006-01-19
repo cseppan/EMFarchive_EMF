@@ -1,14 +1,17 @@
 package gov.epa.emissions.framework.install.installer;
 
+import gov.epa.emissions.commons.io.importer.ImporterException;
+
 import java.awt.Cursor;
+import java.io.IOException;
 
 public class InstallPresenter {
     private InstallView view;
     
     private Download model;
 
-//    public InstallPresenter() {
-//        //TODO: take in a parameter
+//    public InstallPresenter(Download model) {
+//        this.model = model;
 //    }
 
     public void doCancel() {
@@ -32,8 +35,9 @@ public class InstallPresenter {
         model.stopDownload();
     }
     
-    public void writePreference(String website, String input, String output, String javahome) {
-        Tools.writePreference(website, input, output, javahome);
+    public void writePreference(String website, String input, 
+            String output, String javahome, String emfhome) {
+        Tools.writePreference(website, input, output, javahome, emfhome);
     }
     
     public void setStatus(String status) {
@@ -50,6 +54,21 @@ public class InstallPresenter {
     
     public void setFinish() {
         view.setFinish();
+    }
+    
+    public void createBatchFile(String filename, String preference, 
+            String emfhome, String javahome) {
+        try {
+            new ClientBatchFile(filename).create(preference, emfhome, javahome);
+        } catch (ImporterException e) {
+            view.displayErr("Creating EMF client batch file failed.");
+        } catch (IOException e) {
+            view.displayErr("Creating EMF client batch file failed.");
+        }
+    }
+    
+    public void createShortcut() {
+        model.createShortcut();
     }
     
 }

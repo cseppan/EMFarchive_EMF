@@ -54,7 +54,6 @@ public class Download extends Thread{
                     saveFile(file2save, conn);
 				}
                 
-                createShortcut();
                 presenter.setFinish();
                 stopDownload();
             } catch (IOException e){
@@ -65,7 +64,7 @@ public class Download extends Thread{
         }
 	}
 	
-	private void createShortcut(){
+	public void createShortcut(){
         File bat = new File(installhome, "shortcut.bat");
         File inf = new File(installhome, "shortcut.inf");
         createShortcutBatchFile(bat, inf);
@@ -97,7 +96,7 @@ public class Download extends Thread{
         //FIXME: shortcut.inf directory
         String battext = "\n@echo off & setlocal" + separator +
                          "\nset inf=rundll32 setupapi,InstallHinfSection DefaultInstall" + separator +
-                         "\nstart/w %inf% 132 " + installhome.replace('\\', '/') + "/bat/shortcut.inf" + separator +
+                         "\nstart/w %inf% 132 " + installhome.replace('\\', '/') + "/shortcut.inf" + separator +
                          "\nendlocal" + separator;
                          
         String inftext = "[version]" + separator +
@@ -106,7 +105,8 @@ public class Download extends Thread{
                          "UpdateInis=Addlink" + separator +
                          "[Addlink]" + separator +
                          "setup.ini, progman.groups,, \"\"group200=\"EMF\"\"\"" + separator +
-                         "setup.ini, group200,, \"\"\"EMF Client\"\",\"\"\"\"\"\"" + installhome.replace('\\', '/') + "/bat/runtrim.bat\"\"\"\"\"\"" + separator;
+                         "setup.ini, group200,, \"\"\"EMF Client\"\",\"\"\"\"\"\"" + installhome.replace('\\', '/') + 
+                         "/" + Generic.EMF_BATCH_FILE + "\"\"\"\"\"\"" + separator;
         
         try{
             FileWriter fw1 = new FileWriter(bat);
@@ -124,18 +124,14 @@ public class Download extends Thread{
         String[] cmd = new String[3];
         String os = System.getProperty("os.name");
         
-        if(os.equalsIgnoreCase("Windows XP") 
-              || os.equalsIgnoreCase("Windows 2000") 
-              || os.equalsIgnoreCase("Windows NT")){
-            cmd[0] = "cmd.exe" ;
-        }           
-        
         if(os.equalsIgnoreCase("Windows 98") || os.equalsIgnoreCase("Windows 95")){
             cmd[0] = "command.com" ;
+        } else {
+            cmd[0] = "cmd.exe" ;
         }
         
         cmd[1] = "/C" ;
-        cmd[2] = installhome.replace('\\', '/') + "/bat/shortcut.bat";
+        cmd[2] = installhome.replace('\\', '/') + "/shortcut.bat";
         
         return cmd;
     }

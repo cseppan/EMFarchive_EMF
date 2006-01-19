@@ -28,7 +28,8 @@ public class ExportFilenameTest extends TestCase {
         SimpleDateFormat sdf = new SimpleDateFormat(timeformat);
         String date = sdf.format(new Date());
         
-        String expected = "hello123Emf___data_Set_txt_" + date + "world";
+        String expected = "hello123Emf___data_Set_txt_" + date.toLowerCase() + "world";
+        System.out.println(expected);
         assertTrue(expected, expected.equals(getCorrectExportFilename(dataset)));
     }
     
@@ -58,7 +59,7 @@ public class ExportFilenameTest extends TestCase {
             }
         }
 
-        return prefix + name + "_" + date + suffix;
+        return prefix + name + "_" + date.toLowerCase() + suffix;
     }
 
 }

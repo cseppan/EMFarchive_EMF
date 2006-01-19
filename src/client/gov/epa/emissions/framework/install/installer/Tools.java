@@ -1,8 +1,10 @@
 package gov.epa.emissions.framework.install.installer;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -62,33 +64,39 @@ public class Tools {
 		}
 	}
 	
-    public static void writePreference(String website, String input, String output, String javahome){
-        File prefdir = new File(System.getProperty("user.home"));
-        File pref = new File(prefdir, Generic.USER_PARAMETER);
+    public static void writePreference(String website, String input, 
+            String output, String javahome, String emfhome){
         String separator = Generic.SEPARATOR;
-        
+        String emfPrefString = "local.input.drive=" + input.charAt(0) + separator
+                             + "local.output.drive=" + output.charAt(0) + separator
+                             + "remote.input.drive=/data" + separator
+                             + "remote.output.drive=/data" + separator
+                             + "default.input.folder=" + input.substring(3).replace('\\', '/') + separator
+                             + "default.output.folder=" + input.substring(3).replace('\\', '/') + separator;
+
         String towrite = "#EMF Client Installer - Preferences" + separator
-                         + "#comments '#'" + separator 
-                         + "#preference specified by key,value pair separted by '='" + separator 
-                         + "#case sensitive" + separator 
-                         + "#white spaces and line terminators can be escaped by '\'" + separator 
-                         + "#If the value aren't specified then default value will be empty string" + separator 
-                         + "#Use '/' for path separator for file names"+ separator + separator
-                         + "web.site=" + website + separator 
-                         + "EMFInputDriveLetter=" + input.charAt(0) + separator
-                         + "EMFOutputDriveLetter=" + output.charAt(0) + separator
-                         + "EMFInputServerDirectory=/data" + separator
-                         + "EMFOutputServerDirectory=/data" + separator
-                         + "EMFDefaultInputDirectory=emf_input" + separator
-                         + "EMFDefaultOutputDirectory=emf_output" + separator
-                         + "java.home=" + javahome.replace('\\', '/') + separator;
+                       + "#comments '#'" + separator 
+                       + "#preference specified by key,value pair separted by '='" + separator 
+                       + "#case sensitive" + separator 
+                       + "#white spaces and line terminators can be escaped by '\'" + separator 
+                       + "#If the value aren't specified then default value will be empty string" + separator 
+                       + "#Use '/' for path separator for file names"+ separator + separator
+                       + "web.site=" + website + separator
+                       + "emf.install.folder=" + emfhome.replace('\\', '/') + separator
+                       + emfPrefString
+                       + "java.home=" + javahome.replace('\\', '/') + separator;
         
         try{
-            FileWriter fw = new FileWriter(pref);
-            fw.write(towrite);
-            fw.close();
+            PrintWriter userPrefWriter = new PrintWriter(new BufferedWriter( new FileWriter
+                    (System.getProperty("user.home") + "\\" + Generic.USER_PARAMETER)));
+            PrintWriter emfPrefWriter = new PrintWriter(new BufferedWriter( new FileWriter
+                    (emfhome + "\\" + Generic.EMF_PARAMETER)));
+            userPrefWriter.write(towrite);
+            emfPrefWriter.write(emfPrefString);
+            userPrefWriter.close();
+            emfPrefWriter.close();
         }catch(IOException e){
-            e.printStackTrace();
+            //No op
         }   
     }
 

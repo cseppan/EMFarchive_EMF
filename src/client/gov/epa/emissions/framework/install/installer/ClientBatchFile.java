@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.install;
+package gov.epa.emissions.framework.install.installer;
 
 import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
 import gov.epa.emissions.commons.io.importer.ImporterException;
@@ -12,22 +12,25 @@ import java.io.PrintWriter;
 public class ClientBatchFile {
     
     private PrintWriter writer;
+    
+    private final String sep = Generic.SEPARATOR;
 
     public ClientBatchFile(String fileName) throws IOException{
         writer = new PrintWriter(new BufferedWriter( new FileWriter(fileName)));
     }
     
-    public void create(String preferenceFile) throws ImporterException{
-        writer.println("@echo off");
-        writer.println("\n::  Batch file to start the EMF Client");
-        writer.println("\n\nset EMF_HOME=");
-        writer.println("\nset R_HOME=C:\\Program Files\\R\\rw2000\\bin");
-        writer.println("\nset JAVA_EXE=\"C:\\j2sdk1.4.2_01\\bin\\java\"");
-        writer.println("\n::  add bin directory to search path"); 
-        writer.println("\nset PATH=%PATH%;%R_HOME%");
-        writer.println("\nset needed jar files in CLASSPATH");
+    public void create(String preferenceFile, String emfhome, String javahome) throws ImporterException{
+        writer.println("@echo off" + sep);
+        writer.println("::  Batch file to start the EMF Client" + sep  + sep);
+        writer.println("set EMF_HOME=" + emfhome + sep);
+        writer.println("set R_HOME=C:\\Program Files\\R\\rw2000\\bin" + sep);
+        writer.println("set JAVA_EXE=\"" + javahome.replace('/', '\\') + "\\bin\\java\"" + sep);
+        writer.println("::  add bin directory to search path" + sep); 
+        writer.println("set PATH=%PATH%;%R_HOME%" + sep);
+        writer.println(":: set needed jar files in CLASSPATH" + sep);
         classPath();
-        writer.println("\n\n@echo on\n\n");
+        writer.println("set CLASSPATH=%CLASSPATH%;%EMF_HOME%\\emf-client.jar");
+        writer.println(sep + sep + "@echo on" + sep + sep);
         writer.println("%JAVA_EXE% -Xmx400M -DEMF_PREFERENCE=" + "\""+preferenceFile+"\""+
                 "  -classpath %CLASSPATH% gov.epa.emissions.framework.client.Launcher");
         writer.close();
@@ -47,12 +50,16 @@ public class ClientBatchFile {
         String[] fileNames = new File("lib").list();
         return new FilePatternMatcher("*.jar").matchingNames(fileNames);
     }
-
+    
     public static void main(String[] args) {
         try {
             String fileName = System.getProperty("user.home") + "/EMFClient.bat";
-            String preferenceFile="";
-            new ClientBatchFile(fileName).create(preferenceFile);
+            String preferenceFile=System.getProperty("user.home") + "/EMFPrefs.txt";
+            String emfhome = "C:\\";
+            String javahome = System.getProperty("java.home");
+            new ClientBatchFile(fileName).create(preferenceFile, emfhome, javahome);
+            CreateDownloadFilesList filelist = new CreateDownloadFilesList("lib", ';');
+            filelist.createFilesList();
         } catch (Exception e) {
             e.printStackTrace();
         }

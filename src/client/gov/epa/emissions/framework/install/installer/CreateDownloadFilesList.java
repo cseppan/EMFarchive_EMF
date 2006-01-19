@@ -1,6 +1,9 @@
 package gov.epa.emissions.framework.install.installer;
 
 
+import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
+import gov.epa.emissions.commons.io.importer.ImporterException;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -29,14 +32,32 @@ public class CreateDownloadFilesList {
 		if (!isDirectory(dir)) {
 			throw new Exception("The '" + dir + "' is not a directory");
 		}
-		File homeDirectory = new File(dir);
-		File[] files = homeDirectory.listFiles();
+//		File homeDirectory = new File(dir);
+//		File[] files = homeDirectory.listFiles();
+        File[] files = getFiles(dir);
 		printer = new PrintWriter(new BufferedWriter(
-				new FileWriter(dir + File.separatorChar + Generic.FILE_LIST)));
+				new FileWriter(System.getProperty("user.home") + File.separatorChar + Generic.FILE_LIST)));
 		printHeader();
 		createFilesList(files);
 		printer.close();
 	}
+    
+    private File[] getFiles(String dir) {
+        String[] fileNames = new File(dir).list();
+        try {
+            String[] jarFiles = new FilePatternMatcher("*.jar").matchingNames(fileNames);
+            File[] jars = new File[jarFiles.length];
+            for(int i = 0; i < jarFiles.length; i++)
+                jars[i] = new File(dir, jarFiles[i]);
+            
+            return jars;
+        } catch (ImporterException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
 	private void createFilesList(File[] files) {
 		for (int i = 0; i < files.length; i++) {
@@ -83,14 +104,16 @@ public class CreateDownloadFilesList {
 	}
 
 	private String getRelativePath(File file) {
-		String absFilePath = file.getAbsolutePath();
-		String fileSeparator = File.separator;
-		String myHomeDir = dir;
-		if(!myHomeDir.endsWith(fileSeparator)){
-			myHomeDir += fileSeparator;
-		}
-		return absFilePath.substring(myHomeDir.length()-1);
+//		String absFilePath = file.getAbsolutePath();
+//		String fileSeparator = File.separator;
+//		String myHomeDir = "/lib/";
+//		if(!myHomeDir.endsWith(fileSeparator)){
+//			myHomeDir += fileSeparator;
+//		}
+//		return absFilePath.substring(myHomeDir.length()-1);
+        return "/lib/" + file.getName();
 	}
+    
 
 	private void printHeader() {
 		printer.println("number" + delimiter + "path" + delimiter + "groups"

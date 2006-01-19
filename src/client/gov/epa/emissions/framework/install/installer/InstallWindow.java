@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.install.installer;
 
+import gov.epa.emissions.framework.EmfException;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
@@ -49,7 +51,7 @@ public class InstallWindow extends JFrame implements InstallView  {
 	JLabel urlLabel, javaHomeLabel, inputLabel, outputLabel, installHomeLabel;
 	JLabel holderLabel1, holderLabel2, holderLabel3, holderLabel4, holderLabel5;
 	JLabel sqlUserLabel, sqlPassLabel;
-	JLabel statusLabel;
+	JLabel statusLabel, load;
 	JButton installButton, exitInstallButton, javaHomeBrowser, inputDirBrowser, outputDirBrowser;
 	JButton installDirBrowser;
 	JButton holderButton1, holderButton2, cancel;
@@ -80,22 +82,22 @@ public class InstallWindow extends JFrame implements InstallView  {
 		c = new GridBagConstraints();
 
 		//Create widgets.		
-		url = new JTextField(30);
-		url.setText("http://www.epa.gov/ttn/fera/data/trim/install");		
+		url = new JTextField(Generic.EMF_URL);
 		javaHomeDirField = new JTextField(Generic.JAVA_HOME);
 		inputDirField = new JTextField(Generic.REMOTE_INPUT_DRIVE);
 		outputDirField = new JTextField(Generic.REMOTE_OUTPUT_DRIVE);
         installDirField = new JTextField(Generic.INSTALL_HOME);
 		urlLabel = new JLabel("EMF Download URL", SwingConstants.RIGHT);
 		javaHomeLabel = new JLabel("JAVA Home Directory", SwingConstants.RIGHT);
-		inputLabel = new JLabel("Remote Input File Drive", SwingConstants.RIGHT);
-		outputLabel = new JLabel("Remote Output File Drive", SwingConstants.RIGHT);
+		inputLabel = new JLabel("Input File Directory", SwingConstants.RIGHT);
+		outputLabel = new JLabel("Output File Directory", SwingConstants.RIGHT);
         installHomeLabel = new JLabel("Install Home Directory", SwingConstants.RIGHT);
 		statusLabel = new JLabel("Status: ");
 		holderLabel1 = new JLabel();
 		holderLabel2 = new JLabel();
 		holderLabel3 = new JLabel();
-		
+        load = new JLabel(Generic.EMF_MESSAGE);
+        
 		javaHomeBrowser = new JButton("Browse...");
 		inputDirBrowser = new JButton("Browse...");
 		outputDirBrowser = new JButton("Browse...");
@@ -121,12 +123,9 @@ public class InstallWindow extends JFrame implements InstallView  {
 		outputDirBrowser.addActionListener(new Browse3Listener());
         installDirBrowser.addActionListener(new InstallDirBrowserListener());
 				
-		//Get the default value if it exists
-		String userhome = System.getProperty("user.home");
-		//String currentdate = null;
-		File preference = new File(userhome, Generic.USER_PARAMETER);
+		File preference = new File(System.getProperty("user.home"), Generic.USER_PARAMETER);
 		if(preference.exists()){
-		    //TODO: to write the user preferences to user.home
+            getUserPreferences();
 		}
 		
 		//Set the default button.
@@ -146,6 +145,19 @@ public class InstallWindow extends JFrame implements InstallView  {
 		setTitle("EMF Client Installer -- " + Generic.VERSION);
 		pack();
 	}
+    
+    private void getUserPreferences() {
+        InstallPreferences up;
+        try {
+            up = new InstallPreferences();
+            url.setText(up.emfWebSite());
+            inputDirField.setText(up.inputFolder());
+            outputDirField.setText(up.outputFolder());
+            installDirField.setText(up.emfInstallFolder().replace('/', '\\'));
+        } catch (EmfException e) {
+            presenter.displayErr("Cann't get user preferences.");
+        }
+    }
     
 	private void setLookAndFeel() {
 		String lookAndFeel = UIManager.getSystemLookAndFeelClassName();
@@ -279,7 +291,6 @@ public class InstallWindow extends JFrame implements InstallView  {
 
 	private JPanel createSecondPage(){
         JPanel upper = new JPanel();
-		JLabel load = new JLabel(Generic.EMF_MESSAGE);
 		load.setFont(new Font("default", Font.BOLD, 12));
         upper.add(load);
         
@@ -318,9 +329,11 @@ public class InstallWindow extends JFrame implements InstallView  {
 	                   
             CardLayout cl = (CardLayout)(cards.getLayout());
             cl.show(cards, PAGETWO);
-            presenter.writePreference(website, inputdir, outputdir, javahome);
+            presenter.writePreference(website, inputdir, outputdir, javahome, installhome);
+            presenter.createBatchFile(installhome + "\\" + Generic.EMF_BATCH_FILE,
+                    installhome + "\\" + Generic.EMF_PARAMETER,
+                    installhome, javahome);
             presenter.startDownload(website, Generic.FILE_LIST, installhome);
-
 		}
 	}
 	
@@ -357,7 +370,8 @@ public class InstallWindow extends JFrame implements InstallView  {
                  cl.show(cards, PAGEONE);
              }
              
-             if(e.getActionCommand().equalsIgnoreCase("Finish"))
+             if(e.getActionCommand().equalsIgnoreCase("Done"))
+                 presenter.createShortcut();
                  System.exit(0);
         }
      }
@@ -367,13 +381,14 @@ public class InstallWindow extends JFrame implements InstallView  {
     }
 
     public void displayErr(String err) {
+        presenter.stopDownload();
         JOptionPane.showMessageDialog (this, err, "File Downloading Error", 
                 JOptionPane.WARNING_MESSAGE);
-        presenter.stopDownload();
     }
 
     public void setFinish() {
-        cancel.setText("Finish");
+        load.setText(Generic.EMF_CLOSE_MESSAGE);
+        cancel.setText("Done");
     }
 	
 }
