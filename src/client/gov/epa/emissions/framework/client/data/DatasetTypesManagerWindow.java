@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.io.DatasetType;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -116,23 +119,22 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private JPanel createCrudPanel() {
-        JPanel crudPanel = new JPanel();
-        crudPanel.setLayout(new FlowLayout());
-
-        JButton viewButton = new JButton("View");
-        viewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+        Action viewAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
                 viewDatasetTypes();
             }
-        });
-        crudPanel.add(viewButton);
-
-        JButton editButton = new JButton("Edit");
-        editButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+        };
+        Button viewButton = new Button("View", viewAction);
+        Action editAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
                 editDatasetTypes();
             }
-        });
+        };
+        Button editButton = new Button("Edit", editAction);
+
+        JPanel crudPanel = new JPanel();
+        crudPanel.setLayout(new FlowLayout());
+        crudPanel.add(viewButton);
         crudPanel.add(editButton);
 
         return crudPanel;

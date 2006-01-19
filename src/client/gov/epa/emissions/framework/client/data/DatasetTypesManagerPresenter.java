@@ -49,8 +49,7 @@ public class DatasetTypesManagerPresenter {
     }
 
     public void doView(DatasetType type, ViewableDatasetTypeView viewable) throws EmfException {
-        ViewableDatasetTypePresenter p = new ViewableDatasetTypePresenterImpl(viewable, type, serviceLocator()
-                .dataCommonsService());
+        ViewableDatasetTypePresenter p = new ViewableDatasetTypePresenterImpl(viewable, type);
         view(type, viewable, p);
     }
 

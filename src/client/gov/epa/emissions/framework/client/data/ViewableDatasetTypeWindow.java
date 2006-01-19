@@ -47,20 +47,20 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         this.presenter = presenter;
     }
 
-    public void display(DatasetType type, Keyword[] keywords) {
+    public void display(DatasetType type) {
         super.setTitle("View Dataset Type: " + type.getName());
         layout.removeAll();
-        doLayout(layout, type, keywords);
+        doLayout(layout, type);
 
         super.display();
     }
 
     // FIXME: CRUD panel. Refactor to use in DatasetTypes Manager
-    private void doLayout(JPanel layout, DatasetType type, Keyword[] keywords) {
+    private void doLayout(JPanel layout, DatasetType type) {
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
         layout.add(createBasicDataPanel(type));
-        layout.add(createKeywordsPanel(keywords));
+        layout.add(createKeywordsPanel(type.getKeywords()));
         layout.add(createButtonsPanel());
 
         messagePanel.setMessage(lockStatus(type));

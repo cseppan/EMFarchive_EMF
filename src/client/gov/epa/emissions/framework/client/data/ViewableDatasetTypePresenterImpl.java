@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataCommonsService;
 
 public class ViewableDatasetTypePresenterImpl implements ViewableDatasetTypePresenter {
 
@@ -10,17 +8,14 @@ public class ViewableDatasetTypePresenterImpl implements ViewableDatasetTypePres
 
     private DatasetType type;
 
-    private DataCommonsService service;
-
-    public ViewableDatasetTypePresenterImpl(ViewableDatasetTypeView view, DatasetType type, DataCommonsService service) {
+    public ViewableDatasetTypePresenterImpl(ViewableDatasetTypeView view, DatasetType type) {
         this.view = view;
         this.type = type;
-        this.service = service;
     }
 
-    public void doDisplay() throws EmfException {
+    public void doDisplay() {
         view.observe(this);
-        view.display(type, service.getKeywords());
+        view.display(type);
     }
 
     public void doClose() {

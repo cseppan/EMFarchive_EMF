@@ -31,7 +31,7 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
         type = service().obtainLockedDatasetType(session.user(), type);
 
         if (!type.isLocked(session.user())) {// view mode, locked by another user
-            new ViewableDatasetTypePresenterImpl(viewable, type, dataCommonsService()).doDisplay();
+            new ViewableDatasetTypePresenterImpl(viewable, type).doDisplay();
             return;
         }
 

@@ -57,14 +57,11 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("obtainLockedDatasetType").with(same(user), same(type)).will(returnValue(type));
 
-        Keyword[] keywords = new Keyword[0];
-        service.stubs().method("getKeywords").withNoArguments().will(returnValue(keywords));
-
         Mock session = session(user, service.proxy());
 
         Mock view = mock(ViewableDatasetTypeView.class);
         view.expects(once()).method("observe").with(new IsInstanceOf(ViewableDatasetTypePresenterImpl.class));
-        view.expects(once()).method("display").with(eq(type), same(keywords));
+        view.expects(once()).method("display").with(eq(type));
 
         EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenterImpl((EmfSession) session.proxy(),
                 null, (ViewableDatasetTypeView) view.proxy(), type);
