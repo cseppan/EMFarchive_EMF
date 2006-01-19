@@ -29,7 +29,6 @@ public class ExportFilenameTest extends TestCase {
         String date = sdf.format(new Date());
         
         String expected = "hello123Emf___data_Set_txt_" + date.toLowerCase() + "world";
-        System.out.println(expected);
         assertTrue(expected, expected.equals(getCorrectExportFilename(dataset)));
     }
     

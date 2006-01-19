@@ -1,10 +1,9 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataAccessService;
-import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataEditorService;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -32,19 +31,6 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("observe").with(same(p));
 
         p.display();
-    }
-
-    public void testShouldRaiseErrorWhenAttemptedToViewNonFinalVersionOnDisplay() throws Exception {
-        Version version = new Version();
-        DataViewPresenter p = new DataViewPresenter(version, null, null, null);
-
-        try {
-            p.display();
-        } catch (EmfException e) {
-            return;
-        }
-
-        fail("Should have raised an error if user attempts to view a non-final version");
     }
 
     public void testShouldCloseViewAndCloseDataEditSessionOnClose() throws Exception {

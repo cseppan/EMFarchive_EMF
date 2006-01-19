@@ -32,6 +32,19 @@ public class VersionsViewPresenterTest extends MockObjectTestCase {
         presenter.doView(version, table, (DataView) dataView.proxy());
     }
 
+    public void testShouldRaiseErrorWhenAttemptedToViewNonFinalVersionOnDisplay() throws Exception {
+        Version version = new Version();
+        VersionsViewPresenter presenter = new VersionsViewPresenter(null, null);
+
+        try {
+            presenter.doView(version, null, null);
+        } catch (EmfException e) {
+            return;
+        }
+
+        fail("Should have raised an error if user attempts to view a non-final version");
+    }
+
     private VersionsViewPresenter displayPresenter(Mock service, Mock view) throws EmfException {
         EmfDataset dataset = new EmfDataset();
         dataset.setDatasetid(1);

@@ -34,8 +34,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(null));
 
-        DataEditorPresenter p = new DataEditorPresenter(version, table, (DataEditorView) view.proxy(),
-                serviceProxy);
+        DataEditorPresenter p = new DataEditorPresenter(version, table, (DataEditorView) view.proxy(), serviceProxy);
         view.expects(once()).method("observe").with(same(p));
 
         p.display();
@@ -65,7 +64,8 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         String table = "table";
 
         DataAccessToken token = token();
-        service.expects(once()).method("openSession").with(new IsInstanceOf(DataAccessToken.class)).will(returnValue(token));
+        service.expects(once()).method("openSession").with(new IsInstanceOf(DataAccessToken.class)).will(
+                returnValue(token));
 
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(null));
@@ -73,8 +73,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
 
-        DataEditorPresenter p = new DataEditorPresenter(version, table, (DataEditorView) view.proxy(),
-                serviceProxy);
+        DataEditorPresenter p = new DataEditorPresenter(version, table, (DataEditorView) view.proxy(), serviceProxy);
         view.expects(once()).method("observe").with(same(p));
         p.display();
 
@@ -137,7 +136,8 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         ChangeSet changeset = new ChangeSet();
         changeset.addDeleted(new VersionedRecord());
         tableView.stubs().method("changeset").withNoArguments().will(returnValue(changeset));
-        service.expects(once()).method("submit").with(new IsInstanceOf(DataAccessToken.class), same(changeset), ANYTHING);
+        service.expects(once()).method("submit").with(new IsInstanceOf(DataAccessToken.class), same(changeset),
+                ANYTHING);
 
         p.doSave();
     }

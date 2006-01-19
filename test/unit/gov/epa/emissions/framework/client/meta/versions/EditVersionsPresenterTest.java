@@ -35,6 +35,20 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         presenter.doView(version, table, (DataView) dataView.proxy());
     }
 
+    public void testShouldRaiseErrorWhenAttemptedToViewNonFinalVersionOnDisplay() throws Exception {
+        Version version = new Version();
+
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null);
+
+        try {
+            presenter.doView(version, null, null);
+        } catch (EmfException e) {
+            return;
+        }
+
+        fail("Should have raised an error if user attempts to view a non-final version");
+    }
+
     public void testShouldDisplayEditableTableViewOnEdit() throws Exception {
         Version version = new Version();
         String table = "table";

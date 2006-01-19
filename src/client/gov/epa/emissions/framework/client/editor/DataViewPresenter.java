@@ -27,9 +27,6 @@ public class DataViewPresenter {
     }
 
     public void display() throws EmfException {
-        if(!version.isFinalVersion())
-            throw new EmfException("Can only view a 'final' Version");
-        
         service.openSession(token);
         view.observe(this);
         view.display(version, table, service);

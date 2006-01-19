@@ -26,6 +26,9 @@ public class VersionsViewPresenter {
     }
 
     public void doView(Version version, String table, DataView view) throws EmfException {
+        if (!version.isFinalVersion())
+            throw new EmfException("Can only view a 'final' Version");
+
         DataViewPresenter presenter = new DataViewPresenter(version, table, view, service);
         presenter.display();
     }
