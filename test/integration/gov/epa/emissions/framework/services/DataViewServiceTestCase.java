@@ -1,10 +1,7 @@
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.db.version.Versions;
@@ -43,7 +40,7 @@ public abstract class DataViewServiceTestCase extends ServicesTestCase {
 
         doImport();
 
-        token = editToken();
+        token = token();
         service.openSession(token);
     }
 
@@ -65,15 +62,26 @@ public abstract class DataViewServiceTestCase extends ServicesTestCase {
 
     protected void doTearDown() throws Exception {
         service.closeSession(token);
-
-        DbUpdate dbUpdate = new PostgresDbUpdate(datasource.getConnection());
-        dbUpdate.dropTable(datasource.getName(), dataset.getName());
-
-        DataModifier modifier = datasource.dataModifier();
-        modifier.dropAll("versions");
+        dropTable(dataset.getName(), datasource);
+        dropData("versions", datasource);
     }
 
-    public void testShouldReturnExactlyTenPages() throws EmfException {
+    public void testShouldFailWhenAttemptingToViewANonFinalVersion() throws Exception {
+        Version v0 = versionZero();
+        Versions versions = new Versions();
+        Version v1 = versions.derive(v0, "v1", session);
+
+        token = token(v1);
+        try {
+            service.openSession(token);
+        } catch (EmfException e) {
+            return;
+        }
+
+        fail("Should have raised an error if attempting to view a non-final version");
+    }
+
+    public void testShouldReturnExactlyTwoPages() throws EmfException {
         assertEquals(2, service.getPageCount(token));
 
         Page page = service.getPage(token, 1);
@@ -94,28 +102,26 @@ public abstract class DataViewServiceTestCase extends ServicesTestCase {
     }
 
     public void testShouldReturnAtleastOneRecord() throws EmfException {
-        int numberOfRecords = service.getTotalRecords(editToken());
+        int numberOfRecords = service.getTotalRecords(token());
         assertTrue(numberOfRecords >= 1);
     }
 
     public void testShouldReturnAtLeastOnePage() throws EmfException {
-        int numberOfPages = service.getPageCount(editToken());
+        int numberOfPages = service.getPageCount(token());
         assertTrue(numberOfPages >= 1);
     }
 
-    private DataAccessToken editToken() {
+    private DataAccessToken token() {
         Version version = versionZero();
-        return editToken(version);
+        return token(version);
     }
 
-    private DataAccessToken editToken(Version version) {
-        return editToken(version, dataset.getName());
+    private DataAccessToken token(Version version) {
+        return token(version, dataset.getName());
     }
 
-    private DataAccessToken editToken(Version version, String table) {
-        DataAccessToken result = new DataAccessToken(version, table);
-
-        return result;
+    private DataAccessToken token(Version version, String table) {
+        return new DataAccessToken(version, table);
     }
 
     private Version versionZero() {

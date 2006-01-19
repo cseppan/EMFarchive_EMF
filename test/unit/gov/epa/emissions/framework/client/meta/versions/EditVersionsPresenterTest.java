@@ -21,6 +21,7 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayTableViewOnView() throws Exception {
         Version version = new Version();
         String table = "table";
+        version.markFinal();
 
         Mock service = mock(DataEditorService.class);
         service.expects(once()).method("openSession").withAnyArguments();

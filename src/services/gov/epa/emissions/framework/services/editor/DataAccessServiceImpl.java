@@ -78,6 +78,19 @@ public class DataAccessServiceImpl {
         }
     }
 
+    public Version currentVersion(Version reference) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            Version current = versions.current(reference, session);
+            session.close();
+
+            return current;
+        } catch (HibernateException e) {
+            LOG.error("Could not load current version of Dataset : " + reference.getDatasetId() + ". Reason: " + e);
+            throw new EmfException("Could not load current version of Dataset : " + reference.getDatasetId());
+        }
+    }
+
     public Version[] getVersions(long datasetId) throws EmfException {
         try {
             Session session = sessionFactory.getSession();

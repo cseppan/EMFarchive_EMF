@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.impl;
 
+import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
@@ -27,6 +28,7 @@ import org.hibernate.SessionFactory;
 public abstract class ServicesTestCase extends TestCase {
 
     private EmfDatabaseSetup dbSetup;
+
     protected Session session;
 
     final protected void setUp() throws Exception {
@@ -79,9 +81,14 @@ public abstract class ServicesTestCase extends TestCase {
         return dbServer().getSqlDataTypes();
     }
 
-    protected void dropTable(Datasource datasource, String table) throws Exception, SQLException {
+    protected void dropTable(String table, Datasource datasource) throws Exception, SQLException {
         PostgresDbUpdate dbUpdate = new PostgresDbUpdate();
         dbUpdate.dropTable(datasource.getName(), table);
+    }
+
+    protected void dropData(String table, Datasource datasource) throws Exception, SQLException {
+        DataModifier modifier = datasource.dataModifier();
+        modifier.dropAll(table);
     }
 
     protected ServiceLocator serviceLocator() throws Exception {
