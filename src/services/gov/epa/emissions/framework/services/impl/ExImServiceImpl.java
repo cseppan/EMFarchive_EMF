@@ -229,7 +229,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             }
         }
 
-        return prefix + name + "_" + date + suffix;
+        return prefix + name + "_" + date.toLowerCase() + suffix;
     }
 
     public void startMultipleFileImport(User user, String folderPath, String[] fileNames, DatasetType datasetType)
