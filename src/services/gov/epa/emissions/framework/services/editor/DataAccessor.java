@@ -37,6 +37,14 @@ public class DataAccessor {
         lockableVersions = new LockableVersions(versions);
     }
 
+    public int defaultPageSize() {
+        Session session = sessionFactory.getSession();
+        int result = cache.defaultPageSize(session);
+        session.close();
+
+        return result;
+    }
+
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
         RecordsFilter filter = new RecordsFilter();
 
@@ -119,19 +127,20 @@ public class DataAccessor {
         }
     }
 
-    public DataAccessToken openSession(DataAccessToken token) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            cache.init(token, session);
-            session.close();
+    public DataAccessToken openSession(DataAccessToken token, int pageSize) throws Exception {
+        Session session = sessionFactory.getSession();
+        cache.init(token, pageSize, session);
+        session.close();
 
-            return token;
-        } catch (SQLException e) {
-            LOG.error("Could not initialize Session for Dataset: " + token.datasetId() + ", Version: "
-                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
-            throw new EmfException("Could not initialize Session for Dataset: " + token.datasetId() + ", Version: "
-                    + token.getVersion().getVersion());
-        }
+        return token;
+    }
+
+    public DataAccessToken openSession(DataAccessToken token) throws Exception {
+        Session session = sessionFactory.getSession();
+        cache.init(token, session);
+        session.close();
+
+        return token;
     }
 
     public void closeSession(DataAccessToken token) throws EmfException {
@@ -147,17 +156,16 @@ public class DataAccessor {
         }
     }
 
-    public DataAccessToken openEditSession(DataAccessToken token) throws EmfException {
-        token = openSession(token);
-        return token;
+    public DataAccessToken openEditSession(User user, DataAccessToken token) throws Exception {
+        return openEditSession(user, token, defaultPageSize());
     }
 
-    public DataAccessToken openEditSession(User user, DataAccessToken token) throws EmfException {
+    public DataAccessToken openEditSession(User user, DataAccessToken token, int pageSize) throws Exception {
         obtainLock(user, token);
         if (!token.isLocked(user))
             return token;// abort
 
-        token = openSession(token);
+        token = openSession(token, pageSize);
 
         return token;
     }
@@ -183,7 +191,7 @@ public class DataAccessor {
     }
 
     public DataAccessToken closeEditSession(DataAccessToken token) throws EmfException {
-        if (!isLocked(token))
+        if (!isLockOwned(token))
             throw new EmfException("Cannot unlock unless locked");
 
         releaseLock(token);
@@ -206,14 +214,13 @@ public class DataAccessor {
         }
     }
 
-    // is the version still locked by the same owner?
-    public boolean isLocked(DataAccessToken token) throws EmfException {
+    public boolean isLockOwned(DataAccessToken token) throws EmfException {
         Version version = token.getVersion();
         Version current = currentVersion(version);
         return current.isLocked(version.getLockOwner());
     }
 
-    public DataAccessToken extendLock(DataAccessToken token) throws EmfException {
+    public DataAccessToken renewLock(DataAccessToken token) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             Version extended = lockableVersions.renewLockOnUpdate(token.getVersion(), session);
@@ -227,4 +234,5 @@ public class DataAccessor {
 
         return token;
     }
+
 }

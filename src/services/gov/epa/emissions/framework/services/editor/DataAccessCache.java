@@ -111,7 +111,7 @@ public class DataAccessCache {
         init(token, defaultPageSize(session), session);
     }
 
-    private int defaultPageSize(Session session) {
+    public int defaultPageSize(Session session) {
         EmfProperty pageSize = properties.getProperty("page-size", session);
         return Integer.parseInt(pageSize.getValue());
     }

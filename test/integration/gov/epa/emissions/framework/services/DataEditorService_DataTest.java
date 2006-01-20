@@ -17,16 +17,18 @@ import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
+import gov.epa.emissions.framework.services.editor.DataEditorServiceImpl;
 import gov.epa.emissions.framework.services.impl.EmfProperty;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
+import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
 import java.io.File;
 import java.util.Date;
 import java.util.Random;
 
-public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
+public class DataEditorService_DataTest extends ServicesTestCase {
 
-    private DataEditorService service;
+    private DataEditorServiceImpl service;
 
     private Datasource datasource;
 
@@ -38,27 +40,31 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
 
     private User user;
 
-    protected void setUpService(DataEditorService service, UserService userService) throws Exception {
-        this.service = service;
-        datasource = emissions();
+    protected void doSetUp() throws Exception {
+        service = new DataEditorServiceImpl(emf(), super.dbServer(), sessionFactory());
+        UserService userService = new UserServiceImpl(sessionFactory());
 
+        datasource = emissions();
         dataset = new EmfDataset();
         table = "test" + new Date().getTime();
         dataset.setName(table);
         setTestValues(dataset);
 
-        doImport();
+        doImport(dataset);
 
         Versions versions = new Versions();
         Version v1 = versions.derive(versionZero(), "v1", session);
-        token = token(v1);
-        
-        user = userService.getUser("emf");
-        token = service.openSession(user, token);
+        openSession(userService, v1);
     }
 
-    private void doImport() throws ImporterException {
-        File file = new File("test/data/orl/nc", "onroad-300records.txt");
+    private void openSession(UserService userService, Version v1) throws EmfException {
+        token = token(v1);
+        user = userService.getUser("emf");
+        token = service.openSession(user, token, 5);
+    }
+
+    private void doImport(EmfDataset dataset) throws ImporterException {
+        File file = new File("test/data/orl/nc", "onroad-15records.txt");
         DataFormatFactory formatFactory = new VersionedDataFormatFactory(0);
         Importer importer = new ORLOnRoadImporter(file.getParentFile(), new String[] { file.getName() }, dataset,
                 dbServer(), sqlDataTypes(), formatFactory);
@@ -79,7 +85,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         dropData("versions", datasource);
     }
 
-    public void TODO_testTokenContainLockStartAndEndInfoOnOpeningSession() {
+    public void testTokenContainLockStartAndEndInfoOnOpeningSession() {
         assertNotNull("Lock Start Date should be set on opening of session", token.lockStart());
         assertNotNull("Lock End Date should be set on opening of session", token.lockEnd());
 
@@ -91,13 +97,13 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         assertEquals(expectedEnd, token.lockEnd());
     }
 
-    public void testShouldReturnExactlyTenPages() throws EmfException {
+    public void testShouldReturnExactlyThreePages() throws EmfException {
         assertEquals(3, service.getPageCount(token));
 
         Page page = service.getPage(token, 1);
         assertNotNull("Should be able to get Page 1", page);
 
-        assertEquals(100, page.count());
+        assertEquals(5, page.count());
         VersionedRecord[] records = page.getRecords();
         assertEquals(page.count(), records.length);
         for (int i = 0; i < records.length; i++) {
@@ -208,6 +214,21 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
 
         VersionedRecord[] records = reader.fetchAll(v1, dataset.getName(), session);
         assertEquals(v0RecordsCount + 3, records.length);
+    }
+
+    public void testLockRenewedOnSave() throws Exception {
+        Version v1 = versionOne();
+
+        ChangeSet changeset = new ChangeSet();
+        changeset.setVersion(v1);
+
+        VersionedRecord record6 = new VersionedRecord();
+        record6.setDatasetId((int) dataset.getDatasetid());
+        changeset.addNew(record6);
+
+        service.submit(token, changeset, 1);
+        DataAccessToken saved = service.save(token);
+        assertTrue("Should renew lock on save", saved.isLocked(user));
     }
 
     private Version versionOne() throws EmfException {

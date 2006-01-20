@@ -70,8 +70,15 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
         Version current = accessor.currentVersion(token.getVersion());
         if (!current.isFinalVersion())
             throw new EmfException("Can only view a final Version.");
-        
-        return accessor.openSession(token);
+
+        try {
+            return accessor.openSession(token);
+        } catch (Exception e) {
+            LOG.error("Could not open Session for Dataset: " + token.datasetId() + ", Version: "
+                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
+            throw new EmfException("Could not open Session for Dataset: " + token.datasetId() + ", Version: "
+                    + token.getVersion().getVersion());
+        }
     }
 
     public void closeSession(DataAccessToken token) throws EmfException {

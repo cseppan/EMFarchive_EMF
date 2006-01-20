@@ -120,7 +120,11 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public DataAccessToken save(DataAccessToken token) throws EmfException {
-        return doSave(token);
+        if(!accessor.isLockOwned(token))
+            throw new EmfException("Cannot save as the lock is not owned");
+        
+        DataAccessToken extended = accessor.renewLock(token);
+        return doSave(extended);
     }
 
     private DataAccessToken doSave(DataAccessToken token) throws EmfException {
@@ -156,11 +160,22 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public DataAccessToken openSession(User user, DataAccessToken token) throws EmfException {
+        return openSession(user, token, accessor.defaultPageSize());
+    }
+
+    public DataAccessToken openSession(User user, DataAccessToken token, int pageSize) throws EmfException {
         Version current = accessor.currentVersion(token.getVersion());
         if (current.isFinalVersion())
             throw new EmfException("Can only edit non-final Version.");
 
-        return accessor.openEditSession(user, token);
+        try {
+            return accessor.openEditSession(user, token, pageSize);
+        } catch (Exception e) {
+            LOG.error("Could not open Session for Dataset: " + token.datasetId() + ", Version: "
+                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
+            throw new EmfException("Could not open Session for Dataset: " + token.datasetId() + ", Version: "
+                    + token.getVersion().getVersion());
+        }
     }
 
     public void closeSession(DataAccessToken token) throws EmfException {

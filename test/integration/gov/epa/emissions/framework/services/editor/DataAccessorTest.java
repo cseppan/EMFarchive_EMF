@@ -91,14 +91,14 @@ public class DataAccessorTest extends ServicesTestCase {
 
     public void testShouldConfirmLockOwnershipOnIsLocked() throws Exception {
         DataAccessToken result = accessor.openEditSession(owner, token);
-        assertTrue("Should have obtained lock on opening edit session", accessor.isLocked(result));
+        assertTrue("Should have obtained lock on opening edit session", accessor.isLockOwned(result));
     }
     
     public void testShouldExtendLockPeriodOnExtendLock() throws Exception {
         DataAccessToken locked = accessor.openEditSession(owner, token);
         
-        DataAccessToken extended = accessor.extendLock(locked);
-        assertTrue("Should continue to extend lock", accessor.isLocked(extended));
+        DataAccessToken extended = accessor.renewLock(locked);
+        assertTrue("Should continue to extend lock", accessor.isLockOwned(extended));
     }
 
     public void testClosingEditSessionShouldReleaseLock() throws Exception {
