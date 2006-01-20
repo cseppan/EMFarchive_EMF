@@ -33,6 +33,15 @@ public class DataEditorPresenter {
         token = new DataAccessToken(version, table);
         token = service.openSession(user, token);
 
+        if (!token.isLocked(user)) {// abort
+            view.notifyLockFailure(token);
+            return;
+        }
+        
+        display(token, view);
+    }
+
+    private void display(DataAccessToken token, DataEditorView view) {
         this.view = view;
         view.observe(this);
         view.display(version, table, service);

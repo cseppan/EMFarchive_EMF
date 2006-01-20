@@ -6,7 +6,6 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataEditorService;
 
@@ -26,7 +25,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         Mock service = mock(DataEditorService.class);
         Constraint constraint = tokenConstraint(version, table);
-        DataAccessToken token = token();
+        DataAccessToken token = successToken();
         User user = new User();
         service.expects(once()).method("openSession").with(same(user), constraint).will(returnValue(token));
 
@@ -37,21 +36,45 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("updateLockPeriod")
                 .with(new IsInstanceOf(Date.class), new IsInstanceOf(Date.class));
 
-        Mock session = mock(EmfSession.class);
-        session.stubs().method("user").withNoArguments().will(returnValue(null));
-
         DataEditorPresenter p = new DataEditorPresenter(user, version, table, serviceProxy);
         view.expects(once()).method("observe").with(same(p));
 
         p.display((DataEditorView) view.proxy());
     }
 
-    private DataAccessToken token() {
+    public void testShouldAbortWithNotificationIfUnableToObtainLockOnDisplay() throws Exception {
+        Version version = new Version();
+        String table = "table";
+
+        Mock service = mock(DataEditorService.class);
+        DataAccessToken failureToken = failureToken();
+        User user = new User();
+        service.expects(once()).method("openSession").with(same(user), new IsInstanceOf(DataAccessToken.class)).will(
+                returnValue(failureToken));
+
+        DataEditorService serviceProxy = (DataEditorService) service.proxy();
+
+        Mock view = mock(DataEditorView.class);
+        view.expects(once()).method("notifyLockFailure");
+
+        DataEditorPresenter p = new DataEditorPresenter(user, version, table, serviceProxy);
+
+        p.display((DataEditorView) view.proxy());
+    }
+
+    private DataAccessToken successToken() {
         Mock mock = mock(DataAccessToken.class);
         mock.stubs().method("isLocked").will(returnValue(Boolean.TRUE));
         mock.stubs().method("lockStart").will(returnValue(new Date()));
         mock.stubs().method("lockEnd").will(returnValue(new Date()));
 
+        return (DataAccessToken) mock.proxy();
+    }
+    
+    private DataAccessToken failureToken() {
+        Mock mock = mock(DataAccessToken.class);
+        mock.stubs().method("isLocked").will(returnValue(Boolean.FALSE));
+        
         return (DataAccessToken) mock.proxy();
     }
 
@@ -71,13 +94,10 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Version version = new Version();
         String table = "table";
 
-        DataAccessToken token = token();
+        DataAccessToken token = successToken();
         User user = new User();
         service.expects(once()).method("openSession").with(same(user), new IsInstanceOf(DataAccessToken.class)).will(
                 returnValue(token));
-
-        Mock session = mock(EmfSession.class);
-        session.stubs().method("user").withNoArguments().will(returnValue(null));
 
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
