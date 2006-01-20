@@ -23,7 +23,6 @@ import javax.sql.DataSource;
 import junit.framework.TestCase;
 
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 
 public abstract class ServicesTestCase extends TestCase {
 
@@ -33,8 +32,7 @@ public abstract class ServicesTestCase extends TestCase {
 
     final protected void setUp() throws Exception {
         dbSetup = new EmfDatabaseSetup(config());
-        HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
-        session = sessionFactory.getSession();
+        session = sessionFactory().getSession();
 
         doSetUp();
     }
@@ -77,7 +75,7 @@ public abstract class ServicesTestCase extends TestCase {
         return dbSetup.getDbServer();
     }
 
-    protected SqlDataTypes dataTypes() {
+    protected SqlDataTypes sqlDataTypes() {
         return dbServer().getSqlDataTypes();
     }
 
@@ -97,9 +95,9 @@ public abstract class ServicesTestCase extends TestCase {
         return new RemoteServiceLocator(baseUrl);
     }
 
-    protected SessionFactory sessionFactory() throws Exception {
+    protected HibernateSessionFactory sessionFactory() throws Exception {
         LocalHibernateConfiguration config = new LocalHibernateConfiguration();
-        return config.factory();
+        return new HibernateSessionFactory(config.factory());
     }
 
     public void deleteDatasets() throws Exception {

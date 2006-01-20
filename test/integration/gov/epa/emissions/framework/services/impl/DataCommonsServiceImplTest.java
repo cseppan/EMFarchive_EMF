@@ -6,8 +6,7 @@ import gov.epa.emissions.framework.services.UserService;
 public class DataCommonsServiceImplTest extends DataCommonsServiceTestCase {
 
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
-        
+        HibernateSessionFactory sessionFactory = sessionFactory();
         DataCommonsServiceImpl commonsService = new DataCommonsServiceImpl(sessionFactory);
         UserService userService = new UserServiceImpl(sessionFactory);
 

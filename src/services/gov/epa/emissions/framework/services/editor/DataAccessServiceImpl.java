@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.LockingScheme;
 import gov.epa.emissions.framework.services.DataAccessToken;
@@ -146,6 +147,13 @@ public class DataAccessServiceImpl {
         token = openSession(token);
         obtainLock(token);
 
+        return token;
+    }
+    
+    public DataAccessToken openEditSession(User user, DataAccessToken token) throws EmfException {
+        token = openSession(token);
+        obtainLock(token);
+        
         return token;
     }
 

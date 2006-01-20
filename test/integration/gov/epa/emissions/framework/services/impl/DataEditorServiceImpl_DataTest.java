@@ -6,8 +6,7 @@ import gov.epa.emissions.framework.services.editor.DataEditorServiceImpl;
 public class DataEditorServiceImpl_DataTest extends DataEditorService_DataTestCase {
 
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = new HibernateSessionFactory(sessionFactory());
-        DataEditorServiceImpl service = new DataEditorServiceImpl(emf(), super.dbServer(), sessionFactory);
+        DataEditorServiceImpl service = new DataEditorServiceImpl(emf(), super.dbServer(), sessionFactory());
 
         super.setUpService(service);
     }

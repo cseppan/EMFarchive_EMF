@@ -56,7 +56,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         File file = new File("test/data/orl/nc", "onroad-300records.txt");
         DataFormatFactory formatFactory = new VersionedDataFormatFactory(0);
         Importer importer = new ORLOnRoadImporter(file.getParentFile(), new String[] { file.getName() }, dataset,
-                dbServer(), dataTypes(), formatFactory);
+                dbServer(), sqlDataTypes(), formatFactory);
         new VersionedImporter(importer, dataset, dbServer()).run();
     }
 
