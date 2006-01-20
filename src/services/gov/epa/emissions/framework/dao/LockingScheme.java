@@ -9,15 +9,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class LockingScheme {
-    private static Log log = LogFactory.getLog(LockingScheme.class);
-
     private EmfProperties propertiesDao;
 
     public LockingScheme() {
@@ -68,7 +64,6 @@ public class LockingScheme {
             session.update(lockable);
             tx.commit();
         } catch (HibernateException e) {
-            log.error(e);
             tx.rollback();
             throw e;
         }
@@ -91,7 +86,6 @@ public class LockingScheme {
 
             tx.commit();
         } catch (HibernateException e) {
-            log.error(e);
             tx.rollback();
             throw e;
         }
@@ -99,15 +93,18 @@ public class LockingScheme {
         return current;
     }
 
-    public Lockable update(Lockable target, Session session, List all) throws EmfException {
+    public Lockable releaseLockOnUpdate(Lockable target, Session session, List all) throws EmfException {
+        doUpdate(target, session, all);
+        return releaseLock(target, session);
+    }
+
+    private void doUpdate(Lockable target, Session session, List all) throws EmfException {
         Lockable current = current(target, all);
         if (!current.isLocked(target.getLockOwner()))
             throw new EmfException("Cannot update without owning lock");
 
         session.clear();// clear 'loaded' locked object - to make way for updated object
         doUpdate(session, target);
-
-        return releaseLock(target, session);
     }
 
     private void doUpdate(Session session, Lockable target) {
@@ -117,10 +114,14 @@ public class LockingScheme {
             session.update(target);
             tx.commit();
         } catch (HibernateException e) {
-            log.error(e);
             tx.rollback();
             throw e;
         }
+    }
+
+    public Lockable renewLockOnUpdate(Lockable target, Session session, List all) throws EmfException {
+        doUpdate(target, session, all);
+        return target;
     }
 
 }

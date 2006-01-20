@@ -7,7 +7,6 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.UserDAO;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
@@ -22,6 +21,8 @@ public class DataAccessorTest extends ServicesTestCase {
 
     private DataAccessToken token;
 
+    private String table;
+
     protected void doSetUp() throws Exception {
         datasource = emissions();
         accessor = createService();
@@ -31,8 +32,9 @@ public class DataAccessorTest extends ServicesTestCase {
         Version version = createVersionZero();
         token.setVersion(version);
 
-        createDataTable("dataccess_test");
-        token.setTable("dataccess_test");
+        table = "dataccess_test";
+        createDataTable(table);
+        token.setTable(table);
     }
 
     private DataAccessor createService() throws Exception {
@@ -46,7 +48,7 @@ public class DataAccessorTest extends ServicesTestCase {
 
     protected void doTearDown() throws Exception {
         dropData("versions", datasource);
-        dropTable("dataccess_test", datasource);
+        dropTable(table, datasource);
 
         accessor.shutdown();
     }
@@ -79,18 +81,24 @@ public class DataAccessorTest extends ServicesTestCase {
         DataAccessToken anotherToken = new DataAccessToken();
         Version version = loadVersionZero();
         anotherToken.setVersion(version);
+        anotherToken.setTable(table);
 
         User user = new UserDAO().get("admin", session);
         DataAccessToken result = accessor.openEditSession(user, anotherToken);
         assertTrue("Version should be locked by owner", result.isLocked(owner));
         assertFalse("Should have failed to obtain lock on opening edit session", result.isLocked(user));
+    }
 
-        try {
-            accessor.closeEditSession(anotherToken);
-        } catch (EmfException e) {
-            return;// no session to close
-        }
-        fail("Should have failed to close session as it was never successfully opened");
+    public void testShouldConfirmLockOwnershipOnIsLocked() throws Exception {
+        DataAccessToken result = accessor.openEditSession(owner, token);
+        assertTrue("Should have obtained lock on opening edit session", accessor.isLocked(result));
+    }
+    
+    public void testShouldExtendLockPeriodOnExtendLock() throws Exception {
+        DataAccessToken locked = accessor.openEditSession(owner, token);
+        
+        DataAccessToken extended = accessor.extendLock(locked);
+        assertTrue("Should continue to extend lock", accessor.isLocked(extended));
     }
 
     public void testClosingEditSessionShouldReleaseLock() throws Exception {

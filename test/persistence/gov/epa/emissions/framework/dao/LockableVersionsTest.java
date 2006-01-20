@@ -105,8 +105,18 @@ public class LockableVersionsTest extends HibernateTestCase {
         assertEquals(locked.getLockOwner(), owner.getUsername());
         locked.setName("TEST");
 
-        Version modified = lockableVersions.update(locked, session);
+        Version modified = lockableVersions.releaseLockOnUpdate(locked, session);
         assertEquals("TEST", locked.getName());
         assertEquals(modified.getLockOwner(), null);
+    }
+
+    public void testShouldBeAbleToRenewAfterObtainingLockOnRenew() throws Exception {
+        Version version = versions.get(1, 0, session);
+
+        Version locked = lockableVersions.obtainLocked(owner, version, session);
+        locked.setName("TEST");
+
+        Version renewed = lockableVersions.renewLockOnUpdate(locked, session);
+        assertTrue("Should continue to hold lock on renew", renewed.isLocked(owner));
     }
 }

@@ -120,11 +120,15 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public DataAccessToken save(DataAccessToken token) throws EmfException {
+        return doSave(token);
+    }
+
+    private DataAccessToken doSave(DataAccessToken token) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             cache.save(token, session);
             session.close();
-            
+
             return token;
         } catch (Exception e) {
             LOG.error("Could not update Dataset: " + token.datasetId() + " with changes for Version: "

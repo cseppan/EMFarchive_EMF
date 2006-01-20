@@ -94,7 +94,7 @@ public class DatasetDao {
     }
 
     public EmfDataset update(EmfDataset locked, Session session) throws EmfException {
-        return (EmfDataset) lockingScheme.update(locked, session, all(session));
+        return (EmfDataset) lockingScheme.releaseLockOnUpdate(locked, session, all(session));
     }
 
 }

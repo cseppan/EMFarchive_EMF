@@ -103,11 +103,11 @@ public class DataCommonsDAO {
     }
 
     public Sector updateSector(Sector sector, Session session) throws EmfException {
-        return (Sector) lockingScheme.update(sector, session, getSectors(session));
+        return (Sector) lockingScheme.releaseLockOnUpdate(sector, session, getSectors(session));
     }
 
     public DatasetType updateDatasetType(DatasetType type, Session session) throws EmfException {
-        return (DatasetType) lockingScheme.update(type, session, getDatasetTypes(session));
+        return (DatasetType) lockingScheme.releaseLockOnUpdate(type, session, getDatasetTypes(session));
     }
 
     public Sector releaseLockedSector(Sector locked, Session session) throws EmfException {

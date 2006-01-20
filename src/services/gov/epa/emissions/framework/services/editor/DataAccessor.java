@@ -183,8 +183,11 @@ public class DataAccessor {
     }
 
     public DataAccessToken closeEditSession(DataAccessToken token) throws EmfException {
-        closeSession(token);
+        if (!isLocked(token))
+            throw new EmfException("Cannot unlock unless locked");
+
         releaseLock(token);
+        closeSession(token);
 
         return token;
     }
@@ -201,5 +204,27 @@ public class DataAccessor {
             LOG.error("Could not release lock of Dataset " + token.datasetId() + ". Reason: " + e);
             throw new EmfException("Could not release lock of Dataset " + token.datasetId());
         }
+    }
+
+    // is the version still locked by the same owner?
+    public boolean isLocked(DataAccessToken token) throws EmfException {
+        Version version = token.getVersion();
+        Version current = currentVersion(version);
+        return current.isLocked(version.getLockOwner());
+    }
+
+    public DataAccessToken extendLock(DataAccessToken token) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            Version extended = lockableVersions.renewLockOnUpdate(token.getVersion(), session);
+            token.setVersion(extended);
+
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Could not extend lock of Dataset " + token.datasetId() + ". Reason: " + e);
+            throw new EmfException("Could not extend lock of Dataset " + token.datasetId());
+        }
+
+        return token;
     }
 }
