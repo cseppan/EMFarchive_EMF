@@ -1,9 +1,8 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.DataViewService;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -18,11 +17,11 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         String table = "table";
         version.markFinal();
 
-        Mock service = mock(DataEditorService.class);
+        Mock service = mock(DataViewService.class);
         Constraint constraint = tokenConstraint(version, table);
         service.expects(once()).method("openSession").with(constraint);
 
-        DataAccessService serviceProxy = (DataAccessService) service.proxy();
+        DataViewService serviceProxy = (DataViewService) service.proxy();
 
         Mock view = mock(DataView.class);
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
@@ -40,12 +39,12 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         Version version = new Version();
         String table = "table";
 
-        Mock service = mock(DataEditorService.class);
+        Mock service = mock(DataViewService.class);
         Constraint constraint = tokenConstraint(version, table);
         service.expects(once()).method("closeSession").with(constraint);
 
-        DataViewPresenter p = new DataViewPresenter(version, table, (DataView) view.proxy(),
-                (DataAccessService) service.proxy());
+        DataViewPresenter p = new DataViewPresenter(version, table, (DataView) view.proxy(), (DataViewService) service
+                .proxy());
 
         p.doClose();
     }

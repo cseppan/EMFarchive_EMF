@@ -82,8 +82,8 @@ public class DatasetsBrowserPresenter {
     public void doDisplayVersionedData(VersionedDataView versionsView, EmfDataset dataset) {
         view.clearMessage();
 
-        VersionedDataPresenter presenter = new VersionedDataPresenter(dataset, session, serviceLocator
-                .dataEditorService());
+        VersionedDataPresenter presenter = new VersionedDataPresenter(dataset, serviceLocator.dataEditorService(),
+                serviceLocator.dataViewService());
         presenter.display(versionsView);
     }
 

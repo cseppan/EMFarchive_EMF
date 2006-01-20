@@ -4,16 +4,16 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
-import gov.epa.emissions.framework.services.DataAccessService;
+import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 public class VersionsViewPresenter {
 
-    private DataAccessService service;
+    private DataViewService service;
 
     private EmfDataset dataset;
 
-    public VersionsViewPresenter(EmfDataset dataset, DataAccessService service) {
+    public VersionsViewPresenter(EmfDataset dataset, DataViewService service) {
         this.dataset = dataset;
         this.service = service;
     }

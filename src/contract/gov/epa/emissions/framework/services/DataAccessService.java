@@ -18,9 +18,4 @@ public interface DataAccessService {
     // version-related
     Version[] getVersions(long datasetId) throws EmfException;
 
-    // session
-    DataAccessToken openSession(DataAccessToken token) throws EmfException;
-
-    void closeSession(DataAccessToken token) throws EmfException;
-
 }

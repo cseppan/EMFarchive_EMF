@@ -2,11 +2,12 @@ package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.editor.DataEditorPresenter;
+import gov.epa.emissions.framework.client.editor.DataEditorView;
 import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
-import gov.epa.emissions.framework.client.editor.DataEditorView;
-import gov.epa.emissions.framework.client.editor.DataEditorPresenter;
 import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 public class EditVersionsPresenter {
@@ -17,9 +18,12 @@ public class EditVersionsPresenter {
 
     private EmfDataset dataset;
 
-    public EditVersionsPresenter(EmfDataset dataset, DataEditorService service) {
+    private DataViewService viewService;
+
+    public EditVersionsPresenter(EmfDataset dataset, DataEditorService service, DataViewService viewService) {
         this.dataset = dataset;
         this.service = service;
+        this.viewService = viewService;
     }
 
     public void display(EditVersionsView view) throws EmfException {
@@ -39,7 +43,7 @@ public class EditVersionsPresenter {
         if (!version.isFinalVersion())
             throw new EmfException("Cannot view a Version(" + version.getVersion() + ") that is not Final.");
 
-        DataViewPresenter presenter = new DataViewPresenter(version, table, view, service);
+        DataViewPresenter presenter = new DataViewPresenter(version, table, view, viewService);
         presenter.display();
     }
 

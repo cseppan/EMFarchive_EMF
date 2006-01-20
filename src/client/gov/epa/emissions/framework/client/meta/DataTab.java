@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.versions.VersionsPanel;
 import gov.epa.emissions.framework.client.meta.versions.VersionsViewPresenter;
-import gov.epa.emissions.framework.services.DataAccessService;
+import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -25,7 +25,7 @@ public class DataTab extends JPanel implements DataTabView {
         this.parentConsole = parentConsole;
     }
 
-    public void display(EmfDataset dataset, DataAccessService service) {
+    public void display(EmfDataset dataset, DataViewService service) {
         super.setLayout(new BorderLayout());
 
         messagePanel = new SingleLineMessagePanel();
@@ -33,7 +33,7 @@ public class DataTab extends JPanel implements DataTabView {
         add(createLayout(dataset, service, messagePanel), BorderLayout.CENTER);
     }
 
-    private JPanel createLayout(EmfDataset dataset, DataAccessService service, MessagePanel messagePanel) {
+    private JPanel createLayout(EmfDataset dataset, DataViewService service, MessagePanel messagePanel) {
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
@@ -42,7 +42,7 @@ public class DataTab extends JPanel implements DataTabView {
         return container;
     }
 
-    private VersionsPanel versionsPanel(EmfDataset dataset, DataAccessService service, MessagePanel messagePanel) {
+    private VersionsPanel versionsPanel(EmfDataset dataset, DataViewService service, MessagePanel messagePanel) {
         VersionsPanel versionsPanel = new VersionsPanel(dataset, messagePanel, parentConsole);
         VersionsViewPresenter versionsPresenter = new VersionsViewPresenter(dataset, service);
         try {

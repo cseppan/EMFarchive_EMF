@@ -2,14 +2,14 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataViewService;
 
 public class DataViewPresenter {
 
     private DataView view;
 
-    private DataAccessService service;
+    private DataViewService service;
 
     private Version version;
 
@@ -17,7 +17,7 @@ public class DataViewPresenter {
 
     private DataAccessToken token;
 
-    public DataViewPresenter(Version version, String table, DataView view, DataAccessService service) {
+    public DataViewPresenter(Version version, String table, DataView view, DataViewService service) {
         this.version = version;
         this.table = table;
         this.view = view;

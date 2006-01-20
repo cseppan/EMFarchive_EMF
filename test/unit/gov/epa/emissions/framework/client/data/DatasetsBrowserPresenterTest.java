@@ -6,22 +6,23 @@ import gov.epa.emissions.framework.client.exim.ExportView;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportPresenterStub;
 import gov.epa.emissions.framework.client.exim.ImportView;
-import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditorView;
+import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
+import gov.epa.emissions.framework.client.meta.versions.EditVersionsPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataView;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.constraint.IsInstanceOf;
-import org.jmock.core.constraint.IsNull;
 
 public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
@@ -143,13 +144,15 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         view.expects(once()).method("clearMessage").withNoArguments();
 
-        Mock service = mock(DataEditorService.class);
-        Object editorServiceProxy = service.proxy();
-        serviceLocator.stubs().method("dataEditorService").withNoArguments().will(returnValue(editorServiceProxy));
+        Mock editorService = mock(DataEditorService.class);
+        serviceLocator.stubs().method("dataEditorService").withNoArguments().will(returnValue(editorService.proxy()));
+
+        Mock viewService = mock(DataViewService.class);
+        serviceLocator.stubs().method("dataViewService").withNoArguments().will(returnValue(viewService.proxy()));
 
         Mock editorView = mock(VersionedDataView.class);
         editorView.expects(once()).method("observe").with(new IsInstanceOf(VersionedDataPresenter.class));
-        editorView.expects(once()).method("display").with(eq(dataset), new IsNull(), same(editorServiceProxy));
+        editorView.expects(once()).method("display").with(eq(dataset), new IsInstanceOf(EditVersionsPresenter.class));
 
         VersionedDataView viewProxy = (VersionedDataView) editorView.proxy();
 

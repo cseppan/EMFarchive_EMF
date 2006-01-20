@@ -5,8 +5,7 @@ import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
-import gov.epa.emissions.framework.services.DataAccessService;
-import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.jmock.Mock;
@@ -20,9 +19,9 @@ public class VersionsViewPresenterTest extends MockObjectTestCase {
         String table = "table";
         version.markFinal();
 
-        Mock service = mock(DataEditorService.class);
+        Mock service = mock(DataViewService.class);
         service.expects(once()).method("openSession").withAnyArguments();
-        DataAccessService serviceProxy = (DataAccessService) service.proxy();
+        DataViewService serviceProxy = (DataViewService) service.proxy();
 
         Mock dataView = mock(DataView.class);
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
@@ -53,7 +52,7 @@ public class VersionsViewPresenterTest extends MockObjectTestCase {
 
         service.stubs().method("getVersions").with(eq(new Long(dataset.getDatasetid()))).will(returnValue(versions));
 
-        VersionsViewPresenter presenter = new VersionsViewPresenter(dataset, (DataAccessService) service.proxy());
+        VersionsViewPresenter presenter = new VersionsViewPresenter(dataset, (DataViewService) service.proxy());
         view.expects(once()).method("observe").with(same(presenter));
         view.expects(once()).method("display").with(eq(versions), eq(internalSources));
 
@@ -63,7 +62,7 @@ public class VersionsViewPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldObserveAndDisplayViewOnDisplay() throws Exception {
-        Mock service = mock(DataEditorService.class);
+        Mock service = mock(DataViewService.class);
         Mock view = mock(VersionsView.class);
 
         displayPresenter(service, view);

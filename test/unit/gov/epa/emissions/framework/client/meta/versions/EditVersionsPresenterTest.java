@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.util.Date;
@@ -25,22 +26,22 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         String table = "table";
         version.markFinal();
 
-        Mock service = mock(DataEditorService.class);
+        Mock service = mock(DataViewService.class);
         service.expects(once()).method("openSession").withAnyArguments();
-        DataEditorService serviceProxy = (DataEditorService) service.proxy();
+        DataViewService serviceProxy = (DataViewService) service.proxy();
 
         Mock dataView = mock(DataView.class);
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
         dataView.expects(once()).method("observe").with(new IsInstanceOf(DataViewPresenter.class));
 
-        EditVersionsPresenter presenter = new EditVersionsPresenter(null, serviceProxy);
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null, serviceProxy);
         presenter.doView(version, table, (DataView) dataView.proxy());
     }
 
     public void testShouldRaiseErrorWhenAttemptedToViewNonFinalVersionOnDisplay() throws Exception {
         Version version = new Version();
 
-        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null);
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null, null);
 
         try {
             presenter.doView(version, null, null);
@@ -68,7 +69,7 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(null));
 
-        EditVersionsPresenter presenter = new EditVersionsPresenter(null, serviceProxy);
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, serviceProxy, null);
         presenter.doEdit(version, table, (DataEditorView) dataView.proxy());
     }
 
@@ -81,11 +82,11 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         return (DataAccessToken) mock.proxy();
     }
 
-    public void testShouldRaiseErrorOnEditWhenVersionIsFinal() throws Exception {
+public void testShouldRaiseErrorOnEditWhenVersionIsFinal() throws Exception {
         Version version = new Version();
         version.markFinal();
 
-        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null);
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null, null);
 
         try {
             presenter.doEdit(version, null, null);
@@ -95,9 +96,7 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         }
 
         fail("Should have failed to edit a Version that is already Final.");
-    }
-
-    public void testShouldDeriveNewVersionOnNew() throws Exception {
+    }    public void testShouldDeriveNewVersionOnNew() throws Exception {
         Version version = new Version();
         Version derived = new Version();
         String derivedName = "name";
@@ -121,7 +120,7 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
 
         service.stubs().method("getVersions").with(eq(new Long(dataset.getDatasetid()))).will(returnValue(versions));
 
-        EditVersionsPresenter presenter = new EditVersionsPresenter(dataset, (DataEditorService) service.proxy());
+        EditVersionsPresenter presenter = new EditVersionsPresenter(dataset, (DataEditorService) service.proxy(), null);
         view.expects(once()).method("observe").with(same(presenter));
         view.expects(once()).method("display").with(eq(versions), eq(internalSources));
 
@@ -159,7 +158,7 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         version.setVersion(2);
         version.markFinal();
 
-        EditVersionsPresenter p = new EditVersionsPresenter(null, null);
+        EditVersionsPresenter p = new EditVersionsPresenter(null, null, null);
 
         try {
             p.doMarkFinal(new Version[] { version });
