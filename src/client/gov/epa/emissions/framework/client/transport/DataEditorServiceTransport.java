@@ -237,13 +237,13 @@ public class DataEditorServiceTransport implements DataEditorService {
         }
     }
 
-    public void save(DataAccessToken token) throws EmfException {
+    public DataAccessToken save(DataAccessToken token) throws EmfException {
         try {
             mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.setOperation(call, "save");
-            mappings.setVoidReturnType(call);
+            mappings.setReturnType(call, mappings.dataAccessToken());
 
-            call.invoke(new Object[] { token });
+            return (DataAccessToken) call.invoke(new Object[] { token });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Could not save changes for " + token, fault);
         } catch (Exception e) {
@@ -251,6 +251,8 @@ public class DataEditorServiceTransport implements DataEditorService {
         } finally {
             call.removeAllParameters();
         }
+
+        return null;
     }
 
     public Version markFinal(Version derived) throws EmfException {

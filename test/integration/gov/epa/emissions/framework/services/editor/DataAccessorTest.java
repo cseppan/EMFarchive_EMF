@@ -7,13 +7,14 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.UserDAO;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
-public class DataAccessServiceTest extends ServicesTestCase {
+public class DataAccessorTest extends ServicesTestCase {
 
-    private DataAccessServiceImpl service;
+    private DataAccessor accessor;
 
     public Datasource datasource;
 
@@ -23,31 +24,31 @@ public class DataAccessServiceTest extends ServicesTestCase {
 
     protected void doSetUp() throws Exception {
         datasource = emissions();
-        service = createService();
+        accessor = createService();
 
         owner = new UserDAO().get("emf", session);
         token = new DataAccessToken();
-        Version version = versionZero();
+        Version version = createVersionZero();
         token.setVersion(version);
 
         createDataTable("dataccess_test");
         token.setTable("dataccess_test");
     }
 
-    private DataAccessServiceImpl createService() throws Exception {
+    private DataAccessor createService() throws Exception {
         DefaultVersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
 
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
         DataAccessCache cache = new DataAccessCache(reader, writerFactory, datasource, sqlDataTypes());
 
-        return new DataAccessServiceImpl(cache, sessionFactory());
+        return new DataAccessor(cache, sessionFactory());
     }
 
     protected void doTearDown() throws Exception {
         dropData("versions", datasource);
         dropTable("dataccess_test", datasource);
 
-        service.shutdown();
+        accessor.shutdown();
     }
 
     private void createDataTable(String table) throws Exception {
@@ -55,27 +56,47 @@ public class DataAccessServiceTest extends ServicesTestCase {
         createVersionedTable(table, emissions(), new Column[] { col1 });
     }
 
-    private void insertVersionZero(Datasource datasource, String table) throws Exception {
+    private Version createVersionZero() throws Exception {
         DataModifier modifier = datasource.dataModifier();
-        modifier.insertRow(table, (new String[] { null, "1", "0", "version zero", "", "true" }));
+        modifier.insertRow("versions", (new String[] { null, "1", "0", "version zero", "", "true" }));
+
+        return loadVersionZero();
     }
 
-    private Version versionZero() throws Exception {
-        insertVersionZero(datasource, "versions");
-
+    private Version loadVersionZero() {
         Versions versions = new Versions();
         return versions.get(1, session)[0];
     }
 
     public void testOpeningEditSessionShouldObtainLock() throws Exception {
-        DataAccessToken result = service.openEditSession(owner, token);
+        DataAccessToken result = accessor.openEditSession(owner, token);
         assertTrue("Should have obtained lock on opening edit session", result.isLocked(owner));
     }
 
-    public void testClosingEditSessionShouldReleaseLock() throws Exception {
-        DataAccessToken locked = service.openEditSession(owner, token);
+    public void testShouldFailToOpenSessionIfVersionIsLockedByAnotherUser() throws Exception {
+        accessor.openEditSession(owner, token);
 
-        DataAccessToken result = service.closeEditSession(locked);
+        DataAccessToken anotherToken = new DataAccessToken();
+        Version version = loadVersionZero();
+        anotherToken.setVersion(version);
+
+        User user = new UserDAO().get("admin", session);
+        DataAccessToken result = accessor.openEditSession(user, anotherToken);
+        assertTrue("Version should be locked by owner", result.isLocked(owner));
+        assertFalse("Should have failed to obtain lock on opening edit session", result.isLocked(user));
+
+        try {
+            accessor.closeEditSession(anotherToken);
+        } catch (EmfException e) {
+            return;// no session to close
+        }
+        fail("Should have failed to close session as it was never successfully opened");
+    }
+
+    public void testClosingEditSessionShouldReleaseLock() throws Exception {
+        DataAccessToken locked = accessor.openEditSession(owner, token);
+
+        DataAccessToken result = accessor.closeEditSession(locked);
         assertFalse("Should be unlocked on close", result.isLocked(owner));
     }
 }

@@ -34,7 +34,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
 
     private HibernateSessionFactory sessionFactory;
 
-    private DataAccessServiceImpl access;
+    private DataAccessor accessor;
 
     public DataEditorServiceImpl() throws Exception {
         try {
@@ -59,23 +59,23 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
         cache = new DataAccessCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
 
-        access = new DataAccessServiceImpl(cache, sessionFactory);
+        accessor = new DataAccessor(cache, sessionFactory);
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
-        return access.getPage(token, pageNumber);
+        return accessor.getPage(token, pageNumber);
     }
 
     public int getPageCount(DataAccessToken token) throws EmfException {
-        return access.getPageCount(token);
+        return accessor.getPageCount(token);
     }
 
     public Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException {
-        return access.getPageWithRecord(token, recordId);
+        return accessor.getPageWithRecord(token, recordId);
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {
-        return access.getTotalRecords(token);
+        return accessor.getTotalRecords(token);
     }
 
     public Version derive(Version baseVersion, String name) throws EmfException {
@@ -119,11 +119,13 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
     }
 
-    public void save(DataAccessToken token) throws EmfException {
+    public DataAccessToken save(DataAccessToken token) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             cache.save(token, session);
             session.close();
+            
+            return token;
         } catch (Exception e) {
             LOG.error("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
                     + token.getVersion() + "\t" + e.getMessage(), e);
@@ -146,26 +148,26 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public Version[] getVersions(long datasetId) throws EmfException {
-        return access.getVersions(datasetId);
+        return accessor.getVersions(datasetId);
     }
 
     public DataAccessToken openSession(User user, DataAccessToken token) throws EmfException {
-        Version current = access.currentVersion(token.getVersion());
+        Version current = accessor.currentVersion(token.getVersion());
         if (current.isFinalVersion())
             throw new EmfException("Can only edit non-final Version.");
 
-        return access.openEditSession(user, token);
+        return accessor.openEditSession(user, token);
     }
 
     public void closeSession(DataAccessToken token) throws EmfException {
-        access.closeSession(token);
+        accessor.closeSession(token);
     }
 
     /**
      * This method is for cleaning up session specific objects within this service.
      */
     protected void finalize() throws Throwable {
-        access.shutdown();
+        accessor.shutdown();
         super.finalize();
     }
 

@@ -19,8 +19,8 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
-public class DataAccessServiceImpl {
-    private Log LOG = LogFactory.getLog(DataAccessServiceImpl.class);
+public class DataAccessor {
+    private Log LOG = LogFactory.getLog(DataAccessor.class);
 
     private DataAccessCache cache;
 
@@ -30,7 +30,7 @@ public class DataAccessServiceImpl {
 
     private LockableVersions lockableVersions;
 
-    public DataAccessServiceImpl(DataAccessCache cache, HibernateSessionFactory sessionFactory) {
+    public DataAccessor(DataAccessCache cache, HibernateSessionFactory sessionFactory) {
         this.cache = cache;
         this.sessionFactory = sessionFactory;
         versions = new Versions();
@@ -153,8 +153,11 @@ public class DataAccessServiceImpl {
     }
 
     public DataAccessToken openEditSession(User user, DataAccessToken token) throws EmfException {
-        token = openSession(token);
         obtainLock(user, token);
+        if (!token.isLocked(user))
+            return token;// abort
+
+        token = openSession(token);
 
         return token;
     }

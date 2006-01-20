@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 public class DataViewServiceImpl extends EmfServiceImpl implements DataViewService {
     private static Log LOG = LogFactory.getLog(DataViewServiceImpl.class);
 
-    private DataAccessServiceImpl access;
+    private DataAccessor accessor;
 
     public DataViewServiceImpl() throws Exception {
         try {
@@ -43,46 +43,46 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
         DataAccessCache cache = new DataAccessCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
 
-        access = new DataAccessServiceImpl(cache, sessionFactory);
+        accessor = new DataAccessor(cache, sessionFactory);
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
-        return access.getPage(token, pageNumber);
+        return accessor.getPage(token, pageNumber);
     }
 
     public int getPageCount(DataAccessToken token) throws EmfException {
-        return access.getPageCount(token);
+        return accessor.getPageCount(token);
     }
 
     public Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException {
-        return access.getPageWithRecord(token, recordId);
+        return accessor.getPageWithRecord(token, recordId);
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {
-        return access.getTotalRecords(token);
+        return accessor.getTotalRecords(token);
     }
 
     public Version[] getVersions(long datasetId) throws EmfException {
-        return access.getVersions(datasetId);
+        return accessor.getVersions(datasetId);
     }
 
     public DataAccessToken openSession(DataAccessToken token) throws EmfException {
-        Version current = access.currentVersion(token.getVersion());
+        Version current = accessor.currentVersion(token.getVersion());
         if (!current.isFinalVersion())
             throw new EmfException("Can only view a final Version.");
         
-        return access.openSession(token);
+        return accessor.openSession(token);
     }
 
     public void closeSession(DataAccessToken token) throws EmfException {
-        access.closeSession(token);
+        accessor.closeSession(token);
     }
 
     /**
      * This method is for cleaning up session specific objects within this service.
      */
     protected void finalize() throws Throwable {
-        access.shutdown();
+        accessor.shutdown();
         super.finalize();
     }
 
