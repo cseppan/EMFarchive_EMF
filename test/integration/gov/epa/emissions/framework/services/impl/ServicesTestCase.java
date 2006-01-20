@@ -5,11 +5,13 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
+import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.db.EmfDatabaseSetup;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
 import gov.epa.emissions.framework.db.LocalHibernateConfiguration;
+import gov.epa.emissions.framework.db.VersionedTable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -104,4 +106,9 @@ public abstract class ServicesTestCase extends TestCase {
         ExImDbUpdate dbUpdate = new ExImDbUpdate();
         dbUpdate.deleteAllDatasets();
     }
+
+    protected void createVersionedTable(String table, Datasource datasource, Column[] cols) throws Exception {
+        new VersionedTable(datasource, sqlDataTypes()).create(table, cols);
+    }
+
 }

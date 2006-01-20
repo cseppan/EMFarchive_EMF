@@ -2,9 +2,6 @@ package gov.epa.emissions.framework.services.editor;
 
 import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.db.DbColumn;
-import gov.epa.emissions.commons.db.SqlDataTypes;
-import gov.epa.emissions.commons.db.TableDefinition;
 import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
@@ -18,16 +15,32 @@ public class DataAccessServiceTest extends ServicesTestCase {
 
     private DataAccessServiceImpl service;
 
-    private Datasource datasource;
+    public Datasource datasource;
+
+    private User owner;
+
+    private DataAccessToken token;
 
     protected void doSetUp() throws Exception {
         datasource = emissions();
+        service = createService();
+
+        owner = new UserDAO().get("emf", session);
+        token = new DataAccessToken();
+        Version version = versionZero();
+        token.setVersion(version);
+
+        createDataTable("dataccess_test");
+        token.setTable("dataccess_test");
+    }
+
+    private DataAccessServiceImpl createService() throws Exception {
         DefaultVersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
 
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
         DataAccessCache cache = new DataAccessCache(reader, writerFactory, datasource, sqlDataTypes());
 
-        service = new DataAccessServiceImpl(cache, sessionFactory());
+        return new DataAccessServiceImpl(cache, sessionFactory());
     }
 
     protected void doTearDown() throws Exception {
@@ -37,24 +50,9 @@ public class DataAccessServiceTest extends ServicesTestCase {
         service.shutdown();
     }
 
-    public void testOpeningEditSessionShouldObtainLock() throws Exception {
-        User owner = new UserDAO().get("emf", session);
-        DataAccessToken token = new DataAccessToken();
-        Version version = versionZero();
-        token.setVersion(version);
-
-        createSampleTable("dataccess_test");
-        token.setTable("dataccess_test");
-
-        DataAccessToken result = service.openEditSession(owner, token);
-        assertTrue(result.isLocked(owner));
-    }
-
-    private void createSampleTable(String table) throws Exception {
-        TableDefinition def = datasource.tableDefinition();
-        SqlDataTypes types = sqlDataTypes();
-        DbColumn[] cols = { new Column("p1", types.text()), new Column("p2", types.text()) };
-        def.createTable(table, cols);
+    private void createDataTable(String table) throws Exception {
+        Column col1 = new Column("p1", sqlDataTypes().text());
+        createVersionedTable(table, emissions(), new Column[] { col1 });
     }
 
     private void insertVersionZero(Datasource datasource, String table) throws Exception {
@@ -67,5 +65,17 @@ public class DataAccessServiceTest extends ServicesTestCase {
 
         Versions versions = new Versions();
         return versions.get(1, session)[0];
+    }
+
+    public void testOpeningEditSessionShouldObtainLock() throws Exception {
+        DataAccessToken result = service.openEditSession(owner, token);
+        assertTrue("Should have obtained lock on opening edit session", result.isLocked(owner));
+    }
+
+    public void testClosingEditSessionShouldReleaseLock() throws Exception {
+        DataAccessToken locked = service.openEditSession(owner, token);
+
+        DataAccessToken result = service.closeEditSession(locked);
+        assertFalse("Should be unlocked on close", result.isLocked(owner));
     }
 }

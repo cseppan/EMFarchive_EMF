@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.dao.LockableVersions;
 import gov.epa.emissions.framework.dao.LockingScheme;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
@@ -27,10 +28,13 @@ public class DataAccessServiceImpl {
 
     private Versions versions;
 
+    private LockableVersions lockableVersions;
+
     public DataAccessServiceImpl(DataAccessCache cache, HibernateSessionFactory sessionFactory) {
         this.cache = cache;
         this.sessionFactory = sessionFactory;
         versions = new Versions();
+        lockableVersions = new LockableVersions(versions);
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
@@ -145,31 +149,54 @@ public class DataAccessServiceImpl {
 
     public DataAccessToken openEditSession(DataAccessToken token) throws EmfException {
         token = openSession(token);
-        obtainLock(token);
-
         return token;
     }
-    
+
     public DataAccessToken openEditSession(User user, DataAccessToken token) throws EmfException {
         token = openSession(token);
-        obtainLock(token);
-        
+        obtainLock(user, token);
+
         return token;
     }
 
-    private void obtainLock(DataAccessToken token) throws EmfException {
+    private void obtainLock(User user, DataAccessToken token) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            token.setVersion(currentVersion(token.getVersion()));
+
+            Version current = currentVersion(token.getVersion());
+            Version locked = lockableVersions.obtainLocked(user, current, session);
+            token.setVersion(locked);
             token.setLockTimeInterval(lockTimeInterval(session));
+
             session.close();
         } catch (HibernateException e) {
-            LOG.error("Could not obtain lock for Dataset " + token.datasetId() + ". Reason: " + e);
-            throw new EmfException("Could not obtain lock for Dataset " + token.datasetId());
+            LOG.error("Could not obtain lock of Dataset " + token.datasetId() + ". Reason: " + e);
+            throw new EmfException("Could not obtain lock of Dataset " + token.datasetId());
         }
     }
 
     private long lockTimeInterval(Session session) {
         return new LockingScheme().timeInterval(session);
+    }
+
+    public DataAccessToken closeEditSession(DataAccessToken token) throws EmfException {
+        closeSession(token);
+        releaseLock(token);
+
+        return token;
+    }
+
+    private void releaseLock(DataAccessToken token) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            Version unlocked = lockableVersions.releaseLocked(token.getVersion(), session);
+            token.setVersion(unlocked);
+            token.setLockTimeInterval(lockTimeInterval(session));
+
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Could not release lock of Dataset " + token.datasetId() + ". Reason: " + e);
+            throw new EmfException("Could not release lock of Dataset " + token.datasetId());
+        }
     }
 }
