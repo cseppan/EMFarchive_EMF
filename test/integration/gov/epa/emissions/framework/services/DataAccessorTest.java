@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.dao.UserDAO;
 import gov.epa.emissions.framework.services.editor.DataAccessCache;
 import gov.epa.emissions.framework.services.editor.DataAccessor;
+import gov.epa.emissions.framework.services.editor.DataAccessorImpl;
 import gov.epa.emissions.framework.services.editor.DefaultVersionedRecordsWriterFactory;
 import gov.epa.emissions.framework.services.editor.VersionedRecordsWriterFactory;
 
@@ -45,7 +46,7 @@ public class DataAccessorTest extends ServicesTestCase {
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
         DataAccessCache cache = new DataAccessCache(reader, writerFactory, datasource, sqlDataTypes());
 
-        return new DataAccessor(cache, sessionFactory());
+        return new DataAccessorImpl(cache, sessionFactory());
     }
 
     protected void doTearDown() throws Exception {

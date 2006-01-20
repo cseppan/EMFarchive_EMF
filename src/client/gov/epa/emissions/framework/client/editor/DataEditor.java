@@ -252,4 +252,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         return dateFormat.format(lockDate);
     }
 
+    public void notifySaveFailure(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
 }

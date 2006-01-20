@@ -16,4 +16,6 @@ public interface DataEditorView extends ManagedView {
 
     void updateLockPeriod(Date start, Date end);
 
+    void notifySaveFailure(String message);
+
 }

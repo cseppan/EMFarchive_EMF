@@ -43,7 +43,7 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
         DataAccessCache cache = new DataAccessCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
 
-        accessor = new DataAccessor(cache, sessionFactory);
+        accessor = new DataAccessorImpl(cache, sessionFactory);
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {

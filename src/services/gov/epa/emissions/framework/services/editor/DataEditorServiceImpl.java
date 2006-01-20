@@ -59,7 +59,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
         cache = new DataAccessCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
 
-        accessor = new DataAccessor(cache, sessionFactory);
+        accessor = new DataAccessorImpl(cache, sessionFactory);
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
@@ -120,26 +120,30 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public DataAccessToken save(DataAccessToken token) throws EmfException {
-        if(!accessor.isLockOwned(token))
-            throw new EmfException("Cannot save as the lock is not owned");
-        
+        if (!accessor.isLockOwned(token)) {
+            Version current = accessor.currentVersion(token.getVersion());
+            throw new EmfException("Cannot save as the lock is currently owned by " + current.getLockOwner()
+                    + ", obtained at " + current.getDate());
+        }
+
         DataAccessToken extended = accessor.renewLock(token);
-        return doSave(extended);
+        return doSave(extended, cache, sessionFactory);
     }
 
-    private DataAccessToken doSave(DataAccessToken token) throws EmfException {
+    private DataAccessToken doSave(DataAccessToken token, DataAccessCache cache,
+            HibernateSessionFactory hibernateSessionFactory) throws EmfException {
         try {
-            Session session = sessionFactory.getSession();
+            Session session = hibernateSessionFactory.getSession();
             cache.save(token, session);
             session.close();
-
-            return token;
         } catch (Exception e) {
             LOG.error("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
                     + token.getVersion() + "\t" + e.getMessage(), e);
             throw new EmfException("Could not update Dataset: " + token.datasetId() + " with changes for Version: "
                     + token.getVersion());
         }
+
+        return token;
     }
 
     public Version markFinal(Version derived) throws EmfException {

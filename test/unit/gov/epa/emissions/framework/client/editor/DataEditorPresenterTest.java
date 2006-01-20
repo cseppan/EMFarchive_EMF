@@ -70,11 +70,11 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         return (DataAccessToken) mock.proxy();
     }
-    
+
     private DataAccessToken failureToken() {
         Mock mock = mock(DataAccessToken.class);
         mock.stubs().method("isLocked").will(returnValue(Boolean.FALSE));
-        
+
         return (DataAccessToken) mock.proxy();
     }
 
@@ -122,21 +122,6 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         p.doDiscard();
     }
 
-    public void testShouldSaveChangesOnSave() throws Exception {
-        Mock view = mock(DataEditorView.class);
-
-        Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class));
-
-        DataEditorPresenter p = displayPresenter(view, service);
-
-        Mock tableView = displayTableView(service, p);
-        ChangeSet changeset = new ChangeSet();
-        tableView.stubs().method("changeset").withNoArguments().will(returnValue(changeset));
-
-        p.doSave();
-    }
-
     public void testShouldDisplayTableViewOnDisplayTableView() throws Exception {
         Mock tableView = mock(EditablePageManagerView.class);
         tableView.expects(once()).method("observe").with(new IsInstanceOf(EditableTablePresenter.class));
@@ -169,6 +154,31 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         tableView.stubs().method("changeset").withNoArguments().will(returnValue(changeset));
         service.expects(once()).method("submit").with(new IsInstanceOf(DataAccessToken.class), same(changeset),
                 ANYTHING);
+
+        p.doSave();
+    }
+
+    public void testOnSaveShouldDiscardChangesCloseSessionAndNotifyUserOfFailureIfLockWasOwnedByAnotherUser()
+            throws Exception {
+        Mock view = mock(DataEditorView.class);
+        view.expects(once()).method("notifySaveFailure").with(eq("Failure"));
+        view.expects(once()).method("close").withNoArguments();
+
+        Mock service = mock(DataEditorService.class);
+        service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class)).will(
+                throwException(new EmfException("Failure")));
+        service.expects(once()).method("closeSession").with(new IsInstanceOf(DataAccessToken.class));
+
+        DataEditorPresenter p = displayPresenter(view, service);
+        Mock tableView = displayTableView(service, p);
+
+        ChangeSet changeset = new ChangeSet();
+        changeset.addDeleted(new VersionedRecord());
+        tableView.stubs().method("changeset").withNoArguments().will(returnValue(changeset));
+        service.expects(once()).method("submit").with(new IsInstanceOf(DataAccessToken.class), same(changeset),
+                ANYTHING);
+
+        service.expects(once()).method("discard").with(new IsInstanceOf(DataAccessToken.class));
 
         p.doSave();
     }

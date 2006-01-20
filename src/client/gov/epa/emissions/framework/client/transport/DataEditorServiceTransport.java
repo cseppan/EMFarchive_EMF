@@ -47,13 +47,13 @@ public class DataEditorServiceTransport implements DataEditorService {
 
     private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
         log.error(message, fault);
-        String msg = extractMessage(fault.getMessage());
-
         if (fault.getCause() != null) {
             if (fault.getCause().getMessage().equals(EMFConstants.CONNECTION_REFUSED)) {
-                msg = "EMF server not responding";
+                throw new EmfException("EMF server not responding");
             }
         }
+        
+        String msg = extractMessage(fault.getMessage());
         throw new EmfException(msg);
     }
 

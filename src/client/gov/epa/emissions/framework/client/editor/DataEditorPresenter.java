@@ -65,7 +65,13 @@ public class DataEditorPresenter {
 
     public void doSave() throws EmfException {
         tablePresenter.submitChanges();
-        service.save(token);
+        try {
+            token = service.save(token);
+        } catch (EmfException e) {
+            view.notifySaveFailure(e.getMessage());
+            doDiscard();
+            doClose();
+        }
     }
 
 }
