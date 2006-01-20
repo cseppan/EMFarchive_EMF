@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.impl;
+package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.db.EmfDatabaseSetup;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
 import gov.epa.emissions.framework.db.LocalHibernateConfiguration;
 import gov.epa.emissions.framework.db.VersionedTable;
+import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 
 import java.io.File;
 import java.io.FileInputStream;

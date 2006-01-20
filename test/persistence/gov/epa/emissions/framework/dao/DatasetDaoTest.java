@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.dao;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.impl.ServicesTestCase;
+import gov.epa.emissions.framework.services.ServicesTestCase;
 
 import java.util.List;
 

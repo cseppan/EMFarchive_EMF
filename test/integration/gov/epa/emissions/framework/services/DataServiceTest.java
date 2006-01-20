@@ -2,7 +2,9 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.impl.ServicesTestCase;
+import gov.epa.emissions.framework.services.impl.DataServiceImpl;
+import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
 import java.util.Random;
 
@@ -11,15 +13,16 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public abstract class DataServiceTestCase extends ServicesTestCase {
+public class DataServiceTest extends ServicesTestCase {
 
     private DataService service;
 
     private UserService userService;
 
-    protected void setUpService(DataService service, UserService userService) throws Exception {
-        this.service = service;
-        this.userService = userService;
+    protected void doSetUp() throws Exception {
+        HibernateSessionFactory sessionFactory = sessionFactory();
+        service = new DataServiceImpl(sessionFactory);
+        userService = new UserServiceImpl(sessionFactory);
 
         deleteDatasets();
     }

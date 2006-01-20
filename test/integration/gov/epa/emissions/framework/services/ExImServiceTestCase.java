@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
-import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 import java.io.File;
 import java.util.Random;

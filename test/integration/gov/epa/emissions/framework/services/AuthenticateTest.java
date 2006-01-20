@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.security.PasswordGenerator;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.UserService;
-import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 public class AuthenticateTest extends ServicesTestCase {
 

@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.editor;
+package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
@@ -8,8 +8,10 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.dao.UserDAO;
-import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.impl.ServicesTestCase;
+import gov.epa.emissions.framework.services.editor.DataAccessCache;
+import gov.epa.emissions.framework.services.editor.DataAccessor;
+import gov.epa.emissions.framework.services.editor.DefaultVersionedRecordsWriterFactory;
+import gov.epa.emissions.framework.services.editor.VersionedRecordsWriterFactory;
 
 public class DataAccessorTest extends ServicesTestCase {
 

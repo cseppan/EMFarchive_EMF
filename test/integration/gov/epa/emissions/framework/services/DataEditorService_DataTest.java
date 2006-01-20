@@ -19,7 +19,6 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.editor.DataEditorServiceImpl;
 import gov.epa.emissions.framework.services.impl.EmfProperty;
-import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
 import java.io.File;

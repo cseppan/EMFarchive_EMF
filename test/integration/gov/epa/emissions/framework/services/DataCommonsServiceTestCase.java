@@ -4,22 +4,25 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.impl.ServicesTestCase;
+import gov.epa.emissions.framework.services.impl.DataCommonsServiceImpl;
+import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
 import java.util.Date;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 
-public abstract class DataCommonsServiceTestCase extends ServicesTestCase {
+public class DataCommonsServiceTestCase extends ServicesTestCase {
 
     private DataCommonsService service;
 
     private UserService userService;
 
-    protected void setUpService(DataCommonsService service, UserService userService) throws Exception {
-        this.service = service;
-        this.userService = userService;
+    protected void doSetUp() throws Exception {
+        HibernateSessionFactory sessionFactory = sessionFactory();
+        service = new DataCommonsServiceImpl(sessionFactory);
+        userService = new UserServiceImpl(sessionFactory);
     }
 
     public void testShouldReturnCompleteListOfSectors() throws EmfException {

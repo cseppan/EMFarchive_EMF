@@ -11,13 +11,14 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
-import gov.epa.emissions.framework.services.impl.ServicesTestCase;
+import gov.epa.emissions.framework.services.editor.DataEditorServiceImpl;
+import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
 import java.io.File;
 import java.util.Date;
 import java.util.Random;
 
-public abstract class DataEditorService_VersionsTestCase extends ServicesTestCase {
+public class DataEditorService_VersionsTest extends ServicesTestCase {
 
     private DataEditorService service;
 
@@ -29,8 +30,10 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
 
     private DataAccessToken token;
 
-    protected void setUpService(DataEditorService service, UserService userService) throws Exception {
-        this.service = service;
+    protected void doSetUp() throws Exception {
+        service = new DataEditorServiceImpl(emf(), super.dbServer(), sessionFactory());
+        UserServiceImpl userService = new UserServiceImpl(sessionFactory());
+
         datasource = emissions();
 
         dataset = new EmfDataset();

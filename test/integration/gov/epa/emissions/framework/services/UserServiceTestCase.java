@@ -3,18 +3,18 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.UserDAO;
-import gov.epa.emissions.framework.services.impl.ServicesTestCase;
+import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public abstract class UserServiceTestCase extends ServicesTestCase {
+public class UserServiceTestCase extends ServicesTestCase {
     private UserService service;
 
-    public void setUpService(UserService service) throws Exception {
-        this.service = service;
+    public void doSetUp() throws Exception {
+        service = new UserServiceImpl(sessionFactory());
     }
 
     protected void doTearDown() throws Exception {// no op
