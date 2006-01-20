@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.dao;
 import gov.epa.emissions.commons.io.Lockable;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.impl.EmfProperty;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -19,6 +20,12 @@ public class LockingScheme {
 
     public static final long DEFAULT_TIMEOUT = 1 * 60 * 60 * 1000;// i.e. 1 hrs
 
+    private EmfProperties propertiesDao;
+
+    public LockingScheme() {
+        propertiesDao = new EmfPropertiesDAO();
+    }
+
     public Lockable getLocked(User user, Lockable target, Session session, List all) {
         Lockable current = current(target, all);
         return getLocked(user, current, session);
@@ -32,11 +39,16 @@ public class LockingScheme {
 
         long elapsed = new Date().getTime() - current.getLockDate().getTime();
 
-        if ((user.getFullName().equals(current.getLockOwner())) || (elapsed > DEFAULT_TIMEOUT)) {
+        if ((user.getFullName().equals(current.getLockOwner())) || (elapsed > timeout(session))) {
             grabLock(user, current, session);
         }
 
         return current;
+    }
+
+    private long timeout(Session session) {
+        EmfProperty timeInterval = propertiesDao.getProperty("lock.time-interval", session);
+        return Long.parseLong(timeInterval.getValue());
     }
 
     private Lockable current(Lockable target, List list) {

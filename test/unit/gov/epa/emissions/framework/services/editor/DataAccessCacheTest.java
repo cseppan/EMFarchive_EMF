@@ -5,7 +5,9 @@ import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
+import gov.epa.emissions.framework.dao.EmfProperties;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.impl.EmfProperty;
 
 import java.util.List;
 
@@ -35,8 +37,22 @@ public class DataAccessCacheTest extends MockObjectTestCase {
         Mock writerFactory = mock(VersionedRecordsWriterFactory.class);
         writerFactory.stubs().method("create").withAnyArguments().will(returnValue(writer.proxy()));
 
+        session = null;
+        Mock properties = properties();
+        
         cache = new DataAccessCache((VersionedRecordsReader) reader.proxy(),
-                (VersionedRecordsWriterFactory) writerFactory.proxy(), null, null);
+                (VersionedRecordsWriterFactory) writerFactory.proxy(), null, null, (EmfProperties) properties.proxy());
+    }
+
+    private Mock properties() {
+        Mock properties = mock(EmfProperties.class);
+        
+        EmfProperty property = new EmfProperty();
+        property.setName("page-size");
+        property.setValue("100");
+        
+        properties.stubs().method("getProperty").with(eq("page-size"), eq(null)).will(returnValue(property));
+        return properties;
     }
 
     public void testShouldMaintainListOfChangeSetsPerPage() throws Exception {

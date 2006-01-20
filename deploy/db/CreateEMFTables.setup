@@ -111,8 +111,8 @@ WITHOUT OIDS;
 ALTER TABLE emf.statusmessages OWNER TO emf;
 --emf.statusmessages
 --
---emf.emf_properties
-CREATE TABLE emf.emf_properties
+--emf.properties
+CREATE TABLE emf.properties
 (
   prop_id serial NOT NULL,
   prop_name varchar(255) NOT NULL,
@@ -121,8 +121,8 @@ CREATE TABLE emf.emf_properties
   CONSTRAINT emf_properties_prop_id_key UNIQUE (prop_id)
 ) 
 WITHOUT OIDS;
-ALTER TABLE emf.emf_properties OWNER TO emf;
---emf.emf_properties
+ALTER TABLE emf.properties OWNER TO emf;
+--emf.properties
 --
 -- emf.dataset_types
 CREATE SEQUENCE emf.dataset_types_dataset_type_id_seq

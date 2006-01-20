@@ -8,7 +8,7 @@ DROP TABLE emf.users CASCADE;
 --
 --emf. status, countries, properties, sectors,sector criteria
 DROP TABLE emf.statusmessages;
-DROP TABLE emf.emf_properties;
+DROP TABLE emf.properties;
 --
 DROP SEQUENCE emf.countries_id_seq;
 DROP TABLE emf.countries;

@@ -8,7 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class EmfPropertiesDAO {
+public class EmfPropertiesDAO implements EmfProperties {
 
     public EmfProperty getProperty(String name, Session session) {
         Transaction tx = null;

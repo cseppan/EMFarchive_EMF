@@ -7,7 +7,10 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
+import gov.epa.emissions.framework.dao.EmfProperties;
+import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.impl.EmfProperty;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -37,8 +40,17 @@ public class DataAccessCache {
 
     private VersionedRecordsWriterFactory writerFactory;
 
+    private EmfProperties properties;
+
     public DataAccessCache(VersionedRecordsReader reader, VersionedRecordsWriterFactory writerFactory,
             Datasource datasource, SqlDataTypes sqlTypes) {
+        this(reader, writerFactory, datasource, sqlTypes, new EmfPropertiesDAO());
+    }
+
+    public DataAccessCache(VersionedRecordsReader reader, VersionedRecordsWriterFactory writerFactory,
+            Datasource datasource, SqlDataTypes sqlTypes, EmfProperties properties) {
+        this.properties = properties;
+
         recordsReader = reader;
         this.writerFactory = writerFactory;
         this.datasource = datasource;
@@ -96,7 +108,12 @@ public class DataAccessCache {
     }
 
     public void init(DataAccessToken token, Session session) throws SQLException {
-        init(token, 100, session);
+        init(token, defaultPageSize(session), session);
+    }
+
+    private int defaultPageSize(Session session) {
+        EmfProperty pageSize = properties.getProperty("page-size", session);
+        return Integer.parseInt(pageSize.getValue());
     }
 
     public void init(DataAccessToken token, int pageSize, Session session) throws SQLException {
