@@ -18,8 +18,6 @@ import org.hibernate.Transaction;
 public class LockingScheme {
     private static Log log = LogFactory.getLog(LockingScheme.class);
 
-    public static final long DEFAULT_TIMEOUT = 1 * 60 * 60 * 1000;// i.e. 1 hrs
-
     private EmfProperties propertiesDao;
 
     public LockingScheme() {
@@ -39,14 +37,14 @@ public class LockingScheme {
 
         long elapsed = new Date().getTime() - current.getLockDate().getTime();
 
-        if ((user.getFullName().equals(current.getLockOwner())) || (elapsed > timeout(session))) {
+        if ((user.getFullName().equals(current.getLockOwner())) || (elapsed > timeInterval(session))) {
             grabLock(user, current, session);
         }
 
         return current;
     }
 
-    private long timeout(Session session) {
+    public long timeInterval(Session session) {
         EmfProperty timeInterval = propertiesDao.getProperty("lock.time-interval", session);
         return Long.parseLong(timeInterval.getValue());
     }

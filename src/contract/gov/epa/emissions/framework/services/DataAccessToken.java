@@ -3,11 +3,15 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 
+import java.util.Date;
+
 public class DataAccessToken {
 
     private String table;
 
     private Version version;
+
+    private long lockTimeInterval;
 
     public DataAccessToken() {// needed by Axis
     }
@@ -43,6 +47,23 @@ public class DataAccessToken {
 
     public boolean isLocked(User user) {
         return version.isLocked(user);
+    }
+
+    public Date lockStart() {
+        return version.getLockDate();
+    }
+
+    public Date lockEnd() {
+        Date lockStart = lockStart();
+        return lockStart != null ? new Date(lockStart.getTime() + lockTimeInterval) : null;
+    }
+
+    public void setLockTimeInterval(long lockTimeInterval) {
+        this.lockTimeInterval = lockTimeInterval;
+    }
+
+    public long getLockTimeInterval() {
+        return lockTimeInterval;
     }
 
 }

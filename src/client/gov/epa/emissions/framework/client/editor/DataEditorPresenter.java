@@ -32,6 +32,7 @@ public class DataEditorPresenter {
         token = service.openSession(token);
         view.observe(this);
         view.display(version, table, service);
+        view.updateLockPeriod(token.lockStart(), token.lockEnd());
     }
 
     public void displayTable(EditablePageManagerView tableView) throws EmfException {

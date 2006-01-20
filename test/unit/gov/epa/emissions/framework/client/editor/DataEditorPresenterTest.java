@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
+import java.util.Date;
+
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
@@ -30,6 +32,8 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         Mock view = mock(DataEditorView.class);
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
+        view.expects(once()).method("updateLockPeriod")
+                .with(new IsInstanceOf(Date.class), new IsInstanceOf(Date.class));
 
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(null));
@@ -43,6 +47,8 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
     private DataAccessToken token() {
         Mock mock = mock(DataAccessToken.class);
         mock.stubs().method("isLocked").will(returnValue(Boolean.TRUE));
+        mock.stubs().method("lockStart").will(returnValue(new Date()));
+        mock.stubs().method("lockEnd").will(returnValue(new Date()));
 
         return (DataAccessToken) mock.proxy();
     }
@@ -72,6 +78,8 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
+        view.expects(once()).method("updateLockPeriod")
+                .with(new IsInstanceOf(Date.class), new IsInstanceOf(Date.class));
 
         DataEditorPresenter p = new DataEditorPresenter(version, table, (DataEditorView) view.proxy(), serviceProxy);
         view.expects(once()).method("observe").with(same(p));

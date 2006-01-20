@@ -15,8 +15,6 @@ import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.impl.EmfServiceImpl;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 
-import java.sql.SQLException;
-
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -25,7 +23,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorService {
-    private static Log LOG = LogFactory.getLog(DataEditorServiceImpl.class);
+    private static final Log LOG = LogFactory.getLog(DataEditorServiceImpl.class);
 
     private Versions versions;
 
@@ -150,27 +148,12 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         return access.getVersions(datasetId);
     }
 
-    public DataAccessToken openSession(DataAccessToken token, int pageSize) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            cache.init(token, pageSize, session);
-            session.close();
-
-            return token;
-        } catch (SQLException e) {
-            LOG.error("Could not initialize editing Session for Dataset: " + token.datasetId() + ", Version: "
-                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
-            throw new EmfException("Could not initialize editing Session for Dataset: " + token.datasetId()
-                    + ", Version: " + token.getVersion().getVersion());
-        }
-    }
-
     public DataAccessToken openSession(DataAccessToken token) throws EmfException {
         Version current = access.currentVersion(token.getVersion());
-        if(current.isFinalVersion())
+        if (current.isFinalVersion())
             throw new EmfException("Can only edit non-final Version.");
-        
-        return access.openSession(token);
+
+        return access.openEditSession(token);
     }
 
     public void closeSession(DataAccessToken token) throws EmfException {

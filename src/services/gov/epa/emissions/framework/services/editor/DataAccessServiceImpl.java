@@ -1,5 +1,14 @@
 package gov.epa.emissions.framework.services.editor;
 
+import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.PageReader;
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.dao.LockingScheme;
+import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
+
 import java.sql.SQLException;
 import java.util.List;
 
@@ -7,14 +16,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-
-import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.commons.db.PageReader;
-import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.db.version.Versions;
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 
 public class DataAccessServiceImpl {
     private Log LOG = LogFactory.getLog(DataAccessServiceImpl.class);
@@ -141,4 +142,26 @@ public class DataAccessServiceImpl {
         }
     }
 
+    public DataAccessToken openEditSession(DataAccessToken token) throws EmfException {
+        token = openSession(token);
+        obtainLock(token);
+
+        return token;
+    }
+
+    private void obtainLock(DataAccessToken token) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            token.setVersion(currentVersion(token.getVersion()));
+            token.setLockTimeInterval(lockTimeInterval(session));
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Could not obtain lock for Dataset " + token.datasetId() + ". Reason: " + e);
+            throw new EmfException("Could not obtain lock for Dataset " + token.datasetId());
+        }
+    }
+
+    private long lockTimeInterval(Session session) {
+        return new LockingScheme().timeInterval(session);
+    }
 }

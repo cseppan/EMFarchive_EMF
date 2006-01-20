@@ -41,7 +41,7 @@ public abstract class DataViewServiceTestCase extends ServicesTestCase {
         doImport();
 
         token = token();
-        service.openSession(token);
+        token = service.openSession(token);
     }
 
     private void doImport() throws ImporterException {

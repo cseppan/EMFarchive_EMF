@@ -15,6 +15,8 @@ import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
+import gov.epa.emissions.framework.services.impl.EmfProperty;
 import gov.epa.emissions.framework.services.impl.ServicesTestCase;
 
 import java.io.File;
@@ -47,7 +49,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Versions versions = new Versions();
         Version v1 = versions.derive(versionZero(), "v1", session);
         token = token(v1);
-        service.openSession(token);
+        token = service.openSession(token);
     }
 
     private void doImport() throws ImporterException {
@@ -72,6 +74,18 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         dropData("versions", datasource);
     }
 
+    public void TODO_testTokenContainLockStartAndEndInfoOnOpeningSession() {
+        assertNotNull("Lock Start Date should be set on opening of session", token.lockStart());
+        assertNotNull("Lock End Date should be set on opening of session", token.lockEnd());
+
+        Date expectedStart = token.getVersion().getLockDate();
+        assertEquals(expectedStart, token.lockStart());
+
+        EmfProperty timeInterval = new EmfPropertiesDAO().getProperty("lock.time-interval", session);
+        Date expectedEnd = new Date(expectedStart.getTime() + Long.parseLong(timeInterval.getValue()));
+        assertEquals(expectedEnd, token.lockEnd());
+    }
+    
     public void testShouldReturnExactlyTenPages() throws EmfException {
         assertEquals(3, service.getPageCount(token));
 

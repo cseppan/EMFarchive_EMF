@@ -41,7 +41,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private String table;
 
-    private JPanel lockInfoPanel;
+    private JLabel lockInfo;
 
     public DataEditor(EmfDataset dataset) {
         super("Data Editor: " + dataset.getName());
@@ -70,7 +70,9 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.CENTER);
 
-        lockInfoPanel = new JPanel();
+        JPanel lockInfoPanel = new JPanel();
+        lockInfo = new JLabel();
+        lockInfoPanel.add(lockInfo);
         panel.add(lockInfoPanel, BorderLayout.LINE_END);
 
         return panel;
@@ -96,16 +98,13 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private void updateLabelInfo(Version version, String table) {
         super.setTitle(super.getTitle() + " / " + version.getName() + " / " + table);
-        
+
         labelPanel.add(new JLabel("    Version:    " + version.getName()));
         labelPanel.add(new JLabel("    Table:       " + table));
-        
-        updateLockInfo(version);
     }
 
-    private void updateLockInfo(Version version) {
-        //TODO: obtain time-interval, also refresh on 'save'
-        lockInfoPanel.add(new JLabel("Lock obtained at: " + version.getLockDate()));
+    public void updateLockPeriod(Date start, Date end) {
+        lockInfo.setText("Lock obtained at " + start + ", expires at " + end);
     }
 
     private JPanel tablePanel(Version version, String table) {

@@ -4,13 +4,15 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.editor.DataEditorView;
 import gov.epa.emissions.framework.client.editor.DataEditorPresenter;
+import gov.epa.emissions.framework.client.editor.DataEditorView;
 import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
-import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
+
+import java.util.Date;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -60,6 +62,8 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         Mock dataView = mock(DataEditorView.class);
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
         dataView.expects(once()).method("observe").with(new IsInstanceOf(DataEditorPresenter.class));
+        dataView.expects(once()).method("updateLockPeriod").with(new IsInstanceOf(Date.class),
+                new IsInstanceOf(Date.class));
 
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(null));
@@ -71,6 +75,8 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
     private DataAccessToken token() {
         Mock mock = mock(DataAccessToken.class);
         mock.stubs().method("isLocked").will(returnValue(Boolean.TRUE));
+        mock.stubs().method("lockStart").will(returnValue(new Date()));
+        mock.stubs().method("lockEnd").will(returnValue(new Date()));
 
         return (DataAccessToken) mock.proxy();
     }
