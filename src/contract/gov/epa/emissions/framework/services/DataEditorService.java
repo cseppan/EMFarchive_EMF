@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 
 public interface DataEditorService extends DataAccessService {
@@ -17,7 +18,7 @@ public interface DataEditorService extends DataAccessService {
     Version markFinal(Version derived) throws EmfException;
 
     // session
-    DataAccessToken openSession(DataAccessToken token) throws EmfException;
+    DataAccessToken openSession(User user, DataAccessToken token) throws EmfException;
 
     void closeSession(DataAccessToken token) throws EmfException;
 }

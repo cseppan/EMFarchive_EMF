@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EMFConstants;
@@ -205,13 +206,14 @@ public class DataEditorServiceTransport implements DataEditorService {
         }
     }
 
-    public DataAccessToken openSession(DataAccessToken token) throws EmfException {
+    public DataAccessToken openSession(User user, DataAccessToken token) throws EmfException {
         try {
             mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.setOperation(call, "openSession");
+            mappings.setReturnType(call, mappings.user());
             mappings.setReturnType(call, mappings.dataAccessToken());
 
-            return (DataAccessToken) call.invoke(new Object[] { token });
+            return (DataAccessToken) call.invoke(new Object[] { user, token });
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not open editing session for " + token.key(), e);
         } finally {

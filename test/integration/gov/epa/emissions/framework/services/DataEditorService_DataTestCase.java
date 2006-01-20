@@ -14,6 +14,7 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadImporter;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.impl.EmfProperty;
@@ -35,7 +36,9 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
 
     private DataAccessToken token;
 
-    protected void setUpService(DataEditorService service) throws Exception {
+    private User user;
+
+    protected void setUpService(DataEditorService service, UserService userService) throws Exception {
         this.service = service;
         datasource = emissions();
 
@@ -49,7 +52,9 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Versions versions = new Versions();
         Version v1 = versions.derive(versionZero(), "v1", session);
         token = token(v1);
-        token = service.openSession(token);
+        
+        user = userService.getUser("emf");
+        token = service.openSession(user, token);
     }
 
     private void doImport() throws ImporterException {
@@ -85,7 +90,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Date expectedEnd = new Date(expectedStart.getTime() + Long.parseLong(timeInterval.getValue()));
         assertEquals(expectedEnd, token.lockEnd());
     }
-    
+
     public void testShouldReturnExactlyTenPages() throws EmfException {
         assertEquals(3, service.getPageCount(token));
 
@@ -110,7 +115,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Version v0 = versionZero();
         DataAccessToken token = token(v0);
         try {
-            service.openSession(token);
+            service.openSession(user, token);
         } catch (EmfException e) {
             return;
         }
@@ -263,7 +268,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Version v1 = versionOne();
 
         DataAccessToken token = token(v1, table);
-        DataAccessToken locked = service.openSession(token);
+        DataAccessToken locked = service.openSession(user, token);
         Page page = service.getPage(token, 1);
 
         ChangeSet changeset = new ChangeSet();
@@ -297,7 +302,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Version v1 = versionOne();
 
         DataAccessToken token = token(v1, table);
-        DataAccessToken locked = service.openSession(token);
+        DataAccessToken locked = service.openSession(user, token);
 
         Page page = service.getPage(token, 1);
 
@@ -337,7 +342,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Version v1 = versionOne();
 
         DataAccessToken token = token(v1, table);
-        service.openSession(token);
+        service.openSession(user, token);
 
         // page 1 changes
         ChangeSet page1ChangeSet = new ChangeSet();
@@ -372,7 +377,7 @@ public abstract class DataEditorService_DataTestCase extends ServicesTestCase {
         Version v1 = versionOne();
 
         DataAccessToken token = token(v1, table);
-        service.openSession(token);
+        service.openSession(user, token);
 
         // page 1 changes
         ChangeSet page1ChangeSet = new ChangeSet();

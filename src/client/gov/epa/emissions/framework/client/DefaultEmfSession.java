@@ -5,7 +5,9 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.preference.UserPreferences;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataCommonsService;
+import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.LoggingService;
 import gov.epa.emissions.framework.services.UserService;
@@ -17,7 +19,7 @@ public class DefaultEmfSession implements EmfSession {
     private ServiceLocator serviceLocator;
 
     private String mostRecentExportFolder;
-    
+
     private UserPreferences preferences;
 
     public DefaultEmfSession(User user, ServiceLocator locator) throws EmfException {
@@ -25,7 +27,7 @@ public class DefaultEmfSession implements EmfSession {
         this.preferences = new UserPreferences();
         this.user = user;
     }
-    
+
     public UserPreferences preferences() {
         return preferences;
     }
@@ -64,5 +66,13 @@ public class DefaultEmfSession implements EmfSession {
 
     public DataCommonsService dataCommonsService() {
         return serviceLocator.dataCommonsService();
+    }
+
+    public DataViewService dataViewService() {
+        return serviceLocator.dataViewService();
+    }
+
+    public DataEditorService dataEditorService() {
+        return serviceLocator.dataEditorService();
     }
 }

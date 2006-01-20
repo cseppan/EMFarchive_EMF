@@ -1,15 +1,16 @@
 package gov.epa.emissions.framework.client.editor;
 
-import java.util.Date;
-
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataEditorService;
+
+import java.util.Date;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -26,7 +27,8 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Mock service = mock(DataEditorService.class);
         Constraint constraint = tokenConstraint(version, table);
         DataAccessToken token = token();
-        service.expects(once()).method("openSession").with(constraint).will(returnValue(token));
+        User user = new User();
+        service.expects(once()).method("openSession").with(same(user), constraint).will(returnValue(token));
 
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
@@ -38,10 +40,10 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(null));
 
-        DataEditorPresenter p = new DataEditorPresenter(version, table, (DataEditorView) view.proxy(), serviceProxy);
+        DataEditorPresenter p = new DataEditorPresenter(user, version, table, serviceProxy);
         view.expects(once()).method("observe").with(same(p));
 
-        p.display();
+        p.display((DataEditorView) view.proxy());
     }
 
     private DataAccessToken token() {
@@ -70,7 +72,8 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         String table = "table";
 
         DataAccessToken token = token();
-        service.expects(once()).method("openSession").with(new IsInstanceOf(DataAccessToken.class)).will(
+        User user = new User();
+        service.expects(once()).method("openSession").with(same(user), new IsInstanceOf(DataAccessToken.class)).will(
                 returnValue(token));
 
         Mock session = mock(EmfSession.class);
@@ -81,9 +84,9 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("updateLockPeriod")
                 .with(new IsInstanceOf(Date.class), new IsInstanceOf(Date.class));
 
-        DataEditorPresenter p = new DataEditorPresenter(version, table, (DataEditorView) view.proxy(), serviceProxy);
+        DataEditorPresenter p = new DataEditorPresenter(user, version, table, serviceProxy);
         view.expects(once()).method("observe").with(same(p));
-        p.display();
+        p.display((DataEditorView) view.proxy());
 
         return p;
     }
@@ -126,7 +129,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Mock service = mock(DataEditorService.class);
         service.stubs().method("getPage").withAnyArguments().will(returnValue(new Page()));
 
-        DataEditorPresenter p = new DataEditorPresenter(version, table, null, (DataEditorService) service.proxy());
+        DataEditorPresenter p = new DataEditorPresenter(null, version, table, (DataEditorService) service.proxy());
 
         p.displayTable((EditablePageManagerView) tableView.proxy());
     }

@@ -1,9 +1,10 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataEditorService;
 
 public class DataEditorPresenter {
 
@@ -19,17 +20,20 @@ public class DataEditorPresenter {
 
     private EditableTablePresenter tablePresenter;
 
-    public DataEditorPresenter(Version version, String table, DataEditorView view, DataEditorService service) {
+    private User user;
+
+    public DataEditorPresenter(User user, Version version, String table, DataEditorService service) {
+        this.user = user;
         this.version = version;
         this.table = table;
-        this.view = view;
         this.service = service;
     }
 
-    public void display() throws EmfException {
+    public void display(DataEditorView view) throws EmfException {
         token = new DataAccessToken(version, table);
+        token = service.openSession(user, token);
 
-        token = service.openSession(token);
+        this.view = view;
         view.observe(this);
         view.display(version, table, service);
         view.updateLockPeriod(token.lockStart(), token.lockEnd());

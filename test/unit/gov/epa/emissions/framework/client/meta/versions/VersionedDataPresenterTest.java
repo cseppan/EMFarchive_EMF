@@ -14,7 +14,7 @@ public class VersionedDataPresenterTest extends MockObjectTestCase {
 
         view.expects(once()).method("display").with(same(dataset), new IsInstanceOf(EditVersionsPresenter.class));
 
-        VersionedDataPresenter p = new VersionedDataPresenter(dataset, null, null);
+        VersionedDataPresenter p = new VersionedDataPresenter(null, dataset, null, null);
         view.expects(once()).method("observe").with(same(p));
 
         p.display((VersionedDataView) view.proxy());
@@ -33,7 +33,7 @@ public class VersionedDataPresenterTest extends MockObjectTestCase {
 
         view.expects(once()).method("display").with(same(dataset), new IsInstanceOf(EditVersionsPresenter.class));
 
-        VersionedDataPresenter p = new VersionedDataPresenter(dataset, null, null);
+        VersionedDataPresenter p = new VersionedDataPresenter(null, dataset, null, null);
         view.expects(once()).method("observe").with(same(p));
 
         p.display((VersionedDataView) view.proxy());

@@ -29,7 +29,7 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
 
     private DataAccessToken token;
 
-    protected void setUpService(DataEditorService service) throws Exception {
+    protected void setUpService(DataEditorService service, UserService userService) throws Exception {
         this.service = service;
         datasource = emissions();
 
@@ -42,7 +42,7 @@ public abstract class DataEditorService_VersionsTestCase extends ServicesTestCas
 
         Version v1 = new Versions().derive(versionZero(), "v1", session);
         token = token(v1);
-        service.openSession(token);
+        service.openSession(userService.getUser("emf"), token);
     }
 
     private void doImport() throws ImporterException {

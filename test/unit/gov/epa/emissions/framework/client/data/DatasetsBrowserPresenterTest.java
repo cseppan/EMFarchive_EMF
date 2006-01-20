@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportView;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
@@ -44,7 +46,10 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         serviceLocator.stubs().method("dataCommonsService").withNoArguments().will(
                 returnValue(dataCommonsService.proxy()));
 
-        presenter = new DatasetsBrowserPresenter(null, (ServiceLocator) serviceLocator.proxy());
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("user").withNoArguments().will(returnValue(new User()));
+
+        presenter = new DatasetsBrowserPresenter((EmfSession) session.proxy(), (ServiceLocator) serviceLocator.proxy());
 
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();

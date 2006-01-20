@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
 import gov.epa.emissions.framework.services.DataAccessToken;
@@ -148,12 +149,12 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         return access.getVersions(datasetId);
     }
 
-    public DataAccessToken openSession(DataAccessToken token) throws EmfException {
+    public DataAccessToken openSession(User user, DataAccessToken token) throws EmfException {
         Version current = access.currentVersion(token.getVersion());
         if (current.isFinalVersion())
             throw new EmfException("Can only edit non-final Version.");
 
-        return access.openEditSession(token);
+        return access.openEditSession(user, token);
     }
 
     public void closeSession(DataAccessToken token) throws EmfException {
