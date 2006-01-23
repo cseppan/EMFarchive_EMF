@@ -33,34 +33,33 @@ public class Download extends Thread{
     }
     
     public void stopDownload() {
-        blinker = null;
         presenter.setCursor(Cursor.getDefaultCursor());
+        blinker = null;
     }
 
 	public void run(){
         Thread thisThread = Thread.currentThread();
-		
-        while(blinker == thisThread) {
-            presenter.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            try{
-                downloadFileList();
-                File2Download[] todownload = getFiles2Download();
-				
-				for(int x=0; x<numFiles2Download; x++){
-				    String temp = todownload[x].getPath();
-				    File file2save = getSingleDownloadFile(temp);
+        presenter.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        try{
+            downloadFileList();
+            File2Download[] todownload = getFiles2Download();
+            
+            for(int x=0; x<numFiles2Download; x++){
+                if(blinker == thisThread) {
+                    String temp = todownload[x].getPath();
+                    File file2save = getSingleDownloadFile(temp);
                     HttpURLConnection conn = getConnection(temp);
                     writeStatus(x, temp);
                     saveFile(file2save, conn);
-				}
-                
-                presenter.setFinish();
-                stopDownload();
-            } catch (IOException e){
-                presenter.displayErr("Downloading files failed.");
-            } finally {
-                stopDownload(); 
+                }
             }
+            
+            if(blinker == thisThread)
+                presenter.setFinish();
+        } catch (IOException e){
+            presenter.displayErr("Downloading files failed.");
+        } finally {
+            stopDownload();
         }
 	}
 	
@@ -93,7 +92,6 @@ public class Download extends Thread{
     private void createShortcutBatchFile(File bat, File inf){
         String separator = Generic.SEPARATOR;
         
-        //FIXME: shortcut.inf directory
         String battext = "\n@echo off & setlocal" + separator +
                          "\nset inf=rundll32 setupapi,InstallHinfSection DefaultInstall" + separator +
                          "\nstart/w %inf% 132 " + installhome.replace('\\', '/') + "/shortcut.inf" + separator +

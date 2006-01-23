@@ -1,13 +1,8 @@
 package gov.epa.emissions.framework.install.installer;
 
-import gov.epa.emissions.framework.EmfException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class InstallPreferences {
 
@@ -23,20 +18,17 @@ public class InstallPreferences {
     
     private static final String WEB_SITE = "web.site";
 
-    private static Log log = LogFactory.getLog(InstallPreferences.class);
-
     public static final String EMF_PREFERENCE = "EMF_PREFERENCE";
 
     private Properties props;
 
-    public InstallPreferences() throws EmfException {
+    public InstallPreferences() throws Exception {
         props = new Properties();
         try {
             FileInputStream inStream = new FileInputStream(getFile());
             props.load(inStream);
         } catch (Exception e) {
-            log.error("Cannot load user preferences file " + getFile().getAbsolutePath());
-            throw new EmfException("Cannot load user preferences file");
+            throw new Exception("Cannot load user preferences file");
         }
     }
 

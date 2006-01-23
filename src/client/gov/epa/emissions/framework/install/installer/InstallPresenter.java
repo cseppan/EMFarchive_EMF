@@ -35,7 +35,11 @@ public class InstallPresenter {
     
     public void writePreference(String website, String input, 
             String output, String javahome, String emfhome) {
-        Tools.writePreference(website, input, output, javahome, emfhome);
+        try {
+            Tools.writePreference(website, input, output, javahome, emfhome);
+        } catch (Exception e) {
+            view.displayErr("Creating EMF client preference file failed.");
+        }
     }
     
     public void setStatus(String status) {

@@ -1,19 +1,7 @@
-/*
- * Created on Sep 20, 2005
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
 package gov.epa.emissions.framework.install.installer;
 
-/**
- * @author Qun He, CEP, UNC Chapel Hill
- *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
 public class Generic {
-	public static final String VERSION = "1/19/2006";
+	public static final String VERSION = "1/20/2006";
 	public static final String SEPARATOR = System.getProperty("line.separator");
 	
 	public static final String TIME_FORMAT = "MM/dd/yyyy hh:mmaaa";

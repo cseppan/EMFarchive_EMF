@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.install.installer;
 
 import javax.swing.JFrame;
 
-public class ClientInstallLauncher {
+public class Launcher {
     public static void main(String[] args) throws Exception {
         InstallWindow view = new InstallWindow();
         view.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
