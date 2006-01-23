@@ -64,7 +64,7 @@ public class NonEditableTableViewPanel extends JPanel implements NonEditableTabl
         notesLabelPanel.add(new JLabel("Notes"), BorderLayout.LINE_START);
         panel.add(notesLabelPanel);
 
-        TextArea notes = new TextArea("Notes", "");
+        TextArea notes = new TextArea("Notes", "Notes will be coming soon...");
         notes.setEditable(false);
         panel.add(new ScrollableTextArea(notes));
 

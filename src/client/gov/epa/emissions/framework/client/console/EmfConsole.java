@@ -44,6 +44,12 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     private StatusPresenter presenter;
 
     private ViewLayout windowLayoutManager;
+    
+    private static String aboutMessage = 
+        "<html><center>Emissions Modeling Framework (EMF)<br>"+
+        "Version: Beta 2 (1/24/2006)<br>"+
+        "Developed by the Carolina Environmental Program<br>"+
+        "University of North Carolina at Chapel Hill</center></html>"; 
 
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(EmfSession session) {
@@ -145,7 +151,8 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         about.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 JOptionPane.showMessageDialog(EmfConsole.this,
-                        "\nEmissions Modeling Framework (EMF)\nVersion: Beta 1 (1/17/2006)", "EMF",
+                        aboutMessage,
+                        "About the EMF",
                         JOptionPane.INFORMATION_MESSAGE);
             }
         });
