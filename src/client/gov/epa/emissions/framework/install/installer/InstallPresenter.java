@@ -34,9 +34,9 @@ public class InstallPresenter {
     }
     
     public void writePreference(String website, String input, 
-            String output, String javahome, String emfhome) {
+            String output, String javahome, String emfhome, String server) {
         try {
-            Tools.writePreference(website, input, output, javahome, emfhome);
+            Tools.writePreference(website, input, output, javahome, emfhome, server);
         } catch (Exception e) {
             view.displayErr("Creating EMF client preference file failed.");
         }
@@ -59,9 +59,9 @@ public class InstallPresenter {
     }
     
     public void createBatchFile(String filename, String preference, 
-            String javahome) {
+            String javahome, String server) {
         try {
-            new ClientBatchFile(filename).create(preference, javahome);
+            new ClientBatchFile(filename).create(preference, javahome, server);
         } catch (Exception e) {
             view.displayErr("Creating EMF client batch file failed.");
         }

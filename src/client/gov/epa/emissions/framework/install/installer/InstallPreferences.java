@@ -16,6 +16,8 @@ public class InstallPreferences {
     
     private static final String EMF_INSTALL_FOLDER = "emf.install.folder";
     
+    private static final String EMF_SERVER_ADDRESS = "server.address";
+    
     private static final String WEB_SITE = "web.site";
 
     public static final String EMF_PREFERENCE = "EMF_PREFERENCE";
@@ -69,6 +71,10 @@ public class InstallPreferences {
     
     public String emfWebSite() {
         return property(WEB_SITE);
+    }
+    
+    public String emfServer() {
+        return property(EMF_SERVER_ADDRESS);
     }
  
 }
