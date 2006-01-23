@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
@@ -37,7 +38,7 @@ public class KeywordsTableData extends AbstractTableData implements SelectableEm
         rows.add(row(new Keyword(keyword), masterKeywords));
     }
 
-    public Keyword[] sources() {
+    public Keyword[] sources() throws EmfException {
         List sources = sourcesList();
         return (Keyword[]) sources.toArray(new Keyword[0]);
     }
@@ -92,11 +93,13 @@ public class KeywordsTableData extends AbstractTableData implements SelectableEm
             remove(keywords[i]);
     }
 
-    private List sourcesList() {
+    private List sourcesList() throws EmfException {
         List sources = new ArrayList();
-
+        int rowNumber = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            rowNumber++;
             EditableRow row = (EditableRow) iter.next();
+            row.validate(rowNumber);
             sources.add(row.source());
         }
         return sources;

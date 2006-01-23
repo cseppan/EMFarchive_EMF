@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.ui.RowSource;
 
 public class KeywordRowSource implements RowSource {
@@ -40,5 +41,11 @@ public class KeywordRowSource implements RowSource {
 
     public boolean isSelected() {
         return selected.booleanValue();
+    }
+
+    public void validate(int rowNumber) throws EmfException {
+        if (keyword == null || keyword.getName().trim().length() == 0) {
+            throw new EmfException("empty keyword at row "+rowNumber);
+        }
     }
 }

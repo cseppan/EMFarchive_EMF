@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;
@@ -72,7 +73,7 @@ public class KeywordsTableDataTest extends TestCase {
         assertEquals(3, data.rows().size());
     }
 
-    public void testShouldReturnCurrentlyHeldKeyword() {
+    public void testShouldReturnCurrentlyHeldKeyword() throws EmfException {
         data.add("keyword3");
 
         Keyword[] sources = data.sources();

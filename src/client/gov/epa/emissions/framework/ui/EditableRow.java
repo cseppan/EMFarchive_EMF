@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.ui;
 
+import gov.epa.emissions.framework.EmfException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +48,10 @@ public class EditableRow implements Row {
     public void setValueAt(Object val, int column) {
         rowSource.setValueAt(column, val);
         columns(rowSource);
+    }
+    
+    public void validate(int rowNumber) throws EmfException{
+        rowSource.validate(rowNumber);
     }
 
 }

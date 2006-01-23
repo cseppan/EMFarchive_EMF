@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -47,7 +48,7 @@ public class DatasetPersistenceTest extends HibernateTestCase {
         ds.setName(datasetName);
         ds.setProject("P1");
         ds.setRegion("USA");
-        ds.setSector("S1");
+        ds.setSectors(new Sector[]{new Sector("","S1")});
         ds.setStartDateTime(new Date());
         ds.setStatus("imported");
         ds.setYear(42);

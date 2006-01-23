@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.SectorCriteria;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.ui.RowSource;
 
 public class SectorCriterionRowSource implements RowSource {
@@ -41,5 +42,14 @@ public class SectorCriterionRowSource implements RowSource {
 
     public boolean isSelected() {
         return selected.booleanValue();
+    }
+
+    public void validate(int rowNumber) throws EmfException {
+        if(criterion.getType().length() == 0){
+            throw new EmfException("Empty sector criteria type at row "+rowNumber);
+        }
+        if(criterion.getCriteria().length() == 0){
+            throw new EmfException("Empty sector criteria name at row "+rowNumber);
+        }
     }
 }

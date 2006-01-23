@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
@@ -76,17 +77,19 @@ public class EditableKeyValueTableData extends AbstractTableData implements Sele
             remove(values[i]);
     }
 
-    public KeyVal[] sources() {
+    public KeyVal[] sources() throws EmfException {
         List sources = sourcesList();
         return (KeyVal[]) sources.toArray(new KeyVal[0]);
     }
 
-    private List sourcesList() {
+    private List sourcesList() throws EmfException {
         List sources = new ArrayList();
-
+        int rowNumber = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            rowNumber++;
             EditableRow row = (EditableRow) iter.next();
             EditableKeyValueRowSource rowSource = (EditableKeyValueRowSource) row.rowSource();
+            rowSource.validate(rowNumber);
             sources.add(rowSource.source());
         }
         return sources;

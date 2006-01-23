@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.io.KeyVal;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.Keywords;
 
 import javax.swing.BoxLayout;
@@ -29,7 +30,7 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
         return editableKeywordsPanel;
     }
 
-    public KeyVal[] updates() {
+    public KeyVal[] updates() throws EmfException {
         return tableData.sources();
     }
 

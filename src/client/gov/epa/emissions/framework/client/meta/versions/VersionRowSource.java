@@ -47,4 +47,9 @@ public class VersionRowSource implements RowSource {
     public boolean isSelected() {
         return selected.booleanValue();
     }
+
+    public void validate(int rowNumber) {
+        //FIXME: validate row source
+        
+    }
 }

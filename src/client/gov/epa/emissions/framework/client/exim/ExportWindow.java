@@ -8,11 +8,13 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.ui.FileChooser;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -37,11 +39,12 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     private TextArea purpose;
 
     public ExportWindow(EmfDataset[] datasets) {
-        super(title(datasets), new Dimension(600, 350));
+        super(title(datasets));
         super.setName("exportWindow");
         this.datasets = datasets;
 
         this.getContentPane().add(createLayout());
+        this.pack();
     }
 
     private static String title(EmfDataset[] datasets) {
@@ -86,7 +89,15 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         // folder
         folder = new JTextField(40);
         folder.setName("folder");
-        layoutGenerator.addLabelWidgetPair("Folder", folder, panel);
+        Button button = new Button("Choose Folder", new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
+                selectFolder();
+            } 
+        });
+        JPanel folderPanel = new JPanel(new BorderLayout());
+        folderPanel.add(folder);
+        folderPanel.add(button, BorderLayout.EAST);
+        layoutGenerator.addLabelWidgetPair("Folder", folderPanel, panel);
 
         // purpose
         purpose = new TextArea("purpose", "");
@@ -178,5 +189,23 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
     public void setMostRecentUsedFolder(String mostRecentUsedFolder) {
         if (mostRecentUsedFolder != null)
             folder.setText(mostRecentUsedFolder);
+    }
+    
+    private void selectFolder() {
+        FileChooser chooser = new FileChooser(
+                "Select File", new File(folder.getText()), ExportWindow.this);
+        
+        chooser.setTitle("Select a folder");
+        File file = chooser.choose();
+        if (file == null)
+            return;
+
+        if (file.isDirectory()) {
+            folder.setText(file.getAbsolutePath());
+        }
+        
+        if (file.isFile()) {
+            folder.setText(file.getParent());
+        }
     }
 }

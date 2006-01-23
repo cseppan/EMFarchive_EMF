@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.summary;
 
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -116,7 +117,12 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         layoutGenerator.addLabelWidgetPair("Time Period Start:", new JLabel(formatDate(dataset.getStartDateTime())), panel);
         layoutGenerator.addLabelWidgetPair("Time Period End:", new JLabel(formatDate(dataset.getStopDateTime())), panel);
         layoutGenerator.addLabelWidgetPair("Temporal Resolution:", new JLabel(dataset.getTemporalResolution()), panel);
-        layoutGenerator.addLabelWidgetPair("Sector:", new JLabel(dataset.getSector()), panel);
+        Sector[] sectors = dataset.getSectors();
+        String sectorLabel = "";
+        if(sectors != null && sectors.length>0){
+            sectorLabel = sectors[0].toString();
+        }
+        layoutGenerator.addLabelWidgetPair("Sector:", new JLabel(sectorLabel), panel);
         layoutGenerator.addLabelWidgetPair("Region:", new JLabel(dataset.getRegion()), panel);
         layoutGenerator.addLabelWidgetPair("Country:", new JLabel(dataset.getCountry()), panel);
 

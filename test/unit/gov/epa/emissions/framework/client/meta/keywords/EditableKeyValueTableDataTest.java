@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueTableData;
 import gov.epa.emissions.framework.ui.Row;
@@ -107,14 +108,31 @@ public class EditableKeyValueTableDataTest extends TestCase {
         assertEquals("", blankSource.getValue());
     }
 
-    public void testShouldReturnCurrentlyHeldKeyVal() {
+    public void testShouldReturnCurrentlyHeldKeyVal() throws EmfException {
         data.addBlankRow();
-
+        
+        String key = "key";
+        String value = "value";
+        data.setValueAt(new Boolean(true),2,0);
+        data.setValueAt(key,2,1);
+        data.setValueAt(value,2,2);
+        
         KeyVal[] sources = data.sources();
         assertEquals(3, sources.length);
         assertEquals(val1, sources[0]);
         assertEquals(val2, sources[1]);
-        assertEquals(new Keyword(""), sources[2].getKeyword());
+        assertEquals(new Keyword(key), sources[2].getKeyword());
+    }
+    
+    public void testShouldGiveErrorForEmptyValues() {
+        data.addBlankRow();
+        try {
+            data.sources();
+        } catch (EmfException e) {
+            assertEquals("empty keyword at row 3",e.getMessage());
+            return;
+        }
+        assertFalse("blank key values are not allowed",true);
     }
 
 }

@@ -24,9 +24,8 @@ public class FileChooser {
         chooser = new JFileChooser(folder);
         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     }
-    
-    public void setTitle(String title)
-    {
+
+    public void setTitle(String title) {
         chooser.setDialogTitle(title);
     }
 

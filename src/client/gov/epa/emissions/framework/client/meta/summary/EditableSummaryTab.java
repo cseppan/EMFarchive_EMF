@@ -32,7 +32,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-//import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputVerifier;
 import javax.swing.JCheckBox;
@@ -171,9 +170,13 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         layoutGenerator.addLabelWidgetPair("Temporal Resolution:", temporalResolutionsCombo, panel);
 
         // sectors
-        sectors = new DefaultComboBoxModel(sectorNames(dataset.getSector(), service.getSectors()));
+        sectors = new DefaultComboBoxModel(service.getSectors());
         JComboBox sectorsCombo = new JComboBox(sectors);
-        sectorsCombo.setSelectedItem(dataset.getSector());
+        Sector[] datasetSectors = dataset.getSectors();
+        //TODO: Change this code, when multiple sector selection is allowed
+        if(datasetSectors!=null && datasetSectors.length>0){
+            sectorsCombo.setSelectedItem(datasetSectors[0]);
+        }
         sectorsCombo.setName("sectors");
         sectorsCombo.setPreferredSize(new Dimension(175, 20));
         sectorsCombo.addItemListener(comboxBoxListener);
@@ -217,18 +220,6 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
         if (!list.contains(selectedCountry))
             list.add(selectedCountry);
-
-        return (String[]) list.toArray(new String[0]);
-    }
-
-    private String[] sectorNames(String selectedSector, Sector[] sectors) {
-        List list = new ArrayList();
-        for (int i = 0; i < sectors.length; i++) {
-            list.add(sectors[i].getName());
-        }
-
-        if (!list.contains(selectedSector))
-            list.add(selectedSector);
 
         return (String[]) list.toArray(new String[0]);
     }
@@ -294,7 +285,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         dataset.setTemporalResolution((String) temporalResolutions.getSelectedItem());
         dataset.setRegion((String) regions.getSelectedItem());
         dataset.setCountry((String) countries.getSelectedItem());
-        dataset.setSector((String) sectors.getSelectedItem());
+        dataset.setSectors(new Sector[]{ (Sector) sectors.getSelectedItem()});
     }
 
     private Date toDate(String text) {

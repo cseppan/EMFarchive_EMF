@@ -23,7 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-public class PropertiesViewWindow extends DisposableInteralFrame implements PropertiesView {
+public class DatasetPropertiesViewer extends DisposableInteralFrame implements PropertiesView {
 
     private PropertiesViewPresenter presenter;
 
@@ -33,7 +33,7 @@ public class PropertiesViewWindow extends DisposableInteralFrame implements Prop
 
     private EmfSession session;
 
-    public PropertiesViewWindow(EmfSession session, EmfConsole parentConsole) {
+    public DatasetPropertiesViewer(EmfSession session, EmfConsole parentConsole) {
         super("Dataset Properties View", new Dimension(700, 500));
         this.session = session;
         this.parentConsole = parentConsole;
