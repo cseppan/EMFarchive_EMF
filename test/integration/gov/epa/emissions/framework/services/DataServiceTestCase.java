@@ -3,10 +3,6 @@ package gov.epa.emissions.framework.services;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.impl.DataCommonsServiceImpl;
-import gov.epa.emissions.framework.services.impl.DataServiceImpl;
-import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
-import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
 import java.util.Random;
 
@@ -15,20 +11,17 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class DataServiceTest extends ServicesTestCase {
+public abstract class DataServiceTestCase extends ServicesTestCase {
 
     private DataService service;
 
     private UserService userService;
+    private DataCommonsService dataCommService;
 
-    private DataCommonsServiceImpl dataCommonsService;
-
-    protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory();
-        service = new DataServiceImpl(sessionFactory);
-        userService = new UserServiceImpl(sessionFactory);
-        dataCommonsService = new DataCommonsServiceImpl(sessionFactory);
-
+    protected void setUpService(DataService service, UserService userService, DataCommonsService dataCommonsService) throws Exception {
+        this.service = service;
+        this.userService = userService;
+        this.dataCommService = dataCommonsService;
         deleteDatasets();
     }
 
@@ -79,6 +72,64 @@ public class DataServiceTest extends ServicesTestCase {
         }
     }
 
+    public void testShouldAddMultipleSectors() throws EmfException {
+        User owner = userService.getUser("emf");
+        Sector[] allSectors = dataCommService.getSectors();
+
+        for (int i = 0; i < allSectors.length; i++) {
+            System.out.println("sector_id: " + allSectors[i].getId());
+        }
+
+        EmfDataset dataset = newDataset();
+
+        try {
+            EmfDataset locked = service.obtainLockedDataset(owner, dataset);
+            locked.addSector(allSectors[0]);
+            locked.addSector(allSectors[1]);
+            EmfDataset released = service.updateDataset(locked);
+            Sector[] sectorsFromDataset = released.getSectors();
+            
+            System.out.println("Number of sectors: " + sectorsFromDataset.length);
+            for (int i = 0; i < sectorsFromDataset.length; i++) {
+                System.out.println("sector_id: " + sectorsFromDataset[i].getId());                
+            }
+            assertEquals(2, sectorsFromDataset.length);
+        } finally {
+            remove(dataset);
+        }
+        
+    }
+    
+    public void testShouldAddProject() throws EmfException {
+        User owner = userService.getUser("emf");
+        EmfDataset dataset = newDataset();
+        try {
+            EmfDataset locked = service.obtainLockedDataset(owner, dataset);
+            locked.setProject("FOOBAR");
+
+            EmfDataset released = service.updateDataset(locked);
+            System.out.println("project: " + released.getProject());
+            assertEquals("FOOBAR", released.getProject());
+        } finally {
+            remove(dataset);
+        }
+    }
+
+    public void testShouldAddRegion() throws EmfException {
+        User owner = userService.getUser("emf");
+        EmfDataset dataset = newDataset();
+        try {
+            EmfDataset locked = service.obtainLockedDataset(owner, dataset);
+            locked.setRegion("FOOBAR");
+
+            EmfDataset released = service.updateDataset(locked);
+            System.out.println("region: " + released.getRegion());
+            assertEquals("FOOBAR", released.getRegion());
+        } finally {
+            remove(dataset);
+        }
+    }
+    
     public void testShouldUpdateDataset() throws EmfException {
         User owner = userService.getUser("emf");
         EmfDataset dataset = newDataset();
@@ -136,53 +187,6 @@ public class DataServiceTest extends ServicesTestCase {
         Transaction tx = session.beginTransaction();
         session.delete(dataset);
         tx.commit();
-    }
-
-    public void testShouldAddMultipleSectors() throws EmfException {
-        User owner = userService.getUser("emf");
-        Sector[] allSectors = dataCommonsService.getSectors();
-
-        EmfDataset dataset = newDataset();
-
-        try {
-            EmfDataset locked = service.obtainLockedDataset(owner, dataset);
-            locked.addSector(allSectors[0]);
-            locked.addSector(allSectors[1]);
-            EmfDataset released = service.updateDataset(locked);
-            Sector[] sectorsFromDataset = released.getSectors();
-
-            assertEquals(2, sectorsFromDataset.length);
-        } finally {
-            remove(dataset);
-        }
-    }
-
-    public void testShouldAddProject() throws EmfException {
-        User owner = userService.getUser("emf");
-        EmfDataset dataset = newDataset();
-        try {
-            EmfDataset locked = service.obtainLockedDataset(owner, dataset);
-            locked.setProject("FOOBAR");
-
-            EmfDataset released = service.updateDataset(locked);
-            assertEquals("FOOBAR", released.getProject());
-        } finally {
-            remove(dataset);
-        }
-    }
-
-    public void testShouldAddRegion() throws EmfException {
-        User owner = userService.getUser("emf");
-        EmfDataset dataset = newDataset();
-        try {
-            EmfDataset locked = service.obtainLockedDataset(owner, dataset);
-            locked.setRegion("FOOBAR");
-
-            EmfDataset released = service.updateDataset(locked);
-            assertEquals("FOOBAR", released.getRegion());
-        } finally {
-            remove(dataset);
-        }
     }
 
 }

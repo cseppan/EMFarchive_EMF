@@ -30,6 +30,9 @@
     	<mapping resource="gov/epa/emissions/framework/services/impl/EmfProperties.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/impl/Keyword.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/impl/Version.hbm.xml"/>
+        <mapping resource="gov/epa/emissions/framework/services/impl/Region.hbm.xml"/>
+        <mapping resource="gov/epa/emissions/framework/services/impl/Project.hbm.xml"/>
+        <mapping resource="gov/epa/emissions/framework/services/impl/IntendedUse.hbm.xml"/>
     
     </session-factory>
     

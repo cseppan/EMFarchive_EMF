@@ -16,6 +16,9 @@ import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.IntendedUse;
+import gov.epa.emissions.framework.services.Project;
+import gov.epa.emissions.framework.services.Region;
 import gov.epa.emissions.framework.services.Status;
 
 import javax.xml.namespace.QName;
@@ -42,6 +45,10 @@ public class EmfMappings extends Mappings {
         bean(call, KeyVal.class, "KeyVal");
 
         bean(call, Country.class, country());
+        bean(call, Project.class, project());
+        bean(call, Region.class, region());
+        bean(call, IntendedUse.class, intendeduse());
+        
         bean(call, Sector.class, sector());
         bean(call, SectorCriteria.class, "SectorCriteria");
 
@@ -68,6 +75,10 @@ public class EmfMappings extends Mappings {
         array(call, KeyVal[].class, "KeyVals");
 
         array(call, Country[].class, countries());
+        array(call, Project[].class, projects());
+        array(call, Region[].class, regions());
+        array(call, IntendedUse[].class, intendeduses());
+        
         array(call, Sector[].class, sectors());
         array(call, SectorCriteria[].class, "SectorCriterias");
 
@@ -97,6 +108,30 @@ public class EmfMappings extends Mappings {
 
     public QName sectors() {
         return qname("Sectors");
+    }
+
+    public QName region() {
+        return qname("Region");
+    }
+
+    public QName intendeduse() {
+        return qname("IntendedUse");
+    }
+
+    public QName project() {
+        return qname("Project");
+    }
+
+    public QName intendeduses() {
+        return qname("IntendedUses");
+    }
+
+    public QName regions() {
+        return qname("Regions");
+    }
+
+    public QName projects() {
+        return qname("Projects");
     }
 
     public QName statuses() {

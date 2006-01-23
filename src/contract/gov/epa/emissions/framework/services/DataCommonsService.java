@@ -10,6 +10,18 @@ public interface DataCommonsService {
     // Keywords
     Keyword[] getKeywords() throws EmfException;
 
+    //Projects
+    Project[] getProjects() throws EmfException;
+    void addProject(Project project) throws EmfException;
+
+    // intended use
+    IntendedUse[] getIntendedUses() throws EmfException;
+    void addIntendedUse(IntendedUse intendedUse) throws EmfException;
+    
+    //Regions
+    Region[] getRegions() throws EmfException;
+    void addRegion(Region region) throws EmfException;
+    
     // Countries
     Country[] getCountries() throws EmfException;
 

@@ -8,6 +8,9 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DataCommonsDAO;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataCommonsService;
+import gov.epa.emissions.framework.services.IntendedUse;
+import gov.epa.emissions.framework.services.Project;
+import gov.epa.emissions.framework.services.Region;
 import gov.epa.emissions.framework.services.Status;
 
 import java.util.List;
@@ -179,6 +182,80 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             LOG.error("Could not get all Status messages. Reason: " + e);
             throw new EmfException("Could not get all Status messages");
         }
+    }
+
+    public Project[] getProjects() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List projects = dao.getProjects(session);
+            session.close();
+
+            return (Project[]) projects.toArray(new Project[0]);
+        } catch (HibernateException e) {
+            LOG.error("Could not get all Projects. Reason: " + e);
+            throw new EmfException("Could not get all Projects");
+        }
+    }
+
+    public void addProject(Project project) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.add(project,session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Could not add new Project. Reason: " + e);
+            throw new EmfException("Could not add Project");
+        }
+        
+    }
+
+    public Region[] getRegions() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List regions = dao.getRegions(session);
+            session.close();
+
+            return (Region[]) regions.toArray(new Region[0]);
+        } catch (HibernateException e) {
+            LOG.error("Could not get all Regions. Reason: " + e);
+            throw new EmfException("Could not get all Regions");
+        }
+    }
+
+    public void addRegion(Region region) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.add(region,session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Could not add new Region. Reason: " + e);
+            throw new EmfException("Could not add Region");
+        }
+    }
+
+    public IntendedUse[] getIntendedUses() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List regions = dao.getIntendedUses(session);
+            session.close();
+
+            return (IntendedUse[]) regions.toArray(new IntendedUse[0]);
+        } catch (HibernateException e) {
+            LOG.error("Could not get all Intended Use. Reason: " + e);
+            throw new EmfException("Could not get all Intended Use");
+        }
+    }
+
+    public void addIntendedUse(IntendedUse intendedUse) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.add(intendedUse,session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Could not add new intended use. Reason: " + e);
+            throw new EmfException("Could not add new intended use");
+        }
+        
     }
 
 }

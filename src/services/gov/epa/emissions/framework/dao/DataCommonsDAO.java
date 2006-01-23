@@ -6,6 +6,9 @@ import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Country;
+import gov.epa.emissions.framework.services.IntendedUse;
+import gov.epa.emissions.framework.services.Project;
+import gov.epa.emissions.framework.services.Region;
 import gov.epa.emissions.framework.services.Status;
 
 import java.util.ArrayList;
@@ -28,6 +31,9 @@ public class DataCommonsDAO {
     private static final String GET_EMF_KEYWORDS_QUERY = "select kw from Keyword as kw order by keyword";
 
     private static final String GET_COUNTRY_QUERY = "select country from Country as country order by name";
+    private static final String GET_REGIONS_QUERY = "select region from Region as region order by name";
+    private static final String GET_PROJECTS_QUERY = "select project from Project as project order by name";
+    private static final String GET_INTENDEDUSES_QUERY = "select intendeduse from IntendedUse as intendeduse order by name";
 
     private LockingScheme lockingScheme;
 
@@ -60,6 +66,78 @@ public class DataCommonsDAO {
         return allKeywords;
     }
 
+    public void add(Region region, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.save(region);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public void add(Project project, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.save(project);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public List getRegions(Session session){
+        ArrayList regions = null;
+        Transaction tx = null;
+
+        try {
+            tx = session.beginTransaction();
+            regions = new ArrayList();
+            Query query = session.createQuery(GET_REGIONS_QUERY);
+
+            Iterator iter = query.iterate();
+            while (iter.hasNext()) {
+                Region region = (Region) iter.next();
+                regions.add(region);
+            }
+
+            tx.commit();
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
+        }
+        return regions;
+    }
+
+    public List getProjects(Session session){
+      ArrayList projects = null;
+      Transaction tx = null;
+
+      try {
+          tx = session.beginTransaction();
+          projects = new ArrayList();
+          Query query = session.createQuery(GET_PROJECTS_QUERY);
+
+          Iterator iter = query.iterate();
+          while (iter.hasNext()) {
+              Project project = (Project) iter.next();
+              projects.add(project);
+          }
+
+          tx.commit();
+      } catch (HibernateException e) {
+          log.error(e);
+          tx.rollback();
+          throw e;
+      }      
+      return projects;
+    }
+    
     public List getCountries(Session session) {
         ArrayList countries = null;
 
@@ -173,6 +251,42 @@ public class DataCommonsDAO {
             tx.rollback();
             throw e;
         }
+    }
+
+    public List getIntendedUses(Session session) {
+        ArrayList intendeduses = null;
+        Transaction tx = null;
+
+        try {
+            tx = session.beginTransaction();
+            intendeduses = new ArrayList();
+            Query query = session.createQuery(GET_INTENDEDUSES_QUERY);
+
+            Iterator iter = query.iterate();
+            while (iter.hasNext()) {
+                IntendedUse intendedUse = (IntendedUse) iter.next();
+                intendeduses.add(intendedUse);
+            }
+
+            tx.commit();
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
+        }      
+        return intendeduses;
+    }
+
+    public void add(IntendedUse intendedUse, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.save(intendedUse);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }        
     }
 
 }

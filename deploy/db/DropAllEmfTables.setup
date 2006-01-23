@@ -40,3 +40,17 @@ DROP TABLE emf.external_sources;
 DROP TABLE emf.internal_sources;
 -- emf internal and external sources
 --
+-- emf regions, projects and intended use
+DROP SEQUENCE intended_uses_id_seq CASCADE;
+DROP SEQUENCE projects_id_seq CASCADE;
+DROP SEQUENCE regions_id_seq CASCADE;
+DROP TABLE intended_uses CASCADE;
+DROP TABLE projects CASCADE;
+DROP TABLE regions CASCADE;
+-- emf regions, projects and intended use
+--
+-- emf datasets_sectors
+DROP SEQUENCE datasets_sectors_id_seq CASCADE;
+DROP TABLE datasets_sectors CASCADE;
+-- emf datasets_sectors
+--

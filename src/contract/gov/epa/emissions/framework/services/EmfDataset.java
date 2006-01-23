@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Lockable;
 import gov.epa.emissions.commons.io.Mutex;
+import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 
 import java.util.ArrayList;
@@ -27,6 +28,8 @@ public class EmfDataset implements Dataset, Lockable {
     private String status;
 
     private String region;
+    
+    private String intendedUse;
 
     private String country = "US";
 
@@ -58,6 +61,8 @@ public class EmfDataset implements Dataset, Lockable {
 
     private List keyValsList;
 
+    private List sectorsList;
+    
     private int defaultVersion;
 
     private Mutex lock;
@@ -66,7 +71,7 @@ public class EmfDataset implements Dataset, Lockable {
         internalSources = new ArrayList();
         externalSources = new ArrayList();
         keyValsList = new ArrayList();
-
+        sectorsList = new ArrayList();
         lock = new Mutex();
     }
 
@@ -263,6 +268,19 @@ public class EmfDataset implements Dataset, Lockable {
         this.externalSources.add(source);
     }
 
+    public void addSector(Sector sector) {
+        sectorsList.add(sector);
+    }
+
+    public Sector[] getSectors() {
+        return (Sector[])sectorsList.toArray(new Sector[0]);
+    }
+
+    public void setSectors(Sector[] sectors) {
+        sectorsList.clear();
+        sectorsList.addAll(Arrays.asList(sectors));
+    }
+
     public void addKeyVal(KeyVal keyval) {
         keyValsList.add(keyval);
     }
@@ -310,6 +328,14 @@ public class EmfDataset implements Dataset, Lockable {
 
     public boolean isLocked() {
         return lock.isLocked();
+    }
+
+    public String getIntendedUse() {
+        return intendedUse;
+    }
+
+    public void setIntendedUse(String intendedUse) {
+        this.intendedUse = intendedUse;
     }
 
 }

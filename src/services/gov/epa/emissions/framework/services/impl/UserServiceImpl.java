@@ -15,7 +15,7 @@ import org.hibernate.Session;
 
 public class UserServiceImpl implements UserService {
     private static Log LOG = LogFactory.getLog(UserServiceImpl.class);
-
+  
     private HibernateSessionFactory sessionFactory;
 
     private UserDAO dao;

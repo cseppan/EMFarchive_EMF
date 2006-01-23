@@ -8,6 +8,9 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.EMFConstants;
+import gov.epa.emissions.framework.services.IntendedUse;
+import gov.epa.emissions.framework.services.Project;
+import gov.epa.emissions.framework.services.Region;
 import gov.epa.emissions.framework.services.Status;
 
 import org.apache.axis.AxisFault;
@@ -256,5 +259,104 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         }
 
         return null;
+    }
+
+    public Project[] getProjects() throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.setOperation(call, "getProjects");
+            mappings.setReturnType(call, mappings.projects());
+
+            return (Project[]) call.invoke(new Object[] {});
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to fetch projects", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to fetch projects", e);
+        }
+
+        return null;
+    }
+
+    public void addProject(Project project) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.setOperation(call, "addProject");
+            mappings.setReturnType(call, mappings.project());
+
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to add project", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to add project", e);
+        }
+    }
+
+    public Region[] getRegions() throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.setOperation(call, "getRegions");
+            mappings.setReturnType(call, mappings.regions());
+
+            return (Region[]) call.invoke(new Object[] {});
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to fetch regions", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to fetch regions", e);
+        }
+
+        return null;
+    }
+
+    public void addRegion(Region region) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.setOperation(call, "addRegion");
+            mappings.setReturnType(call, mappings.region());
+
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to add region", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to add region", e);
+        }
+    }
+
+    public IntendedUse[] getIntendedUses() throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.setOperation(call, "getIntendedUses");
+            mappings.setReturnType(call, mappings.intendeduses());
+
+            return (IntendedUse[]) call.invoke(new Object[] {});
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to fetch intended uses", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to fetch intended uses", e);
+        }
+
+        return null;
+    }
+
+    public void addIntendedUse(IntendedUse intendedUse) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.setOperation(call, "addIntendedUse");
+            mappings.setReturnType(call, mappings.intendeduse());
+
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to add new intended use", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to add add new intended use", e);
+        }
     }
 }

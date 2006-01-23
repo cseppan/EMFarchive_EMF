@@ -164,6 +164,7 @@ CREATE TABLE emf.datasets
   dataset_type integer,
   units varchar(255),
   region varchar(255),
+  intended_use varchar(255),
   "year" int4 NOT NULL DEFAULT 0,
   country varchar(255),
   temporal_resolution varchar(255),
@@ -265,4 +266,88 @@ CREATE TABLE emf.internal_sources
 WITHOUT OIDS;
 ALTER TABLE emf.internal_sources OWNER TO emf;
 -- emf internal and external sources
+--
+-- emf intended_uses
+CREATE SEQUENCE intended_uses_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 199
+  CACHE 1;
+ALTER TABLE intended_uses_id_seq OWNER TO emf;
+--
+CREATE TABLE intended_uses
+(
+  id int4 NOT NULL DEFAULT nextval('intended_uses_id_seq'::regclass),
+  name varchar(255) NOT NULL,
+  CONSTRAINT intended_uses_pk PRIMARY KEY (id)
+) 
+WITHOUT OIDS;
+ALTER TABLE intended_uses OWNER TO emf;
+-- emf intended_uses
+--
+-- emf projects
+CREATE SEQUENCE projects_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 199
+  CACHE 1;
+ALTER TABLE projects_id_seq OWNER TO emf;
+--
+CREATE TABLE projects
+(
+  id int4 NOT NULL DEFAULT nextval('projects_id_seq'::regclass),
+  name varchar(255) NOT NULL,
+  CONSTRAINT projects_pk PRIMARY KEY (id)
+) 
+WITHOUT OIDS;
+ALTER TABLE projects OWNER TO emf;
+-- emf projects
+--
+-- emf regions
+CREATE SEQUENCE regions_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 199
+  CACHE 1;
+ALTER TABLE regions_id_seq OWNER TO emf;
+--
+CREATE TABLE regions
+(
+  id int4 NOT NULL DEFAULT nextval('regions_id_seq'::regclass),
+  name varchar(255) NOT NULL,
+  CONSTRAINT regions_pk PRIMARY KEY (id)
+) 
+WITHOUT OIDS;
+ALTER TABLE regions OWNER TO emf;
+-- emf regions
+--
+-- emf datasets_sectors
+CREATE SEQUENCE datasets_sectors_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 1
+  CACHE 1;
+ALTER TABLE datasets_sectors_id_seq OWNER TO emf;
+--
+CREATE TABLE datasets_sectors
+(
+  id int4 NOT NULL DEFAULT nextval('datasets_sectors_id_seq'::regclass),
+  dataset_id int4 NOT NULL,
+  list_index int4,
+  sector_id int4,
+  CONSTRAINT datasets_sectors_pkey PRIMARY KEY (id),
+  CONSTRAINT datasets_sectors_to_datasets FOREIGN KEY (dataset_id)
+      REFERENCES datasets (dataset_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT datasets_sectors_to_sectors FOREIGN KEY (sector_id)
+      REFERENCES sectors (id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+) 
+WITHOUT OIDS;
+ALTER TABLE datasets_sectors OWNER TO emf;
+-- emf datasets_sectors
 --

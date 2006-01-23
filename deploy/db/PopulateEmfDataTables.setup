@@ -79,4 +79,10 @@ insert into emf.dataset_types values(46,'SCC Descriptions (Line-based)','SCC Des
  
 -- emf.dataset_types
 --
-
+-- emf.intended_uses
+insert into emf.intended_uses values (1, 'public');
+insert into emf.intended_uses values (2, 'private');
+insert into emf.intended_uses values (3, 'EIAG');
+insert into emf.intended_uses values (4, 'ORD ');
+-- emf.intended_uses
+--
