@@ -41,9 +41,9 @@ public class Tools {
         return datenewformat;
     }
 
-    public static void updateFileModTime(String trimhome, File2Download[] files) throws Exception {
+    public static void updateFileModTime(String installhome, File2Download[] files) throws Exception {
         for (int i = 0; i < files.length; i++) {
-            String fullpath = trimhome + "/" + files[i].getPath();
+            String fullpath = installhome + "/" + files[i].getPath();
             File file = new File(fullpath);
 
             StringTokenizer st = new StringTokenizer(files[i].getDate(), " ");
@@ -59,11 +59,10 @@ public class Tools {
     public static void writePreference(String website, String input, String output, 
             String javahome, String emfhome, String server) throws Exception {
         String separator = Generic.SEPARATOR;
-        new File(emfhome).mkdirs();
         String emfPrefString = "local.input.drive=" + input.charAt(0) + separator + "local.output.drive="
                 + output.charAt(0) + separator + "remote.input.drive=/data" + separator + "remote.output.drive=/data"
                 + separator + "default.input.folder=" + input.substring(3).replace('\\', '/') + separator
-                + "default.output.folder=" + input.substring(3).replace('\\', '/') + separator
+                + "default.output.folder=" + output.substring(3).replace('\\', '/') + separator
                 + "server.address=" + server + separator;
 
         String towrite = "#EMF Client Installer - Preferences" + separator + "#comments '#'" + separator
@@ -76,12 +75,12 @@ public class Tools {
 
         PrintWriter userPrefWriter = new PrintWriter(new BufferedWriter(new FileWriter(System.getProperty("user.home")
                 + "\\" + Generic.USER_PARAMETER)));
-        PrintWriter emfPrefWriter = new PrintWriter(new BufferedWriter(new FileWriter(emfhome + "\\"
-                + Generic.EMF_PARAMETER)));
+        PrintWriter emfPrefWriter = new PrintWriter(new BufferedWriter(new FileWriter(System.getProperty("user.home")
+                + "\\" + Generic.EMF_PARAMETER)));
         userPrefWriter.write(towrite);
         emfPrefWriter.write(emfPrefString);
         userPrefWriter.close();
         emfPrefWriter.close();
     }
-
+    
 }

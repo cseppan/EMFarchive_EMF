@@ -66,19 +66,19 @@ public class InstallWindow extends JFrame implements InstallView  {
 		c = new GridBagConstraints();
 
 		//Create widgets.		
-		url = new JTextField(Generic.EMF_URL);
+		url = new JTextField(30);
 		javaHomeDirField = new JTextField(Generic.JAVA_HOME);
-		inputDirField = new JTextField(Generic.REMOTE_INPUT_DIR);
-		outputDirField = new JTextField(Generic.REMOTE_OUTPUT_DIR);
-        installDirField = new JTextField(Generic.INSTALL_HOME);
-        serverField = new JTextField(Generic.SERVER_ADDRESS);
+		inputDirField = new JTextField(30);
+		outputDirField = new JTextField(30);
+        installDirField = new JTextField(30);
+        serverField = new JTextField(30);
 		urlLabel = new JLabel("EMF Download URL", SwingConstants.RIGHT);
 		javaHomeLabel = new JLabel("Java Home Directory", SwingConstants.RIGHT);
 		inputLabel = new JLabel("Input File Directory", SwingConstants.RIGHT);
 		outputLabel = new JLabel("Output File Directory", SwingConstants.RIGHT);
         installHomeLabel = new JLabel("Client Home Directory", SwingConstants.RIGHT);
         serverLabel = new JLabel("Server Address", SwingConstants.RIGHT);
-		statusLabel = new JLabel("Status: ");
+		statusLabel = new JLabel();
 		holderLabel1 = new JLabel();
 		holderLabel2 = new JLabel();
 		holderLabel3 = new JLabel();
@@ -156,6 +156,7 @@ public class InstallWindow extends JFrame implements InstallView  {
 		}
         
         setLocationRelativeTo(null);
+        setResizable(false);
 	}
     
     public void display() {
@@ -309,11 +310,14 @@ public class InstallWindow extends JFrame implements InstallView  {
             String installhome = installDirField.getText();
             String website = url.getText();
             String server = serverField.getText();
-	                   
-            CardLayout cl = (CardLayout)(cards.getLayout());
-            cl.show(cards, PAGETWO);
-            presenter.writePreference(website, inputdir, outputdir, javahome, installhome, server);
-            presenter.startDownload(website, Generic.FILE_LIST, installhome);
+	        
+            int option = checkDirs();
+            if(option == JOptionPane.OK_OPTION) {
+                CardLayout cl = (CardLayout)(cards.getLayout());
+                cl.show(cards, PAGETWO);
+                presenter.writePreference(website, inputdir, outputdir, javahome, installhome, server);
+                presenter.startDownload(website, Generic.FILE_LIST, installhome);
+            }
 		}
 	}
 	
@@ -351,12 +355,6 @@ public class InstallWindow extends JFrame implements InstallView  {
              }
              
              if(e.getActionCommand().equalsIgnoreCase("Done")) {
-                 String javahome = javaHomeDirField.getText();
-                 String installhome = installDirField.getText();
-                 String server = serverField.getText();
-                 presenter.createBatchFile(installhome + "\\" + Generic.EMF_BATCH_FILE,
-                         Generic.EMF_PARAMETER, javahome, server);
-                 presenter.createShortcut();
                  System.exit(0);
              }
         }
@@ -373,8 +371,36 @@ public class InstallWindow extends JFrame implements InstallView  {
     }
 
     public void setFinish() {
+        String javahome = javaHomeDirField.getText();
+        String installhome = installDirField.getText();
+        String server = serverField.getText();
+        presenter.createBatchFile(installhome + "\\" + Generic.EMF_BATCH_FILE,
+                Generic.EMF_PARAMETER, javahome, server);
+        presenter.createShortcut();
         load.setText(Generic.EMF_CLOSE_MESSAGE);
         cancel.setText("Done");
     }
-	
+    
+    public int checkDirs() {
+        String[] names = {javaHomeDirField.getText(), inputDirField.getText(),
+                outputDirField.getText(), installDirField.getText()};
+        String[] labels = {"Java Home Directory", "Input File Directory",
+                "Output File Directory", "Client Home Directory"};
+        String message = "";
+        for(int i = 0; i < names.length; i++) {
+            if(!(new File(names[i]).exists())) {
+                if(message.equals(""))
+                    message += labels[i];
+                else 
+                    message += ", " + labels[i];
+            }
+        }
+            
+        if(!message.equals("")) {
+            message += " does not exist." + Generic.SEPARATOR +
+                "Do you want to proceed to install EMF client?";
+        }
+            
+        return JOptionPane.showConfirmDialog(this, message);
+    }
 }

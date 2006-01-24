@@ -33,7 +33,7 @@ public class ClientBatchFile {
         writer.println("set CLASSPATH=%CLASSPATH%;%EMF_HOME%\\emf-client.jar");
         writer.println(sep + sep + "@echo on" + sep + sep);
         writer.println("%JAVA_EXE% -Xmx400M -DEMF_PREFERENCE=" + 
-                "\"" + batchFile.getParent() + "\\" + preference + "\" " +
+                "\"" + System.getProperty("user.home") + "\\" + preference + "\" " +
                 "-classpath %CLASSPATH% gov.epa.emissions.framework.client.Launcher " +
                 server + sep);
         writer.close();

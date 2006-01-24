@@ -54,9 +54,12 @@ public class Download extends Thread{
                 }
             }
             
-            if(blinker == thisThread)
+            if(blinker == thisThread) {
+                Tools.updateFileModTime(installhome, todownload);
+                presenter.setStatus("Downloads Complete.");
                 presenter.setFinish();
-        } catch (IOException e){
+            }
+        } catch (Exception e){
             presenter.displayErr("Downloading files failed.");
         } finally {
             stopDownload();
