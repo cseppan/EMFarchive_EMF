@@ -30,7 +30,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
 
     private VersionedRecordsReader reader;
 
-    private DataAccessCache cache;
+    private DataUpdatesCache cache;
 
     private HibernateSessionFactory sessionFactory;
 
@@ -70,8 +70,8 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         return accessor.getPageCount(token);
     }
 
-    public Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException {
-        return accessor.getPageWithRecord(token, recordId);
+    public Page getPageWithRecord(DataAccessToken token, int record) throws EmfException {
+        return accessor.getPageWithRecord(token, record);
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {
@@ -130,7 +130,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         return doSave(extended, cache, sessionFactory);
     }
 
-    private DataAccessToken doSave(DataAccessToken token, DataAccessCache cache,
+    private DataAccessToken doSave(DataAccessToken token, DataUpdatesCache cache,
             HibernateSessionFactory hibernateSessionFactory) throws EmfException {
         try {
             Session session = hibernateSessionFactory.getSession();

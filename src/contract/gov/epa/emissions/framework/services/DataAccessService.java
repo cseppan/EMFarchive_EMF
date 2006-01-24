@@ -11,7 +11,7 @@ public interface DataAccessService {
 
     int getPageCount(DataAccessToken token) throws EmfException;
 
-    Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException;
+    Page getPageWithRecord(DataAccessToken token, int record) throws EmfException;
 
     int getTotalRecords(DataAccessToken token) throws EmfException;
 

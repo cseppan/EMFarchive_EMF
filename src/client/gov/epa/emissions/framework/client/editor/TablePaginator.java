@@ -52,7 +52,7 @@ public class TablePaginator {
         if (pageNumber() == pageNumber)
             return;
 
-        page = service.getPage(editToken(), pageNumber);
+        page = service.getPage(token(), pageNumber);
 
         view.display(page);
     }
@@ -69,19 +69,19 @@ public class TablePaginator {
     }
 
     private int pageCount() throws EmfException {
-        return service.getPageCount(editToken());
+        return service.getPageCount(token());
     }
 
     public void doDisplayPageWithRecord(int record) throws EmfException {
-        page = service.getPageWithRecord(editToken(), record);
+        page = service.getPageWithRecord(token(), record);
         view.display(page);
     }
 
     public int totalRecords() throws EmfException {
-        return service.getTotalRecords(editToken());
+        return service.getTotalRecords(token());
     }
 
-    DataAccessToken editToken() {
+    DataAccessToken token() {
         return new DataAccessToken(version, table);
     }
 

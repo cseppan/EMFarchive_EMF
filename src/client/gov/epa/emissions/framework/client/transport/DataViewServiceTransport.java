@@ -95,17 +95,15 @@ public class DataViewServiceTransport implements DataViewService {
         return -1;
     }
 
-    public Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException {
-        Page page = null;
-
+    public Page getPageWithRecord(DataAccessToken token, int record) throws EmfException {
         try {
             mappings.setOperation(call, "getPageWithRecord");
             mappings.setReturnType(call, mappings.page());
 
             mappings.addParam(call, "token", mappings.dataAccessToken());
-            mappings.addIntegerParam(call, "recordId");
+            mappings.addIntegerParam(call, "record");
 
-            page = (Page) call.invoke(new Object[] { token, new Integer(recordId) });
+            return (Page) call.invoke(new Object[] { token, new Integer(record) });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get page: ", fault);
         } catch (Exception e) {
@@ -114,7 +112,7 @@ public class DataViewServiceTransport implements DataViewService {
             call.removeAllParameters();
         }
 
-        return page;
+        return null;
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {

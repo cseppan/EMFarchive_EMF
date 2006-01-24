@@ -61,7 +61,7 @@ public class EditableTablePresenter implements TablePresenter {
     void submitChanges() throws EmfException {
         ChangeSet changeset = view.changeset();
         if (changeset.hasChanges()) {
-            service.submit(paginator.editToken(), changeset, paginator.pageNumber());
+            service.submit(paginator.token(), changeset, paginator.pageNumber());
             changeset.clear();
         }
     }

@@ -54,8 +54,8 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
         return accessor.getPageCount(token);
     }
 
-    public Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException {
-        return accessor.getPageWithRecord(token, recordId);
+    public Page getPageWithRecord(DataAccessToken token, int record) throws EmfException {
+        return accessor.getPageWithRecord(token, record);
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {

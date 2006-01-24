@@ -22,7 +22,7 @@ import org.hibernate.Session;
 public class DataAccessorImpl implements DataAccessor {
     private Log LOG = LogFactory.getLog(DataAccessorImpl.class);
 
-    private DataAccessCache cache;
+    private DataUpdatesCache cache;
 
     private HibernateSessionFactory sessionFactory;
 
@@ -30,7 +30,7 @@ public class DataAccessorImpl implements DataAccessor {
 
     private LockableVersions lockableVersions;
 
-    public DataAccessorImpl(DataAccessCache cache, HibernateSessionFactory sessionFactory) {
+    public DataAccessorImpl(DataUpdatesCache cache, HibernateSessionFactory sessionFactory) {
         this.cache = cache;
         this.sessionFactory = sessionFactory;
         versions = new Versions();
@@ -72,13 +72,13 @@ public class DataAccessorImpl implements DataAccessor {
         }
     }
 
-    public Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException {
+    public Page getPageWithRecord(DataAccessToken token, int record) throws EmfException {
         try {
             PageReader reader = cache.reader(token);
-            return reader.pageByRecord(recordId);
+            return reader.pageByRecord(record);
         } catch (SQLException ex) {
-            LOG.error("Could not obtain the page with Record: " + recordId + ". Reason: " + ex.getMessage());
-            throw new EmfException("Could not obtain the page with Record: " + recordId);
+            LOG.error("Could not obtain the page with Record: " + record + ". Reason: " + ex.getMessage());
+            throw new EmfException("Could not obtain the page with Record: " + record);
         }
     }
 

@@ -24,7 +24,7 @@ import java.util.TreeSet;
 
 import org.hibernate.Session;
 
-public class DataAccessCache {
+public class DataAccessCache implements DataUpdatesCache {
 
     private Map readersMap;
 
