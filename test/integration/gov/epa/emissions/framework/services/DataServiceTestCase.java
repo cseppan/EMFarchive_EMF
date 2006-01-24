@@ -76,10 +76,6 @@ public abstract class DataServiceTestCase extends ServicesTestCase {
         User owner = userService.getUser("emf");
         Sector[] allSectors = dataCommService.getSectors();
 
-        for (int i = 0; i < allSectors.length; i++) {
-            System.out.println("sector_id: " + allSectors[i].getId());
-        }
-
         EmfDataset dataset = newDataset();
 
         try {
@@ -89,10 +85,6 @@ public abstract class DataServiceTestCase extends ServicesTestCase {
             EmfDataset released = service.updateDataset(locked);
             Sector[] sectorsFromDataset = released.getSectors();
             
-            System.out.println("Number of sectors: " + sectorsFromDataset.length);
-            for (int i = 0; i < sectorsFromDataset.length; i++) {
-                System.out.println("sector_id: " + sectorsFromDataset[i].getId());                
-            }
             assertEquals(2, sectorsFromDataset.length);
         } finally {
             remove(dataset);
@@ -108,7 +100,6 @@ public abstract class DataServiceTestCase extends ServicesTestCase {
             locked.setProject("FOOBAR");
 
             EmfDataset released = service.updateDataset(locked);
-            System.out.println("project: " + released.getProject());
             assertEquals("FOOBAR", released.getProject());
         } finally {
             remove(dataset);
@@ -123,7 +114,6 @@ public abstract class DataServiceTestCase extends ServicesTestCase {
             locked.setRegion("FOOBAR");
 
             EmfDataset released = service.updateDataset(locked);
-            System.out.println("region: " + released.getRegion());
             assertEquals("FOOBAR", released.getRegion());
         } finally {
             remove(dataset);

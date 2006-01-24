@@ -10,7 +10,7 @@ import org.apache.axis.encoding.ser.BeanSerializerFactory;
 
 public class Mapper {
     public QName qname(String name) {
-        return new QName("urn:gov.epa.services.EmfServices", name);
+        return new QName("urn:gov.epa.services.EmfService", name);
     }
 
     public void registerBeanMapping(Call call, Class clazz, QName beanQName) {

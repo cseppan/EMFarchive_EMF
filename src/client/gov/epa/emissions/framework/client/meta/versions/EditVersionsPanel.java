@@ -70,30 +70,29 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     }
 
     public void display(Version[] versions, InternalSource[] sources) {
-        VersionsSet versionsSet = new VersionsSet(versions);
-        add(topPanel(dataset, versionsSet), BorderLayout.PAGE_START);
+        add(topRightPanel(sources), BorderLayout.PAGE_START);
         add(tablePanel(versions), BorderLayout.CENTER);
-        add(bottomPanel(sources), BorderLayout.PAGE_END);
+        add(bottomPanel(versions), BorderLayout.PAGE_END);
         if (dataset.getInternalSources().length == 0) {
             displayError("Versions cannot be edited for external files.");
         }
     }
 
-    private JPanel topPanel(final EmfDataset dataset, VersionsSet versionsSet) {
-        JPanel container = new JPanel(new BorderLayout());
+    private JPanel bottomRightPanel(final EmfDataset dataset, Version[] versions) {
+        VersionsSet versionsSet = new VersionsSet(versions);
 
-        JPanel right = new JPanel();
-        right.add(new JLabel("Default Version"));
+        JPanel panel = new JPanel();
+        panel.add(new JLabel("Default Version"));
 
-        String[] versions = getVersionNames(versionsSet);
-        ComboBoxModel model = new DefaultComboBoxModel(versions);
+        String[] versionNames = getVersionNames(versionsSet);
+        ComboBoxModel model = new DefaultComboBoxModel(versionNames);
         defaultVersionsCombo = new JComboBox(model);
         String defaultVersion = getDefaultVersion(versionsSet);
         defaultVersionsCombo.setSelectedItem(defaultVersion);
         defaultVersionsCombo.setName("defaultVersions");
         defaultVersionsCombo.setEditable(false);
         defaultVersionsCombo.setPreferredSize(new Dimension(175, 20));
-        right.add(defaultVersionsCombo);
+        panel.add(defaultVersionsCombo);
 
         defaultVersionsCombo.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -103,9 +102,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             }
         });
 
-        container.add(right, BorderLayout.LINE_END);
-
-        return container;
+        return panel;
     }
 
     private String getDefaultVersion(VersionsSet versionsSet) {
@@ -168,11 +165,11 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         return table;
     }
 
-    private JPanel bottomPanel(InternalSource[] sources) {
+    private JPanel bottomPanel(Version[] versions) {
         JPanel container = new JPanel(new BorderLayout());
 
         container.add(leftControlPanel(), BorderLayout.LINE_START);
-        container.add(rightControlPanel(sources), BorderLayout.LINE_END);
+        container.add(bottomRightPanel(dataset, versions), BorderLayout.LINE_END);
 
         return container;
     }
@@ -229,7 +226,9 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         }
     }
 
-    private JPanel rightControlPanel(InternalSource[] sources) {
+    private JPanel topRightPanel(InternalSource[] sources) {
+        JPanel container = new JPanel(new BorderLayout());
+
         JPanel panel = new JPanel();
 
         panel.add(new Label("Table:"));
@@ -252,7 +251,9 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         }
         panel.add(edit);
 
-        return panel;
+        container.add(panel, BorderLayout.LINE_END);
+
+        return container;
     }
 
     private Button viewButton(final JComboBox tableCombo) {

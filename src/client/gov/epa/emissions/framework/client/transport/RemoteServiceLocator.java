@@ -21,12 +21,16 @@ public class RemoteServiceLocator implements ServiceLocator {
 
     private String baseUrl;
 
-    private Call call = null;
+    //Note: Each session-based service needs to create it's own Call object
+    private Call viewCall = null;
+
+    private Call editCall;
 
     public RemoteServiceLocator(String baseUrl) throws Exception {
         try {
             this.baseUrl = baseUrl;
-            call = this.createCall();
+            viewCall = this.createCall();
+            editCall = this.createCall();
         } catch (ServiceException e) {
             log.error("Failed to create Axis Call object: " + e.getMessage());
             throw new EmfException("Error communicating with the server");
@@ -54,11 +58,11 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
 
     public DataEditorService dataEditorService() {
-        return new DataEditorServiceTransport(call, baseUrl + "/gov.epa.emf.services.DataEditorService");
+        return new DataEditorServiceTransport(editCall, baseUrl + "/gov.epa.emf.services.DataEditorService");
     }
 
     public DataViewService dataViewService() {
-        return new DataViewServiceTransport(call, baseUrl + "/gov.epa.emf.services.DataViewService");
+        return new DataViewServiceTransport(viewCall, baseUrl + "/gov.epa.emf.services.DataViewService");
     }
 
     /*

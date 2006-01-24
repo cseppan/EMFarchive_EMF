@@ -27,7 +27,7 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
     private JPanel layout;
 
     public VersionedDataWindow(EmfConsole parentConsole) {
-        super("Data Versions Editor", new Dimension(550, 350), parentConsole.desktop());
+        super("Data Versions Editor", new Dimension(750, 350), parentConsole.desktop());
 
         this.parentConsole = parentConsole;
         layout = new JPanel();
@@ -39,13 +39,14 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
         this.setTitle("Dataset Versions Editor: " + dataset.getName());
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel, BorderLayout.PAGE_START);
-        layout.add(createLayout(versionsPresenter, dataset, messagePanel), BorderLayout.CENTER);
+        layout.add(createVersionsPanelLayout(versionsPresenter, dataset, messagePanel), BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.PAGE_END);
 
         super.display();
     }
 
-    private JPanel createLayout(EditVersionsPresenter versionsPresenter, EmfDataset dataset, MessagePanel messagePanel) {
+    private JPanel createVersionsPanelLayout(EditVersionsPresenter versionsPresenter, EmfDataset dataset,
+            MessagePanel messagePanel) {
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 

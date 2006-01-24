@@ -78,18 +78,18 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         return accessor.getTotalRecords(token);
     }
 
-    public Version derive(Version baseVersion, String name) throws EmfException {
+    public Version derive(Version base, String name) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            Version derived = versions.derive(baseVersion, name, session);
+            Version derived = versions.derive(base, name, session);
             session.close();
 
             return derived;
         } catch (HibernateException e) {
-            LOG.error("Could not derive a new Version from the base Version: " + baseVersion.getVersion()
-                    + " of Dataset: " + baseVersion.getDatasetId() + ". Reason: " + e);
-            throw new EmfException("Could not derive a new Version from the base Version: " + baseVersion.getVersion()
-                    + " of Dataset: " + baseVersion.getDatasetId());
+            LOG.error("Could not derive a new Version from the base Version: " + base.getVersion()
+                    + " of Dataset: " + base.getDatasetId() + ". Reason: " + e);
+            throw new EmfException("Could not derive a new Version from the base Version: " + base.getVersion()
+                    + " of Dataset: " + base.getDatasetId());
         }
     }
 

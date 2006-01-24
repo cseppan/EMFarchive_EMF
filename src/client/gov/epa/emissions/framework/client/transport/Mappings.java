@@ -31,7 +31,7 @@ public class Mappings {
     }
 
     public QName qname(String name) {
-        return mapper.qname("ns1:" + name);
+        return mapper.qname(name);
     }
 
     public void addParam(Call call, String id, QName name) {

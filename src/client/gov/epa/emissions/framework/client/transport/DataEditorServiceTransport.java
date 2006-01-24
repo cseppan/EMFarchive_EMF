@@ -5,9 +5,9 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EMFConstants;
-import gov.epa.emissions.framework.services.DataAccessToken;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -52,7 +52,7 @@ public class DataEditorServiceTransport implements DataEditorService {
                 throw new EmfException("EMF server not responding");
             }
         }
-        
+
         String msg = extractMessage(fault.getMessage());
         throw new EmfException(msg);
     }
@@ -162,11 +162,11 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             return (Version) call.invoke(new Object[] { baseVersion, name });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get derive Version from base Version: " + baseVersion.getVersion()
+            throwExceptionOnAxisFault("Failed to derive Version from base Version: " + baseVersion.getVersion()
                     + " for Dataset: " + baseVersion.getDatasetId(), fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get derive Version from base Version: "
-                    + baseVersion.getVersion() + " for Dataset: " + baseVersion.getDatasetId(), e);
+            throwExceptionDueToServiceErrors("Failed to derive Version from base Version: " + baseVersion.getVersion()
+                    + " for Dataset: " + baseVersion.getDatasetId(), e);
         } finally {
             call.removeAllParameters();
         }
