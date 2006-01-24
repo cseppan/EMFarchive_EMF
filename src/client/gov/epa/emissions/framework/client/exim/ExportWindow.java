@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.exim;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
@@ -169,6 +170,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private void doExport() {
         try {
+            checkKeyVals();
             if (!overwrite.isSelected())
                 presenter.doExport(datasets, folder.getText(), purpose.getText());
             else
@@ -206,6 +208,16 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         
         if (file.isFile()) {
             folder.setText(file.getParent());
+        }
+    }
+    
+    private void checkKeyVals() throws EmfException {
+        for (int i = 0; i < datasets.length; i++) {
+            KeyVal[] keyVals = datasets[i].getKeyVals();
+            for(int j = 0; j < keyVals.length; j++)
+                if(keyVals[j].getValue().equals(""))
+                    throw new EmfException(keyVals[j].getKeyword() + "doesn't" +
+                            "have a value.");
         }
     }
 }
