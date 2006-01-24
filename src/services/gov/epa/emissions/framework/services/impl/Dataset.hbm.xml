@@ -26,7 +26,6 @@
   <property name="startDateTime"		column="start_date_time"   		type="java.util.Date"		not-null="false"	length="4"/>
   <property name="stopDateTime"			column="stop_date_time" 		type="java.util.Date"		not-null="false"	length="4"/>
   <property name="description"			column="description"			type="java.lang.String"		not-null="false"/>
-  <property name="sector"				column="sector"					type="java.lang.String"		not-null="false"/>
   <property name="project"				column="project"				type="java.lang.String"		not-null="false"/>
   <property name="createdDateTime"		column="created_date_time" 		type="java.util.Date"		not-null="false"	length="4"/>
   <property name="modifiedDateTime"		column="modified_date_time" 	type="java.util.Date"		not-null="false"	length="4"/>

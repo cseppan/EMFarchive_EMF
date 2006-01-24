@@ -43,8 +43,6 @@ public class EmfDataset implements Dataset, Lockable {
 
     private Date endDateTime;
 
-    private String sector;
-
     private String project;
 
     private Date createdDateTime;
@@ -113,14 +111,6 @@ public class EmfDataset implements Dataset, Lockable {
 
     public void setProject(String project) {
         this.project = project;
-    }
-
-    public String getSector() {
-        return sector;
-    }
-
-    public void setSector(String sector) {
-        this.sector = sector;
     }
 
     public String getDatasetTypeName() {

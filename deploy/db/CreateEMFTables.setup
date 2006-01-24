@@ -171,7 +171,6 @@ CREATE TABLE emf.datasets
   start_date_time timestamp,
   stop_date_time timestamp,
   description text,
-  sector varchar(255),
   project varchar(255),
   created_date_time timestamp,
   modified_date_time timestamp,
