@@ -29,7 +29,7 @@ public class DataServiceTest extends ServicesTestCase {
         userService = new UserServiceImpl(sessionFactory);
         dataCommonsService = new DataCommonsServiceImpl(sessionFactory);
 
-        deleteDatasets();
+        deleteAllDatasets();
     }
 
     protected void doTearDown() throws Exception {// no op

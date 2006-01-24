@@ -183,7 +183,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public void closeSession(DataAccessToken token) throws EmfException {
-        accessor.closeSession(token);
+        accessor.closeEditSession(token);
     }
 
     /**

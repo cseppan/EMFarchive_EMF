@@ -13,7 +13,7 @@ import java.util.Date;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 
-public class DataCommonsServiceTestCase extends ServicesTestCase {
+public class DataCommonsServiceTest extends ServicesTestCase {
 
     private DataCommonsService service;
 

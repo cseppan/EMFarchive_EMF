@@ -8,9 +8,29 @@ import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import javax.swing.JFrame;
 
 public class Launcher {
+    private static final String DEFAULT_URL = "http://localhost:8080/emf/services";// default
 
     public static void main(String[] args) throws Exception {
-        String url = "http://localhost:8080/emf/services";// default
+        if (args.length == 1 && args[0].equalsIgnoreCase("Help")) {
+            displayHelp();
+            return;
+        }
+
+        run(args);
+    }
+
+    private static void displayHelp() {
+        System.out
+                .println("Usage\njava "
+                        + Launcher.class.getName()
+                        + " [url]"
+                        + "\n\turl - location of EMF Services. Defaults to "
+                        + DEFAULT_URL
+                        + "\n\tspecify '-DEMF_PREFERENCE=<full path to EMFPrefs.txt>' to override location of User Preferences");
+    }
+
+    private static void run(String[] args) throws Exception {
+        String url = DEFAULT_URL;
         if (args.length == 1)
             url = args[0];
 

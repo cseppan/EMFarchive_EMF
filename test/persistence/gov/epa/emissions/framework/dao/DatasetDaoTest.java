@@ -17,6 +17,7 @@ public class DatasetDaoTest extends ServicesTestCase {
     private DatasetDao dao;
 
     protected void doSetUp() throws Exception {
+        deleteAllDatasets();
         dao = new DatasetDao();
     }
 

@@ -66,17 +66,17 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     public void display(Version[] versions, InternalSource[] sources) {
         VersionsSet versionsSet = new VersionsSet(versions);
-        add(topPanel(versionsSet), BorderLayout.PAGE_START);
+        add(topPanel(sources), BorderLayout.PAGE_START);
         add(tablePanel(versions), BorderLayout.CENTER);
-        add(bottomPanel(sources), BorderLayout.PAGE_END);
+        add(bottomPanel(versionsSet), BorderLayout.PAGE_END);
     }
 
-    private JPanel topPanel(VersionsSet versionsSet) {
+    private JPanel bottomPanel(VersionsSet versionsSet) {
         JPanel container = new JPanel(new BorderLayout());
 
         JPanel right = new JPanel();
         right.add(new JLabel("Default Version"));
-        
+
         String name = versionsSet.getDefaultVersionName(dataset.getDefaultVersion());
         right.add(new JLabel(displayableVersion(name, dataset)));
 
@@ -127,7 +127,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
         return table;
     }
 
-    private JPanel bottomPanel(InternalSource[] sources) {
+    private JPanel topPanel(InternalSource[] sources) {
         JPanel container = new JPanel(new BorderLayout());
         container.add(rightControlPanel(sources), BorderLayout.LINE_END);
 

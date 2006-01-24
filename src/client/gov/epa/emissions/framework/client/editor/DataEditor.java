@@ -67,13 +67,20 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         labelPanel.add(new JLabel("    Dataset:    " + dataset.getName()));
         panel.add(labelPanel, BorderLayout.LINE_START);
 
-        messagePanel = new SingleLineMessagePanel();
-        panel.add(messagePanel, BorderLayout.CENTER);
+        panel.add(infoPanel(), BorderLayout.LINE_END);
 
-        JPanel lockInfoPanel = new JPanel();
+        return panel;
+    }
+
+    private JPanel infoPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
         lockInfo = new JLabel();
-        lockInfoPanel.add(lockInfo);
-        panel.add(lockInfoPanel, BorderLayout.LINE_END);
+        panel.add(lockInfo);
+
+        messagePanel = new SingleLineMessagePanel();
+        panel.add(messagePanel);
 
         return panel;
     }

@@ -22,7 +22,7 @@ public abstract class DataServiceTestCase extends ServicesTestCase {
         this.service = service;
         this.userService = userService;
         this.dataCommService = dataCommonsService;
-        deleteDatasets();
+        deleteAllDatasets();
     }
 
     protected void doTearDown() throws Exception {// no op

@@ -103,7 +103,7 @@ public abstract class ServicesTestCase extends TestCase {
         return new HibernateSessionFactory(config.factory());
     }
 
-    public void deleteDatasets() throws Exception {
+    public void deleteAllDatasets() throws Exception {
         ExImDbUpdate dbUpdate = new ExImDbUpdate();
         dbUpdate.deleteAllDatasets();
     }

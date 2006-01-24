@@ -8,36 +8,36 @@ import gov.epa.emissions.framework.services.DataAccessToken;
 
 public interface DataAccessor {
 
-    public abstract int defaultPageSize();
+    int defaultPageSize();
 
-    public abstract Page getPage(DataAccessToken token, int pageNumber) throws EmfException;
+    Page getPage(DataAccessToken token, int pageNumber) throws EmfException;
 
-    public abstract int getPageCount(DataAccessToken token) throws EmfException;
+    int getPageCount(DataAccessToken token) throws EmfException;
 
-    public abstract Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException;
+    Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException;
 
-    public abstract int getTotalRecords(DataAccessToken token) throws EmfException;
+    int getTotalRecords(DataAccessToken token) throws EmfException;
 
-    public abstract Version currentVersion(Version reference) throws EmfException;
+    Version currentVersion(Version reference) throws EmfException;
 
-    public abstract Version[] getVersions(long datasetId) throws EmfException;
+    Version[] getVersions(long datasetId) throws EmfException;
 
-    public abstract void shutdown() throws EmfException;
+    void shutdown() throws EmfException;
 
-    public abstract DataAccessToken openSession(DataAccessToken token, int pageSize) throws Exception;
+    DataAccessToken openSession(DataAccessToken token, int pageSize) throws Exception;
 
-    public abstract DataAccessToken openSession(DataAccessToken token) throws Exception;
+    DataAccessToken openSession(DataAccessToken token) throws Exception;
 
-    public abstract void closeSession(DataAccessToken token) throws EmfException;
+    void closeSession(DataAccessToken token) throws EmfException;
 
-    public abstract DataAccessToken openEditSession(User user, DataAccessToken token) throws Exception;
+    DataAccessToken openEditSession(User user, DataAccessToken token) throws Exception;
 
-    public abstract DataAccessToken openEditSession(User user, DataAccessToken token, int pageSize) throws Exception;
+    DataAccessToken openEditSession(User user, DataAccessToken token, int pageSize) throws Exception;
 
-    public abstract DataAccessToken closeEditSession(DataAccessToken token) throws EmfException;
+    DataAccessToken closeEditSession(DataAccessToken token) throws EmfException;
 
-    public abstract boolean isLockOwned(DataAccessToken token) throws EmfException;
+    boolean isLockOwned(DataAccessToken token) throws EmfException;
 
-    public abstract DataAccessToken renewLock(DataAccessToken token) throws EmfException;
+    DataAccessToken renewLock(DataAccessToken token) throws EmfException;
 
 }

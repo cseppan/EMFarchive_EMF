@@ -208,9 +208,10 @@ public class DataEditorServiceTransport implements DataEditorService {
 
     public DataAccessToken openSession(User user, DataAccessToken token) throws EmfException {
         try {
-            mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.setOperation(call, "openSession");
-            mappings.setReturnType(call, mappings.user());
+            mappings.addParam(call, "user", mappings.user());
+            mappings.addParam(call, "token", mappings.dataAccessToken());
+
             mappings.setReturnType(call, mappings.dataAccessToken());
 
             return (DataAccessToken) call.invoke(new Object[] { user, token });

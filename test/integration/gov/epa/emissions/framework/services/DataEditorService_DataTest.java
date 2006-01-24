@@ -287,8 +287,6 @@ public class DataEditorService_DataTest extends ServicesTestCase {
     public void testShouldAddNewRecordsInChangeSetToPageOnRepeatFetchOfSamePage() throws Exception {
         Version v1 = versionOne();
 
-        DataAccessToken token = token(v1, table);
-        DataAccessToken locked = service.openSession(user, token);
         Page page = service.getPage(token, 1);
 
         ChangeSet changeset = new ChangeSet();
@@ -314,15 +312,10 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         for (int i = 0; i < page1Records.length; i++)
             assertEquals(page1Records[i].getRecordId(), records[i].getRecordId());
         assertEquals(record6.getRecordId(), records[records.length - 1].getRecordId());
-
-        service.closeSession(locked);
     }
 
     public void testShouldApplyChangeSetToPageOnRepeatFetchOfSamePage() throws Exception {
         Version v1 = versionOne();
-
-        DataAccessToken token = token(v1, table);
-        DataAccessToken locked = service.openSession(user, token);
 
         Page page = service.getPage(token, 1);
 
@@ -354,8 +347,6 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         for (int i = 3; i < page1Records.length; i++)
             assertEquals(page1Records[i].getRecordId(), records[i - 1].getRecordId());
         assertEquals(record6.getRecordId(), records[records.length - 1].getRecordId());
-
-        service.closeSession(locked);
     }
 
     public void testShouldApplyChangeSetToMultiplePages() throws Exception {

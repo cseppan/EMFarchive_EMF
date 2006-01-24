@@ -38,7 +38,7 @@ public class DataAccessToken {
     }
 
     public Object key() {
-        return "DatasetId:" + version.getDatasetId() + "-Version:" + version.getVersion() + "-Table:" + getTable();
+        return "DatasetId:" + version.getDatasetId() + ", Version:" + version.getVersion() + ", Table:" + getTable();
     }
 
     public long datasetId() {
