@@ -98,8 +98,6 @@ public class DataEditorServiceTransport implements DataEditorService {
     }
 
     public Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException {
-        Page page = null;
-
         try {
             mappings.setOperation(call, "getPageWithRecord");
             mappings.setReturnType(call, mappings.page());
@@ -107,7 +105,7 @@ public class DataEditorServiceTransport implements DataEditorService {
             mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.addIntegerParam(call, "recordId");
 
-            page = (Page) call.invoke(new Object[] { token, new Integer(recordId) });
+            return (Page) call.invoke(new Object[] { token, new Integer(recordId) });
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to get page: ", fault);
         } catch (Exception e) {
@@ -116,7 +114,7 @@ public class DataEditorServiceTransport implements DataEditorService {
             call.removeAllParameters();
         }
 
-        return page;
+        return null;
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {

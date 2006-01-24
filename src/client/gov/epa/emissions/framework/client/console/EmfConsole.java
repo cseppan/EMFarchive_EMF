@@ -43,21 +43,20 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private StatusPresenter presenter;
 
-    private ViewLayout windowLayoutManager;
-    
-    private static String aboutMessage = 
-        "<html><center>Emissions Modeling Framework (EMF)<br>"+
-        "Version: Beta 2 (1/24/2006)<br>"+
-        "Developed by the Carolina Environmental Program<br>"+
-        "University of North Carolina at Chapel Hill</center></html>"; 
+    private ViewLayout viewLayout;
+
+    private static String aboutMessage = "<html><center>Emissions Modeling Framework (EMF)<br>"
+            + "Version: Beta 2 (1/24/2006)<br>" + "Developed by the Carolina Environmental Program<br>"
+            + "University of North Carolina at Chapel Hill</center></html>";
 
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(EmfSession session) {
-        super("EMF Console", "Emissions Modeling Framework (EMF)");
+        super("EMF Console", "Emissions Modeling Framework (EMF):  " + session.user().getFullName() + "("
+                + session.user().getUsername() + ")");
         user = session.user();
         this.serviceLocator = session.serviceLocator();
 
-        this.windowLayoutManager = new CascadeLayout(this);
+        this.viewLayout = new CascadeLayout(this);
         messagePanel = new SingleLineMessagePanel();
 
         setProperties();
@@ -120,7 +119,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private JMenu createFileMenu(EmfSession session) {
-        return new FileMenu(session, this, messagePanel, windowLayoutManager);
+        return new FileMenu(session, this, messagePanel, viewLayout);
     }
 
     public void doClose() {
@@ -136,7 +135,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private JMenu createManageMenu(EmfSession session) {
-        manageMenu = new ManageMenu(session, this, messagePanel, windowLayoutManager);
+        manageMenu = new ManageMenu(session, this, messagePanel, viewLayout);
 
         return manageMenu;
     }
@@ -150,9 +149,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         JMenuItem about = new JMenuItem("About");
         about.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                JOptionPane.showMessageDialog(EmfConsole.this,
-                        aboutMessage,
-                        "About the EMF",
+                JOptionPane.showMessageDialog(EmfConsole.this, aboutMessage, "About the EMF",
                         JOptionPane.INFORMATION_MESSAGE);
             }
         });

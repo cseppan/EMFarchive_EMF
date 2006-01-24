@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.client.ManagedView;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
-public class DefaultViewLayoutTest extends MockObjectTestCase {
+public class CascadeLayoutTest extends MockObjectTestCase {
 
     public void testShouldLookupViewBasedOnId() {
         Mock parent = mock(EmfView.class);

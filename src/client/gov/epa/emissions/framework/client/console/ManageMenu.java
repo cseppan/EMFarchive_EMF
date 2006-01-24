@@ -137,8 +137,7 @@ public class ManageMenu extends JMenu {
         viewLayout.add(view, "DatasetTypes Manager");
         parent.addToDesktop(view);
 
-        ViewLayout viewLayout = new CascadeLayout(view);
-        DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(session, view, viewLayout);
+        DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(session, view);
         presenter.doDisplay();
     }
 
@@ -150,8 +149,7 @@ public class ManageMenu extends JMenu {
         viewLayout.add(view, "Sectors Manager");
         parent.addToDesktop(view);
 
-        ViewLayout sectorsLayout = new CascadeLayout(view);
-        SectorsManagerPresenter presenter = new SectorsManagerPresenter(session, view, service, sectorsLayout);
+        SectorsManagerPresenter presenter = new SectorsManagerPresenter(session, view, service);
         presenter.doDisplay();
     }
 

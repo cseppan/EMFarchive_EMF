@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.ui.ViewLayout;
 
 public class SectorsManagerPresenter {
 
@@ -12,16 +11,12 @@ public class SectorsManagerPresenter {
 
     private DataCommonsService service;
 
-    private ViewLayout viewLayout;
-
     private EmfSession session;
 
-    public SectorsManagerPresenter(EmfSession session, SectorsManagerView view, DataCommonsService service,
-            ViewLayout viewLayout) {
+    public SectorsManagerPresenter(EmfSession session, SectorsManagerView view, DataCommonsService service) {
         this.session = session;
         this.view = view;
         this.service = service;
-        this.viewLayout = viewLayout;
     }
 
     public void doDisplay() throws EmfException {
@@ -36,27 +31,19 @@ public class SectorsManagerPresenter {
     public void doEdit(Sector sector, EditableSectorView editSectorView, ViewableSectorView displaySectorView)
             throws EmfException {
         EditableSectorPresenter p = new EditableSectorPresenterImpl(session, editSectorView, displaySectorView, sector);
-        edit(sector, editSectorView, p);
+        edit(p);
     }
 
-    void edit(Sector sector, EditableSectorView editSectorView, EditableSectorPresenter presenter) throws EmfException {
-        if (viewLayout.activate("Edit " + sector.getName()))
-            return;
-
-        viewLayout.add(editSectorView, "Edit " + sector.getName());
+    void edit(EditableSectorPresenter presenter) throws EmfException {
         presenter.doDisplay();
     }
 
     public void doView(Sector sector, ViewableSectorView viewable) {
         ViewableSectorPresenter p = new ViewableSectorPresenterImpl(viewable, sector);
-        view(sector, viewable, p);
+        view(p);
     }
 
-    void view(Sector sector, ViewableSectorView viewable, ViewableSectorPresenter presenter) {
-        if (viewLayout.activate(sector.getName()))
-            return;
-
-        viewLayout.add(viewable, sector.getName());
+    void view(ViewableSectorPresenter presenter) {
         presenter.doDisplay();
     }
 

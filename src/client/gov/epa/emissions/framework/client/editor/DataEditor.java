@@ -249,8 +249,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     public void notifyLockFailure(DataAccessToken token) {
         Version version = token.getVersion();
         String message = "Cannot edit Version: " + version.getName() + "(" + version.getVersion() + ") of Dataset: "
-                + dataset.getName() + " since it is locked by " + version.getLockOwner() + " at "
-                + format(version.getLockDate());
+                + dataset.getName() + " as it was locked by User: " + version.getLockOwner() + "(at "
+                + format(version.getLockDate()) + ")";
         JOptionPane.showMessageDialog(this, message);
     }
 

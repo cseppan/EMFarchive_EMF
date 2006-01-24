@@ -45,7 +45,7 @@ public class EditVersionsPresenter {
 
     public void doView(Version version, String table, DataView view) throws EmfException {
         if (!version.isFinalVersion())
-            throw new EmfException("Can only View a Version(" + version.getVersion() + ") that is Final.");
+            throw new EmfException("Cannot view a Version(" + version.getVersion() + ") that is not Final. Please choose edit.");
 
         DataViewPresenter presenter = new DataViewPresenter(version, table, view, viewService);
         presenter.display();
@@ -53,7 +53,7 @@ public class EditVersionsPresenter {
 
     public void doEdit(Version version, String table, DataEditorView view) throws EmfException {
         if (version.isFinalVersion())
-            throw new EmfException("Cannot edit a Version(" + version.getVersion() + ") that is Final.");
+            throw new EmfException("Cannot edit a Version(" + version.getVersion() + ") that is Final. Please choose 'view'.");
 
         DataEditorPresenter presenter = new DataEditorPresenter(user, version, table, service);
         presenter.display(view);

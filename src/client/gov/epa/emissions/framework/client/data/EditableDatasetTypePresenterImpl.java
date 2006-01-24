@@ -34,7 +34,7 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
             new ViewableDatasetTypePresenterImpl(viewable, type).doDisplay();
             return;
         }
-
+        
         editable.observe(this);
         editable.display(type, dataCommonsService().getKeywords());
     }
