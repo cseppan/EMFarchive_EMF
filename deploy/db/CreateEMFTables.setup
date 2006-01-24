@@ -334,7 +334,7 @@ ALTER TABLE emf.datasets_sectors_id_seq OWNER TO emf;
 --
 CREATE TABLE emf.datasets_sectors
 (
-  id int4 NOT NULL DEFAULT nextval('datasets_sectors_id_seq'::regclass),
+  id int4 NOT NULL DEFAULT nextval('emf.datasets_sectors_id_seq'::regclass),
   dataset_id int4 NOT NULL,
   list_index int4,
   sector_id int4,
