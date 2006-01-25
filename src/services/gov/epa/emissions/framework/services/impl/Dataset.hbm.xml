@@ -36,7 +36,7 @@
   <array name="sectors" table="datasets_sectors" cascade="save-update">
     <key column="dataset_id" not-null="true"/>
     <list-index column="list_index"/>
-    <many-to-many class="gov.epa.emissions.commons.io.Sector" column="id"/>
+    <many-to-many class="gov.epa.emissions.commons.io.Sector" column="sector_id"/>
   </array>
 
   <array name="internalSources" table="internal_sources">
