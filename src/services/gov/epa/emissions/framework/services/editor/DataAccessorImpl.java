@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 
 public class DataAccessorImpl implements DataAccessor {
     private Log LOG = LogFactory.getLog(DataAccessorImpl.class);
@@ -21,30 +22,66 @@ public class DataAccessorImpl implements DataAccessor {
 
     private SessionLifecycle sessionLifecycle;
 
+    private HibernateSessionFactory sessionFactory;
+
     public DataAccessorImpl(DataUpdatesCache cache, HibernateSessionFactory sessionFactory) {
         this.cache = cache;
-        pageFetch = new PageFetch(cache, sessionFactory);
+        this.sessionFactory = sessionFactory;
+        pageFetch = new PageFetch(cache);
         sessionLifecycle = new SessionLifecycle(cache, sessionFactory);
     }
 
     public int defaultPageSize() {
-        return pageFetch.defaultPageSize();
+        Session session = sessionFactory.getSession();
+        int result = pageFetch.defaultPageSize(session);
+        session.close();
+
+        return result;
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
-        return pageFetch.getPage(token, pageNumber);
+        try {
+            Session session = sessionFactory.getSession();
+            Page result = pageFetch.getPage(token, pageNumber, session);
+            session.close();
+
+            return result;
+        } catch (Exception e) {
+            LOG.error("Could not get Page: " + pageNumber + " for Dataset: " + token.datasetId() + ". Reason: " + e);
+            throw new EmfException("Could not get Page: " + pageNumber + " for Dataset: " + token.datasetId());
+        }
+
     }
 
     public int getPageCount(DataAccessToken token) throws EmfException {
-        return pageFetch.getPageCount(token);
+        try {
+            return pageFetch.getPageCount(token);
+        } catch (Exception e) {
+            LOG.error("Failed to get page count. Reason: " + e.getMessage());
+            throw new EmfException("Failed to get page count");
+        }
     }
 
     public Page getPageWithRecord(DataAccessToken token, int record) throws EmfException {
-        return pageFetch.getPageWithRecord(token, record);
+        try {
+            return pageFetch.getPageWithRecord(token, record);
+        } catch (Exception ex) {
+            LOG.error("Could not obtain the page with Record: " + record + ". Reason: " + ex.getMessage());
+            throw new EmfException("Could not obtain the page with Record: " + record);
+        }
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {
-        return pageFetch.getTotalRecords(token);
+        try {
+            Session session = sessionFactory.getSession();
+            int result = pageFetch.getTotalRecords(token, session);
+            session.close();
+
+            return result;
+        } catch (Exception e) {
+            LOG.error("Failed to get a count of total number of records. Reason: " + e.getMessage());
+            throw new EmfException("Failed to get a count of total number of records");
+        }
     }
 
     public Version currentVersion(Version reference) throws EmfException {

@@ -4,8 +4,8 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.version.ChangeSet;
-import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
+import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
 import gov.epa.emissions.framework.dao.EmfProperties;
 import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
@@ -13,11 +13,9 @@ import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.impl.EmfProperty;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -74,20 +72,20 @@ public class DataAccessCache implements DataUpdatesCache {
      * Keeps a two-level mapping. First map, ChangeSetMap is a map of tokens and PageChangeSetMap. PageChangeSetMap maps
      * Page Number to Change Sets (of that Page)
      */
-    public List changesets(DataAccessToken token, int pageNumber, Session session) throws SQLException {
+    public ChangeSets changesets(DataAccessToken token, int pageNumber, Session session) throws SQLException {
         Map map = pageChangesetsMap(token, session);
         Integer pageKey = pageChangesetsKey(pageNumber);
         if (!map.containsKey(pageKey)) {
-            map.put(pageKey, new ArrayList());
+            map.put(pageKey, new ChangeSets());
         }
 
-        return (List) map.get(pageKey);
+        return (ChangeSets) map.get(pageKey);
     }
 
     public void submitChangeSet(DataAccessToken token, ChangeSet changeset, int pageNumber, Session session)
             throws SQLException {
-        List list = changesets(token, pageNumber, session);
-        list.add(changeset);
+        ChangeSets sets = changesets(token, pageNumber, session);
+        sets.add(changeset);
     }
 
     public void discardChangeSets(DataAccessToken token, Session session) throws SQLException {
@@ -95,13 +93,14 @@ public class DataAccessCache implements DataUpdatesCache {
         pageChangsetsMap.clear();
     }
 
-    public List changesets(DataAccessToken token, Session session) throws SQLException {
-        List all = new ArrayList();
+    public ChangeSets changesets(DataAccessToken token, Session session) throws SQLException {
+        ChangeSets all = new ChangeSets();
+
         Map pageChangesetsMap = pageChangesetsMap(token, session);
         Set keys = new TreeSet(pageChangesetsMap.keySet());
         for (Iterator iter = keys.iterator(); iter.hasNext();) {
-            List list = (List) pageChangesetsMap.get(iter.next());
-            all.addAll(list);
+            ChangeSets sets = (ChangeSets) pageChangesetsMap.get(iter.next());
+            all.add(sets);
         }
 
         return all;
@@ -207,8 +206,8 @@ public class DataAccessCache implements DataUpdatesCache {
 
     public void save(DataAccessToken token, Session session) throws Exception {
         VersionedRecordsWriter writer = writer(token);
-        List list = changesets(token, session);
-        for (Iterator iter = list.iterator(); iter.hasNext();) {
+        ChangeSets sets = changesets(token, session);
+        for (Iterator iter = sets.iterator(); iter.hasNext();) {
             ChangeSet element = (ChangeSet) iter.next();
             writer.update(element);
         }

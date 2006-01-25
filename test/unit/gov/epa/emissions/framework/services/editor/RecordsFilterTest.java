@@ -3,10 +3,6 @@ package gov.epa.emissions.framework.services.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.TestCase;
 
 public class RecordsFilterTest extends TestCase {
@@ -50,7 +46,7 @@ public class RecordsFilterTest extends TestCase {
         VersionedRecord newRecord2 = new VersionedRecord(3);
         changeset2.addNew(newRecord2);
         
-        List changesets = new ArrayList();
+        ChangeSets changesets = new ChangeSets();
         changesets.add(changeset1);
         changesets.add(changeset2);
         

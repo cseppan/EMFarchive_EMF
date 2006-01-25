@@ -1,15 +1,13 @@
 package gov.epa.emissions.framework.services.editor;
 
 import gov.epa.emissions.commons.db.version.ChangeSet;
-import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
 import gov.epa.emissions.framework.dao.EmfProperties;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.impl.EmfProperty;
-
-import java.util.List;
 
 import org.hibernate.Session;
 import org.jmock.Mock;
@@ -70,7 +68,7 @@ public class DataAccessCacheTest extends MockObjectTestCase {
         ChangeSet changeset2 = new ChangeSet();
         cache.submitChangeSet(token, changeset2, 1, session);
 
-        List results = cache.changesets(token, 1, session);
+        ChangeSets results = cache.changesets(token, 1, session);
         assertEquals(2, results.size());
         assertEquals(changeset1, results.get(0));
         assertEquals(changeset2, results.get(1));
@@ -93,11 +91,11 @@ public class DataAccessCacheTest extends MockObjectTestCase {
         ChangeSet changeset2 = new ChangeSet();
         cache.submitChangeSet(token, changeset2, 2, session);
 
-        List resultsPage1 = cache.changesets(token, 1, session);
+        ChangeSets resultsPage1 = cache.changesets(token, 1, session);
         assertEquals(1, resultsPage1.size());
         assertEquals(changeset1, resultsPage1.get(0));
 
-        List resultsPage2 = cache.changesets(token, 2, session);
+        ChangeSets resultsPage2 = cache.changesets(token, 2, session);
         assertEquals(1, resultsPage2.size());
         assertEquals(changeset2, resultsPage2.get(0));
 
@@ -122,7 +120,7 @@ public class DataAccessCacheTest extends MockObjectTestCase {
         ChangeSet changeset2Page1 = new ChangeSet();
         cache.submitChangeSet(token, changeset2Page1, 1, session);
 
-        List all = cache.changesets(token, session);
+        ChangeSets all = cache.changesets(token, session);
         assertEquals(3, all.size());
         assertEquals(changeset1Page1, all.get(0));
         assertEquals(changeset2Page1, all.get(1));
@@ -143,12 +141,12 @@ public class DataAccessCacheTest extends MockObjectTestCase {
         ChangeSet changeset1Page1 = new ChangeSet();
         cache.submitChangeSet(token, changeset1Page1, 1, session);
 
-        List all = cache.changesets(token, session);
+        ChangeSets all = cache.changesets(token, session);
         assertEquals(1, all.size());
 
         cache.close(token, session);
 
-        List empty = cache.changesets(token, session);
+        ChangeSets empty = cache.changesets(token, session);
         assertEquals(0, empty.size());
     }
 
@@ -170,9 +168,9 @@ public class DataAccessCacheTest extends MockObjectTestCase {
         cache.discardChangeSets(token, session);
 
         // empty
-        List resultsPage1 = cache.changesets(token, 1, session);
+        ChangeSets resultsPage1 = cache.changesets(token, 1, session);
         assertEquals(0, resultsPage1.size());
-        List resultsPage2 = cache.changesets(token, 2, session);
+        ChangeSets resultsPage2 = cache.changesets(token, 2, session);
         assertEquals(0, resultsPage2.size());
 
         cache.close(token, session);

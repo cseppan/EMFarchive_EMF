@@ -5,11 +5,10 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 
 import java.util.Iterator;
-import java.util.List;
 
 public class RecordsFilter {
 
-    public Page filter(Page page, List changesets) {
+    public Page filter(Page page, ChangeSets changesets) {
         // TODO: efficiency is O(n^2). Need to optimize, but order should be maintained
         for (Iterator iter = changesets.iterator(); iter.hasNext();) {
             ChangeSet element = (ChangeSet) iter.next();
