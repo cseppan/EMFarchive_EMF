@@ -38,12 +38,14 @@ public class PaginationPanel extends JPanel {
 
     private JSlider slider;
 
+    private JLabel totalRecords;
+
     public PaginationPanel(MessagePanel messagePanel) {
         super(new BorderLayout());
         this.messagePanel = messagePanel;
     }
 
-    private void doLayout(int totalRecords) {
+    private void doLayout(int totalRecordsCount) {
         JPanel container = new JPanel();
 
         JLabel currentName = new JLabel("Current: ");
@@ -53,11 +55,11 @@ public class PaginationPanel extends JPanel {
         current.setToolTipText("Range of displayed records");
         container.add(current);
 
-        JLabel total = new JLabel("Total: " + totalRecords);
-        total.setToolTipText("Total Records");
-        container.add(total);
+        totalRecords = new JLabel("Total: " + totalRecordsCount);
+        totalRecords.setToolTipText("Total Records");
+        container.add(totalRecords);
 
-        container.add(layoutControls(totalRecords));
+        container.add(layoutControls(totalRecordsCount));
 
         super.add(container, BorderLayout.LINE_END);
     }
@@ -259,6 +261,11 @@ public class PaginationPanel extends JPanel {
         } catch (EmfException e) {
             messagePanel.setError("Could not display First Page. Reason: " + e.getMessage());
         }
+    }
+
+    public void updateTotalRecordsCount(int total) {
+        totalRecords.setText("Total Records: " + total);
+        slider.setMaximum(total);
     }
 
 }

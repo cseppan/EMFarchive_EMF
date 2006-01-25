@@ -46,7 +46,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -70,7 +70,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
 
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) service.proxy());
@@ -92,7 +92,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
 
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) service.proxy());
@@ -113,7 +113,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
 
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) service.proxy());
@@ -135,7 +135,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
 
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
                 (DataEditorService) service.proxy());
@@ -156,7 +156,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -179,7 +179,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -204,7 +204,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -229,7 +229,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -266,7 +266,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.expects(atLeastOnce()).method("display").with(eq(page2));
         
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -309,7 +309,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
