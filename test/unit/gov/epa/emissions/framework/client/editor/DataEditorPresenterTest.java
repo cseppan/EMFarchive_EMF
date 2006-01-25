@@ -133,6 +133,9 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         Mock service = mock(DataEditorService.class);
         service.stubs().method("getPage").withAnyArguments().will(returnValue(new Page()));
+        
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        tableView.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
 
         DataEditorPresenter p = new DataEditorPresenter(null, version, table, (DataEditorService) service.proxy());
 
@@ -189,6 +192,9 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         tableView.expects(once()).method("display").with(new IsInstanceOf(Page.class));
         tableView.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
         service.stubs().method("getPage").withAnyArguments().will(returnValue(new Page()));
+
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        tableView.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
 
         p.displayTable((EditablePageManagerView) tableView.proxy());
         return tableView;

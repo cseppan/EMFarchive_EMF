@@ -314,6 +314,22 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         assertEquals(record6.getRecordId(), records[records.length - 1].getRecordId());
     }
 
+    public void testTotalRecordsShouldIncludeUncommitedChanges() throws Exception {
+        Version v1 = versionOne();
+
+        ChangeSet changeset = new ChangeSet();
+        changeset.setVersion(v1);
+
+        VersionedRecord record6 = new VersionedRecord(10);
+        record6.setDatasetId((int) dataset.getDatasetid());
+        changeset.addNew(record6);
+
+        int totalPriorToChanges = service.getTotalRecords(token);
+        service.submit(token, changeset, 1);
+
+        assertEquals(totalPriorToChanges + 1, service.getTotalRecords(token));
+    }
+
     public void testShouldApplyChangeSetToPageOnRepeatFetchOfSamePage() throws Exception {
         Version v1 = versionOne();
 
@@ -405,7 +421,7 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         int recordsBeforeSave = service.getTotalRecords(token);
         service.save(token);
 
-        assertEquals(recordsBeforeSave + 1, service.getTotalRecords(token));
+        assertEquals(recordsBeforeSave, service.getTotalRecords(token));
     }
 
 }

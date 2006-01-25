@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.editor;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.PageReader;
+import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
@@ -12,6 +13,7 @@ import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -85,10 +87,27 @@ public class DataAccessorImpl implements DataAccessor {
     public int getTotalRecords(DataAccessToken token) throws EmfException {
         try {
             PageReader reader = cache.reader(token);
-            return reader.totalRecords();
-        } catch (SQLException e) {
+            return reader.totalRecords() + netRecordCountIncreaseDueToChanges(token);
+        } catch (Exception e) {
             LOG.error("Failed to get a count of total number of records. Reason: " + e.getMessage());
             throw new EmfException("Failed to get a count of total number of records");
+        }
+    }
+
+    private int netRecordCountIncreaseDueToChanges(DataAccessToken token) throws SQLException {
+        Session session = sessionFactory.getSession();
+        int total;
+        try {
+            List changesets = cache.changesets(token, session);
+            total = 0;
+            for (Iterator iter = changesets.iterator(); iter.hasNext();) {
+                ChangeSet element = (ChangeSet) iter.next();
+                total += element.netIncrease();
+            }
+
+            return total;
+        } finally {
+            session.close();
         }
     }
 

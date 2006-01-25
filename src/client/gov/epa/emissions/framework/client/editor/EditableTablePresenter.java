@@ -64,6 +64,8 @@ public class EditableTablePresenter implements TablePresenter {
             service.submit(paginator.token(), changeset, paginator.pageNumber());
             changeset.clear();
         }
+        
+        view.updateTotalRecordCount(paginator.totalRecords());
     }
 
 }

@@ -87,4 +87,9 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
         return editablePage != null ? editablePage.changeset() : new ChangeSet();
     }
 
+    public void updateTotalRecordCount(int total) {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

@@ -36,28 +36,31 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldDisplayFirstPageOnFirstNextCall() throws Exception {
-        Mock services = mock(DataEditorService.class);
+        Mock service = mock(DataEditorService.class);
         Page page = new Page();
-        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(returnValue(page));
-        services.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
+        service.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(returnValue(page));
+        service.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
-                (DataEditorService) services.proxy());
+                (DataEditorService) service.proxy());
 
         p.doDisplayNext();
     }
 
     public void testShouldDisplaySpecifiedPage() throws Exception {
-        Mock services = mock(DataEditorService.class);
+        Mock service = mock(DataEditorService.class);
         Page page = new Page();
-        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(21))).will(returnValue(page));
+        service.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(21))).will(returnValue(page));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
@@ -66,16 +69,19 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
-                (DataEditorService) services.proxy());
+                (DataEditorService) service.proxy());
 
         p.doDisplay(21);
     }
 
     public void testShouldDisplayPageWithRecord() throws Exception {
-        Mock services = mock(DataEditorService.class);
+        Mock service = mock(DataEditorService.class);
         Page page = new Page();
-        services.stubs().method("getPageWithRecord").with(isA(DataAccessToken.class), eq(new Integer(21))).will(
+        service.stubs().method("getPageWithRecord").with(isA(DataAccessToken.class), eq(new Integer(21))).will(
                 returnValue(page));
 
         Mock view = mock(EditablePageManagerView.class);
@@ -85,16 +91,19 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
-                (DataEditorService) services.proxy());
+                (DataEditorService) service.proxy());
 
         p.doDisplayPageWithRecord(21);
     }
 
     public void testShouldDisplayFirstPage() throws Exception {
-        Mock services = mock(DataEditorService.class);
+        Mock service = mock(DataEditorService.class);
         Page page = new Page();
-        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(returnValue(page));
+        service.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(returnValue(page));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
@@ -103,17 +112,20 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
-                (DataEditorService) services.proxy());
+                (DataEditorService) service.proxy());
 
         p.doDisplayFirst();
     }
 
     public void testShouldDisplayFirstPageEvenAfterPrevRequestOnFirstPage() throws Exception {
-        Mock services = mock(DataEditorService.class);
+        Mock service = mock(DataEditorService.class);
         Page page = new Page();
         page.setNumber(1);
-        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(returnValue(page));
+        service.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(returnValue(page));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
@@ -122,71 +134,83 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
-                (DataEditorService) services.proxy());
+                (DataEditorService) service.proxy());
 
         p.doDisplayFirst();
         p.doDisplayPrevious();
     }
 
     public void testShouldDisplayLastPageEvenAfterNextRequestOnLastPage() throws Exception {
-        Mock services = mock(DataEditorService.class);
+        Mock service = mock(DataEditorService.class);
         Page page = new Page();
         page.setNumber(20);
-        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(20))).will(returnValue(page));
-        services.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
+        service.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(20))).will(returnValue(page));
+        service.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
-                (DataEditorService) services.proxy());
+                (DataEditorService) service.proxy());
 
         p.doDisplayLast();
         p.doDisplayNext();
     }
 
     public void testShouldDisplayLastPage() throws Exception {
-        Mock services = mock(DataEditorService.class);
+        Mock service = mock(DataEditorService.class);
         Page page = new Page();
-        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(20))).will(returnValue(page));
-        services.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
+        service.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(20))).will(returnValue(page));
+        service.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
-                (DataEditorService) services.proxy());
+                (DataEditorService) service.proxy());
 
         p.doDisplayLast();
     }
 
     public void testShouldDisplaySecondPageOnTwoConsecutiveNextCalls() throws Exception {
-        Mock services = mock(DataEditorService.class);
+        Mock service = mock(DataEditorService.class);
         Page page = new Page();
         page.setNumber(1);
-        services.expects(once()).method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(
+        service.expects(once()).method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(
                 returnValue(page));
-        services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(2))).will(returnValue(page));
-        services.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
+        service.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(2))).will(returnValue(page));
+        service.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
-                (DataEditorService) services.proxy());
+                (DataEditorService) service.proxy());
 
         p.doDisplayNext();
         p.doDisplayNext();
@@ -203,6 +227,9 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
 
         Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
+
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
@@ -238,6 +265,9 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page2));
         
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
         
@@ -261,16 +291,16 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldDisplayFirstPageOnDisplayPreviousAfterTwoConsecutiveNextCalls() throws Exception {
-        Mock services = mock(DataEditorService.class);
-        services.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
+        Mock service = mock(DataEditorService.class);
+        service.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
         Page page1 = new Page();
         page1.setNumber(1);
-        services.expects(atLeastOnce()).method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(
+        service.expects(atLeastOnce()).method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(
                 returnValue(page1));
         Page page2 = new Page();
         page2.setNumber(2);
-        services.expects(once()).method("getPage").with(isA(DataAccessToken.class), eq(new Integer(2))).will(
+        service.expects(once()).method("getPage").with(isA(DataAccessToken.class), eq(new Integer(2))).will(
                 returnValue(page2));
 
         Mock view = mock(EditablePageManagerView.class);
@@ -278,11 +308,14 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").with(eq(page2));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
+        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
+        view.stubs().method("updateTotalRecordCount").with(eq(new Integer(20)));
+
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getDatasetid").withNoArguments().will(returnValue(new Long(2)));
 
         TablePresenter p = new EditableTablePresenter(new Version(), "table", (EditablePageManagerView) view.proxy(),
-                (DataEditorService) services.proxy());
+                (DataEditorService) service.proxy());
 
         p.doDisplayNext();
         p.doDisplayNext();
