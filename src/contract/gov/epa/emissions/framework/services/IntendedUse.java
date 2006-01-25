@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class IntendedUse implements Serializable {
 
     private long id;
+
     private String name;
 
     /*
@@ -15,7 +16,7 @@ public class IntendedUse implements Serializable {
     }
 
     public IntendedUse(String name) {
-        this.name=name;
+        this.name = name;
     }
 
     public long getId() {
@@ -36,6 +37,24 @@ public class IntendedUse implements Serializable {
     
     public String toString(){
         return getName();
+    }
+
+    public boolean equals(Object other) {
+        if (this == other)
+            return true;
+        if (!(other instanceof IntendedUse))
+            return false;
+
+        final IntendedUse iu = (IntendedUse) other;
+
+        if (!(iu.getName().equals(this.getName())))
+            return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        return name.hashCode();
     }
 
 }

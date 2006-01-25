@@ -16,10 +16,14 @@
             name="datasetType" 
             class="gov.epa.emissions.commons.io.DatasetType"
             column="dataset_type"/> 
+
+  <many-to-one
+            name="intendedUse" 
+            class="gov.epa.emissions.framework.services.IntendedUse"
+            column="intended_use"/> 
                   
   <property name="units"				column="units"					type="java.lang.String"		not-null="false"/>
   <property name="region"				column="region"					type="java.lang.String"		not-null="false"/>
-  <property name="intendedUse"			column="intended_use"			type="java.lang.String"		not-null="false"/>
   <property name="year"					column="year"					type="integer"				not-null="false"/>
   <property name="country"				column="country"				type="java.lang.String"		not-null="false"/>
   <property name="temporalResolution"	column="temporal_resolution"	type="java.lang.String"		not-null="false"/>

@@ -29,7 +29,7 @@ public class EmfDataset implements Dataset, Lockable {
 
     private String region;
     
-    private String intendedUse;
+    private IntendedUse intendedUse;
 
     private String country = "US";
 
@@ -320,11 +320,11 @@ public class EmfDataset implements Dataset, Lockable {
         return lock.isLocked();
     }
 
-    public String getIntendedUse() {
+    public IntendedUse getIntendedUse() {
         return intendedUse;
     }
 
-    public void setIntendedUse(String intendedUse) {
+    public void setIntendedUse(IntendedUse intendedUse) {
         this.intendedUse = intendedUse;
     }
 

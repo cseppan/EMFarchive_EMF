@@ -164,7 +164,7 @@ CREATE TABLE emf.datasets
   dataset_type integer,
   units varchar(255),
   region varchar(255),
-  intended_use varchar(255),
+  intended_use integer,
   "year" int4 NOT NULL DEFAULT 0,
   country varchar(255),
   temporal_resolution varchar(255),
