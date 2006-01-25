@@ -91,4 +91,12 @@ public class PageFetch {
             session.close();
         }
     }
+
+    public int defaultPageSize() {
+        Session session = sessionFactory.getSession();
+        int result = cache.defaultPageSize(session);
+        session.close();
+
+        return result;
+    }
 }
