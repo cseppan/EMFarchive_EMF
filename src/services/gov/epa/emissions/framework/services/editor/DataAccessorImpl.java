@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.services.editor;
 
 import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.commons.db.PageReader;
-import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
@@ -13,8 +11,6 @@ import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,11 +28,14 @@ public class DataAccessorImpl implements DataAccessor {
 
     private LockableVersions lockableVersions;
 
+    private PageFetch pageFetch;
+
     public DataAccessorImpl(DataUpdatesCache cache, HibernateSessionFactory sessionFactory) {
         this.cache = cache;
         this.sessionFactory = sessionFactory;
         versions = new Versions();
         lockableVersions = new LockableVersions(versions);
+        pageFetch = new PageFetch(cache, sessionFactory);
     }
 
     public int defaultPageSize() {
@@ -48,67 +47,19 @@ public class DataAccessorImpl implements DataAccessor {
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
-        RecordsFilter filter = new RecordsFilter();
-
-        PageReader reader = cache.reader(token);
-        try {
-            Page page = reader.page(pageNumber);
-            Session session = sessionFactory.getSession();
-            List changesets = cache.changesets(token, pageNumber, session);
-            session.close();
-
-            return filter.filter(page, changesets);
-        } catch (Exception e) {
-            LOG.error("Could not get Page: " + pageNumber + " for Dataset: " + token.datasetId() + ". Reason: " + e);
-            throw new EmfException("Could not get Page: " + pageNumber + " for Dataset: " + token.datasetId());
-        }
+        return pageFetch.getPage(token, pageNumber);
     }
 
     public int getPageCount(DataAccessToken token) throws EmfException {
-        try {
-            PageReader reader = cache.reader(token);
-            return reader.totalPages();
-        } catch (SQLException e) {
-            LOG.error("Failed to get page count. Reason: " + e.getMessage());
-            throw new EmfException("Failed to get page count");
-        }
+        return pageFetch.getPageCount(token);
     }
 
     public Page getPageWithRecord(DataAccessToken token, int record) throws EmfException {
-        try {
-            PageReader reader = cache.reader(token);
-            return reader.pageByRecord(record);
-        } catch (SQLException ex) {
-            LOG.error("Could not obtain the page with Record: " + record + ". Reason: " + ex.getMessage());
-            throw new EmfException("Could not obtain the page with Record: " + record);
-        }
+        return pageFetch.getPageWithRecord(token, record);
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {
-        try {
-            PageReader reader = cache.reader(token);
-            return reader.totalRecords() + netRecordCountIncreaseDueToChanges(token);
-        } catch (Exception e) {
-            LOG.error("Failed to get a count of total number of records. Reason: " + e.getMessage());
-            throw new EmfException("Failed to get a count of total number of records");
-        }
-    }
-
-    private int netRecordCountIncreaseDueToChanges(DataAccessToken token) throws SQLException {
-        Session session = sessionFactory.getSession();
-        int total;
-        try {
-            List changesets = cache.changesets(token, session);
-            total = 0;
-            for (Iterator iter = changesets.iterator(); iter.hasNext();) {
-                ChangeSet element = (ChangeSet) iter.next();
-                total += element.netIncrease();
-            }
-
-            return total;
-        } finally {
-            session.close();
-        }
+        return pageFetch.getTotalRecords(token);
     }
 
     public Version currentVersion(Version reference) throws EmfException {
