@@ -16,7 +16,7 @@ import gov.epa.emissions.framework.client.meta.versions.VersionedDataView;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.EmfDataset;
 
-public class DatasetsBrowserPresenter {
+public class DatasetsBrowserPresenter implements Browser {
 
     private DatasetsBrowserView view;
 
@@ -57,7 +57,7 @@ public class DatasetsBrowserPresenter {
 
     public void doDisplayPropertiesEditor(DatasetPropertiesEditorView propertiesEditorView, EmfDataset dataset)
             throws EmfException {
-        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, serviceLocator, session);
+        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, serviceLocator, session,this);
         doDisplayPropertiesEditor(propertiesEditorView, presenter);
     }
 
@@ -85,6 +85,15 @@ public class DatasetsBrowserPresenter {
         VersionedDataPresenter presenter = new VersionedDataPresenter(session.user(), dataset, serviceLocator
                 .dataEditorService(), serviceLocator.dataViewService());
         presenter.display(versionsView);
+    }
+
+    public void notifyUpdates() {
+        try {
+            doRefresh();
+        } catch (EmfException e) {
+            view.showError(e.getMessage());
+        }
+        
     }
 
 }

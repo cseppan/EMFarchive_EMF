@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.data.Browser;
 import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
@@ -28,10 +29,14 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
 
     private EmfSession session;
 
-    public PropertiesEditorPresenterImpl(EmfDataset dataset, ServiceLocator serviceLocator, EmfSession session) {
+    private Browser browser;
+
+    public PropertiesEditorPresenterImpl(EmfDataset dataset, ServiceLocator serviceLocator, EmfSession session,
+            Browser browserPresenter) {
         this.dataset = dataset;
         this.serviceLocator = serviceLocator;
         this.session = session;
+        this.browser = browserPresenter;
     }
 
     public void doDisplay(DatasetPropertiesEditorView view) throws EmfException {
@@ -65,8 +70,8 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
             return;
         }
 
-        clearChanges();
         view.close();
+        browser.notifyUpdates();
     }
 
     private DataService dataService() {
@@ -90,10 +95,6 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
 
         Keywords keywords = new Keywords(serviceLocator.dataCommonsService().getKeywords());
         keywordsPresenter.display(keywords);
-    }
-
-    private void clearChanges() {
-        unsavedChanges = false;
     }
 
     public void onChange() {

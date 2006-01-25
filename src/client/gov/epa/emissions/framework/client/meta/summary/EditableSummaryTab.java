@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.summary;
 
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
@@ -60,8 +61,6 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private TextArea description;
 
-    private DefaultComboBoxModel sectors;
-
     private DefaultComboBoxModel countries;
 
     private MessagePanel messagePanel;
@@ -71,6 +70,10 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     private DefaultComboBoxModel regions;
 
     private ChangeObserver changeObserver;
+
+    private ComboBox intendedUseCombo;
+
+    private ComboBox sectorsCombo;
 
     public EditableSummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel)
             throws EmfException {
@@ -91,16 +94,16 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         JPanel lowerPanel = new JPanel(new FlowLayout());
 
         lowerPanel.add(createTimeSpaceSection(service, comboxBoxListener));
-        lowerPanel.add(createStatusSection());
+        lowerPanel.add(createStatusSection(service));
 
         return lowerPanel;
     }
 
-    private JPanel createStatusSection() {
+    private JPanel createStatusSection(DataCommonsService service) throws EmfException {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        panel.add(createStatusDatesPanel(), BorderLayout.PAGE_START);
+        panel.add(createStatusDatesAndIntendedUsePanel(service), BorderLayout.PAGE_START);
         panel.add(createSubscriptionPanel(), BorderLayout.CENTER);
 
         return panel;
@@ -123,7 +126,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         return panel;
     }
 
-    private JPanel createStatusDatesPanel() {
+    private JPanel createStatusDatesAndIntendedUsePanel(DataCommonsService service) throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -134,9 +137,12 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
                 .getAccessedDateTime())), panel);
         layoutGenerator.addLabelWidgetPair("Creation Date:", new Label("creationDate", format(dataset
                 .getCreatedDateTime())), panel);
-
+        
+        intendedUseCombo = new ComboBox("Choose an intended use", service.getIntendedUses());
+        //FIXME: set the dataset.getIntendedUse();
+        layoutGenerator.addLabelWidgetPair("Intended Use: ",intendedUseCombo,panel);
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -169,9 +175,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         temporalResolutionsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Temporal Resolution:", temporalResolutionsCombo, panel);
 
-        // sectors
-        sectors = new DefaultComboBoxModel(service.getSectors());
-        JComboBox sectorsCombo = new JComboBox(sectors);
+        sectorsCombo = new ComboBox("Choose a sector",service.getSectors());
         Sector[] datasetSectors = dataset.getSectors();
         //TODO: Change this code, when multiple sector selection is allowed
         if(datasetSectors!=null && datasetSectors.length>0){
@@ -285,7 +289,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         dataset.setTemporalResolution((String) temporalResolutions.getSelectedItem());
         dataset.setRegion((String) regions.getSelectedItem());
         dataset.setCountry((String) countries.getSelectedItem());
-        dataset.setSectors(new Sector[]{ (Sector) sectors.getSelectedItem()});
+        dataset.setSectors(new Sector[]{ (Sector) sectorsCombo.getSelectedItem()});
+        //FIXME: dataset.setIntendedUse((IntendedUse)intendUse.getSelectedItem());
     }
 
     private Date toDate(String text) {
