@@ -116,6 +116,10 @@ public class DataAccessCache implements DataUpdatesCache {
         return Integer.parseInt(pageSize.getValue());
     }
 
+    public int pageSize(DataAccessToken token) {
+        return reader(token).pageSize();
+    }
+
     public void init(DataAccessToken token, int pageSize, Session session) throws SQLException {
         initChangesetsMap(token);
         initReader(token, pageSize, session);

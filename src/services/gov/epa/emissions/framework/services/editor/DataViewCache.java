@@ -15,6 +15,8 @@ public interface DataViewCache {
 
     int defaultPageSize(Session session);
 
+    int pageSize(DataAccessToken token);
+
     void init(DataAccessToken token, int pageSize, Session session) throws SQLException;
 
     void invalidate() throws SQLException;

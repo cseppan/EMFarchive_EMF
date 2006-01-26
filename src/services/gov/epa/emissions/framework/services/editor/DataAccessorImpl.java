@@ -64,7 +64,11 @@ public class DataAccessorImpl implements DataAccessor {
 
     public Page getPageWithRecord(DataAccessToken token, int record) throws EmfException {
         try {
-            return pageFetch.getPageWithRecord(token, record);
+            Session session = sessionFactory.getSession();
+            Page page = pageFetch.getPageWithRecord(token, record, session);
+            session.close();
+
+            return page;
         } catch (Exception ex) {
             LOG.error("Could not obtain the page with Record: " + record + ". Reason: " + ex.getMessage());
             throw new EmfException("Could not obtain the page with Record: " + record);

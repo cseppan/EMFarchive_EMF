@@ -55,4 +55,29 @@ public class PageFetchTest extends MockObjectTestCase {
         fetch.setRange(page, token, session);
         assertEquals(18, page.getMin());
     }
+
+    public void testShouldReturnPageByRecordNumber() throws Exception {
+        Mock cache = mock(DataUpdatesCache.class);
+        cache.stubs().method("pageSize").will(returnValue(10));
+
+        PageFetch fetch = new PageFetch((DataUpdatesCache) cache.proxy());
+
+        DataAccessToken token = new DataAccessToken();
+        Session session = (Session) mock(Session.class).proxy();
+
+        Mock sets1 = mock(ChangeSets.class);
+        sets1.stubs().method("netIncrease").will(returnValue(3));// page 1 - 13 records
+        cache.stubs().method("changesets").with(same(token), eq(new Integer(1)), same(session)).will(
+                returnValue(sets1.proxy()));
+
+        Mock sets2 = mock(ChangeSets.class);
+        sets2.stubs().method("netIncrease").will(returnValue(-1));// page 2 - 9 records
+        cache.stubs().method("changesets").with(same(token), eq(new Integer(2)), same(session)).will(
+                returnValue(sets2.proxy()));
+
+        assertEquals(1, fetch.pageNumber(token, 12, 2, session));
+        assertEquals(2, fetch.pageNumber(token, 14, 2, session));
+        assertEquals(1, fetch.pageNumber(token, 10, 2, session));
+        assertEquals(2, fetch.pageNumber(token, 22, 2, session));
+    }
 }

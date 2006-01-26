@@ -49,9 +49,27 @@ public class PageFetch {
         return reader.totalPages();
     }
 
-    public Page getPageWithRecord(DataAccessToken token, int record) throws Exception {
-        PageReader reader = cache.reader(token);
-        return reader.pageByRecord(record);
+    public Page getPageWithRecord(DataAccessToken token, int record, Session session) throws Exception {
+        int pageCount = cache.pageSize(token);
+        int pageNumber = pageNumber(token, record, pageCount, session);
+        return getPage(token, pageNumber, session);
+    }
+
+    int pageNumber(DataAccessToken token, int record, int pageCount, Session session) throws Exception {
+        int pageSize = cache.pageSize(token);
+        int low = 0;
+        int high = low;
+        for (int i = 1; i <= pageCount; i++) {
+            ChangeSets sets = cache.changesets(token, i, session);
+            int pageMax = pageSize + sets.netIncrease();
+            high = low + pageMax;
+            if ((low < record) && (record <= high))
+                return i;
+
+            low += pageMax;
+        }
+
+        return 0;
     }
 
     public int getTotalRecords(DataAccessToken token, Session session) throws Exception {
@@ -86,4 +104,5 @@ public class PageFetch {
 
         return result;
     }
+
 }

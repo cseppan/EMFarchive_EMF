@@ -162,14 +162,15 @@ public class DataEditorService_DataTest extends ServicesTestCase {
 
         Page page = service.getPageWithRecord(token, numberOfRecords - 1);
         VersionedRecord[] allRecs = page.getRecords();
-        boolean found = false;
 
+        boolean found = false;
         for (int i = 0; i < allRecs.length; i++) {
-            if (allRecs[i].getRecordId() == numberOfRecords - 1) {
+            int recordId = allRecs[i].getRecordId();
+            if (recordId == numberOfRecords - 1) {
                 found = true;
             }
         }
-        assertTrue(found);
+        assertTrue("Could not look up Page by Record Number", found);
     }
 
     public void testShouldReturnNoPage() throws EmfException {
