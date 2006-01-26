@@ -72,6 +72,9 @@ public class TablePaginator {
     }
 
     public void doDisplayPageWithRecord(int record) throws EmfException {
+        if (page.contains(record))
+            return;
+
         page = service.getPageWithRecord(token(), record);
         view.display(page);
     }
