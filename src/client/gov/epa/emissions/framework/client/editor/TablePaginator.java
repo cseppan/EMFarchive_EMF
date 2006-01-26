@@ -72,7 +72,7 @@ public class TablePaginator {
     }
 
     public void doDisplayPageWithRecord(int record) throws EmfException {
-        if (page.contains(record))
+        if (isCurrent(record))
             return;
 
         page = service.getPageWithRecord(token(), record);
@@ -85,6 +85,10 @@ public class TablePaginator {
 
     DataAccessToken token() {
         return new DataAccessToken(version, table);
+    }
+
+    public boolean isCurrent(int record) {
+        return page.contains(record);
     }
 
 }

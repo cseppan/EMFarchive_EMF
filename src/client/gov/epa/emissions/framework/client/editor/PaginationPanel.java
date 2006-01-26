@@ -28,7 +28,7 @@ import javax.swing.event.ChangeListener;
 
 public class PaginationPanel extends JPanel {
 
-    private JFormattedTextField recordInput;
+    private NumberFormattedTextField recordInput;
 
     private TablePresenter presenter;
 
@@ -49,13 +49,14 @@ public class PaginationPanel extends JPanel {
         JPanel container = new JPanel();
 
         JLabel currentName = new JLabel("Current: ");
-        currentName.setToolTipText("Range of displayed records");
         container.add(currentName);
         current = new JLabel("               ");
         current.setToolTipText("Range of displayed records");
         container.add(current);
 
-        totalRecords = new JLabel("Total: " + totalRecordsCount);
+        JLabel totalName = new JLabel("Total: ");
+        container.add(totalName);
+        totalRecords = new JLabel("" + totalRecordsCount);
         totalRecords.setToolTipText("Total Records");
         container.add(totalRecords);
 
@@ -71,11 +72,6 @@ public class PaginationPanel extends JPanel {
         } catch (EmfException e) {
             messagePanel.setError("Could not obtain Total Records. Reason: " + e.getMessage());
         }
-    }
-
-    public void updateStatus(Page page) {
-        current.setText(page.getMin() + " - " + page.getMax());
-        slider.setValue(page.getMin());
     }
 
     private JPanel layoutControls(int totalRecords) {
@@ -104,53 +100,24 @@ public class PaginationPanel extends JPanel {
     private JFormattedTextField recordInputField(final int max) {
         recordInput = new NumberFormattedTextField(1, max, 7, new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if (!verifyInput(max))
+                if (!verifyInput(slider))
                     return;
-                displayPage(Integer.parseInt(recordInput.getText()));
+                int record = Integer.parseInt(recordInput.getText());
+                displayPage(record);
             }
         });
-        recordInput.setInputVerifier(new NumberVerifier(max));
+        recordInput.setInputVerifier(new NumberVerifier());
         recordInput.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent event) {
                 if ("value".equals(event.getPropertyName())) {
-                    Number value = (Number) event.getNewValue();
-                    slider.setValue(value.intValue());
+                    Number record = (Number) event.getNewValue();
+                    displayPage(record.intValue());
                 }
             }
         });
 
         recordInput.setToolTipText("Please input 'record number', and press Enter.");
         return recordInput;
-    }
-
-    private boolean verifyInput(final int max) {
-        AbstractFormatter formatter = recordInput.getFormatter();
-        String val = recordInput.getText();
-
-        try {
-            Integer.parseInt(val);
-            formatter.stringToValue(val);
-            recordInput.commitEdit();
-
-            messagePanel.clear();
-            return true;
-        } catch (Exception pe) {
-            messagePanel.setError("Invalid value: " + val + ". Please use numbers between 1 and " + max);
-            recordInput.selectAll();
-            return false;
-        }
-    }
-
-    public class NumberVerifier extends InputVerifier {
-        private int max;
-
-        NumberVerifier(int max) {
-            this.max = max;
-        }
-
-        public boolean verify(JComponent input) {
-            return verifyInput(max);
-        }
     }
 
     private JSlider slider(int max) {
@@ -162,7 +129,6 @@ public class PaginationPanel extends JPanel {
                 int val = source.getValue();
                 if (!source.getValueIsAdjusting()) { // done adjusting
                     recordInput.setValue(new Integer(val)); // update value
-                    displayPage(val);
                 } else { // value is adjusting; just set the text
                     recordInput.setText(String.valueOf(val));
                 }
@@ -170,6 +136,42 @@ public class PaginationPanel extends JPanel {
         });
 
         return slider;
+    }
+
+    public void updateStatus(Page page) {
+        current.setText(page.getMin() + " - " + page.getMax());
+        slider.setValue(page.getMin());
+    }
+
+    public void updateTotalRecordsCount(int total) {
+        totalRecords.setText("" + total);
+        slider.setMaximum(total);
+        recordInput.setRange(1, total);
+    }
+
+    private boolean verifyInput(JSlider slider) {
+        AbstractFormatter formatter = recordInput.getFormatter();
+        String val = recordInput.getText();
+
+        try {
+            Integer.parseInt(val);
+            formatter.stringToValue(val);
+            recordInput.commitEdit();
+
+            messagePanel.clear();
+            return true;
+        } catch (Exception pe) {
+            messagePanel.setError("Invalid value: " + val + ". Please use numbers between " + slider.getMinimum()
+                    + " and " + slider.getMaximum());
+            recordInput.selectAll();
+            return false;
+        }
+    }
+
+    public class NumberVerifier extends InputVerifier {
+        public boolean verify(JComponent input) {
+            return verifyInput(slider);
+        }
     }
 
     // FIXME: change messages about 'page' to 'range' ??
@@ -261,11 +263,6 @@ public class PaginationPanel extends JPanel {
         } catch (EmfException e) {
             messagePanel.setError("Could not display First Page. Reason: " + e.getMessage());
         }
-    }
-
-    public void updateTotalRecordsCount(int total) {
-        totalRecords.setText("Total Records: " + total);
-        slider.setMaximum(total);
     }
 
 }

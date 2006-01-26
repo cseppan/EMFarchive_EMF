@@ -50,6 +50,9 @@ public class EditableTablePresenter implements TablePresenter {
     }
 
     public void doDisplayPageWithRecord(int record) throws EmfException {
+        if (paginator.isCurrent(record))
+            return;
+
         submitChanges();
         paginator.doDisplayPageWithRecord(record);
     }
@@ -64,7 +67,7 @@ public class EditableTablePresenter implements TablePresenter {
             service.submit(paginator.token(), changeset, paginator.pageNumber());
             changeset.clear();
         }
-        
+
         view.updateTotalRecordsCount(paginator.totalRecords());
     }
 

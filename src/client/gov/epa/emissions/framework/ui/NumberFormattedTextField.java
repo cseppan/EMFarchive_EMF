@@ -32,4 +32,8 @@ public class NumberFormattedTextField extends JFormattedTextField {
         return formatter;
     }
 
+    public void setRange(int min, int max) {
+        super.setFormatterFactory(new DefaultFormatterFactory(formatter(min, max)));
+    }
+
 }

@@ -15,6 +15,8 @@ public class TablePaginatorTest extends MockObjectTestCase {
         Page page = new Page();
         page.setMin(20);
         page.add(new VersionedRecord());
+        page.add(new VersionedRecord());
+        page.add(new VersionedRecord());
         service.stubs().method("getPage").will(returnValue(page));
         
         Mock view = mock(TableView.class);
@@ -23,6 +25,8 @@ public class TablePaginatorTest extends MockObjectTestCase {
         TablePaginator paginator = new TablePaginator(null, null, (TableView)view.proxy(), (DataAccessService) service.proxy());
         paginator.doDisplayFirst();
         
-        paginator.doDisplayPageWithRecord(12);
+        paginator.doDisplayPageWithRecord(20);
+        paginator.doDisplayPageWithRecord(21);
+        paginator.doDisplayPageWithRecord(22);
     }
 }
