@@ -40,4 +40,8 @@ public interface DataAccessor {
 
     DataAccessToken renewLock(DataAccessToken token) throws EmfException;
 
+    void lock(User user, DataAccessToken token) throws EmfException;
+
+    boolean isLocked(Version version) throws EmfException;
+
 }

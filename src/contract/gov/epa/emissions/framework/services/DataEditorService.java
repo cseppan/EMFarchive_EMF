@@ -15,9 +15,7 @@ public interface DataEditorService extends DataAccessService {
 
     Version derive(Version baseVersion, String name) throws EmfException;
 
-    Version markFinal(Version derived) throws EmfException;
-
-    Version markFinal(User owner, DataAccessToken token) throws EmfException;
+    Version markFinal(DataAccessToken token) throws EmfException;
 
     // session
     DataAccessToken openSession(User user, DataAccessToken token) throws EmfException;

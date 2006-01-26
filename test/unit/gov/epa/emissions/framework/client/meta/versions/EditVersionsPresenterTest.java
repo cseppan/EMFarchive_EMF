@@ -145,7 +145,8 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         version.setVersion(8);
 
         Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("markFinal").with(same(version)).will(returnValue(new Version()));
+        service.expects(once()).method("markFinal").with(new IsInstanceOf(DataAccessToken.class)).will(
+                returnValue(new Version()));
 
         Version[] versions = {};
 

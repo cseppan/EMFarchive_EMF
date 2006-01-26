@@ -137,4 +137,12 @@ public class DataAccessorImpl implements DataAccessor {
         return sessionLifecycle.renewLock(token);
     }
 
+    public void lock(User user, DataAccessToken token) throws EmfException {
+        sessionLifecycle.obtainLock(user, token);
+    }
+
+    public boolean isLocked(Version version) throws EmfException {
+        return currentVersion(version).isLocked();
+    }
+
 }

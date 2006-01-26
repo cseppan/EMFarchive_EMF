@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.editor.DataEditorPresenter;
 import gov.epa.emissions.framework.client.editor.DataEditorView;
 import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
+import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -45,7 +46,8 @@ public class EditVersionsPresenter {
 
     public void doView(Version version, String table, DataView view) throws EmfException {
         if (!version.isFinalVersion())
-            throw new EmfException("Cannot view a Version(" + version.getVersion() + ") that is not Final. Please choose edit.");
+            throw new EmfException("Cannot view a Version(" + version.getVersion()
+                    + ") that is not Final. Please choose edit.");
 
         DataViewPresenter presenter = new DataViewPresenter(version, table, view, viewService);
         presenter.display();
@@ -53,7 +55,8 @@ public class EditVersionsPresenter {
 
     public void doEdit(Version version, String table, DataEditorView view) throws EmfException {
         if (version.isFinalVersion())
-            throw new EmfException("Cannot edit a Version(" + version.getVersion() + ") that is Final. Please choose 'view'.");
+            throw new EmfException("Cannot edit a Version(" + version.getVersion()
+                    + ") that is Final. Please choose 'view'.");
 
         DataEditorPresenter presenter = new DataEditorPresenter(user, version, table, service);
         presenter.display(view);
@@ -64,10 +67,14 @@ public class EditVersionsPresenter {
             if (versions[i].isFinalVersion())
                 throw new EmfException("Version: " + versions[i].getVersion()
                         + " is already Final. It should be non-final.");
-            service.markFinal(versions[i]);
+            service.markFinal(token(versions[i]));
         }
 
         reload(dataset);
+    }
+
+    private DataAccessToken token(Version version) {
+        return new DataAccessToken(version, null);
     }
 
     private void reload(EmfDataset dataset) throws EmfException {

@@ -146,7 +146,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         return token;
     }
 
-    public Version markFinal(Version derived) throws EmfException {
+    Version doMarkFinal(Version derived) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             Version version = versions.markFinal(derived, session);
@@ -159,17 +159,14 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
     }
 
-    public Version markFinal(User user, DataAccessToken token) throws EmfException {
-        DataAccessToken current = openSession(user, token);
-        Version derived = current.getVersion();
-        if (!current.isLocked(user))
+    public Version markFinal(DataAccessToken token) throws EmfException {
+        Version derived = token.getVersion();
+        Version current = accessor.currentVersion(derived);
+        if (current.isLocked())
             throw new EmfException("Cannot mark Version: " + derived.getName() + " Final as it is locked by "
-                    + current.getVersion().getLockOwner());// abort, implicit failure ??
+                    + current.getLockOwner());
 
-        Version result = markFinal(derived);
-        closeSession(current);
-        
-        return result;
+        return doMarkFinal(derived);
     }
 
     public Version[] getVersions(long datasetId) throws EmfException {

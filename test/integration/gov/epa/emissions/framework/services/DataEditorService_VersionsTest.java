@@ -11,7 +11,6 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
-import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.editor.DataEditorServiceImpl;
 import gov.epa.emissions.framework.services.impl.UserServiceImpl;
@@ -90,7 +89,7 @@ public class DataEditorService_VersionsTest extends ServicesTestCase {
         Versions versions = new Versions();
         return versions.get(dataset.getDatasetid(), 0, session);
     }
-    
+
     private Version derived() {
         Versions versions = new Versions();
         return versions.get(dataset.getDatasetid(), 1, session);
@@ -120,14 +119,14 @@ public class DataEditorService_VersionsTest extends ServicesTestCase {
         assertFalse("Derived version should be non-final", derived.isFinalVersion());
     }
 
-    public void testShouldBeAbleToMarkADerivedVersionAsFinal() throws Exception {
-        Version[] versions = service.getVersions(dataset.getDatasetid());
-        Version versionZero = versions[0];
-        Version derived = service.derive(versionZero, "v 1");
+    public void testShouldBeAbleToMarkADerivedVersionAsFinalAfterObtainingLockOnVersion() throws Exception {
+        Version versionZero = versionZero();
+        Version derived = service.derive(versionZero, "v2");
         assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
-        assertEquals("v 1", derived.getName());
+        assertEquals("v2", derived.getName());
 
-        Version finalVersion = service.markFinal(derived);
+        DataAccessToken tokenDerived = token(derived);
+        Version finalVersion = service.markFinal(tokenDerived);
 
         assertNotNull("Should be able to mark a 'derived' as a Final version", derived);
         assertEquals(derived.getDatasetId(), finalVersion.getDatasetId());
@@ -137,55 +136,20 @@ public class DataEditorService_VersionsTest extends ServicesTestCase {
 
         Version[] updated = service.getVersions(dataset.getDatasetid());
         assertEquals(3, updated.length);
-        assertEquals("v 1", updated[2].getName());
-        assertTrue("Derived version (loaded from db) should be final on being marked 'final'", updated[2]
-                .isFinalVersion());
-    }
-
-    public void testShouldBeAbleToMarkADerivedVersionAsFinalAfterObtainingLockOnVersion() throws Exception {
-        Version versionZero = versionZero();
-        Version derived = service.derive(versionZero, "v2");
-        assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
-        assertEquals("v2", derived.getName());
-
-        User owner = userService.getUser("emf");
-        DataAccessToken tokenDerived = token(derived);
-        Version finalVersion = service.markFinal(owner, tokenDerived);
-
-        assertTrue("Derived version should be final on being marked 'final'", finalVersion.isFinalVersion());
-
-        Version[] updated = service.getVersions(dataset.getDatasetid());
-        assertEquals(3, updated.length);
         assertEquals("v2", updated[2].getName());
         assertTrue("Derived version (loaded from db) should be final on being marked 'final'", updated[2]
                 .isFinalVersion());
     }
-    
+
     public void testShouldRaiseErrorOnMarkFinalIfItIsLockedByAnotherUser() throws Exception {
-        User owner = userService.getUser("admin");
         DataAccessToken tokenDerived = token(derived());
         try {
-            service.markFinal(owner, tokenDerived);
+            service.markFinal(tokenDerived);
         } catch (EmfException e) {
             return;
         }
-      
+
         fail("Should have raised an error as the version is locked by another user");
     }
 
-    public void testShouldMarkFinalAndRetrieveVersions() throws Exception {
-        Version[] versions = service.getVersions(dataset.getDatasetid());
-        Version versionZero = versions[0];
-        Version derived = service.derive(versionZero, "v 1");
-        assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
-        assertEquals("v 1", derived.getName());
-
-        Version finalVersion = service.markFinal(derived);
-        assertEquals(derived.getDatasetId(), finalVersion.getDatasetId());
-        assertEquals(derived.getVersion(), finalVersion.getVersion());
-
-        Version[] updatedVersions = service.getVersions(dataset.getDatasetid());
-        assertEquals(versionZero.getVersion(), updatedVersions[0].getVersion());
-        assertEquals(finalVersion.getVersion(), updatedVersions[2].getVersion());
-    }
 }
