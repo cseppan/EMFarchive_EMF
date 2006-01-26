@@ -49,7 +49,8 @@ public class UserPreferences {
         if (property != null && new File(property).exists())
             return new File(property);
 
-        return new File(System.getProperty("user.home"), "EMFPrefs.txt");
+        return new File(System.getProperty("user.home"), 
+           gov.epa.emissions.framework.install.installer.Constants.EMF_CLIENT_PREFERENCES_FILE);
     }
 
     public boolean checkFile(String fileName) {
