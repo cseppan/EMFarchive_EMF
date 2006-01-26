@@ -112,9 +112,7 @@ public class SessionLifecycle {
         if (!token.isLocked(user))
             return token;// abort
 
-        token = open(token, pageSize);
-
-        return token;
+        return open(token, pageSize);
     }
 
     void releaseLock(DataAccessToken token) throws EmfException {

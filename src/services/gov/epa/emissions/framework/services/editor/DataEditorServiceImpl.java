@@ -86,8 +86,8 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
 
             return derived;
         } catch (HibernateException e) {
-            LOG.error("Could not derive a new Version from the base Version: " + base.getVersion()
-                    + " of Dataset: " + base.getDatasetId() + ". Reason: " + e);
+            LOG.error("Could not derive a new Version from the base Version: " + base.getVersion() + " of Dataset: "
+                    + base.getDatasetId() + ". Reason: " + e);
             throw new EmfException("Could not derive a new Version from the base Version: " + base.getVersion()
                     + " of Dataset: " + base.getDatasetId());
         }
@@ -157,6 +157,19 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
             LOG.error("Could not mark a derived Version: " + derived.getDatasetId() + " as Final" + ". Reason: " + e);
             throw new EmfException("Could not mark a derived Version: " + derived.getDatasetId() + " as Final");
         }
+    }
+
+    public Version markFinal(User user, DataAccessToken token) throws EmfException {
+        DataAccessToken current = openSession(user, token);
+        Version derived = current.getVersion();
+        if (!current.isLocked(user))
+            throw new EmfException("Cannot mark Version: " + derived.getName() + " Final as it is locked by "
+                    + current.getVersion().getLockOwner());// abort, implicit failure ??
+
+        Version result = markFinal(derived);
+        closeSession(current);
+        
+        return result;
     }
 
     public Version[] getVersions(long datasetId) throws EmfException {

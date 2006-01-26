@@ -11,6 +11,8 @@ import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
 import gov.epa.emissions.commons.io.importer.VersionedImporter;
 import gov.epa.emissions.commons.io.orl.ORLNonPointImporter;
+import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.editor.DataEditorServiceImpl;
 import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
@@ -30,9 +32,11 @@ public class DataEditorService_VersionsTest extends ServicesTestCase {
 
     private DataAccessToken token;
 
+    private UserServiceImpl userService;
+
     protected void doSetUp() throws Exception {
         service = new DataEditorServiceImpl(emf(), super.dbServer(), sessionFactory());
-        UserServiceImpl userService = new UserServiceImpl(sessionFactory());
+        userService = new UserServiceImpl(sessionFactory());
 
         datasource = emissions();
 
@@ -79,14 +83,17 @@ public class DataEditorService_VersionsTest extends ServicesTestCase {
     }
 
     private DataAccessToken token(Version version, String table) {
-        DataAccessToken result = new DataAccessToken(version, table);
-
-        return result;
+        return new DataAccessToken(version, table);
     }
 
     private Version versionZero() {
         Versions versions = new Versions();
         return versions.get(dataset.getDatasetid(), 0, session);
+    }
+    
+    private Version derived() {
+        Versions versions = new Versions();
+        return versions.get(dataset.getDatasetid(), 1, session);
     }
 
     public void testShouldHaveVersionZeroAfterDatasetImport() throws Exception {
@@ -133,6 +140,37 @@ public class DataEditorService_VersionsTest extends ServicesTestCase {
         assertEquals("v 1", updated[2].getName());
         assertTrue("Derived version (loaded from db) should be final on being marked 'final'", updated[2]
                 .isFinalVersion());
+    }
+
+    public void testShouldBeAbleToMarkADerivedVersionAsFinalAfterObtainingLockOnVersion() throws Exception {
+        Version versionZero = versionZero();
+        Version derived = service.derive(versionZero, "v2");
+        assertEquals(versionZero.getDatasetId(), derived.getDatasetId());
+        assertEquals("v2", derived.getName());
+
+        User owner = userService.getUser("emf");
+        DataAccessToken tokenDerived = token(derived);
+        Version finalVersion = service.markFinal(owner, tokenDerived);
+
+        assertTrue("Derived version should be final on being marked 'final'", finalVersion.isFinalVersion());
+
+        Version[] updated = service.getVersions(dataset.getDatasetid());
+        assertEquals(3, updated.length);
+        assertEquals("v2", updated[2].getName());
+        assertTrue("Derived version (loaded from db) should be final on being marked 'final'", updated[2]
+                .isFinalVersion());
+    }
+    
+    public void testShouldRaiseErrorOnMarkFinalIfItIsLockedByAnotherUser() throws Exception {
+        User owner = userService.getUser("admin");
+        DataAccessToken tokenDerived = token(derived());
+        try {
+            service.markFinal(owner, tokenDerived);
+        } catch (EmfException e) {
+            return;
+        }
+      
+        fail("Should have raised an error as the version is locked by another user");
     }
 
     public void testShouldMarkFinalAndRetrieveVersions() throws Exception {

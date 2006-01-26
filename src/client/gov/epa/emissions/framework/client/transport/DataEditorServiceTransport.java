@@ -273,6 +273,27 @@ public class DataEditorServiceTransport implements DataEditorService {
         return null;
     }
 
+    public Version markFinal(User owner, DataAccessToken token) throws EmfException {
+        Version version = token.getVersion();
+        try {
+            mappings.addParam(call, "owner", mappings.user());
+            mappings.addParam(call, "token", mappings.dataAccessToken());
+            mappings.setOperation(call, "markFinal");
+            mappings.setReturnType(call, mappings.version());
+
+            return (Version) call.invoke(new Object[] { owner, token });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to mark a derived Version: " + version.getVersion() + " as Final", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to mark a derived Version: " + version.getVersion() + " as Final",
+                    e);
+        } finally {
+            call.removeAllParameters();
+        }
+
+        return null;
+    }
+
     public Version[] getVersions(long datasetId) throws EmfException {
         try {
             mappings.addLongParam(call, "datasetId");
