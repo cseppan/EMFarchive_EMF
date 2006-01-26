@@ -67,7 +67,7 @@ public class InstallWindow extends JFrame implements InstallView  {
 
 		//Create widgets.		
 		url = new JTextField(30);
-		javaHomeDirField = new JTextField(Generic.JAVA_HOME);
+		javaHomeDirField = new JTextField(Constants.JAVA_HOME);
 		inputDirField = new JTextField(30);
 		outputDirField = new JTextField(30);
         installDirField = new JTextField(30);
@@ -82,7 +82,7 @@ public class InstallWindow extends JFrame implements InstallView  {
 		holderLabel1 = new JLabel();
 		holderLabel2 = new JLabel();
 		holderLabel3 = new JLabel();
-        load = new JLabel(Generic.EMF_MESSAGE);
+        load = new JLabel(Constants.EMF_MESSAGE);
         
 		javaHomeBrowser = new JButton("Browse...");
 		inputDirBrowser = new JButton("Browse...");
@@ -109,11 +109,12 @@ public class InstallWindow extends JFrame implements InstallView  {
 		outputDirBrowser.addActionListener(new Browse3Listener());
         installDirBrowser.addActionListener(new InstallDirBrowserListener());
 				
-		File preference = new File(System.getProperty("user.home"), Generic.USER_PARAMETER);
+        // first look in the user home directory for the preferences file
+		File preference = new File(System.getProperty("user.home"), Constants.INSTALLER_PREFERENCES_FILE);
 		if(preference.exists()){
             getUserPreferences();
 		}
-		
+        		
 		//Set the default button.
 		getRootPane().setDefaultButton(installButton);
 		
@@ -128,7 +129,7 @@ public class InstallWindow extends JFrame implements InstallView  {
 		getContentPane().add(cards,BorderLayout.CENTER);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(new Dimension(600, 800));
-		setTitle("EMF Client Installer -- " + Generic.VERSION);
+		setTitle("EMF Client Installer -- " + Constants.VERSION);
 		pack();
 	}
     
@@ -316,7 +317,7 @@ public class InstallWindow extends JFrame implements InstallView  {
                 CardLayout cl = (CardLayout)(cards.getLayout());
                 cl.show(cards, PAGETWO);
                 presenter.writePreference(website, inputdir, outputdir, javahome, installhome, server);
-                presenter.startDownload(website, Generic.FILE_LIST, installhome);
+                presenter.startDownload(website, Constants.FILE_LIST, installhome);
             }
 		}
 	}
@@ -374,10 +375,10 @@ public class InstallWindow extends JFrame implements InstallView  {
         String javahome = javaHomeDirField.getText();
         String installhome = installDirField.getText();
         String server = serverField.getText();
-        presenter.createBatchFile(installhome + "\\" + Generic.EMF_BATCH_FILE,
-                Generic.EMF_PARAMETER, javahome, server);
+        presenter.createBatchFile(installhome + "\\" + Constants.EMF_BATCH_FILE,
+                Constants.EMF_CLIENT_PREFERENCES_FILE, javahome, server);
         presenter.createShortcut();
-        load.setText(Generic.EMF_CLOSE_MESSAGE);
+        load.setText(Constants.EMF_CLOSE_MESSAGE);
         cancel.setText("Done");
     }
     
@@ -397,10 +398,11 @@ public class InstallWindow extends JFrame implements InstallView  {
         }
             
         if(!message.equals("")) {
-            message += " does not exist." + Generic.SEPARATOR +
-                "Do you want to proceed to install EMF client?";
+            message += " does not exist." + Constants.SEPARATOR +
+                "Do you want to proceed with installing the EMF client?";
+            return JOptionPane.showConfirmDialog(this, message);
         }
             
-        return JOptionPane.showConfirmDialog(this, message);
+        return JOptionPane.OK_OPTION;
     }
 }

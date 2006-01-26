@@ -35,7 +35,7 @@ public class CreateDownloadFilesList {
 //		File[] files = homeDirectory.listFiles();
         File[] files = getFiles(dir);
 		printer = new PrintWriter(new BufferedWriter(
-				new FileWriter(System.getProperty("user.home") + File.separatorChar + Generic.FILE_LIST)));
+				new FileWriter(System.getProperty("user.home") + File.separatorChar + Constants.FILE_LIST)));
 		printHeader();
 		createFilesList(files);
 		printer.close();

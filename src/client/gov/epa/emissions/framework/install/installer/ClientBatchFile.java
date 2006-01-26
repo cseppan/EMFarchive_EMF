@@ -11,7 +11,7 @@ public class ClientBatchFile {
     
     private PrintWriter writer;
     
-    private final String sep = Generic.SEPARATOR;
+    private final String sep = Constants.SEPARATOR;
     
     private File batchFile;
 

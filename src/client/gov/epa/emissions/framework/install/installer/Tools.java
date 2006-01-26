@@ -50,7 +50,7 @@ public class Tools {
             String time1 = st.nextToken().trim();
             String time2 = st.nextToken().trim();
 
-            SimpleDateFormat sdf = new SimpleDateFormat(Generic.TIME_FORMAT);
+            SimpleDateFormat sdf = new SimpleDateFormat(Constants.TIME_FORMAT);
             Date date = sdf.parse(time1 + " " + time2);
             file.setLastModified(date.getTime());
         }
@@ -58,7 +58,7 @@ public class Tools {
 
     public static void writePreference(String website, String input, String output, 
             String javahome, String emfhome, String server) throws Exception {
-        String separator = Generic.SEPARATOR;
+        String separator = Constants.SEPARATOR;
         String emfPrefString = "local.input.drive=" + input.charAt(0) + separator + "local.output.drive="
                 + output.charAt(0) + separator + "remote.input.drive=/data" + separator + "remote.output.drive=/data"
                 + separator + "default.input.folder=" + input.substring(3).replace('\\', '/') + separator
@@ -74,9 +74,9 @@ public class Tools {
                 + "java.home=" + javahome.replace('\\', '/') + separator;
 
         PrintWriter userPrefWriter = new PrintWriter(new BufferedWriter(new FileWriter(System.getProperty("user.home")
-                + "\\" + Generic.USER_PARAMETER)));
+                + "\\" + Constants.INSTALLER_PREFERENCES_FILE)));
         PrintWriter emfPrefWriter = new PrintWriter(new BufferedWriter(new FileWriter(System.getProperty("user.home")
-                + "\\" + Generic.EMF_PARAMETER)));
+                + "\\" + Constants.EMF_CLIENT_PREFERENCES_FILE)));
         userPrefWriter.write(towrite);
         emfPrefWriter.write(emfPrefString);
         userPrefWriter.close();

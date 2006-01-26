@@ -93,7 +93,7 @@ public class Download extends Thread{
 	}
     
     private void createShortcutBatchFile(File bat, File inf){
-        String separator = Generic.SEPARATOR;
+        String separator = Constants.SEPARATOR;
         
         String battext = "\n@echo off & setlocal" + separator +
                          "\nset inf=rundll32 setupapi,InstallHinfSection DefaultInstall" + separator +
@@ -107,7 +107,7 @@ public class Download extends Thread{
                          "[Addlink]" + separator +
                          "setup.ini, progman.groups,, \"\"group200=\"EMF\"\"\"" + separator +
                          "setup.ini, group200,, \"\"\"EMF Client\"\",\"\"\"\"\"\"" + installhome.replace('\\', '/') + 
-                         "/" + Generic.EMF_BATCH_FILE + "\"\"\"\"\"\"" + separator;
+                         "/" + Constants.EMF_BATCH_FILE + "\"\"\"\"\"\"" + separator;
         
         try{
             FileWriter fw1 = new FileWriter(bat);
@@ -150,7 +150,7 @@ public class Download extends Thread{
         BufferedReader content = new  BufferedReader(new InputStreamReader(is));
         FileWriter fw = new FileWriter(download);
         while((s = content.readLine()) != null){
-            out += s + Generic.SEPARATOR;   
+            out += s + Constants.SEPARATOR;   
         }
         is.close();
         fw.write(out);
@@ -158,7 +158,7 @@ public class Download extends Thread{
     }
     
     private File2Download[] getFiles2Download() {
-        File list = new File(installhome, Generic.FILE_LIST);
+        File list = new File(installhome, Constants.FILE_LIST);
         if(list.exists()){
             TextParser parser = new TextParser(list, ";");
             parser.parse();

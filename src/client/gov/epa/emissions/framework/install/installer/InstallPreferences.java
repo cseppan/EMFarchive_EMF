@@ -43,7 +43,7 @@ public class InstallPreferences {
         if (property != null && new File(property).exists())
             return new File(property);
 
-        return new File(System.getProperty("user.home"), Generic.USER_PARAMETER);
+        return new File(System.getProperty("user.home"), Constants.INSTALLER_PREFERENCES_FILE);
     }
 
     public boolean checkFile(String fileName) {
