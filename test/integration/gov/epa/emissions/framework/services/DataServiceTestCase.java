@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.commons.io.Project;
+import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
@@ -97,10 +99,10 @@ public abstract class DataServiceTestCase extends ServicesTestCase {
         EmfDataset dataset = newDataset();
         try {
             EmfDataset locked = service.obtainLockedDataset(owner, dataset);
-            locked.setProject("FOOBAR");
+            locked.setProject(new Project("FOOBAR"));
 
             EmfDataset released = service.updateDataset(locked);
-            assertEquals("FOOBAR", released.getProject());
+            assertEquals("FOOBAR", released.getProject().getName());
         } finally {
             remove(dataset);
         }
@@ -111,10 +113,10 @@ public abstract class DataServiceTestCase extends ServicesTestCase {
         EmfDataset dataset = newDataset();
         try {
             EmfDataset locked = service.obtainLockedDataset(owner, dataset);
-            locked.setRegion("FOOBAR");
+            locked.setRegion(new Region("FOOBAR"));
 
             EmfDataset released = service.updateDataset(locked);
-            assertEquals("FOOBAR", released.getRegion());
+            assertEquals("FOOBAR", released.getRegion().getName());
         } finally {
             remove(dataset);
         }

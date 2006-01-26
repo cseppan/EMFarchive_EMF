@@ -137,7 +137,7 @@
 		qname="ns1:KeyVal" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
-		languageSpecificType="java:gov.epa.emissions.framework.services.Country"
+		languageSpecificType="java:gov.epa.emissions.commons.io.Country"
 		qname="ns1:Country" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 		
 	<beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Sector"
@@ -147,10 +147,10 @@
 		languageSpecificType="java:gov.epa.emissions.commons.io.SectorCriteria"
 		qname="ns1:SectorCriteria" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 	
-	<beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.Region"
+	<beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Region"
 		qname="ns1:Region" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
-	<beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.Project"
+	<beanMapping languageSpecificType="java:gov.epa.emissions.commons.io.Project"
 		qname="ns1:Project" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping languageSpecificType="java:gov.epa.emissions.framework.services.IntendedUse"
@@ -181,12 +181,12 @@
 	
 	<!-- Arrays of Structs -->
 	<arrayMapping qname="ns1:Sectors" xmlns:ns1="urn:gov.epa.services.EmfService"
-		languageSpecificType="java:gov.epa.emissions.framework.services.Region[]"
+		languageSpecificType="java:gov.epa.emissions.commons.io.Region[]"
 		innerType="ns1:Regions"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<arrayMapping qname="ns1:Sectors" xmlns:ns1="urn:gov.epa.services.EmfService"
-		languageSpecificType="java:gov.epa.emissions.framework.services.Project[]"
+		languageSpecificType="java:gov.epa.emissions.commons.io.Project[]"
 		innerType="ns1:Projects"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
@@ -257,7 +257,7 @@
 	
 	<arrayMapping qname="ns1:Countries"
 		xmlns:ns1="urn:gov.epa.services.EmfService"
-		languageSpecificType="java:gov.epa.emissions.framework.services.Country[]"
+		languageSpecificType="java:gov.epa.emissions.commons.io.Country[]"
 		innerType="ns1:Country"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	

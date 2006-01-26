@@ -48,7 +48,7 @@ ALTER TABLE emf.countries_id_seq OWNER TO emf;
 --
 CREATE TABLE emf.countries
 (
-  id serial NOT NULL,
+  id int4 NOT NULL DEFAULT nextval('emf.countries_id_seq'::regclass),
   name varchar(255) NOT NULL,
   CONSTRAINT countries_pk PRIMARY KEY (id),
   CONSTRAINT countries_id_key UNIQUE (id)
@@ -163,15 +163,15 @@ CREATE TABLE emf.datasets
   status varchar(255),
   dataset_type integer,
   units varchar(255),
-  region varchar(255),
+  region integer,
   intended_use integer,
   "year" int4 NOT NULL DEFAULT 0,
-  country varchar(255),
+  country integer,
   temporal_resolution varchar(255),
   start_date_time timestamp,
   stop_date_time timestamp,
   description text,
-  project varchar(255),
+  project integer,
   created_date_time timestamp,
   modified_date_time timestamp,
   accessed_date_time timestamp,

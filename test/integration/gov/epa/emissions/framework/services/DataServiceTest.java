@@ -1,5 +1,8 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.commons.io.Country;
+import gov.epa.emissions.commons.io.Project;
+import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
@@ -40,6 +43,7 @@ public class DataServiceTest extends ServicesTestCase {
         assertEquals(0, datasets.length);
 
         EmfDataset dataset = newDataset();
+
         try {
             EmfDataset[] postInsert = service.getDatasets();
             assertEquals(1, postInsert.length);
@@ -130,11 +134,11 @@ public class DataServiceTest extends ServicesTestCase {
         }
     }
 
-    private void remove(EmfDataset dataset) {
+    private void remove(Object object) {
         session.clear();// flush cached objects
 
         Transaction tx = session.beginTransaction();
-        session.delete(dataset);
+        session.delete(object);
         tx.commit();
     }
 
@@ -157,31 +161,55 @@ public class DataServiceTest extends ServicesTestCase {
         }
     }
 
+    public void testShouldAddCountry() throws EmfException {
+        User owner = userService.getUser("emf");
+        EmfDataset dataset = newDataset();
+
+        Country country = new Country("FOOBAR");
+        try {
+            EmfDataset locked = service.obtainLockedDataset(owner, dataset);
+            dataCommonsService.addCountry(country);
+            locked.setCountry(country);
+
+            EmfDataset released = service.updateDataset(locked);
+            assertEquals("FOOBAR", released.getCountry().getName());
+        } finally {
+            remove(dataset);
+            remove(country);
+        }
+    }
+
     public void testShouldAddProject() throws EmfException {
         User owner = userService.getUser("emf");
         EmfDataset dataset = newDataset();
+
+        Project project = new Project("FOOBAR");
         try {
             EmfDataset locked = service.obtainLockedDataset(owner, dataset);
-            locked.setProject("FOOBAR");
+            dataCommonsService.addProject(project);
+            locked.setProject(project);
 
             EmfDataset released = service.updateDataset(locked);
-            assertEquals("FOOBAR", released.getProject());
+            assertEquals("FOOBAR", released.getProject().getName());
         } finally {
             remove(dataset);
+            remove(project);
         }
     }
 
     public void testShouldAddRegion() throws EmfException {
         User owner = userService.getUser("emf");
         EmfDataset dataset = newDataset();
+        Region region = new Region("FOOBAR");
         try {
             EmfDataset locked = service.obtainLockedDataset(owner, dataset);
-            locked.setRegion("FOOBAR");
-
+            locked.setRegion(region);
+            dataCommonsService.addRegion(region);
             EmfDataset released = service.updateDataset(locked);
-            assertEquals("FOOBAR", released.getRegion());
+            assertEquals("FOOBAR", released.getRegion().getName());
         } finally {
             remove(dataset);
+            remove(region);
         }
     }
 

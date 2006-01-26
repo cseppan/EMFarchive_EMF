@@ -1,16 +1,16 @@
 package gov.epa.emissions.framework.services.impl;
 
+import gov.epa.emissions.commons.io.Country;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.commons.io.Project;
+import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DataCommonsDAO;
-import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.IntendedUse;
-import gov.epa.emissions.framework.services.Project;
-import gov.epa.emissions.framework.services.Region;
 import gov.epa.emissions.framework.services.Status;
 
 import java.util.List;
@@ -254,6 +254,18 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         } catch (HibernateException e) {
             LOG.error("Could not add new intended use. Reason: " + e);
             throw new EmfException("Could not add new intended use");
+        }
+        
+    }
+
+    public void addCountry(Country country) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.add(country,session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Could not add new country. Reason: " + e);
+            throw new EmfException("Could not add new country");
         }
         
     }

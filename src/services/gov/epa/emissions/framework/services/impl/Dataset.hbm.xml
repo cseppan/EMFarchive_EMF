@@ -21,16 +21,29 @@
             name="intendedUse" 
             class="gov.epa.emissions.framework.services.IntendedUse"
             column="intended_use"/> 
+
+  <many-to-one
+            name="project" 
+            class="gov.epa.emissions.commons.io.Project"
+            column="project"/> 
+
+  <many-to-one
+            name="country" 
+            class="gov.epa.emissions.commons.io.Country"
+            column="country"/> 
+
+  <many-to-one
+            name="region" 
+            class="gov.epa.emissions.commons.io.Region"
+            column="region"/> 
+
                   
   <property name="units"				column="units"					type="java.lang.String"		not-null="false"/>
-  <property name="region"				column="region"					type="java.lang.String"		not-null="false"/>
   <property name="year"					column="year"					type="integer"				not-null="false"/>
-  <property name="country"				column="country"				type="java.lang.String"		not-null="false"/>
   <property name="temporalResolution"	column="temporal_resolution"	type="java.lang.String"		not-null="false"/>
   <property name="startDateTime"		column="start_date_time"   		type="java.util.Date"		not-null="false"	length="4"/>
   <property name="stopDateTime"			column="stop_date_time" 		type="java.util.Date"		not-null="false"	length="4"/>
   <property name="description"			column="description"			type="java.lang.String"		not-null="false"/>
-  <property name="project"				column="project"				type="java.lang.String"		not-null="false"/>
   <property name="createdDateTime"		column="created_date_time" 		type="java.util.Date"		not-null="false"	length="4"/>
   <property name="modifiedDateTime"		column="modified_date_time" 	type="java.util.Date"		not-null="false"	length="4"/>
   <property name="accessedDateTime"		column="accessed_date_time" 	type="java.util.Date"		not-null="false"	length="4"/>        

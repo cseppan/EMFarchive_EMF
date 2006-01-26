@@ -3,9 +3,12 @@ package gov.epa.emissions.framework.dao;
 import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.HibernateTestCase;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
+import gov.epa.emissions.commons.io.Country;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.commons.io.Project;
+import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -22,9 +25,13 @@ public class DatasetPersistenceTest extends HibernateTestCase {
 
     private String datasetName;
 
+    private DataCommonsDAO dcDao;
+
     protected void setUp() throws Exception {
         super.setUp();
         datasetName = "A1" + new Random().nextLong();
+        dcDao = new DataCommonsDAO();
+
     }
 
     protected void doTearDown() throws Exception {
@@ -38,36 +45,51 @@ public class DatasetPersistenceTest extends HibernateTestCase {
     }
 
     public void testVerifySimplePropertiesAreStored() throws Exception {
+        Country country = new Country("FR");
+        Project project = new Project("P1");
         EmfDataset ds = new EmfDataset();
-        ds.setAccessedDateTime(new Date());
-        ds.setCountry("FR");
-        ds.setCreatedDateTime(new Date());
-        ds.setCreator("CFD");
-        ds.setDescription("DESCRIPTION");
-        ds.setModifiedDateTime(new Date());
-        ds.setName(datasetName);
-        ds.setProject("P1");
-        ds.setRegion("USA");
-        ds.setSectors(new Sector[]{new Sector("","S1")});
-        ds.setStartDateTime(new Date());
-        ds.setStatus("imported");
-        ds.setYear(42);
-        ds.setUnits("orl");
-        ds.setTemporalResolution("t1");
-        ds.setStopDateTime(new Date());
 
-        DatasetType type = load("ORL Nonpoint Inventory");
-        ds.setDatasetType(type);
+        Region region = new Region("USA");
+        try {
+            dcDao.add(country, session);
+            dcDao.add(project, session);
+            dcDao.add(region, session);
 
-        KeyVal kv = new KeyVal();
-        kv.setValue("bar-1");
-        kv.setKeyword(new Keyword("bar-key"));
-        ds.addKeyVal(kv);
+            ds.setAccessedDateTime(new Date());
+            ds.setCountry(country);
+            ds.setCreatedDateTime(new Date());
+            ds.setCreator("CFD");
+            ds.setDescription("DESCRIPTION");
+            ds.setModifiedDateTime(new Date());
+            ds.setName(datasetName);
+            ds.setProject(project);
+            ds.setRegion(region);
+            ds.setSectors(new Sector[] { new Sector("", "S1") });
+            ds.setStartDateTime(new Date());
+            ds.setStatus("imported");
+            ds.setYear(42);
+            ds.setUnits("orl");
+            ds.setTemporalResolution("t1");
+            ds.setStopDateTime(new Date());
 
-        save(ds);
+            DatasetType type = load("ORL Nonpoint Inventory");
+            ds.setDatasetType(type);
 
-        kv.setValue(null);
-        update(ds);
+            KeyVal kv = new KeyVal();
+            kv.setValue("bar-1");
+            kv.setKeyword(new Keyword("bar-key"));
+            ds.addKeyVal(kv);
+
+            save(ds);
+
+            kv.setValue(null);
+            update(ds);
+        } finally {
+            remove(country);
+            remove(region);
+            remove(project);
+        }
+
     }
 
     private DatasetType load(String name) {
@@ -99,5 +121,12 @@ public class DatasetPersistenceTest extends HibernateTestCase {
             throw e;
         }
     }
+
+    private void remove(Object object) {
+        Transaction tx = session.beginTransaction();
+        session.delete(object);
+        tx.commit();
+    }
+
 
 }

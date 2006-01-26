@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.dao;
 
+import gov.epa.emissions.commons.io.Country;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -15,10 +16,12 @@ import org.hibernate.criterion.Restrictions;
 public class DatasetDaoTest extends ServicesTestCase {
 
     private DatasetDao dao;
-
+    private DataCommonsDAO dcDao;
+    
     protected void doSetUp() throws Exception {
         deleteAllDatasets();
         dao = new DatasetDao();
+        dcDao = new DataCommonsDAO();
     }
 
     protected void doTearDown() throws Exception {// no op
@@ -47,16 +50,20 @@ public class DatasetDaoTest extends ServicesTestCase {
 
     public void testShouldUpdateDatasetOnUpdate() throws Exception {
         EmfDataset dataset = newDataset();
-        dataset.setCountry("test-country");
+        Country country = new Country("test-country");
 
         try {
+            dcDao.add(country,session);
+           dataset.setCountry(country);
+
             dao.updateWithoutLocking(dataset, session);
             EmfDataset result = load(dataset);
 
             assertEquals(dataset.getDatasetid(), result.getDatasetid());
-            assertEquals("test-country", result.getCountry());
+            assertEquals("test-country", result.getCountry().getName());
         } finally {
             remove(dataset);
+            remove(country);
         }
     }
 
@@ -163,9 +170,9 @@ public class DatasetDaoTest extends ServicesTestCase {
         fail("Should have failed to release lock that was not obtained");
     }
 
-    private void remove(EmfDataset dataset) {
+    private void remove(Object object) {
         Transaction tx = session.beginTransaction();
-        session.delete(dataset);
+        session.delete(object);
         tx.commit();
     }
 

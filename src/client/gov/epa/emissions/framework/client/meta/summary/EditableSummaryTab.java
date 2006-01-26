@@ -4,6 +4,9 @@ import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.io.Country;
+import gov.epa.emissions.commons.io.Project;
+import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
 import gov.epa.emissions.framework.EmfException;
@@ -11,7 +14,6 @@ import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.services.Country;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -67,7 +69,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private DefaultComboBoxModel projects;
 
-    private DefaultComboBoxModel regions;
+    private DefaultComboBoxModel regionsComboModel;
 
     private ChangeObserver changeObserver;
 
@@ -137,10 +139,10 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
                 .getAccessedDateTime())), panel);
         layoutGenerator.addLabelWidgetPair("Creation Date:", new Label("creationDate", format(dataset
                 .getCreatedDateTime())), panel);
-        
+
         intendedUseCombo = new ComboBox("Choose an intended use", service.getIntendedUses());
-        //FIXME: set the dataset.getIntendedUse();
-        layoutGenerator.addLabelWidgetPair("Intended Use: ",intendedUseCombo,panel);
+        // FIXME: set the dataset.getIntendedUse();
+        layoutGenerator.addLabelWidgetPair("Intended Use: ", intendedUseCombo, panel);
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
@@ -175,10 +177,10 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         temporalResolutionsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Temporal Resolution:", temporalResolutionsCombo, panel);
 
-        sectorsCombo = new ComboBox("Choose a sector",service.getSectors());
+        sectorsCombo = new ComboBox("Choose a sector", service.getSectors());
         Sector[] datasetSectors = dataset.getSectors();
-        //TODO: Change this code, when multiple sector selection is allowed
-        if(datasetSectors!=null && datasetSectors.length>0){
+        // TODO: Change this code, when multiple sector selection is allowed
+        if (datasetSectors != null && datasetSectors.length > 0) {
             sectorsCombo.setSelectedItem(datasetSectors[0]);
         }
         sectorsCombo.setName("sectors");
@@ -187,11 +189,11 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         layoutGenerator.addLabelWidgetPair("Sector:", sectorsCombo, panel);
 
         // region
-        String[] regionNames = new String[] { dataset.getRegion() };
-        regions = new DefaultComboBoxModel(regionNames);
-        JComboBox regionsCombo = new JComboBox(regions);
+        Region[] regions = service.getRegions();
+        regionsComboModel = new DefaultComboBoxModel(regions);
+        JComboBox regionsCombo = new JComboBox(regionsComboModel);
         regionsCombo.setSelectedItem(dataset.getRegion());
-        regionsCombo.setName("regions");
+        regionsCombo.setName("regionsComboModel");
         regionsCombo.setEditable(true);
         regionsCombo.setPreferredSize(new Dimension(125, 20));
         regionsCombo.addItemListener(comboxBoxListener);
@@ -216,7 +218,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         return panel;
     }
 
-    private String[] countryNames(String selectedCountry, Country[] countries) {
+    private String[] countryNames(Country selectedCountry, Country[] countries) {
         List list = new ArrayList();
         for (int i = 0; i < countries.length; i++) {
             list.add(countries[i].getName());
@@ -245,8 +247,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableTextArea(description), panel);
 
         // project - TODO: look up all projects
-        String[] projectNames = new String[] { dataset.getProject() };
-        projects = new DefaultComboBoxModel(projectNames);
+        //FIXME: get projects from the service
+        projects = new DefaultComboBoxModel();
         JComboBox projectsCombo = new JComboBox(projects);
         projectsCombo.setSelectedItem(dataset.getProject());
         projectsCombo.setName("projects");
@@ -283,14 +285,14 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     public void updateDataset(EmfDataset dataset) {
         dataset.setName(name.getText());
         dataset.setDescription(description.getText());
-        dataset.setProject((String) projects.getSelectedItem());
+        dataset.setProject( (Project) projects.getSelectedItem());
         dataset.setStartDateTime(toDate(startDateTime.getText()));
         dataset.setStopDateTime(toDate(endDateTime.getText()));
         dataset.setTemporalResolution((String) temporalResolutions.getSelectedItem());
-        dataset.setRegion((String) regions.getSelectedItem());
-        dataset.setCountry((String) countries.getSelectedItem());
-        dataset.setSectors(new Sector[]{ (Sector) sectorsCombo.getSelectedItem()});
-        //FIXME: dataset.setIntendedUse((IntendedUse)intendUse.getSelectedItem());
+        dataset.setRegion((Region) regionsComboModel.getSelectedItem());
+        dataset.setCountry((Country) countries.getSelectedItem());
+        dataset.setSectors(new Sector[] { (Sector) sectorsCombo.getSelectedItem() });
+        // FIXME: dataset.setIntendedUse((IntendedUse)intendUse.getSelectedItem());
     }
 
     private Date toDate(String text) {

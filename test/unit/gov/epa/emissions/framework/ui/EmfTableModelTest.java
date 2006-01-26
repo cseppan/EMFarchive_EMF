@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.ui;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.text.SimpleDateFormat;
@@ -30,7 +31,7 @@ public class EmfTableModelTest extends MockObjectTestCase {
         dataset1.setDatasetType(new DatasetType("name1"));
         dataset1.setStatus("whatever-status");
         dataset1.setCreator("creator1");
-        dataset1.setRegion("region1");
+        dataset1.setRegion(new Region("region1"));
         dataset1.setStartDateTime(new Date());
         dataset1.setModifiedDateTime(new Date());
 
@@ -41,7 +42,7 @@ public class EmfTableModelTest extends MockObjectTestCase {
         dataset2.setDatasetType(new DatasetType("name2"));
         dataset2.setStatus("whatever-status");
         dataset2.setCreator("creator1");
-        dataset2.setRegion("region1");
+        dataset2.setRegion(new Region("region1"));
         dataset2.setStartDateTime(new Date());
         dataset2.setModifiedDateTime(new Date());
         datasetList.add(dataset2);

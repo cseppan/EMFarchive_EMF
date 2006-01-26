@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services;
 
+import gov.epa.emissions.commons.io.Country;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.ExternalSource;
@@ -7,6 +8,8 @@ import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Lockable;
 import gov.epa.emissions.commons.io.Mutex;
+import gov.epa.emissions.commons.io.Project;
+import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 
@@ -27,11 +30,11 @@ public class EmfDataset implements Dataset, Lockable {
 
     private String status;
 
-    private String region;
+    private Region region;
     
     private IntendedUse intendedUse;
 
-    private String country = "US";
+    private Country country ;
 
     private String units;
 
@@ -43,7 +46,7 @@ public class EmfDataset implements Dataset, Lockable {
 
     private Date endDateTime;
 
-    private String project;
+    private Project project;
 
     private Date createdDateTime;
 
@@ -105,11 +108,11 @@ public class EmfDataset implements Dataset, Lockable {
         this.modifiedDateTime = modifiedDateTime;
     }
 
-    public String getProject() {
+    public Project getProject() {
         return project;
     }
 
-    public void setProject(String project) {
+    public void setProject(Project project) {
         this.project = project;
     }
 
@@ -129,7 +132,7 @@ public class EmfDataset implements Dataset, Lockable {
         this.temporalResolution = temporalResolution;
     }
 
-    public void setRegion(String region) {
+    public void setRegion(Region region) {
         this.region = region;
     }
 
@@ -145,7 +148,7 @@ public class EmfDataset implements Dataset, Lockable {
         this.endDateTime = time;
     }
 
-    public String getRegion() {
+    public Region getRegion() {
         return region;
     }
 
@@ -165,11 +168,11 @@ public class EmfDataset implements Dataset, Lockable {
         this.datasetType = datasetType;
     }
 
-    public String getCountry() {
+    public Country getCountry() {
         return country;
     }
 
-    public void setCountry(String country) {
+    public void setCountry(Country country) {
         this.country = country;
     }
 

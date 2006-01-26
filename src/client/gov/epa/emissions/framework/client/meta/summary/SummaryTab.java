@@ -123,8 +123,8 @@ public class SummaryTab extends JPanel implements SummaryTabView {
             sectorLabel = sectors[0].toString();
         }
         layoutGenerator.addLabelWidgetPair("Sector:", new JLabel(sectorLabel), panel);
-        layoutGenerator.addLabelWidgetPair("Region:", new JLabel(dataset.getRegion()), panel);
-        layoutGenerator.addLabelWidgetPair("Country:", new JLabel(dataset.getCountry()), panel);
+        layoutGenerator.addLabelWidgetPair("Region:", new JLabel(dataset.getRegion().getName()), panel);
+        layoutGenerator.addLabelWidgetPair("Country:", new JLabel(dataset.getCountry().getName()), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
@@ -151,7 +151,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         description.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableTextArea(description), panel);
 
-        layoutGenerator.addLabelWidgetPair("Project:", new JLabel(dataset.getProject()), panel);
+        layoutGenerator.addLabelWidgetPair("Project:", new JLabel(dataset.getProject().getName()), panel);
         layoutGenerator.addLabelWidgetPair("Creator:", new JLabel(dataset.getCreator()), panel);
         layoutGenerator.addLabelWidgetPair("Dataset Type:", new JLabel(dataset.getDatasetTypeName()), panel);
 
