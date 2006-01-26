@@ -3,15 +3,14 @@ package gov.epa.emissions.framework.services.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
-
-import java.util.Iterator;
+import gov.epa.emissions.framework.services.editor.ChangeSets.ChangeSetsIterator;
 
 public class RecordsFilter {
 
     public Page filter(Page page, ChangeSets changesets) {
         // TODO: efficiency is O(n^2). Need to optimize, but order should be maintained
-        for (Iterator iter = changesets.iterator(); iter.hasNext();) {
-            ChangeSet element = (ChangeSet) iter.next();
+        for (ChangeSetsIterator iter = changesets.iterator(); iter.hasNext();) {
+            ChangeSet element = iter.next();
             page = filter(page, element);
         }
 

@@ -53,7 +53,6 @@ public class TablePaginator {
             return;
 
         page = service.getPage(token(), pageNumber);
-
         view.display(page);
     }
 

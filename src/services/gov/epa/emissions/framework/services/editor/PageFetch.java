@@ -4,9 +4,9 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.editor.ChangeSets.ChangeSetsIterator;
 
 import java.sql.SQLException;
-import java.util.Iterator;
 
 import org.hibernate.Session;
 
@@ -14,13 +14,29 @@ public class PageFetch {
 
     private DataUpdatesCache cache;
 
+    private RecordsFilter filter;
+
     public PageFetch(DataUpdatesCache cache) {
         this.cache = cache;
+        filter = new RecordsFilter();
     }
 
     public Page getPage(DataAccessToken token, int pageNumber, Session session) throws Exception {
-        RecordsFilter filter = new RecordsFilter();
+        Page page = filteredPage(token, pageNumber, session);
+        setRange(page, token, session);
 
+        return page;
+    }
+
+    void setRange(Page page, DataAccessToken token, Session session) throws Exception {
+        int previousPage = page.getNumber() - 1;
+        int previousPagesTotal = totalSizeOfPreviousPagesUpto(token, previousPage, session);
+        int min = page.count() == 0 ? previousPagesTotal : previousPagesTotal + 1;
+
+        page.setMin(min);
+    }
+
+    private Page filteredPage(DataAccessToken token, int pageNumber, Session session) throws SQLException {
         PageReader reader = cache.reader(token);
         Page page = reader.page(pageNumber);
         ChangeSets changesets = cache.changesets(token, pageNumber, session);
@@ -47,8 +63,8 @@ public class PageFetch {
         int total;
         ChangeSets changesets = cache.changesets(token, session);
         total = 0;
-        for (Iterator iter = changesets.iterator(); iter.hasNext();) {
-            ChangeSet element = (ChangeSet) iter.next();
+        for (ChangeSetsIterator iter = changesets.iterator(); iter.hasNext();) {
+            ChangeSet element = iter.next();
             total += element.netIncrease();
         }
 
@@ -57,5 +73,17 @@ public class PageFetch {
 
     public int defaultPageSize(Session session) {
         return cache.defaultPageSize(session);
+    }
+
+    int totalSizeOfPreviousPagesUpto(DataAccessToken token, int last, Session session) throws Exception {
+        int result = 0;
+        int pageSize = defaultPageSize(session);
+
+        for (int i = 1; i <= last; i++) {
+            ChangeSets sets = cache.changesets(token, i, session);
+            result += pageSize + sets.netIncrease();
+        }
+
+        return result;
     }
 }

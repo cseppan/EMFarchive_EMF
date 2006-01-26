@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
 import gov.epa.emissions.framework.dao.EmfProperties;
 import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.editor.ChangeSets.ChangeSetsIterator;
 import gov.epa.emissions.framework.services.impl.EmfProperty;
 
 import java.sql.SQLException;
@@ -207,8 +208,8 @@ public class DataAccessCache implements DataUpdatesCache {
     public void save(DataAccessToken token, Session session) throws Exception {
         VersionedRecordsWriter writer = writer(token);
         ChangeSets sets = changesets(token, session);
-        for (Iterator iter = sets.iterator(); iter.hasNext();) {
-            ChangeSet element = (ChangeSet) iter.next();
+        for (ChangeSetsIterator iter = sets.iterator(); iter.hasNext();) {
+            ChangeSet element = iter.next();
             writer.update(element);
         }
 

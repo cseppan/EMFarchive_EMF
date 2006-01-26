@@ -74,8 +74,8 @@ public class PaginationPanel extends JPanel {
     }
 
     public void updateStatus(Page page) {
-        current.setText(page.min() + " - " + page.max());
-        slider.setValue(page.min());
+        current.setText(page.getMin() + " - " + page.getMax());
+        slider.setValue(page.getMin());
     }
 
     private JPanel layoutControls(int totalRecords) {

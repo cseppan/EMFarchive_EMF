@@ -37,16 +37,35 @@ public class ChangeSets {
     }
 
     public void add(ChangeSets another) {
-        for (Iterator iter = another.iterator(); iter.hasNext();)
-            add((ChangeSet) iter.next());
+        for (ChangeSetsIterator iter = another.iterator(); iter.hasNext();)
+            add(iter.next());
     }
 
-    public Iterator iterator() {
-        return list.iterator();
+    public ChangeSetsIterator iterator() {
+        return new ChangeSetsIterator(list);
     }
 
     public ChangeSet get(int index) {
         return (ChangeSet) list.get(index);
+    }
+
+    public class ChangeSetsIterator {
+
+        private Iterator iterator;
+
+        public ChangeSetsIterator(List list) {
+            iterator = list.iterator();
+        }
+
+        public boolean hasNext() {
+            return iterator.hasNext();
+        }
+
+        public ChangeSet next() {
+            // TODO Auto-generated method stub
+            return (ChangeSet) iterator.next();
+        }
+
     }
 
 }

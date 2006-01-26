@@ -414,10 +414,6 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         page1ChangeSet.addNew(newRecord);
         service.submit(token, page1ChangeSet, 1);
 
-        // random page browsing
-        service.getPage(token, 5);
-        service.getPage(token, 6);
-
         int recordsBeforeSave = service.getTotalRecords(token);
         service.save(token);
 
