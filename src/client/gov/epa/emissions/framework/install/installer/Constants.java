@@ -9,7 +9,7 @@ public class Constants {
 	public static final String SERVER_ADDRESS = "http://emf.rtpnc.epa.gov:8080/emf/services";
     
 	public static final String INSTALLER_PREFERENCES_FILE = "EMFUserInstallPrefs.ini";
-    public static final String EMF_CLIENT_PREFERENCES_FILE = "EMFPrefs.ini";
+    public static final String EMF_CLIENT_PREFERENCES_FILE = "EMFPrefs.txt";
 	public static final String FILE_LIST = "files.txt";
 	public static final String UPDATE_FILE = "update.dat";
     public static final String EMF_BATCH_FILE = "EMFClient.bat";
