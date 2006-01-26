@@ -31,8 +31,11 @@ public class DataCommonsDAO {
     private static final String GET_EMF_KEYWORDS_QUERY = "select kw from Keyword as kw order by keyword";
 
     private static final String GET_COUNTRY_QUERY = "select country from Country as country order by name";
+
     private static final String GET_REGIONS_QUERY = "select region from Region as region order by name";
+
     private static final String GET_PROJECTS_QUERY = "select project from Project as project order by name";
+
     private static final String GET_INTENDEDUSES_QUERY = "select intendeduse from IntendedUse as intendeduse order by name";
 
     private LockingScheme lockingScheme;
@@ -67,30 +70,14 @@ public class DataCommonsDAO {
     }
 
     public void add(Region region, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            session.save(region);
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        addObject(region, session);
     }
 
     public void add(Project project, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            session.save(project);
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        addObject(project, session);
     }
 
-    public List getRegions(Session session){
+    public List getRegions(Session session) {
         ArrayList regions = null;
         Transaction tx = null;
 
@@ -114,30 +101,30 @@ public class DataCommonsDAO {
         return regions;
     }
 
-    public List getProjects(Session session){
-      ArrayList projects = null;
-      Transaction tx = null;
+    public List getProjects(Session session) {
+        ArrayList projects = null;
+        Transaction tx = null;
 
-      try {
-          tx = session.beginTransaction();
-          projects = new ArrayList();
-          Query query = session.createQuery(GET_PROJECTS_QUERY);
+        try {
+            tx = session.beginTransaction();
+            projects = new ArrayList();
+            Query query = session.createQuery(GET_PROJECTS_QUERY);
 
-          Iterator iter = query.iterate();
-          while (iter.hasNext()) {
-              Project project = (Project) iter.next();
-              projects.add(project);
-          }
+            Iterator iter = query.iterate();
+            while (iter.hasNext()) {
+                Project project = (Project) iter.next();
+                projects.add(project);
+            }
 
-          tx.commit();
-      } catch (HibernateException e) {
-          log.error(e);
-          tx.rollback();
-          throw e;
-      }      
-      return projects;
+            tx.commit();
+        } catch (HibernateException e) {
+            log.error(e);
+            tx.rollback();
+            throw e;
+        }
+        return projects;
     }
-    
+
     public List getCountries(Session session) {
         ArrayList countries = null;
 
@@ -273,33 +260,30 @@ public class DataCommonsDAO {
             log.error(e);
             tx.rollback();
             throw e;
-        }      
+        }
         return intendeduses;
     }
 
     public void add(IntendedUse intendedUse, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            session.save(intendedUse);
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }        
+        addObject(intendedUse, session);
     }
 
     public void add(Country country, Session session) {
+        addObject(country, session);
+    }
+
+    private void addObject(Object obj, Session session) {
+        System.out.println("*********-IN DAO-" + obj);
+        System.out.println("*********-session -" + session.hashCode());
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            session.save(country);
+            session.save(obj);
             tx.commit();
         } catch (HibernateException e) {
             tx.rollback();
-            e.printStackTrace();
             throw e;
-        }        
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.summary;
 
 import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
@@ -70,13 +71,15 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private DataCommonsService service;
 
-    private ComboBox projectsCombo;
+    private EditableComboBox projectsCombo;
 
     private ComboBox temporalResolutionsCombo;
 
     private ComboBox regionsCombo;
 
     private ComboBox countriesCombo;
+
+    private Project[] allProjects;
 
     public EditableSummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel)
             throws EmfException {
@@ -114,7 +117,6 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private JPanel createSubscriptionPanel() {
         JPanel panel = new JPanel();
-
         JCheckBox subscribed = new JCheckBox("Subscribed?", true);
         subscribed.setToolTipText("TBD");
         // panel.add(subscribed);
@@ -142,13 +144,11 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
                 .getCreatedDateTime())), panel);
 
         setupIntendedUseCombo();
-
         layoutGenerator.addLabelWidgetPair("Intended Use: ", intendedUseCombo, panel);
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
-
         return panel;
     }
 
@@ -156,10 +156,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         IntendedUse[] intendedUses = service.getIntendedUses();
         intendedUseCombo = new ComboBox("Choose an intended use", intendedUses);
         IntendedUse intendedUse = dataset.getIntendedUse();
-        if (intendedUse != null) {
-            intendedUseCombo.setSelectedItem(intendedUse);
-        }
-
+        intendedUseCombo.setSelectedItem(intendedUse);
     }
 
     private String format(Date date) {
@@ -182,8 +179,11 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         temporalResolutionsCombo = new ComboBox("Choose a resoluton", temporalResolutionNames);
         temporalResolutionsCombo.setSelectedItem(dataset.getTemporalResolution());
         temporalResolutionsCombo.setName("temporalResolutions");
-        temporalResolutionsCombo.setPreferredSize(new Dimension(175, 20));
+        temporalResolutionsCombo.setPreferredSize(new Dimension(170, 20));
         temporalResolutionsCombo.addItemListener(comboxBoxListener);
+        String temporalResolution = dataset.getTemporalResolution();
+        temporalResolutionsCombo.setSelectedItem(temporalResolution);
+
         layoutGenerator.addLabelWidgetPair("Temporal Resolution:", temporalResolutionsCombo, panel);
 
         sectorsCombo = new ComboBox("Choose a sector", service.getSectors());
@@ -199,17 +199,16 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
         // region
         Region[] regions = service.getRegions();
-        regionsCombo = new ComboBox("Choose a region",regions);
+        regionsCombo = new ComboBox("Choose a region", regions);
         regionsCombo.setSelectedItem(dataset.getRegion());
         regionsCombo.setName("regionsComboModel");
         regionsCombo.setPreferredSize(new Dimension(125, 20));
         regionsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Region:", regionsCombo, panel);
         Region region = dataset.getRegion();
-        if (region != null) {
-           regionsCombo.setSelectedItem(region);
-        }
-        
+        regionsCombo.setSelectedItem(region);
+        regionsCombo.setEnabled(false);
+
         // country
         countriesCombo = new ComboBox("Choose a country", service.getCountries());
         countriesCombo.setSelectedItem(dataset.getCountry());
@@ -217,9 +216,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         countriesCombo.addItemListener(comboxBoxListener);
         countriesCombo.setPreferredSize(new Dimension(175, 20));
         Country country = dataset.getCountry();
-        if (country != null) {
-            countriesCombo.setSelectedItem(country);
-        }
+        countriesCombo.setSelectedItem(country);
 
         layoutGenerator.addLabelWidgetPair("Country:", countriesCombo, panel);
 
@@ -247,13 +244,11 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         description = new TextArea("description", dataset.getDescription());
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableTextArea(description), panel);
 
-        // project - TODO: look up all projects
-        Project[] allProjects = service.getProjects();
-        projectsCombo = new ComboBox("Select or Enter Project", allProjects);
-        Project project = dataset.getProject();
-        if (project != null) {
-            projectsCombo.setSelectedItem(project);
-        }
+        allProjects = service.getProjects();
+        projectsCombo = new EditableComboBox(allProjects);
+        projectsCombo.setEnabled(false);
+        projectsCombo.setEditable(false);
+        projectsCombo.setSelectedItem(dataset.getProject());
         projectsCombo.setName("projects");
         projectsCombo.setPreferredSize(new Dimension(250, 20));
         projectsCombo.addItemListener(comboxBoxListener);
@@ -287,14 +282,30 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     public void updateDataset(EmfDataset dataset) {
         dataset.setName(name.getText());
         dataset.setDescription(description.getText());
-        dataset.setProject((Project) projectsCombo.getSelectedItem());
+        updateProject();
         dataset.setStartDateTime(toDate(startDateTime.getText()));
         dataset.setStopDateTime(toDate(endDateTime.getText()));
         dataset.setTemporalResolution((String) temporalResolutionsCombo.getSelectedItem());
-        dataset.setRegion((Region) regionsCombo.getSelectedItem());
+        //dataset.setRegion((Region) regionsCombo.getSelectedItem());
         dataset.setCountry((Country) countriesCombo.getSelectedItem());
         dataset.setSectors(new Sector[] { (Sector) sectorsCombo.getSelectedItem() });
         dataset.setIntendedUse((IntendedUse) intendedUseCombo.getSelectedItem());
+    }
+
+    private void updateProject() {
+        Object selected = projectsCombo.getSelectedItem();
+        if (selected instanceof String) {
+            String projectName = (String) selected;
+            if (projectName.length() > 0) {
+                // TODO: check the name if already exist
+                //Project project = new Project(projectName);
+                //service.addProject(project);
+                //dataset.setProject(project);
+            }
+
+        } else if (selected instanceof Project) {
+            //dataset.setProject((Project) selected);
+        }
     }
 
     private Date toDate(String text) {
