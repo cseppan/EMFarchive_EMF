@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.ui;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.Project;
 import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -34,7 +35,8 @@ public class EmfTableModelTest extends MockObjectTestCase {
         dataset1.setRegion(new Region("region1"));
         dataset1.setStartDateTime(new Date());
         dataset1.setModifiedDateTime(new Date());
-
+        dataset1.setProject(new Project("p1"));
+        
         datasetList.add(dataset1);
 
         dataset2 = new EmfDataset();
@@ -45,6 +47,8 @@ public class EmfTableModelTest extends MockObjectTestCase {
         dataset2.setRegion(new Region("region1"));
         dataset2.setStartDateTime(new Date());
         dataset2.setModifiedDateTime(new Date());
+        dataset2.setProject(new Project("p2"));
+        
         datasetList.add(dataset2);
 
         tableData = new EmfDatasetTableData(new EmfDataset[] { dataset1, dataset2 });
@@ -53,7 +57,7 @@ public class EmfTableModelTest extends MockObjectTestCase {
     }
 
     public void testShouldReturnColumnsNames() {
-        assertEquals(7, model.getColumnCount());
+        assertEquals(8, model.getColumnCount());
 
         assertEquals("Name", model.getColumnName(0));
         assertEquals("Last Modified Date", model.getColumnName(1));
@@ -61,7 +65,8 @@ public class EmfTableModelTest extends MockObjectTestCase {
         assertEquals("Status", model.getColumnName(3));
         assertEquals("Creator", model.getColumnName(4));
         assertEquals("Region", model.getColumnName(5));
-        assertEquals("Start Date", model.getColumnName(6));
+        assertEquals("Project", model.getColumnName(6));
+        assertEquals("Start Date", model.getColumnName(7));
         
     }
 
@@ -78,7 +83,8 @@ public class EmfTableModelTest extends MockObjectTestCase {
         assertEquals(dataset1.getStatus(), model.getValueAt(0, 3));
         assertEquals(dataset1.getCreator(), model.getValueAt(0, 4));
         assertEquals(dataset1.getRegion(), model.getValueAt(0, 5));
-        assertEquals(dateFormat.format(dataset1.getStartDateTime()), model.getValueAt(0, 6));
+        assertEquals(dataset1.getProject(), model.getValueAt(0, 6));
+        assertEquals(dateFormat.format(dataset1.getStartDateTime()), model.getValueAt(0, 7));
         
     }
 

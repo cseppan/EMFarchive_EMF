@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.IntendedUse;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,9 +31,7 @@ import java.awt.event.KeyListener;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -77,35 +76,41 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private ComboBox sectorsCombo;
 
+    private DataCommonsService service;
+
+    private IntendedUse[] intendedUses;
+
+    private String[] intendedUsesStrings;
+
     public EditableSummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel)
             throws EmfException {
         super.setName("summary");
         this.dataset = dataset;
+        this.service = service;
         this.messagePanel = messagePanel;
 
         super.setLayout(new BorderLayout());
         SummaryTabComboBoxChangesListener comboxBoxListener = new SummaryTabComboBoxChangesListener();
         super.add(createOverviewSection(comboxBoxListener), BorderLayout.PAGE_START);
-        super.add(createLowerSection(service, comboxBoxListener), BorderLayout.CENTER);
+        super.add(createLowerSection(comboxBoxListener), BorderLayout.CENTER);
 
         listenForKeyEvents(new SummaryTabKeyListener());
     }
 
-    private JPanel createLowerSection(DataCommonsService service, SummaryTabComboBoxChangesListener comboxBoxListener)
-            throws EmfException {
+    private JPanel createLowerSection(SummaryTabComboBoxChangesListener comboxBoxListener) throws EmfException {
         JPanel lowerPanel = new JPanel(new FlowLayout());
 
-        lowerPanel.add(createTimeSpaceSection(service, comboxBoxListener));
-        lowerPanel.add(createStatusSection(service));
+        lowerPanel.add(createTimeSpaceSection(comboxBoxListener));
+        lowerPanel.add(createStatusSection());
 
         return lowerPanel;
     }
 
-    private JPanel createStatusSection(DataCommonsService service) throws EmfException {
+    private JPanel createStatusSection() throws EmfException {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        panel.add(createStatusDatesAndIntendedUsePanel(service), BorderLayout.PAGE_START);
+        panel.add(createStatusDatesAndIntendedUsePanel(), BorderLayout.PAGE_START);
         panel.add(createSubscriptionPanel(), BorderLayout.CENTER);
 
         return panel;
@@ -128,7 +133,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         return panel;
     }
 
-    private JPanel createStatusDatesAndIntendedUsePanel(DataCommonsService service) throws EmfException {
+    private JPanel createStatusDatesAndIntendedUsePanel() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -140,8 +145,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         layoutGenerator.addLabelWidgetPair("Creation Date:", new Label("creationDate", format(dataset
                 .getCreatedDateTime())), panel);
 
-        intendedUseCombo = new ComboBox("Choose an intended use", service.getIntendedUses());
-        // FIXME: set the dataset.getIntendedUse();
+        setupIntendedUseCombo();
+
         layoutGenerator.addLabelWidgetPair("Intended Use: ", intendedUseCombo, panel);
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
@@ -151,12 +156,44 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         return panel;
     }
 
+    private void setupIntendedUseCombo() throws EmfException {
+        intendedUses = service.getIntendedUses();
+        intendedUsesStrings = new String[intendedUses.length];
+        for (int i = 0; i < intendedUsesStrings.length; i++) {
+            intendedUsesStrings[i] = intendedUses[i].getName();
+        }
+        intendedUseCombo = new ComboBox("Choose an intended use", intendedUsesStrings);
+        IntendedUse intendedUse = dataset.getIntendedUse();
+        if (intendedUse != null) {
+            intendedUseCombo.setSelectedItem(getIntendedUseString(intendedUse));
+        }
+
+    }
+
+    private IntendedUse getIntendedUse(String intendedUse) {
+        for (int i = 0; i < intendedUses.length; i++) {
+            if (intendedUse.equals(intendedUses[i].getName())) {
+                return intendedUses[i];
+            }
+        }
+        return null;
+    }
+    
+    private String getIntendedUseString(IntendedUse intendedUse) {
+        String name = intendedUse.getName();
+        for (int i = 0; i < intendedUsesStrings.length; i++) {
+            if (name.equals(intendedUsesStrings[i])) {
+                return intendedUsesStrings[i];
+            }
+        }
+        return null;
+    }
+
     private String format(Date date) {
         return DATE_FORMATTER.format(date);
     }
 
-    private JPanel createTimeSpaceSection(DataCommonsService service,
-            SummaryTabComboBoxChangesListener comboxBoxListener) throws EmfException {
+    private JPanel createTimeSpaceSection(SummaryTabComboBoxChangesListener comboxBoxListener) throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -194,17 +231,19 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         JComboBox regionsCombo = new JComboBox(regionsComboModel);
         regionsCombo.setSelectedItem(dataset.getRegion());
         regionsCombo.setName("regionsComboModel");
-        regionsCombo.setEditable(true);
         regionsCombo.setPreferredSize(new Dimension(125, 20));
         regionsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Region:", regionsCombo, panel);
 
         // country
-        countries = new DefaultComboBoxModel(countryNames(dataset.getCountry(), service.getCountries()));
+        countries = new DefaultComboBoxModel(service.getCountries());
+        Country country = dataset.getCountry();
+        if(country != null){
+            countries.setSelectedItem(country);
+        }
         JComboBox countriesCombo = new JComboBox(countries);
         countriesCombo.setSelectedItem(dataset.getCountry());
         countriesCombo.setName("countries");
-        countriesCombo.setEditable(false);
         countriesCombo.addItemListener(comboxBoxListener);
         countriesCombo.setPreferredSize(new Dimension(175, 20));
 
@@ -218,19 +257,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         return panel;
     }
 
-    private String[] countryNames(Country selectedCountry, Country[] countries) {
-        List list = new ArrayList();
-        for (int i = 0; i < countries.length; i++) {
-            list.add(countries[i].getName());
-        }
-
-        if (!list.contains(selectedCountry))
-            list.add(selectedCountry);
-
-        return (String[]) list.toArray(new String[0]);
-    }
-
-    private JPanel createOverviewSection(SummaryTabComboBoxChangesListener comboxBoxListener) {
+    private JPanel createOverviewSection(SummaryTabComboBoxChangesListener comboxBoxListener) throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -247,12 +274,11 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableTextArea(description), panel);
 
         // project - TODO: look up all projects
-        //FIXME: get projects from the service
-        projects = new DefaultComboBoxModel();
+        Project[] allProjects = service.getProjects();
+        projects = new DefaultComboBoxModel(allProjects);
         JComboBox projectsCombo = new JComboBox(projects);
         projectsCombo.setSelectedItem(dataset.getProject());
         projectsCombo.setName("projects");
-        projectsCombo.setEditable(true);
         projectsCombo.setPreferredSize(new Dimension(250, 20));
         projectsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Project:", projectsCombo, panel);
@@ -282,7 +308,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         return datasetTypeLabel;
     }
 
-    public void updateDataset(EmfDataset dataset) {
+    public void updateDataset(EmfDataset dataset) throws EmfException {
         dataset.setName(name.getText());
         dataset.setDescription(description.getText());
         dataset.setProject( (Project) projects.getSelectedItem());
@@ -292,7 +318,13 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         dataset.setRegion((Region) regionsComboModel.getSelectedItem());
         dataset.setCountry((Country) countries.getSelectedItem());
         dataset.setSectors(new Sector[] { (Sector) sectorsCombo.getSelectedItem() });
-        // FIXME: dataset.setIntendedUse((IntendedUse)intendUse.getSelectedItem());
+        String intendedUseString = (String) intendedUseCombo.getSelectedItem();
+        IntendedUse intendedUse = getIntendedUse(intendedUseString);
+        if(intendedUseString!=null && intendedUseString.length()>0 && intendedUse==null){
+            intendedUse = new IntendedUse(intendedUseString);
+            service.addIntendedUse(intendedUse);
+        }
+        dataset.setIntendedUse(intendedUse);
     }
 
     private Date toDate(String text) {

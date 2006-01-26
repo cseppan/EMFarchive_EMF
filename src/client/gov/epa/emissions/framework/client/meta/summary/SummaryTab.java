@@ -2,10 +2,14 @@ package gov.epa.emissions.framework.client.meta.summary;
 
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.io.Country;
+import gov.epa.emissions.commons.io.Project;
+import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.IntendedUse;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -85,9 +89,12 @@ public class SummaryTab extends JPanel implements SummaryTabView {
                 .getAccessedDateTime())), panel);
         layoutGenerator.addLabelWidgetPair("Creation Date:", new Label("creationDate", formatDate(dataset
                 .getCreatedDateTime())), panel);
-
+        
+        IntendedUse intendedUse = dataset.getIntendedUse();
+        String intendedUseName = (intendedUse!=null)? intendedUse.getName() :"";
+        layoutGenerator.addLabelWidgetPair("Intended Use:", new Label("intendedUse", intendedUseName), panel);
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -123,8 +130,13 @@ public class SummaryTab extends JPanel implements SummaryTabView {
             sectorLabel = sectors[0].toString();
         }
         layoutGenerator.addLabelWidgetPair("Sector:", new JLabel(sectorLabel), panel);
-        layoutGenerator.addLabelWidgetPair("Region:", new JLabel(dataset.getRegion().getName()), panel);
-        layoutGenerator.addLabelWidgetPair("Country:", new JLabel(dataset.getCountry().getName()), panel);
+        Region region = dataset.getRegion();
+        String regionName = (region!=null) ?region.getName() :"";
+        layoutGenerator.addLabelWidgetPair("Region:", new JLabel(regionName), panel);
+        
+        Country country = dataset.getCountry();
+        String countryName = (country!=null) ?country.getName() :"";
+        layoutGenerator.addLabelWidgetPair("Country:", new JLabel(countryName), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
@@ -151,7 +163,10 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         description.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableTextArea(description), panel);
 
-        layoutGenerator.addLabelWidgetPair("Project:", new JLabel(dataset.getProject().getName()), panel);
+        
+        Project project = dataset.getProject();
+        String projectName = (project!=null) ?project.getName() :"";
+        layoutGenerator.addLabelWidgetPair("Project:", new JLabel(projectName), panel);
         layoutGenerator.addLabelWidgetPair("Creator:", new JLabel(dataset.getCreator()), panel);
         layoutGenerator.addLabelWidgetPair("Dataset Type:", new JLabel(dataset.getDatasetTypeName()), panel);
 
