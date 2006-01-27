@@ -279,21 +279,6 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return null;
     }
 
-    public void addProject(Project project) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
-
-            mappings.register(call);
-            mappings.setOperation(call, "addProject");
-            mappings.setReturnType(call, mappings.project());
-
-        } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to add project", fault);
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to add project", e);
-        }
-    }
-
     public Region[] getRegions() throws EmfException {
         try {
             Call call = callFactory.createCall();
@@ -310,21 +295,6 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         }
 
         return null;
-    }
-
-    public void addRegion(Region region) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
-
-            mappings.register(call);
-            mappings.setOperation(call, "addRegion");
-            mappings.setReturnType(call, mappings.region());
-
-        } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to add region", fault);
-        } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to add region", e);
-        }
     }
 
     public IntendedUse[] getIntendedUses() throws EmfException {
@@ -345,13 +315,49 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return null;
     }
 
+    public void addRegion(Region region) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.addParam(call, "region", mappings.region());
+            mappings.setOperation(call, "addRegion");
+            mappings.setVoidReturnType(call);
+            call.invoke(new Object[] {region});           
+
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to add region", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to add region", e);
+        }
+    }
+
+    public void addProject(Project project) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+
+            mappings.register(call);
+            mappings.addParam(call, "project", mappings.project());
+            mappings.setOperation(call, "addProject");
+            mappings.setVoidReturnType(call);
+            call.invoke(new Object[] {project});           
+
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to add project", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to add project", e);
+        }
+    }
+
     public void addIntendedUse(IntendedUse intendedUse) throws EmfException {
         try {
             Call call = callFactory.createCall();
 
             mappings.register(call);
+            mappings.addParam(call, "intendeduse", mappings.project());
             mappings.setOperation(call, "addIntendedUse");
-            mappings.setReturnType(call, mappings.intendeduse());
+            mappings.setVoidReturnType(call);
+            call.invoke(new Object[] {intendedUse});           
 
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Failed to add new intended use", fault);
