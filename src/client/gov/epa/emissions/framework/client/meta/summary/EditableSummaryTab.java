@@ -65,7 +65,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private ChangeObserver changeObserver;
 
-    private ComboBox intendedUseCombo;
+    private EditableComboBox intendedUseCombo;
 
     private ComboBox sectorsCombo;
 
@@ -75,11 +75,15 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private ComboBox temporalResolutionsCombo;
 
-    private ComboBox regionsCombo;
+    private EditableComboBox regionsCombo;
 
     private ComboBox countriesCombo;
 
     private Project[] allProjects;
+
+    private Region[] allRegions;
+
+    private IntendedUse[] allIntendedUses;
 
     public EditableSummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel)
             throws EmfException {
@@ -153,8 +157,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     }
 
     private void setupIntendedUseCombo() throws EmfException {
-        IntendedUse[] intendedUses = service.getIntendedUses();
-        intendedUseCombo = new ComboBox("Choose an intended use", intendedUses);
+        allIntendedUses = service.getIntendedUses();
+        intendedUseCombo = new EditableComboBox(allIntendedUses);
         IntendedUse intendedUse = dataset.getIntendedUse();
         intendedUseCombo.setSelectedItem(intendedUse);
     }
@@ -197,9 +201,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         sectorsCombo.addItemListener(comboxBoxListener);
         layoutGenerator.addLabelWidgetPair("Sector:", sectorsCombo, panel);
 
-        // region
-        Region[] regions = service.getRegions();
-        regionsCombo = new ComboBox("Choose a region", regions);
+        allRegions = service.getRegions();
+        regionsCombo = new EditableComboBox(allRegions);
         regionsCombo.setSelectedItem(dataset.getRegion());
         regionsCombo.setName("regionsComboModel");
         regionsCombo.setPreferredSize(new Dimension(125, 20));
@@ -207,7 +210,6 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         layoutGenerator.addLabelWidgetPair("Region:", regionsCombo, panel);
         Region region = dataset.getRegion();
         regionsCombo.setSelectedItem(region);
-        regionsCombo.setEnabled(false);
 
         // country
         countriesCombo = new ComboBox("Choose a country", service.getCountries());
@@ -246,8 +248,6 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
         allProjects = service.getProjects();
         projectsCombo = new EditableComboBox(allProjects);
-//        projectsCombo.setEnabled(false);
-//        projectsCombo.setEditable(false);
         projectsCombo.setSelectedItem(dataset.getProject());
         projectsCombo.setName("projects");
         projectsCombo.setPreferredSize(new Dimension(250, 20));
@@ -279,17 +279,17 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         return datasetTypeLabel;
     }
 
-    public void updateDataset(EmfDataset dataset)  {
+    public void updateDataset(EmfDataset dataset) {
         dataset.setName(name.getText());
         dataset.setDescription(description.getText());
         updateProject();
         dataset.setStartDateTime(toDate(startDateTime.getText()));
         dataset.setStopDateTime(toDate(endDateTime.getText()));
         dataset.setTemporalResolution((String) temporalResolutionsCombo.getSelectedItem());
-        //dataset.setRegion((Region) regionsCombo.getSelectedItem());
+        updateRegion();
         dataset.setCountry((Country) countriesCombo.getSelectedItem());
         dataset.setSectors(new Sector[] { (Sector) sectorsCombo.getSelectedItem() });
-        dataset.setIntendedUse((IntendedUse) intendedUseCombo.getSelectedItem());
+        updateIntendedUse();
     }
 
     private void updateProject() {
@@ -297,17 +297,67 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         if (selected instanceof String) {
             String projectName = (String) selected;
             if (projectName.length() > 0) {
-                // TODO: check the name if already exist
-                Project project = new Project(projectName);
-//               service.addProject(project);
+                Project project = project(projectName);//checking for duplicates
                 dataset.setProject(project);
             }
-
         } else if (selected instanceof Project) {
-            //dataset.setProject((Project) selected);
+            dataset.setProject((Project) selected);
         }
     }
 
+    private Project project(String projectName) {
+        for (int i = 0; i < allProjects.length; i++) {
+            if(projectName.equals(allProjects[i].getName())){
+                return allProjects[i];
+            }
+        }
+        return new Project(projectName);
+    }
+    
+    private void updateRegion() {
+        Object selected = regionsCombo.getSelectedItem();
+        if (selected instanceof String) {
+            String regionName = (String) selected;
+            if (regionName.length() > 0) {
+                Region region = region(regionName);//checking for duplicates
+                dataset.setRegion(region);
+            }
+        } else if (selected instanceof Region) {
+            dataset.setRegion((Region) selected);
+        }
+    }
+
+    private Region region(String region) {
+        for (int i = 0; i < allRegions.length; i++) {
+            if(region.equals(allRegions[i].getName())){
+                return allRegions[i];
+            }
+        }
+        return new Region(region);
+    }
+    
+    private void updateIntendedUse() {
+        Object selected = intendedUseCombo.getSelectedItem();
+        if (selected instanceof String) {
+            String intendedUseName = (String) selected;
+            if (intendedUseName.length() > 0) {
+                IntendedUse intendedUse = intendedUse(intendedUseName);//checking for duplicates
+                dataset.setIntendedUse(intendedUse);
+            }
+        } else if (selected instanceof IntendedUse) {
+            dataset.setIntendedUse((IntendedUse) selected);
+        }
+    }
+
+    private IntendedUse intendedUse(String intendedUseName) {
+        for (int i = 0; i < allIntendedUses.length; i++) {
+            if(intendedUseName.equals(allIntendedUses[i].getName())){
+                return allIntendedUses[i];
+            }
+        }
+        return new IntendedUse(intendedUseName);
+    }
+    
     private Date toDate(String text) {
         if (text == null || text.length() == 0)
             return null;
