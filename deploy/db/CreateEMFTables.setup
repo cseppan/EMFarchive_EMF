@@ -51,7 +51,7 @@ CREATE TABLE emf.countries
   id int4 NOT NULL DEFAULT nextval('emf.countries_id_seq'::regclass),
   name varchar(255) NOT NULL,
   CONSTRAINT countries_pk PRIMARY KEY (id),
-  CONSTRAINT countries_id_key UNIQUE (id)
+  CONSTRAINT countries_name_key UNIQUE (name)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.countries OWNER TO emf;
@@ -279,7 +279,8 @@ CREATE TABLE emf.intended_uses
 (
   id int4 NOT NULL DEFAULT nextval('emf.intended_uses_id_seq'::regclass),
   name varchar(255) NOT NULL,
-  CONSTRAINT intended_uses_pk PRIMARY KEY (id)
+  CONSTRAINT intended_uses_pk PRIMARY KEY (id),
+  CONSTRAINT intended_uses_name_key UNIQUE(name)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.intended_uses OWNER TO emf;
@@ -298,7 +299,8 @@ CREATE TABLE emf.projects
 (
   id int4 NOT NULL DEFAULT nextval('emf.projects_id_seq'::regclass),
   name varchar(255) NOT NULL,
-  CONSTRAINT projects_pk PRIMARY KEY (id)
+  CONSTRAINT projects_pk PRIMARY KEY (id),
+  CONSTRAINT projects_name_key UNIQUE(name)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.projects OWNER TO emf;
@@ -317,7 +319,8 @@ CREATE TABLE emf.regions
 (
   id int4 NOT NULL DEFAULT nextval('emf.regions_id_seq'::regclass),
   name varchar(255) NOT NULL,
-  CONSTRAINT regions_pk PRIMARY KEY (id)
+  CONSTRAINT regions_pk PRIMARY KEY (id),
+  CONSTRAINT regions_name_key UNIQUE(name)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.regions OWNER TO emf;

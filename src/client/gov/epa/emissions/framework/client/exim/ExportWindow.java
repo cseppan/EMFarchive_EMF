@@ -81,9 +81,10 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
         // datasets
         TextArea datasetNames = new TextArea("datasets", getDatasetsLabel(datasets));
-        datasetNames.setLineWrap(false);
         datasetNames.setEditable(false);
         ScrollableTextArea dsArea = new ScrollableTextArea(datasetNames);
+        datasetNames.setWrapStyleWord(true);
+        datasetNames.setLineWrap(true);
         dsArea.setMinimumSize(new Dimension(75,75));
         layoutGenerator.addLabelWidgetPair("Datasets", dsArea, panel);
 
