@@ -354,7 +354,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
             Call call = callFactory.createCall();
 
             mappings.register(call);
-            mappings.addParam(call, "intendeduse", mappings.project());
+            mappings.addParam(call, "intendeduse", mappings.intendeduse());
             mappings.setOperation(call, "addIntendedUse");
             mappings.setVoidReturnType(call);
             call.invoke(new Object[] {intendedUse});           
