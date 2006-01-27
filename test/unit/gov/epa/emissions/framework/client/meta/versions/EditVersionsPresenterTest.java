@@ -91,7 +91,7 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         try {
             presenter.doEdit(version, null, null);
         } catch (EmfException e) {
-            assertEquals("Cannot edit a Version(" + version.getVersion() + ") that is Final. Please choose 'view'.", e
+            assertEquals("Cannot edit a Version(" + version.getVersion() + ") that is Final. Please choose 'View'.", e
                     .getMessage());
             return;
         }
