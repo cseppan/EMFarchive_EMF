@@ -111,7 +111,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     public void updateLockPeriod(Date start, Date end) {
-        lockInfo.setText("Lock obtained at " + start + ", expires at " + end);
+        lockInfo.setText("Lock expires at " + format(end)+"  ");
     }
 
     private JPanel tablePanel(Version version, String table) {
@@ -255,7 +255,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     private String format(Date lockDate) {
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         return dateFormat.format(lockDate);
     }
 
