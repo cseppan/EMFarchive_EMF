@@ -255,7 +255,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     private String format(Date lockDate) {
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm MM/dd/yyyy");
         return dateFormat.format(lockDate);
     }
 
