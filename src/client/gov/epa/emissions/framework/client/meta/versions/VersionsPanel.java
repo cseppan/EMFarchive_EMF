@@ -68,14 +68,15 @@ public class VersionsPanel extends JPanel implements VersionsView {
         VersionsSet versionsSet = new VersionsSet(versions);
         add(topPanel(sources), BorderLayout.PAGE_START);
         add(tablePanel(versions), BorderLayout.CENTER);
-        add(bottomPanel(versionsSet), BorderLayout.PAGE_END);
+        add(bottomPanel(versionsSet), BorderLayout.CENTER);
     }
 
     private JPanel bottomPanel(VersionsSet versionsSet) {
         JPanel container = new JPanel(new BorderLayout());
 
         JPanel right = new JPanel();
-        right.add(new JLabel("Default Version"));
+        right.setBorder(BorderFactory.createEmptyBorder(0,0,5,5));
+        right.add(new JLabel("Default Version: "));
 
         String name = versionsSet.getDefaultVersionName(dataset.getDefaultVersion());
         right.add(new JLabel(displayableVersion(name, dataset)));
@@ -129,7 +130,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     private JPanel topPanel(InternalSource[] sources) {
         JPanel container = new JPanel(new BorderLayout());
-        container.add(rightControlPanel(sources), BorderLayout.LINE_END);
+        container.add(rightControlPanel(sources), BorderLayout.CENTER);
 
         return container;
     }
