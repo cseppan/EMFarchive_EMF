@@ -251,7 +251,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         }
         panel.add(edit);
 
-        container.add(panel, BorderLayout.LINE_END);
+        container.add(panel, BorderLayout.CENTER);
 
         return container;
     }
