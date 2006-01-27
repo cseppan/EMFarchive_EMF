@@ -246,8 +246,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
         allProjects = service.getProjects();
         projectsCombo = new EditableComboBox(allProjects);
-        projectsCombo.setEnabled(false);
-        projectsCombo.setEditable(false);
+//        projectsCombo.setEnabled(false);
+//        projectsCombo.setEditable(false);
         projectsCombo.setSelectedItem(dataset.getProject());
         projectsCombo.setName("projects");
         projectsCombo.setPreferredSize(new Dimension(250, 20));
@@ -279,7 +279,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         return datasetTypeLabel;
     }
 
-    public void updateDataset(EmfDataset dataset) {
+    public void updateDataset(EmfDataset dataset)  {
         dataset.setName(name.getText());
         dataset.setDescription(description.getText());
         updateProject();
@@ -298,9 +298,9 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
             String projectName = (String) selected;
             if (projectName.length() > 0) {
                 // TODO: check the name if already exist
-                //Project project = new Project(projectName);
-                //service.addProject(project);
-                //dataset.setProject(project);
+                Project project = new Project(projectName);
+//               service.addProject(project);
+                dataset.setProject(project);
             }
 
         } else if (selected instanceof Project) {

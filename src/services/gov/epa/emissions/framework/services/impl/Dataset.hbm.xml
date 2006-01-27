@@ -17,22 +17,22 @@
             class="gov.epa.emissions.commons.io.DatasetType"
             column="dataset_type"/> 
 
-  <many-to-one
+  <many-to-one cascade="save-update"
             name="intendedUse" 
             class="gov.epa.emissions.framework.services.IntendedUse"
             column="intended_use"/> 
 
-  <many-to-one
+  <many-to-one cascade="save-update"
             name="project" 
             class="gov.epa.emissions.commons.io.Project"
             column="project"/> 
 
-  <many-to-one
+  <many-to-one cascade="save-update"
             name="country" 
             class="gov.epa.emissions.commons.io.Country"
             column="country"/> 
 
-  <many-to-one
+  <many-to-one cascade="save-update"
             name="region" 
             class="gov.epa.emissions.commons.io.Region"
             column="region"/> 

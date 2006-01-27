@@ -85,6 +85,11 @@ public class DatasetPersistenceTest extends HibernateTestCase {
             kv.setValue(null);
             update(ds);
         } finally {
+            ds.setCountry(null);
+            ds.setProject(null);
+            ds.setRegion(null);
+            update(ds);
+            
             remove(country);
             remove(region);
             remove(project);
