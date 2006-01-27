@@ -273,8 +273,6 @@ public class DataCommonsDAO {
     }
 
     private void addObject(Object obj, Session session) {
-        System.out.println("*********-IN DAO-" + obj);
-        System.out.println("*********-session -" + session.hashCode());
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
