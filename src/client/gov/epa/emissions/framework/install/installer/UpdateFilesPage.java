@@ -18,11 +18,13 @@ import javax.swing.JTextArea;
 public class UpdateFilesPage extends Box {
     private JPanel parent;
     
-    JTextArea updateTextArea;
+    private JTextArea updateTextArea;
     
     private InstallPresenter presenter;
     
     private String downloadPage, dirsPage;
+    
+    private JButton ok, cancel;
     
     public UpdateFilesPage(JPanel parent) {
         super(BoxLayout.Y_AXIS);
@@ -49,7 +51,7 @@ public class UpdateFilesPage extends Box {
         upper.setPreferredSize(new Dimension(450, 110));
         upper.add(scrollPane, BorderLayout.CENTER);
         
-        JButton ok = new JButton("Update");
+        ok = new JButton("Update");
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 CardLayout cl = (CardLayout)(parent.getLayout());
@@ -57,8 +59,9 @@ public class UpdateFilesPage extends Box {
                 presenter.downloadUpdates();
             }
         });
+        ok.setEnabled(false);
 
-        JButton cancel = new JButton("Cancel");
+        cancel = new JButton("Cancel");
         cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 CardLayout cl = (CardLayout)(parent.getLayout());
@@ -78,6 +81,10 @@ public class UpdateFilesPage extends Box {
     
     public void display(String text) {
         updateTextArea.setText(text);
+    }
+    
+    public void enableUpdate() {
+        ok.setEnabled(true);
     }
     
     public void observe(InstallPresenter presenter) {

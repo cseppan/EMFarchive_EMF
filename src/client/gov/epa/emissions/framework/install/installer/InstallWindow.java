@@ -469,6 +469,8 @@ public class InstallWindow extends JFrame implements InstallView  {
             text += files[i] + separator;
         
         text += separator + "Total: " + files.length + " files.";
+        if(files.length > 0)
+            ((UpdateFilesPage)updatePage).enableUpdate();
         
         return text;
     }

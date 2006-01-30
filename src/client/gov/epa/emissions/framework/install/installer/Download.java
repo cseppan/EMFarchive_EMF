@@ -66,7 +66,7 @@ public class Download extends Thread {
             
             if(blinker == thisThread) {
                 Tools.updateFileModTime(installhome, todownload);
-                saveCurrentFilesInfo(todownload);
+                saveCurrentFilesInfo();
                 presenter.setStatus("Downloads Complete.");
                 presenter.setFinish();
             }
@@ -231,12 +231,12 @@ public class Download extends Thread {
         }
     }
     
-    private void saveCurrentFilesInfo(File2Download[] todownload) {
+    private void saveCurrentFilesInfo() {
         try {
             FileOutputStream fos = new FileOutputStream(new File(installhome, 
                     Constants.UPDATE_FILE));
             ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(todownload);
+            oos.writeObject(getFiles2Download());
             oos.close();
         } catch (Exception e) {
             setErrMsg("Saving files info failed.");
