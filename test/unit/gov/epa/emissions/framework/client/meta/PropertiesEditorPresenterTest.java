@@ -255,7 +255,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         dataService.expects(once()).method("updateDataset").with(eq(dataset)).will(
                 new ThrowStub(new EmfException("update failure")));
         view.expects(once()).method("showError").with(
-                eq("Could not update dataset - " + dataset.getName() + ". Reason: update failure"));
+                eq("Could not save dataset. Reason: update failure"));
 
         Mock keywordsView = mock(EditableKeywordsTabView.class);
         keywordsView.expects(once()).method("display");

@@ -66,7 +66,7 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         try {
             updateDataset(service, summaryPresenter, keywordsPresenter);
         } catch (EmfException e) {
-            view.showError("Could not update dataset - " + dataset.getName() + ". Reason: " + e.getMessage());
+            view.showError("Could not save dataset. Reason: " + e.getMessage());
             return;
         }
 

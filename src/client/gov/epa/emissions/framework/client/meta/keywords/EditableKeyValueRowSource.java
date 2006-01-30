@@ -59,7 +59,7 @@ public class EditableKeyValueRowSource implements RowSource {
         }
         String value = source.getValue();
         if (value == null || value.trim().length() == 0) {
-            throw new EmfException("empty value at row "+rowNumber);
+            throw new EmfException("empty keyword value at row "+rowNumber);
         }
     }
 }

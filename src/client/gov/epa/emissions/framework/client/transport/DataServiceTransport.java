@@ -52,9 +52,9 @@ public class DataServiceTransport implements DataService {
 
             call.invoke(new Object[] { dataset });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to update Dataset: " + dataset.getName(), fault);
+            throwExceptionOnAxisFault("Failed to save Dataset: " + dataset.getName(), fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to update Dataset: " + dataset.getName(), e);
+            throwExceptionDueToServiceErrors("Failed to save Dataset: " + dataset.getName(), e);
         }
     }
 
@@ -94,7 +94,7 @@ public class DataServiceTransport implements DataService {
         } catch (AxisFault fault) {
             throwExceptionOnAxisFault("Could not get Dataset lock: " + dataset.getName(), fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not get sector lock: " + dataset.getName(), e);
+            throwExceptionDueToServiceErrors("Could not get Dataset lock: " + dataset.getName(), e);
         }
 
         return null;
@@ -111,9 +111,9 @@ public class DataServiceTransport implements DataService {
 
             return (EmfDataset) call.invoke(new Object[] { dataset });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not update Dataset: " + dataset.getName(), fault);
+            throwExceptionOnAxisFault("Could not save Dataset: " + dataset.getName(), fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not update Dataset: " + dataset.getName(), e);
+            throwExceptionDueToServiceErrors("Could not save Dataset: " + dataset.getName(), e);
         }
 
         return null;

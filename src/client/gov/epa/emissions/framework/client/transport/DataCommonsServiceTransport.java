@@ -137,9 +137,9 @@ public class DataCommonsServiceTransport implements DataCommonsService {
 
             return (Sector) call.invoke(new Object[] { sector });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not update locked Sector: " + sector.getName(), fault);
+            throwExceptionOnAxisFault("Could not save locked Sector: " + sector.getName(), fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not update locked Sector: " + sector.getName(), e);
+            throwExceptionDueToServiceErrors("Could not save locked Sector: " + sector.getName(), e);
         }
 
         return null;

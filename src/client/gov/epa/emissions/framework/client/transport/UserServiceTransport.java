@@ -88,9 +88,9 @@ public class UserServiceTransport implements UserService {
 
             call.invoke(new Object[] { user });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not update user: " + user.getUsername(), fault);
+            throwExceptionOnAxisFault("Could not save user information: " + user.getUsername(), fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not update user: " + user.getUsername(), e);
+            throwExceptionDueToServiceErrors("Could not save user infomration: " + user.getUsername(), e);
         }
     }
 
