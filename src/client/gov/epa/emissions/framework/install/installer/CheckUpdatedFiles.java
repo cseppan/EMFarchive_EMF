@@ -22,8 +22,10 @@ public class CheckUpdatedFiles {
         public void initialize(String installhome, Download delegate) {
             this.delegate = delegate;
             storedInfoFile = new File(installhome, Constants.UPDATE_FILE);
-            getOldFilesInfo();
-            getFile2Download();
+            if(storedInfoFile.exists()) {
+                getOldFilesInfo();
+                getFile2Download();
+            }
         }
         
         public void download() {

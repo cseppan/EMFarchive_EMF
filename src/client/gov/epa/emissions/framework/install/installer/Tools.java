@@ -59,8 +59,8 @@ public class Tools {
     public static void writePreference(String website, String input, String output, 
             String javahome, String emfhome, String server) throws Exception {
         String separator = Constants.SEPARATOR;
-        String emfPrefString = "local.input.drive=" + input.charAt(0) + separator + "local.output.drive="
-                + output.charAt(0) + separator + "remote.input.drive=/data" + separator + "remote.output.drive=/data"
+        String emfPrefString = "local.input.drive=" + input.charAt(0) + ":/" + separator + "local.output.drive="
+                + output.charAt(0) + ":/" + separator + "remote.input.drive=/data/" + separator + "remote.output.drive=/data/"
                 + separator + "default.input.folder=" + input.substring(3).replace('\\', '/') + separator
                 + "default.output.folder=" + output.substring(3).replace('\\', '/') + separator
                 + "server.address=" + server + separator;

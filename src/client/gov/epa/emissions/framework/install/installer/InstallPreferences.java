@@ -56,12 +56,12 @@ public class InstallPreferences {
     }
 
     public String inputFolder() {
-        return property(LOCAL_INPUT_DRIVE) + "\\:" + 
+        return property(LOCAL_INPUT_DRIVE).replace('/', '\\') + 
             property(DEFAULT_INPUT_FOLDER).replace('/', '\\');
     }
 
     public String outputFolder() {
-        return property(LOCAL_OUTPUT_DRIVE) + "\\:" +
+        return property(LOCAL_OUTPUT_DRIVE).replace('/', '\\') +
             property(DEFAULT_OUTPUT_FOLDER).replace('/', '\\');
     }
     
