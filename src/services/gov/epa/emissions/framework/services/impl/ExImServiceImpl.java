@@ -136,17 +136,20 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
                 EmfDataset dataset = datasets[i];
 
-                // FIXME: Default is overwrite
-                File file = validateExportFile(path, getCleanDatasetName(dataset), true);
-                Services svcHolder = new Services();
-                svcHolder.setLogSvc(new LoggingServiceImpl(sessionFactory));
-                svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
-                svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
-                Exporter exporter = exporterFactory.create(dataset, dataset.getDefaultVersion());
-                AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
-                        .getAccessedDateTime(), "Version " + dataset.getDefaultVersion(), purpose, dirName);
-                ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);
-                threadPool.execute(eximTask);
+                // if dataset is not exportable throw exception
+                if (isExportable(dataset)) {
+                    // FIXME: Default is overwrite
+                    File file = validateExportFile(path, getCleanDatasetName(dataset), true);
+                    Services svcHolder = new Services();
+                    svcHolder.setLogSvc(new LoggingServiceImpl(sessionFactory));
+                    svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
+                    svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
+                    Exporter exporter = exporterFactory.create(dataset, dataset.getDefaultVersion());
+                    AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
+                            .getAccessedDateTime(), "Version " + dataset.getDefaultVersion(), purpose, dirName);
+                    ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);
+                    threadPool.execute(eximTask);
+                }
             }
         } catch (Exception e) {
             log.error("Exception attempting to start export of file to folder: " + dirName, e);
@@ -191,16 +194,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     }
 
     private boolean isExportable(EmfDataset dataset) {
-        boolean exportable = false;
-
-        String datasetType = dataset.getDatasetType().getName();
-
-        if (!((datasetType.equals("Shapefile")) || (datasetType.equals("External File"))
-                || (datasetType.equals("Meteorology File")) || (datasetType.equals("Model Ready Emissions File")))) {
-
-            exportable = true;
-        }
-        return exportable;
+        return (!(dataset.getDatasetType().isExternal()));
     }
 
     String getCleanDatasetName(EmfDataset dataset) {
