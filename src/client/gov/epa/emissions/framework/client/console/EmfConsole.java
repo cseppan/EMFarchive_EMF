@@ -46,7 +46,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     private ViewLayout viewLayout;
 
     private static String aboutMessage = "<html><center>Emissions Modeling Framework (EMF)<br>"
-            + "Version: Beta 2 - 1/27/2006<br>" + "Developed by the Carolina Environmental Program<br>"
+            + "Version: Beta 2.1 - 1/30/2006<br>" + "Developed by the Carolina Environmental Program<br>"
             + "University of North Carolina at Chapel Hill</center></html>";
 
     // TODO: split the login & logout menu/actions in a separate class ??
