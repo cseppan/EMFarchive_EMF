@@ -38,7 +38,7 @@ insert into emf.dataset_types values(4,'ORL Point Inventory (PTINV)','ORL Point 
 insert into emf.dataset_types values(5,'Shapefile (External)','Shapefile (External)', '3', '-1', true, 'gov.epa.emissions.commons.io.external.ShapeFilesImporter', '');
 insert into emf.dataset_types values(6,'External File (External)','External File (External)', '1', '-1', true, 'gov.epa.emissions.commons.io.external.ExternalFilesImporter', '');
 insert into emf.dataset_types values(7,'Meteorology File (External)','Meteorology File (External)', '1', '-1', true, 'gov.epa.emissions.commons.io.external.MeteorologyFilesImporter', '');
-insert into emf.dataset_types values(8,'Model Ready Emissions File','Model Ready Emissions', '1', '-1',true, 'gov.epa.emissions.commons.io.external.ModelReadyEmissionsFilesImporter', '');
+insert into emf.dataset_types values(8,'Model Ready Emissions File (External)','Model Ready Emissions (External)', '1', '-1',true, 'gov.epa.emissions.commons.io.external.ModelReadyEmissionsFilesImporter', '');
 insert into emf.dataset_types values(9,'Temporal Cross Reference (A/M/PTREF)','Temporal Cross Reference (A/M/PTREF)', '1', '1',false, 'gov.epa.emissions.commons.io.temporal.TemporalReferenceImporter', 'gov.epa.emissions.commons.io.temporal.TemporalReferenceExporter');
 insert into emf.dataset_types values(10,'Temporal Profile (A/M/PTPRO)','Temporal Profile (A/M/PTPRO)', '1', '1',false, 'gov.epa.emissions.commons.io.temporal.TemporalProfileImporter', 'gov.epa.emissions.commons.io.temporal.TemporalProfileExporter');
 insert into emf.dataset_types values(11,'Comma Separated Values (CSV)','Comma Separated Values (CSV)', '1', '1', false, 'gov.epa.emissions.commons.io.csv.CSVImporter', 'gov.epa.emissions.commons.io.csv.CSVExporter');
