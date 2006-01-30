@@ -10,7 +10,7 @@ DROP TABLE emf.users CASCADE;
 DROP TABLE emf.statusmessages;
 DROP TABLE emf.properties;
 --
-DROP SEQUENCE emf.countries_id_seq;
+DROP SEQUENCE emf.countries_id_seq CASCADE;
 DROP TABLE emf.countries;
 --
 DROP SEQUENCE emf.sectors_id_seq;
