@@ -6,10 +6,15 @@ public class InstallPresenter {
     private InstallView view;
     
     private Download model;
+    
+    private CheckUpdatedFiles checkUpdates;
 
-//    public InstallPresenter(Download model) {
-//        this.model = model;
-//    }
+    public InstallPresenter() {
+        this.model = new Download();
+        model.addObserver(this);
+        this.checkUpdates = new CheckUpdatedFiles();
+        checkUpdates.addObserver(this);
+    }
 
     public void doCancel() {
         view.close();
@@ -17,20 +22,30 @@ public class InstallPresenter {
 
     public void display(InstallView view) {
         this.view = view;
-        view.observe(this);
+        this.view.observe(this);
 
-        view.display();
+        this.view.display();
     }
     
-    public void startDownload(String url, String filelist, String installhome) {
-        model = new Download(url, filelist, installhome);
-        model.addObserver(this);
+    public void startDownload() {
         model.start();
+    }
+    
+    public void initModels(String url, String filelist, String installhome) {
+        model.initialize(url, filelist, installhome);
+        checkUpdates.initialize(installhome, model);
+    }
+    
+    public String[] checkUpdates() {
+        return checkUpdates.getNewFilesName();
+    }
+    
+    public void downloadUpdates() {
+        checkUpdates.download();
     }
     
     public void stopDownload() {
         model.stopDownload();
-        //model.stop();
     }
     
     public void writePreference(String website, String input, 

@@ -27,17 +27,27 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 public class InstallWindow extends JFrame implements InstallView  {
-	
+	final static String DIRECTORY_PAGE = "EMF Directories";
+    
+	final static String DOWNLOAD_PAGE = "Messages";
+    
+	final static String UPDATE_PAGE = "Update Files";
+    
+    final static int INSTALL = 0;
+    
+    final static int RE_INSTALL = 1;
+    
+    final static int UPDATE = 2;
+    
+    private int INSTALL_MODE = INSTALL; 
+    
     private InstallPresenter presenter;
     
-	JPanel cards; //a panel that uses CardLayout
-	final static String PAGEONE = "TRIM Directories";
-	final static String PAGETWO = "Projects";
-	final static String PAGETHREE = "APEX Directories";
-	final static String PAGEFOUR = "Updated Files";
+    private JPanel cards; //a panel that uses CardLayout
 	
 	JFrame installFrame;
-	JPanel page1, page2;
+	JPanel directoryPage, downloadPage;
+    Box updatePage;
 	JPanel installPanel;
 	JPanel installPanelNorth, installPanelSouth, installPanelEast, installPanelWest;
 	JPanel nextPanel, statusPanel;
@@ -82,7 +92,7 @@ public class InstallWindow extends JFrame implements InstallView  {
 		holderLabel1 = new JLabel();
 		holderLabel2 = new JLabel();
 		holderLabel3 = new JLabel();
-        load = new JLabel(Constants.EMF_MESSAGE);
+        load = new JLabel();
         
 		javaHomeBrowser = new JButton("Browse...");
 		inputDirBrowser = new JButton("Browse...");
@@ -93,10 +103,10 @@ public class InstallWindow extends JFrame implements InstallView  {
         cancel = new JButton("Cancel");
 		
 		//Create and set up the panel.
-		page1 = new JPanel();
-		page1.setLayout((new BorderLayout()));
-        page2 = new JPanel(); 
-        page2.setLayout((new BorderLayout()));
+		directoryPage = new JPanel();
+		directoryPage.setLayout((new BorderLayout()));
+        downloadPage = new JPanel(); 
+        downloadPage.setLayout((new BorderLayout()));
         
 		statusPanel = new JPanel();
 		statusPanel.setLayout(new GridLayout(1, 1));			
@@ -118,13 +128,15 @@ public class InstallWindow extends JFrame implements InstallView  {
 		//Set the default button.
 		getRootPane().setDefaultButton(installButton);
 		
-		page1 = createFirstPage();
-		page2 = createSecondPage();
+        cards = new JPanel(new CardLayout());
+		directoryPage = createFirstPage();
+		downloadPage = createSecondPage();
+        updatePage = new UpdateFilesPage(cards);
 		
 		//Create the panel that contains the "cards".
-		cards = new JPanel(new CardLayout());
-		cards.add(page1, PAGEONE);
-		cards.add(page2, PAGETWO);
+		cards.add(directoryPage, DIRECTORY_PAGE);
+		cards.add(downloadPage, DOWNLOAD_PAGE);
+        cards.add(updatePage, UPDATE_PAGE);
 		
 		getContentPane().add(cards,BorderLayout.CENTER);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -167,6 +179,7 @@ public class InstallWindow extends JFrame implements InstallView  {
     
     public void observe(InstallPresenter presenter) {
         this.presenter = presenter;
+        ((UpdateFilesPage)updatePage).observe(presenter);
     }
 
     public void close() {
@@ -264,13 +277,13 @@ public class InstallWindow extends JFrame implements InstallView  {
 		installPanelSouth.add(exitInstallButton);
 		
 		//Assemble the panels	
-		page1.add(installPanel, BorderLayout.CENTER);
-		page1.add(installPanelNorth, BorderLayout.NORTH);
-		page1.add(installPanelSouth, BorderLayout.SOUTH);
-		page1.add(installPanelEast, BorderLayout.EAST);
-		page1.add(installPanelWest, BorderLayout.WEST);
+		directoryPage.add(installPanel, BorderLayout.CENTER);
+		directoryPage.add(installPanelNorth, BorderLayout.NORTH);
+		directoryPage.add(installPanelSouth, BorderLayout.SOUTH);
+		directoryPage.add(installPanelEast, BorderLayout.EAST);
+		directoryPage.add(installPanelWest, BorderLayout.WEST);
 		
-		return page1;
+		return directoryPage;
 	}
 
 	private JPanel createSecondPage(){
@@ -291,10 +304,10 @@ public class InstallWindow extends JFrame implements InstallView  {
         southPanel.add(buttons);
         southPanel.add(statusPanel);
         
-        page2.add(upper, BorderLayout.CENTER);
-        page2.add(southPanel, BorderLayout.SOUTH);
+        downloadPage.add(upper, BorderLayout.CENTER);
+        downloadPage.add(southPanel, BorderLayout.SOUTH);
         
-		return page2;
+		return downloadPage;
 	}
 
 	private class ExitInstallButtonListener implements ActionListener {	
@@ -305,19 +318,15 @@ public class InstallWindow extends JFrame implements InstallView  {
 	
 	private class InstallButtonListener implements ActionListener {	
         public void actionPerformed(ActionEvent e) {	
-			String javahome = javaHomeDirField.getText();
-			String outputdir = outputDirField.getText();
-			String inputdir = inputDirField.getText();
-            String installhome = installDirField.getText();
-            String website = url.getText();
-            String server = serverField.getText();
-	        
             int option = checkDirs();
             if(option == JOptionPane.OK_OPTION) {
-                CardLayout cl = (CardLayout)(cards.getLayout());
-                cl.show(cards, PAGETWO);
-                presenter.writePreference(website, inputdir, outputdir, javahome, installhome, server);
-                presenter.startDownload(website, Constants.FILE_LIST, installhome);
+                presenter.initModels(url.getText(), Constants.FILE_LIST, installDirField.getText());
+                if(new File(installDirField.getText(), Constants.UPDATE_FILE).exists())
+                    checkUpdates();
+                else {
+                    load.setText(Constants.EMF_INSTALL_MESSAGE);
+                    startDownload();
+                }
             }
 		}
 	}
@@ -352,7 +361,7 @@ public class InstallWindow extends JFrame implements InstallView  {
              if(e.getActionCommand().equalsIgnoreCase("Cancel")) {
                  presenter.stopDownload();
                  CardLayout cl = (CardLayout)(cards.getLayout());
-                 cl.show(cards, PAGEONE);
+                 cl.show(cards, DIRECTORY_PAGE);
              }
              
              if(e.getActionCommand().equalsIgnoreCase("Done")) {
@@ -377,8 +386,14 @@ public class InstallWindow extends JFrame implements InstallView  {
         String server = serverField.getText();
         presenter.createBatchFile(installhome + "\\" + Constants.EMF_BATCH_FILE,
                 Constants.EMF_CLIENT_PREFERENCES_FILE, javahome, server);
-        presenter.createShortcut();
-        load.setText(Constants.EMF_CLOSE_MESSAGE);
+        if(INSTALL_MODE == INSTALL) {
+            presenter.createShortcut();
+            load.setText(Constants.INSTALL_CLOSE_MESSAGE);
+        } else if (INSTALL_MODE == RE_INSTALL) {
+            load.setText(Constants.REINSTALL_CLOSE_MESSAGE);
+        } else if (INSTALL_MODE == UPDATE) {
+            load.setText(Constants.UPDATE_CLOSE_MESSAGE);
+        }
         cancel.setText("Done");
     }
     
@@ -405,4 +420,57 @@ public class InstallWindow extends JFrame implements InstallView  {
             
         return JOptionPane.OK_OPTION;
     }
+    
+    private void checkUpdates() {
+        Object[] possibleValues = { "Update", "Reinstall" };
+        Object selectedValue = JOptionPane.showInputDialog(installFrame, 
+                "The TRIM Home Directory already exists. Would you like to reinstall " +
+                "or update?\n Please choose one:", "Input",
+                JOptionPane.INFORMATION_MESSAGE, null,
+                possibleValues, possibleValues[0]);
+        if(selectedValue == "Reinstall") {
+            INSTALL_MODE = RE_INSTALL;
+            load.setText(Constants.EMF_REINSTALL_MESSAGE);
+            startDownload();
+        } else if(selectedValue == "Update") {
+            INSTALL_MODE = UPDATE;
+            load.setText(Constants.EMF_UPDATE_MESSAGE);
+            startUpdates();
+        }
+    }
+    
+    private void startDownload() {
+        String javahome = javaHomeDirField.getText();
+        String outputdir = outputDirField.getText();
+        String inputdir = inputDirField.getText();
+        String installhome = installDirField.getText();
+        String website = url.getText();
+        String server = serverField.getText();
+        CardLayout cl = (CardLayout)(cards.getLayout());
+        cl.show(cards, DOWNLOAD_PAGE);
+        presenter.writePreference(website, inputdir, outputdir, javahome, installhome, server);
+        presenter.startDownload();
+    }
+    
+    private void startUpdates() {
+        CardLayout cl = (CardLayout)(cards.getLayout());
+        ((UpdateFilesPage)updatePage).setDownloadPage(DOWNLOAD_PAGE);
+        ((UpdateFilesPage)updatePage).setDirsPage(DIRECTORY_PAGE);
+        ((UpdateFilesPage)updatePage).display(getUpdateText());
+        cl.show(cards, UPDATE_PAGE);
+    }
+    
+    private String getUpdateText() {
+        String separator = Constants.SEPARATOR;
+        String text = "Files to update:" + separator + separator;
+        String[] files = presenter.checkUpdates();
+        
+        for(int i = 0; i < files.length; i++)
+            text += files[i] + separator;
+        
+        text += separator + "Total: " + files.length + " files.";
+        
+        return text;
+    }
+    
 }

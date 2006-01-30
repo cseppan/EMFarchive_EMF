@@ -9,23 +9,36 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class Download extends Thread{
+public class Download extends Thread {
 	private String urlbase;
+    
 	private String installhome;
+    
     private String filelist;
+    
     private InstallPresenter presenter;
+    
     private volatile Thread  blinker;
+    
     private int numFiles2Download;
+    
+    private File2Download[] todownload;
 
-	
-	public Download(String url, String filelist, String installhome){
+	public void initialize(String url, String filelist, String installhome) {
         this.urlbase = url;
         this.installhome = installhome;
         this.filelist = filelist;
         this.blinker = new Thread(this);
+        try {
+            downloadFileList();
+        } catch (IOException e) {
+            setErrMsg("Downloading files list failed.");
+        }
+        this.todownload = getFiles2Download();
     }	
     
     public void start() {
@@ -37,13 +50,10 @@ public class Download extends Thread{
         blinker = null;
     }
 
-	public void run(){
+	public void run() {
         Thread thisThread = Thread.currentThread();
         presenter.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         try{
-            downloadFileList();
-            File2Download[] todownload = getFiles2Download();
-            
             for(int x=0; x<numFiles2Download; x++){
                 if(blinker == thisThread) {
                     String temp = todownload[x].getPath();
@@ -56,17 +66,23 @@ public class Download extends Thread{
             
             if(blinker == thisThread) {
                 Tools.updateFileModTime(installhome, todownload);
+                saveCurrentFilesInfo(todownload);
                 presenter.setStatus("Downloads Complete.");
                 presenter.setFinish();
             }
         } catch (Exception e){
-            presenter.displayErr("Downloading files failed.");
+            setErrMsg("Downloading files failed.");
         } finally {
             stopDownload();
         }
 	}
+    
+    public void setFile2Download(File2Download[] todownload) {
+        this.numFiles2Download = todownload.length;
+        this.todownload = todownload;
+    }
 	
-	public void createShortcut(){
+	public void createShortcut() {
         File bat = new File(installhome, "shortcut.bat");
         File inf = new File(installhome, "shortcut.inf");
         createShortcutBatchFile(bat, inf);
@@ -86,13 +102,13 @@ public class Download extends Thread{
 			bat.delete();
 			inf.delete();
 		} catch (IOException e) {
-			presenter.displayErr("Creating shortcut failed.");
+            setErrMsg("Creating shortcut failed.");
 		} catch (InterruptedException e) {
-		    presenter.displayErr("Windows runtime error while creating EMF client shortcut.");
+            setErrMsg("Windows runtime error while creating EMF client shortcut.");
         }
 	}
     
-    private void createShortcutBatchFile(File bat, File inf){
+    private void createShortcutBatchFile(File bat, File inf) {
         String separator = Constants.SEPARATOR;
         
         String battext = "\n@echo off & setlocal" + separator +
@@ -117,7 +133,7 @@ public class Download extends Thread{
             fw1.close();
             fw2.close();
         }catch(IOException e){
-            presenter.displayErr("Creating shortcut files failed.");
+            setErrMsg("Creating shortcut files failed.");
         }
     }
     
@@ -157,8 +173,8 @@ public class Download extends Thread{
         fw.close();
     }
     
-    private File2Download[] getFiles2Download() {
-        File list = new File(installhome, Constants.FILE_LIST);
+    public File2Download[] getFiles2Download() {
+        File list = new File(installhome, filelist);
         if(list.exists()){
             TextParser parser = new TextParser(list, ";");
             parser.parse();
@@ -213,6 +229,22 @@ public class Download extends Thread{
             is.close(); 
             fos.close();
         }
+    }
+    
+    private void saveCurrentFilesInfo(File2Download[] todownload) {
+        try {
+            FileOutputStream fos = new FileOutputStream(new File(installhome, 
+                    Constants.UPDATE_FILE));
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(todownload);
+            oos.close();
+        } catch (Exception e) {
+            setErrMsg("Saving files info failed.");
+        }
+    }
+    
+    private void setErrMsg(String msg) {
+        presenter.displayErr(msg);
     }
     
     public void addObserver(InstallPresenter presenter) {

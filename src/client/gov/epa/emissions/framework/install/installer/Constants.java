@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.install.installer;
 
 public class Constants {
-	public static final String VERSION = "1/26/2006";
+	public static final String VERSION = "1/29/2006";
 	public static final String SEPARATOR = System.getProperty("line.separator");
 	
 	public static final String TIME_FORMAT = "MM/dd/yyyy hh:mmaaa";
@@ -23,10 +23,22 @@ public class Constants {
 	public static final String[] BAT_FILES = {"runmims"};
 	public static final String[] TO_DELETE = {"rundave.txt"};
 	
-    public static final String EMF_MESSAGE = "<html> <br><br><br><br>" +
+    public static final String EMF_INSTALL_MESSAGE = "<html> <br><br><br><br>" +
             "Installing the Emissions Modeling Framework...";  
     
-    public static final String EMF_CLOSE_MESSAGE = "<html><br><br><br><br>" +
+    public static final String EMF_REINSTALL_MESSAGE = "<html> <br><br><br><br>" +
+    "Re-installing the Emissions Modeling Framework...";  
+    
+    public static final String EMF_UPDATE_MESSAGE = "<html> <br><br><br><br>" +
+    "Updating the Emissions Modeling Framework...";  
+    
+    public static final String INSTALL_CLOSE_MESSAGE = "<html><br><br><br><br>" +
             "Installation complete.";
+    
+    public static final String REINSTALL_CLOSE_MESSAGE = "<html><br><br><br><br>" +
+    "Re-installation complete.";
+    
+    public static final String UPDATE_CLOSE_MESSAGE = "<html><br><br><br><br>" +
+    "Update complete.";
     
 }
