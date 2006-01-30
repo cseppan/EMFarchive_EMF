@@ -10,7 +10,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class UserServiceTestCase extends ServicesTestCase {
+public class UserServiceTest extends ServicesTestCase {
     private UserService service;
 
     public void doSetUp() throws Exception {
