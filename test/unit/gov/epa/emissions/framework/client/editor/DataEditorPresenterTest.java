@@ -133,7 +133,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         Mock service = mock(DataEditorService.class);
         service.stubs().method("getPage").withAnyArguments().will(returnValue(new Page()));
-        
+
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
         tableView.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
 
@@ -146,11 +146,17 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Mock view = mock(DataEditorView.class);
 
         Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class));
+        Mock token = mock(DataAccessToken.class);
+        token.stubs().method("lockStart").will(returnValue(new Date()));
+        token.stubs().method("lockEnd").will(returnValue(new Date()));
+        
+        service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class)).will(
+                returnValue(token.proxy()));
 
         DataEditorPresenter p = displayPresenter(view, service);
 
         Mock tableView = displayTableView(service, p);
+        view.expects(once()).method("updateLockPeriod");
 
         ChangeSet changeset = new ChangeSet();
         changeset.addDeleted(new VersionedRecord());

@@ -67,6 +67,7 @@ public class DataEditorPresenter {
         tablePresenter.submitChanges();
         try {
             token = service.save(token);
+            view.updateLockPeriod(token.lockStart(), token.lockEnd());
         } catch (EmfException e) {
             view.notifySaveFailure(e.getMessage());
             doDiscard();
