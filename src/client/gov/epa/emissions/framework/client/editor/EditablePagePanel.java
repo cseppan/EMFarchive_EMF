@@ -130,15 +130,17 @@ public class EditablePagePanel extends JPanel {
 
         tableData.addBlankRow();
         refresh();
-
-        table.moveToBottom();
-        refresh();
+        scrollToPageEnd();
     }
 
     private void doRemove(final EditablePage tableData) {
         clearMessages();
         tableData.removeSelected();
         refresh();
+    }
+
+    public void scrollToPageEnd() {
+        table.moveToBottom();
     }
 
 }

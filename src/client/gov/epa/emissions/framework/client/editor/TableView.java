@@ -6,4 +6,6 @@ public interface TableView {
 
     void display(Page page);
 
+    void scrollToPageEnd();
+
 }

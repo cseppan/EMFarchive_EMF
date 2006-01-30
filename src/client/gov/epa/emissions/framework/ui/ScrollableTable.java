@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.ui;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
@@ -23,6 +24,8 @@ public class ScrollableTable extends JScrollPane {
 
         enableScrolling(table);
         setColWidthsBasedOnColNames(table);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setRowSelectionAllowed(true);
 
         return table;
     }
@@ -51,7 +54,14 @@ public class ScrollableTable extends JScrollPane {
 
     public void moveToBottom() {
         JScrollBar vertical = getVerticalScrollBar();
-        vertical.setValue(vertical.getMaximum());
+        vertical.setValue(vertical.getMaximum() - 1);
+
+        selectLastRow();
+    }
+
+    public void selectLastRow() {
+        int total = table.getModel().getRowCount();
+        table.setRowSelectionInterval(total - 1, total - 1);
     }
 
 }

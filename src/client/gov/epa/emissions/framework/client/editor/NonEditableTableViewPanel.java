@@ -17,7 +17,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.border.CompoundBorder;
 
 public class NonEditableTableViewPanel extends JPanel implements NonEditableTableView {
@@ -29,6 +28,8 @@ public class NonEditableTableViewPanel extends JPanel implements NonEditableTabl
     private JPanel pageContainer;
 
     private PaginationPanel paginationPanel;
+
+    private ScrollableTable table;
 
     public NonEditableTableViewPanel(InternalSource source, MessagePanel messagePanel) {
         super(new BorderLayout());
@@ -82,7 +83,7 @@ public class NonEditableTableViewPanel extends JPanel implements NonEditableTabl
         paginationPanel.updateStatus(page);
 
         tableModel = new EmfTableModel(new ViewablePage(page, cols()));
-        JScrollPane table = new ScrollableTable(tableModel);
+        table = new ScrollableTable(tableModel);
         pageContainer.add(table, BorderLayout.CENTER);
     }
 
@@ -96,6 +97,10 @@ public class NonEditableTableViewPanel extends JPanel implements NonEditableTabl
             cols.add(allCols[i]);
 
         return (String[]) cols.toArray(new String[0]);
+    }
+
+    public void scrollToPageEnd() {
+        table.selectLastRow();
     }
 
 }

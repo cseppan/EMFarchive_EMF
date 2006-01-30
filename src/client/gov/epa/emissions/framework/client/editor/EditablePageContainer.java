@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 public class EditablePageContainer extends JPanel implements EditablePageManagerView {
@@ -31,6 +30,8 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
     private EditablePage editablePage;
 
     private MessagePanel messagePanel;
+
+    private EditablePagePanel editablePagePanel;
 
     public EditablePageContainer(EmfDataset dataset, Version version, InternalSource source, MessagePanel messagePanel) {
         super(new BorderLayout());
@@ -66,9 +67,11 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
         pageContainer.add(createEditablePage(page), BorderLayout.CENTER);
     }
 
-    private JComponent createEditablePage(Page page) {
+    private EditablePagePanel createEditablePage(Page page) {
         editablePage = new EditablePage((int) dataset.getDatasetid(), version, page, cols());
-        return new EditablePagePanel(editablePage, messagePanel);
+        editablePagePanel = new EditablePagePanel(editablePage, messagePanel);
+        
+        return editablePagePanel;
     }
 
     // Filter out the first four (version-specific cols)
@@ -89,6 +92,10 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
 
     public void updateTotalRecordsCount(int total) {
         paginationPanel.updateTotalRecordsCount(total);
+    }
+
+    public void scrollToPageEnd() {
+        editablePagePanel.scrollToPageEnd();
     }
 
 }

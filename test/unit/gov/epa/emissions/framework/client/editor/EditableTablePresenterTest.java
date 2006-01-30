@@ -154,6 +154,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock view = mock(EditablePageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
+        view.stubs().method("scrollToPageEnd").withNoArguments();
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
         view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
@@ -177,6 +178,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         Mock view = mock(EditablePageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
+        view.stubs().method("scrollToPageEnd").withNoArguments();
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
         view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));

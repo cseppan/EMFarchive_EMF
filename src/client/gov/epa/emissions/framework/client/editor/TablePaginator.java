@@ -63,8 +63,10 @@ public class TablePaginator {
 
     public void doDisplayLast() throws EmfException {
         int pageCount = pageCount();
-        if (pageNumber() != pageCount)
+        if (pageNumber() != pageCount) {
             doDisplay(pageCount);
+            view.scrollToPageEnd();
+        }
     }
 
     private int pageCount() throws EmfException {
