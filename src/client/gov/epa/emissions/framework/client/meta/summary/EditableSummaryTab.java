@@ -23,7 +23,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -101,12 +100,15 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     }
 
     private JPanel createLowerSection(SummaryTabComboBoxChangesListener comboxBoxListener) throws EmfException {
-        JPanel lowerPanel = new JPanel(new FlowLayout());
+        JPanel panel = new JPanel(new BorderLayout());
 
-        lowerPanel.add(createTimeSpaceSection(comboxBoxListener));
-        lowerPanel.add(createStatusSection());
+        JPanel container = new JPanel();
+        container.add(createTimeSpaceSection(comboxBoxListener));
+        container.add(createStatusSection());
+        
+        panel.add(container, BorderLayout.LINE_START);
 
-        return lowerPanel;
+        return panel;
     }
 
     private JPanel createStatusSection() throws EmfException {

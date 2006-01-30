@@ -13,16 +13,10 @@ import gov.epa.emissions.framework.services.IntendedUse;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
-//import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -43,12 +37,15 @@ public class SummaryTab extends JPanel implements SummaryTabView {
     }
 
     private JPanel createLowerSection() {
-        JPanel lowerPanel = new JPanel(new FlowLayout());
+        JPanel panel = new JPanel(new BorderLayout());
 
-        lowerPanel.add(createTimeSpaceSection());
-        lowerPanel.add(createStatusSection());
+        JPanel container = new JPanel();
+        container.add(createTimeSpaceSection());
+        container.add(createStatusSection());
+        
+        panel.add(container, BorderLayout.LINE_START);
 
-        return lowerPanel;
+        return panel;
     }
 
     private JPanel createStatusSection() {
@@ -56,24 +53,6 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         panel.setLayout(new BorderLayout());
 
         panel.add(createStatusDatesPanel(), BorderLayout.PAGE_START);
-        panel.add(createSubscriptionPanel(), BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    private JPanel createSubscriptionPanel() {
-        JPanel panel = new JPanel();
-
-        JCheckBox subscribed = new JCheckBox("Subscribed?", true);
-        subscribed.setToolTipText("TBD");
- //       panel.add(subscribed);
-
-//        panel.add(new JLabel("Subscribed Users"));
-        DefaultComboBoxModel subscribedUsersModel = new DefaultComboBoxModel(new String[0]);
-        JComboBox subscribedUsers = new JComboBox(subscribedUsersModel);
-        subscribedUsers.setName("subscribedUser");
-        subscribedUsers.setPreferredSize(new Dimension(100, 20));
- //       panel.add(subscribedUsers);
 
         return panel;
     }
@@ -89,9 +68,9 @@ public class SummaryTab extends JPanel implements SummaryTabView {
                 .getAccessedDateTime())), panel);
         layoutGenerator.addLabelWidgetPair("Creation Date:", new Label("creationDate", formatDate(dataset
                 .getCreatedDateTime())), panel);
-        
+
         IntendedUse intendedUse = dataset.getIntendedUse();
-        String intendedUseName = (intendedUse!=null)? intendedUse.getName() :"";
+        String intendedUseName = (intendedUse != null) ? intendedUse.getName() : "";
         layoutGenerator.addLabelWidgetPair("Intended Use:", new Label("intendedUse", intendedUseName), panel);
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
@@ -107,35 +86,24 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // time period
-//        JPanel startDatePanel = new JPanel();
-//        startDatePanel.add(new JLabel("Time Period Start:"));
-//        startDatePanel.add(new JLabel(formatDate(dataset.getStartDateTime())));
-//
-//        JPanel endDatePanel = new JPanel();
-//        endDatePanel.add(new JLabel("Time Period End:  "));
-//        endDatePanel.add(new JLabel(formatDate(dataset.getStopDateTime())));
-//
-//        JPanel datesPanel = new JPanel();
-//        datesPanel.setLayout(new BoxLayout(datesPanel, BoxLayout.Y_AXIS));
-//        datesPanel.add(startDatePanel);
-//        datesPanel.add(endDatePanel);
-
-//        layoutGenerator.addLabelWidgetPair("", datesPanel, panel);
-        layoutGenerator.addLabelWidgetPair("Time Period Start:", new JLabel(formatDate(dataset.getStartDateTime())), panel);
-        layoutGenerator.addLabelWidgetPair("Time Period End:", new JLabel(formatDate(dataset.getStopDateTime())), panel);
-        layoutGenerator.addLabelWidgetPair("Temporal Resolution:", new JLabel(dataset.getTemporalResolution()), panel);
+        layoutGenerator.addLabelWidgetPair("Time Period Start:", new JLabel(formatDate(dataset.getStartDateTime())),
+                panel);
+        layoutGenerator.addLabelWidgetPair("Time Period End:", new JLabel(formatDate(dataset.getStopDateTime())),
+                panel);
+        layoutGenerator.addLabelWidgetPair("Temporal Resolution:", new JLabel(dataset.getTemporalResolution()),
+                panel);
         Sector[] sectors = dataset.getSectors();
         String sectorLabel = "";
-        if(sectors != null && sectors.length>0){
+        if (sectors != null && sectors.length > 0) {
             sectorLabel = sectors[0].toString();
         }
         layoutGenerator.addLabelWidgetPair("Sector:", new JLabel(sectorLabel), panel);
         Region region = dataset.getRegion();
-        String regionName = (region!=null) ?region.getName() :"";
+        String regionName = (region != null) ? region.getName() : "";
         layoutGenerator.addLabelWidgetPair("Region:", new JLabel(regionName), panel);
-        
+
         Country country = dataset.getCountry();
-        String countryName = (country!=null) ?country.getName() :"";
+        String countryName = (country != null) ? country.getName() : "";
         layoutGenerator.addLabelWidgetPair("Country:", new JLabel(countryName), panel);
 
         // Lay out the panel.
@@ -163,9 +131,8 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         description.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableTextArea(description), panel);
 
-        
         Project project = dataset.getProject();
-        String projectName = (project!=null) ?project.getName() :"";
+        String projectName = (project != null) ? project.getName() : "";
         layoutGenerator.addLabelWidgetPair("Project:", new JLabel(projectName), panel);
         layoutGenerator.addLabelWidgetPair("Creator:", new JLabel(dataset.getCreator()), panel);
         layoutGenerator.addLabelWidgetPair("Dataset Type:", new JLabel(dataset.getDatasetTypeName()), panel);
