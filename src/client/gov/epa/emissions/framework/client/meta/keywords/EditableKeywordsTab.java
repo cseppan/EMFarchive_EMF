@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.io.KeyVal;
+import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -22,7 +23,16 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
 
     public void display(EmfDataset dataset, Keywords masterKeywords) {
         super.removeAll();
+        //TODO: where to do this removal?
+        removeDatasetTypeKeywords(dataset,masterKeywords);
         super.add(createLayout(dataset, masterKeywords));
+    }
+
+    private void removeDatasetTypeKeywords(EmfDataset dataset, Keywords masterKeywords) {
+        Keyword[] datasetTypeKeywords = dataset.getDatasetType().getKeywords();
+        for (int i = 0; i < datasetTypeKeywords.length; i++) {
+            masterKeywords.remove(datasetTypeKeywords[i]);
+        }
     }
 
     private JPanel createLayout(EmfDataset dataset, Keywords masterKeywords) {
