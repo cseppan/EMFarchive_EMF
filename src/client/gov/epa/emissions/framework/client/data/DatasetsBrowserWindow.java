@@ -326,14 +326,31 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         for (int i = 0; i < datasets.length; i++) {
             KeyVal[] keyVals = datasets[i].getKeyVals();
             Keyword[] keyWords = datasets[i].getDatasetType().getKeywords();
-            if(keyVals.length < keyWords.length)
-                throw new EmfException("Keywords for dataset: " + datasets[i].getName() + 
-                        " may not have values.");
+            int k;
+            boolean found = true; // need to do this to handle no keywords case
+            // verify that each keyword defined for the dataset type is in the
+            // dataset
+            for (k = 0; (k < keyWords.length) && !found; k++)
+            {
+                found = false;
+                for (int l = 0; l < keyVals.length; l++)
+                {
+                    if (keyVals[l].getKeyword().getName().equals(keyWords[k].getName()))
+                    {    
+                        found = true;
+                    }    
+                }               
+                if (!found)
+                    break;
+            }
+            if(!found)
+                throw new EmfException("Cannot export: Keyword "+keyWords[k].getName()+" is missing for dataset " + 
+                        datasets[i].getName());
             
             for(int j = 0; j < keyVals.length; j++)
                 if(keyVals[j].getValue().equals(""))
-                    throw new EmfException("Keyword: " + keyVals[j].getKeyword() + 
-                            "doesn't have a value.");
+                    throw new EmfException("Cannot export: Keyword " + keyVals[j].getKeyword() + 
+                            "does not have a value for dataset "+datasets[i].getName());
         }
     }
     
