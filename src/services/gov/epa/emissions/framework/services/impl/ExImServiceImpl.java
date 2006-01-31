@@ -194,7 +194,14 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     }
 
     private boolean isExportable(EmfDataset dataset) {
-        return (!(dataset.getDatasetType().isExternal()));
+        boolean exportable = true;
+        
+        DatasetType dst = dataset.getDatasetType();
+        
+        //if (dst.isExternal()) exportable=false;
+        if (dst.getExporterClassName().equals("")) exportable=false;
+        
+        return (exportable);
     }
 
     String getCleanDatasetName(EmfDataset dataset) {
