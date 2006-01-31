@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.commons.io.KeyVal;
+import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
@@ -209,7 +211,11 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         JButton exportButton = new Button("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                exportSelectedDatasets();
+                try {
+                    exportSelectedDatasets();
+                } catch (EmfException e) {
+                    showError(e.getMessage());
+                }
             }
         });
         exportButton.setToolTipText("Export existing Dataset(s)");
@@ -226,10 +232,11 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         return panel;
     }
 
-    protected void exportSelectedDatasets() {
+    protected void exportSelectedDatasets() throws EmfException{
         List datasets = getSelectedDatasets();
         EmfDataset[] emfDatasets = (EmfDataset[]) datasets.toArray(new EmfDataset[0]);
-
+        checkKeyVals(emfDatasets);
+        
         ExportWindow exportView = new ExportWindow(emfDatasets);
         getDesktopPane().add(exportView);
 
@@ -314,5 +321,20 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         messagePanel.clear();
         super.refreshLayout();
     }
-
+    
+    private void checkKeyVals(EmfDataset[] datasets) throws EmfException {
+        for (int i = 0; i < datasets.length; i++) {
+            KeyVal[] keyVals = datasets[i].getKeyVals();
+            Keyword[] keyWords = datasets[i].getDatasetType().getKeywords();
+            if(keyVals.length < keyWords.length)
+                throw new EmfException("Keywords for dataset: " + datasets[i].getName() + 
+                        " may not have values.");
+            
+            for(int j = 0; j < keyVals.length; j++)
+                if(keyVals[j].getValue().equals(""))
+                    throw new EmfException("Keyword: " + keyVals[j].getKeyword() + 
+                            "doesn't have a value.");
+        }
+    }
+    
 }
