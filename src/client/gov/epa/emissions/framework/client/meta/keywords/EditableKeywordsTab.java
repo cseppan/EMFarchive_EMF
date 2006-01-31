@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.Keywords;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -19,13 +20,13 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     }
 
-    public void display(KeyVal[] values, Keywords masterKeywords) {
+    public void display(EmfDataset dataset, Keywords masterKeywords) {
         super.removeAll();
-        super.add(createLayout(values, masterKeywords));
+        super.add(createLayout(dataset, masterKeywords));
     }
 
-    private JPanel createLayout(KeyVal[] values, Keywords masterKeywords) {
-        tableData = new EditableKeyValueTableData(values, masterKeywords);
+    private JPanel createLayout(EmfDataset dataset, Keywords masterKeywords) {
+        tableData = new EditableKeyValueTableData(dataset, masterKeywords);
         editableKeywordsPanel = new EditableKeywordsPanel("", tableData, masterKeywords);
         return editableKeywordsPanel;
     }

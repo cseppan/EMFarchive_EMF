@@ -22,9 +22,9 @@ import javax.swing.table.TableColumnModel;
 
 public class EditableTablePanel extends JPanel implements Editor{
 
-    private EmfTableModel tableModel;
+    protected EmfTableModel tableModel;
 
-    private EditableTable table;
+    protected EditableTable table;
 
     public EditableTablePanel(String label, SelectableEmfTableData tableData) {
         super.setLayout(new BorderLayout());
@@ -50,7 +50,7 @@ public class EditableTablePanel extends JPanel implements Editor{
         return panel;
     }
 
-    private JScrollPane table(TableData tableData) {
+    protected JScrollPane table(TableData tableData) {
         tableModel = new EmfTableModel(tableData);
         table = new EditableTable(tableModel);
 

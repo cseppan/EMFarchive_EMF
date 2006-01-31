@@ -17,7 +17,7 @@ public class EditableKeywordsPanel extends JPanel implements Editor {
     private EditableTablePanel editableTablePanel;
 
     public EditableKeywordsPanel(String label, EditableKeyValueTableData tableData, Keywords masterKeywords) {
-        editableTablePanel = new EditableTablePanel(label, tableData);
+        editableTablePanel = new EditableKeyValueTablePanel(label, tableData);
         editableTablePanel.setColumnEditor(keywordColumnEditor(masterKeywords), 1, "Select from the list");
 
         super.setLayout(new BorderLayout());

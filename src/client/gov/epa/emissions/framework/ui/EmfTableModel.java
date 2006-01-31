@@ -13,7 +13,7 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
 
     private List rows;
 
-    private TableData tableData;
+    protected TableData tableData;
 
     public EmfTableModel(TableData tableData) {
         refresh(tableData);

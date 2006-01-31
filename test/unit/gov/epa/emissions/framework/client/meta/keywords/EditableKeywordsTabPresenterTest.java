@@ -5,13 +5,10 @@ import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.Keywords;
-import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
-import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
-import org.jmock.core.Constraint;
 
 public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
 
@@ -23,7 +20,7 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getKeyVals").will(returnValue(values));
 
         Keywords keywords = new Keywords(new Keyword[0]);
-        view.expects(once()).method("display").with(eq(values), same(keywords));
+        view.expects(once()).method("display").with(eq(dataset.proxy()), same(keywords));
 
         Mock type = mock(DatasetType.class);
         type.stubs().method("getKeywords").withNoArguments().will(returnValue(new Keyword[0]));
@@ -52,34 +49,12 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
 
         Mock view = mock(EditableKeywordsTabView.class);
         Keywords keywords = new Keywords(keywordsList);
-        view.expects(once()).method("display").with(keyValsConstraint(keyword1, keyword2, values), same(keywords));
+        view.expects(once()).method("display").with(eq(dataset.proxy()), same(keywords));
 
         EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenter((EditableKeywordsTabView) view.proxy(), (EmfDataset) dataset
                 .proxy());
 
         presenter.display(keywords);
-    }
-
-    private Constraint keyValsConstraint(final Keyword keyword1, final Keyword keyword2, final KeyVal[] values) {
-        return new Constraint() {
-            public boolean eval(Object arg) {
-                assertTrue(arg instanceof KeyVal[]);
-
-                KeyVal[] actual = (KeyVal[]) arg;
-                assertEquals(2, actual.length);
-                assertEquals(values[0], actual[0]);
-                assertEquals(keyword1, actual[0].getKeyword());
-                KeyVal newKeyVal = actual[1];
-                assertEquals("", newKeyVal.getValue());
-                assertEquals(keyword2, newKeyVal.getKeyword());
-
-                return true;
-            }
-
-            public StringBuffer describeTo(StringBuffer arg0) {
-                return null;
-            }
-        };
     }
 
     public void testUpdateDatasetOnSave() throws EmfException {

@@ -1,10 +1,12 @@
 package gov.epa.emissions.framework.client.meta.keywords;
 
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueTableData;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;
@@ -31,7 +33,11 @@ public class EditableKeyValueTableDataTest extends TestCase {
         val2.setValue("val2");
 
         Keyword[] keywords = { new Keyword("1"), new Keyword("2") };
-        data = new EditableKeyValueTableData(new KeyVal[] { val1, val2 }, new Keywords(keywords));
+        KeyVal[] keyVals = new KeyVal[] { val1, val2 };
+        EmfDataset dataset = new EmfDataset();
+        dataset.setKeyVals(keyVals);
+        dataset.setDatasetType(new DatasetType());
+        data = new EditableKeyValueTableData(dataset, new Keywords(keywords));
     }
 
     public void testShouldHaveThreeColumns() {
