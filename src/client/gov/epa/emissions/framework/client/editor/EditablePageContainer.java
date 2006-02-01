@@ -53,7 +53,7 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
         add(pageContainer, BorderLayout.CENTER);
     }
 
-    public void observe(EditableTablePresenter presenter) {
+    public void observe(EditableTablePresenterImpl presenter) {
         paginationPanel.init(presenter);
     }
 

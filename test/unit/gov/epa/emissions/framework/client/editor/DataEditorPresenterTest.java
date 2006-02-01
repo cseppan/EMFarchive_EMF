@@ -86,39 +86,47 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("closeSession").with(new IsInstanceOf(DataAccessToken.class));
         service.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
 
-        DataEditorPresenter p = displayPresenter(view, service);
+        Mock tablePresenter = mock(EditableTablePresenter.class);
+        tablePresenter.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
+        DataEditorPresenter p = displayPresenter(view, service, tablePresenter);
 
         p.doClose();
     }
-    
+
     public void testShouldCloseIfConfirmDiscardAndChangesExistOnClose() throws Exception {
         Mock view = mock(DataEditorView.class);
         view.expects(once()).method("close").withNoArguments();
-        
+
         Mock service = mock(DataEditorService.class);
         service.expects(once()).method("closeSession").with(new IsInstanceOf(DataAccessToken.class));
-        
+
         service.stubs().method("hasChanges").will(returnValue(Boolean.TRUE));
         view.expects(once()).method("confirmDiscardChanges").will(returnValue(Boolean.TRUE));
+
+        Mock tablePresenter = mock(EditableTablePresenter.class);
+        tablePresenter.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
         
-        DataEditorPresenter p = displayPresenter(view, service);
-        
-        p.doClose();
-    }
-    
-    public void testShouldNotCloseIfConfirmDiscardIsNoAndChangesExistOnClose() throws Exception {
-        Mock view = mock(DataEditorView.class);
-        Mock service = mock(DataEditorService.class);
-        
-        service.stubs().method("hasChanges").will(returnValue(Boolean.TRUE));
-        view.expects(once()).method("confirmDiscardChanges").will(returnValue(Boolean.FALSE));
-        
-        DataEditorPresenter p = displayPresenter(view, service);
-        
+        DataEditorPresenter p = displayPresenter(view, service, tablePresenter);
+
         p.doClose();
     }
 
-    private DataEditorPresenter displayPresenter(Mock view, Mock service) throws EmfException {
+    public void testShouldNotCloseIfConfirmDiscardIsNoAndChangesExistOnClose() throws Exception {
+        Mock view = mock(DataEditorView.class);
+        Mock service = mock(DataEditorService.class);
+
+        service.stubs().method("hasChanges").will(returnValue(Boolean.TRUE));
+        view.expects(once()).method("confirmDiscardChanges").will(returnValue(Boolean.FALSE));
+
+        Mock tablePresenter = mock(EditableTablePresenter.class);
+        tablePresenter.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
+        
+        DataEditorPresenter p = displayPresenter(view, service, tablePresenter);
+
+        p.doClose();
+    }
+
+    private DataEditorPresenter displayPresenter(Mock view, Mock service, Mock tablePresenter) throws EmfException {
         Version version = new Version();
         String table = "table";
 
@@ -136,6 +144,10 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("observe").with(same(p));
         p.display((DataEditorView) view.proxy());
 
+        tablePresenter.expects(once()).method("observe");
+        tablePresenter.expects(once()).method("doDisplayFirst");
+        p.displayTable((EditableTablePresenter) tablePresenter.proxy());
+
         return p;
     }
 
@@ -145,29 +157,21 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Mock service = mock(DataEditorService.class);
         service.expects(once()).method("discard").with(new IsInstanceOf(DataAccessToken.class));
 
-        DataEditorPresenter p = displayPresenter(view, service);
+        DataEditorPresenter p = displayPresenter(view, service, mock(EditableTablePresenter.class));
 
         p.doDiscard();
     }
 
     public void testShouldDisplayTableViewOnDisplayTableView() throws Exception {
-        Mock tableView = mock(EditablePageManagerView.class);
-        tableView.expects(once()).method("observe").with(new IsInstanceOf(EditableTablePresenter.class));
-        tableView.expects(once()).method("display").with(new IsInstanceOf(Page.class));
-        tableView.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
-
-        Version version = new Version();
-        String table = "table";
-
         Mock service = mock(DataEditorService.class);
-        service.stubs().method("getPage").withAnyArguments().will(returnValue(new Page()));
 
-        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        tableView.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
+        DataEditorPresenter p = new DataEditorPresenter(null, null, null, (DataEditorService) service.proxy());
 
-        DataEditorPresenter p = new DataEditorPresenter(null, version, table, (DataEditorService) service.proxy());
+        Mock tablePresenter = mock(EditableTablePresenter.class);
+        tablePresenter.expects(once()).method("observe");
+        tablePresenter.expects(once()).method("doDisplayFirst");
 
-        p.displayTable((EditablePageManagerView) tableView.proxy());
+        p.displayTable((EditableTablePresenter) tablePresenter.proxy());
     }
 
     public void testShouldSubmitAnyChangesAndSaveChangesOnSave() throws Exception {
@@ -177,11 +181,11 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Mock token = mock(DataAccessToken.class);
         token.stubs().method("lockStart").will(returnValue(new Date()));
         token.stubs().method("lockEnd").will(returnValue(new Date()));
-        
+
         service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class)).will(
                 returnValue(token.proxy()));
 
-        DataEditorPresenter p = displayPresenter(view, service);
+        DataEditorPresenter p = displayPresenter(view, service, mock(EditableTablePresenter.class));
 
         Mock tableView = displayTableView(service, p);
         view.expects(once()).method("updateLockPeriod");
@@ -207,7 +211,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("closeSession").with(new IsInstanceOf(DataAccessToken.class));
         service.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
 
-        DataEditorPresenter p = displayPresenter(view, service);
+        DataEditorPresenter p = displayPresenter(view, service, mock(EditableTablePresenter.class));
         Mock tableView = displayTableView(service, p);
 
         ChangeSet changeset = new ChangeSet();
@@ -223,7 +227,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
     private Mock displayTableView(Mock service, DataEditorPresenter p) throws EmfException {
         Mock tableView = mock(EditablePageManagerView.class);
-        tableView.expects(once()).method("observe").with(new IsInstanceOf(EditableTablePresenter.class));
+        tableView.expects(once()).method("observe").with(new IsInstanceOf(EditableTablePresenterImpl.class));
         tableView.expects(once()).method("display").with(new IsInstanceOf(Page.class));
         tableView.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
         service.stubs().method("getPage").withAnyArguments().will(returnValue(new Page()));

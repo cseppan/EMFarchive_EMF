@@ -37,9 +37,6 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
         
         editable.observe(this);
         Keyword[] keywords = dataCommonsService().getKeywords();
-        for(int i=0;i<keywords.length; i++){
-            System.out.println("IN editable dataset type panel keyword -"+ keywords[i].getName());
-        }
         editable.display(type, keywords);
     }
 

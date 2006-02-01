@@ -49,17 +49,26 @@ public class DataEditorPresenter {
     }
 
     public void displayTable(EditablePageManagerView tableView) throws EmfException {
-        tablePresenter = new EditableTablePresenter(version, table, tableView, service);
+        EditableTablePresenter tablePresenter = new EditableTablePresenterImpl(version, table, tableView, service);
+        displayTable(tablePresenter);
+    }
+
+    void displayTable(EditableTablePresenter tablePresenter) throws EmfException {
+        this.tablePresenter = tablePresenter;
         tablePresenter.observe();
         tablePresenter.doDisplayFirst();
     }
 
     public void doClose() throws EmfException {
-        if (service.hasChanges(token) && !view.confirmDiscardChanges())
+        if (hasChanges() && !view.confirmDiscardChanges())
             return;
 
         service.closeSession(token);
         view.close();
+    }
+
+    private boolean hasChanges() throws EmfException {
+        return tablePresenter.hasChanges() || service.hasChanges(token);
     }
 
     public void doDiscard() throws EmfException {
