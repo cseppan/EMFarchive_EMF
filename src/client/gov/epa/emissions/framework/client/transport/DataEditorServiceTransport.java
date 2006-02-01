@@ -190,6 +190,23 @@ public class DataEditorServiceTransport implements DataEditorService {
         }
     }
 
+    public boolean hasChanges(DataAccessToken token) throws EmfException {
+        try {
+            mappings.addParam(call, "token", mappings.dataAccessToken());
+            mappings.setOperation(call, "hasChanges");
+            mappings.setBooleanReturnType(call);
+
+            Object result = call.invoke(new Object[] { token });
+            return ((Boolean) result).booleanValue();
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Could not confirm changes for " + token, e);
+        } finally {
+            call.removeAllParameters();
+        }
+
+        return false;
+    }
+
     public void discard(DataAccessToken token) throws EmfException {
         try {
             mappings.addParam(call, "token", mappings.dataAccessToken());

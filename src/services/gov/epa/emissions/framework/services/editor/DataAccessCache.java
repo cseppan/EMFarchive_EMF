@@ -220,4 +220,8 @@ public class DataAccessCache implements DataUpdatesCache {
         reload(token, session);
     }
 
+    public boolean hasChanges(DataAccessToken token, Session session) throws Exception {
+        return changesets(token, session).hasChanges();
+    }
+
 }

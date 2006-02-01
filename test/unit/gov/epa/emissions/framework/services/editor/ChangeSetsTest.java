@@ -31,6 +31,21 @@ public class ChangeSetsTest extends MockObjectTestCase {
         assertEquals(6, sets.netIncrease());
     }
 
+    public void testShouldConfirmChangesIfTotalNetIncreaseOfAllChangeSetsIsGreaterThanZero() {
+        ChangeSets sets = new ChangeSets();
+
+        Mock set1 = mock(ChangeSet.class);
+        set1.stubs().method("netIncrease").will(returnValue(8));
+        sets.add((ChangeSet) set1.proxy());
+
+        Mock set2 = mock(ChangeSet.class);
+        set2.stubs().method("netIncrease").will(returnValue(-2));
+        sets.add((ChangeSet) set2.proxy());
+
+        assertTrue("Should confirm changes if total net increase of all ChangeSets is greater than zero", sets
+                .hasChanges());
+    }
+
     public void testShouldBeAbleToIterateThroughContents() {
         ChangeSets sets = new ChangeSets();
 

@@ -37,18 +37,18 @@ public class DataAccessCacheTest extends MockObjectTestCase {
 
         session = null;
         Mock properties = properties();
-        
+
         cache = new DataAccessCache((VersionedRecordsReader) reader.proxy(),
                 (VersionedRecordsWriterFactory) writerFactory.proxy(), null, null, (EmfProperties) properties.proxy());
     }
 
     private Mock properties() {
         Mock properties = mock(EmfProperties.class);
-        
+
         EmfProperty property = new EmfProperty();
         property.setName("page-size");
         property.setValue("100");
-        
+
         properties.stubs().method("getProperty").with(eq("page-size"), eq(null)).will(returnValue(property));
         return properties;
     }
@@ -148,6 +148,24 @@ public class DataAccessCacheTest extends MockObjectTestCase {
 
         ChangeSets empty = cache.changesets(token, session);
         assertEquals(0, empty.size());
+    }
+
+    public void testConfirmChangesIfChangeSetContainsUpdates() throws Exception {
+        DataAccessToken token = new DataAccessToken();
+        Version version = new Version();
+        version.setDatasetId(2);
+        version.setVersion(3);
+        token.setVersion(version);
+
+        cache.init(token, session);
+
+        Mock changeset = mock(ChangeSet.class);
+        changeset.stubs().method("netIncrease").will(returnValue(2));
+        cache.submitChangeSet(token, (ChangeSet) changeset.proxy(), 1, session);
+        assertTrue("Should confirm updates if ChangeSet has changes", cache.hasChanges(token, session));
+
+        cache.close(token, session);
+        assertFalse("Should not have any changes once Cache is closed", cache.hasChanges(token, session));
     }
 
     public void testShouldDiscardChangeSetsOfAllPagesOnDiscard() throws Exception {

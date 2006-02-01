@@ -48,7 +48,7 @@ public class EmfMappings extends Mappings {
         bean(call, Project.class, project());
         bean(call, Region.class, region());
         bean(call, IntendedUse.class, intendeduse());
-        
+
         bean(call, Sector.class, sector());
         bean(call, SectorCriteria.class, "SectorCriteria");
 
@@ -78,7 +78,7 @@ public class EmfMappings extends Mappings {
         array(call, Project[].class, projects());
         array(call, Region[].class, regions());
         array(call, IntendedUse[].class, intendeduses());
-        
+
         array(call, Sector[].class, sectors());
         array(call, SectorCriteria[].class, "SectorCriterias");
 

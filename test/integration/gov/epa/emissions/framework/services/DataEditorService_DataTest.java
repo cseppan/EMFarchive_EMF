@@ -285,6 +285,27 @@ public class DataEditorService_DataTest extends ServicesTestCase {
             assertEquals(v1Records[i].getRecordId(), v2Records[i].getRecordId());
     }
 
+    public void testShouldConfirmWithYesIfChangesExist() throws Exception {
+        Version v1 = versionOne();
+        DataAccessToken token = token(v1, table);
+
+        ChangeSet changeset = new ChangeSet();
+        changeset.setVersion(v1);
+        VersionedRecord record6 = new VersionedRecord();
+        record6.setDatasetId((int) dataset.getDatasetid());
+        changeset.addNew(record6);
+        service.submit(token, changeset, 1);
+
+        assertTrue("Should confirm with Yes if session contains changes", service.hasChanges(token));
+    }
+
+    public void testShouldConfirmWithNoIfChangesDontExist() throws Exception {
+        Version v1 = versionOne();
+        DataAccessToken token = token(v1, table);
+
+        assertFalse("Should confirm with No if session does not contains changes", service.hasChanges(token));
+    }
+
     public void testShouldAddNewRecordsInChangeSetToPageOnRepeatFetchOfSamePage() throws Exception {
         Version v1 = versionOne();
 

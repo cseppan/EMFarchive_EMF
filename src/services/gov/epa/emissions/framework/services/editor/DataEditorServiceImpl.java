@@ -204,4 +204,18 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         super.finalize();
     }
 
+    public boolean hasChanges(DataAccessToken token) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            boolean result = cache.hasChanges(token, session);
+            session.close();
+
+            return result;
+        } catch (Exception e) {
+            Version version = token.getVersion();
+            LOG.error("Could not confirm changes for Version: " + version.getDatasetId() + ". Reason: " + e);
+            throw new EmfException("Could not confirm changes for Version: " + version.getDatasetId());
+        }
+    }
+
 }

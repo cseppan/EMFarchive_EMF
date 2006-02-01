@@ -68,4 +68,8 @@ public class ChangeSets {
 
     }
 
+    public boolean hasChanges() {
+        return netIncrease() > 0;
+    }
+
 }

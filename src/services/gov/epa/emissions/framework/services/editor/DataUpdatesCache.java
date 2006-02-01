@@ -25,6 +25,8 @@ public interface DataUpdatesCache extends DataViewCache {
 
     ChangeSets changesets(DataAccessToken token, Session session) throws SQLException;
 
+    boolean hasChanges(DataAccessToken token, Session session) throws Exception;
+
     void save(DataAccessToken token, Session session) throws Exception;
 
 }
