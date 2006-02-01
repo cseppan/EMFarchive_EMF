@@ -18,4 +18,5 @@ public interface DataEditorView extends ManagedView {
 
     void notifySaveFailure(String message);
 
+    boolean confirmDiscardChanges();
 }

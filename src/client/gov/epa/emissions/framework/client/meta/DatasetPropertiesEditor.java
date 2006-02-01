@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.ui.ConfirmDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -171,9 +172,9 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     public boolean shouldContinueLosingUnsavedChanges() {
-        int option = JOptionPane.showConfirmDialog(this,
-                "Would you like to Close(without saving and lose the updates)?", "Close", JOptionPane.YES_NO_OPTION);
-        return (option == 0);
+        String message = "Would you like to Close(without saving and lose the updates)?";
+        String title = "Close";
+        return new ConfirmDialog(message, title, this).confirm();
     }
 
     public void notifyLockFailure(EmfDataset dataset) {

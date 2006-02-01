@@ -84,9 +84,37 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         Mock service = mock(DataEditorService.class);
         service.expects(once()).method("closeSession").with(new IsInstanceOf(DataAccessToken.class));
+        service.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
 
         DataEditorPresenter p = displayPresenter(view, service);
 
+        p.doClose();
+    }
+    
+    public void testShouldCloseIfConfirmDiscardAndChangesExistOnClose() throws Exception {
+        Mock view = mock(DataEditorView.class);
+        view.expects(once()).method("close").withNoArguments();
+        
+        Mock service = mock(DataEditorService.class);
+        service.expects(once()).method("closeSession").with(new IsInstanceOf(DataAccessToken.class));
+        
+        service.stubs().method("hasChanges").will(returnValue(Boolean.TRUE));
+        view.expects(once()).method("confirmDiscardChanges").will(returnValue(Boolean.TRUE));
+        
+        DataEditorPresenter p = displayPresenter(view, service);
+        
+        p.doClose();
+    }
+    
+    public void testShouldNotCloseIfConfirmDiscardIsNoAndChangesExistOnClose() throws Exception {
+        Mock view = mock(DataEditorView.class);
+        Mock service = mock(DataEditorService.class);
+        
+        service.stubs().method("hasChanges").will(returnValue(Boolean.TRUE));
+        view.expects(once()).method("confirmDiscardChanges").will(returnValue(Boolean.FALSE));
+        
+        DataEditorPresenter p = displayPresenter(view, service);
+        
         p.doClose();
     }
 
@@ -177,6 +205,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class)).will(
                 throwException(new EmfException("Failure")));
         service.expects(once()).method("closeSession").with(new IsInstanceOf(DataAccessToken.class));
+        service.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
 
         DataEditorPresenter p = displayPresenter(view, service);
         Mock tableView = displayTableView(service, p);

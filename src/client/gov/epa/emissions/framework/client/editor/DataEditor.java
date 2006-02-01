@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.ui.ConfirmDialog;
 import gov.epa.emissions.framework.ui.Dimensions;
 
 import java.awt.BorderLayout;
@@ -111,7 +112,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     public void updateLockPeriod(Date start, Date end) {
-        lockInfo.setText("Lock expires at " + format(end)+"  ");
+        lockInfo.setText("Lock expires at " + format(end) + "  ");
     }
 
     private JPanel tablePanel(Version version, String table) {
@@ -261,6 +262,12 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     public void notifySaveFailure(String message) {
         JOptionPane.showMessageDialog(this, message);
+    }
+
+    public boolean confirmDiscardChanges() {
+        String message = "Would you like to Close(without Save) and Lose the Changes?";
+        String title = "Close";
+        return new ConfirmDialog(message, title, this).confirm();
     }
 
 }

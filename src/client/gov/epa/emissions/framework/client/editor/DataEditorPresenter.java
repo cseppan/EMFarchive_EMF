@@ -37,7 +37,7 @@ public class DataEditorPresenter {
             view.notifyLockFailure(token);
             return;
         }
-        
+
         display(token, view);
     }
 
@@ -55,6 +55,9 @@ public class DataEditorPresenter {
     }
 
     public void doClose() throws EmfException {
+        if (service.hasChanges(token) && !view.confirmDiscardChanges())
+            return;
+
         service.closeSession(token);
         view.close();
     }

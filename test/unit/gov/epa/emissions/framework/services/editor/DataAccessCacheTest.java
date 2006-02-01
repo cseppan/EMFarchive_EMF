@@ -160,7 +160,7 @@ public class DataAccessCacheTest extends MockObjectTestCase {
         cache.init(token, session);
 
         Mock changeset = mock(ChangeSet.class);
-        changeset.stubs().method("netIncrease").will(returnValue(2));
+        changeset.stubs().method("hasChanges").will(returnValue(Boolean.TRUE));
         cache.submitChangeSet(token, (ChangeSet) changeset.proxy(), 1, session);
         assertTrue("Should confirm updates if ChangeSet has changes", cache.hasChanges(token, session));
 

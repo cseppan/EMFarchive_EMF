@@ -69,7 +69,13 @@ public class ChangeSets {
     }
 
     public boolean hasChanges() {
-        return netIncrease() > 0;
+        for (ChangeSetsIterator iter = iterator(); iter.hasNext();) {
+            ChangeSet element = iter.next();
+            if (element.hasChanges())
+                return true;
+
+        }
+        return false;
     }
 
 }

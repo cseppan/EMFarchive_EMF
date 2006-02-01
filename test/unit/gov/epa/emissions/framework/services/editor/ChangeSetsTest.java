@@ -31,18 +31,22 @@ public class ChangeSetsTest extends MockObjectTestCase {
         assertEquals(6, sets.netIncrease());
     }
 
-    public void testShouldConfirmChangesIfTotalNetIncreaseOfAllChangeSetsIsGreaterThanZero() {
-        ChangeSets sets = new ChangeSets();
-
+    public void testShouldConfirmChangesIfAnyChangeSetHasChanges() {
+        ChangeSets sets1 = new ChangeSets();
         Mock set1 = mock(ChangeSet.class);
-        set1.stubs().method("netIncrease").will(returnValue(8));
-        sets.add((ChangeSet) set1.proxy());
+        set1.stubs().method("hasChanges").will(returnValue(Boolean.TRUE));
+        sets1.add((ChangeSet) set1.proxy());
+        assertTrue("Should confirm changes if total net increase of all ChangeSets is greater than zero", sets1
+                .hasChanges());
 
-        Mock set2 = mock(ChangeSet.class);
-        set2.stubs().method("netIncrease").will(returnValue(-2));
-        sets.add((ChangeSet) set2.proxy());
-
-        assertTrue("Should confirm changes if total net increase of all ChangeSets is greater than zero", sets
+        ChangeSets sets2 = new ChangeSets();
+        Mock set21 = mock(ChangeSet.class);
+        set21.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
+        sets2.add((ChangeSet) set21.proxy());
+        Mock set22 = mock(ChangeSet.class);
+        set22.stubs().method("hasChanges").will(returnValue(Boolean.TRUE));
+        sets2.add((ChangeSet) set22.proxy());
+        assertTrue("Should confirm changes if total net increase of all ChangeSets is less than zero", sets2
                 .hasChanges());
     }
 
