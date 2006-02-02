@@ -69,7 +69,7 @@ ALTER TABLE emf.sectors_id_seq OWNER TO emf;
 CREATE TABLE emf.sectors
 (
   id int4 NOT NULL DEFAULT nextval('emf.sectors_id_seq'::text),
-  name varchar(255) NOT NULL,
+  name varchar(255) UNIQUE NOT NULL,
   description text,
   lock_owner varchar(255),
   lock_date timestamp,
