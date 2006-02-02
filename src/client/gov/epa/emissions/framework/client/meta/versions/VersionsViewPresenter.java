@@ -21,7 +21,7 @@ public class VersionsViewPresenter {
     public void display(VersionsView view) throws EmfException {
         view.observe(this);
 
-        Version[] versions = service.getVersions(dataset.getDatasetid());
+        Version[] versions = service.getVersions(dataset.getId());
         view.display(versions, dataset.getInternalSources());
     }
 

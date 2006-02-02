@@ -19,14 +19,14 @@ public class DatasetTypesTableDataTest extends TestCase {
         type1 = new DatasetType();
         type1.setName("name1");
         type1.setDescription("desc1");
-        type1.setMinfiles(1);
-        type1.setMaxfiles(3);
+        type1.setMinFiles(1);
+        type1.setMaxFiles(3);
 
         type2 = new DatasetType();
         type2.setName("name2");
         type2.setDescription("desc2");
-        type2.setMinfiles(3);
-        type2.setMaxfiles(3);
+        type2.setMinFiles(3);
+        type2.setMaxFiles(3);
 
         data = new DatasetTypesTableData(new DatasetType[] { type1, type2 });
     }

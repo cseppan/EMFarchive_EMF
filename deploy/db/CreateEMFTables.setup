@@ -20,18 +20,18 @@ ALTER TABLE emissions.versions OWNER TO emf;
 CREATE TABLE emf.users
 (
   id serial NOT NULL,
-  user_name varchar(255) NOT NULL,
-  user_pass varchar(255) NOT NULL,
-  fullname varchar(255) NOT NULL,
+  username varchar(255) NOT NULL,
+  password varchar(255) NOT NULL,
+  name varchar(255) NOT NULL,
   affiliation varchar(255) NOT NULL,
-  workphone varchar(15) NOT NULL,
-  emailaddr varchar(255) NOT NULL,
-  inadmingrp bool NOT NULL DEFAULT false,
-  acctdisabled bool NOT NULL DEFAULT false,
+  phone varchar(15) NOT NULL,
+  email varchar(255) NOT NULL,
+  is_admin bool NOT NULL DEFAULT false,
+  is_account_disabled bool NOT NULL DEFAULT false,
   lock_owner varchar(255),  
   lock_date timestamp,
   CONSTRAINT users_pkey PRIMARY KEY (id),
-  CONSTRAINT users_username_key UNIQUE (user_name)
+  CONSTRAINT users_username_key UNIQUE (username)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.users OWNER TO emf;
@@ -81,7 +81,7 @@ ALTER TABLE emf.sectors OWNER TO emf;
 -- emf.sector
 --
 -- emf.sectorcriteria
-CREATE TABLE emf.sectorcriteria
+CREATE TABLE emf.sector_criteria
 (
   id serial NOT NULL,
   sector_id int4 NOT NULL,
@@ -92,62 +92,59 @@ CREATE TABLE emf.sectorcriteria
   CONSTRAINT sector_criteria_to_sectors FOREIGN KEY (sector_id) REFERENCES emf.sectors (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
-ALTER TABLE emf.sectorcriteria OWNER TO emf;
--- emf.sectorcriteria
+ALTER TABLE emf.sector_criteria OWNER TO emf;
+-- emf.sector_criteria
 --
---emf.statusmessages
-CREATE TABLE emf.statusmessages
+--emf.status
+CREATE TABLE emf.status
 (
-  status_id serial NOT NULL,
-  user_name varchar(255) NOT NULL,
-  msg_type varchar(255) NOT NULL,
+  id serial NOT NULL,
+  username varchar(255) NOT NULL,
+  type varchar(255) NOT NULL,
   message text NOT NULL,
-  msg_read bool NOT NULL DEFAULT false,
+  is_read bool NOT NULL DEFAULT false,
   date timestamp NOT NULL,
-  CONSTRAINT statusmessages_pk PRIMARY KEY (status_id),
-  CONSTRAINT statusmessages_status_id_key UNIQUE (status_id)
+  CONSTRAINT status_pk PRIMARY KEY (id)
 ) 
 WITHOUT OIDS;
-ALTER TABLE emf.statusmessages OWNER TO emf;
---emf.statusmessages
+ALTER TABLE emf.status OWNER TO emf;
+--emf.status
 --
 --emf.properties
 CREATE TABLE emf.properties
 (
-  prop_id serial NOT NULL,
-  prop_name varchar(255) NOT NULL,
-  prop_value varchar(255) NOT NULL,
-  CONSTRAINT emf_properties_pk PRIMARY KEY (prop_id),
-  CONSTRAINT emf_properties_prop_id_key UNIQUE (prop_id)
+  id serial NOT NULL,
+  name varchar(255) NOT NULL,
+  value varchar(255) NOT NULL,
+  CONSTRAINT emf_properties_pk PRIMARY KEY (id)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.properties OWNER TO emf;
 --emf.properties
 --
 -- emf.dataset_types
-CREATE SEQUENCE emf.dataset_types_dataset_type_id_seq
+CREATE SEQUENCE emf.dataset_types_id_seq
   INCREMENT 1
   MINVALUE 1
   MAXVALUE 9223372036854775807
   START 200
   CACHE 1;
-ALTER TABLE emf.dataset_types_dataset_type_id_seq OWNER TO emf;
+ALTER TABLE emf.dataset_types_id_seq OWNER TO emf;
 
 
 CREATE TABLE emf.dataset_types
 (
-  dataset_type_id int4 NOT NULL DEFAULT nextval('emf.dataset_types_dataset_type_id_seq'::text),
+  id int4 NOT NULL DEFAULT nextval('emf.dataset_types_id_seq'::text),
   name varchar(255) NOT NULL,
   description text NOT NULL,
-  minfiles int4 NOT NULL DEFAULT 1,
-  maxfiles int4 NOT NULL DEFAULT 1,
+  min_files int4 NOT NULL DEFAULT 1,
+  max_files int4 NOT NULL DEFAULT 1,
   "external" bool NOT NULL DEFAULT false,
-  importer_class_name varchar(255),
-  exporter_class_name varchar(255),
+  importer_classname varchar(255),
+  exporter_classname varchar(255),
   lock_owner varchar(255),
   lock_date timestamp,
-  CONSTRAINT dataset_types_pkey PRIMARY KEY (dataset_type_id),
-  CONSTRAINT dataset_types_dataset_type_id_key UNIQUE (dataset_type_id)
+  CONSTRAINT dataset_types_pkey PRIMARY KEY (id)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.dataset_types OWNER TO emf;
@@ -157,8 +154,8 @@ ALTER TABLE emf.dataset_types OWNER TO emf;
 -- emf.datasets
 CREATE TABLE emf.datasets
 (
-  dataset_id serial NOT NULL,
-  name varchar(255) NOT NULL,
+  id serial NOT NULL,
+  name varchar(255) NOT NULL UNIQUE,
   creator varchar(255) NOT NULL,
   status varchar(255),
   dataset_type integer,
@@ -178,25 +175,23 @@ CREATE TABLE emf.datasets
   default_version int4 DEFAULT 0,
   lock_owner varchar(255),
   lock_date timestamp,
-  CONSTRAINT datasets_pkey PRIMARY KEY (dataset_id),
-  CONSTRAINT datasets_name_key UNIQUE (name)
+  CONSTRAINT datasets_pkey PRIMARY KEY (id)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.datasets OWNER TO emf;
 --
 CREATE TABLE emf.dataset_access_logs
 (
-  access_log_id serial NOT NULL,
-  dataset_id int4 REFERENCES emf.datasets (dataset_id) NOT NULL,
-  username varchar(255) REFERENCES emf.users (user_name) NOT NULL,
+  id serial NOT NULL,
+  dataset_id int4 REFERENCES emf.datasets (id) NOT NULL,
+  username varchar(255) REFERENCES emf.users (username) NOT NULL,
   date timestamp NOT NULL,
   version varchar(128) NOT NULL,
   description text NOT NULL,
   "location" varchar(255) NOT NULL,
-  CONSTRAINT dataset_access_logs_access_log_id_key UNIQUE (access_log_id),
-  CONSTRAINT dataset_access_logs_pkey PRIMARY KEY (access_log_id),
+  CONSTRAINT dataset_access_logs_pkey PRIMARY KEY (id),
   CONSTRAINT dataset_access_logs_to_datasets FOREIGN KEY (dataset_id)
-      REFERENCES emf.datasets (dataset_id)
+      REFERENCES emf.datasets (id)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.dataset_access_logs OWNER TO emf;
@@ -219,7 +214,7 @@ CREATE TABLE emf.dataset_types_keywords
   list_index int4,
   keyword_id int4 NOT NULL,
   CONSTRAINT dataset_types_keywords_pkey PRIMARY KEY (id),
-  CONSTRAINT dataset_types_keywords_to_datasetstypes FOREIGN KEY (dataset_type_id) REFERENCES emf.dataset_types (dataset_type_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT dataset_types_keywords_to_datasetstypes FOREIGN KEY (dataset_type_id) REFERENCES emf.dataset_types (id) ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT dataset_types_keywords_to_emf_keywords FOREIGN KEY (keyword_id) REFERENCES emf.emf_keywords (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
@@ -233,20 +228,20 @@ CREATE TABLE emf.datasets_keywords
   keyword_id int4 NOT NULL,
   value varchar(255),
   CONSTRAINT datasets_keywords_pkey PRIMARY KEY (id),
-  CONSTRAINT datasets_keywords_to_datasets FOREIGN KEY (dataset_id) REFERENCES emf.datasets (dataset_id) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT datasets_keywords_to_datasets FOREIGN KEY (dataset_id) REFERENCES emf.datasets (id) ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT dataset_types_keywords_to_emf_keywords FOREIGN KEY (keyword_id) REFERENCES emf.emf_keywords (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.datasets_keywords OWNER TO emf;
--- emf ... KEYWORDS framework
+-- emf datasets_keywords
 --
 -- emf internal and external sources
 CREATE TABLE emf.external_sources
 (
   dataset_id int4 NOT NULL,
   list_index int4,
-  data_source varchar(255) NOT NULL,
-  CONSTRAINT dataset_tables_to_datasets FOREIGN KEY (dataset_id) REFERENCES emf.datasets (dataset_id) ON UPDATE CASCADE ON DELETE CASCADE
+  datasource varchar(255) NOT NULL,
+  CONSTRAINT dataset_tables_to_datasets FOREIGN KEY (dataset_id) REFERENCES emf.datasets (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.external_sources OWNER TO emf;
@@ -255,12 +250,12 @@ CREATE TABLE emf.internal_sources
 (
   dataset_id int4 NOT NULL,
   list_index int4,
-  data_source varchar(255) NOT NULL,
+  datasource varchar(255) NOT NULL,
   table_name varchar(255) NOT NULL,
   table_type varchar(255) NOT NULL,
   table_columns text NOT NULL,
-  file_size int4 NOT NULL,
-  CONSTRAINT internalsources_to_datasets FOREIGN KEY (dataset_id) REFERENCES emf.datasets (dataset_id) ON UPDATE CASCADE ON DELETE CASCADE
+  file_size int4 NOT NULL, 
+  CONSTRAINT internalsources_to_datasets FOREIGN KEY (dataset_id) REFERENCES emf.datasets (id) ON UPDATE CASCADE ON DELETE CASCADE
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.internal_sources OWNER TO emf;
@@ -343,7 +338,7 @@ CREATE TABLE emf.datasets_sectors
   sector_id int4,
   CONSTRAINT datasets_sectors_pkey PRIMARY KEY (id),
   CONSTRAINT datasets_sectors_to_datasets FOREIGN KEY (dataset_id)
-      REFERENCES emf.datasets (dataset_id) MATCH SIMPLE
+      REFERENCES emf.datasets (id) MATCH SIMPLE
       ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT datasets_sectors_to_sectors FOREIGN KEY (sector_id)
       REFERENCES emf.sectors (id) MATCH SIMPLE

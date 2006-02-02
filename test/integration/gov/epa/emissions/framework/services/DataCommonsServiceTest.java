@@ -160,7 +160,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
     private void newStatus() {
         Status status = new Status();
         status.setMessage("test message");
-        status.setMessageType("type");
+        status.setType("type");
         status.setUsername("user");
         status.setTimestamp(new Date());
 

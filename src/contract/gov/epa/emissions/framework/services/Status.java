@@ -5,39 +5,38 @@ import java.util.Date;
 
 public class Status implements Serializable {
 
-    private long statusid;
+    private long id;
 
     private String username;
 
-    private String messageType;
+    private String type;
 
     private String message;
 
-    private boolean msgRead = false;
+    private boolean isRead;
 
-    private Date timestamp = null;
-
-    public boolean isMsgRead() {
-        return msgRead;
-    }
-
-    public void setMsgRead() {
-        this.msgRead = true;
-    }
-
-    public void setMsgRead(boolean msgRead) {
-        this.msgRead = msgRead;
-    }
+    private Date timestamp;
 
     public Status() {// needed for serialization
     }
 
     public Status(String username, String msgType, String message, Date timestamp) {
-        super();
         this.username = username;
-        this.messageType = msgType;
+        this.type = msgType;
         this.message = message;
         this.timestamp = timestamp;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void markRead() {
+        this.isRead = true;
+    }
+
+    public void setRead(boolean read) {
+        this.isRead = read;
     }
 
     public String getUsername() {
@@ -56,12 +55,12 @@ public class Status implements Serializable {
         this.message = message;
     }
 
-    public String getMessageType() {
-        return messageType;
+    public String getType() {
+        return type;
     }
 
-    public void setMessageType(String messageType) {
-        this.messageType = messageType;
+    public void setType(String messageType) {
+        this.type = messageType;
     }
 
     public Date getTimestamp() {
@@ -76,11 +75,11 @@ public class Status implements Serializable {
         return "Message : " + message + " for user: " + username;
     }
 
-    public long getStatusid() {
-        return statusid;
+    public long getId() {
+        return id;
     }
 
-    public void setStatusid(long statusid) {
-        this.statusid = statusid;
+    public void setId(long id) {
+        this.id = id;
     }
 }

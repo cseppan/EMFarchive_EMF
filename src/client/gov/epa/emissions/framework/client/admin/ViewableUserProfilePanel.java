@@ -86,7 +86,7 @@ public class ViewableUserProfilePanel extends JPanel {
         JPanel optionsPanel = new JPanel();
 
         JCheckBox isAdmin = new JCheckBox("Is Admin?");
-        isAdmin.setSelected(user.isInAdminGroup());
+        isAdmin.setSelected(user.isAdmin());
         isAdmin.setEnabled(false);
         optionsPanel.add(isAdmin);
 
@@ -97,7 +97,7 @@ public class ViewableUserProfilePanel extends JPanel {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Name", new JLabel(user.getFullName()), panel);
+        layoutGenerator.addLabelWidgetPair("Name", new JLabel(user.getName()), panel);
         layoutGenerator.addLabelWidgetPair("Affiliation", new JLabel(user.getAffiliation()), panel);
         layoutGenerator.addLabelWidgetPair("Phone", new JLabel(user.getPhone()), panel);
         layoutGenerator.addLabelWidgetPair("Email", new JLabel(user.getEmail()), panel);

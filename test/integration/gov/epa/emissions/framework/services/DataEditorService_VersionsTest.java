@@ -60,7 +60,7 @@ public class DataEditorService_VersionsTest extends ServicesTestCase {
     }
 
     private void setTestValues(EmfDataset dataset) {
-        dataset.setDatasetid(Math.abs(new Random().nextInt()));
+        dataset.setId(Math.abs(new Random().nextInt()));
         dataset.setCreator("tester");
         dataset.setCreatedDateTime(new Date());
         dataset.setModifiedDateTime(new Date());
@@ -87,27 +87,27 @@ public class DataEditorService_VersionsTest extends ServicesTestCase {
 
     private Version versionZero() {
         Versions versions = new Versions();
-        return versions.get(dataset.getDatasetid(), 0, session);
+        return versions.get(dataset.getId(), 0, session);
     }
 
     private Version derived() {
         Versions versions = new Versions();
-        return versions.get(dataset.getDatasetid(), 1, session);
+        return versions.get(dataset.getId(), 1, session);
     }
 
     public void testShouldHaveVersionZeroAfterDatasetImport() throws Exception {
-        Version[] versions = service.getVersions(dataset.getDatasetid());
+        Version[] versions = service.getVersions(dataset.getId());
 
         assertNotNull("Should return versions of imported dataset", versions);
         assertEquals(2, versions.length);
 
         Version versionZero = versions[0];
         assertEquals(0, versionZero.getVersion());
-        assertEquals(dataset.getDatasetid(), versionZero.getDatasetId());
+        assertEquals(dataset.getId(), versionZero.getDatasetId());
     }
 
     public void testShouldDeriveVersionFromAFinalVersion() throws Exception {
-        Version[] versions = service.getVersions(dataset.getDatasetid());
+        Version[] versions = service.getVersions(dataset.getId());
 
         Version versionZero = versions[0];
         Version derived = service.derive(versionZero, "v 1");
@@ -134,7 +134,7 @@ public class DataEditorService_VersionsTest extends ServicesTestCase {
         assertEquals("0", finalVersion.getPath());
         assertTrue("Derived version should be final on being marked 'final'", finalVersion.isFinalVersion());
 
-        Version[] updated = service.getVersions(dataset.getDatasetid());
+        Version[] updated = service.getVersions(dataset.getId());
         assertEquals(3, updated.length);
         assertEquals("v2", updated[2].getName());
         assertTrue("Derived version (loaded from db) should be final on being marked 'final'", updated[2]

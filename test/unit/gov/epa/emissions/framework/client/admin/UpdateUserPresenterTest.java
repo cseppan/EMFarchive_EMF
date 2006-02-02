@@ -24,7 +24,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
     public void testShouldUpdateUserOnSave() throws Exception {
         User user = new User();
         user.setUsername("joey");
-        user.setFullName("Joey Moey");
+        user.setName("Joey Moey");
 
         UpdateUserPresenter presenter = new UpdateUserPresenterImpl(null, user, (UserService) service.proxy());
         service.expects(once()).method("updateUser").with(eq(user));
@@ -89,7 +89,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
     public void testShouldCloseWithNoPromptsOnSaveFollowedByClose() throws Exception {
         User user = new User();
         user.setUsername("joey");
-        user.setFullName("Joey Moey");
+        user.setName("Joey Moey");
 
         UpdateUserPresenter presenter = displayablePresenter(user);
         presenter.display((UpdatableUserView) view.proxy(), null);

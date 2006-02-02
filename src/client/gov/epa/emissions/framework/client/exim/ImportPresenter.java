@@ -52,7 +52,7 @@ public class ImportPresenter {
             throw new EmfException("Dataset Type should be selected");
 
         EmfDataset dataset = new EmfDataset();
-        dataset.setCreator(user.getFullName());
+        dataset.setCreator(user.getName());
         dataset.setDatasetType(type);
         dataset.setName(datasetName);
         dataset.setCreatedDateTime(new Date());

@@ -41,7 +41,7 @@ public class DatasetDaoTest extends ServicesTestCase {
             dao.add(dataset, session);
             EmfDataset result = load(dataset);
 
-            assertEquals(dataset.getDatasetid(), result.getDatasetid());
+            assertEquals(dataset.getId(), result.getId());
             assertEquals(dataset.getName(), result.getName());
         } finally {
             remove(dataset);
@@ -59,7 +59,7 @@ public class DatasetDaoTest extends ServicesTestCase {
             dao.updateWithoutLocking(dataset, session);
             EmfDataset result = load(dataset);
 
-            assertEquals(dataset.getDatasetid(), result.getDatasetid());
+            assertEquals(dataset.getId(), result.getId());
             assertEquals("test-country", result.getCountry().getName());
         } finally {
             remove(dataset);

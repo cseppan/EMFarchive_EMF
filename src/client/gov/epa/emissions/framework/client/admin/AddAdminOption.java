@@ -18,7 +18,7 @@ public class AddAdminOption implements AdminOption {
     }
 
     public void setInAdminGroup(User user) {
-        user.setInAdminGroup(isAdmin.isSelected());
+        user.setAdmin(isAdmin.isSelected());
     }
 
 }

@@ -15,7 +15,7 @@ public class PopulateUserOnRegisterStrategy implements PopulateUserStrategy {
     public void populate(String name, String affiliation, String phone, String email, String username, char[] password,
             char[] confirmPassword) throws EmfException {
         try {
-            user.setFullName(name);
+            user.setName(name);
             user.setAffiliation(affiliation);
             user.setPhone(phone);
             user.setEmail(email);

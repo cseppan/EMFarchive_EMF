@@ -42,9 +42,9 @@ public class UserManagerTableModelTest extends MockObjectTestCase {
     private void setUserAttributes(User joe, String username, String name, String email, boolean isAdmin)
             throws UserException {
         joe.setUsername(username);
-        joe.setFullName(name);
+        joe.setName(name);
         joe.setEmail(email);
-        joe.setInAdminGroup(isAdmin);
+        joe.setAdmin(isAdmin);
     }
 
     public void testShouldReturnFourColumns() {
@@ -74,7 +74,7 @@ public class UserManagerTableModelTest extends MockObjectTestCase {
 
     public void testShouldReturnUserAttributesAtSpecifiedIndex() {
         assertEquals(joe.getUsername(), model.getValueAt(0, 0));
-        assertEquals(joe.getFullName(), model.getValueAt(0, 1));
+        assertEquals(joe.getName(), model.getValueAt(0, 1));
         assertEquals(joe.getEmail(), model.getValueAt(0, 2));
     }
 
@@ -84,7 +84,7 @@ public class UserManagerTableModelTest extends MockObjectTestCase {
 
         model.setValueAt("Joe Jumper", 0, 1);
         assertEquals("Joe Jumper", model.getValueAt(0, 1));
-        assertEquals("Joe Jumper", joe.getFullName());
+        assertEquals("Joe Jumper", joe.getName());
 
         model.setValueAt("joe@jumper.net", 0, 2);
         assertEquals("joe@jumper.net", model.getValueAt(0, 2));
@@ -92,7 +92,7 @@ public class UserManagerTableModelTest extends MockObjectTestCase {
         
         model.setValueAt(Boolean.TRUE, 0, 3);
         assertEquals(Boolean.TRUE, model.getValueAt(0, 3));
-        assertEquals(true, joe.isInAdminGroup());
+        assertEquals(true, joe.isAdmin());
     }
 
     public void testShouldReturnStringAsClassForAllColumns() {

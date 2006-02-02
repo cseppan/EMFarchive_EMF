@@ -19,7 +19,7 @@ public class LogsTabPresenter {
     }
 
     public void doDisplay() throws EmfException {
-        view.display(services.getAccessLogs(dataset.getDatasetid()));
+        view.display(services.getAccessLogs(dataset.getId()));
     }
 
     public void doSave() {

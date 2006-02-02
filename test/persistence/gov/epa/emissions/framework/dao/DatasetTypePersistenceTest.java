@@ -28,8 +28,8 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
         DatasetType type = new DatasetType();
         type.setDescription("TEST");
         type.setName("NAME");
-        type.setMaxfiles(1);
-        type.setMinfiles(1);
+        type.setMaxFiles(1);
+        type.setMinFiles(1);
 
         save(type);
         DatasetType loadedType = load("NAME");

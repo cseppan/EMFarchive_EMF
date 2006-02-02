@@ -54,7 +54,7 @@ public class DataViewServiceTest extends ServicesTestCase {
     }
 
     private void setTestValues(EmfDataset dataset) {
-        dataset.setDatasetid(Math.abs(new Random().nextInt()));
+        dataset.setId(Math.abs(new Random().nextInt()));
         dataset.setCreator("tester");
         dataset.setCreatedDateTime(new Date());
         dataset.setModifiedDateTime(new Date());
@@ -127,7 +127,7 @@ public class DataViewServiceTest extends ServicesTestCase {
 
     private Version versionZero() {
         Versions versions = new Versions();
-        return versions.get(dataset.getDatasetid(), 0, session);
+        return versions.get(dataset.getId(), 0, session);
     }
 
     /**

@@ -5,7 +5,7 @@
 
 <hibernate-mapping schema="emf" default-lazy="false">
  <class name="gov.epa.emissions.framework.services.EmfDataset" table="datasets" schema="emf">
-  <id name="datasetid" type="long" column="dataset_id">
+  <id name="id" type="long" column="id">
    <generator class="identity"/>
   </id>
   <property name="name"					column="name"					type="java.lang.String"		not-null="true"/>
@@ -63,7 +63,7 @@
 		<property name="table"			column="table_name"						not-null="true"/>
 		<property name="type"			column="table_type"						not-null="true"/>
 		<property name="colsList"		column="table_columns"					not-null="true"/>
-		<property name="source"			column="data_source"					not-null="true"/>
+		<property name="source"			column="datasource"					not-null="true"/>
 		<property name="sourceSize"		column="file_size" 		    type="long" not-null="true"/>    
     </composite-element>
   </array>
@@ -72,7 +72,7 @@
     <key column="dataset_id"/>
     <list-index column="list_index"/>
     <composite-element class="gov.epa.emissions.commons.io.ExternalSource">
-		<property name="datasource"	column="data_source" not-null="true"/>
+		<property name="datasource"	column="datasource" not-null="true"/>
     </composite-element>
   </array>
 

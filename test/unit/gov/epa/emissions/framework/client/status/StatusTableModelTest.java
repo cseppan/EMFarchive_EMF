@@ -52,11 +52,11 @@ public class StatusTableModelTest extends MockObjectTestCase {
 
     public void testShouldReturnUserAttributesAtSpecifiedIndex() {
         DateFormat dateFormat = new SimpleDateFormat("hh:mm:ss MM/dd/yyyy");
-        assertEquals(status2.getMessageType(), model.getValueAt(0, 0));
+        assertEquals(status2.getType(), model.getValueAt(0, 0));
         assertEquals(status2.getMessage(), model.getValueAt(0, 1));
         assertEquals(dateFormat.format(status2.getTimestamp()), model.getValueAt(0, 2));
 
-        assertEquals(status1.getMessageType(), model.getValueAt(1, 0));
+        assertEquals(status1.getType(), model.getValueAt(1, 0));
         assertEquals(status1.getMessage(), model.getValueAt(1, 1));
         assertEquals(dateFormat.format(status1.getTimestamp()), model.getValueAt(1, 2));
     }

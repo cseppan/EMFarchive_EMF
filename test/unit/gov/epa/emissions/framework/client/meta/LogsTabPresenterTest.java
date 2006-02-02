@@ -13,11 +13,11 @@ public class LogsTabPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayViewOnDisplay() throws EmfException {
         Mock view = mock(LogsTabView.class);
         EmfDataset dataset = new EmfDataset();
-        dataset.setDatasetid(1);
+        dataset.setId(1);
 
         Mock loggingServices = mock(LoggingService.class);
         AccessLog[] accessLogs = new AccessLog[0];
-        loggingServices.expects(once()).method("getAccessLogs").with(eq(dataset.getDatasetid())).will(
+        loggingServices.expects(once()).method("getAccessLogs").with(eq(dataset.getId())).will(
                 returnValue(accessLogs));
 
         LogsTabPresenter presenter = new LogsTabPresenter((LogsTabView) view.proxy(), dataset,

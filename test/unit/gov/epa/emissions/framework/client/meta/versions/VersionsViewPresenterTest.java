@@ -46,11 +46,11 @@ public class VersionsViewPresenterTest extends MockObjectTestCase {
 
     private VersionsViewPresenter displayPresenter(Mock service, Mock view) throws EmfException {
         EmfDataset dataset = new EmfDataset();
-        dataset.setDatasetid(1);
+        dataset.setId(1);
         Version[] versions = new Version[0];
         InternalSource[] internalSources = new InternalSource[0];
 
-        service.stubs().method("getVersions").with(eq(new Long(dataset.getDatasetid()))).will(returnValue(versions));
+        service.stubs().method("getVersions").with(eq(new Long(dataset.getId()))).will(returnValue(versions));
 
         VersionsViewPresenter presenter = new VersionsViewPresenter(dataset, (DataViewService) service.proxy());
         view.expects(once()).method("observe").with(same(presenter));

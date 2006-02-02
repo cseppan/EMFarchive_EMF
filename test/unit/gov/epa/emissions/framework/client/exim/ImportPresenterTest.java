@@ -53,11 +53,11 @@ public class ImportPresenterTest extends MockObjectTestCase {
 
         User user = new User();
         user.setUsername("user");
-        user.setFullName("full name");
+        user.setName("full name");
 
         String datasetName = "dataset name";
         Constraint datasetNameConstraint = new HasPropertyWithValue("name", eq(datasetName));
-        Constraint datasetCreatorConstraint = new HasPropertyWithValue("creator", eq(user.getFullName()));
+        Constraint datasetCreatorConstraint = new HasPropertyWithValue("creator", eq(user.getName()));
         Constraint datasetCreatedDateTimeConstraint = new HasPropertyWithValue("createdDateTime", new IsInstanceOf(
                 Date.class));
         Constraint datasetAccessedDateTimeConstraint = new HasPropertyWithValue("accessedDateTime", new IsInstanceOf(

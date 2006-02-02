@@ -113,10 +113,10 @@ public class UserManagerTableModel extends AbstractTableModel implements Refresh
                 }
             });
 
-            columns.put(new Integer(1), new Column(user.getFullName()) {
+            columns.put(new Integer(1), new Column(user.getName()) {
                 void setUnderlyingValue(Object value) {
                     try {
-                        user.setFullName((String) value);
+                        user.setName((String) value);
                     } catch (UserException e) {
                         throw new RuntimeException(e);// TODO: verify
                     }
@@ -131,10 +131,10 @@ public class UserManagerTableModel extends AbstractTableModel implements Refresh
                     }
                 }
             });
-            columns.put(new Integer(3), new Column(Boolean.valueOf(user.isInAdminGroup())) {
+            columns.put(new Integer(3), new Column(Boolean.valueOf(user.isAdmin())) {
                 void setUnderlyingValue(Object value) {
                     Boolean bool = (Boolean) value;
-                    user.setInAdminGroup(bool.booleanValue());
+                    user.setAdmin(bool.booleanValue());
                 }
             });
         }

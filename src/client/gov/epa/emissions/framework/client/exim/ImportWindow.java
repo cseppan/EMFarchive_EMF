@@ -48,11 +48,11 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private DataCommonsService service;
 
     private JTextField folder;
-    
+
     private JCheckBox box;
-    
+
     private static File lastFolder = null;
-    
+
     public ImportWindow(DataCommonsService service, JDesktopPane desktop) throws EmfException {
         super("Import Dataset", new Dimension(650, 300), desktop);
         super.setName("importWindow");
@@ -103,7 +103,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         layoutGenerator.addLabelWidgetPair("Dataset Name", name, panel);
 
         box = new JCheckBox("Create Multiple Datasets");
-        box.addActionListener(new ActionListener(){
+        box.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 boxChecked();
             }
@@ -119,46 +119,27 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
         return panel;
     }
-    
-//    private JPanel datasetTypesPanel(JComboBox cb) {
-//        JPanel panel = new JPanel(new FlowLayout());
-//        cb.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                boxChecked();
-//            }
-//        });
-//        panel.add(cb);
-//        box = new JCheckBox("Create Multiple Datasets");
-//        box.addActionListener(new ActionListener(){
-//            public void actionPerformed(ActionEvent event) {
-//                boxChecked();
-//            }
-//        });
-//        panel.add(box);
-//        
-//        return panel;
-//    }
-    
+
     private void boxChecked() {
         enableAll();
-        if(box.isSelected()) {
+        if (box.isSelected()) {
             name.setEnabled(false);
             name.setVisible(false);
             checkMinFiles();
-        }             
+        }
     }
-    
+
     private void checkMinFiles() {
-        DatasetType dt = (DatasetType)datasetTypesModel.getSelectedItem();
-        if(dt.getMinfiles() > 1){
+        DatasetType dt = (DatasetType) datasetTypesModel.getSelectedItem();
+        if (dt.getMinFiles() > 1) {
             String message = "Sorry. You cannot create multiple datasets on this dataset type.";
             messagePanel.setError(message);
             folder.setEnabled(false);
             filename.setEnabled(false);
-        } 
+        }
     }
-    
-    private void enableAll(){
+
+    private void enableAll() {
         messagePanel.clear();
         name.setEnabled(true);
         name.setVisible(true);
@@ -178,7 +159,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         Button button = new Button("Choose File", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 selectFile();
-            } 
+            }
         });
 
         Icon icon = new ImageResources().open("Import a File");
@@ -188,10 +169,9 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     }
 
     private void selectFile() {
-        FileChooser chooser = new FileChooser(
-                "Select File", new File(folder.getText()), ImportWindow.this);
-        
-        chooser.setTitle("Select a "+datasetTypesModel.getSelectedItem().toString()+" File");
+        FileChooser chooser = new FileChooser("Select File", new File(folder.getText()), ImportWindow.this);
+
+        chooser.setTitle("Select a " + datasetTypesModel.getSelectedItem().toString() + " File");
         File file = chooser.choose();
         if (file == null)
             return;
@@ -210,7 +190,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         name.setText(file.getName());
         lastFolder = file.getParentFile();
     }
-    
+
     private void registerForEditEvents(JTextField name, JTextField directory, JTextField filename) {
         name.getDocument().addDocumentListener(notifyBeginInput());
         directory.getDocument().addDocumentListener(notifyBeginInput());
@@ -265,20 +245,21 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         this.presenter = presenter;
     }
 
-/**
- * If the checkbox is selected then start importing multiple datasets of the datasetType specified
- * The fileName is a regular expression for multiple datasets
- * 
- */
+    /**
+     * If the checkbox is selected then start importing multiple datasets of the datasetType specified The fileName is a
+     * regular expression for multiple datasets
+     * 
+     */
     private void doImport() {
         clearMessagePanel();
-        
+
         try {
-            if(box.isSelected()) {
-                presenter.doImport(folder.getText(), filename.getText(), (DatasetType) datasetTypesModel.getSelectedItem());                                
-            }else{
-                presenter.doImport(folder.getText(), filename.getText(), name.getText(), (DatasetType) datasetTypesModel
-                        .getSelectedItem());                
+            if (box.isSelected()) {
+                presenter.doImport(folder.getText(), filename.getText(), (DatasetType) datasetTypesModel
+                        .getSelectedItem());
+            } else {
+                presenter.doImport(folder.getText(), filename.getText(), name.getText(),
+                        (DatasetType) datasetTypesModel.getSelectedItem());
             }
 
             String message = "Started import. Please monitor the Status window to track your Import request.";
@@ -295,8 +276,8 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     public void setDefaultBaseFolder(String folder) {
         if (lastFolder == null)
-           this.folder.setText(folder);
+            this.folder.setText(folder);
         else
-           this.folder.setText(lastFolder.getAbsolutePath());
+            this.folder.setText(lastFolder.getAbsolutePath());
     }
 }

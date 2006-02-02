@@ -154,7 +154,7 @@ public class EditableUserProfilePanel extends JPanel {
         JPanel valuesPanel = new JPanel();
         valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
 
-        name = new TextField("name", user.getFullName(), 15);
+        name = new TextField("name", user.getName(), 15);
         valuesPanel.add(name);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
 

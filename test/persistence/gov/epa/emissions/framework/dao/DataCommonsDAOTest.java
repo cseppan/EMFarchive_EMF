@@ -232,7 +232,7 @@ public class DataCommonsDAOTest extends ServicesTestCase {
     private Status unreadStatus(User emf) {
         Status status = new Status();
         status.setUsername(emf.getUsername());
-        status.setMessageType("type");
+        status.setType("type");
         status.setMessage("message");
         status.setTimestamp(new Date());
         return status;
@@ -263,11 +263,11 @@ public class DataCommonsDAOTest extends ServicesTestCase {
     private Status newReadStatus(User emf) {
         Status status = new Status();
         status.setUsername(emf.getUsername());
-        status.setMessageType("type");
+        status.setType("type");
         status.setMessage("message");
         status.setTimestamp(new Date());
 
-        status.setMsgRead();
+        status.markRead();
 
         add(status);
 

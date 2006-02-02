@@ -13,7 +13,7 @@ public class DataTabPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayInternalSourcesAndVersionsOnDisplay() throws Exception {
         EmfDataset dataset = new EmfDataset();
-        dataset.setDatasetid(1);
+        dataset.setId(1);
         dataset.addInternalSource(new InternalSource());
 
         DatasetType type = new DatasetType();

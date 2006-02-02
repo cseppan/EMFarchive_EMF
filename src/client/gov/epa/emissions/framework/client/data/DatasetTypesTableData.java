@@ -39,8 +39,8 @@ public class DatasetTypesTableData extends AbstractTableData {
 
         for (int i = 0; i < types.length; i++) {
             DatasetType element = types[i];
-            Object[] values = { element.getName(), element.getDescription(), new Integer(element.getMinfiles()),
-                    new Integer(element.getMaxfiles()) };
+            Object[] values = { element.getName(), element.getDescription(), new Integer(element.getMinFiles()),
+                    new Integer(element.getMaxFiles()) };
 
             Row row = new ViewableRow(element, values);
             rows.add(row);

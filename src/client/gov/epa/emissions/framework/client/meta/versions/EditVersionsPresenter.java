@@ -35,7 +35,7 @@ public class EditVersionsPresenter {
         this.view = view;
         view.observe(this);
 
-        Version[] versions = service.getVersions(dataset.getDatasetid());
+        Version[] versions = service.getVersions(dataset.getId());
         view.display(versions, dataset.getInternalSources());
     }
 
@@ -78,7 +78,7 @@ public class EditVersionsPresenter {
     }
 
     private void reload(EmfDataset dataset) throws EmfException {
-        Version[] updatedVersions = service.getVersions(dataset.getDatasetid());
+        Version[] updatedVersions = service.getVersions(dataset.getId());
         view.reload(updatedVersions);
     }
 

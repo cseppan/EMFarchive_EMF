@@ -195,7 +195,7 @@ public class DataCommonsDAO {
             // mark read
             for (Iterator iter = all.iterator(); iter.hasNext();) {
                 Status element = (Status) iter.next();
-                element.setMsgRead();
+                element.markRead();
                 session.save(element);
 
             }
@@ -225,7 +225,7 @@ public class DataCommonsDAO {
         try {
             tx = session.beginTransaction();
             Criteria crit = session.createCriteria(Status.class).add(Restrictions.eq("username", username)).add(
-                    Restrictions.eq("msgRead", Boolean.TRUE));
+                    Restrictions.eq("read", Boolean.TRUE));
 
             List read = crit.list();
             for (Iterator iter = read.iterator(); iter.hasNext();) {

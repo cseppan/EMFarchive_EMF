@@ -5,10 +5,10 @@
 
 <hibernate-mapping default-lazy="false"> 
   <class name="gov.epa.emissions.framework.services.impl.EmfProperty" table="properties" schema="emf"> 
- 	<id name="id" type="long" column="prop_id">
+ 	<id name="id" type="long" column="id">
 	  <generator class="identity"/>
  	</id>
-	<property name="name"		column="prop_name"		type="java.lang.String"		not-null="true"/>
-	<property name="value"		column="prop_value"		type="java.lang.String"		not-null="true"/>
+	<property name="name"		column="name"		type="java.lang.String"		not-null="true"/>
+	<property name="value"		column="value"		type="java.lang.String"		not-null="true"/>
   </class> 
 </hibernate-mapping>  

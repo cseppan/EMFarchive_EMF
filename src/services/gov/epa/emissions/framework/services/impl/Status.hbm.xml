@@ -4,15 +4,15 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false"> 
-  <class name="gov.epa.emissions.framework.services.Status" table="statusmessages" schema="emf"> 
- 	<id name="statusid" type="long" column="status_id">
-	  <generator class="identity"/>
- 	</id>
-	<property name="username"		column="user_name"	type="java.lang.String"		not-null="true"		length="15"/>
-	<property name="messageType" 	column="msg_type"	type="java.lang.String"		not-null="true" 	length="255"/>
-	<property name="message" 		column="message"	type="java.lang.String"		not-null="true"/>
-	<property name="timestamp" 		column="date"		type="java.util.Date"		not-null="true" 	length="10"/>
-    <property name="msgRead" 		column="msg_read"	type="boolean"				not-null="true"/>
-  </class> 
+    <class name="gov.epa.emissions.framework.services.Status" table="status" schema="emf">
+        <id name="id" type="long" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="username" column="username" type="java.lang.String" not-null="true" length="15"/>
+        <property name="type" column="type" type="java.lang.String" not-null="true" length="255"/>
+        <property name="message" column="message" type="java.lang.String" not-null="true"/>
+        <property name="timestamp" column="date" type="java.util.Date" not-null="true" length="10"/>
+        <property name="read" column="is_read" type="boolean" not-null="true"/>
+    </class>
 </hibernate-mapping>  
 

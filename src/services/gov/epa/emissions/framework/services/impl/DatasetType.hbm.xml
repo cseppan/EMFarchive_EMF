@@ -5,16 +5,16 @@
 
 <hibernate-mapping default-lazy="false">
     <class name="gov.epa.emissions.commons.io.DatasetType" table="dataset_types" schema="emf">
-        <id name="datasettypeid" type="long" column="dataset_type_id">
+        <id name="id" type="long" column="id">
             <generator class="identity"/>
         </id>
         <property name="name" column="name" type="java.lang.String" not-null="true" length="255"/>
         <property name="description" column="description" type="java.lang.String" not-null="true"/>
-        <property name="minfiles" column="minfiles" type="integer" not-null="true" length="4"/>
-        <property name="maxfiles" column="maxfiles" type="integer" not-null="true" length="4"/>
+        <property name="minFiles" column="min_files" type="integer" not-null="true" length="4"/>
+        <property name="maxFiles" column="max_files" type="integer" not-null="true" length="4"/>
         <property name="external" column="external" type="boolean" not-null="true"/>
-        <property name="importerClassName" column="importer_class_name" type="java.lang.String" not-null="false"/>
-        <property name="exporterClassName" column="exporter_class_name" type="java.lang.String" not-null="false"/>
+        <property name="importerClassName" column="importer_classname" type="java.lang.String" not-null="false"/>
+        <property name="exporterClassName" column="exporter_classname" type="java.lang.String" not-null="false"/>
         <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
         <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
         

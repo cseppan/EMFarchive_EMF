@@ -51,7 +51,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(EmfSession session) {
-        super("EMF Console", "Emissions Modeling Framework (EMF):  " + session.user().getFullName() + "("
+        super("EMF Console", "Emissions Modeling Framework (EMF):  " + session.user().getName() + "("
                 + session.user().getUsername() + ")");
         user = session.user();
         this.serviceLocator = session.serviceLocator();

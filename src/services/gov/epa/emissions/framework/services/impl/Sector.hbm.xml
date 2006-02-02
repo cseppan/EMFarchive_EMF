@@ -13,7 +13,7 @@
         <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
         <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
         
-        <array name="sectorCriteria" table="sectorcriteria">
+        <array name="sectorCriteria" table="sector_criteria">
             <key column="sector_id"/>
             <list-index column="list_index"/>
             <composite-element class="gov.epa.emissions.commons.io.SectorCriteria">

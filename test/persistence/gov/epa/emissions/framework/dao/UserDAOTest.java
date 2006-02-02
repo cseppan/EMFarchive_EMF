@@ -55,7 +55,7 @@ public class UserDAOTest extends HibernateTestCase {
 
         // assert
         assertEquals(user.getUsername(), loaded.getUsername());
-        assertEquals(user.getFullName(), loaded.getFullName());
+        assertEquals(user.getName(), loaded.getName());
     }
 
     public void testShouldVerifyIfUserAlreadyExists() throws Exception {
@@ -109,10 +109,10 @@ public class UserDAOTest extends HibernateTestCase {
 
         User modified1 = dao.obtainLocked(emf, user, session);
         assertEquals(modified1.getLockOwner(), emf.getUsername());
-        modified1.setFullName("TEST");
+        modified1.setName("TEST");
 
         User modified2 = dao.update(modified1, session);
-        assertEquals("TEST", modified1.getFullName());
+        assertEquals("TEST", modified1.getName());
         assertEquals(modified2.getLockOwner(), null);
     }
 
@@ -146,7 +146,7 @@ public class UserDAOTest extends HibernateTestCase {
         User user = new User();
         user.setUsername(username);
         user.setPassword("abc12345");
-        user.setFullName("user dao");
+        user.setName("user dao");
         user.setAffiliation("test");
         user.setPhone("123-123-1234");
         user.setEmail("email@user-test.test");

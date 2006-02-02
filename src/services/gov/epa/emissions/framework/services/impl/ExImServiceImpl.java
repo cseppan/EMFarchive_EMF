@@ -103,7 +103,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     }
 
     public void startImport(User user, String folderPath, String fileName, EmfDataset dataset) throws EmfException {
-        log.debug("In ExImServicesImpl:startImport START for: " + dataset.getDatasetid() + " " + dataset.getName());
+        log.debug("In ExImServicesImpl:startImport START for: " + dataset.getId() + " " + dataset.getName());
 
         try {
             File path = validatePath(folderPath);
@@ -145,7 +145,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                     svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
                     svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
                     Exporter exporter = exporterFactory.create(dataset, dataset.getDefaultVersion());
-                    AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
+                    AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset
                             .getAccessedDateTime(), "Version " + dataset.getDefaultVersion(), purpose, dirName);
                     ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);
                     threadPool.execute(eximTask);
@@ -178,7 +178,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                     svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
                     svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
                     Exporter exporter = exporterFactory.create(dataset, dataset.getDefaultVersion());
-                    AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getDatasetid(), dataset
+                    AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset
                             .getAccessedDateTime(), "Version " + dataset.getDefaultVersion(), purpose, dirName);
                     ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);
                     threadPool.execute(eximTask);
@@ -258,7 +258,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 log.debug("modified filename: " + importFileName);
                 EmfDataset dataset = new EmfDataset();
                 dataset.setName(importFileName);
-                dataset.setCreator(user.getFullName());
+                dataset.setCreator(user.getName());
                 dataset.setDatasetType(datasetType);
                 dataset.setCreatedDateTime(new Date());
                 dataset.setModifiedDateTime(new Date());

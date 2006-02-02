@@ -33,7 +33,7 @@ public class LockingScheme {
 
         long elapsed = new Date().getTime() - current.getLockDate().getTime();
 
-        if ((user.getFullName().equals(current.getLockOwner())) || (elapsed > timeInterval(session))) {
+        if ((user.getName().equals(current.getLockOwner())) || (elapsed > timeInterval(session))) {
             grabLock(user, current, session);
         }
 

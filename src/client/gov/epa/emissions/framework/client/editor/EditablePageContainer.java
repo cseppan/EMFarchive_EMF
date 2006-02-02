@@ -68,7 +68,7 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
     }
 
     private EditablePagePanel createEditablePage(Page page) {
-        editablePage = new EditablePage((int) dataset.getDatasetid(), version, page, cols());
+        editablePage = new EditablePage((int) dataset.getId(), version, page, cols());
         editablePagePanel = new EditablePagePanel(editablePage, messagePanel);
         
         return editablePagePanel;

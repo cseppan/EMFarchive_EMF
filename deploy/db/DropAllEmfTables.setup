@@ -7,7 +7,7 @@ DROP TABLE emf.users CASCADE;
 --emf.users
 --
 --emf. status, countries, properties, sectors,sector criteria
-DROP TABLE emf.statusmessages;
+DROP TABLE emf.status;
 DROP TABLE emf.properties;
 --
 DROP SEQUENCE emf.countries_id_seq CASCADE;
@@ -16,7 +16,7 @@ DROP TABLE emf.countries;
 DROP SEQUENCE emf.sectors_id_seq;
 DROP TABLE emf.sectors CASCADE;
 --
-DROP TABLE emf.sectorcriteria;
+DROP TABLE emf.sector_criteria;
 --emf. status, countries, properties, sectors,sector criteria
 --
 -- emf ... KEYWORDS framework
@@ -27,7 +27,7 @@ DROP TABLE emf.dataset_types_keywords;
 --
 -- emf.dataset_types
 DROP TABLE emf.dataset_types CASCADE;
-DROP SEQUENCE emf.dataset_types_dataset_type_id_seq;
+DROP SEQUENCE emf.dataset_types_id_seq;
 -- emf.dataset_types
 --
 -- emf.datasets must

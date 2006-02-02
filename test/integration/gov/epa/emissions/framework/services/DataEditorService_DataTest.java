@@ -71,7 +71,7 @@ public class DataEditorService_DataTest extends ServicesTestCase {
     }
 
     private void setTestValues(EmfDataset dataset) {
-        dataset.setDatasetid(Math.abs(new Random().nextInt()));
+        dataset.setId(Math.abs(new Random().nextInt()));
         dataset.setCreator("tester");
         dataset.setCreatedDateTime(new Date());
         dataset.setModifiedDateTime(new Date());
@@ -150,7 +150,7 @@ public class DataEditorService_DataTest extends ServicesTestCase {
 
     private Version versionZero() {
         Versions versions = new Versions();
-        return versions.get(dataset.getDatasetid(), 0, session);
+        return versions.get(dataset.getId(), 0, session);
     }
 
     /**
@@ -195,15 +195,15 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         changeset.setVersion(v1);
 
         VersionedRecord record6 = new VersionedRecord();
-        record6.setDatasetId((int) dataset.getDatasetid());
+        record6.setDatasetId((int) dataset.getId());
         changeset.addNew(record6);
 
         VersionedRecord record7 = new VersionedRecord();
-        record7.setDatasetId((int) dataset.getDatasetid());
+        record7.setDatasetId((int) dataset.getId());
         changeset.addNew(record7);
 
         VersionedRecord record8 = new VersionedRecord();
-        record8.setDatasetId((int) dataset.getDatasetid());
+        record8.setDatasetId((int) dataset.getId());
         changeset.addNew(record8);
 
         service.submit(token, changeset, 1);
@@ -223,7 +223,7 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         changeset.setVersion(v1);
 
         VersionedRecord record6 = new VersionedRecord();
-        record6.setDatasetId((int) dataset.getDatasetid());
+        record6.setDatasetId((int) dataset.getId());
         changeset.addNew(record6);
 
         service.submit(token, changeset, 1);
@@ -232,7 +232,7 @@ public class DataEditorService_DataTest extends ServicesTestCase {
     }
 
     private Version versionOne() throws EmfException {
-        Version[] versions = service.getVersions(dataset.getDatasetid());
+        Version[] versions = service.getVersions(dataset.getId());
         return versions[1];
     }
 
@@ -242,14 +242,14 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         ChangeSet changeset1 = new ChangeSet();
         changeset1.setVersion(v1);
         VersionedRecord record6 = new VersionedRecord();
-        record6.setDatasetId((int) dataset.getDatasetid());
+        record6.setDatasetId((int) dataset.getId());
         changeset1.addNew(record6);
         service.submit(token, changeset1, 1);
 
         ChangeSet changeset2 = new ChangeSet();
         changeset2.setVersion(v1);
         VersionedRecord record7 = new VersionedRecord();
-        record7.setDatasetId((int) dataset.getDatasetid());
+        record7.setDatasetId((int) dataset.getId());
         changeset2.addNew(record7);
         service.submit(token, changeset2, 1);
 
@@ -269,7 +269,7 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         ChangeSet changeset1 = new ChangeSet();
         changeset1.setVersion(v1);
         VersionedRecord record6 = new VersionedRecord();
-        record6.setDatasetId((int) dataset.getDatasetid());
+        record6.setDatasetId((int) dataset.getId());
         changeset1.addNew(record6);
         service.submit(token, changeset1, 1);
 
@@ -292,7 +292,7 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         ChangeSet changeset = new ChangeSet();
         changeset.setVersion(v1);
         VersionedRecord record6 = new VersionedRecord();
-        record6.setDatasetId((int) dataset.getDatasetid());
+        record6.setDatasetId((int) dataset.getId());
         changeset.addNew(record6);
         service.submit(token, changeset, 1);
 
@@ -315,7 +315,7 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         changeset.setVersion(v1);
 
         VersionedRecord record6 = new VersionedRecord(10);
-        record6.setDatasetId((int) dataset.getDatasetid());
+        record6.setDatasetId((int) dataset.getId());
         changeset.addNew(record6);
 
         service.submit(token, changeset, 1);
@@ -343,7 +343,7 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         changeset.setVersion(v1);
 
         VersionedRecord record6 = new VersionedRecord(10);
-        record6.setDatasetId((int) dataset.getDatasetid());
+        record6.setDatasetId((int) dataset.getId());
         changeset.addNew(record6);
 
         int totalPriorToChanges = service.getTotalRecords(token);
@@ -361,7 +361,7 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         changeset.setVersion(v1);
 
         VersionedRecord record6 = new VersionedRecord(10);
-        record6.setDatasetId((int) dataset.getDatasetid());
+        record6.setDatasetId((int) dataset.getId());
         changeset.addNew(record6);
 
         VersionedRecord[] page1Records = page.getRecords();
@@ -397,7 +397,7 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         ChangeSet page1ChangeSet = new ChangeSet();
         page1ChangeSet.setVersion(v1);
         VersionedRecord record6 = new VersionedRecord(10);
-        record6.setDatasetId((int) dataset.getDatasetid());
+        record6.setDatasetId((int) dataset.getId());
         page1ChangeSet.addNew(record6);
         Page page1 = service.getPage(token, 1);
         service.submit(token, page1ChangeSet, 1);
@@ -432,7 +432,7 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         ChangeSet page1ChangeSet = new ChangeSet();
         page1ChangeSet.setVersion(v1);
         VersionedRecord newRecord = new VersionedRecord(10);
-        newRecord.setDatasetId((int) dataset.getDatasetid());
+        newRecord.setDatasetId((int) dataset.getId());
         page1ChangeSet.addNew(newRecord);
         service.submit(token, page1ChangeSet, 1);
 

@@ -35,7 +35,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
     public void FIXME_EmfSession_Setup_Failed_testSendsExportRequestToEximServiceOnExport() throws Exception {
         User user = new User();
         user.setUsername("user");
-        user.setFullName("full name");
+        user.setName("full name");
         String purpose = "HELLO EMF ACCESSLOGS FOR MOCK EXPORT";
 
         Mock dataset = mock(EmfDataset.class);
@@ -59,7 +59,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
     public void FIXME_EmfSession_Setup_Failed_testSendsExportRequestToEximServiceOnExportWithoutOverwrite() throws Exception {
         User user = new User();
         user.setUsername("user");
-        user.setFullName("full name");
+        user.setName("full name");
         String description = "HELLO EMF ACCESSLOGS FOR MOCK EXPORT";
         EmfDataset dataset = new EmfDataset();
         dataset.setName("dataset test");

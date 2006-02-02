@@ -22,14 +22,14 @@ public class UserServiceTest extends ServicesTestCase {
 
     public void testGetUserSucceedsForEMFAdministrator() throws Exception {
         User user = service.getUser("admin");
-        assertEquals("EMF Administrator", user.getFullName());
+        assertEquals("EMF Administrator", user.getName());
     }
 
     public void testCreateUser() throws Exception {
         User user = new User();
         user.setUsername("test-user");
         user.setPassword("user12345");
-        user.setFullName("test");
+        user.setName("test");
         user.setAffiliation("aff");
         user.setPhone("111-222-3333");
         user.setEmail("email@email.edu");
@@ -51,7 +51,7 @@ public class UserServiceTest extends ServicesTestCase {
         User user = new User();
         user.setUsername("test-user");
         user.setPassword("user12345");
-        user.setFullName("test");
+        user.setName("test");
         user.setAffiliation("aff");
         user.setPhone("111-222-3333");
         user.setEmail("email@email.edu");
@@ -69,7 +69,7 @@ public class UserServiceTest extends ServicesTestCase {
         User user = new User();
         user.setUsername("test-user");
         user.setPassword("user12345");
-        user.setFullName("test");
+        user.setName("test");
         user.setAffiliation("aff");
         user.setPhone("111-222-3333");
         user.setEmail("email@email.edu");
@@ -91,11 +91,11 @@ public class UserServiceTest extends ServicesTestCase {
         User user = new User();
         user.setUsername("test-user");
         user.setPassword("user12345");
-        user.setFullName("test");
+        user.setName("test");
         user.setAffiliation("aff");
         user.setPhone("111-222-3333");
         user.setEmail("email@email.edu");
-        user.setAcctDisabled(true);
+        user.setAccountDisabled(true);
 
         service.createUser(user);
 
@@ -161,7 +161,7 @@ public class UserServiceTest extends ServicesTestCase {
         User user = new User();
         user.setUsername("test-user");
         user.setPassword("abc12345");
-        user.setFullName("user dao");
+        user.setName("user dao");
         user.setAffiliation("test");
         user.setPhone("123-123-1234");
         user.setEmail("email@user-test.test");
@@ -183,7 +183,7 @@ public class UserServiceTest extends ServicesTestCase {
         User user = new User();
         user.setUsername("test-user");
         user.setPassword("user12345");
-        user.setFullName("name");
+        user.setName("name");
         user.setAffiliation("aff");
         user.setPhone("111-222-3333");
         user.setEmail("email@email.edu");
@@ -193,13 +193,13 @@ public class UserServiceTest extends ServicesTestCase {
         User owner = service.getUser("emf");
         User locked = service.obtainLocked(owner, user);
 
-        locked.setFullName("modified-name");
+        locked.setName("modified-name");
         service.updateUser(locked);
 
         try {
             User result = service.getUser("test-user");
             assertNotNull(result);
-            assertEquals("modified-name", result.getFullName());
+            assertEquals("modified-name", result.getName());
         } finally {
             remove(user);
         }

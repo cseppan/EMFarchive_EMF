@@ -104,7 +104,7 @@ public class StatusTableModel extends AbstractTableModel {
         private Map columns;
 
         public Row(Status status) {
-            Column messageType = new Column(status.getMessageType());
+            Column messageType = new Column(status.getType());
             Column message = new Column(status.getMessage());
             Column timestamp = new Column(dateFormat.format(status.getTimestamp()));
 

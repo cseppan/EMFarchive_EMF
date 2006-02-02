@@ -15,7 +15,7 @@ import org.hibernate.Session;
 
 public class UserServiceImpl implements UserService {
     private static Log LOG = LogFactory.getLog(UserServiceImpl.class);
-  
+
     private HibernateSessionFactory sessionFactory;
 
     private UserDAO dao;
@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
             if (user == null)
                 throw new AuthenticationException("User " + username + " does not exist");
 
-            if (user.isAcctDisabled())
+            if (user.isAccountDisabled())
                 throw new AuthenticationException("Account Disabled");
 
             if (!user.getEncryptedPassword().equals(password))
@@ -95,8 +95,8 @@ public class UserServiceImpl implements UserService {
             dao.update(user, session);
             session.close();
         } catch (HibernateException e) {
-            LOG.error("Could not update user - " + user.getFullName() + ". Reason: " + e.getMessage());
-            throw new EmfException("Could not update user - " + user.getFullName());
+            LOG.error("Could not update user - " + user.getName() + ". Reason: " + e.getMessage());
+            throw new EmfException("Could not update user - " + user.getName());
         }
     }
 
@@ -106,8 +106,8 @@ public class UserServiceImpl implements UserService {
             dao.remove(user, session);
             session.close();
         } catch (HibernateException e) {
-            LOG.error("Could not delete user - " + user.getFullName() + ". Reason: " + e.getMessage());
-            throw new EmfException("Could not delete user - " + user.getFullName());
+            LOG.error("Could not delete user - " + user.getName() + ". Reason: " + e.getMessage());
+            throw new EmfException("Could not delete user - " + user.getName());
         }
     }
 

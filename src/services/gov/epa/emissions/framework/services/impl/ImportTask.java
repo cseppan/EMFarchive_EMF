@@ -76,7 +76,7 @@ public class ImportTask implements Runnable {
     private void setStatus(String message) {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
-        endStatus.setMessageType("Import");
+        endStatus.setType("Import");
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 

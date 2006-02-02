@@ -71,7 +71,7 @@ public class ExportTask implements Runnable {
     private void setStatus(String message) {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
-        endStatus.setMessageType("Export");
+        endStatus.setType("Export");
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 

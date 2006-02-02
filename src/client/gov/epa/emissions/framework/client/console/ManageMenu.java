@@ -67,7 +67,7 @@ public class ManageMenu extends JMenu {
     }
 
     private void addUsers(User user) {
-        if (user.isInAdminGroup()) {
+        if (user.isAdmin()) {
             JMenuItem users = new JMenuItem("Users");
             users.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {

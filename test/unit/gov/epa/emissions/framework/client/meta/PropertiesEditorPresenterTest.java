@@ -113,7 +113,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     public void testShouldRaiseErrorOnDisplayIfFailedToObtainLock() throws Exception {
         User owner = new User();
         owner.setUsername("owner");
-        owner.setFullName("owner");
+        owner.setName("owner");
         dataset.setLockOwner(owner.getUsername());
         dataset.setLockDate(new Date());
 
@@ -254,8 +254,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
         dataService.expects(once()).method("updateDataset").with(eq(dataset)).will(
                 new ThrowStub(new EmfException("update failure")));
-        view.expects(once()).method("showError").with(
-                eq("Could not save dataset. Reason: update failure"));
+        view.expects(once()).method("showError").with(eq("Could not save dataset. Reason: update failure"));
 
         Mock keywordsView = mock(EditableKeywordsTabView.class);
         keywordsView.expects(once()).method("display");
