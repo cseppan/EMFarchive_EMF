@@ -62,6 +62,11 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         accessor = new DataAccessorImpl(cache, sessionFactory);
     }
 
+    public Page applyConstraints(DataAccessToken token, String rowFilter, String sortOrder) throws EmfException {
+        accessor.applyConstraints(token, null, rowFilter, sortOrder);
+        return getPage(token, 1);
+    }
+
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
         return accessor.getPage(token, pageNumber);
     }

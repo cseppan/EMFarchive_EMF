@@ -5,8 +5,9 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 
 public interface DataAccessService {
-
     // read
+    Page applyConstraints(DataAccessToken token, String rowFilter, String sortOrder) throws EmfException;
+
     Page getPage(DataAccessToken token, int pageNumber) throws EmfException;
 
     int getPageCount(DataAccessToken token) throws EmfException;

@@ -138,6 +138,15 @@ public class DataEditorService_DataTest extends ServicesTestCase {
         assertTrue(numberOfPages >= 1);
     }
 
+    public void testShouldApplyConstraintsAndReturnFirstPage() throws Exception {
+        String rowFilter = "AND POLL = '100414'";
+        String sortOrder = "POLL, ANN_EMIS";
+        Page page = service.applyConstraints(token, rowFilter, sortOrder);
+
+        assertEquals(1, page.getNumber());
+        assertEquals(2, page.count());
+    }
+
     private DataAccessToken token(Version version) {
         return token(version, dataset.getName());
     }
