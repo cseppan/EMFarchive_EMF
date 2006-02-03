@@ -1,5 +1,8 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.security.User;
@@ -22,6 +25,8 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -172,26 +177,30 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     private JPanel createCrudPanel() {
-        JButton newButton = new JButton("New");
-        newButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+
+
+        Action newAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent arg0) {
                 displayRegisterUser();
             }
-        });
+        };
+        Button newButton = new Button("New", newAction);
 
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+        Action deleteAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
                 deleteUsers();
             }
-        });
+        };
+        Button deleteButton = new Button("Delete", deleteAction);
 
-        JButton updateButton = new JButton("Update");
-        updateButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+        String messageTooManyWindows = "Opening too many windows. Do you want proceed?";
+        ConfirmDialog confirmUpdateDialog = new ConfirmDialog(messageTooManyWindows, "Warning", this);
+        Action updateAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
                 updateUsers();
             }
-        });
+        };
+        SelectAwareButton updateButton = new SelectAwareButton("Update",updateAction,selectModel,confirmUpdateDialog);
 
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());

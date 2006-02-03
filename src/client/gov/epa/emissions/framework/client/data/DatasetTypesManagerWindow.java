@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
-import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.io.DatasetType;
@@ -119,18 +120,22 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private JPanel createCrudPanel() {
+        String message = "Opening too many windows. Do you want proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message,"Warning",this);
+        
         Action viewAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 viewDatasetTypes();
             }
         };
-        Button viewButton = new Button("View", viewAction);
+        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction,selectModel,confirmDialog);
+        
         Action editAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 editDatasetTypes();
             }
         };
-        Button editButton = new Button("Edit", editAction);
+        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction,selectModel,confirmDialog);
 
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());

@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.gui.ConfirmDialog;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.io.Sector;
@@ -20,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -125,21 +129,26 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     private JPanel createCrudPanel() {
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
-
-        JButton viewButton = new JButton("View");
-        viewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+        Action viewAction = new AbstractAction(){
+            public void actionPerformed(ActionEvent e) {
                 viewSectors();
             }
-        });
+            
+        };
+        
+        String message = "Opening too many windows. Do you want proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message,"Warning",this);
+        SelectAwareButton viewButton = new SelectAwareButton("View",viewAction,selectModel,confirmDialog);
         crudPanel.add(viewButton);
 
-        JButton editButton = new JButton("Edit");
-        editButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+        
+        Action editAction = new AbstractAction(){
+            public void actionPerformed(ActionEvent e) {
                 editSectors();
             }
-        });
+            
+        };
+        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction,selectModel,confirmDialog);
         crudPanel.add(editButton);
 
         return crudPanel;
