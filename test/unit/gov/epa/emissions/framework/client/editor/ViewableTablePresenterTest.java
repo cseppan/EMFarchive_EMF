@@ -3,14 +3,16 @@ package gov.epa.emissions.framework.client.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.Dataset;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataAccessToken;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.core.constraint.IsInstanceOf;
 
-public class NonEditableTablePresenterTest extends MockObjectTestCase {
+public class ViewableTablePresenterTest extends MockObjectTestCase {
 
     public void testShouldObserveViewOnObserve() {
         Mock view = mock(NonEditableTableView.class);
@@ -19,6 +21,23 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         view.expects(once()).method("observe").with(same(p));
 
         p.observe();
+    }
+
+    public void testShouldDisplayPageOneAfterApplyingConstraintsOnApplyConstraints() throws EmfException {
+        Mock view = mock(NonEditableTableView.class);
+        Mock service = mock(DataEditorService.class);
+
+        TablePresenter p = new ViewableTablePresenter(null, "table", (NonEditableTableView) view.proxy(),
+                (DataAccessService) service.proxy());
+
+        String rowFilter = "rowFilter";
+        String sortOrder = "sortOrder";
+        Page page = new Page();
+        service.expects(once()).method("applyConstraints").with(new IsInstanceOf(DataAccessToken.class), eq(rowFilter),
+                eq(sortOrder)).will(returnValue(page));
+        view.expects(once()).method("display").with(same(page));
+
+        p.applyConstraints(rowFilter, sortOrder);
     }
 
     public void testShouldFetchTotalRecords() throws Exception {
@@ -68,9 +87,9 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldDisplayPageWithRecord() throws Exception {
-        Mock services = mock(DataEditorService.class);
+        Mock service = mock(DataEditorService.class);
         Page page = new Page();
-        services.stubs().method("getPageWithRecord").with(isA(DataAccessToken.class), eq(new Integer(21))).will(
+        service.stubs().method("getPageWithRecord").with(isA(DataAccessToken.class), eq(new Integer(21))).will(
                 returnValue(page));
 
         Mock view = mock(NonEditableTableView.class);
@@ -80,7 +99,7 @@ public class NonEditableTablePresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
         TablePresenter p = new ViewableTablePresenter(new Version(), "table", (NonEditableTableView) view.proxy(),
-                (DataAccessService) services.proxy());
+                (DataAccessService) service.proxy());
 
         p.doDisplayPageWithRecord(21);
     }

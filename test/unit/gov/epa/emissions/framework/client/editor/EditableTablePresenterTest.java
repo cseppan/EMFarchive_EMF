@@ -5,8 +5,9 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.io.Dataset;
-import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataEditorService;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -23,6 +24,23 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.expects(once()).method("observe").with(same(p));
 
         p.observe();
+    }
+
+    public void testShouldDisplayPageOneAfterApplyingConstraintsOnApplyConstraints() throws EmfException {
+        Mock view = mock(EditablePageManagerView.class);
+        Mock service = mock(DataEditorService.class);
+
+        TablePresenter p = new EditableTablePresenterImpl(null, "table", (EditablePageManagerView) view.proxy(),
+                (DataEditorService) service.proxy());
+
+        String rowFilter = "rowFilter";
+        String sortOrder = "sortOrder";
+        Page page = new Page();
+        service.expects(once()).method("applyConstraints").with(new IsInstanceOf(DataAccessToken.class), eq(rowFilter),
+                eq(sortOrder)).will(returnValue(page));
+        view.expects(once()).method("display").with(same(page));
+
+        p.applyConstraints(rowFilter, sortOrder);
     }
 
     public void testShouldFetchTotalRecords() throws Exception {

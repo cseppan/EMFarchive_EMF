@@ -20,4 +20,6 @@ public interface TablePresenter {
 
     int totalRecords() throws EmfException;
 
+    void applyConstraints(String rowFilter, String sortOrder) throws EmfException;
+
 }

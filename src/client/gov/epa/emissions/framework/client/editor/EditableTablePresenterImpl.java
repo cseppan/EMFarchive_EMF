@@ -1,8 +1,10 @@
 package gov.epa.emissions.framework.client.editor;
 
+import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataEditorService;
 
 public class EditableTablePresenterImpl implements EditableTablePresenter {
@@ -65,15 +67,24 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
     public void submitChanges() throws EmfException {
         ChangeSet changeset = view.changeset();
         if (changeset.hasChanges()) {
-            service.submit(paginator.token(), changeset, paginator.pageNumber());
+            service.submit(token(), changeset, paginator.pageNumber());
             changeset.clear();
         }
 
         view.updateTotalRecordsCount(paginator.totalRecords());
     }
 
+    private DataAccessToken token() {
+        return paginator.token();
+    }
+
     public boolean hasChanges() {
         return view.changeset().hasChanges();
+    }
+
+    public void applyConstraints(String rowFilter, String sortOrder) throws EmfException {
+        Page page = service.applyConstraints(token(), rowFilter, sortOrder);
+        view.display(page);
     }
 
 }
