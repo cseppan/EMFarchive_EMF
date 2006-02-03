@@ -8,7 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class LoggingDAO {
-    private static final String GET_ACCESS_LOG_QUERY = "from AccessLog as alog where alog.datasetid=:datasetid";
+    private static final String GET_ACCESS_LOG_QUERY = "from AccessLog as alog where alog.datasetId=:datasetid";
 
     public static void insertAccessLog(AccessLog accesslog, Session session) {
         Transaction tx = session.beginTransaction();
