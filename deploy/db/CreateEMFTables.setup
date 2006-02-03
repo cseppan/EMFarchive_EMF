@@ -189,9 +189,7 @@ CREATE TABLE emf.dataset_access_logs
   version varchar(128) NOT NULL,
   description text NOT NULL,
   "location" varchar(255) NOT NULL,
-  CONSTRAINT dataset_access_logs_pkey PRIMARY KEY (id),
-  CONSTRAINT dataset_access_logs_to_datasets FOREIGN KEY (dataset_id)
-      REFERENCES emf.datasets (id)
+  CONSTRAINT dataset_access_logs_pkey PRIMARY KEY (id)
 ) 
 WITHOUT OIDS;
 ALTER TABLE emf.dataset_access_logs OWNER TO emf;

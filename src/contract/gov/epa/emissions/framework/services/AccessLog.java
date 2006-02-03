@@ -11,9 +11,9 @@ import java.util.Date;
  */
 public class AccessLog {
 
-    private long accesslogid;
+    private long id;
 
-    private long datasetid;
+    private long datasetId;
 
     private String username = null;
 
@@ -29,13 +29,13 @@ public class AccessLog {
     }
 
     public String toString() {
-        return "[ " + accesslogid + " " + datasetid + " " + username + " " + version + " ]";
+        return "[ " + id + " " + datasetId + " " + username + " " + version + " ]";
     }
 
     public AccessLog(String username, long datasetid, Date date, String version, String description, String folderPath) {
         super();
         setUsername(username);
-        setDatasetid(datasetid);
+        setDatasetId(datasetid);
         setTimestamp(date);
         setVersion(version);
         setDescription(description);
@@ -82,20 +82,20 @@ public class AccessLog {
         this.version = version;
     }
 
-    public long getAccesslogid() {
-        return accesslogid;
+    public long getId() {
+        return id;
     }
 
-    public void setAccesslogid(long accesslogid) {
-        this.accesslogid = accesslogid;
+    public void setId(long id) {
+        this.id = id;
     }
 
-    public long getDatasetid() {
-        return datasetid;
+    public long getDatasetId() {
+        return datasetId;
     }
 
-    public void setDatasetid(long datasetid) {
-        this.datasetid = datasetid;
+    public void setDatasetId(long datasetid) {
+        this.datasetId = datasetid;
     }
 
 }
