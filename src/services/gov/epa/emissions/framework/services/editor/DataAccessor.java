@@ -44,4 +44,7 @@ public interface DataAccessor {
 
     boolean isLocked(Version version) throws EmfException;
 
+    void applyConstraints(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder)
+            throws EmfException;
+
 }

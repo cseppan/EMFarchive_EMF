@@ -49,12 +49,12 @@ public class DataViewCacheImpl implements DataViewCache {
 
     public void init(DataAccessToken token, int pageSize, String columnFilter, String rowFilter, String sortOrder,
             Session session) throws Exception {
-        initReader(token, pageSize, columnFilter, rowFilter, sortOrder, session);
+        reinitialize(token, pageSize, columnFilter, rowFilter, sortOrder, session);
     }
 
     public void applyConstraints(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder, Session session)
             throws Exception {
-        initReader(token, defaultPageSize(session), columnFilter, rowFilter, sortOrder, session);
+        reinitialize(token, defaultPageSize(session), columnFilter, rowFilter, sortOrder, session);
     }
 
     public int defaultPageSize(Session session) {
@@ -100,11 +100,8 @@ public class DataViewCacheImpl implements DataViewCache {
         readersMap.put(token.key(), reader);
     }
 
-    private void initReader(DataAccessToken token, int pageSize, String columnFilter, String rowFilter,
+    private void reinitialize(DataAccessToken token, int pageSize, String columnFilter, String rowFilter,
             String sortOrder, Session session) throws Exception {
-        if (readersMap.containsKey(token.key()))
-            return;
-
         ScrollableVersionedRecords records = recordsReader.fetch(token.getVersion(), token.getTable(), columnFilter,
                 rowFilter, sortOrder, session);
         PageReader reader = new PageReader(pageSize, records);

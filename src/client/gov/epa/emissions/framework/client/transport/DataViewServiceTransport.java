@@ -55,6 +55,27 @@ public class DataViewServiceTransport implements DataViewService {
         throw new EmfException(msg);
     }
 
+    public Page applyConstraints(DataAccessToken token, String rowFilter, String sortOrder) throws EmfException {
+        try {
+            mappings.addParam(call, "token", mappings.dataAccessToken());
+            mappings.addStringParam(call, "rowFilter");
+            mappings.addStringParam(call, "sortOrder");
+            
+            mappings.setOperation(call, "applyConstraints");
+            mappings.setReturnType(call, mappings.page());
+
+            return (Page) call.invoke(new Object[] { token, rowFilter, sortOrder });
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to apply constraints: ", fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to apply constraints: ", e);
+        } finally {
+            call.removeAllParameters();
+        }
+
+        return null;
+    }
+
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
         try {
             mappings.addParam(call, "token", mappings.dataAccessToken());

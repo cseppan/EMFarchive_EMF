@@ -112,6 +112,15 @@ public class DataViewServiceTest extends ServicesTestCase {
         assertTrue(numberOfPages >= 1);
     }
 
+    public void testShouldApplyConstraintsAndReturnFirstPage() throws Exception {
+        String rowFilter = "AND POLL = '100414'";
+        String sortOrder = "POLL, ANN_EMIS";
+        Page page = service.applyConstraints(token(), rowFilter, sortOrder);
+
+        assertEquals(1, page.getNumber());
+        assertEquals(20, page.count());
+    }
+
     private DataAccessToken token() {
         Version version = versionZero();
         return token(version);

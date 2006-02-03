@@ -37,6 +37,18 @@ public class DataAccessorImpl implements DataAccessor {
         return result;
     }
 
+    public void applyConstraints(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder)
+            throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            cache.applyConstraints(token, columnFilter, rowFilter, sortOrder, session);
+            session.close();
+        } catch (Exception e) {
+            LOG.error("Could not apply constraints for Dataset: " + token.datasetId() + ". Reason: " + e);
+            throw new EmfException("Could not apply constraints for Dataset: " + token.datasetId());
+        }
+    }
+
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
