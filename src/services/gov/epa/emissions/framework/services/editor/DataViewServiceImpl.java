@@ -41,7 +41,7 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
     private void init(DbServer dbServer, Datasource datasource, HibernateSessionFactory sessionFactory) {
         VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
-        DataAccessCache cache = new DataAccessCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
+        DataAccessCacheImpl cache = new DataAccessCacheImpl(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
 
         accessor = new DataAccessorImpl(cache, sessionFactory);
     }

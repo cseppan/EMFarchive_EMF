@@ -30,7 +30,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
 
     private VersionedRecordsReader reader;
 
-    private DataUpdatesCache cache;
+    private DataAccessCache cache;
 
     private HibernateSessionFactory sessionFactory;
 
@@ -57,7 +57,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         reader = new DefaultVersionedRecordsReader(datasource);
 
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
-        cache = new DataAccessCache(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
+        cache = new DataAccessCacheImpl(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
 
         accessor = new DataAccessorImpl(cache, sessionFactory);
     }
@@ -130,7 +130,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         return doSave(extended, cache, sessionFactory);
     }
 
-    private DataAccessToken doSave(DataAccessToken token, DataUpdatesCache cache,
+    private DataAccessToken doSave(DataAccessToken token, DataAccessCache cache,
             HibernateSessionFactory hibernateSessionFactory) throws EmfException {
         try {
             Session session = hibernateSessionFactory.getSession();

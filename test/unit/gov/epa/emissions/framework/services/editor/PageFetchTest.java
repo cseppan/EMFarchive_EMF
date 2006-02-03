@@ -10,10 +10,10 @@ import org.jmock.cglib.MockObjectTestCase;
 public class PageFetchTest extends MockObjectTestCase {
 
     public void testShouldCalculateTotalSizeOfAllPreviousPages() throws Exception {
-        Mock cache = mock(DataUpdatesCache.class);
+        Mock cache = mock(DataAccessCache.class);
         cache.stubs().method("defaultPageSize").will(returnValue(10));
 
-        PageFetch fetch = new PageFetch((DataUpdatesCache) cache.proxy());
+        PageFetch fetch = new PageFetch((DataAccessCache) cache.proxy());
 
         DataAccessToken token = new DataAccessToken();
         Session session = (Session) mock(Session.class).proxy();
@@ -32,10 +32,10 @@ public class PageFetchTest extends MockObjectTestCase {
     }
 
     public void testShouldSetRangeBasedOnTotalRecordsOfPreviousPagesAndCurrentPageSize() throws Exception {
-        Mock cache = mock(DataUpdatesCache.class);
+        Mock cache = mock(DataAccessCache.class);
         cache.stubs().method("defaultPageSize").will(returnValue(10));
 
-        PageFetch fetch = new PageFetch((DataUpdatesCache) cache.proxy());
+        PageFetch fetch = new PageFetch((DataAccessCache) cache.proxy());
 
         DataAccessToken token = new DataAccessToken();
         Session session = (Session) mock(Session.class).proxy();
@@ -57,10 +57,10 @@ public class PageFetchTest extends MockObjectTestCase {
     }
 
     public void testShouldReturnPageByRecordNumber() throws Exception {
-        Mock cache = mock(DataUpdatesCache.class);
+        Mock cache = mock(DataAccessCache.class);
         cache.stubs().method("pageSize").will(returnValue(10));
 
-        PageFetch fetch = new PageFetch((DataUpdatesCache) cache.proxy());
+        PageFetch fetch = new PageFetch((DataAccessCache) cache.proxy());
 
         DataAccessToken token = new DataAccessToken();
         Session session = (Session) mock(Session.class).proxy();

@@ -72,7 +72,7 @@ public class DataViewServiceTest extends ServicesTestCase {
         Versions versions = new Versions();
         Version v1 = versions.derive(v0, "v1", session);
 
-        token = token(v1);
+        DataAccessToken token = token(v1);
         try {
             service.openSession(token);
         } catch (EmfException e) {

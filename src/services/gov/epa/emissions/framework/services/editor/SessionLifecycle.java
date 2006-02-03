@@ -17,7 +17,7 @@ import org.hibernate.Session;
 public class SessionLifecycle {
     private Log LOG = LogFactory.getLog(SessionLifecycle.class);
 
-    private DataUpdatesCache cache;
+    private DataAccessCache cache;
 
     private HibernateSessionFactory sessionFactory;
 
@@ -25,7 +25,7 @@ public class SessionLifecycle {
 
     private LockableVersions lockableVersions;
 
-    public SessionLifecycle(DataUpdatesCache cache, HibernateSessionFactory sessionFactory) {
+    public SessionLifecycle(DataAccessCache cache, HibernateSessionFactory sessionFactory) {
         this.cache = cache;
         this.sessionFactory = sessionFactory;
         versions = new Versions();

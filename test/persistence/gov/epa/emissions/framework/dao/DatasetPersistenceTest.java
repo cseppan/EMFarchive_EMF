@@ -45,51 +45,45 @@ public class DatasetPersistenceTest extends HibernateTestCase {
     }
 
     public void testVerifySimplePropertiesAreStored() throws Exception {
-        Country country = new Country("FR");
-        Project project = new Project("P1");
-        EmfDataset ds = new EmfDataset();
+        Country country = new Country("FR" + Math.random());
+        Project project = new Project("P1" + Math.random());
+        EmfDataset dataset = new EmfDataset();
 
-        Region region = new Region("USA");
+        Region region = new Region("USA" + Math.random());
         try {
             dcDao.add(country, session);
             dcDao.add(project, session);
             dcDao.add(region, session);
 
-            ds.setAccessedDateTime(new Date());
-            ds.setCountry(country);
-            ds.setCreatedDateTime(new Date());
-            ds.setCreator("CFD");
-            ds.setDescription("DESCRIPTION");
-            ds.setModifiedDateTime(new Date());
-            ds.setName(datasetName);
-            ds.setProject(project);
-            ds.setRegion(region);
-            ds.setSectors(new Sector[] { new Sector("", "S1") });
-            ds.setStartDateTime(new Date());
-            ds.setStatus("imported");
-            ds.setYear(42);
-            ds.setUnits("orl");
-            ds.setTemporalResolution("t1");
-            ds.setStopDateTime(new Date());
+            dataset.setAccessedDateTime(new Date());
+            dataset.setCountry(country);
+            dataset.setCreatedDateTime(new Date());
+            dataset.setCreator("CFD");
+            dataset.setDescription("DESCRIPTION");
+            dataset.setModifiedDateTime(new Date());
+            dataset.setName(datasetName);
+            dataset.setProject(project);
+            dataset.setRegion(region);
+            dataset.setSectors(new Sector[] { new Sector("", "S1" + Math.random()) });
+            dataset.setStartDateTime(new Date());
+            dataset.setStatus("imported");
+            dataset.setYear(42);
+            dataset.setUnits("orl");
+            dataset.setTemporalResolution("t1");
+            dataset.setStopDateTime(new Date());
 
             DatasetType type = load("ORL Nonpoint Inventory");
-            ds.setDatasetType(type);
+            dataset.setDatasetType(type);
 
             KeyVal kv = new KeyVal();
             kv.setValue("bar-1");
             kv.setKeyword(new Keyword("bar-key"));
-            ds.addKeyVal(kv);
+            dataset.addKeyVal(kv);
 
-            save(ds);
-
-            kv.setValue(null);
-            update(ds);
+            save(dataset);
         } finally {
-            ds.setCountry(null);
-            ds.setProject(null);
-            ds.setRegion(null);
-            update(ds);
-            
+            remove(dataset);
+
             remove(country);
             remove(region);
             remove(project);
@@ -115,23 +109,10 @@ public class DatasetPersistenceTest extends HibernateTestCase {
         }
     }
 
-    private void update(Object element) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            session.update(element);
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
-    }
-
     private void remove(Object object) {
         Transaction tx = session.beginTransaction();
         session.delete(object);
         tx.commit();
     }
-
 
 }

@@ -7,8 +7,6 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 
-import java.sql.SQLException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
@@ -16,7 +14,7 @@ import org.hibernate.Session;
 public class DataAccessorImpl implements DataAccessor {
     private Log LOG = LogFactory.getLog(DataAccessorImpl.class);
 
-    private DataUpdatesCache cache;
+    private DataAccessCache cache;
 
     private PageFetch pageFetch;
 
@@ -24,7 +22,7 @@ public class DataAccessorImpl implements DataAccessor {
 
     private HibernateSessionFactory sessionFactory;
 
-    public DataAccessorImpl(DataUpdatesCache cache, HibernateSessionFactory sessionFactory) {
+    public DataAccessorImpl(DataAccessCache cache, HibernateSessionFactory sessionFactory) {
         this.cache = cache;
         this.sessionFactory = sessionFactory;
         pageFetch = new PageFetch(cache);
@@ -99,7 +97,7 @@ public class DataAccessorImpl implements DataAccessor {
     public void shutdown() throws EmfException {
         try {
             cache.invalidate();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             LOG.error("Could not close DataView Service. Reason: " + e.getMessage());
             throw new EmfException("Could not close DataView Service");
         }

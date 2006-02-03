@@ -15,7 +15,7 @@ import org.jmock.cglib.MockObjectTestCase;
 
 public class DataAccessCacheTest extends MockObjectTestCase {
 
-    private DataAccessCache cache;
+    private DataAccessCacheImpl cache;
 
     private Session session;
 
@@ -38,7 +38,7 @@ public class DataAccessCacheTest extends MockObjectTestCase {
         session = null;
         Mock properties = properties();
 
-        cache = new DataAccessCache((VersionedRecordsReader) reader.proxy(),
+        cache = new DataAccessCacheImpl((VersionedRecordsReader) reader.proxy(),
                 (VersionedRecordsWriterFactory) writerFactory.proxy(), null, null, (EmfProperties) properties.proxy());
     }
 

@@ -6,17 +6,15 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.ChangeSets.ChangeSetsIterator;
 
-import java.sql.SQLException;
-
 import org.hibernate.Session;
 
 public class PageFetch {
 
-    private DataUpdatesCache cache;
+    private DataAccessCache cache;
 
     private RecordsFilter filter;
 
-    public PageFetch(DataUpdatesCache cache) {
+    public PageFetch(DataAccessCache cache) {
         this.cache = cache;
         filter = new RecordsFilter();
     }
@@ -36,7 +34,7 @@ public class PageFetch {
         page.setMin(min);
     }
 
-    private Page filteredPage(DataAccessToken token, int pageNumber, Session session) throws SQLException {
+    private Page filteredPage(DataAccessToken token, int pageNumber, Session session) throws Exception {
         PageReader reader = cache.reader(token);
         Page page = reader.page(pageNumber);
         ChangeSets changesets = cache.changesets(token, pageNumber, session);
@@ -77,7 +75,7 @@ public class PageFetch {
         return reader.totalRecords() + netRecordCountIncreaseDueToChanges(token, session);
     }
 
-    private int netRecordCountIncreaseDueToChanges(DataAccessToken token, Session session) throws SQLException {
+    private int netRecordCountIncreaseDueToChanges(DataAccessToken token, Session session) throws Exception {
         int total;
         ChangeSets changesets = cache.changesets(token, session);
         total = 0;

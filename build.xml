@@ -201,7 +201,7 @@
 
 	<!-- All tests -->
 	<target name="all-dev-tests" depends="unit-tests, integration-tests, persistence-tests" />
-	<target name="all-tests" depends="unit-tests, integration-tests, uat-tests" />
+	<target name="all-tests" depends="all-dev-tests, uat-tests" />
 	<target name="run-uat" description="Deploys application to Tomcat, runs all UAT tests, and stops Tomcat">
 		<antcall target="run-integration-tests">
 			<param name="tests-target" value="uat-tests" />
@@ -212,11 +212,7 @@
 	<target name="ci-build" depends="compile, unit-tests, app-dist" description="Continuous Integration build" />
 
 	<!-- DEFAULT target-->
-	<target name="nirvana" description="Deploys application to Tomcat, runs ALL (except UAT) tests, and stops Tomcat" depends="clean, init">
-		<antcall target="run-integration-tests">
-			<param name="tests-target" value="all-dev-tests" />
-		</antcall>
-	</target>
+	<target name="nirvana" description="Deploys application to Tomcat, runs ALL (except UAT) tests, and stops Tomcat" depends="clean, init, all-dev-tests" />
 
 	<target name="moksha" description="Deploys application to Tomcat, runs ALL tests, and stops Tomcat">
 		<antcall target="run-integration-tests">
