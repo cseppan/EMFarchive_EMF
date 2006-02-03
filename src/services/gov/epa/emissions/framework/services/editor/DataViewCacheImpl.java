@@ -52,7 +52,7 @@ public class DataViewCacheImpl implements DataViewCache {
         initReader(token, pageSize, columnFilter, rowFilter, sortOrder, session);
     }
 
-    public void init(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder, Session session)
+    public void applyConstraints(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder, Session session)
             throws Exception {
         initReader(token, defaultPageSize(session), columnFilter, rowFilter, sortOrder, session);
     }

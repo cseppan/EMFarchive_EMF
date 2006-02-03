@@ -11,7 +11,7 @@ public interface DataViewCache {
 
     void init(DataAccessToken token, Session session) throws Exception;
 
-    void init(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder, Session session)
+    void applyConstraints(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder, Session session)
             throws Exception;
 
     int defaultPageSize(Session session);

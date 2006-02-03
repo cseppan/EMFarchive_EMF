@@ -12,7 +12,7 @@ import org.jmock.core.Constraint;
 
 public class DataViewCacheImplTest extends MockObjectTestCase {
 
-    public void testShouldReinitializeRecordsReaderOnInitWithSortFilterClause() throws Exception {
+    public void testShouldReinitializeRecordsReaderOnApplyConstraints() throws Exception {
         Mock reader = mock(VersionedRecordsReader.class);
         DataViewCacheImpl cache = new DataViewCacheImpl((VersionedRecordsReader) reader.proxy());
 

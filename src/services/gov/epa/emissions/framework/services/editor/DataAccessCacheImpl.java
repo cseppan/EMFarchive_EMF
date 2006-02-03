@@ -15,7 +15,7 @@ public class DataAccessCacheImpl implements DataAccessCache {
 
     private DataViewCache view;
 
-    private DataUpdatesCache update;
+    private DataUpdatesCache updates;
 
     public DataAccessCacheImpl(VersionedRecordsReader reader, VersionedRecordsWriterFactory writerFactory,
             Datasource datasource, SqlDataTypes sqlTypes) {
@@ -25,20 +25,26 @@ public class DataAccessCacheImpl implements DataAccessCache {
     public DataAccessCacheImpl(VersionedRecordsReader reader, VersionedRecordsWriterFactory writerFactory,
             Datasource datasource, SqlDataTypes sqlTypes, EmfProperties properties) {
         view = new DataViewCacheImpl(reader, properties);
-        update = new DataUpdatesCacheImpl(writerFactory, datasource, sqlTypes, properties);
+        updates = new DataUpdatesCacheImpl(writerFactory, datasource, sqlTypes, properties);
+    }
+
+    public DataAccessCacheImpl(DataViewCache view, DataUpdatesCache updates) {
+        this.view = view;
+        this.updates = updates;
     }
 
     public void init(DataAccessToken token, Session session) throws Exception {
         init(token, defaultPageSize(session), session);
     }
 
-    public void init(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder, Session session)
-            throws Exception {//TODO
+    public void applyConstraints(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder,
+            Session session) throws Exception {
+        view.applyConstraints(token, columnFilter, rowFilter, sortOrder, session);
     }
 
     public void init(DataAccessToken token, int pageSize, Session session) throws Exception {
         view.init(token, pageSize, session);
-        update.init(token, session);
+        updates.init(token, session);
     }
 
     public PageReader reader(DataAccessToken token) {
@@ -50,20 +56,20 @@ public class DataAccessCacheImpl implements DataAccessCache {
      * Page Number to Change Sets (of that Page)
      */
     public ChangeSets changesets(DataAccessToken token, int pageNumber, Session session) throws Exception {
-        return update.changesets(token, pageNumber, session);
+        return updates.changesets(token, pageNumber, session);
     }
 
     public void submitChangeSet(DataAccessToken token, ChangeSet changeset, int pageNumber, Session session)
             throws Exception {
-        update.submitChangeSet(token, changeset, pageNumber, session);
+        updates.submitChangeSet(token, changeset, pageNumber, session);
     }
 
     public void discardChangeSets(DataAccessToken token, Session session) throws Exception {
-        update.discardChangeSets(token, session);
+        updates.discardChangeSets(token, session);
     }
 
     public ChangeSets changesets(DataAccessToken token, Session session) throws Exception {
-        return update.changesets(token, session);
+        return updates.changesets(token, session);
     }
 
     public int defaultPageSize(Session session) {
@@ -76,7 +82,7 @@ public class DataAccessCacheImpl implements DataAccessCache {
 
     public void invalidate() throws Exception {
         view.invalidate();
-        update.invalidate();
+        updates.invalidate();
     }
 
     public void reload(DataAccessToken token, Session session) throws Exception {
@@ -86,16 +92,16 @@ public class DataAccessCacheImpl implements DataAccessCache {
 
     public void close(DataAccessToken token, Session session) throws Exception {
         view.close(token, session);
-        update.close(token, session);
+        updates.close(token, session);
     }
 
     public void save(DataAccessToken token, Session session) throws Exception {
-        update.save(token, session);
+        updates.save(token, session);
         reload(token, session);
     }
 
     public boolean hasChanges(DataAccessToken token, Session session) throws Exception {
-        return update.hasChanges(token, session);
+        return updates.hasChanges(token, session);
     }
 
 }
