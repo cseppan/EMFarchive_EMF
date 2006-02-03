@@ -14,7 +14,7 @@ import javax.swing.JMenuItem;
 public class WindowMenu extends JMenu implements WindowMenuView {
 
     private List menuItems;
-
+    
     public WindowMenu() {
         super("Window");
         super.setName("window");
