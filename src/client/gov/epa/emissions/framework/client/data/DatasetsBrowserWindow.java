@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ConfirmDialog;
+import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.io.KeyVal;
@@ -35,6 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -162,13 +165,15 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         combo.setPreferredSize(new Dimension(125, 25));
         combo.setToolTipText("Select one of the options and click Go to view/edit a Dataset");
         panel.add(combo);
-
-        Button goButton = new Button("Go", new AbstractAction() {
+        Action dataAction = new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 String selected = (String) combo.getSelectedItem();
                 selectedOption(selected);
             }
-        });
+        };
+        String message = "Opening too many windows. Do you want proceed?";
+        ConfirmDialog confirmDialog = new ConfirmDialog(message,"Warning",this);
+        SelectAwareButton goButton = new SelectAwareButton("Go",dataAction,selectModel,confirmDialog  );
         panel.add(goButton);
 
         return panel;

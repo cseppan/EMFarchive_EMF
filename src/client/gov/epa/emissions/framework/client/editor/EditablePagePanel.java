@@ -127,7 +127,6 @@ public class EditablePagePanel extends JPanel {
 
     private void doAdd(final EditablePage tableData) {
         clearMessages();
-
         tableData.addBlankRow();
         refresh();
         scrollToPageEnd();
