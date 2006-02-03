@@ -43,6 +43,20 @@ public class DataViewCacheImpl implements DataViewCache {
         init(token, defaultPageSize(session), session);
     }
 
+    public void init(DataAccessToken token, int pageSize, Session session) throws SQLException {
+        initReader(token, pageSize, session);
+    }
+
+    public void init(DataAccessToken token, int pageSize, String columnFilter, String rowFilter, String sortOrder,
+            Session session) throws Exception {
+        initReader(token, pageSize, columnFilter, rowFilter, sortOrder, session);
+    }
+
+    public void init(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder, Session session)
+            throws Exception {
+        initReader(token, defaultPageSize(session), columnFilter, rowFilter, sortOrder, session);
+    }
+
     public int defaultPageSize(Session session) {
         EmfProperty pageSize = properties.getProperty("page-size", session);
         return Integer.parseInt(pageSize.getValue());
@@ -50,10 +64,6 @@ public class DataViewCacheImpl implements DataViewCache {
 
     public int pageSize(DataAccessToken token) {
         return reader(token).pageSize();
-    }
-
-    public void init(DataAccessToken token, int pageSize, Session session) throws SQLException {
-        initReader(token, pageSize, session);
     }
 
     public void invalidate() throws SQLException {
@@ -81,12 +91,24 @@ public class DataViewCacheImpl implements DataViewCache {
     }
 
     private void initReader(DataAccessToken token, int pageSize, Session session) throws SQLException {
-        if (!readersMap.containsKey(token.key())) {
-            ScrollableVersionedRecords records = recordsReader.fetch(token.getVersion(), token.getTable(), session);
-            PageReader reader = new PageReader(pageSize, records);
+        if (readersMap.containsKey(token.key()))
+            return;
 
-            readersMap.put(token.key(), reader);
-        }
+        ScrollableVersionedRecords records = recordsReader.fetch(token.getVersion(), token.getTable(), session);
+        PageReader reader = new PageReader(pageSize, records);
+
+        readersMap.put(token.key(), reader);
     }
 
+    private void initReader(DataAccessToken token, int pageSize, String columnFilter, String rowFilter,
+            String sortOrder, Session session) throws Exception {
+        if (readersMap.containsKey(token.key()))
+            return;
+
+        ScrollableVersionedRecords records = recordsReader.fetch(token.getVersion(), token.getTable(), columnFilter,
+                rowFilter, sortOrder, session);
+        PageReader reader = new PageReader(pageSize, records);
+
+        readersMap.put(token.key(), reader);
+    }
 }

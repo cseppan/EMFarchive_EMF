@@ -59,7 +59,7 @@ public class DataUpdatesCacheImpl implements DataUpdatesCache {
      * Keeps a two-level mapping. First map, ChangeSetMap is a map of tokens and PageChangeSetMap. PageChangeSetMap maps
      * Page Number to Change Sets (of that Page)
      */
-    public ChangeSets changesets(DataAccessToken token, int pageNumber, Session session) throws SQLException {
+    public ChangeSets changesets(DataAccessToken token, int pageNumber, Session session) throws Exception {
         Map map = pageChangesetsMap(token);
         Integer pageKey = pageChangesetsKey(pageNumber);
         if (!map.containsKey(pageKey)) {
@@ -70,7 +70,7 @@ public class DataUpdatesCacheImpl implements DataUpdatesCache {
     }
 
     public void submitChangeSet(DataAccessToken token, ChangeSet changeset, int pageNumber, Session session)
-            throws SQLException {
+            throws Exception {
         ChangeSets sets = changesets(token, pageNumber, session);
         sets.add(changeset);
     }
