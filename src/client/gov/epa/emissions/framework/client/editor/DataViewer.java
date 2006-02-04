@@ -16,8 +16,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class DataViewer extends DisposableInteralFrame implements DataView {
@@ -30,15 +28,13 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     private EmfDataset dataset;
 
-    private JPanel labelPanel;
-
     public DataViewer(EmfDataset dataset) {
-        super("Data Viewer: " + dataset.getName());
+        super("Data Viewer [Dataset:" + dataset.getName());
         setDimension();
         this.dataset = dataset;
-
+        
         layout = new JPanel(new BorderLayout());
-        layout.add(topPanel(dataset), BorderLayout.PAGE_START);
+        layout.add(topPanel(), BorderLayout.PAGE_START);
 
         this.getContentPane().add(layout);
     }
@@ -48,13 +44,8 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         setSize(dim);
     }
 
-    private JPanel topPanel(EmfDataset dataset) {
+    private JPanel topPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-
-        labelPanel = new JPanel();
-        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.Y_AXIS));
-        labelPanel.add(new JLabel("    Dataset:    " + dataset.getName()));
-        panel.add(labelPanel, BorderLayout.LINE_START);
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.CENTER);
@@ -80,13 +71,15 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
     }
 
     private void updateTitle(Version version, String table) {
-        super.setTitle(super.getTitle() + " / " + version.getName() + " / " + table);
-        labelPanel.add(new JLabel("    Version:    " + version.getName()));
-        labelPanel.add(new JLabel("    Table:       " + table));
+        String label = super.getTitle();
+        label += ", Version: " + version.getName();
+        label += ", Table: " + table + "]";
+        super.setTitle(label);
     }
 
     private JPanel tablePanel(Version version, String table, DataAccessService service) {
-        NonEditableTableViewPanel tableView = new NonEditableTableViewPanel(source(table, dataset.getInternalSources()), messagePanel);
+        NonEditableTableViewPanel tableView = new NonEditableTableViewPanel(
+                source(table, dataset.getInternalSources()), messagePanel);
         TablePresenter tablePresenter = new ViewableTablePresenter(version, table, tableView, service);
         tablePresenter.observe();
 
