@@ -269,5 +269,30 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
         
     }
+    
+    public void addDatasetType(DatasetType type) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.add(type,session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Could not add new DatasetType. Reason: " + e);
+            throw new EmfException("Could not add DatasetType");
+        }
+        
+    }
+
+    public void addSector(Sector sector) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.add(sector,session);
+            session.close();
+        } catch (HibernateException e) {
+            LOG.error("Could not add new Sector. Reason: " + e);
+            throw new EmfException("Could not add Sector");
+        }
+        
+    }
+
 
 }

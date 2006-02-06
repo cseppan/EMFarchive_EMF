@@ -34,11 +34,13 @@ public interface DataCommonsService {
     Sector obtainLockedSector(User owner, Sector sector) throws EmfException;
 
     Sector updateSector(Sector sector) throws EmfException;
+    void addSector(Sector sector) throws EmfException;
 
     Sector releaseLockedSector(Sector sector) throws EmfException;
 
     // DatasetType
     DatasetType[] getDatasetTypes() throws EmfException;
+    void addDatasetType(DatasetType type) throws EmfException;
 
     DatasetType obtainLockedDatasetType(User owner, DatasetType type) throws EmfException;
 
