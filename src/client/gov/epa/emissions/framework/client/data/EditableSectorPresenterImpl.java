@@ -55,10 +55,23 @@ public class EditableSectorPresenterImpl implements EditableSectorPresenter {
     }
 
     public void doSave(SectorsManagerView sectorManager) throws EmfException {
-        sector = service().updateSector(sector);
+        if(!isNameUsed())
+            service().addSector(sector);
+        else
+            sector = service().updateSector(sector);
 
         sectorManager.refresh();
         closeView();
+    }
+    
+    public boolean isNameUsed() throws EmfException {
+        boolean existed = false;
+        Sector[] sectors = service().getSectors();
+        for(int i = 0; i < sectors.length; i++)
+            if(sectors[i].getName().equalsIgnoreCase(sector.getName()))
+                existed = true;
+        
+        return existed;
     }
 
 }
