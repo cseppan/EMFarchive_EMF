@@ -49,13 +49,19 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
             + "Version: Beta 2.1 - 1/30/2006<br>" + "Developed by the Carolina Environmental Program<br>"
             + "University of North Carolina at Chapel Hill</center></html>";
 
+    private WindowMenuView windowMenuView;
+
+    private DesktopManager desktopManager;
+
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(EmfSession session) {
         super("EMF Console", "Emissions Modeling Framework (EMF):  " + session.user().getName() + "("
                 + session.user().getUsername() + ")");
         user = session.user();
         this.serviceLocator = session.serviceLocator();
-
+        windowMenuView = createWindowMenu();
+        this.desktopManager = new DesktopManagerImpl(windowMenuView);
+        this.windowMenuPresenter.setDesktopManager(desktopManager);
         this.viewLayout = new CascadeLayout(this);
         messagePanel = new SingleLineMessagePanel();
 
@@ -105,17 +111,16 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
         menubar.add(createFileMenu(session));
         menubar.add(createManageMenu(session));
-        menubar.add(createWindowMenu());
+        menubar.add((WindowMenu) windowMenuView);
         menubar.add(createHelpMenu());
 
         return menubar;
     }
 
-    private WindowMenu createWindowMenu() {
-        WindowMenu menu = new WindowMenu();
-        windowMenuPresenter = new WindowMenuPresenter(menu);
-
-        return menu;
+    private WindowMenuView createWindowMenu() {
+        WindowMenuView windowsMenu = new WindowMenu();
+        windowMenuPresenter = new WindowMenuPresenter(windowsMenu);
+        return windowsMenu;
     }
 
     private JMenu createFileMenu(EmfSession session) {
@@ -135,7 +140,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private JMenu createManageMenu(EmfSession session) {
-        manageMenu = new ManageMenu(session, this, messagePanel, viewLayout);
+        manageMenu = new ManageMenu(session, this, messagePanel, viewLayout, desktopManager);
 
         return manageMenu;
     }

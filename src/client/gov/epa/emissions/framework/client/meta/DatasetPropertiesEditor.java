@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
@@ -39,8 +40,12 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private EditableKeywordsTab keywordsTab;
 
-    public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole) {
-        super("Dataset Properties Editor", new Dimension(700, 550));
+    /*
+     * public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole) { super("Dataset Properties Editor",
+     * new Dimension(700, 550)); this.session = session; this.parentConsole = parentConsole; }
+     */
+    public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
+        super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
     }
@@ -124,7 +129,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         contentPane.add(panel);
-
+        desktopManager.registerOpenWindow(this);
         super.display();
     }
 
@@ -191,6 +196,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     public void windowClosing() {
         try {
             presenter.doClose();
+            desktopManager.unregisterCloseWindow(this);
         } catch (EmfException e) {
             showError("Could not close. Reason - " + e.getMessage());
             return;

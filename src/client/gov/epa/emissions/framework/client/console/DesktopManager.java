@@ -6,4 +6,10 @@ public interface DesktopManager {
     
     public void registerOpenWindow(ManagedView manageView);
     
+    public void unregisterCloseWindow(ManagedView manageView);
+
+    public void unregisterFromWindowMenu(ManagedView view);
+
+    public void closeAll();
+    
 }

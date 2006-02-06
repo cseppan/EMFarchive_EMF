@@ -7,4 +7,6 @@ public interface WindowMenuView {
     void register(ManagedView view);
 
     void unregister(ManagedView view);
+
+    void setWindowMenuViewPresenter(WindowMenuPresenter presenter);
 }

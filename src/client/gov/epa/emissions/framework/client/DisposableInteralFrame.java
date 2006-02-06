@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client;
 
+import gov.epa.emissions.framework.client.console.DesktopManager;
+
 import java.awt.Dimension;
 
 public abstract class DisposableInteralFrame extends EmfInternalFrame {
@@ -12,6 +14,10 @@ public abstract class DisposableInteralFrame extends EmfInternalFrame {
         super(title, dimension);
     }
 
+    public DisposableInteralFrame(String title, Dimension dimension, DesktopManager desktopManager) {
+        super(title, dimension, desktopManager);
+    }
+
     public void windowClosing() {
         close();
     }
@@ -21,6 +27,7 @@ public abstract class DisposableInteralFrame extends EmfInternalFrame {
     }
 
     public boolean isAlive() {
-        return !super.isClosed();
+       // return !super.isClosed();
+        return false;
     }
 }

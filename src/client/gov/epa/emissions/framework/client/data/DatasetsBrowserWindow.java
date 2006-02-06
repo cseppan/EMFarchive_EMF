@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.exim.DatasetsBrowserAwareImportPresenter;
 import gov.epa.emissions.framework.client.exim.DefaultExportPresenter;
@@ -83,6 +84,12 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         createLayout(layout, parentConsole);
     }
 
+    public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
+            throws EmfException {
+        this(session, parentConsole);
+        super.desktopManager = desktopManager;
+    }
+
     private void createLayout(JPanel layout, EmfConsole parentConsole) {
         layout.removeAll();
 
@@ -97,7 +104,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private JScrollPane createSortFilterPane(EmfConsole parentConsole) {
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
         SortCriteria sortCriteria = sortCriteria();
-        panel.sort(sortCriteria );
+        panel.sort(sortCriteria);
         panel.getTable().setName("datasetsTable");
 
         JScrollPane scrollPane = new JScrollPane(panel);
@@ -107,8 +114,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     private SortCriteria sortCriteria() {
-        String[] columnNames = {"Last Modified Date"};
-        return new SortCriteria(columnNames ,new boolean []{false},new boolean []{true});
+        String[] columnNames = { "Last Modified Date" };
+        return new SortCriteria(columnNames, new boolean[] { false }, new boolean[] { true });
     }
 
     private JPanel createTopPanel() {
@@ -173,8 +180,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             }
         };
         String message = "Opening too many windows. Do you want proceed?";
-        ConfirmDialog confirmDialog = new ConfirmDialog(message,"Warning",this);
-        SelectAwareButton goButton = new SelectAwareButton("Go",dataAction,selectModel,confirmDialog  );
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+        SelectAwareButton goButton = new SelectAwareButton("Go", dataAction, selectModel, confirmDialog);
         panel.add(goButton);
 
         return panel;
@@ -238,26 +245,26 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         return panel;
     }
 
-    protected void exportSelectedDatasets() throws EmfException{
+    protected void exportSelectedDatasets() throws EmfException {
         EmfDataset[] emfDatasets = getNonExternalDatasets(getSelectedDatasets());
         checkKeyVals(emfDatasets);
-        
+
         ExportWindow exportView = new ExportWindow(emfDatasets);
         getDesktopPane().add(exportView);
 
         ExportPresenter exportPresenter = new DefaultExportPresenter(session);
         presenter.doExport(exportView, exportPresenter, emfDatasets);
     }
-    
+
     private EmfDataset[] getNonExternalDatasets(List emfDatasets) {
         List nonExternal = new ArrayList();
-        for(int i = 0; i < emfDatasets.size(); i++) {
-            EmfDataset temp = (EmfDataset)emfDatasets.get(i);
-            if(!temp.getDatasetType().isExternal())
+        for (int i = 0; i < emfDatasets.size(); i++) {
+            EmfDataset temp = (EmfDataset) emfDatasets.get(i);
+            if (!temp.getDatasetType().isExternal())
                 nonExternal.add(temp);
         }
-        
-        return (EmfDataset[])nonExternal.toArray(new EmfDataset[0]);
+
+        return (EmfDataset[]) nonExternal.toArray(new EmfDataset[0]);
     }
 
     private List getSelectedDatasets() {
@@ -282,7 +289,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
             EmfDataset dataset = (EmfDataset) iter.next();
-            DatasetPropertiesEditor view = new DatasetPropertiesEditor(session, parentConsole);
+            DatasetPropertiesEditor view = new DatasetPropertiesEditor(session, parentConsole, desktopManager);
             desktop.add(view);
             try {
                 presenter.doDisplayPropertiesEditor(view, dataset);
@@ -317,6 +324,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     public void display() {
         this.setVisible(true);
+        desktopManager.registerOpenWindow(this);
     }
 
     public void refresh(EmfDataset[] datasets) {
@@ -337,7 +345,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         messagePanel.clear();
         super.refreshLayout();
     }
-    
+
     private void checkKeyVals(EmfDataset[] datasets) throws EmfException {
         for (int i = 0; i < datasets.length; i++) {
             KeyVal[] keyVals = datasets[i].getKeyVals();
@@ -346,28 +354,25 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             boolean found = true; // need to do this to handle no keywords case
             // verify that each keyword defined for the dataset type is in the
             // dataset
-            for (k = 0; (k < keyWords.length) && !found; k++)
-            {
+            for (k = 0; (k < keyWords.length) && !found; k++) {
                 found = false;
-                for (int l = 0; l < keyVals.length; l++)
-                {
-                    if (keyVals[l].getKeyword().getName().equals(keyWords[k].getName()))
-                    {    
+                for (int l = 0; l < keyVals.length; l++) {
+                    if (keyVals[l].getKeyword().getName().equals(keyWords[k].getName())) {
                         found = true;
-                    }    
-                }               
+                    }
+                }
                 if (!found)
                     break;
             }
-            if(!found)
-                throw new EmfException("Cannot export: Keyword "+keyWords[k].getName()+" is missing for dataset " + 
-                        datasets[i].getName());
-            
-            for(int j = 0; j < keyVals.length; j++)
-                if(keyVals[j].getValue().equals(""))
-                    throw new EmfException("Cannot export: Keyword " + keyVals[j].getKeyword() + 
-                            "does not have a value for dataset "+datasets[i].getName());
+            if (!found)
+                throw new EmfException("Cannot export: Keyword " + keyWords[k].getName() + " is missing for dataset "
+                        + datasets[i].getName());
+
+            for (int j = 0; j < keyVals.length; j++)
+                if (keyVals[j].getValue().equals(""))
+                    throw new EmfException("Cannot export: Keyword " + keyVals[j].getKeyword()
+                            + "does not have a value for dataset " + datasets[i].getName());
         }
     }
-    
+
 }

@@ -37,6 +37,8 @@ public class ManageMenu extends JMenu {
 
     private ViewLayout viewLayout;
 
+    private DesktopManager desktopManger;
+
     // FIXME: where's the associated Presenter ?
     public ManageMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, ViewLayout viewLayout) {
         super("Manage");
@@ -53,6 +55,11 @@ public class ManageMenu extends JMenu {
 
         addUsers(session.user());
         super.add(createMyProfile(session, messagePanel));
+    }
+    
+    public ManageMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, ViewLayout viewLayout, DesktopManager desktopManager) {
+        this(session,parent,messagePanel,viewLayout);
+        this.desktopManger = desktopManager;
     }
 
     private JMenuItem createMyProfile(final EmfSession session, final MessagePanel messagePanel) {
@@ -157,7 +164,7 @@ public class ManageMenu extends JMenu {
         if (viewLayout.activate("Datasets Browser"))
             return;
 
-        DatasetsBrowserWindow datasetsBrowserView = new DatasetsBrowserWindow(session, parent);
+        DatasetsBrowserWindow datasetsBrowserView = new DatasetsBrowserWindow(session, parent,desktopManger);
         viewLayout.add(datasetsBrowserView, "Datasets Browser");
         parent.addToDesktop(datasetsBrowserView);
 

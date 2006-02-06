@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client;
 
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.ui.Position;
 
 import java.awt.Dimension;
@@ -11,6 +12,8 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 public abstract class EmfInternalFrame extends JInternalFrame implements ManagedView {
+
+    protected DesktopManager desktopManager;
 
     public EmfInternalFrame(String title) {
         super(title, true, // resizable
@@ -26,12 +29,17 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
         });
     }
 
-    abstract public void windowClosing();
-
     public EmfInternalFrame(String title, Dimension dimension) {
         this(title);
         dimensions(dimension);
     }
+
+    public EmfInternalFrame(String title, Dimension dimension, DesktopManager desktopManager) {
+        this(title, dimension);
+        this.desktopManager = desktopManager;
+    }
+
+    abstract public void windowClosing();
 
     public void bringToFront() {
         super.toFront();

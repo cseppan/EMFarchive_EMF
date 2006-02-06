@@ -14,12 +14,30 @@ import javax.swing.JMenuItem;
 public class WindowMenu extends JMenu implements WindowMenuView {
 
     private List menuItems;
-    
+
+    private WindowMenuPresenter presenter;
+
     public WindowMenu() {
         super("Window");
         super.setName("window");
-
+        JMenuItem closeAllMenuItem = new JMenuItem("Close All");
+        closeAllMenuItem.addActionListener(closeAll());
+        super.add(closeAllMenuItem);
         menuItems = new ArrayList();
+    }
+
+    public void setWindowMenuViewPresenter(WindowMenuPresenter presenter) {
+        this.presenter = presenter;
+
+    }
+
+    private ActionListener closeAll() {
+        ActionListener listener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                presenter.closeAll();
+            }
+        };
+        return listener;
     }
 
     public void register(ManagedView view) {
@@ -44,7 +62,6 @@ public class WindowMenu extends JMenu implements WindowMenuView {
             if (element.view() == view)
                 return element;
         }
-
         return null;
     }
 

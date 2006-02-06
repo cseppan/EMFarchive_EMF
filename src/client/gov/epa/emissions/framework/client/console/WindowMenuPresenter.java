@@ -6,8 +6,16 @@ public class WindowMenuPresenter {
 
     private WindowMenuView view;
 
+    private DesktopManager desktopManager;
+
     public WindowMenuPresenter(WindowMenuView view) {
         this.view = view;
+        this.view.setWindowMenuViewPresenter(this);
+
+    }
+    
+    public void setDesktopManager(DesktopManager desktopManager){
+        this.desktopManager = desktopManager;
     }
 
     public void notifyAdd(ManagedView managedView) {
@@ -20,6 +28,10 @@ public class WindowMenuPresenter {
 
     public void select(ManagedView managedView) {
         managedView.bringToFront();
+    }
+
+    public void closeAll() {
+       desktopManager.closeAll();
     }
 
 }
