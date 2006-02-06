@@ -365,4 +365,38 @@ public class DataCommonsServiceTransport implements DataCommonsService {
             throwExceptionDueToServiceErrors("Failed to add add new intended use", e);
         }
     }
+
+    public void addSector(Sector sector) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+            
+            mappings.register(call);
+            mappings.addParam(call, "sector", mappings.sector());
+            mappings.setOperation(call, "addSector");
+            mappings.setVoidReturnType(call);
+            call.invoke(new Object[] { sector });           
+            
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to add Sector: " + sector.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to add Sector: " + sector.getName(), e);
+        }
+    }
+
+    public void addDatasetType(DatasetType type) throws EmfException {
+        try {
+            Call call = callFactory.createCall();
+            
+            mappings.register(call);
+            mappings.addParam(call, "type", mappings.datasetType());
+            mappings.setOperation(call, "addDatasetType");
+            mappings.setVoidReturnType(call);
+            call.invoke(new Object[] { type });           
+            
+        } catch (AxisFault fault) {
+            throwExceptionOnAxisFault("Failed to add DatasetType: " + type.getName(), fault);
+        } catch (Exception e) {
+            throwExceptionDueToServiceErrors("Failed to add DatasetType: " + type.getName(), e);
+        }
+    }
 }
