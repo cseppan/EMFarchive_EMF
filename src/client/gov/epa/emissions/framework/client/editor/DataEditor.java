@@ -21,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -36,8 +35,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private EmfDataset dataset;
 
-    private JPanel labelPanel;
-
     private EditablePageContainer tableView;
 
     private String table;
@@ -50,7 +47,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         this.dataset = dataset;
 
         layout = new JPanel(new BorderLayout());
-        layout.add(topPanel(dataset), BorderLayout.PAGE_START);
+        layout.add(topPanel(), BorderLayout.PAGE_START);
 
         this.getContentPane().add(layout);
     }
@@ -60,28 +57,14 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         setSize(dim);
     }
 
-    private JPanel topPanel(EmfDataset dataset) {
+    private JPanel topPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
-        labelPanel = new JPanel();
-        labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.Y_AXIS));
-        labelPanel.add(new JLabel("    Dataset:    " + dataset.getName()));
-        panel.add(labelPanel, BorderLayout.LINE_START);
-
-        panel.add(infoPanel(), BorderLayout.LINE_END);
-
-        return panel;
-    }
-
-    private JPanel infoPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        messagePanel = new SingleLineMessagePanel();
+        panel.add(messagePanel, BorderLayout.CENTER);
 
         lockInfo = new JLabel();
-        panel.add(lockInfo);
-
-        messagePanel = new SingleLineMessagePanel();
-        panel.add(messagePanel);
+        panel.add(lockInfo, BorderLayout.LINE_END);
 
         return panel;
     }
@@ -92,7 +75,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     public void display(Version version, String table, DataAccessService service) {
         this.table = table;
-        updateLabelInfo(version, table);
+        updateTitle(version, table);
 
         JPanel container = new JPanel(new BorderLayout());
 
@@ -104,11 +87,11 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         super.display();
     }
 
-    private void updateLabelInfo(Version version, String table) {
-        super.setTitle(super.getTitle() + " / " + version.getName() + " / " + table);
-
-        labelPanel.add(new JLabel("    Version:    " + version.getName()));
-        labelPanel.add(new JLabel("    Table:       " + table));
+    private void updateTitle(Version version, String table) {
+        String label = super.getTitle();
+        label += ", Version: " + version.getName();
+        label += ", Table: " + table + "]";
+        super.setTitle(label);
     }
 
     public void updateLockPeriod(Date start, Date end) {

@@ -82,7 +82,7 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
         return view.changeset().hasChanges();
     }
 
-    public void applyConstraints(String rowFilter, String sortOrder) throws EmfException {
+    public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
         Page page = service.applyConstraints(token(), rowFilter, sortOrder);
         view.display(page);
     }

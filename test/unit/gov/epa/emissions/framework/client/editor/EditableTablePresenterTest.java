@@ -40,7 +40,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
                 eq(sortOrder)).will(returnValue(page));
         view.expects(once()).method("display").with(same(page));
 
-        p.applyConstraints(rowFilter, sortOrder);
+        p.doApplyConstraints(rowFilter, sortOrder);
     }
 
     public void testShouldFetchTotalRecords() throws Exception {

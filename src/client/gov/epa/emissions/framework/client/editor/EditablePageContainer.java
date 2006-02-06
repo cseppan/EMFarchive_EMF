@@ -33,6 +33,8 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
 
     private EditablePagePanel editablePagePanel;
 
+    private DataSortFilterPanel sortFilterPanel;
+
     public EditablePageContainer(EmfDataset dataset, Version version, InternalSource source, MessagePanel messagePanel) {
         super(new BorderLayout());
         super.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -46,15 +48,31 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
     }
 
     private void doLayout(MessagePanel messagePanel) {
-        paginationPanel = new PaginationPanel(messagePanel);
-        add(paginationPanel, BorderLayout.PAGE_START);
+        add(topPanel(messagePanel), BorderLayout.PAGE_START);
 
         pageContainer = new JPanel(new BorderLayout());
         add(pageContainer, BorderLayout.CENTER);
     }
 
-    public void observe(EditableTablePresenterImpl presenter) {
+    private JPanel topPanel(MessagePanel messagePanel) {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        panel.add(sortFilterPanel(messagePanel), BorderLayout.LINE_START);
+
+        paginationPanel = new PaginationPanel(messagePanel);
+        panel.add(paginationPanel, BorderLayout.LINE_END);
+
+        return panel;
+    }
+
+    private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
+        sortFilterPanel = new DataSortFilterPanel(messagePanel);
+        return sortFilterPanel;
+    }
+
+    public void observe(TablePresenter presenter) {
         paginationPanel.init(presenter);
+        sortFilterPanel.init(presenter);
     }
 
     public void display(Page page) {
@@ -70,7 +88,7 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
     private EditablePagePanel createEditablePage(Page page) {
         editablePage = new EditablePage((int) dataset.getId(), version, page, cols());
         editablePagePanel = new EditablePagePanel(editablePage, messagePanel);
-        
+
         return editablePagePanel;
     }
 

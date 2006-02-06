@@ -7,13 +7,13 @@ import gov.epa.emissions.framework.services.DataAccessService;
 
 public class ViewableTablePresenter implements TablePresenter {
 
-    private NonEditableTableView view;
+    private NonEditablePageManagerView view;
 
     private TablePaginator delegate;
 
     private DataAccessService service;
 
-    public ViewableTablePresenter(Version version, String table, NonEditableTableView view, DataAccessService service) {
+    public ViewableTablePresenter(Version version, String table, NonEditablePageManagerView view, DataAccessService service) {
         delegate = new TablePaginator(version, table, view, service);
         this.view = view;
         this.service = service;
@@ -51,7 +51,7 @@ public class ViewableTablePresenter implements TablePresenter {
         return delegate.totalRecords();
     }
 
-    public void applyConstraints(String rowFilter, String sortOrder) throws EmfException {
+    public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
         Page page = service.applyConstraints(delegate.token(), rowFilter, sortOrder);
         view.display(page);
     }
