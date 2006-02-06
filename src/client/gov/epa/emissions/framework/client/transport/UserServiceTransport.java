@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.UserService;
 
 import org.apache.axis.AxisFault;
@@ -31,7 +30,7 @@ public class UserServiceTransport implements UserService {
 
             call.invoke(new Object[] { username, password });
         } catch (AxisFault fault) {
-            throw new EmfException(extractMessageFromFault(fault));
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
             throw new EmfException("Unable to connect to User Service");
         }
@@ -48,7 +47,7 @@ public class UserServiceTransport implements UserService {
 
             return (User) call.invoke(new Object[] { username });
         } catch (AxisFault fault) {
-            throw new EmfException(extractMessageFromFault(fault));
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
             throw new EmfException("Unable to connect to User Service");
         }
@@ -65,7 +64,7 @@ public class UserServiceTransport implements UserService {
 
             call.invoke(new Object[] { user });
         } catch (AxisFault fault) {
-            throw new EmfException(extractMessageFromFault(fault));
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
             throw new EmfException("Unable to connect to User Service");
         }
@@ -82,7 +81,7 @@ public class UserServiceTransport implements UserService {
 
             call.invoke(new Object[] { user });
         } catch (AxisFault fault) {
-            throw new EmfException(extractMessageFromFault(fault));
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
             throw new EmfException("Unable to connect to User Service");
         }
@@ -99,7 +98,7 @@ public class UserServiceTransport implements UserService {
 
             call.invoke(new Object[] { user });
         } catch (AxisFault fault) {
-            throw new EmfException(extractMessageFromFault(fault));
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
             throw new EmfException("Unable to connect to User Service");
         }
@@ -115,22 +114,10 @@ public class UserServiceTransport implements UserService {
 
             return (User[]) call.invoke(new Object[0]);
         } catch (AxisFault fault) {
-            throw new EmfException(extractMessageFromFault(fault));
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
             throw new EmfException("Unable to connect to User Service");
         }
-    }
-
-    private String extractMessageFromFault(AxisFault fault) {
-        String msg = extractMessage(fault.getFaultReason());
-
-        Throwable cause = fault.getCause();
-
-        if ((cause != null) && (cause.getMessage().equals(EMFConstants.CONNECTION_REFUSED))) {
-            msg = "EMF server not responding";
-        }
-
-        return msg;
     }
 
     public User obtainLocked(User owner, User object) throws EmfException {
@@ -145,7 +132,7 @@ public class UserServiceTransport implements UserService {
 
             return (User) call.invoke(new Object[] { owner, object });
         } catch (AxisFault fault) {
-            throw new EmfException(extractMessageFromFault(fault));
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
             throw new EmfException("Unable to connect to User Service");
         }
@@ -162,14 +149,10 @@ public class UserServiceTransport implements UserService {
 
             return (User) call.invoke(new Object[] { object });
         } catch (AxisFault fault) {
-            throw new EmfException(extractMessageFromFault(fault));
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
             throw new EmfException("Unable to connect to User Service");
         }
-    }
-
-    private String extractMessage(String faultReason) {
-        return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
     }
 
 }

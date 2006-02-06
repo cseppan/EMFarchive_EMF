@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.AccessLog;
-import gov.epa.emissions.framework.services.EMFConstants;
 import gov.epa.emissions.framework.services.LoggingService;
 
 import org.apache.axis.AxisFault;
@@ -57,7 +56,7 @@ public class LoggingServiceTransport implements LoggingService {
         String msg=extractMessage(fault.getMessage());
         
         if (fault.getCause()!=null){
-            if (fault.getCause().getMessage().equals(EMFConstants.CONNECTION_REFUSED)){
+            if (fault.getCause().getMessage().equals(EmfServiceFault.CONNECTION_REFUSED)){
                 msg="EMF server not responding";
             }            
         }

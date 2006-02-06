@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataViewService;
-import gov.epa.emissions.framework.services.EMFConstants;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -48,7 +47,7 @@ public class DataViewServiceTransport implements DataViewService {
         String msg = extractMessage(fault.getMessage());
 
         if (fault.getCause() != null) {
-            if (fault.getCause().getMessage().equals(EMFConstants.CONNECTION_REFUSED)) {
+            if (fault.getCause().getMessage().equals(EmfServiceFault.CONNECTION_REFUSED)) {
                 msg = "EMF server not responding";
             }
         }

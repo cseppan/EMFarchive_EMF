@@ -7,8 +7,4 @@ public final class EMFConstants {
 
     public static final String EMF_EMISSIONS_SCHEMA = "emissions";
 
-    // DatasetType Names constants
-    // Axis and Hibernate Runtime Exception message strings
-    public static final String CONNECTION_REFUSED = "Connection refused: connect";
-
 }
