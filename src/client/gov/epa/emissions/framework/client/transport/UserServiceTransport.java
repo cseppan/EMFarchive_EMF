@@ -33,7 +33,7 @@ public class UserServiceTransport implements UserService {
         } catch (AxisFault fault) {
             throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
-            throw new EmfException("Could not authenticate user: " + username);
+            throw new EmfException("Unable to connect to User Service");
         }
     }
 
@@ -50,10 +50,8 @@ public class UserServiceTransport implements UserService {
         } catch (AxisFault fault) {
             throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not get user: " + username, e);
+            throw new EmfException("Unable to connect to User Service");
         }
-
-        return null;
     }
 
     public void createUser(User user) throws EmfException {
@@ -69,7 +67,7 @@ public class UserServiceTransport implements UserService {
         } catch (AxisFault fault) {
             throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not create user: " + user.getUsername(), e);
+            throw new EmfException("Unable to connect to User Service");
         }
     }
 
@@ -86,7 +84,7 @@ public class UserServiceTransport implements UserService {
         } catch (AxisFault fault) {
             throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not save user infomration: " + user.getUsername(), e);
+            throw new EmfException("Unable to connect to User Service");
         }
     }
 
@@ -103,7 +101,7 @@ public class UserServiceTransport implements UserService {
         } catch (AxisFault fault) {
             throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not delete user: " + user.getUsername(), e);
+            throw new EmfException("Unable to connect to User Service");
         }
     }
 
@@ -119,7 +117,7 @@ public class UserServiceTransport implements UserService {
         } catch (AxisFault fault) {
             throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
-            throw new EmfException("Could not get all users", e.getMessage(), e);
+            throw new EmfException("Unable to connect to User Service");
         }
     }
 
@@ -149,10 +147,8 @@ public class UserServiceTransport implements UserService {
         } catch (AxisFault fault) {
             throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not get User lock: " + object.getUsername(), e);
+            throw new EmfException("Unable to connect to User Service");
         }
-
-        return null;
     }
 
     public User releaseLocked(User object) throws EmfException {
@@ -168,18 +164,12 @@ public class UserServiceTransport implements UserService {
         } catch (AxisFault fault) {
             throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not release User lock: " + object.getUsername(), e);
+            throw new EmfException("Unable to connect to User Service");
         }
-
-        return null;
     }
 
     private String extractMessage(String faultReason) {
         return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
-    }
-
-    private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {
-        throw new EmfException(message, e.getMessage(), e);
     }
 
 }
