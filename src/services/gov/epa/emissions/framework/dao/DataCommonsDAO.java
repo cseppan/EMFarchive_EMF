@@ -272,6 +272,14 @@ public class DataCommonsDAO {
         addObject(country, session);
     }
 
+    public void add(DatasetType datasetType, Session session) {
+        addObject(datasetType, session);
+    }
+    
+    public void add(Sector sector, Session session) {
+        addObject(sector, session);
+    }
+    
     private void addObject(Object obj, Session session) {
         Transaction tx = null;
         try {
