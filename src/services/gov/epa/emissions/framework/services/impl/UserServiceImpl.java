@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class UserServiceImpl implements UserService {
@@ -40,9 +39,9 @@ public class UserServiceImpl implements UserService {
 
             if (!user.getEncryptedPassword().equals(password))
                 throw new AuthenticationException("Incorrect Password");
-        } catch (HibernateException ex) {
-            LOG.error("Could not authenticate user: " + username + ". Reason: " + ex.getMessage());
-            throw new EmfException("Could not authenticate user: " + username);
+        } catch (RuntimeException rex){
+            LOG.error("Unable to authenticate due to data access failure" + username, rex);
+            throw new EmfException("Unable to authenticate due to data access failure");
         }
     }
 
@@ -53,9 +52,9 @@ public class UserServiceImpl implements UserService {
             session.close();
 
             return user;
-        } catch (HibernateException e) {
-            LOG.error("Could not get User - " + username + ". Reason: " + e);
-            throw new EmfException("Could not get User - " + username);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get User - " + username, e);
+            throw new EmfException("Could not get User due to data access failure");
         }
     }
 
@@ -66,9 +65,9 @@ public class UserServiceImpl implements UserService {
             session.close();
 
             return (User[]) all.toArray(new User[0]);
-        } catch (HibernateException e) {
-            LOG.error("Could not get all Users. Reason: " + e);
-            throw new EmfException("Could not get all Users.");
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Users", e);
+            throw new EmfException("Unable to fetch all users due to data access failure");
         }
     }
 
@@ -83,9 +82,9 @@ public class UserServiceImpl implements UserService {
             Session session = sessionFactory.getSession();
             dao.add(user, session);
             session.close();
-        } catch (HibernateException e) {
-            LOG.error("Could not create new user - " + user.getUsername() + ". Reason: " + e.getMessage());
-            throw new EmfException("Could not create new user - " + user.getUsername());
+        } catch (RuntimeException e) {
+            LOG.error("Could not create new user - " + user.getUsername(),e);
+            throw new EmfException("Unable to fetch user due to data access failure");
         }
     }
 
@@ -94,9 +93,9 @@ public class UserServiceImpl implements UserService {
             Session session = sessionFactory.getSession();
             dao.update(user, session);
             session.close();
-        } catch (HibernateException e) {
-            LOG.error("Could not update user - " + user.getName() + ". Reason: " + e.getMessage());
-            throw new EmfException("Could not update user - " + user.getName());
+        } catch (RuntimeException e) {
+            LOG.error("Could not update user - " + user.getName(),e);
+            throw new EmfException("Unable to update user due to data access failure");
         }
     }
 
@@ -105,9 +104,9 @@ public class UserServiceImpl implements UserService {
             Session session = sessionFactory.getSession();
             dao.remove(user, session);
             session.close();
-        } catch (HibernateException e) {
-            LOG.error("Could not delete user - " + user.getName() + ". Reason: " + e.getMessage());
-            throw new EmfException("Could not delete user - " + user.getName());
+        } catch (RuntimeException e) {
+            LOG.error("Could not delete user - " + user.getName(),e);
+            throw new EmfException("Unable to delete user due to data access failure");
         }
     }
 
@@ -118,11 +117,9 @@ public class UserServiceImpl implements UserService {
             session.close();
 
             return locked;
-        } catch (HibernateException e) {
-            LOG.error("Could not obtain lock for user: " + object.getUsername() + " by owner: " + owner.getUsername()
-                    + ".Reason: " + e);
-            throw new EmfException("Could not obtain lock for user: " + object.getUsername() + " by owner: "
-                    + owner.getUsername());
+        } catch (RuntimeException e) {
+            LOG.error("Could not obtain lock for user: " + object.getUsername() + " by owner: " + owner.getUsername(),e);
+            throw new EmfException("Unable to fetch lock user due to data access failure");
         }
     }
 
@@ -133,11 +130,10 @@ public class UserServiceImpl implements UserService {
             session.close();
 
             return released;
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not release lock for user: " + object.getUsername() + " by owner: "
-                    + object.getLockOwner() + ".Reason: " + e);
-            throw new EmfException("Could not obtain release for user: " + object.getUsername() + " by owner: "
-                    + object.getLockOwner());
+                    + object.getLockOwner(),e);
+            throw new EmfException("Unable to release lock on user due to data access failure");
         }
     }
 

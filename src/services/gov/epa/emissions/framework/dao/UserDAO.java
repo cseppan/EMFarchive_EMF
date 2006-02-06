@@ -48,7 +48,7 @@ public class UserDAO {
     public void remove(User user, Session session) {
         User loaded = get(user.getUsername(), session);
         if (!loaded.isLocked(user.getLockOwner()))
-            throw new RuntimeException("Cannot remove unless locked");
+            throw new RuntimeException("Cannot remove user unless locked");
 
         Transaction tx = null;
         try {

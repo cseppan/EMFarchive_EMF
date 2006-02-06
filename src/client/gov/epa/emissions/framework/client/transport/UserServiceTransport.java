@@ -7,12 +7,8 @@ import gov.epa.emissions.framework.services.UserService;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class UserServiceTransport implements UserService {
-    private static Log LOG = LogFactory.getLog(UserServiceTransport.class);
-
     private CallFactory callFactory;
 
     private EmfMappings mappings;
@@ -35,9 +31,9 @@ public class UserServiceTransport implements UserService {
 
             call.invoke(new Object[] { username, password });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not authenticate user: " + username, fault);
+            throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not authenticate user: " + username, e);
+            throw new EmfException("Could not authenticate user: " + username);
         }
     }
 
@@ -52,7 +48,7 @@ public class UserServiceTransport implements UserService {
 
             return (User) call.invoke(new Object[] { username });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not get user: " + username, fault);
+            throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not get user: " + username, e);
         }
@@ -71,7 +67,7 @@ public class UserServiceTransport implements UserService {
 
             call.invoke(new Object[] { user });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not create user: " + user.getUsername(), fault);
+            throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not create user: " + user.getUsername(), e);
         }
@@ -88,7 +84,7 @@ public class UserServiceTransport implements UserService {
 
             call.invoke(new Object[] { user });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not save user information: " + user.getUsername(), fault);
+            throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not save user infomration: " + user.getUsername(), e);
         }
@@ -105,7 +101,7 @@ public class UserServiceTransport implements UserService {
 
             call.invoke(new Object[] { user });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not delete user: " + user.getUsername(), fault);
+            throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not delete user: " + user.getUsername(), e);
         }
@@ -121,12 +117,22 @@ public class UserServiceTransport implements UserService {
 
             return (User[]) call.invoke(new Object[0]);
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not get all users", fault);
+            throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not get all users", e);
+            throw new EmfException("Could not get all users", e.getMessage(), e);
+        }
+    }
+
+    private String extractMessageFromFault(AxisFault fault) {
+        String msg = extractMessage(fault.getFaultReason());
+
+        Throwable cause = fault.getCause();
+
+        if ((cause != null) && (cause.getMessage().equals(EMFConstants.CONNECTION_REFUSED))) {
+            msg = "EMF server not responding";
         }
 
-        return null;
+        return msg;
     }
 
     public User obtainLocked(User owner, User object) throws EmfException {
@@ -141,7 +147,7 @@ public class UserServiceTransport implements UserService {
 
             return (User) call.invoke(new Object[] { owner, object });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not get User lock: " + object.getUsername(), fault);
+            throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not get User lock: " + object.getUsername(), e);
         }
@@ -160,7 +166,7 @@ public class UserServiceTransport implements UserService {
 
             return (User) call.invoke(new Object[] { object });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not release User lock: " + object.getUsername(), fault);
+            throw new EmfException(extractMessageFromFault(fault));
         } catch (Exception e) {
             throwExceptionDueToServiceErrors("Could not release User lock: " + object.getUsername(), e);
         }
@@ -173,20 +179,7 @@ public class UserServiceTransport implements UserService {
     }
 
     private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {
-        LOG.error(message, e);
         throw new EmfException(message, e.getMessage(), e);
-    }
-
-    private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
-        LOG.error(message, fault);
-        String msg=extractMessage(fault.getMessage());
-        
-        if (fault.getCause()!=null){
-            if (fault.getCause().getMessage().equals(EMFConstants.CONNECTION_REFUSED)){
-                msg="EMF server not responding";
-            }            
-        }
-        throw new EmfException(msg);
     }
 
 }
