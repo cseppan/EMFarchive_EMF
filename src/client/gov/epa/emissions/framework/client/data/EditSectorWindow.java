@@ -123,7 +123,10 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
                 sector.setDescription(description.getText());
                 sector.setSectorCriteria(criteriaTableData.sources());
                 try {
-                    presenter.doSave(sectorManager);
+                    if(!name.getText().equals(""))
+                        presenter.doSave(sectorManager);
+                    else
+                        messagePanel.setError("Name field should be a non-empty string.");
                 } catch (EmfException e) {
                     messagePanel.setError("Could not save. Reason: " + e.getMessage());
                 }

@@ -47,4 +47,10 @@ public class DatasetTypesManagerPresenter {
     void view(ViewableDatasetTypePresenter presenter) throws EmfException {
         presenter.doDisplay();
     }
+    
+    public void displayNewDatasetTypeView(NewDatasetTypeView view) {
+        NewDatasetTypePresenter presenter = new NewDatasetTypePresenter(session, view);
+        presenter.doDisplay();
+    }
+    
 }

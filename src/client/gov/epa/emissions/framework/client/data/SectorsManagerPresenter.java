@@ -33,6 +33,11 @@ public class SectorsManagerPresenter {
         EditableSectorPresenter p = new EditableSectorPresenterImpl(session, editSectorView, displaySectorView, sector);
         edit(p);
     }
+    
+    public void displayNewSector(Sector sector, EditableSectorView editSectorView, ViewableSectorView displaySectorView) {
+        EditableSectorPresenter p = new EditableSectorPresenterImpl(session, editSectorView, displaySectorView, sector);
+        p.displayNewSector();
+    }
 
     void edit(EditableSectorPresenter presenter) throws EmfException {
         presenter.doDisplay();

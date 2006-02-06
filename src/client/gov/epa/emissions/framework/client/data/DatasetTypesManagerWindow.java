@@ -128,19 +128,26 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
                 viewDatasetTypes();
             }
         };
-        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction,selectModel,confirmDialog);
+        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
         
         Action editAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 editDatasetTypes();
             }
         };
-        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction,selectModel,confirmDialog);
+        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction, selectModel, confirmDialog);
 
+        Action createAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                createDatasetTypes();
+            }
+        };
+        SelectAwareButton newButton = new SelectAwareButton("New", createAction, selectModel, confirmDialog);
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
         crudPanel.add(viewButton);
         crudPanel.add(editButton);
+        crudPanel.add(newButton);
 
         return crudPanel;
     }
@@ -169,6 +176,10 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
                 break;
             }
         }
+    }
+    
+    private void createDatasetTypes() {
+        presenter.displayNewDatasetTypeView(newTypeView());
     }
 
     // generic. Could be moved into 'SortFilterSelectModel' ? - FIXME
@@ -200,6 +211,19 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     private EditableDatasetTypeView editableView() {
         EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(this);
+        desktop.add(view);
+
+        view.addInternalFrameListener(new InternalFrameAdapter() {
+            public void internalFrameClosed(InternalFrameEvent event) {
+                doTableRefresh();
+            }
+        });
+
+        return view;
+    }
+    
+    private NewDatasetTypeView newTypeView() {
+        NewDatasetTypeWindow view = new NewDatasetTypeWindow();
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {

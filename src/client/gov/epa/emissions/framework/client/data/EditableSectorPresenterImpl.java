@@ -34,13 +34,19 @@ public class EditableSectorPresenterImpl implements EditableSectorPresenter {
         editable.observe(this);
         editable.display(sector);
     }
+    
+    public void displayNewSector() {
+        editable.observe(this);
+        editable.display(sector);
+    }
 
     private DataCommonsService service() {
         return session.dataCommonsService();
     }
 
     public void doClose() throws EmfException {
-        service().releaseLockedSector(sector);
+        if(sector.isLocked(session.user()))
+            service().releaseLockedSector(sector);
         closeView();
     }
 

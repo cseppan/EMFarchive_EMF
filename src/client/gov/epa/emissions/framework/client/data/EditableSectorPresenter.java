@@ -5,6 +5,8 @@ import gov.epa.emissions.framework.EmfException;
 public interface EditableSectorPresenter {
 
     void doDisplay() throws EmfException;
+    
+    void displayNewSector();
 
     void doClose() throws EmfException;
 

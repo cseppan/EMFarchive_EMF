@@ -151,6 +151,14 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
         SelectAwareButton editButton = new SelectAwareButton("Edit", editAction,selectModel,confirmDialog);
         crudPanel.add(editButton);
 
+        JButton newButton = new JButton("New");
+        newButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                createNewSector();
+            }
+        });
+        crudPanel.add(newButton);
+        
         return crudPanel;
     }
 
@@ -174,6 +182,11 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
                 setError("Could not edit Sector: " + sector.getName() + ". Reason: " + e.getMessage());
             }
         }
+    }
+    
+    private void createNewSector() {
+            Sector sector = new Sector("New Sector", "New Sector");
+            presenter.displayNewSector(sector, editSectorView(), displaySectorView());
     }
 
     private void setError(String message) {

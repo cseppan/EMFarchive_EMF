@@ -33,6 +33,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -238,8 +239,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void exportSelectedDatasets() throws EmfException{
-        List datasets = getSelectedDatasets();
-        EmfDataset[] emfDatasets = (EmfDataset[]) datasets.toArray(new EmfDataset[0]);
+        EmfDataset[] emfDatasets = getNonExternalDatasets(getSelectedDatasets());
         checkKeyVals(emfDatasets);
         
         ExportWindow exportView = new ExportWindow(emfDatasets);
@@ -247,6 +247,17 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         ExportPresenter exportPresenter = new DefaultExportPresenter(session);
         presenter.doExport(exportView, exportPresenter, emfDatasets);
+    }
+    
+    private EmfDataset[] getNonExternalDatasets(List emfDatasets) {
+        List nonExternal = new ArrayList();
+        for(int i = 0; i < emfDatasets.size(); i++) {
+            EmfDataset temp = (EmfDataset)emfDatasets.get(i);
+            if(!temp.getDatasetType().isExternal())
+                nonExternal.add(temp);
+        }
+        
+        return (EmfDataset[])nonExternal.toArray(new EmfDataset[0]);
     }
 
     private List getSelectedDatasets() {
