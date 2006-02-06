@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
@@ -122,6 +123,37 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         modified.setName(name);
         Sector modified3 = service.updateSector(modified);
         assertEquals(sector.getName(), modified3.getName());
+    }
+    
+    public void testShouldAddDatasetType() throws EmfException {
+        DatasetType newtype = new DatasetType("MyDatasetType");
+        newtype.setDescription("MyDatasetType, newly added type.");
+        newtype.setKeywords(new Keyword[0]);
+        newtype.setMinFiles(1);
+        newtype.setMaxFiles(1);
+        newtype.setImporterClassName("importer");
+        newtype.setExporterClassName("exporter");
+        newtype.setExternal(false);
+        int existingTypes = service.getDatasetTypes().length;
+        service.addDatasetType(newtype);
+        
+        assertEquals(existingTypes + 1, service.getDatasetTypes().length);
+        assertTrue(currentDatasetType(newtype).getName().equalsIgnoreCase("MyDatasetType"));
+    }
+    
+    public void testShouldAddSector() throws EmfException {
+        Sector newSector = new Sector("MySector", "MySector");
+        boolean newSectorAdded = false;
+        int existingSectors = service.getSectors().length;
+        
+        service.addSector(newSector);
+        Sector[] sectors = service.getSectors();
+        for(int i = 0; i < sectors.length; i++)
+            if(sectors[i].getName().equalsIgnoreCase("MySector"))
+                newSectorAdded = true;
+        
+        assertEquals(existingSectors + 1, service.getSectors().length);
+        assertTrue(newSectorAdded);
     }
 
     public void testShouldUpdateDatasetType() throws EmfException {
