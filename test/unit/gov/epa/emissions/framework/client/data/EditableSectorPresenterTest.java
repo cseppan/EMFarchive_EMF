@@ -71,7 +71,8 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
         User user = new User();
         user.setUsername("user");
         Mock service = mock(DataCommonsService.class);
-
+        service.expects(once()).method("releaseLockedSector").with(same(sector)).will(returnValue(sector));
+        
         Mock session = session(user, service.proxy());
 
         EditableSectorPresenter presenter = new EditableSectorPresenterImpl((EmfSession) session.proxy(),
@@ -80,7 +81,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
         presenter.doClose();
     }
 
-    public void idle_testShouldUpdateSectorReleaseLockAndCloseOnSave() throws Exception {
+    public void testShouldUpdateSectorReleaseLockAndCloseOnSave() throws Exception {
         Sector sector = new Sector();
 
         Mock view = mock(EditableSectorView.class);

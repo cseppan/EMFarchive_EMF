@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
 import java.util.Date;
+import java.util.Random;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
@@ -126,7 +127,8 @@ public class DataCommonsServiceTest extends ServicesTestCase {
     }
     
     public void testShouldAddDatasetType() throws EmfException {
-        DatasetType newtype = new DatasetType("MyDatasetType");
+        String newname = "MyDatasetType" + Math.abs(new Random().nextInt());
+        DatasetType newtype = new DatasetType(newname);
         newtype.setDescription("MyDatasetType, newly added type.");
         newtype.setKeywords(new Keyword[0]);
         newtype.setMinFiles(1);
@@ -138,18 +140,19 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         service.addDatasetType(newtype);
         
         assertEquals(existingTypes + 1, service.getDatasetTypes().length);
-        assertTrue(currentDatasetType(newtype).getName().equalsIgnoreCase("MyDatasetType"));
+        assertTrue(currentDatasetType(newtype).getName().equalsIgnoreCase(newname));
     }
     
     public void testShouldAddSector() throws EmfException {
-        Sector newSector = new Sector("MySector", "MySector");
+        String newname = "MySector" + Math.abs(new Random().nextInt());
+        Sector newSector = new Sector(newname, newname);
         boolean newSectorAdded = false;
         int existingSectors = service.getSectors().length;
         
         service.addSector(newSector);
         Sector[] sectors = service.getSectors();
         for(int i = 0; i < sectors.length; i++)
-            if(sectors[i].getName().equalsIgnoreCase("MySector"))
+            if(sectors[i].getName().equalsIgnoreCase(newname))
                 newSectorAdded = true;
         
         assertEquals(existingSectors + 1, service.getSectors().length);

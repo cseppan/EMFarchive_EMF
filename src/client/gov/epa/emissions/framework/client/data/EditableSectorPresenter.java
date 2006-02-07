@@ -6,8 +6,6 @@ public interface EditableSectorPresenter {
 
     void doDisplay() throws EmfException;
     
-    void displayNewSector();
-
     void doClose() throws EmfException;
 
     void doSave(SectorsManagerView sectorManager) throws EmfException;

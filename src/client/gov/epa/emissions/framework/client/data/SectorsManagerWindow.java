@@ -186,7 +186,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     
     private void createNewSector() {
             Sector sector = new Sector("New Sector", "New Sector");
-            presenter.displayNewSector(sector, editSectorView(), displaySectorView());
+            presenter.displayNewSector(sector, newSectorView());
     }
 
     private void setError(String message) {
@@ -224,6 +224,19 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
 
     private EditableSectorView editSectorView() {
         EditSectorWindow view = new EditSectorWindow(this);
+        desktop.add(view);
+
+        view.addInternalFrameListener(new InternalFrameAdapter() {
+            public void internalFrameClosed(InternalFrameEvent event) {
+                doTableRefresh();
+            }
+        });
+
+        return view;
+    }
+    
+    private NewSectorView newSectorView() {
+        NewSectorWindow view = new NewSectorWindow(this);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
