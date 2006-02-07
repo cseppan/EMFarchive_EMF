@@ -3,8 +3,8 @@ package gov.epa.emissions.framework.services;
 import java.util.Date;
 
 /**
- * This class keeps track of the date/time a user initiated an export of a
- * particular version of a dataset to a repository (location).
+ * This class keeps track of the date/time a user initiated an export of a particular version of a dataset to a
+ * repository (location).
  * 
  * @author Conrad F. D'Cruz
  * 
@@ -96,6 +96,30 @@ public class AccessLog {
 
     public void setDatasetId(long datasetid) {
         this.datasetId = datasetid;
+    }
+
+    public boolean equals(Object other) {
+        if (this == other)
+            return true;
+
+        if (!(other instanceof AccessLog))
+            return false;
+
+        final AccessLog aLog = (AccessLog) other;
+
+        if ((!(aLog.getUsername().equals(this.getUsername()))) && (!(aLog.getDatasetId() == (this.getDatasetId())))
+                && (!(aLog.getId() == (this.getId())))
+                && (!(aLog.getTimestamp().getTime() == (this.getTimestamp().getTime())))
+                && (!(aLog.getVersion().equals(this.getVersion())))
+                && (!(aLog.getDescription().equals(this.getDescription())))
+                && (!(aLog.getFolderPath().equals(this.getFolderPath()))))
+            return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        return toString().hashCode();
     }
 
 }
