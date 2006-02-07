@@ -53,7 +53,8 @@ public class WindowMenu extends JMenu implements WindowMenuView {
     }
 
     public void unregister(ManagedView view) {
-        super.remove(getMenuItem(view));
+        JMenuItem menuItem = getMenuItem(view);
+        super.remove(menuItem);
     }
 
     private JMenuItem getMenuItem(ManagedView view) {

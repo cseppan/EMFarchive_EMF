@@ -2,8 +2,9 @@ package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.framework.client.ManagedView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class DesktopManagerImpl implements DesktopManager {
@@ -24,7 +25,6 @@ public class DesktopManagerImpl implements DesktopManager {
             windowNames.put(name, manageView);
             windowMenu.register(manageView);
         }
-        // setposition
     }
 
     public void unregisterCloseWindow(ManagedView manageView) {
@@ -32,17 +32,14 @@ public class DesktopManagerImpl implements DesktopManager {
         windowMenu.unregister(manageView);
     }
 
-    public void unregisterFromWindowMenu(ManagedView view) {
-        view.close();
-    }
-
     public void closeAll() {
-        Iterator iterator = windowNames.keySet().iterator();
-        while (iterator.hasNext()) {
-            Object key = iterator.next();
+        List list = new ArrayList(windowNames.keySet());
+        for (int i = 0; i < list.size(); i++) {
+            Object key = list.get(i);
             ManagedView view = (ManagedView) windowNames.get(key);
             windowMenu.unregister(view);
             windowNames.remove(key);
+            view.close();
         }
     }
 

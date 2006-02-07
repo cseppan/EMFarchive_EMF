@@ -8,8 +8,6 @@ public interface DesktopManager {
     
     public void unregisterCloseWindow(ManagedView manageView);
 
-    public void unregisterFromWindowMenu(ManagedView view);
-
     public void closeAll();
     
 }
