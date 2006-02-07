@@ -8,11 +8,8 @@ import gov.epa.emissions.framework.services.ExImService;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class ExImServiceTransport implements ExImService {
-    private static Log LOG = LogFactory.getLog(ExImServiceTransport.class);
 
     private CallFactory callFactory;
 
@@ -39,10 +36,9 @@ public class ExImServiceTransport implements ExImService {
 
             call.invoke(new Object[] { user, folderPath, fileName, dataset });
         } catch (AxisFault fault) {
-            LOG.error("Axis Fault details", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            LOG.error("Error communicating with server", e);
+            throw new EmfException("Unable to connect to Export-Import Service");
         }
     }
 
@@ -71,31 +67,10 @@ public class ExImServiceTransport implements ExImService {
             call.invoke(new Object[] { user, datasets, folder, purpose });
 
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not export datasets for user: " + user.getUsername(), fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not export datasets for user: " + user.getUsername(), e);
+            throw new EmfException("Unable to connect to Export-Import Service");
         }
-    }
-
-    private String extractMessage(String faultReason) {
-        return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
-    }
-
-    private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {
-        LOG.error(message, e);
-        throw new EmfException(message, e.getMessage(), e);
-    }
-
-    private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
-        LOG.error(message, fault);
-        String msg = extractMessage(fault.getMessage());
-
-        if (fault.getCause() != null) {
-            if (fault.getCause().getMessage().equals(EmfServiceFault.CONNECTION_REFUSED)) {
-                msg = "EMF server not responding";
-            }
-        }
-        throw new EmfException(msg);
     }
 
     public void startMultipleFileImport(User user, String folderPath, String[] fileName, DatasetType datasetType)
@@ -115,10 +90,9 @@ public class ExImServiceTransport implements ExImService {
 
             call.invoke(new Object[] { user, folderPath, fileName, datasetType });
         } catch (AxisFault fault) {
-            LOG.error("Axis Fault details", fault);
-            throw new EmfException(extractMessage(fault.getMessage()));
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            LOG.error("Error communicating with server", e);
+            throw new EmfException("Unable to connect to Export-Import Service");
         }
     }
 }

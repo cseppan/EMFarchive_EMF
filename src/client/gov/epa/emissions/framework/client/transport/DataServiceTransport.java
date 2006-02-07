@@ -7,12 +7,8 @@ import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class DataServiceTransport implements DataService {
-    private static Log LOG = LogFactory.getLog(DataServiceTransport.class);
-
     private CallFactory callFactory;
 
     private EmfMappings mappings;
@@ -32,12 +28,10 @@ public class DataServiceTransport implements DataService {
 
             return (EmfDataset[]) call.invoke(new Object[] {});
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to fetch Datasets", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to fetch Datasets", e);
+            throw new EmfException("Unable to connect to Data Service");
         }
-
-        return null;
     }
 
     public void updateDatasetWithoutLock(EmfDataset dataset) throws EmfException {
@@ -51,34 +45,12 @@ public class DataServiceTransport implements DataService {
 
             call.invoke(new Object[] { dataset });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to save Dataset: " + dataset.getName(), fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to save Dataset: " + dataset.getName(), e);
+            throw new EmfException("Unable to connect to Data Service");
         }
     }
 
-    private String extractMessage(String faultReason) {// FIXME: what's this?
-        return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
-    }
-
-    private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {
-        LOG.error(message, e);
-        throw new EmfException(message, e.getMessage(), e);
-    }
-
-    private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
-        LOG.error(message, fault);
-        String msg=extractMessage(fault.getMessage());
-        
-        if (fault.getCause()!=null){
-            if (fault.getCause().getMessage().equals(EmfServiceFault.CONNECTION_REFUSED)){
-                msg="EMF server not responding";
-            }            
-        }
-        throw new EmfException(msg);
-    }
-
-    
     public EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
         try {
             Call call = callFactory.createCall();
@@ -91,12 +63,10 @@ public class DataServiceTransport implements DataService {
 
             return (EmfDataset) call.invoke(new Object[] { owner, dataset });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not get Dataset lock: " + dataset.getName(), fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not get Dataset lock: " + dataset.getName(), e);
+            throw new EmfException("Unable to connect to Data Service");
         }
-
-        return null;
     }
 
     public EmfDataset updateDataset(EmfDataset dataset) throws EmfException {
@@ -110,12 +80,10 @@ public class DataServiceTransport implements DataService {
 
             return (EmfDataset) call.invoke(new Object[] { dataset });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not save Dataset: " + dataset.getName(), fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not save Dataset: " + dataset.getName(), e);
+            throw new EmfException("Unable to connect to Data Service");
         }
-
-        return null;
     }
 
     public EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException {
@@ -129,12 +97,10 @@ public class DataServiceTransport implements DataService {
 
             return (EmfDataset) call.invoke(new Object[] { locked });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not release Dataset lock: " + locked.getName(), fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not release Dataset lock: " + locked.getName(), e);
+            throw new EmfException("Unable to connect to Data Service");
         }
-
-        return null;
     }
 
 }

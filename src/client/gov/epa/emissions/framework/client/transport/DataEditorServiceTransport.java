@@ -13,12 +13,8 @@ import java.net.URL;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class DataEditorServiceTransport implements DataEditorService {
-    private static Log log = LogFactory.getLog(DataEditorServiceTransport.class);
-
     private Call call = null;
 
     private EmfMappings mappings;
@@ -35,27 +31,6 @@ public class DataEditorServiceTransport implements DataEditorService {
         mappings.register(call);
     }
 
-    private String extractMessage(String faultReason) {
-        return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
-    }
-
-    private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {
-        log.error(message, e);
-        throw new EmfException(message, e.getMessage(), e);
-    }
-
-    private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
-        log.error(message, fault);
-        if (fault.getCause() != null) {
-            if (fault.getCause().getMessage().equals(EmfServiceFault.CONNECTION_REFUSED)) {
-                throw new EmfException("EMF server not responding");
-            }
-        }
-
-        String msg = extractMessage(fault.getMessage());
-        throw new EmfException(msg);
-    }
-
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
         try {
             mappings.addParam(call, "token", mappings.dataAccessToken());
@@ -66,14 +41,12 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             return (Page) call.invoke(new Object[] { token, new Integer(pageNumber) });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get page: ", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get page: ", e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
     public int getPageCount(DataAccessToken token) throws EmfException {
@@ -86,14 +59,12 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             return cnt.intValue();
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get count: ", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get count: ", e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return -1;
     }
 
     public Page getPageWithRecord(DataAccessToken token, int recordId) throws EmfException {
@@ -106,14 +77,12 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             return (Page) call.invoke(new Object[] { token, new Integer(recordId) });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get page: ", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get page: ", e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {
@@ -125,14 +94,12 @@ public class DataEditorServiceTransport implements DataEditorService {
             Integer cnt = (Integer) call.invoke(new Object[] { token });
             return cnt.intValue();
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get count: ", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get count: ", e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return -1;
     }
 
     public void close() throws EmfException {
@@ -142,9 +109,9 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             call.invoke(new Object[0]);
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get count: ", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get count: ", e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
@@ -159,16 +126,12 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             return (Version) call.invoke(new Object[] { baseVersion, name });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to derive Version from base Version: " + baseVersion.getVersion()
-                    + " for Dataset: " + baseVersion.getDatasetId(), fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to derive Version from base Version: " + baseVersion.getVersion()
-                    + " for Dataset: " + baseVersion.getDatasetId(), e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
     public void submit(DataAccessToken token, ChangeSet changeset, int pageNumber) throws EmfException {
@@ -181,9 +144,9 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             call.invoke(new Object[] { token, changeset, new Integer(pageNumber) });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not submit changes for " + token, fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not submit changes for " + token, e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
@@ -197,13 +160,13 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             Object result = call.invoke(new Object[] { token });
             return ((Boolean) result).booleanValue();
+        } catch (AxisFault fault) {
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not confirm changes for " + token, e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return false;
     }
 
     public void discard(DataAccessToken token) throws EmfException {
@@ -213,8 +176,10 @@ public class DataEditorServiceTransport implements DataEditorService {
             mappings.setVoidReturnType(call);
 
             call.invoke(new Object[] { token });
+        } catch (AxisFault fault) {
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not discard changes for " + token, e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
@@ -229,13 +194,13 @@ public class DataEditorServiceTransport implements DataEditorService {
             mappings.setReturnType(call, mappings.dataAccessToken());
 
             return (DataAccessToken) call.invoke(new Object[] { user, token });
+        } catch (AxisFault fault) {
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not open editing session for " + token.key(), e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
     public void closeSession(DataAccessToken token) throws EmfException {
@@ -245,8 +210,10 @@ public class DataEditorServiceTransport implements DataEditorService {
             mappings.setVoidReturnType(call);
 
             call.invoke(new Object[] { token });
+        } catch (AxisFault fault) {
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not close editing session for " + token.key(), e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
@@ -260,18 +227,15 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             return (DataAccessToken) call.invoke(new Object[] { token });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Could not save changes for " + token, fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not save changes for " + token, e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
     public Version markFinal(DataAccessToken token) throws EmfException {
-        Version version = token.getVersion();
         try {
             mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.setOperation(call, "markFinal");
@@ -279,15 +243,12 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             return (Version) call.invoke(new Object[] { token });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to mark a derived Version: " + version.getVersion() + " as Final", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to mark a derived Version: " + version.getVersion() + " as Final",
-                    e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
     public Version[] getVersions(long datasetId) throws EmfException {
@@ -298,14 +259,12 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             return (Version[]) call.invoke(new Object[] { new Long(datasetId) });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get versions for dataset: " + datasetId, fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get versions for dataset: " + datasetId, e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
     public Page applyConstraints(DataAccessToken token, String rowFilter, String sortOrder) throws EmfException {
@@ -319,14 +278,12 @@ public class DataEditorServiceTransport implements DataEditorService {
 
             return (Page) call.invoke(new Object[] { token, rowFilter, sortOrder });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to apply constraints: ", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to apply constraints: ", e);
+            throw new EmfException("Unable to connect to DataEditor Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
 }

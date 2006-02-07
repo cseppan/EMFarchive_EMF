@@ -11,12 +11,8 @@ import java.net.URL;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Call;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class DataViewServiceTransport implements DataViewService {
-    private static Log log = LogFactory.getLog(DataViewServiceTransport.class);
-
     private Call call = null;
 
     private EmfMappings mappings;
@@ -33,46 +29,23 @@ public class DataViewServiceTransport implements DataViewService {
         mappings.register(call);
     }
 
-    private String extractMessage(String faultReason) {
-        return faultReason.substring(faultReason.indexOf("Exception: ") + 11);
-    }
-
-    private void throwExceptionDueToServiceErrors(String message, Exception e) throws EmfException {
-        log.error(message, e);
-        throw new EmfException(message, e.getMessage(), e);
-    }
-
-    private void throwExceptionOnAxisFault(String message, AxisFault fault) throws EmfException {
-        log.error(message, fault);
-        String msg = extractMessage(fault.getMessage());
-
-        if (fault.getCause() != null) {
-            if (fault.getCause().getMessage().equals(EmfServiceFault.CONNECTION_REFUSED)) {
-                msg = "EMF server not responding";
-            }
-        }
-        throw new EmfException(msg);
-    }
-
     public Page applyConstraints(DataAccessToken token, String rowFilter, String sortOrder) throws EmfException {
         try {
             mappings.addParam(call, "token", mappings.dataAccessToken());
             mappings.addStringParam(call, "rowFilter");
             mappings.addStringParam(call, "sortOrder");
-            
+
             mappings.setOperation(call, "applyConstraints");
             mappings.setReturnType(call, mappings.page());
 
             return (Page) call.invoke(new Object[] { token, rowFilter, sortOrder });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to apply constraints: ", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to apply constraints: ", e);
+            throw new EmfException("Unable to connect to DataView Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {
@@ -85,14 +58,12 @@ public class DataViewServiceTransport implements DataViewService {
 
             return (Page) call.invoke(new Object[] { token, new Integer(pageNumber) });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get page: ", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get page: ", e);
+            throw new EmfException("Unable to connect to DataView Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
     public int getPageCount(DataAccessToken token) throws EmfException {
@@ -105,14 +76,12 @@ public class DataViewServiceTransport implements DataViewService {
 
             return cnt.intValue();
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get count: ", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get count: ", e);
+            throw new EmfException("Unable to connect to DataView Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return -1;
     }
 
     public Page getPageWithRecord(DataAccessToken token, int record) throws EmfException {
@@ -125,14 +94,12 @@ public class DataViewServiceTransport implements DataViewService {
 
             return (Page) call.invoke(new Object[] { token, new Integer(record) });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get page: ", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get page: ", e);
+            throw new EmfException("Unable to connect to DataView Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
     public int getTotalRecords(DataAccessToken token) throws EmfException {
@@ -144,14 +111,12 @@ public class DataViewServiceTransport implements DataViewService {
             Integer cnt = (Integer) call.invoke(new Object[] { token });
             return cnt.intValue();
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get count: ", fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get count: ", e);
+            throw new EmfException("Unable to connect to DataView Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return -1;
     }
 
     public DataAccessToken openSession(DataAccessToken token) throws EmfException {
@@ -161,13 +126,13 @@ public class DataViewServiceTransport implements DataViewService {
             mappings.setReturnType(call, mappings.dataAccessToken());
 
             return (DataAccessToken) call.invoke(new Object[] { token });
+        } catch (AxisFault fault) {
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not open session for " + token.key(), e);
+            throw new EmfException("Unable to connect to DataView Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
     public void closeSession(DataAccessToken token) throws EmfException {
@@ -177,8 +142,10 @@ public class DataViewServiceTransport implements DataViewService {
             mappings.setVoidReturnType(call);
 
             call.invoke(new Object[] { token });
+        } catch (AxisFault fault) {
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Could not close session for " + token.key(), e);
+            throw new EmfException("Unable to connect to DataView Service");
         } finally {
             call.removeAllParameters();
         }
@@ -192,14 +159,12 @@ public class DataViewServiceTransport implements DataViewService {
 
             return (Version[]) call.invoke(new Object[] { new Long(datasetId) });
         } catch (AxisFault fault) {
-            throwExceptionOnAxisFault("Failed to get versions for dataset: " + datasetId, fault);
+            throw new EmfServiceException(fault);
         } catch (Exception e) {
-            throwExceptionDueToServiceErrors("Failed to get versions for dataset: " + datasetId, e);
+            throw new EmfException("Unable to connect to DataView Service");
         } finally {
             call.removeAllParameters();
         }
-
-        return null;
     }
 
 }
