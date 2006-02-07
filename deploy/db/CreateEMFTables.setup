@@ -185,6 +185,7 @@ WITHOUT OIDS;
 -- emf internal and external sources
 CREATE TABLE emf.external_sources
 (
+  id SERIAL PRIMARY KEY,
   dataset_id int4 NOT NULL,
   list_index int4,
   datasource varchar(255) NOT NULL,
@@ -195,6 +196,7 @@ WITHOUT OIDS;
 --
 CREATE TABLE emf.internal_sources
 (
+  id SERIAL PRIMARY KEY,
   dataset_id int4 NOT NULL,
   list_index int4,
   datasource varchar(255) NOT NULL,
