@@ -62,6 +62,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         windowMenuView = createWindowMenu();
         this.desktopManager = new DesktopManagerImpl(windowMenuView);
         this.windowMenuPresenter.setDesktopManager(desktopManager);
+        this.windowMenuView.setWindowMenuViewPresenter(windowMenuPresenter);
         this.viewLayout = new CascadeLayout(this);
         messagePanel = new SingleLineMessagePanel();
 

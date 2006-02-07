@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.client.ManagedView;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
-public class WindowMenuPresenterTest_FIXME extends MockObjectTestCase {
+public class WindowMenuPresenterTest extends MockObjectTestCase {
 
     private WindowMenuPresenter presenter;
 
@@ -18,22 +18,21 @@ public class WindowMenuPresenterTest_FIXME extends MockObjectTestCase {
     protected void setUp() {
         view = mock(WindowMenuView.class);
         presenter = new WindowMenuPresenter((WindowMenuView) view.proxy());
-
         managedView = mock(ManagedView.class);
         managedViewProxy = (ManagedView) managedView.proxy();
     }
 
-    public void itestShouldRegisterWindowWithMenuOnBeingAddedToDesktop() {
+    public void testShouldRegisterWindowWithMenuOnBeingAddedToDesktop() {
         view.expects(once()).method("register").with(same(managedViewProxy));
         presenter.notifyAdd(managedViewProxy);
     }
 
-    public void itestShouldUnregisterWindowWithMenuOnBeingRemovedFromDesktop() {
+    public void testShouldUnregisterWindowWithMenuOnBeingRemovedFromDesktop() {
         view.expects(once()).method("unregister").with(same(managedViewProxy));
         presenter.notifyRemove(managedViewProxy);
     }
 
-    public void itestShouldBringManagedViewToFrontOnBeingSelectedFromMenu() {
+    public void testShouldBringManagedViewToFrontOnBeingSelectedFromMenu() {
         managedView.expects(once()).method("bringToFront").withNoArguments();
         presenter.select(managedViewProxy);
     }

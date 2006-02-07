@@ -5,12 +5,14 @@ import gov.epa.emissions.framework.client.ManagedView;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
-public class DesktopManagerTest_FIXME extends MockObjectTestCase {
+public class DesktopManagerTest extends MockObjectTestCase {
 
-    public void FIXME_testShouldRegisterOpenWindowWithWindowMenuOnRegister() {
+    public void testShouldRegisterOpenWindowWithWindowMenuOnRegister() {
         Mock windowsMenu = mock(WindowMenuView.class);
         
-        ManagedView managedViewProxy = (ManagedView) mock(ManagedView.class).proxy();
+        Mock managedView = mock(ManagedView.class);
+        ManagedView managedViewProxy = (ManagedView) managedView.proxy();
+        managedView.expects(once()).method("getName").withNoArguments();
         windowsMenu.expects(once()).method("register").with(same(managedViewProxy));
         
         DesktopManager desktopManager = new DesktopManagerImpl(((WindowMenuView) windowsMenu.proxy()));

@@ -10,8 +10,6 @@ public class WindowMenuPresenter {
 
     public WindowMenuPresenter(WindowMenuView view) {
         this.view = view;
-        this.view.setWindowMenuViewPresenter(this);
-
     }
     
     public void setDesktopManager(DesktopManager desktopManager){
