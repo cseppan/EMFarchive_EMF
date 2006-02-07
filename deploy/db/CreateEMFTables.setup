@@ -198,7 +198,7 @@ CREATE TABLE emf.datasets_keywords
   list_index int4,
   dataset_id int4 NOT NULL REFERENCES emf.datasets (id), 
   keyword_id int4 NOT NULL REFERENCES emf.emf_keywords (id), 
-  value varchar(255),
+  value varchar(255) NOT NULL,
   UNIQUE (dataset_id, keyword_id)
 ) 
 WITHOUT OIDS;
