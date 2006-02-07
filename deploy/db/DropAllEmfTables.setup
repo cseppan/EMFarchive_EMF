@@ -1,5 +1,5 @@
 --emissions.versions
-DROP TABLE emissions.versions;
+DROP TABLE emissions.versions CASCADE;
 --emissions.versions
 --
 -- emf.users
@@ -7,27 +7,24 @@ DROP TABLE emf.users CASCADE;
 --emf.users
 --
 --emf. status, countries, properties, sectors,sector criteria
-DROP TABLE emf.status;
-DROP TABLE emf.properties;
+DROP TABLE emf.status CASCADE;
+DROP TABLE emf.properties CASCADE;
 --
-DROP SEQUENCE emf.countries_id_seq CASCADE;
-DROP TABLE emf.countries;
+DROP TABLE emf.countries CASCADE;
 --
-DROP SEQUENCE emf.sectors_id_seq;
 DROP TABLE emf.sectors CASCADE;
 --
-DROP TABLE emf.sector_criteria;
+DROP TABLE emf.sector_criteria CASCADE;
 --emf. status, countries, properties, sectors,sector criteria
 --
 -- emf ... KEYWORDS framework
-DROP TABLE emf.datasets_keywords;
+DROP TABLE emf.datasets_keywords CASCADE;
 DROP TABLE emf.emf_keywords CASCADE;
-DROP TABLE emf.dataset_types_keywords;
+DROP TABLE emf.dataset_types_keywords CASCADE;
 -- emf ... KEYWORDS framework
 --
 -- emf.dataset_types
 DROP TABLE emf.dataset_types CASCADE;
-DROP SEQUENCE emf.dataset_types_id_seq;
 -- emf.dataset_types
 --
 -- emf.datasets must
@@ -36,21 +33,17 @@ DROP TABLE emf.dataset_access_logs CASCADE;
 --emf.datasets
 --
 -- emf internal and external sources
-DROP TABLE emf.external_sources;
-DROP TABLE emf.internal_sources;
+DROP TABLE emf.external_sources CASCADE;
+DROP TABLE emf.internal_sources CASCADE;
 -- emf internal and external sources
 --
 -- emf regions, projects and intended use
-DROP SEQUENCE intended_uses_id_seq CASCADE;
-DROP SEQUENCE projects_id_seq CASCADE;
-DROP SEQUENCE regions_id_seq CASCADE;
 DROP TABLE intended_uses CASCADE;
 DROP TABLE projects CASCADE;
 DROP TABLE regions CASCADE;
 -- emf regions, projects and intended use
 --
 -- emf datasets_sectors
-DROP SEQUENCE datasets_sectors_id_seq CASCADE;
 DROP TABLE datasets_sectors CASCADE;
 -- emf datasets_sectors
 --
