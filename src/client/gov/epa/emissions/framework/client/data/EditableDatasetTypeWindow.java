@@ -123,8 +123,12 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    keywordsPanel.commit();
-                    presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), manager);
+                    if(name.getText().equals(""))
+                        messagePanel.setError("Name field should be a non-empty string.");
+                    else {
+                        keywordsPanel.commit();
+                        presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), manager);
+                    }
                 } catch (EmfException e) {
                     messagePanel.setError("Could not save. Reason: " + e.getMessage());
                 }
