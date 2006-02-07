@@ -100,10 +100,13 @@ public class DataServiceTest extends ServicesTestCase {
         }
     }
 
-    private EmfDataset newDataset() {
+    private EmfDataset newDataset() throws EmfException {
         EmfDataset dataset = new EmfDataset();
+        
+        User owner = userService.getUser("emf");
+
         dataset.setName("dataset-dao-test" + new Random().nextInt());
-        dataset.setCreator("creator");
+        dataset.setCreator(owner.getUsername());
 
         Transaction tx = null;
         try {

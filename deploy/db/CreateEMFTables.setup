@@ -4,7 +4,7 @@ CREATE TABLE emissions.versions
   id SERIAL PRIMARY KEY,
   dataset_id int4 NOT NULL,
   version int4 NOT NULL,
-  name varchar NOT NULL,
+  name varchar(255) NOT NULL,
   path text NULL DEFAULT ''::text,
   final_version bool NOT NULL DEFAULT false,
   date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -34,6 +34,24 @@ CREATE TABLE emf.users
 WITHOUT OIDS;
 -- emf.users
 --
+-- emf intended_uses
+CREATE TABLE emf.intended_uses
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf intended_uses
+--
+-- emf projects
+CREATE TABLE emf.projects
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf projects
+--
 -- emf.countries
 CREATE TABLE emf.countries
 (
@@ -55,15 +73,23 @@ CREATE TABLE emf.sectors
 WITHOUT OIDS;
 -- emf.sector
 --
+-- emf regions
+CREATE TABLE emf.regions
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf regions
+--
 -- emf.sectorcriteria
 CREATE TABLE emf.sector_criteria
 (
   id SERIAL PRIMARY KEY,
-  sector_id int4 NOT NULL,
+  sector_id int4 NOT NULL REFERENCES emf.sectors (id),
   list_index int4,
   "type" varchar(255) NOT NULL,
-  criteria text,
-  CONSTRAINT sector_criteria_to_sectors FOREIGN KEY (sector_id) REFERENCES emf.sectors (id) ON UPDATE CASCADE ON DELETE CASCADE
+  criteria text
 ) 
 WITHOUT OIDS;
 -- emf.sector_criteria
@@ -72,7 +98,7 @@ WITHOUT OIDS;
 CREATE TABLE emf.status
 (
   id SERIAL PRIMARY KEY,
-  username varchar(255) NOT NULL,
+  username varchar(255) NOT NULL REFERENCES emf.users (username),
   type varchar(255) NOT NULL,
   message text NOT NULL,
   is_read bool NOT NULL DEFAULT false,
@@ -113,19 +139,19 @@ CREATE TABLE emf.datasets
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE,
-  creator varchar(255) NOT NULL,
+  creator varchar(255) NOT NULL REFERENCES emf.users (username),
   status varchar(255),
-  dataset_type integer,
+  dataset_type integer REFERENCES emf.dataset_types (id),
   units varchar(255),
-  region integer,
-  intended_use integer,
+  region integer REFERENCES emf.regions (id),
+  intended_use integer REFERENCES emf.intended_uses (id),
   "year" int4 NOT NULL DEFAULT 0,
-  country integer,
+  country integer REFERENCES emf.countries (id),
   temporal_resolution varchar(255),
   start_date_time timestamp,
   stop_date_time timestamp,
   description text,
-  project integer,
+  project integer REFERENCES emf.projects (id),
   created_date_time timestamp,
   modified_date_time timestamp,
   accessed_date_time timestamp,
@@ -141,7 +167,7 @@ CREATE TABLE emf.dataset_access_logs
   dataset_id int4 REFERENCES emf.datasets (id) NOT NULL,
   username varchar(255) REFERENCES emf.users (username) NOT NULL,
   date timestamp NOT NULL,
-  version varchar(128) NOT NULL,
+  version varchar(255) NOT NULL,
   description text NOT NULL,
   "location" varchar(255) NOT NULL
 ) 
@@ -159,12 +185,10 @@ WITHOUT OIDS;
 CREATE TABLE emf.dataset_types_keywords
 (
   id SERIAL PRIMARY KEY,
-  dataset_type_id int4 NOT NULL,
+  dataset_type_id int4 NOT NULL REFERENCES emf.dataset_types(id),
   list_index int4,
-  keyword_id int4 NOT NULL,
-  UNIQUE (dataset_type_id, keyword_id),
-  CONSTRAINT dataset_types_keywords_to_datasetstypes FOREIGN KEY (dataset_type_id) REFERENCES emf.dataset_types (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT dataset_types_keywords_to_emf_keywords FOREIGN KEY (keyword_id) REFERENCES emf.emf_keywords (id) ON UPDATE CASCADE ON DELETE CASCADE
+  keyword_id int4 NOT NULL REFERENCES emf.emf_keywords (id),
+  UNIQUE (dataset_type_id, keyword_id)
 ) 
 WITHOUT OIDS;
 --
@@ -172,12 +196,10 @@ CREATE TABLE emf.datasets_keywords
 (
   id SERIAL PRIMARY KEY,
   list_index int4,
-  dataset_id int4 NOT NULL,
-  keyword_id int4 NOT NULL,
+  dataset_id int4 NOT NULL REFERENCES emf.datasets (id), 
+  keyword_id int4 NOT NULL REFERENCES emf.emf_keywords (id), 
   value varchar(255),
-  UNIQUE (dataset_id, keyword_id),
-  CONSTRAINT datasets_keywords_to_datasets FOREIGN KEY (dataset_id) REFERENCES emf.datasets (id) ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT dataset_types_keywords_to_emf_keywords FOREIGN KEY (keyword_id) REFERENCES emf.emf_keywords (id) ON UPDATE CASCADE ON DELETE CASCADE
+  UNIQUE (dataset_id, keyword_id)
 ) 
 WITHOUT OIDS;
 -- emf datasets_keywords
@@ -186,70 +208,35 @@ WITHOUT OIDS;
 CREATE TABLE emf.external_sources
 (
   id SERIAL PRIMARY KEY,
-  dataset_id int4 NOT NULL,
+  dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
   list_index int4,
   datasource varchar(255) NOT NULL,
-  UNIQUE (dataset_id, datasource),
-  CONSTRAINT dataset_tables_to_datasets FOREIGN KEY (dataset_id) REFERENCES emf.datasets (id) ON UPDATE CASCADE ON DELETE CASCADE
+  UNIQUE (dataset_id, datasource)
 ) 
 WITHOUT OIDS;
 --
 CREATE TABLE emf.internal_sources
 (
   id SERIAL PRIMARY KEY,
-  dataset_id int4 NOT NULL,
+  dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
   list_index int4,
   datasource varchar(255) NOT NULL,
   table_name varchar(255) NOT NULL UNIQUE,
   table_type varchar(255) NOT NULL,
   table_columns text NOT NULL,
   file_size int4 NOT NULL, 
-  UNIQUE (dataset_id, datasource),
-  CONSTRAINT internalsources_to_datasets FOREIGN KEY (dataset_id) REFERENCES emf.datasets (id) ON UPDATE CASCADE ON DELETE CASCADE
+  UNIQUE (dataset_id, datasource)
 ) 
 WITHOUT OIDS;
 -- emf internal and external sources
---
--- emf intended_uses
-CREATE TABLE emf.intended_uses
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
-) 
-WITHOUT OIDS;
--- emf intended_uses
---
--- emf projects
-CREATE TABLE emf.projects
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
-) 
-WITHOUT OIDS;
--- emf projects
---
--- emf regions
-CREATE TABLE emf.regions
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE
-) 
-WITHOUT OIDS;
--- emf regions
 --
 -- emf datasets_sectors
 CREATE TABLE emf.datasets_sectors
 (
   id SERIAL PRIMARY KEY,
-  dataset_id int4 NOT NULL,
+  dataset_id int4 NOT NULL REFERENCES emf.datasets (id) ,
   list_index int4,
-  sector_id int4,
-  CONSTRAINT datasets_sectors_to_datasets FOREIGN KEY (dataset_id)
-      REFERENCES emf.datasets (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT datasets_sectors_to_sectors FOREIGN KEY (sector_id)
-      REFERENCES emf.sectors (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE
+  sector_id int4 REFERENCES emf.sectors (id) 
 ) 
 WITHOUT OIDS;
 -- emf datasets_sectors

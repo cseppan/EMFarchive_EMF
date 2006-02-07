@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.io.Project;
 import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.commons.io.Sector;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.db.ExImDbUpdate;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -27,11 +28,13 @@ public class DatasetPersistenceTest extends HibernateTestCase {
 
     private DataCommonsDAO dcDao;
 
+    private UserDAO userDAO;
+
     protected void setUp() throws Exception {
         super.setUp();
         datasetName = "A1" + new Random().nextLong();
         dcDao = new DataCommonsDAO();
-
+        userDAO = new UserDAO();
     }
 
     protected void doTearDown() throws Exception {
@@ -48,6 +51,7 @@ public class DatasetPersistenceTest extends HibernateTestCase {
         Country country = new Country("FR" + Math.random());
         Project project = new Project("P1" + Math.random());
         EmfDataset dataset = new EmfDataset();
+        User owner = userDAO.get("emf", session);
 
         Region region = new Region("USA" + Math.random());
         try {
@@ -58,7 +62,7 @@ public class DatasetPersistenceTest extends HibernateTestCase {
             dataset.setAccessedDateTime(new Date());
             dataset.setCountry(country);
             dataset.setCreatedDateTime(new Date());
-            dataset.setCreator("CFD");
+            dataset.setCreator(owner.getUsername());
             dataset.setDescription("DESCRIPTION");
             dataset.setModifiedDateTime(new Date());
             dataset.setName(datasetName);
@@ -77,7 +81,7 @@ public class DatasetPersistenceTest extends HibernateTestCase {
 
             KeyVal kv = new KeyVal();
             kv.setValue("bar-1");
-            kv.setKeyword(new Keyword("bar-key"));
+            kv.setKeyword(new Keyword("bar-key" + Math.random()));
             dataset.addKeyVal(kv);
 
             save(dataset);

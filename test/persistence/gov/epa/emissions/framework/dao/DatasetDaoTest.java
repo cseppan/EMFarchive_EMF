@@ -17,11 +17,13 @@ public class DatasetDaoTest extends ServicesTestCase {
 
     private DatasetDao dao;
     private DataCommonsDAO dcDao;
+    private UserDAO userDAO;
     
     protected void doSetUp() throws Exception {
         deleteAllDatasets();
         dao = new DatasetDao();
         dcDao = new DataCommonsDAO();
+        userDAO = new UserDAO();
     }
 
     protected void doTearDown() throws Exception {// no op
@@ -33,10 +35,7 @@ public class DatasetDaoTest extends ServicesTestCase {
     }
 
     public void testShouldAddDatasetToDatabaseOnAdd() throws Exception {
-        EmfDataset dataset = new EmfDataset();
-        dataset.setName("dataset-dao-test");
-        dataset.setCreator("creator");
-
+        EmfDataset dataset = newDataset();
         try {
             dao.add(dataset, session);
             EmfDataset result = load(dataset);
@@ -177,9 +176,11 @@ public class DatasetDaoTest extends ServicesTestCase {
     }
 
     private EmfDataset newDataset() {
+        User owner = userDAO.get("emf", session);
+
         EmfDataset dataset = new EmfDataset();
         dataset.setName("dataset-dao-test");
-        dataset.setCreator("creator");
+        dataset.setCreator(owner.getUsername());
 
         Transaction tx = null;
         try {
