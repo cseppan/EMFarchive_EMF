@@ -42,6 +42,8 @@ public class EmfCall {
             throw new EmfServiceException(fault);
         } catch (Exception e) {
             throw new EmfException("Unable to connect to " + service);
+        } finally {
+            call.removeAllParameters();
         }
     }
 
@@ -56,6 +58,8 @@ public class EmfCall {
             throw new EmfServiceException(fault);
         } catch (Exception e) {
             throw new EmfException("Unable to connect to " + service);
+        } finally {
+            call.removeAllParameters();
         }
     }
 
@@ -77,6 +81,19 @@ public class EmfCall {
 
     public void enableSession() {
         call.setMaintainSession(true);
+        call.setTimeout(new Integer(0));// never times out
+    }
+
+    public void addIntegerParam(String id) {
+        mappings.addIntegerParam(call, id);
+    }
+
+    public void setIntegerReturnType() {
+        mappings.setIntegerReturnType(call);
+    }
+
+    public void setBooleanReturnType() {
+        mappings.setBooleanReturnType(call);
     }
 
 }
