@@ -281,6 +281,11 @@ public class DataCommonsDAO {
         addObject(datasetType, session);
     }
 
+    public boolean containsDatasetType(String name, Session session) {
+        Criteria crit = session.createCriteria(DatasetType.class).add(Restrictions.eq("name", name));
+        return crit.uniqueResult() != null;
+    }
+
     public void add(Sector sector, Session session) {
         addObject(sector, session);
     }

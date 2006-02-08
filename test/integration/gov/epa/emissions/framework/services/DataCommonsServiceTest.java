@@ -131,16 +131,37 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         DatasetType newtype = new DatasetType(newname);
         newtype.setDescription("MyDatasetType, newly added type.");
         newtype.setKeywords(new Keyword[0]);
-        newtype.setMinFiles(1);
-        newtype.setMaxFiles(1);
-        newtype.setImporterClassName("importer");
-        newtype.setExporterClassName("exporter");
-        newtype.setExternal(false);
         int existingTypes = service.getDatasetTypes().length;
+
         service.addDatasetType(newtype);
 
-        assertEquals(existingTypes + 1, service.getDatasetTypes().length);
-        assertTrue(currentDatasetType(newtype).getName().equalsIgnoreCase(newname));
+        try {
+            assertEquals(existingTypes + 1, service.getDatasetTypes().length);
+            assertTrue(currentDatasetType(newtype).getName().equalsIgnoreCase(newname));
+        } finally {
+            remove(newtype);
+        }
+    }
+
+    public void testShouldFailOnAttemptToAddDatasetTypeWithDuplicateName() throws EmfException {
+        String newname = "MyDatasetType" + Math.abs(new Random().nextInt());
+        DatasetType type1 = new DatasetType(newname);
+        type1.setDescription("MyDatasetType, newly added type.");
+        type1.setKeywords(new Keyword[0]);
+        service.addDatasetType(type1);
+
+        try {
+            DatasetType type2 = new DatasetType(newname);
+            type2.setDescription("duplicate type");
+            type2.setKeywords(new Keyword[0]);
+
+            service.addDatasetType(type2);
+        } catch (EmfException e) {
+            assertEquals("DatasetType name already in use", e.getMessage());
+            return;
+        } finally {
+            remove(type1);
+        }
     }
 
     public void testShouldAddSector() throws EmfException {

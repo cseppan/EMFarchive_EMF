@@ -269,6 +269,10 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addDatasetType(DatasetType type) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+            
+            if (dao.containsDatasetType(type.getName(), session))
+                throw new EmfException("DatasetType name already in use");
+            
             dao.add(type, session);
             session.close();
         } catch (RuntimeException e) {
