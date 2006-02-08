@@ -12,9 +12,6 @@ import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.IntendedUse;
 import gov.epa.emissions.framework.services.Status;
 
-import org.apache.axis.AxisFault;
-import org.apache.axis.client.Call;
-
 public class DataCommonsServiceTransport implements DataCommonsService {
     private EmfMappings mappings;
 
@@ -25,337 +22,192 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         mappings = new EmfMappings();
     }
 
+    private EmfCall call() throws EmfException {
+        return callFactory.createEmfCall("DataCommons Service");
+    }
+
     public Country[] getCountries() throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "getCountries");
-            mappings.setReturnType(call, mappings.countries());
+        call.setOperation("getCountries");
+        call.setReturnType(mappings.countries());
 
-            return (Country[]) call.invoke(new Object[] {});
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (Country[]) call.requestResponse(new Object[] {});
     }
 
     public Sector[] getSectors() throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "getSectors");
-            mappings.setReturnType(call, mappings.sectors());
+        call.setOperation("getSectors");
+        call.setReturnType(mappings.sectors());
 
-            return (Sector[]) call.invoke(new Object[] {});
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (Sector[]) call.requestResponse(new Object[] {});
     }
 
     public Keyword[] getKeywords() throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "getKeywords");
-            mappings.setReturnType(call, mappings.keywords());
+        call.setOperation("getKeywords");
+        call.setReturnType(mappings.keywords());
 
-            return (Keyword[]) call.invoke(new Object[] {});
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (Keyword[]) call.requestResponse(new Object[] {});
     }
 
     public Sector obtainLockedSector(User owner, Sector sector) throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "obtainLockedSector");
-            mappings.addParam(call, "owner", mappings.user());
-            mappings.addParam(call, "sector", mappings.sector());
-            mappings.setReturnType(call, mappings.sector());
+        call.addParam("owner", mappings.user());
+        call.addParam("sector", mappings.sector());
+        call.setReturnType(mappings.sector());
 
-            return (Sector) call.invoke(new Object[] { owner, sector });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (Sector) call.requestResponse(new Object[] { owner, sector });
     }
 
     public Sector updateSector(Sector sector) throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "updateSector");
-            mappings.addParam(call, "sector", mappings.sector());
-            mappings.setReturnType(call, mappings.sector());
+        call.setOperation("updateSector");
+        call.addParam("sector", mappings.sector());
+        call.setReturnType(mappings.sector());
 
-            return (Sector) call.invoke(new Object[] { sector });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (Sector) call.requestResponse(new Object[] { sector });
     }
 
     public Sector releaseLockedSector(Sector sector) throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "releaseLockedSector");
-            mappings.addParam(call, "sector", mappings.sector());
-            mappings.setReturnType(call, mappings.sector());
+        call.setOperation("releaseLockedSector");
+        call.addParam("sector", mappings.sector());
+        call.setReturnType(mappings.sector());
 
-            return (Sector) call.invoke(new Object[] { sector });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (Sector) call.requestResponse(new Object[] { sector });
     }
 
     public DatasetType[] getDatasetTypes() throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "getDatasetTypes");
-            mappings.setReturnType(call, mappings.datasetTypes());
+        call.setOperation("getDatasetTypes");
+        call.setReturnType(mappings.datasetTypes());
 
-            return (DatasetType[]) call.invoke(new Object[] {});
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (DatasetType[]) call.requestResponse(new Object[] {});
     }
 
     public DatasetType obtainLockedDatasetType(User owner, DatasetType type) throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "obtainLockedDatasetType");
-            mappings.addParam(call, "owner", mappings.user());
-            mappings.addParam(call, "type", mappings.datasetType());
-            mappings.setReturnType(call, mappings.datasetType());
+        call.setOperation("obtainLockedDatasetType");
+        call.addParam("owner", mappings.user());
+        call.addParam("type", mappings.datasetType());
+        call.setReturnType(mappings.datasetType());
 
-            return (DatasetType) call.invoke(new Object[] { owner, type });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (DatasetType) call.requestResponse(new Object[] { owner, type });
     }
 
     public DatasetType updateDatasetType(DatasetType type) throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "updateDatasetType");
-            mappings.addParam(call, "type", mappings.datasetType());
-            mappings.setReturnType(call, mappings.datasetType());
+        call.setOperation("updateDatasetType");
+        call.addParam("type", mappings.datasetType());
+        call.setReturnType(mappings.datasetType());
 
-            return (DatasetType) call.invoke(new Object[] { type });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (DatasetType) call.requestResponse(new Object[] { type });
     }
 
     public DatasetType releaseLockedDatasetType(User owner, DatasetType type) throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "releaseLockedDatasetType");
-            mappings.addParam(call, "owner", mappings.user());
-            mappings.addParam(call, "type", mappings.datasetType());
-            mappings.setReturnType(call, mappings.datasetType());
+        call.setOperation("releaseLockedDatasetType");
+        call.addParam("owner", mappings.user());
+        call.addParam("type", mappings.datasetType());
+        call.setReturnType(mappings.datasetType());
 
-            return (DatasetType) call.invoke(new Object[] { owner, type });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (DatasetType) call.requestResponse(new Object[] { owner, type });
     }
 
     public Status[] getStatuses(String username) throws EmfException {
-        try {
-            Call call = call();
-            call.setMaintainSession(true);
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "getStatuses");
-            mappings.addStringParam(call, "username");
-            mappings.setReturnType(call, mappings.statuses());
+        call.setOperation("getStatuses");
+        call.addStringParam("username");
+        call.setReturnType(mappings.statuses());
 
-            return (Status[]) call.invoke(new Object[] { username });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (Status[]) call.requestResponse(new Object[] { username });
     }
 
     public Project[] getProjects() throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "getProjects");
-            mappings.setReturnType(call, mappings.projects());
+        call.setOperation("getProjects");
+        call.setReturnType(mappings.projects());
 
-            return (Project[]) call.invoke(new Object[] {});
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (Project[]) call.requestResponse(new Object[] {});
     }
 
     public Region[] getRegions() throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "getRegions");
-            mappings.setReturnType(call, mappings.regions());
+        call.setOperation("getRegions");
+        call.setReturnType(mappings.regions());
 
-            return (Region[]) call.invoke(new Object[] {});
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (Region[]) call.requestResponse(new Object[] {});
     }
 
     public IntendedUse[] getIntendedUses() throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "getIntendedUses");
-            mappings.setReturnType(call, mappings.intendeduses());
+        call.setOperation("getIntendedUses");
+        call.setReturnType(mappings.intendeduses());
 
-            return (IntendedUse[]) call.invoke(new Object[] {});
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        return (IntendedUse[]) call.requestResponse(new Object[] {});
     }
 
     public void addRegion(Region region) throws EmfException {
-        Call call = call();
+        EmfCall call = call();
 
-        mappings.addParam(call, "region", mappings.region());
-        mappings.setOperation(call, "addRegion");
-        mappings.setVoidReturnType(call);
-        Object[] params = new Object[] { region };
+        call.addParam("region", mappings.region());
+        call.setOperation("addRegion");
+        call.setVoidReturnType();
 
-        invoke(call, params);
-    }
-
-    private void invoke(Call call, Object[] params) throws EmfException {
-        try {
-            call.invoke(params);
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
-    }
-
-    private Call call() throws EmfException {
-        try {
-            Call call = callFactory.createCall();
-            mappings.register(call);
-            return call;
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        call.request(new Object[] { region });
     }
 
     public void addProject(Project project) throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.addParam(call, "project", mappings.project());
-            mappings.setOperation(call, "addProject");
-            mappings.setVoidReturnType(call);
-            call.invoke(new Object[] { project });
+        call.addParam("project", mappings.project());
+        call.setOperation("addProject");
+        call.setVoidReturnType();
 
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        call.request(new Object[] { project });
     }
 
     public void addIntendedUse(IntendedUse intendedUse) throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.addParam(call, "intendeduse", mappings.intendeduse());
-            mappings.setOperation(call, "addIntendedUse");
-            mappings.setVoidReturnType(call);
-            call.invoke(new Object[] { intendedUse });
+        call.addParam("intendeduse", mappings.intendeduse());
+        call.setOperation("addIntendedUse");
+        call.setVoidReturnType();
 
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        call.request(new Object[] { intendedUse });
     }
 
     public void addSector(Sector sector) throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.addParam(call, "sector", mappings.sector());
-            mappings.setOperation(call, "addSector");
-            mappings.setVoidReturnType(call);
-            call.invoke(new Object[] { sector });
+        call.addParam("sector", mappings.sector());
+        call.setOperation("addSector");
+        call.setVoidReturnType();
 
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        call.request(new Object[] { sector });
     }
 
     public void addDatasetType(DatasetType type) throws EmfException {
-        try {
-            Call call = call();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.addParam(call, "type", mappings.datasetType());
-            mappings.setOperation(call, "addDatasetType");
-            mappings.setVoidReturnType(call);
-            call.invoke(new Object[] { type });
+        call.addParam("type", mappings.datasetType());
+        call.setOperation("addDatasetType");
+        call.setVoidReturnType();
 
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to DataCommons Service");
-        }
+        call.request(new Object[] { type });
     }
 }

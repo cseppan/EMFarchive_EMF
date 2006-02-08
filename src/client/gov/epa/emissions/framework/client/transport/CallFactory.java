@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.framework.EmfException;
+
 import java.net.URL;
 
 import org.apache.axis.client.Call;
@@ -17,6 +19,21 @@ public class CallFactory {
         Service service = new Service();
         Call call = (Call) service.createCall();
         call.setTargetEndpointAddress(new URL(endpoint));
+
+        return call;
+    }
+
+    public EmfCall createEmfCall(String service) throws EmfException {
+        try {
+            return new EmfCall(createCall(), service);
+        } catch (Exception e) {
+            throw new EmfException("Unable to connect to " + service);
+        }
+    }
+
+    public EmfCall createSessionEnabledCall(String service) throws EmfException {
+        EmfCall call = createEmfCall(service);
+        call.enableSession();
 
         return call;
     }

@@ -6,9 +6,6 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
 
-import org.apache.axis.AxisFault;
-import org.apache.axis.client.Call;
-
 public class ExImServiceTransport implements ExImService {
 
     private CallFactory callFactory;
@@ -20,26 +17,21 @@ public class ExImServiceTransport implements ExImService {
         mappings = new EmfMappings();
     }
 
+    private EmfCall call() throws EmfException {
+        return callFactory.createEmfCall("Export-Import Service");
+    }
+
     public void startImport(User user, String folderPath, String fileName, EmfDataset dataset) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
-            mappings.register(call);
+        EmfCall call = call();
 
-            mappings.setOperation(call, "startImport");
+        call.setOperation("startImport");
+        call.addParam("user", mappings.user());
+        call.addParam("folderpath", mappings.string());
+        call.addParam("filename", mappings.strings());
+        call.addParam("dataset", mappings.dataset());
+        call.setVoidReturnType();
 
-            mappings.addParam(call, "user", mappings.user());
-            mappings.addParam(call, "folderpath", mappings.string());
-            mappings.addParam(call, "filename", mappings.strings());
-            mappings.addParam(call, "dataset", mappings.dataset());
-
-            mappings.setAnyReturnType(call);
-
-            call.invoke(new Object[] { user, folderPath, fileName, dataset });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to Export-Import Service");
-        }
+        call.request(new Object[] { user, folderPath, fileName, dataset });
     }
 
     public void startExport(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException {
@@ -53,46 +45,29 @@ public class ExImServiceTransport implements ExImService {
 
     private void doExport(String operationName, User user, EmfDataset[] datasets, String folder, String purpose)
             throws EmfException {
-        try {
-            Call call = callFactory.createCall();
-            mappings.register(call);
+        EmfCall call = call();
 
-            mappings.setOperation(call, operationName);
-            mappings.addParam(call, "user", mappings.user());
-            mappings.addParam(call, "datasets", mappings.datasets());
-            mappings.addStringParam(call, "foldername");
-            mappings.addBooleanParameter(call, "purpose");
-            mappings.setAnyReturnType(call);
+        call.setOperation(operationName);
+        call.addParam("user", mappings.user());
+        call.addParam("datasets", mappings.datasets());
+        call.addStringParam("foldername");
+        call.addBooleanParameter("purpose");
+        call.setVoidReturnType();
 
-            call.invoke(new Object[] { user, datasets, folder, purpose });
-
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to Export-Import Service");
-        }
+        call.request(new Object[] { user, datasets, folder, purpose });
     }
 
     public void startMultipleFileImport(User user, String folderPath, String[] fileName, DatasetType datasetType)
             throws EmfException {
-        try {
-            Call call = callFactory.createCall();
-            mappings.register(call);
+        EmfCall call = call();
 
-            mappings.setOperation(call, "startMultipleFileImport");
+        call.setOperation("startMultipleFileImport");
+        call.addParam("user", mappings.user());
+        call.addParam("folderpath", mappings.string());
+        call.addParam("filename", mappings.strings());
+        call.addParam("dataset", mappings.datasetType());
+        call.setVoidReturnType();
 
-            mappings.addParam(call, "user", mappings.user());
-            mappings.addParam(call, "folderpath", mappings.string());
-            mappings.addParam(call, "filename", mappings.strings());
-            mappings.addParam(call, "dataset", mappings.datasetType());
-
-            mappings.setAnyReturnType(call);
-
-            call.invoke(new Object[] { user, folderPath, fileName, datasetType });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to Export-Import Service");
-        }
+        call.request(new Object[] { user, folderPath, fileName, datasetType });
     }
 }

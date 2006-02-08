@@ -4,9 +4,6 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.UserService;
 
-import org.apache.axis.AxisFault;
-import org.apache.axis.client.Call;
-
 public class UserServiceTransport implements UserService {
     private CallFactory callFactory;
 
@@ -18,141 +15,90 @@ public class UserServiceTransport implements UserService {
     }
 
     public void authenticate(String username, String password) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
-            call.setMaintainSession(true);
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "authenticate");
-            mappings.addStringParam(call, "username");
-            mappings.addStringParam(call, "password");
-            mappings.setStringReturnType(call);
+        call.setOperation("authenticate");
+        call.addStringParam("username");
+        call.addStringParam("password");
+        call.setStringReturnType();
 
-            call.invoke(new Object[] { username, password });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to User Service");
-        }
+        call.request(new Object[] { username, password });
     }
 
     public User getUser(String username) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "getUser");
-            mappings.addStringParam(call, "username");
-            mappings.setReturnType(call, mappings.user());
+        call.setOperation("getUser");
+        call.addStringParam("username");
+        call.setReturnType(mappings.user());
+        Object[] params = new Object[] { username };
 
-            return (User) call.invoke(new Object[] { username });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to User Service");
-        }
+        return (User) call.requestResponse(params);
     }
 
     public void createUser(User user) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "createUser");
-            mappings.addParam(call, "user", mappings.user());
-            mappings.setStringReturnType(call);
+        call.setOperation("createUser");
+        call.addParam("user", mappings.user());
+        call.setStringReturnType();
 
-            call.invoke(new Object[] { user });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to User Service");
-        }
+        call.request(new Object[] { user });
+    }
+
+    private EmfCall call() throws EmfException {
+        return callFactory.createSessionEnabledCall("User Service");
     }
 
     public void updateUser(User user) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "updateUser");
-            mappings.addParam(call, "user", mappings.user());
-            mappings.setVoidReturnType(call);
+        call.setOperation("updateUser");
+        call.addParam("user", mappings.user());
+        call.setVoidReturnType();
 
-            call.invoke(new Object[] { user });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to User Service");
-        }
+        call.request(new Object[] { user });
     }
 
     public void deleteUser(User user) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "deleteUser");
-            mappings.addParam(call, "user", mappings.user());
-            mappings.setVoidReturnType(call);
+        call.setOperation("deleteUser");
+        call.addParam("user", mappings.user());
+        call.setVoidReturnType();
 
-            call.invoke(new Object[] { user });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to User Service");
-        }
+        call.request(new Object[] { user });
     }
 
     public User[] getUsers() throws EmfException {
-        try {
-            Call call = callFactory.createCall();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "getUsers");
-            mappings.setReturnType(call, mappings.users());
+        call.setOperation("getUsers");
+        call.setReturnType(mappings.users());
 
-            return (User[]) call.invoke(new Object[0]);
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to User Service");
-        }
+        return (User[]) call.requestResponse(new Object[0]);
     }
 
     public User obtainLocked(User owner, User object) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "obtainLocked");
-            mappings.addParam(call, "owner", mappings.user());
-            mappings.addParam(call, "object", mappings.user());
-            call.setReturnType(mappings.user());
+        call.setOperation("obtainLocked");
+        call.addParam("owner", mappings.user());
+        call.addParam("object", mappings.user());
+        call.setReturnType(mappings.user());
+        Object[] params = new Object[] { owner, object };
 
-            return (User) call.invoke(new Object[] { owner, object });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to User Service");
-        }
+        return (User) call.requestResponse(params);
     }
 
     public User releaseLocked(User object) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "releaseLocked");
-            mappings.addParam(call, "object", mappings.user());
-            call.setReturnType(mappings.user());
+        call.setOperation("releaseLocked");
+        call.addParam("object", mappings.user());
+        call.setReturnType(mappings.user());
 
-            return (User) call.invoke(new Object[] { object });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to User Service");
-        }
+        return (User) call.requestResponse(new Object[] { object });
     }
 
 }

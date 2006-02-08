@@ -21,7 +21,7 @@ public class RemoteServiceLocator implements ServiceLocator {
 
     private String baseUrl;
 
-    //Note: Each session-based service needs to create it's own Call object
+    // Note: Each session-based service needs to create it's own Call object
     private Call viewCall = null;
 
     private Call editCall;

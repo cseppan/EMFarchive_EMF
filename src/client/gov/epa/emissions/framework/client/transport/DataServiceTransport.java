@@ -5,9 +5,6 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
-import org.apache.axis.AxisFault;
-import org.apache.axis.client.Call;
-
 public class DataServiceTransport implements DataService {
     private CallFactory callFactory;
 
@@ -18,89 +15,58 @@ public class DataServiceTransport implements DataService {
         mappings = new EmfMappings();
     }
 
+    private EmfCall call() throws EmfException {
+        return callFactory.createEmfCall("Data Service");
+    }
+
     public EmfDataset[] getDatasets() throws EmfException {
-        try {
-            Call call = callFactory.createCall();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "getDatasets");
-            mappings.setReturnType(call, mappings.datasets());
+        call.setOperation("getDatasets");
+        call.setReturnType(mappings.datasets());
 
-            return (EmfDataset[]) call.invoke(new Object[] {});
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to Data Service");
-        }
+        return (EmfDataset[]) call.requestResponse(new Object[] {});
     }
 
     public void updateDatasetWithoutLock(EmfDataset dataset) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "updateDatasetWithoutLock");
-            mappings.addParam(call, "dataset", mappings.dataset());
-            mappings.setAnyReturnType(call);
+        call.setOperation("updateDatasetWithoutLock");
+        call.addParam("dataset", mappings.dataset());
+        call.setVoidReturnType();
 
-            call.invoke(new Object[] { dataset });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to Data Service");
-        }
+        call.request(new Object[] { dataset });
     }
 
     public EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "obtainLockedDataset");
-            mappings.addParam(call, "owner", mappings.user());
-            mappings.addParam(call, "dataset", mappings.dataset());
-            mappings.setReturnType(call, mappings.dataset());
+        call.setOperation("obtainLockedDataset");
+        call.addParam("owner", mappings.user());
+        call.addParam("dataset", mappings.dataset());
+        call.setReturnType(mappings.dataset());
 
-            return (EmfDataset) call.invoke(new Object[] { owner, dataset });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to Data Service");
-        }
+        return (EmfDataset) call.requestResponse(new Object[] { owner, dataset });
     }
 
     public EmfDataset updateDataset(EmfDataset dataset) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "updateDataset");
-            mappings.addParam(call, "dataset", mappings.dataset());
-            mappings.setReturnType(call, mappings.dataset());
+        call.setOperation("updateDataset");
+        call.addParam("dataset", mappings.dataset());
+        call.setReturnType(mappings.dataset());
 
-            return (EmfDataset) call.invoke(new Object[] { dataset });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to Data Service");
-        }
+        return (EmfDataset) call.requestResponse(new Object[] { dataset });
     }
 
     public EmfDataset releaseLockedDataset(EmfDataset locked) throws EmfException {
-        try {
-            Call call = callFactory.createCall();
+        EmfCall call = call();
 
-            mappings.register(call);
-            mappings.setOperation(call, "releaseLockedDataset");
-            mappings.addParam(call, "locked", mappings.dataset());
-            mappings.setReturnType(call, mappings.dataset());
+        call.setOperation("releaseLockedDataset");
+        call.addParam("locked", mappings.dataset());
+        call.setReturnType(mappings.dataset());
 
-            return (EmfDataset) call.invoke(new Object[] { locked });
-        } catch (AxisFault fault) {
-            throw new EmfServiceException(fault);
-        } catch (Exception e) {
-            throw new EmfException("Unable to connect to Data Service");
-        }
+        return (EmfDataset) call.requestResponse(new Object[] { locked });
     }
 
 }
