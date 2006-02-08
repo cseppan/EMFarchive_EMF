@@ -40,7 +40,7 @@ public class SessionLifecycle {
 
             return results;
         } catch (HibernateException e) {
-            LOG.error("Could not get all versions of Dataset : " + datasetId + ". Reason: " + e);
+            LOG.error("Could not get all versions of Dataset : " + datasetId, e);
             throw new EmfException("Could not get all versions of Dataset : " + datasetId);
         }
     }
@@ -68,7 +68,7 @@ public class SessionLifecycle {
             session.close();
         } catch (Exception e) {
             LOG.error("Could not close Session for Dataset: " + token.datasetId() + ", Version: "
-                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
+                    + token.getVersion().getVersion(), e);
             throw new EmfException("Could not close Session for Dataset: " + token.datasetId() + ", Version: "
                     + token.getVersion().getVersion());
         }
@@ -85,7 +85,7 @@ public class SessionLifecycle {
 
             session.close();
         } catch (HibernateException e) {
-            LOG.error("Could not obtain lock of Dataset " + token.datasetId() + ". Reason: " + e);
+            LOG.error("Could not obtain lock of Dataset " + token.datasetId(), e);
             throw new EmfException("Could not obtain lock of Dataset " + token.datasetId());
         }
     }
@@ -102,7 +102,7 @@ public class SessionLifecycle {
 
             return current;
         } catch (HibernateException e) {
-            LOG.error("Could not load current version of Dataset : " + reference.getDatasetId() + ". Reason: " + e);
+            LOG.error("Could not load current version of Dataset : " + reference.getDatasetId(), e);
             throw new EmfException("Could not load current version of Dataset : " + reference.getDatasetId());
         }
     }
@@ -124,7 +124,7 @@ public class SessionLifecycle {
 
             session.close();
         } catch (HibernateException e) {
-            LOG.error("Could not release lock of Dataset " + token.datasetId() + ". Reason: " + e);
+            LOG.error("Could not release lock of Dataset " + token.datasetId(), e);
             throw new EmfException("Could not release lock of Dataset " + token.datasetId());
         }
     }
@@ -153,7 +153,7 @@ public class SessionLifecycle {
 
             session.close();
         } catch (HibernateException e) {
-            LOG.error("Could not extend lock of Dataset " + token.datasetId() + ". Reason: " + e);
+            LOG.error("Could not extend lock of Dataset " + token.datasetId(), e);
             throw new EmfException("Could not extend lock of Dataset " + token.datasetId());
         }
 

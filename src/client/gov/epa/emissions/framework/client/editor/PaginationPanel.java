@@ -47,22 +47,30 @@ public class PaginationPanel extends JPanel {
 
     private void doLayout(int totalRecordsCount) {
         JPanel container = new JPanel();
+        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
-        JLabel currentName = new JLabel("Current: ");
-        container.add(currentName);
-        current = new JLabel("               ");
-        current.setToolTipText("Range of displayed records");
-        container.add(current);
-
-        JLabel totalName = new JLabel("Total: ");
-        container.add(totalName);
-        totalRecords = new JLabel("" + totalRecordsCount);
-        totalRecords.setToolTipText("Total Records");
-        container.add(totalRecords);
-
+        container.add(recordsPanel(totalRecordsCount));
         container.add(layoutControls(totalRecordsCount));
 
         super.add(container, BorderLayout.LINE_END);
+    }
+
+    private JPanel recordsPanel(int totalRecordsCount) {
+        JPanel panel = new JPanel();
+
+        JLabel currentName = new JLabel("Current: ");
+        panel.add(currentName);
+        current = new JLabel("               ");
+        current.setToolTipText("Range of displayed records");
+        panel.add(current);
+
+        JLabel totalName = new JLabel("Total: ");
+        panel.add(totalName);
+        totalRecords = new JLabel("" + totalRecordsCount);
+        totalRecords.setToolTipText("Total Records");
+        panel.add(totalRecords);
+
+        return panel;
     }
 
     public void init(TablePresenter presenter) {

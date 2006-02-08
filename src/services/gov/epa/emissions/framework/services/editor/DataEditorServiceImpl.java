@@ -92,7 +92,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
             return derived;
         } catch (HibernateException e) {
             LOG.error("Could not derive a new Version from the base Version: " + base.getVersion() + " of Dataset: "
-                    + base.getDatasetId() + ". Reason: " + e);
+                    + base.getDatasetId(), e);
             throw new EmfException("Could not derive a new Version from the base Version: " + base.getVersion()
                     + " of Dataset: " + base.getDatasetId());
         }

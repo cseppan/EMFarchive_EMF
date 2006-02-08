@@ -44,7 +44,7 @@ public class DataAccessorImpl implements DataAccessor {
             cache.applyConstraints(token, columnFilter, rowFilter, sortOrder, session);
             session.close();
         } catch (Exception e) {
-            LOG.error("Could not apply constraints for Dataset: " + token.datasetId() + ". Reason: " + e);
+            LOG.error("Could not apply constraints for Dataset: " + token.datasetId(), e);
             throw new EmfException("Could not apply constraints for Dataset: " + token.datasetId());
         }
     }
@@ -57,7 +57,7 @@ public class DataAccessorImpl implements DataAccessor {
 
             return result;
         } catch (Exception e) {
-            LOG.error("Could not get Page: " + pageNumber + " for Dataset: " + token.datasetId() + ". Reason: " + e);
+            LOG.error("Could not get Page: " + pageNumber + " for Dataset: " + token.datasetId(), e);
             throw new EmfException("Could not get Page: " + pageNumber + " for Dataset: " + token.datasetId());
         }
 
@@ -67,7 +67,7 @@ public class DataAccessorImpl implements DataAccessor {
         try {
             return pageFetch.getPageCount(token);
         } catch (Exception e) {
-            LOG.error("Failed to get page count. Reason: " + e.getMessage());
+            LOG.error("Failed to get page count", e);
             throw new EmfException("Failed to get page count");
         }
     }
@@ -80,7 +80,7 @@ public class DataAccessorImpl implements DataAccessor {
 
             return page;
         } catch (Exception ex) {
-            LOG.error("Could not obtain the page with Record: " + record + ". Reason: " + ex.getMessage());
+            LOG.error("Could not obtain the page with Record: " + record, ex);
             throw new EmfException("Could not obtain the page with Record: " + record);
         }
     }
@@ -93,7 +93,7 @@ public class DataAccessorImpl implements DataAccessor {
 
             return result;
         } catch (Exception e) {
-            LOG.error("Failed to get a count of total number of records. Reason: " + e.getMessage());
+            LOG.error("Failed to get a count of total number of records", e);
             throw new EmfException("Failed to get a count of total number of records");
         }
     }
@@ -110,7 +110,7 @@ public class DataAccessorImpl implements DataAccessor {
         try {
             cache.invalidate();
         } catch (Exception e) {
-            LOG.error("Could not close DataView Service. Reason: " + e.getMessage());
+            LOG.error("Could not close DataView Service", e);
             throw new EmfException("Could not close DataView Service");
         }
     }

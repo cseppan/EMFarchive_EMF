@@ -44,7 +44,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (Keyword[]) keywords.toArray(new Keyword[keywords.size()]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all Keywords. Reason: " + e);
+            LOG.error("Could not get all Keywords", e);
             throw new EmfException("Could not get all Keywords");
         }
     }
@@ -57,7 +57,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (Country[]) countries.toArray(new Country[countries.size()]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all Countries. Reason: " + e);
+            LOG.error("Could not get all Countries", e);
             throw new EmfException("Could not get all Countries");
         }
     }
@@ -70,7 +70,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (Sector[]) sectors.toArray(new Sector[sectors.size()]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all Sectors. Reason: " + e);
+            LOG.error("Could not get all Sectors", e);
             throw new EmfException("Could not get all Sectors");
         }
     }
@@ -83,8 +83,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return lockedSector;
         } catch (RuntimeException e) {
-            LOG.error("Could not obtain lock for sector: " + sector.getName() + " by owner: " + owner.getUsername()
-                    + ".Reason: " + e);
+            LOG.error("Could not obtain lock for sector: " + sector.getName() + " by owner: " + owner.getUsername(), e);
             throw new EmfException("Could not obtain lock for sector: " + sector.getName() + " by owner: "
                     + owner.getUsername());
         }
@@ -98,7 +97,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return released;
         } catch (RuntimeException e) {
-            LOG.error("Could not update sector: " + sector.getName() + ".Reason: " + e);
+            LOG.error("Could not update sector: " + sector.getName(), e);
             throw new EmfException("Could not update sector: " + sector.getName());
         }
     }
@@ -111,8 +110,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return released;
         } catch (RuntimeException e) {
-            LOG.error("Could not release lock for sector: " + sector.getName() + " by owner: " + sector.getLockOwner()
-                    + ".Reason: " + e);
+            LOG.error("Could not release lock for sector: " + sector.getName() + " by owner: " + sector.getLockOwner(),
+                    e);
             throw new EmfException("Could not release lock for sector: " + sector.getName() + " by owner: "
                     + sector.getLockOwner());
         }
@@ -126,7 +125,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (DatasetType[]) list.toArray(new DatasetType[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all DatasetTypes. Reason: " + e);
+            LOG.error("Could not get all DatasetTypes", e);
             throw new EmfException("Could not get all DatasetTypes ");
         }
     }
@@ -139,7 +138,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return locked;
         } catch (RuntimeException e) {
-            LOG.error("Could not obtain lock for DatasetType: " + type.getName() + ".Reason: " + e);
+            LOG.error("Could not obtain lock for DatasetType: " + type.getName(), e);
             throw new EmfException("Could not obtain lock for DatasetType: " + type.getName());
         }
     }
@@ -152,7 +151,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return locked;
         } catch (RuntimeException e) {
-            LOG.error("Could not update DatasetType: " + type.getName() + ".Reason: " + e);
+            LOG.error("Could not update DatasetType: " + type.getName(), e);
             throw new EmfException("Could not update DatasetType: " + type.getName());
         }
     }
@@ -165,7 +164,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return locked;
         } catch (RuntimeException e) {
-            LOG.error("Could not release lock on DatasetType: " + type.getName() + ".Reason: " + e);
+            LOG.error("Could not release lock on DatasetType: " + type.getName(), e);
             throw new EmfException("Could not release lock on DatasetType: " + type.getName());
         }
     }
@@ -178,7 +177,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (Status[]) statuses.toArray(new Status[statuses.size()]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all Status messages. Reason: " + e);
+            LOG.error("Could not get all Status messages", e);
             throw new EmfException("Could not get all Status messages");
         }
     }
@@ -191,7 +190,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (Project[]) projects.toArray(new Project[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all Projects. Reason: " + e);
+            LOG.error("Could not get all Projects", e);
             throw new EmfException("Could not get all Projects");
         }
     }
@@ -202,7 +201,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             dao.add(project, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not add new Project. Reason: " + e);
+            LOG.error("Could not add new Project", e);
             throw new EmfException("Could not add Project");
         }
     }
@@ -215,7 +214,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (Region[]) regions.toArray(new Region[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all Regions. Reason: " + e);
+            LOG.error("Could not get all Regions", e );
             throw new EmfException("Could not get all Regions");
         }
     }
@@ -226,7 +225,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             dao.add(region, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not add new Region. Reason: " + e);
+            LOG.error("Could not add new Region", e);
             throw new EmfException("Could not add Region");
         }
     }
@@ -239,7 +238,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (IntendedUse[]) regions.toArray(new IntendedUse[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all Intended Use. Reason: " + e);
+            LOG.error("Could not get all Intended Use", e);
             throw new EmfException("Could not get all Intended Use");
         }
     }
@@ -269,10 +268,10 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addDatasetType(DatasetType type) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            
+
             if (dao.containsDatasetType(type.getName(), session))
                 throw new EmfException("DatasetType name already in use");
-            
+
             dao.add(type, session);
             session.close();
         } catch (RuntimeException e) {

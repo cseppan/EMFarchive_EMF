@@ -36,7 +36,7 @@ public class DataServiceImpl implements DataService {
 
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all Datasets. Reason: " + e);
+            LOG.error("Could not get all Datasets", e);
             throw new EmfException("Could not get all Datasets");
         }
     }
@@ -47,7 +47,7 @@ public class DataServiceImpl implements DataService {
             dao.add(dataset, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not get add Dataset - " + dataset.getName() + ". Reason: " + e);
+            LOG.error("Could not add Dataset - " + dataset.getName(), e);
             throw new EmfException("Could not get add Dataset - " + dataset.getName());
         }
     }
@@ -58,7 +58,7 @@ public class DataServiceImpl implements DataService {
             dao.updateWithoutLocking(dataset, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not get update Dataset - " + dataset.getName() + ". Reason: " + e);
+            LOG.error("Could not get update Dataset - " + dataset.getName(), e);
             throw new EmfException("Could not get update Dataset - " + dataset.getName());
         }
     }
@@ -69,7 +69,7 @@ public class DataServiceImpl implements DataService {
             dao.remove(dataset, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not get remove Dataset - " + dataset.getName() + ". Reason: " + e);
+            LOG.error("Could not get remove Dataset - " + dataset.getName(), e);
             throw new EmfException("Could not get remove Dataset - " + dataset.getName());
         }
     }
@@ -82,8 +82,8 @@ public class DataServiceImpl implements DataService {
 
             return locked;
         } catch (RuntimeException e) {
-            LOG.error("Could not obtain lock for Dataset: " + dataset.getName() + " by owner: " + owner.getUsername()
-                    + ".Reason: " + e);
+            LOG.error("Could not obtain lock for Dataset: " + dataset.getName() + " by owner: " + owner.getUsername(),
+                    e);
             throw new EmfException("Could not obtain lock for Dataset: " + dataset.getName() + " by owner: "
                     + owner.getUsername());
         }
@@ -97,8 +97,9 @@ public class DataServiceImpl implements DataService {
 
             return released;
         } catch (RuntimeException e) {
-            LOG.error("Could not release lock for Dataset: " + locked.getName() + " by owner: " + locked.getLockOwner()
-                    + ".Reason: " + e);
+            LOG.error(
+                    "Could not release lock for Dataset: " + locked.getName() + " by owner: " + locked.getLockOwner(),
+                    e);
             throw new EmfException("Could not release lock for Dataset: " + locked.getName() + " by owner: "
                     + locked.getLockOwner());
         }
@@ -112,7 +113,7 @@ public class DataServiceImpl implements DataService {
 
             return released;
         } catch (RuntimeException e) {
-            LOG.error("Could not update Dataset: " + dataset.getName() + ".Reason: " + e);
+            LOG.error("Could not update Dataset: " + dataset.getName(), e);
             throw new EmfException("Could not update Dataset: " + dataset.getName());
         }
     }

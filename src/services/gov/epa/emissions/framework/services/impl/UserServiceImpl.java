@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
 
             if (!user.getEncryptedPassword().equals(password))
                 throw new AuthenticationException("Incorrect Password");
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             LOG.error("Unable to authenticate due to data access failure" + username, e);
             throw new EmfException("Unable to authenticate due to data access failure");
         }
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
             dao.add(user, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not create new user - " + user.getUsername(),e);
+            LOG.error("Could not create new user - " + user.getUsername(), e);
             throw new EmfException("Unable to fetch user due to data access failure");
         }
     }
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
             dao.update(user, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not update user - " + user.getName(),e);
+            LOG.error("Could not update user - " + user.getName(), e);
             throw new EmfException("Unable to update user due to data access failure");
         }
     }
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
             dao.remove(user, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not delete user - " + user.getName(),e);
+            LOG.error("Could not delete user - " + user.getName(), e);
             throw new EmfException("Unable to delete user due to data access failure");
         }
     }
@@ -118,7 +118,8 @@ public class UserServiceImpl implements UserService {
 
             return locked;
         } catch (RuntimeException e) {
-            LOG.error("Could not obtain lock for user: " + object.getUsername() + " by owner: " + owner.getUsername(),e);
+            LOG.error("Could not obtain lock for user: " + object.getUsername() + " by owner: " + owner.getUsername(),
+                    e);
             throw new EmfException("Unable to fetch lock user due to data access failure");
         }
     }
@@ -132,7 +133,7 @@ public class UserServiceImpl implements UserService {
             return released;
         } catch (RuntimeException e) {
             LOG.error("Could not release lock for user: " + object.getUsername() + " by owner: "
-                    + object.getLockOwner(),e);
+                    + object.getLockOwner(), e);
             throw new EmfException("Unable to release lock on user due to data access failure");
         }
     }

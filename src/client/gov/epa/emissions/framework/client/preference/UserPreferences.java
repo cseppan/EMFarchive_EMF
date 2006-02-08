@@ -35,7 +35,7 @@ public class UserPreferences {
             FileInputStream inStream = new FileInputStream(getFile());
             props.load(inStream);
         } catch (Exception e) {
-            log.error("Cannot load user preferences file " + getFile().getAbsolutePath());
+            log.error("Cannot load user preferences file " + getFile().getAbsolutePath(), e);
             throw new EmfException("Cannot load user preferences file");
         }
     }
@@ -49,8 +49,8 @@ public class UserPreferences {
         if (property != null && new File(property).exists())
             return new File(property);
 
-        return new File(System.getProperty("user.home"), 
-           gov.epa.emissions.framework.install.installer.Constants.EMF_CLIENT_PREFERENCES_FILE);
+        return new File(System.getProperty("user.home"),
+                gov.epa.emissions.framework.install.installer.Constants.EMF_CLIENT_PREFERENCES_FILE);
     }
 
     public boolean checkFile(String fileName) {

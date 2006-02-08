@@ -62,7 +62,6 @@ public class DataCommonsDAO {
 
             tx.commit();
         } catch (HibernateException e) {
-            log.error(e);
             tx.rollback();
             throw e;
         }
@@ -118,7 +117,6 @@ public class DataCommonsDAO {
 
             tx.commit();
         } catch (HibernateException e) {
-            log.error(e);
             tx.rollback();
             throw e;
         }
@@ -262,7 +260,6 @@ public class DataCommonsDAO {
 
             tx.commit();
         } catch (HibernateException e) {
-            log.error(e);
             tx.rollback();
             throw e;
         }

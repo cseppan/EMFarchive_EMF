@@ -38,7 +38,7 @@ public class VersionedExporterFactory {
             Constructor exporterConstructor = exporterClass.getDeclaredConstructor(classParams);
             return (Exporter) exporterConstructor.newInstance(params);
         } catch (Exception e) {
-            log.error("Could not create Exporter. Reason: " + e.getMessage());
+            log.error("Could not create Exporter", e);
             throw new EmfException("EMF server error: Could not create exporter");
         }
     }
