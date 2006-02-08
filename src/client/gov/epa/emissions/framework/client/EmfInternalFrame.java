@@ -15,28 +15,24 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
 
     protected DesktopManager desktopManager;
 
-    public EmfInternalFrame(String title) {
+    public EmfInternalFrame(String title, DesktopManager desktopManager) {
         super(title, true, // resizable
                 true, // closable
                 true, // maximizable
                 true);// iconifiable
-
+        
         this.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosing(InternalFrameEvent event) {
                 windowClosing();
                 super.internalFrameClosing(event);
             }
         });
-    }
-
-    public EmfInternalFrame(String title, Dimension dimension) {
-        this(title);
-        dimensions(dimension);
+        this.desktopManager = desktopManager;
     }
 
     public EmfInternalFrame(String title, Dimension dimension, DesktopManager desktopManager) {
-        this(title, dimension);
-        this.desktopManager = desktopManager;
+        this(title, desktopManager);
+        dimensions(dimension);
     }
 
     abstract public void windowClosing();
@@ -54,6 +50,9 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
 
     public void display() {
         super.setVisible(true);
+        if (desktopManager != null) {// FIXME: remove if after finishing the window management
+            desktopManager.registerOpenWindow(this);
+        }
     }
 
     public Position getPosition() {

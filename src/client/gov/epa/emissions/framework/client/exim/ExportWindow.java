@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.FileChooser;
 
@@ -38,8 +39,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     private TextArea purpose;
 
-    public ExportWindow(EmfDataset[] datasets) {
-        super(title(datasets));
+    public ExportWindow(EmfDataset[] datasets, DesktopManager desktopManager) {
+        super(title(datasets), desktopManager);
         super.setName("exportWindow");
         this.datasets = datasets;
 
@@ -53,7 +54,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
             buf.append(datasets[i].getName());
             if (i + 1 <= datasets.length)
                 buf.append(", ");
-         }
+        }
 
         return buf.toString();
     }
@@ -84,7 +85,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         ScrollableTextArea dsArea = new ScrollableTextArea(datasetNames);
         datasetNames.setWrapStyleWord(true);
         datasetNames.setLineWrap(true);
-        dsArea.setMinimumSize(new Dimension(75,75));
+        dsArea.setMinimumSize(new Dimension(75, 75));
         layoutGenerator.addLabelWidgetPair("Datasets", dsArea, panel);
 
         // folder
@@ -93,7 +94,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         Button button = new Button("Choose Folder", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
                 selectFolder();
-            } 
+            }
         });
         JPanel folderPanel = new JPanel(new BorderLayout());
         folderPanel.add(folder);
@@ -191,11 +192,10 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         if (mostRecentUsedFolder != null)
             folder.setText(mostRecentUsedFolder);
     }
-    
+
     private void selectFolder() {
-        FileChooser chooser = new FileChooser(
-                "Select Folder", new File(folder.getText()), ExportWindow.this);
-        
+        FileChooser chooser = new FileChooser("Select Folder", new File(folder.getText()), ExportWindow.this);
+
         chooser.setTitle("Select a folder");
         File file = chooser.choose();
         if (file == null)
@@ -204,10 +204,10 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         if (file.isDirectory()) {
             folder.setText(file.getAbsolutePath());
         }
-        
+
         if (file.isFile()) {
             folder.setText(file.getParent());
         }
     }
-    
+
 }

@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.editor.DataViewer;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -45,13 +46,16 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     private JComboBox defaultVersionsCombo;
 
-    public VersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole) {
+    private DesktopManager desktopManager;
+
+    public VersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole, DesktopManager desktopManager) {
         super.setLayout(new BorderLayout());
         setBorder();
 
         this.dataset = dataset;
         this.messagePanel = messagePanel;
         this.parentConsole = parentConsole;
+        this.desktopManager = desktopManager;
     }
 
     private void setBorder() {
@@ -171,7 +175,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
     }
 
     private void showView(String table, Version version) {
-        DataViewer view = new DataViewer(dataset);
+        DataViewer view = new DataViewer(dataset, desktopManager);
         parentConsole.addToDesktop(view);
         try {
             presenter.doView(version, table, view);

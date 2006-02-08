@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -47,8 +48,9 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
 
     private DataCommonsService service;
 
-    public SectorsManagerWindow(EmfConsole parentConsole) {
-        super("Sector Manager", new Dimension(475, 300), parentConsole.desktop());
+    public SectorsManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
+        super("Sector Manager", new Dimension(475, 300), parentConsole.desktop(), desktopManager);
+        super.setName("sectorManager");
         this.parentConsole = parentConsole;
 
         layout = new JPanel();
@@ -129,26 +131,25 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     private JPanel createCrudPanel() {
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
-        Action viewAction = new AbstractAction(){
+        Action viewAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 viewSectors();
             }
-            
+
         };
-        
+
         String message = "Opening too many windows. Do you want proceed?";
-        ConfirmDialog confirmDialog = new ConfirmDialog(message,"Warning",this);
-        SelectAwareButton viewButton = new SelectAwareButton("View",viewAction,selectModel,confirmDialog);
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
         crudPanel.add(viewButton);
 
-        
-        Action editAction = new AbstractAction(){
+        Action editAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 editSectors();
             }
-            
+
         };
-        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction,selectModel,confirmDialog);
+        SelectAwareButton editButton = new SelectAwareButton("Edit", editAction, selectModel, confirmDialog);
         crudPanel.add(editButton);
 
         JButton newButton = new JButton("New");
@@ -158,7 +159,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
             }
         });
         crudPanel.add(newButton);
-        
+
         return crudPanel;
     }
 
@@ -183,10 +184,10 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
             }
         }
     }
-    
+
     private void createNewSector() {
-            Sector sector = new Sector("New Sector", "New Sector");
-            presenter.displayNewSector(sector, newSectorView());
+        Sector sector = new Sector("New Sector", "New Sector");
+        presenter.displayNewSector(sector, newSectorView());
     }
 
     private void setError(String message) {
@@ -210,7 +211,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
 
     // FIXME: this table refresh sequence applies to every CRUD panel. Refactor
     private ViewSectorWindow displaySectorView() {
-        ViewSectorWindow view = new ViewSectorWindow();
+        ViewSectorWindow view = new ViewSectorWindow(desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
@@ -223,7 +224,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     }
 
     private EditableSectorView editSectorView() {
-        EditSectorWindow view = new EditSectorWindow(this);
+        EditSectorWindow view = new EditSectorWindow(this, desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
@@ -234,9 +235,9 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
 
         return view;
     }
-    
+
     private NewSectorView newSectorView() {
-        NewSectorWindow view = new NewSectorWindow(this);
+        NewSectorWindow view = new NewSectorWindow(this, desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {

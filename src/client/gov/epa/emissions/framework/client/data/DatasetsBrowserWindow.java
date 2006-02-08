@@ -65,15 +65,17 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private EmfTableModel model;
 
-    public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole) throws EmfException {
-        super("Datasets Browser", new Dimension(800, 450), parentConsole.desktop());
+    public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
+            throws EmfException {
+        super("Datasets Browser", new Dimension(800, 450), parentConsole.desktop(),desktopManager);
+        this.session = session;
+        this.parentConsole = parentConsole;
+
         super.setName("datasetsBrowser");
 
-        this.session = session;
         DataService services = session.dataService();
         model = new EmfTableModel(new EmfDatasetTableData(services.getDatasets()));
         selectModel = new SortFilterSelectModel(model);
-        this.parentConsole = parentConsole;
 
         layout = new JPanel();
         this.getContentPane().add(layout);
@@ -82,12 +84,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         // cannot refresh itself. So, we will regen the layout on every
         // refresh - it's a HACK. Will need to be addressed
         createLayout(layout, parentConsole);
-    }
 
-    public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
-            throws EmfException {
-        this(session, parentConsole);
-        super.desktopManager = desktopManager;
     }
 
     private void createLayout(JPanel layout, EmfConsole parentConsole) {
@@ -199,7 +196,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void importDataset() throws EmfException {
-        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktop);
+        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktop, desktopManager);
         desktop.add(importView);
 
         ImportPresenter importPresenter = new DatasetsBrowserAwareImportPresenter(session, session.user(), session
@@ -249,7 +246,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         EmfDataset[] emfDatasets = getNonExternalDatasets(getSelectedDatasets());
         checkKeyVals(emfDatasets);
 
-        ExportWindow exportView = new ExportWindow(emfDatasets);
+        ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager);
         getDesktopPane().add(exportView);
 
         ExportPresenter exportPresenter = new DefaultExportPresenter(session);
@@ -277,7 +274,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         List datasets = getSelectedDatasets();
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
-            DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole);
+            DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
             desktop.add(view);
             EmfDataset dataset = (EmfDataset) iter.next();
             presenter.doDisplayPropertiesView(view, dataset);
@@ -303,7 +300,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         List datasets = getSelectedDatasets();
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
-            VersionedDataWindow view = new VersionedDataWindow(parentConsole);
+            VersionedDataWindow view = new VersionedDataWindow(parentConsole, desktopManager);
             desktop.add(view);
             presenter.doDisplayVersionedData(view, (EmfDataset) iter.next());
         }
@@ -323,8 +320,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     public void display() {
-        this.setVisible(true);
-        desktopManager.registerOpenWindow(this);
+        super.display();
     }
 
     public void refresh(EmfDataset[] datasets) {

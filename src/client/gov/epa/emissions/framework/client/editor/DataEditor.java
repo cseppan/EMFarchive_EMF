@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -41,8 +42,9 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private JLabel lockInfo;
 
-    public DataEditor(EmfDataset dataset) {
-        super("Data Editor: " + dataset.getName());
+    public DataEditor(EmfDataset dataset, DesktopManager desktopManager) {
+        super("Data Editor: " + dataset.getName(), desktopManager);
+        super.setName(dataset.getName());
         setDimension();
         this.dataset = dataset;
 

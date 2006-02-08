@@ -40,10 +40,6 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private EditableKeywordsTab keywordsTab;
 
-    /*
-     * public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole) { super("Dataset Properties Editor",
-     * new Dimension(700, 550)); this.session = session; this.parentConsole = parentConsole; }
-     */
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
         this.session = session;
@@ -118,7 +114,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     public void display(EmfDataset dataset) {
         super.setTitle("Dataset Properties Editor: " + dataset.getName());
-        super.setName("Dataset Properties Editor: " + dataset.getName());
+        super.setName(dataset.getName());
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 
@@ -129,7 +125,6 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         contentPane.add(panel);
-        desktopManager.registerOpenWindow(this);
         super.display();
     }
 

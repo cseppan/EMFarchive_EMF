@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -27,56 +28,56 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
     private SingleLineMessagePanel messagePanel;
 
     private TextField name;
-    
+
     private TextField minFiles;
-    
+
     private TextField maxFiles;
-    
+
     private JComboBox derivedFrom;
 
-    //private DatasetTypesManagerView manager;
+    // private DatasetTypesManagerView manager;
 
-    private static final String[] types = {"External File", "CSV File", "Line-based File",
-        "SMOKE Report File"};
-    
-    public NewDatasetTypeWindow() {
-        super("Create New Dataset Type", new Dimension(600, 260));
+    private static final String[] types = { "External File", "CSV File", "Line-based File", "SMOKE Report File" };
 
-        //this.manager = manager;
+    public NewDatasetTypeWindow(DesktopManager desktopManager) {
+        super("Create New Dataset Type", new Dimension(600, 260), desktopManager);
+        // this.manager = manager;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
     }
-    
+
     private void doLayout(JPanel layout) {
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
         layout.add(createInputPanel());
         layout.add(createButtonsPanel());
     }
-    
+
     public void observe(NewDatasetTypePresenter presenter) {
         this.presenter = presenter;
     }
 
     public void display() {
-        super.setTitle("Create New Dataset Type");
+        String name = "Create New Dataset Type";
+        super.setTitle(name);
+        super.setName(name);// FIXME: will break when two new windows opened
         layout.removeAll();
         doLayout(layout);
 
         super.display();
     }
-    
+
     private JPanel createInputPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         name = new TextField("name", 40);
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
-        
+
         minFiles = new TextField("minfiles", "1", 20);
         layoutGenerator.addLabelWidgetPair("Min Files:", minFiles, panel);
-        
+
         maxFiles = new TextField("maxfiles", "-1", 20);
         layoutGenerator.addLabelWidgetPair("Max Files:", maxFiles, panel);
 
@@ -90,42 +91,42 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
         return panel;
     }
-    
+
     private boolean isDigit(String text) {
-        if(!Character.isDigit(text.charAt(0)) && text.charAt(0) != '-')
+        if (!Character.isDigit(text.charAt(0)) && text.charAt(0) != '-')
             return false;
-        
+
         for (int n = 1; n < text.length(); n++) {
             if (!Character.isDigit(text.charAt(n))) {
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     private boolean checkTextFields() {
-        if(name.getText().equals(""))
+        if (name.getText().equals(""))
             messagePanel.setError("Name field should be a non-empty string.");
-        else if(!isDigit(minFiles.getText()))
+        else if (!isDigit(minFiles.getText()))
             messagePanel.setError("Min Files field should only contain a number.");
-        else if(!isDigit(maxFiles.getText()))
+        else if (!isDigit(maxFiles.getText()))
             messagePanel.setError("Max Files field should only contain a number.");
         else {
             messagePanel.clear();
             return true;
         }
-        
+
         return false;
     }
-    
+
     private Action saveAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                if(checkTextFields()) {
+                if (checkTextFields()) {
                     try {
-                        presenter.doSave(name.getText(), minFiles.getText(),
-                                maxFiles.getText(), (String)derivedFrom.getSelectedItem());
+                        presenter.doSave(name.getText(), minFiles.getText(), maxFiles.getText(), (String) derivedFrom
+                                .getSelectedItem());
                     } catch (EmfException e) {
                         messagePanel.setError(e.getMessage());
                     }
@@ -135,7 +136,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
         return action;
     }
-    
+
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -145,7 +146,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
         return action;
     }
-    
+
     private JPanel createButtonsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 

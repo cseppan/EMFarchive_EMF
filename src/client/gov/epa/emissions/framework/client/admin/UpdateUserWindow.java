@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -25,10 +26,11 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
 
     private EditableUserProfilePanel panel;
 
-    public UpdateUserWindow(User user, AdminOption adminOption) {
-        super("Update User: " + user.getUsername());
+    public UpdateUserWindow(User user, AdminOption adminOption, DesktopManager desktopManager) {
+        super("Update User: " + user.getUsername(), desktopManager);
 
         this.windowTitle = "Update User: " + user.getUsername();
+        super.setName(user.getUsername());
         this.user = user;
 
         JPanel container = new JPanel();
@@ -40,8 +42,8 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
         super.setResizable(false);
     }
 
-    public UpdateUserWindow(User user) {
-        this(user, new NoAdminOption());
+    public UpdateUserWindow(User user, DesktopManager desktopManager) {
+        this(user, new NoAdminOption(), desktopManager);
     }
 
     private EditableUserProfilePanel createLayout(AdminOption adminOption) {

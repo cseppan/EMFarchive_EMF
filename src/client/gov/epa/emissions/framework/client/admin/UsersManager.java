@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.UserService;
 import gov.epa.mims.analysisengine.table.OverallTableModel;
@@ -56,8 +57,9 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     private EmfSession session;
 
     // FIXME: this class needs to be refactored into smaller components
-    public UsersManager(EmfSession session, UserService userServices, EmfConsole parentConsole) {
-        super("User Manager", new Dimension(550, 300), parentConsole.desktop());
+    public UsersManager(EmfSession session, UserService userServices, EmfConsole parentConsole, DesktopManager desktopManager) {
+        super("User Manager", new Dimension(550, 300), parentConsole.desktop(),desktopManager);
+        super.setName("userManager");
         this.session = session;
         this.parentConsole = parentConsole;
 
@@ -117,8 +119,8 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     public UpdatableUserView getUpdateUserView(User updateUser) {
-        UpdateUserWindow view = updateUser.equals(session.user()) ? new DisposableUpdateUserWindow(updateUser)
-                : new DisposableUpdateUserWindow(updateUser, new AddAdminOption());
+        UpdateUserWindow view = updateUser.equals(session.user()) ? new DisposableUpdateUserWindow(updateUser, desktopManager)
+                : new DisposableUpdateUserWindow(updateUser, new AddAdminOption(), desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
@@ -131,7 +133,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     public UserView getUserView() {
-        ViewUserWindow view = new DisposableViewUserWindow();
+        ViewUserWindow view = new DisposableViewUserWindow(desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
@@ -256,7 +258,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
     private void displayRegisterUser() {
         RegisterUserInternalFrame registerUserView = new RegisterUserInternalFrame(new NoOpPostRegisterStrategy(),
-                desktop);
+                desktop, desktopManager);
         desktop.add(registerUserView);
 
         // FIXME: should be notifying the Presenter

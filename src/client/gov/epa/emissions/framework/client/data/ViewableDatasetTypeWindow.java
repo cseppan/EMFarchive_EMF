@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.TableData;
 
@@ -35,8 +36,8 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private SingleLineMessagePanel messagePanel;
 
-    public ViewableDatasetTypeWindow() {
-        super("View Dataset Type", new Dimension(550, 400));
+    public ViewableDatasetTypeWindow(DesktopManager desktopManager) {
+        super("View Dataset Type", new Dimension(550, 400), desktopManager);
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -49,6 +50,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
 
     public void display(DatasetType type) {
         super.setTitle("View Dataset Type: " + type.getName());
+        super.setName(type.getName());
         layout.removeAll();
         doLayout(layout, type);
 
@@ -83,7 +85,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         TextArea description = new TextArea("description", type.getDescription(), 40);
         description.setEditable(false);
         ScrollableTextArea descScrollableTextArea = new ScrollableTextArea(description);
-        descScrollableTextArea.setMinimumSize(new Dimension(80,80));
+        descScrollableTextArea.setMinimumSize(new Dimension(80, 80));
         layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, panel);
 
         // Lay out the panel.
@@ -109,7 +111,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private JPanel createButtonsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         Button closeButton = new Button("Close", closeAction());
         panel.add(closeButton, BorderLayout.LINE_END);

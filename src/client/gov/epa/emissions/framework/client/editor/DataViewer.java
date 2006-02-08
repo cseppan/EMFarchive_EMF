@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Dimensions;
@@ -28,8 +29,9 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     private EmfDataset dataset;
 
-    public DataViewer(EmfDataset dataset) {
-        super("Data Viewer [Dataset:" + dataset.getName());
+    public DataViewer(EmfDataset dataset, DesktopManager desktopManager) {
+        super("Data Viewer [Dataset:" + dataset.getName(),desktopManager);
+        super.setName(dataset.getName());
         setDimension();
         this.dataset = dataset;
         

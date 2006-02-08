@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTab;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTab;
@@ -33,15 +34,15 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     private EmfSession session;
 
-    public DatasetPropertiesViewer(EmfSession session, EmfConsole parentConsole) {
-        super("Dataset Properties View", new Dimension(700, 500));
+    public DatasetPropertiesViewer(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
+        super("Dataset Properties View", new Dimension(700, 500), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
     }
 
     public void display(EmfDataset dataset) {
         super.setTitle("Dataset Properties View: " + dataset.getName());
-        super.setName("Dataset Properties View: " + dataset.getName());
+        super.setName(dataset.getName());
 
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
@@ -79,7 +80,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         ServiceLocator serviceLocator = session.serviceLocator();
         DataViewService dataViewService = serviceLocator.dataViewService();
 
-        DataTab view = new DataTab(parentConsole);
+        DataTab view = new DataTab(parentConsole, desktopManager);
         DataTabPresenter presenter = new DataTabPresenter(view, dataset, dataViewService);
         presenter.doDisplay();
 

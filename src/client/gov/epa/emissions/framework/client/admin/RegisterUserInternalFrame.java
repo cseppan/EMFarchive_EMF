@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 
 import javax.swing.JDesktopPane;
 
@@ -8,9 +9,11 @@ public class RegisterUserInternalFrame extends ReusableInteralFrame implements R
 
     private RegisterUserPanel view;
 
-    public RegisterUserInternalFrame(PostRegisterStrategy postRegisterStrategy, JDesktopPane desktop) {
-        super("Register New User", desktop);
-
+    public RegisterUserInternalFrame(PostRegisterStrategy postRegisterStrategy, JDesktopPane desktop,
+            DesktopManager desktopManager) {
+        super("Register New User", desktop, desktopManager);
+        super.setName("registerNewUser");
+        
         view = new RegisterUserPanel(postRegisterStrategy, new CloseViewOnCancelStrategy(), this, new AddAdminOption());
 
         super.dimensions(view.getSize());

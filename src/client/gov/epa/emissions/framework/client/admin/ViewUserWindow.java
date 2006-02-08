@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -23,8 +24,8 @@ public abstract class ViewUserWindow extends EmfInternalFrame implements UserVie
 
     private SingleLineMessagePanel messagePanel;
 
-    public ViewUserWindow() {
-        super("User: ", new Dimension(350, 425));
+    public ViewUserWindow(DesktopManager desktopManager) {
+        super("User: ", new Dimension(350, 425), desktopManager);
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -35,6 +36,7 @@ public abstract class ViewUserWindow extends EmfInternalFrame implements UserVie
         doLayout(user);
 
         super.setTitle("User: " + user.getUsername());
+        super.setName(user.getUsername());
         super.dimensions(layout.getSize());
         super.setResizable(false);
 

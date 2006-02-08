@@ -36,4 +36,11 @@ public class WindowMenuPresenterTest extends MockObjectTestCase {
         managedView.expects(once()).method("bringToFront").withNoArguments();
         presenter.select(managedViewProxy);
     }
+
+    public void testShouldCloseAllOnBeingSelectedFromMenu() {
+        Mock mock = mock(DesktopManager.class);
+        presenter.setDesktopManager((DesktopManager) mock.proxy());
+        mock.expects(once()).method("closeAll").withNoArguments();
+        presenter.closeAll();
+    }
 }

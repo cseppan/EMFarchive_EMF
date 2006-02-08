@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
@@ -53,8 +54,9 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     private static File lastFolder = null;
 
-    public ImportWindow(DataCommonsService service, JDesktopPane desktop) throws EmfException {
-        super("Import Dataset", new Dimension(650, 300), desktop);
+    public ImportWindow(DataCommonsService service, JDesktopPane desktop, DesktopManager desktopManager)
+            throws EmfException {
+        super("Import Dataset", new Dimension(650, 300), desktop, desktopManager);
         super.setName("importWindow");
         this.service = service;
 
@@ -258,9 +260,9 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
                 presenter.doImport(folder.getText(), filename.getText(), (DatasetType) datasetTypesModel
                         .getSelectedItem());
             } else {
-                if(!name.getText().equals("")) {
+                if (!name.getText().equals("")) {
                     presenter.doImport(folder.getText(), filename.getText(), name.getText(),
-                        (DatasetType) datasetTypesModel.getSelectedItem());
+                            (DatasetType) datasetTypesModel.getSelectedItem());
                     String message = "Started import. Please monitor the Status window to track your Import request.";
                     messagePanel.setMessage(message);
                 } else {

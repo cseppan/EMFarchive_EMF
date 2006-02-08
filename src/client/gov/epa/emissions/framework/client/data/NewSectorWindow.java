@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -38,8 +39,8 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
 
     private SectorsManagerView sectorManager;
 
-    public NewSectorWindow(SectorsManagerView sectorManager) {
-        super("Create New Sector", new Dimension(550, 400));
+    public NewSectorWindow(SectorsManagerView sectorManager, DesktopManager desktopManager) {
+        super("Create New Sector", new Dimension(550, 400), desktopManager);
 
         this.sectorManager = sectorManager;
         layout = new JPanel();
@@ -52,7 +53,9 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
     }
 
     public void display(Sector sector) {
-        super.setTitle("Create New Sector: " + sector.getName());
+        String name = "Create New Sector: " + sector.getName();
+        super.setTitle(name);
+        super.setName(name);// FIXME: will break when two new windows opened
         layout.removeAll();
         doLayout(layout, sector);
 
@@ -123,7 +126,7 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
                 sector.setDescription(description.getText());
                 sector.setSectorCriteria(criteriaTableData.sources());
                 try {
-                    if(!name.getText().equals(""))
+                    if (!name.getText().equals(""))
                         presenter.doSave(sectorManager);
                     else
                         messagePanel.setError("Name field should be a non-empty string.");
@@ -144,11 +147,11 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                    presenter.doClose();
+                presenter.doClose();
             }
         };
 
         return action;
     }
-    
+
 }

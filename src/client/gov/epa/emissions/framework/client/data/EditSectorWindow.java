@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -38,8 +39,8 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
 
     private SectorsManagerView sectorManager;
 
-    public EditSectorWindow(SectorsManagerView sectorManager) {
-        super("Edit Sector", new Dimension(550, 400));
+    public EditSectorWindow(SectorsManagerView sectorManager, DesktopManager desktopManager) {
+        super("Edit Sector", new Dimension(550, 400),desktopManager);
 
         this.sectorManager = sectorManager;
         layout = new JPanel();
@@ -53,6 +54,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
 
     public void display(Sector sector) {
         super.setTitle("Edit Sector: " + sector.getName());
+        super.setName(sector.getName());
         layout.removeAll();
         doLayout(layout, sector);
 

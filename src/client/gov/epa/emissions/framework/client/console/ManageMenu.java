@@ -37,7 +37,7 @@ public class ManageMenu extends JMenu {
 
     private ViewLayout viewLayout;
 
-    private DesktopManager desktopManger;
+    private DesktopManager desktopManager;
 
     // FIXME: where's the associated Presenter ?
     public ManageMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, ViewLayout viewLayout) {
@@ -59,7 +59,7 @@ public class ManageMenu extends JMenu {
     
     public ManageMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, ViewLayout viewLayout, DesktopManager desktopManager) {
         this(session,parent,messagePanel,viewLayout);
-        this.desktopManger = desktopManager;
+        this.desktopManager = desktopManager;
     }
 
     private JMenuItem createMyProfile(final EmfSession session, final MessagePanel messagePanel) {
@@ -140,7 +140,7 @@ public class ManageMenu extends JMenu {
         if (viewLayout.activate("DatasetTypes Manager"))
             return;
 
-        DatasetTypesManagerWindow view = new DatasetTypesManagerWindow(parent);
+        DatasetTypesManagerWindow view = new DatasetTypesManagerWindow(parent, desktopManager);
         viewLayout.add(view, "DatasetTypes Manager");
         parent.addToDesktop(view);
 
@@ -152,7 +152,7 @@ public class ManageMenu extends JMenu {
         if (viewLayout.activate("Sectors Manager"))
             return;
 
-        SectorsManagerWindow view = new SectorsManagerWindow(parent);
+        SectorsManagerWindow view = new SectorsManagerWindow(parent, desktopManager);
         viewLayout.add(view, "Sectors Manager");
         parent.addToDesktop(view);
 
@@ -164,7 +164,7 @@ public class ManageMenu extends JMenu {
         if (viewLayout.activate("Datasets Browser"))
             return;
 
-        DatasetsBrowserWindow datasetsBrowserView = new DatasetsBrowserWindow(session, parent,desktopManger);
+        DatasetsBrowserWindow datasetsBrowserView = new DatasetsBrowserWindow(session, parent,desktopManager);
         viewLayout.add(datasetsBrowserView, "Datasets Browser");
         parent.addToDesktop(datasetsBrowserView);
 
@@ -173,10 +173,10 @@ public class ManageMenu extends JMenu {
     }
 
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
-        UpdateMyProfileWindow updatable = new UpdateMyProfileWindow(session.user(), parent.desktop());
+        UpdateMyProfileWindow updatable = new UpdateMyProfileWindow(session.user(), parent.desktop(), desktopManager);
         parent.addToDesktop(updatable);
 
-        ViewMyProfileWindow viewable = new ViewMyProfileWindow(parent.desktop());
+        ViewMyProfileWindow viewable = new ViewMyProfileWindow(parent.desktop(), desktopManager);
         parent.addToDesktop(viewable);
 
         UpdateUserPresenter presenter = new UpdateUserPresenterImpl(session, session.user(), session.userService());
@@ -193,7 +193,7 @@ public class ManageMenu extends JMenu {
 
         UserService userServices = session.userService();
 
-        UsersManager usesrManagerView = new UsersManager(session, userServices, parent);
+        UsersManager usesrManagerView = new UsersManager(session, userServices, parent, desktopManager);
         viewLayout.add(usesrManagerView, "Users Manager");
         parent.addToDesktop(usesrManagerView);
 

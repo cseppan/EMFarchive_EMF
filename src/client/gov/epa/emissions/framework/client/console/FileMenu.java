@@ -21,8 +21,11 @@ public class FileMenu extends JMenu {
 
     private ViewLayout viewLayout;
 
+    private DesktopManager desktopManager;
+
     // FIXME: where's the associated Presenter ?
-    public FileMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, ViewLayout viewLayout) {
+    public FileMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, ViewLayout viewLayout,
+            DesktopManager desktopManager) {
         super("File");
         super.setName("file");
 
@@ -32,6 +35,7 @@ public class FileMenu extends JMenu {
         super.add(createExit());
 
         this.viewLayout = viewLayout;
+        this.desktopManager = desktopManager;
     }
 
     private JMenuItem createExit() {
@@ -88,7 +92,7 @@ public class FileMenu extends JMenu {
         if (viewLayout.activate("Import Dataset - FileMenu"))
             return;
 
-        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktop);
+        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktop, desktopManager);
         viewLayout.add(importView, "Import Dataset - FileMenu");
         desktop.add(importView);
 

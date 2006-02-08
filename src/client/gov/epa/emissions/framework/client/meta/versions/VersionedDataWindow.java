@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -26,9 +27,9 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
 
     private JPanel layout;
 
-    public VersionedDataWindow(EmfConsole parentConsole) {
-        super("Data Versions Editor", new Dimension(750, 350), parentConsole.desktop());
-
+    public VersionedDataWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
+        super("Data Versions Editor", new Dimension(750, 350), parentConsole.desktop(),desktopManager);
+        super.setName("dataVersionsEditor");
         this.parentConsole = parentConsole;
         layout = new JPanel();
         this.getContentPane().add(layout);
@@ -58,7 +59,7 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
 
     private EditVersionsPanel createVersionsPanel(EditVersionsPresenter versionsPresenter, EmfDataset dataset,
             MessagePanel messagePanel) {
-        EditVersionsPanel versionsPanel = new EditVersionsPanel(dataset, messagePanel, parentConsole);
+        EditVersionsPanel versionsPanel = new EditVersionsPanel(dataset, messagePanel, parentConsole, desktopManager);
         try {
             versionsPresenter.display(versionsPanel);
         } catch (EmfException e) {

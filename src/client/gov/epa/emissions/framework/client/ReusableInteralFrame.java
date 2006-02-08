@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client;
 
+import gov.epa.emissions.framework.client.console.DesktopManager;
+
 import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.List;
@@ -10,13 +12,13 @@ public abstract class ReusableInteralFrame extends EmfInternalFrame {
 
     protected JDesktopPane desktop;
 
-    public ReusableInteralFrame(String title, JDesktopPane desktop) {
-        super(title);
+    public ReusableInteralFrame(String title, Dimension dimension, JDesktopPane desktop, DesktopManager desktopManager) {
+        super(title, dimension, desktopManager);
         this.desktop = desktop;
     }
 
-    public ReusableInteralFrame(String title, Dimension dimension, JDesktopPane desktop) {
-        super(title, dimension);
+    public ReusableInteralFrame(String title, JDesktopPane desktop, DesktopManager desktopManager) {
+        super(title, desktopManager);
         this.desktop = desktop;
     }
 

@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.TableData;
 
@@ -35,8 +36,8 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
 
     private SingleLineMessagePanel messagePanel;
 
-    public ViewSectorWindow() {
-        super("View Sector", new Dimension(550, 400));
+    public ViewSectorWindow(DesktopManager desktopManager) {
+        super("View Sector", new Dimension(550, 400),desktopManager);
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -49,6 +50,7 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
 
     public void display(Sector sector) {
         super.setTitle("View Sector: " + sector.getName());
+        super.setName(sector.getName());
         layout.removeAll();
         doLayout(layout, sector);
 

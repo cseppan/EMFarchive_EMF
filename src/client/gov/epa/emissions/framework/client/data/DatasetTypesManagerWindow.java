@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
@@ -9,6 +10,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -47,8 +49,9 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     private DataCommonsService service;
 
-    public DatasetTypesManagerWindow(EmfConsole parentConsole) {
-        super("Dataset Type Manager", new Dimension(600, 300), parentConsole.desktop());
+    public DatasetTypesManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
+        super("Dataset Type Manager", new Dimension(600, 300), parentConsole.desktop(), desktopManager);
+        super.setName("datasetTypeManager");
         this.parentConsole = parentConsole;
 
         layout = new JPanel();
@@ -121,15 +124,15 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     private JPanel createCrudPanel() {
         String message = "Opening too many windows. Do you want proceed?";
-        ConfirmDialog confirmDialog = new ConfirmDialog(message,"Warning",this);
-        
+        ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
+
         Action viewAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 viewDatasetTypes();
             }
         };
         SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
-        
+
         Action editAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 editDatasetTypes();
@@ -142,7 +145,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
                 createDatasetTypes();
             }
         };
-        SelectAwareButton newButton = new SelectAwareButton("New", createAction, selectModel, confirmDialog);
+        Button newButton = new Button("New", createAction);
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
         crudPanel.add(viewButton);
@@ -177,7 +180,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
             }
         }
     }
-    
+
     private void createDatasetTypes() {
         presenter.displayNewDatasetTypeView(newTypeView());
     }
@@ -197,7 +200,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private ViewableDatasetTypeWindow viewableView() {
-        ViewableDatasetTypeWindow view = new ViewableDatasetTypeWindow();
+        ViewableDatasetTypeWindow view = new ViewableDatasetTypeWindow(desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
@@ -210,7 +213,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private EditableDatasetTypeView editableView() {
-        EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(this);
+        EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(this, desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
@@ -221,9 +224,9 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
         return view;
     }
-    
+
     private NewDatasetTypeView newTypeView() {
-        NewDatasetTypeWindow view = new NewDatasetTypeWindow();
+        NewDatasetTypeWindow view = new NewDatasetTypeWindow(desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {

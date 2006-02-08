@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.status;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.TextAreaTableCellRenderer;
@@ -36,8 +37,8 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
     private StatusPresenter presenter;
 
-    public StatusWindow(Container parent, JDesktopPane desktop) {
-        super("Status", desktop);
+    public StatusWindow(Container parent, JDesktopPane desktop, DesktopManager desktopManager) {
+        super("Status", desktop, desktopManager);
         super.setName("statusWindow");
 
         position(parent);
@@ -120,10 +121,10 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         statusTableModel = new StatusTableModel();
         JTable table = new JTable(statusTableModel);
         table.setName("statusMessages");
-        //FIXME: code put in for the demo
+        // FIXME: code put in for the demo
         table.setRowHeight(36);
         table.setDefaultRenderer(Object.class, new TextAreaTableCellRenderer());
-        
+
         setColumnWidths(table.getColumnModel());
         table.setPreferredScrollableViewportSize(this.getSize());
 
@@ -149,6 +150,11 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
     public void close() {
         super.dispose();
+    }
+
+    public void display() {
+        setVisible(true);
+        //don't register through desktopmanager, since we don't want to close this window
     }
 
     public void update(Status[] statuses) {

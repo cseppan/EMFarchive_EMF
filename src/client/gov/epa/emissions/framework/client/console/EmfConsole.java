@@ -85,7 +85,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private void showStatus() {
         DataCommonsService statusServices = serviceLocator.dataCommonsService();
-        StatusWindow status = new StatusWindow(this, desktop);
+        StatusWindow status = new StatusWindow(this, desktop, desktopManager);
         windowMenuPresenter.notifyAdd(status);
 
         desktop.add(status);
@@ -125,7 +125,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private JMenu createFileMenu(EmfSession session) {
-        return new FileMenu(session, this, messagePanel, viewLayout);
+        return new FileMenu(session, this, messagePanel, viewLayout, desktopManager);
     }
 
     public void doClose() {

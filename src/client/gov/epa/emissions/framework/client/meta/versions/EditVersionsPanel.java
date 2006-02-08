@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.editor.DataViewer;
 import gov.epa.emissions.framework.client.editor.DataEditor;
@@ -50,13 +51,16 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
 
     private JComboBox defaultVersionsCombo;
 
-    public EditVersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole) {
+    private DesktopManager desktopManager;
+
+    public EditVersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole, DesktopManager desktopManger) {
         super.setLayout(new BorderLayout());
         setBorder();
 
         this.dataset = dataset;
         this.messagePanel = messagePanel;
         this.parentConsole = parentConsole;
+        this.desktopManager = desktopManger;
     }
 
     private void setBorder() {
@@ -291,7 +295,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     }
 
     private void showView(String table, Version version) {
-        DataViewer view = new DataViewer(dataset);
+        DataViewer view = new DataViewer(dataset, desktopManager);
         parentConsole.addToDesktop(view);
         try {
             if (dataset.getInternalSources().length > 0)
@@ -326,7 +330,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     }
 
     private void showEditor(String table, Version version) {
-        DataEditor view = new DataEditor(dataset);
+        DataEditor view = new DataEditor(dataset, desktopManager);
         parentConsole.addToDesktop(view);
         try {
             if (dataset.getInternalSources().length > 0)

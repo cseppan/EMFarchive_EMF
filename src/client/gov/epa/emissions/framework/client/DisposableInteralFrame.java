@@ -6,16 +6,12 @@ import java.awt.Dimension;
 
 public abstract class DisposableInteralFrame extends EmfInternalFrame {
 
-    public DisposableInteralFrame(String title) {
-        super(title);
-    }
-
-    public DisposableInteralFrame(String title, Dimension dimension) {
-        super(title, dimension);
-    }
-
     public DisposableInteralFrame(String title, Dimension dimension, DesktopManager desktopManager) {
         super(title, dimension, desktopManager);
+    }
+
+    public DisposableInteralFrame(String title, DesktopManager desktopManager) {
+        super(title, desktopManager);
     }
 
     public void windowClosing() {
@@ -27,7 +23,7 @@ public abstract class DisposableInteralFrame extends EmfInternalFrame {
     }
 
     public boolean isAlive() {
-       // return !super.isClosed();
+        // return !super.isClosed();
         return false;
     }
 }

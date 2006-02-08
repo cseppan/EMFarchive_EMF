@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.versions.VersionsPanel;
 import gov.epa.emissions.framework.client.meta.versions.VersionsViewPresenter;
@@ -20,9 +21,12 @@ public class DataTab extends JPanel implements DataTabView {
 
     private SingleLineMessagePanel messagePanel;
 
-    public DataTab(EmfConsole parentConsole) {
+    private DesktopManager desktopManager;
+
+    public DataTab(EmfConsole parentConsole, DesktopManager desktopManager) {
         setName("dataTab");
         this.parentConsole = parentConsole;
+        this.desktopManager = desktopManager;
     }
 
     public void display(EmfDataset dataset, DataViewService service) {
@@ -43,7 +47,7 @@ public class DataTab extends JPanel implements DataTabView {
     }
 
     private VersionsPanel versionsPanel(EmfDataset dataset, DataViewService service, MessagePanel messagePanel) {
-        VersionsPanel versionsPanel = new VersionsPanel(dataset, messagePanel, parentConsole);
+        VersionsPanel versionsPanel = new VersionsPanel(dataset, messagePanel, parentConsole, desktopManager);
         VersionsViewPresenter versionsPresenter = new VersionsViewPresenter(dataset, service);
         try {
             versionsPresenter.display(versionsPanel);

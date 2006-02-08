@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -42,8 +43,8 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private DatasetTypeKeywordsPanel keywordsPanel;
 
-    public EditableDatasetTypeWindow(DatasetTypesManagerView manager) {
-        super("Edit Dataset Type", new Dimension(600, 500));
+    public EditableDatasetTypeWindow(DatasetTypesManagerView manager, DesktopManager desktopManager) {
+        super("Edit Dataset Type", new Dimension(600, 500),desktopManager);
 
         this.manager = manager;
         layout = new JPanel();
@@ -57,6 +58,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     public void display(DatasetType type, Keyword[] keywords) {
         super.setTitle("Edit Dataset Type: " + type.getName());
+        super.setName(type.getName());
         layout.removeAll();
         doLayout(layout, type, keywords);
 
