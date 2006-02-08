@@ -16,9 +16,11 @@ import org.hibernate.criterion.Restrictions;
 public class DatasetDaoTest extends ServicesTestCase {
 
     private DatasetDao dao;
+
     private DataCommonsDAO dcDao;
+
     private UserDAO userDAO;
-    
+
     protected void doSetUp() throws Exception {
         deleteAllDatasets();
         dao = new DatasetDao();
@@ -52,8 +54,8 @@ public class DatasetDaoTest extends ServicesTestCase {
         Country country = new Country("test-country");
 
         try {
-            dcDao.add(country,session);
-           dataset.setCountry(country);
+            dcDao.add(country, session);
+            dataset.setCountry(country);
 
             dao.updateWithoutLocking(dataset, session);
             EmfDataset result = load(dataset);
@@ -167,12 +169,6 @@ public class DatasetDaoTest extends ServicesTestCase {
         }
 
         fail("Should have failed to release lock that was not obtained");
-    }
-
-    private void remove(Object object) {
-        Transaction tx = session.beginTransaction();
-        session.delete(object);
-        tx.commit();
     }
 
     private EmfDataset newDataset() {

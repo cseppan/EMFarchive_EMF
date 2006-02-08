@@ -1,3 +1,4 @@
+delete from emf.datasets_sectors;
 delete from emissions.versions;
 delete from emf.countries;
 delete from emf.dataset_access_logs;
@@ -16,5 +17,4 @@ delete from emf.users;
 delete from emf.intended_uses;
 delete from emf.projects;
 delete from emf.regions;
-delete from emf.datasets_sectors;
 

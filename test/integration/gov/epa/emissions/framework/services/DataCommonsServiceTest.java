@@ -125,7 +125,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         Sector modified3 = service.updateSector(modified);
         assertEquals(sector.getName(), modified3.getName());
     }
-    
+
     public void testShouldAddDatasetType() throws EmfException {
         String newname = "MyDatasetType" + Math.abs(new Random().nextInt());
         DatasetType newtype = new DatasetType(newname);
@@ -138,25 +138,47 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         newtype.setExternal(false);
         int existingTypes = service.getDatasetTypes().length;
         service.addDatasetType(newtype);
-        
+
         assertEquals(existingTypes + 1, service.getDatasetTypes().length);
         assertTrue(currentDatasetType(newtype).getName().equalsIgnoreCase(newname));
     }
-    
+
     public void testShouldAddSector() throws EmfException {
         String newname = "MySector" + Math.abs(new Random().nextInt());
         Sector newSector = new Sector(newname, newname);
         boolean newSectorAdded = false;
         int existingSectors = service.getSectors().length;
-        
+
         service.addSector(newSector);
-        Sector[] sectors = service.getSectors();
-        for(int i = 0; i < sectors.length; i++)
-            if(sectors[i].getName().equalsIgnoreCase(newname))
-                newSectorAdded = true;
-        
-        assertEquals(existingSectors + 1, service.getSectors().length);
-        assertTrue(newSectorAdded);
+        try {
+            Sector[] sectors = service.getSectors();
+            for (int i = 0; i < sectors.length; i++)
+                if (sectors[i].getName().equalsIgnoreCase(newname))
+                    newSectorAdded = true;
+
+            assertEquals(existingSectors + 1, service.getSectors().length);
+            assertTrue(newSectorAdded);
+        } finally {
+            remove(newSector);
+        }
+    }
+
+    public void testShouldFailOnAttemptToAddSectorWithDuplicateName() throws EmfException {
+        String name = "MySector" + Math.abs(new Random().nextInt());
+        Sector sector1 = new Sector("Desc", name);
+        service.addSector(sector1);
+
+        try {
+            Sector sector2 = new Sector("Desc", name);
+            service.addSector(sector2);
+        } catch (EmfException e) {
+            assertEquals("Sector name already in use", e.getMessage());
+            return;
+        } finally {
+            remove(sector1);
+        }
+
+        fail("Should have failed to add Sector w/ duplicate name");
     }
 
     public void testShouldUpdateDatasetType() throws EmfException {

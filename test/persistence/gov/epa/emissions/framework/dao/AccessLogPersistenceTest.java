@@ -13,9 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Transaction;
 
 public class AccessLogPersistenceTest extends HibernateTestCase {
 
@@ -90,24 +88,6 @@ public class AccessLogPersistenceTest extends HibernateTestCase {
         Query query = session.createQuery("SELECT type FROM DatasetType AS type WHERE name='" + name + "'");
         List list = query.list();
         return list.size() == 1 ? (DatasetType) list.get(0) : null;
-    }
-
-    private void save(Object element) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            session.save(element);
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
-    }
-
-    private void remove(Object object) {
-        Transaction tx = session.beginTransaction();
-        session.delete(object);
-        tx.commit();
     }
 
 }

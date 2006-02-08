@@ -155,6 +155,11 @@ public class DataCommonsDAO {
         return session.createCriteria(Sector.class).addOrder(Order.asc("name")).list();
     }
 
+    public boolean containsSector(String name, Session session) {
+        Criteria crit = session.createCriteria(Sector.class).add(Restrictions.eq("name", name));
+        return crit.uniqueResult() != null;
+    }
+
     public List getDatasetTypes(Session session) {
         return session.createCriteria(DatasetType.class).addOrder(Order.asc("name")).list();
     }
@@ -275,11 +280,11 @@ public class DataCommonsDAO {
     public void add(DatasetType datasetType, Session session) {
         addObject(datasetType, session);
     }
-    
+
     public void add(Sector sector, Session session) {
         addObject(sector, session);
     }
-    
+
     private void addObject(Object obj, Session session) {
         Transaction tx = null;
         try {

@@ -31,7 +31,7 @@ public class DataServiceTest extends ServicesTestCase {
         service = new DataServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
         dataCommonsService = new DataCommonsServiceImpl(sessionFactory);
-
+    
         deleteAllDatasets();
     }
 
@@ -102,7 +102,7 @@ public class DataServiceTest extends ServicesTestCase {
 
     private EmfDataset newDataset() throws EmfException {
         EmfDataset dataset = new EmfDataset();
-        
+
         User owner = userService.getUser("emf");
 
         dataset.setName("dataset-dao-test" + new Random().nextInt());
@@ -135,14 +135,6 @@ public class DataServiceTest extends ServicesTestCase {
             tx.rollback();
             throw e;
         }
-    }
-
-    private void remove(Object object) {
-        session.clear();// flush cached objects
-
-        Transaction tx = session.beginTransaction();
-        session.delete(object);
-        tx.commit();
     }
 
     public void testShouldAddMultipleSectors() throws EmfException {

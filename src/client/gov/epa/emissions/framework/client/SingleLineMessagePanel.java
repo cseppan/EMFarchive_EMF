@@ -10,7 +10,10 @@ public class SingleLineMessagePanel extends MessagePanel {
 
     private String message;
 
+    private Color background;
+
     public SingleLineMessagePanel() {
+        background = super.getBackground();
         label = new JLabel(" ");
         super.add(label);
 
@@ -20,6 +23,7 @@ public class SingleLineMessagePanel extends MessagePanel {
     public void clear() {
         message = "";
         label.setText(" ");
+        super.setBackground(background);
     }
 
     public void setMessage(String message, Color color) {       
@@ -27,6 +31,7 @@ public class SingleLineMessagePanel extends MessagePanel {
 
         this.message = message;
         label.setForeground(color);
+        super.setBackground(new Color(227, 224, 251));
         label.setText(message);
 
         super.setVisible(true);

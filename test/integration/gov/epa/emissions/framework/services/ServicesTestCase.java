@@ -26,6 +26,7 @@ import javax.sql.DataSource;
 import junit.framework.TestCase;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public abstract class ServicesTestCase extends TestCase {
 
@@ -110,6 +111,14 @@ public abstract class ServicesTestCase extends TestCase {
 
     protected void createVersionedTable(String table, Datasource datasource, Column[] cols) throws Exception {
         new VersionedTable(datasource, sqlDataTypes()).create(table, cols);
+    }
+
+    protected void remove(Object object) {
+        session.clear();// flush cached objects
+
+        Transaction tx = session.beginTransaction();
+        session.delete(object);
+        tx.commit();
     }
 
 }

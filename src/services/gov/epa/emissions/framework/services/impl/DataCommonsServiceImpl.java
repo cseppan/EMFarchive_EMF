@@ -199,13 +199,12 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addProject(Project project) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.add(project,session);
+            dao.add(project, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add new Project. Reason: " + e);
             throw new EmfException("Could not add Project");
         }
-        
     }
 
     public Region[] getRegions() throws EmfException {
@@ -224,7 +223,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addRegion(Region region) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.add(region,session);
+            dao.add(region, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add new Region. Reason: " + e);
@@ -248,50 +247,49 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addIntendedUse(IntendedUse intendedUse) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.add(intendedUse,session);
+            dao.add(intendedUse, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not add new intended use. Reason: " + e);
+            LOG.error("Could not add new intended use", e);
             throw new EmfException("Could not add new intended use");
         }
-        
     }
 
     public void addCountry(Country country) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.add(country,session);
+            dao.add(country, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not add new country. Reason: " + e);
+            LOG.error("Could not add new country", e);
             throw new EmfException("Could not add new country");
         }
-        
     }
-    
+
     public void addDatasetType(DatasetType type) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.add(type,session);
+            dao.add(type, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not add new DatasetType. Reason: " + e);
+            LOG.error("Could not add new DatasetType", e);
             throw new EmfException("Could not add DatasetType");
         }
-        
     }
 
     public void addSector(Sector sector) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            dao.add(sector,session);
+
+            if (dao.containsSector(sector.getName(), session))
+                throw new EmfException("Sector name already in use");
+
+            dao.add(sector, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not add new Sector. Reason: " + e);
+            LOG.error("Could not add new Sector.", e);
             throw new EmfException("Could not add Sector");
         }
-        
     }
-
 
 }

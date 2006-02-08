@@ -12,8 +12,6 @@ import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 import java.util.Date;
 import java.util.Random;
 
-import org.hibernate.Transaction;
-
 public class LoggingServiceTest extends ServicesTestCase {
 
     private LoggingServiceImpl logService;
@@ -72,16 +70,17 @@ public class LoggingServiceTest extends ServicesTestCase {
 
             datasetFromDB = getDataset(dataset);
 
-            alog = new AccessLog(user.getUsername(), datasetFromDB.getId(), new Date(), "0", "description", "folderPath");
+            alog = new AccessLog(user.getUsername(), datasetFromDB.getId(), new Date(), "0", "description",
+                    "folderPath");
 
             logService.setAccessLog(alog);
 
             AccessLog[] allLogs = logService.getAccessLogs(datasetFromDB.getId());
             for (int i = 0; i < allLogs.length; i++) {
                 returnAlog = allLogs[i];
-                assertEquals(returnAlog,alog);
+                assertEquals(returnAlog, alog);
             }
-        }finally{
+        } finally {
             remove(alog);
             remove(dataset);
             remove(user);
@@ -96,38 +95,29 @@ public class LoggingServiceTest extends ServicesTestCase {
 
             for (int i = 0; i < allDatasets.length; i++) {
                 datasetFromDB = allDatasets[i];
-                
-                if (datasetFromDB.getName().equals(dataset.getName())) break;
+
+                if (datasetFromDB.getName().equals(dataset.getName()))
+                    break;
             }
         } catch (EmfException e) {
             e.printStackTrace();
         }
-        
+
         return datasetFromDB;
     }
 
-    private DatasetType getDatasetType(String string) {
+    private DatasetType getDatasetType(String string) throws EmfException {
         DatasetType aDST = null;
 
-        try {
-            DatasetType[] allDST = dcService.getDatasetTypes();
-            for (int i = 0; i < allDST.length; i++) {
-                aDST = allDST[i];
+        DatasetType[] allDST = dcService.getDatasetTypes();
+        for (int i = 0; i < allDST.length; i++) {
+            aDST = allDST[i];
 
-                if (aDST.getName().equals(string)) {
-                    break;
-                }
+            if (aDST.getName().equals(string)) {
+                break;
             }
-        } catch (EmfException e) {
-            e.printStackTrace();
         }
         return aDST;
-    }
-
-    private void remove(Object object) {
-        Transaction tx = session.beginTransaction();
-        session.delete(object);
-        tx.commit();
     }
 
 }

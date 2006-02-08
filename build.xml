@@ -338,6 +338,8 @@
 
 	<target name="redeploy" depends="tomcat-stop, simple-deploy, tomcat-start" description="Stops Tomcat, deploys EMF, and starts Tomcat" />
 
+	<target name="tomcat-restart" depends="tomcat-stop, tomcat-start"/>
+    
 	<target name="tomcat-start">
 		<exec executable="${jdk.home}/bin/java.exe" dir="${build.home}" output="${build.home}/tomcat-start.txt" error="${build.home}/tomcat-start-error.txt" failonerror="yes">
 			<arg line="${tomcat.start}" />
