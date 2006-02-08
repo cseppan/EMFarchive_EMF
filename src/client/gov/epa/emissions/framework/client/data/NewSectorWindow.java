@@ -39,6 +39,8 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
 
     private SectorsManagerView sectorManager;
 
+    private static int counter;
+
     public NewSectorWindow(SectorsManagerView sectorManager, DesktopManager desktopManager) {
         super("Create New Sector", new Dimension(550, 400), desktopManager);
 
@@ -53,9 +55,9 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
     }
 
     public void display(Sector sector) {
-        String name = "Create New Sector: " + sector.getName();
+        counter++;
+        String name = "Create New Sector "+counter;
         super.setTitle(name);
-        super.setName(name);// FIXME: will break when two new windows opened
         layout.removeAll();
         doLayout(layout, sector);
 

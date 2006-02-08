@@ -50,7 +50,6 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
 
     public void display(DatasetType type) {
         super.setTitle("View Dataset Type: " + type.getName());
-        super.setName(type.getName());
         layout.removeAll();
         doLayout(layout, type);
 

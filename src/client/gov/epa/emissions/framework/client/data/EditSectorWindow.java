@@ -54,7 +54,6 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
 
     public void display(Sector sector) {
         super.setTitle("Edit Sector: " + sector.getName());
-        super.setName(sector.getName());
         layout.removeAll();
         doLayout(layout, sector);
 

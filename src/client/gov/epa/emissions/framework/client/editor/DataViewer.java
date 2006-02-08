@@ -31,7 +31,6 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     public DataViewer(EmfDataset dataset, DesktopManager desktopManager) {
         super("Data Viewer [Dataset:" + dataset.getName(),desktopManager);
-        super.setName(dataset.getName());
         setDimension();
         this.dataset = dataset;
         

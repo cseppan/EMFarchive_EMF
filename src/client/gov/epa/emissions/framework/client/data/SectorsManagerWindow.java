@@ -50,7 +50,6 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
 
     public SectorsManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Sector Manager", new Dimension(475, 300), parentConsole.desktop(), desktopManager);
-        super.setName("sectorManager");
         this.parentConsole = parentConsole;
 
         layout = new JPanel();

@@ -39,7 +39,6 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
     public StatusWindow(Container parent, JDesktopPane desktop, DesktopManager desktopManager) {
         super("Status", desktop, desktopManager);
-        super.setName("statusWindow");
 
         position(parent);
         super.setContentPane(createLayout());
@@ -150,11 +149,12 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
     public void close() {
         super.dispose();
+        //don't try to unregister, since we didn't register with the desktopManager
     }
 
     public void display() {
         setVisible(true);
-        //don't register through desktopmanager, since we don't want to close this window
+        // don't register through desktopmanager, since we don't want to close this window
     }
 
     public void update(Status[] statuses) {

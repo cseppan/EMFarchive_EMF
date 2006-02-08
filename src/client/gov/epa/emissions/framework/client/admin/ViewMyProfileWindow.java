@@ -18,6 +18,7 @@ public class ViewMyProfileWindow extends ViewUserWindow {
 
     public void close() {
         super.setVisible(false);
+        super.close();
     }
 
     public void bringToFront() {

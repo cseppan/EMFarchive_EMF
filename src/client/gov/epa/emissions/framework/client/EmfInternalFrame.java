@@ -20,7 +20,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
                 true, // closable
                 true, // maximizable
                 true);// iconifiable
-        
+        setName(""+hashCode());
         this.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosing(InternalFrameEvent event) {
                 windowClosing();
@@ -50,9 +50,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
 
     public void display() {
         super.setVisible(true);
-        if (desktopManager != null) {// FIXME: remove if after finishing the window management
-            desktopManager.registerOpenWindow(this);
-        }
+        desktopManager.registerOpenWindow(this);
     }
 
     public Position getPosition() {
@@ -66,6 +64,10 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
 
     public void refreshLayout() {
         super.validate();
+    }
+
+    public void close() {
+        desktopManager.unregisterCloseWindow(this);
     }
 
     protected void dimensions(Dimension size) {

@@ -28,6 +28,7 @@ public abstract class ReusableInteralFrame extends EmfInternalFrame {
 
     public void close() {
         super.setVisible(false);
+        super.close();
     }
 
     public void bringToFront() {

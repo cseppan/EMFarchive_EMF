@@ -15,6 +15,7 @@ public class DisposableUpdateUserWindow extends UpdateUserWindow {
 
     public void close() {
         super.dispose();
+        super.close();
     }
 
     public boolean isAlive() {

@@ -44,7 +44,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     public DataEditor(EmfDataset dataset, DesktopManager desktopManager) {
         super("Data Editor: " + dataset.getName(), desktopManager);
-        super.setName(dataset.getName());
         setDimension();
         this.dataset = dataset;
 

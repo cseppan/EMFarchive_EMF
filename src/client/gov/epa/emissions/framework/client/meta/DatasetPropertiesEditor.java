@@ -114,7 +114,6 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     public void display(EmfDataset dataset) {
         super.setTitle("Dataset Properties Editor: " + dataset.getName());
-        super.setName(dataset.getName());
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 
@@ -191,7 +190,6 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     public void windowClosing() {
         try {
             presenter.doClose();
-            desktopManager.unregisterCloseWindow(this);
         } catch (EmfException e) {
             showError("Could not close. Reason - " + e.getMessage());
             return;

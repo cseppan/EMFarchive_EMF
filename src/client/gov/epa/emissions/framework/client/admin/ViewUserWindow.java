@@ -36,7 +36,6 @@ public abstract class ViewUserWindow extends EmfInternalFrame implements UserVie
         doLayout(user);
 
         super.setTitle("User: " + user.getUsername());
-        super.setName(user.getUsername());
         super.dimensions(layout.getSize());
         super.setResizable(false);
 

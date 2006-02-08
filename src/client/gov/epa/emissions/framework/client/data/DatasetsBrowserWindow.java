@@ -67,11 +67,9 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
             throws EmfException {
-        super("Datasets Browser", new Dimension(800, 450), parentConsole.desktop(),desktopManager);
+        super("Datasets Browser", new Dimension(800, 450), parentConsole.desktop(), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
-
-        super.setName("datasetsBrowser");
 
         DataService services = session.dataService();
         model = new EmfTableModel(new EmfDatasetTableData(services.getDatasets()));
@@ -316,7 +314,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     public void close() {
-        super.dispose();
+        //super.dispose(); //why dispose -- reusable frames
+        super.close();
     }
 
     public void display() {

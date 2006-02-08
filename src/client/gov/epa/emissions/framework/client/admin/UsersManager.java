@@ -59,7 +59,6 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     // FIXME: this class needs to be refactored into smaller components
     public UsersManager(EmfSession session, UserService userServices, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("User Manager", new Dimension(550, 300), parentConsole.desktop(),desktopManager);
-        super.setName("userManager");
         this.session = session;
         this.parentConsole = parentConsole;
 

@@ -34,6 +34,8 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
     private TextField maxFiles;
 
     private JComboBox derivedFrom;
+    
+    private static int counter = 0;
 
     // private DatasetTypesManagerView manager;
 
@@ -59,9 +61,9 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
     }
 
     public void display() {
-        String name = "Create New Dataset Type";
+        counter++;
+        String name = "Create New Dataset Type"+counter;
         super.setTitle(name);
-        super.setName(name);// FIXME: will break when two new windows opened
         layout.removeAll();
         doLayout(layout);
 

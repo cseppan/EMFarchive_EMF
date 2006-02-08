@@ -20,6 +20,7 @@ public class UpdateMyProfileWindow extends UpdateUserWindow {
 
     public void close() {
         super.setVisible(false);
+        super.close();
     }
 
     public void bringToFront() {

@@ -10,6 +10,7 @@ public class DisposableViewUserWindow extends ViewUserWindow {
 
     public void close() {
         super.dispose();
+        super.close();
     }
 
     public boolean isAlive() {

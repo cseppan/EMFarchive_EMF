@@ -30,7 +30,6 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
         super("Update User: " + user.getUsername(), desktopManager);
 
         this.windowTitle = "Update User: " + user.getUsername();
-        super.setName(user.getUsername());
         this.user = user;
 
         JPanel container = new JPanel();
