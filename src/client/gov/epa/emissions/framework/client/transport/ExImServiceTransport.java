@@ -18,7 +18,7 @@ public class ExImServiceTransport implements ExImService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createEmfCall("Export-Import Service");
+        return callFactory.createCall("Export-Import Service");
     }
 
     public void startImport(User user, String folderPath, String fileName, EmfDataset dataset) throws EmfException {

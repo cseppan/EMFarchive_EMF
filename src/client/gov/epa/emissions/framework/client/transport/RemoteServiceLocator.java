@@ -9,32 +9,19 @@ import gov.epa.emissions.framework.services.ExImService;
 import gov.epa.emissions.framework.services.LoggingService;
 import gov.epa.emissions.framework.services.UserService;
 
-import javax.xml.rpc.ServiceException;
-
-import org.apache.axis.client.Call;
-import org.apache.axis.client.Service;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class RemoteServiceLocator implements ServiceLocator {
-    private static Log log = LogFactory.getLog(RemoteServiceLocator.class);
-
     private String baseUrl;
 
     // Note: Each session-based service needs to create it's own Call object
-    private Call viewCall = null;
+    private EmfCall viewCall;
 
     private EmfCall editCall;
 
     public RemoteServiceLocator(String baseUrl) throws Exception {
-        try {
-            this.baseUrl = baseUrl;
-            viewCall = this.createCall();
-            editCall = this.createEmfCall("DataEditor Service", baseUrl + "/gov.epa.emf.services.DataEditorService");
-        } catch (ServiceException e) {
-            log.error("Failed to create Axis Call object: " + e.getMessage());
-            throw new EmfException("Error communicating with the server");
-        }
+        this.baseUrl = baseUrl;
+        editCall = this.createSessionEnabledCall("DataEditor Service", baseUrl
+                + "/gov.epa.emf.services.DataEditorService");
+        viewCall = this.createSessionEnabledCall("DataView Service", baseUrl + "/gov.epa.emf.services.DataViewService");
     }
 
     public UserService userService() {
@@ -62,7 +49,7 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
 
     public DataViewService dataViewService() {
-        return new DataViewServiceTransport(viewCall, baseUrl + "/gov.epa.emf.services.DataViewService");
+        return new DataViewServiceTransport(viewCall);
     }
 
     /*
@@ -70,20 +57,9 @@ public class RemoteServiceLocator implements ServiceLocator {
      * transport objects and will be passed in to via the transport object's constructor
      * 
      */
-    private Call createCall() throws ServiceException {
-        Service service = new Service();
-        Call call = (Call) service.createCall();
-        call.setMaintainSession(true);
-        call.setTimeout(new Integer(0));// never times out
-
-        return call;
-    }
-
-    private EmfCall createEmfCall(String service, String url) throws EmfException {
+    private EmfCall createSessionEnabledCall(String service, String url) throws EmfException {
         CallFactory callFactory = new CallFactory(url);
-        EmfCall call = callFactory.createSessionEnabledCall(service);
-
-        return call;
+        return callFactory.createSessionEnabledCall(service);
     }
 
 }

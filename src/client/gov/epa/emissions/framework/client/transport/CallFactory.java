@@ -15,7 +15,7 @@ public class CallFactory {
         this.endpoint = endpoint;
     }
 
-    public Call createCall() throws Exception {
+    private Call createCall() throws Exception {
         Service service = new Service();
         Call call = (Call) service.createCall();
         call.setTargetEndpointAddress(new URL(endpoint));
@@ -23,7 +23,7 @@ public class CallFactory {
         return call;
     }
 
-    public EmfCall createEmfCall(String service) throws EmfException {
+    public EmfCall createCall(String service) throws EmfException {
         try {
             return new EmfCall(createCall(), service);
         } catch (Exception e) {
@@ -32,7 +32,7 @@ public class CallFactory {
     }
 
     public EmfCall createSessionEnabledCall(String service) throws EmfException {
-        EmfCall call = createEmfCall(service);
+        EmfCall call = createCall(service);
         call.enableSession();
 
         return call;

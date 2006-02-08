@@ -23,7 +23,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createEmfCall("DataCommons Service");
+        return callFactory.createCall("DataCommons Service");
     }
 
     public Country[] getCountries() throws EmfException {

@@ -16,7 +16,7 @@ public class DataServiceTransport implements DataService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createEmfCall("Data Service");
+        return callFactory.createCall("Data Service");
     }
 
     public EmfDataset[] getDatasets() throws EmfException {

@@ -15,6 +15,7 @@ public class DataEditorServiceTransport implements DataEditorService {
 
     public DataEditorServiceTransport(EmfCall call) {
         this.call = call;
+        mappings = new EmfMappings();
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {

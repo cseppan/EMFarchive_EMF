@@ -16,7 +16,7 @@ public class LoggingServiceTransport implements LoggingService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createSessionEnabledCall("User Service");
+        return callFactory.createCall("User Service");
     }
 
     public AccessLog[] getAccessLogs(long datasetid) throws EmfException {

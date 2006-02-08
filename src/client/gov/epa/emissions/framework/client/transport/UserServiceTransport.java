@@ -47,7 +47,7 @@ public class UserServiceTransport implements UserService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createSessionEnabledCall("User Service");
+        return callFactory.createCall("User Service");
     }
 
     public void updateUser(User user) throws EmfException {
