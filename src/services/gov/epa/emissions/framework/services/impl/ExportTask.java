@@ -48,7 +48,6 @@ public class ExportTask implements Runnable {
     }
 
     public void run() {
-        log.info("starting export - file: " + file.getName() + " of type: " + dataset.getDatasetTypeName());
         try {
             setStartStatus();
             exporter.export(file);
@@ -57,11 +56,9 @@ public class ExportTask implements Runnable {
             dataService.updateDatasetWithoutLock(dataset);
             setStatus("Completed export for " + dataset.getName() + ":" + file.getName());
         } catch (Exception e) {
-            log.error("Problem on attempting to run ExIm on file : " + file, e);
+            log.error("Problem on attempting to run Export on file : " + file, e);
             setStatus("Export failure. Reason: " + e.getMessage());
         }
-
-        log.info("exporting of file: " + file.getName() + " of type: " + dataset.getName() + " complete");
     }
 
     private void setStartStatus() {

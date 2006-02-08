@@ -39,8 +39,6 @@ public class ImportTask implements Runnable {
     }
 
     public void run() {
-        log.info("starting import - file: " + fileName + " of type: " + dataset.getDatasetTypeName());
-
         try {
             setStartStatus();
             dataService.addDataset(dataset);
@@ -63,10 +61,8 @@ public class ImportTask implements Runnable {
                 log.error("Problem attempting to run ExIm on file : " + fileName, ex);
             }
         } catch (EmfException e) {
-            log.error("Problem attempting to run ExIm on file : " + fileName, e);
+            log.error("Problem attempting to run Import on file : " + fileName, e);
         }
-
-        log.info("importing of file: " + fileName + " of type: " + dataset.getDatasetTypeName() + " complete");
     }
 
     private void setStartStatus() {

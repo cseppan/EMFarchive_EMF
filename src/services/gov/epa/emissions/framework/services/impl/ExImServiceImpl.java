@@ -62,7 +62,6 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     }
 
     private File validateExportFile(File path, String fileName, boolean overwrite) throws EmfException {
-        log.debug("check if file exists " + fileName);
         File file = new File(path, fileName);
 
         if (!overwrite) {
@@ -71,26 +70,20 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 throw new EmfException("Cannot export to existing file.  Choose overwrite option");
             }
         }
-
-        log.debug("check if file exists " + fileName);
-
         return file;
     }
 
     private File validatePath(String folderPath) throws EmfException {
-        log.debug("check if folder exists " + folderPath);
         File file = new File(folderPath);
 
         if (!file.exists() || !file.isDirectory()) {
             log.error("Folder " + folderPath + " does not exist");
             throw new EmfException("Folder does not exist: " + folderPath);
         }
-        log.debug("check if folder exists " + folderPath);
         return file;
     }
 
     private void validateDatasetName(EmfDataset dataset) throws EmfException {
-        log.debug("check if dataset name exists in table: " + dataset.getName());
         Session session = sessionFactory.getSession();
         boolean dsNameUsed = new DatasetDao().exists(dataset.getName(), session);
         session.flush();
@@ -99,12 +92,9 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             log.error("Dataset name " + dataset.getName() + " is already used");
             throw new EmfException("Dataset name is already used");
         }
-        log.debug("check if dataset name exists in table: " + dataset.getName());
     }
 
     public void startImport(User user, String folderPath, String fileName, EmfDataset dataset) throws EmfException {
-        log.debug("In ExImServicesImpl:startImport START for: " + dataset.getId() + " " + dataset.getName());
-
         try {
             File path = validatePath(folderPath);
 
@@ -119,16 +109,12 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             threadPool.execute(eximTask);
         } catch (Exception e) {
             log.error("Exception attempting to start import of file: " + fileName, e);
-            throw new EmfException("Failed to import file: " + e.getMessage());
+            throw new EmfException("Import of file failed: " + e.getMessage());
         }
-
-        log.debug("In ExImServicesImpl:startImport END");
     }
 
     public void startExportWithOverwrite(User user, EmfDataset[] datasets, String dirName, String purpose)
             throws EmfException {
-        log.info("Start: exporting datasets" + user.getUsername());
-        log.info("Total number of files to export: " + datasets.length);
         File path = validatePath(dirName);
 
         try {
@@ -153,15 +139,11 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             }
         } catch (Exception e) {
             log.error("Exception attempting to start export of file to folder: " + dirName, e);
-            throw new EmfException(e.getMessage());
+            throw new EmfException("Exception attempting to start export of file to folder");
         }
-
-        log.info("Start export for user: " + user.getUsername());
     }
 
     public void startExport(User user, EmfDataset[] datasets, String dirName, String purpose) throws EmfException {
-        log.info("Start: exporting datasets" + user.getUsername());
-        log.info("Total number of files to export: " + datasets.length);
         File path = validatePath(dirName);
 
         try {
@@ -187,10 +169,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             }
         } catch (Exception e) {
             log.error("Exception attempting to start export of file to folder: " + dirName, e);
-            throw new EmfException(e.getMessage());
+            throw new EmfException("Exception attempting to start export of file to folder");
         }
-
-        log.info("Start export for user: " + user.getUsername());
     }
 
     private boolean isExportable(EmfDataset dataset) {
@@ -235,7 +215,6 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     public void startMultipleFileImport(User user, String folderPath, String[] fileNames, DatasetType datasetType)
             throws EmfException {
-        log.debug("multiple datasets import: " + datasetType.getName());
         String[] fileNamesForImport = null;
 
         try {
@@ -269,7 +248,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
         } catch (ImporterException e) {
             log.error("Exception attempting to start export of file to folder: " + folderPath, e);
-            throw new EmfException(e.getMessage());
+            throw new EmfException("Exception attempting to start export of file to folder");
         }
 
     }

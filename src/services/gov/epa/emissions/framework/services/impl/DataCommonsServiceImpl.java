@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class DataCommonsServiceImpl implements DataCommonsService {
@@ -44,7 +43,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return (Keyword[]) keywords.toArray(new Keyword[keywords.size()]);
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not get all Keywords. Reason: " + e);
             throw new EmfException("Could not get all Keywords");
         }
@@ -57,7 +56,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return (Country[]) countries.toArray(new Country[countries.size()]);
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not get all Countries. Reason: " + e);
             throw new EmfException("Could not get all Countries");
         }
@@ -70,7 +69,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return (Sector[]) sectors.toArray(new Sector[sectors.size()]);
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not get all Sectors. Reason: " + e);
             throw new EmfException("Could not get all Sectors");
         }
@@ -83,7 +82,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return lockedSector;
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not obtain lock for sector: " + sector.getName() + " by owner: " + owner.getUsername()
                     + ".Reason: " + e);
             throw new EmfException("Could not obtain lock for sector: " + sector.getName() + " by owner: "
@@ -98,7 +97,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return released;
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not update sector: " + sector.getName() + ".Reason: " + e);
             throw new EmfException("Could not update sector: " + sector.getName());
         }
@@ -111,7 +110,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return released;
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not release lock for sector: " + sector.getName() + " by owner: " + sector.getLockOwner()
                     + ".Reason: " + e);
             throw new EmfException("Could not release lock for sector: " + sector.getName() + " by owner: "
@@ -126,7 +125,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return (DatasetType[]) list.toArray(new DatasetType[0]);
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not get all DatasetTypes. Reason: " + e);
             throw new EmfException("Could not get all DatasetTypes ");
         }
@@ -139,7 +138,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return locked;
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not obtain lock for DatasetType: " + type.getName() + ".Reason: " + e);
             throw new EmfException("Could not obtain lock for DatasetType: " + type.getName());
         }
@@ -152,7 +151,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return locked;
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not update DatasetType: " + type.getName() + ".Reason: " + e);
             throw new EmfException("Could not update DatasetType: " + type.getName());
         }
@@ -165,7 +164,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return locked;
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not release lock on DatasetType: " + type.getName() + ".Reason: " + e);
             throw new EmfException("Could not release lock on DatasetType: " + type.getName());
         }
@@ -178,7 +177,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return (Status[]) statuses.toArray(new Status[statuses.size()]);
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not get all Status messages. Reason: " + e);
             throw new EmfException("Could not get all Status messages");
         }
@@ -191,7 +190,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return (Project[]) projects.toArray(new Project[0]);
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not get all Projects. Reason: " + e);
             throw new EmfException("Could not get all Projects");
         }
@@ -202,7 +201,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             Session session = sessionFactory.getSession();
             dao.add(project,session);
             session.close();
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not add new Project. Reason: " + e);
             throw new EmfException("Could not add Project");
         }
@@ -216,7 +215,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return (Region[]) regions.toArray(new Region[0]);
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not get all Regions. Reason: " + e);
             throw new EmfException("Could not get all Regions");
         }
@@ -227,7 +226,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             Session session = sessionFactory.getSession();
             dao.add(region,session);
             session.close();
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not add new Region. Reason: " + e);
             throw new EmfException("Could not add Region");
         }
@@ -240,7 +239,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             session.close();
 
             return (IntendedUse[]) regions.toArray(new IntendedUse[0]);
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not get all Intended Use. Reason: " + e);
             throw new EmfException("Could not get all Intended Use");
         }
@@ -251,7 +250,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             Session session = sessionFactory.getSession();
             dao.add(intendedUse,session);
             session.close();
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not add new intended use. Reason: " + e);
             throw new EmfException("Could not add new intended use");
         }
@@ -263,7 +262,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             Session session = sessionFactory.getSession();
             dao.add(country,session);
             session.close();
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not add new country. Reason: " + e);
             throw new EmfException("Could not add new country");
         }
@@ -275,7 +274,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             Session session = sessionFactory.getSession();
             dao.add(type,session);
             session.close();
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not add new DatasetType. Reason: " + e);
             throw new EmfException("Could not add DatasetType");
         }
@@ -287,7 +286,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             Session session = sessionFactory.getSession();
             dao.add(sector,session);
             session.close();
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not add new Sector. Reason: " + e);
             throw new EmfException("Could not add Sector");
         }

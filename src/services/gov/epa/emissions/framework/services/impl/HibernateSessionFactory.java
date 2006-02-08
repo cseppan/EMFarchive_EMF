@@ -20,7 +20,7 @@ public class HibernateSessionFactory {
             Configuration configure = new Configuration().configure("hibernate.cfg.xml");
             sessionFactory = configure.buildSessionFactory();
         } catch (Throwable ex) {
-            log.error("Initial SessionFactory creation failed.", ex);
+            log.error("Initial SessionFactory creation failed", ex);
             throw new ExceptionInInitializerError(ex);
         }
     }

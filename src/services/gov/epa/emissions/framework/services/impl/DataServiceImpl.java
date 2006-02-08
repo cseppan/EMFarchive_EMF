@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class DataServiceImpl implements DataService {
@@ -36,7 +35,7 @@ public class DataServiceImpl implements DataService {
             session.close();
 
             return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not get all Datasets. Reason: " + e);
             throw new EmfException("Could not get all Datasets");
         }
@@ -47,7 +46,7 @@ public class DataServiceImpl implements DataService {
             Session session = sessionFactory.getSession();
             dao.add(dataset, session);
             session.close();
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not get add Dataset - " + dataset.getName() + ". Reason: " + e);
             throw new EmfException("Could not get add Dataset - " + dataset.getName());
         }
@@ -58,7 +57,7 @@ public class DataServiceImpl implements DataService {
             Session session = sessionFactory.getSession();
             dao.updateWithoutLocking(dataset, session);
             session.close();
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not get update Dataset - " + dataset.getName() + ". Reason: " + e);
             throw new EmfException("Could not get update Dataset - " + dataset.getName());
         }
@@ -69,7 +68,7 @@ public class DataServiceImpl implements DataService {
             Session session = sessionFactory.getSession();
             dao.remove(dataset, session);
             session.close();
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not get remove Dataset - " + dataset.getName() + ". Reason: " + e);
             throw new EmfException("Could not get remove Dataset - " + dataset.getName());
         }
@@ -82,7 +81,7 @@ public class DataServiceImpl implements DataService {
             session.close();
 
             return locked;
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not obtain lock for Dataset: " + dataset.getName() + " by owner: " + owner.getUsername()
                     + ".Reason: " + e);
             throw new EmfException("Could not obtain lock for Dataset: " + dataset.getName() + " by owner: "
@@ -97,7 +96,7 @@ public class DataServiceImpl implements DataService {
             session.close();
 
             return released;
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not release lock for Dataset: " + locked.getName() + " by owner: " + locked.getLockOwner()
                     + ".Reason: " + e);
             throw new EmfException("Could not release lock for Dataset: " + locked.getName() + " by owner: "
@@ -112,7 +111,7 @@ public class DataServiceImpl implements DataService {
             session.close();
 
             return released;
-        } catch (HibernateException e) {
+        } catch (RuntimeException e) {
             LOG.error("Could not update Dataset: " + dataset.getName() + ".Reason: " + e);
             throw new EmfException("Could not update Dataset: " + dataset.getName());
         }
