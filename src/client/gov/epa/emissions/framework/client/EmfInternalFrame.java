@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.ui.Position;
+import gov.epa.emissions.commons.gui.ChangeObserver;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -11,7 +12,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-public abstract class EmfInternalFrame extends JInternalFrame implements ManagedView {
+public abstract class EmfInternalFrame extends JInternalFrame implements ManagedView, ChangeObserver {
 
     protected DesktopManager desktopManager;
 
@@ -28,6 +29,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
             }
         });
         this.desktopManager = desktopManager;
+        super.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
     public EmfInternalFrame(String title, Dimension dimension, DesktopManager desktopManager) {
@@ -77,5 +79,17 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
 
     protected void dimensions(int width, int height) {
         this.dimensions(new Dimension(width, height));
+    }
+    
+    public void signalChanges() {
+        if(!this.getTitle().endsWith(" *"))
+            this.setTitle(this.getTitle() + " *");
+    }
+    
+    public void signalSaved() {
+        String title = this.getTitle();
+        int starPosition = title.indexOf(" *");
+        if(starPosition >= 0)
+            this.setTitle(title.substring(0, starPosition));
     }
 }

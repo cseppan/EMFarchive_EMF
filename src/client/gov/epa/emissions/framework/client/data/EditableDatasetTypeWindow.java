@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
@@ -10,6 +11,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.WidgetChangesMonitor;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 
 import java.awt.BorderLayout;
@@ -21,6 +23,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.border.EtchedBorder;
@@ -42,6 +45,10 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     private DatasetTypesManagerView manager;
 
     private DatasetTypeKeywordsPanel keywordsPanel;
+    
+    private ChangeablesList changeablesList;
+    
+    private WidgetChangesMonitor monitor;
 
     public EditableDatasetTypeWindow(DatasetTypesManagerView manager, DesktopManager desktopManager) {
         super("Edit Dataset Type", new Dimension(600, 500),desktopManager);
@@ -50,6 +57,8 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
+        changeablesList = new ChangeablesList(this);
+        monitor = new WidgetChangesMonitor(changeablesList, this);
     }
 
     public void observe(EditableDatasetTypePresenter presenter) {
@@ -80,9 +89,13 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         name = new TextField("name", type.getName(), 40);
+        changeablesList.add(name);
+        name.addTextListener();
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         description = new TextArea("description", type.getDescription(), 40);
+        changeablesList.add(description);
+        description.addTextListener();
         ScrollableTextArea descScrollableTextArea = new ScrollableTextArea(description);
         descScrollableTextArea.setMinimumSize(new Dimension(80, 80));
         layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, panel);
@@ -130,6 +143,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
                         messagePanel.setError("Name field should be a non-empty string.");
                     else {
                         keywordsPanel.commit();
+                        monitor.resetChanges();
                         presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), manager);
                     }
                 } catch (EmfException e) {
@@ -142,28 +156,26 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     }
 
     public void windowClosing() {
-        try {
-            presenter.doClose();
-        } catch (EmfException e) {
-            messagePanel.setError("Could not close. Reason: " + e.getMessage());
-            return;
-        }
-
-        super.close();
+        checkChangesAndCloseWindow();
     }
 
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doClose();
-                } catch (EmfException e) {
-                    messagePanel.setError("Could not close. Reason: " + e.getMessage());
-                }
+                checkChangesAndCloseWindow();
             }
         };
 
         return action;
     }
-
+    
+    private void checkChangesAndCloseWindow() {
+        try {
+            if(monitor.checkChanges() == JOptionPane.OK_OPTION)
+                presenter.doClose();
+        } catch (EmfException e) {
+            messagePanel.setError("Could not close. Reason: " + e.getMessage());
+        }
+    }
+   
 }
