@@ -10,6 +10,8 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.IntendedUse;
+import gov.epa.emissions.framework.services.Note;
+import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.services.Status;
 
 public class DataCommonsServiceTransport implements DataCommonsService {
@@ -209,5 +211,20 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.setVoidReturnType();
 
         call.request(new Object[] { type });
+    }
+
+    public Note[] getNotes(int datasetId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void addNote(Note note){
+        // TODO Auto-generated method stub
+        
+    }
+
+    public NoteType[] getNoteTypes() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

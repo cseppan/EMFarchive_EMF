@@ -11,6 +11,8 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DataCommonsDAO;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.IntendedUse;
+import gov.epa.emissions.framework.services.Note;
+import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.services.Status;
 
 import java.util.List;
@@ -293,6 +295,21 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             LOG.error("Could not add new Sector.", e);
             throw new EmfException("Could not add Sector");
         }
+    }
+
+    public Note[] getNotes(int datasetId){
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void addNote(Note note) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public NoteType[] getNoteTypes() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

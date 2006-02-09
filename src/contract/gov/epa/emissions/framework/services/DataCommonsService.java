@@ -50,5 +50,11 @@ public interface DataCommonsService {
 
     // Status
     Status[] getStatuses(String username) throws EmfException;
+    
+    //Notes
+    Note[] getNotes(int datasetId) throws EmfException;
+    void addNote(Note note) throws EmfException;
 
+    //Note types
+    NoteType[] getNoteTypes() throws EmfException;
 }
