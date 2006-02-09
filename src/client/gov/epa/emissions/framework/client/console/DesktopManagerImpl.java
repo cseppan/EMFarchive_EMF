@@ -37,9 +37,7 @@ public class DesktopManagerImpl implements DesktopManager {
         for (int i = 0; i < list.size(); i++) {
             Object key = list.get(i);
             ManagedView view = (ManagedView) windowNames.get(key);
-            windowMenu.unregister(view);
-            windowNames.remove(key);
-            view.close();
+            view.close();//unregisterCloseWindow is called inside this method
         }
     }
 

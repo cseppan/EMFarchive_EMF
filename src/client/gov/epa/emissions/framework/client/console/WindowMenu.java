@@ -41,6 +41,7 @@ public class WindowMenu extends JMenu implements WindowMenuView {
     }
 
     public void register(ManagedView view) {
+        System.out.println("register title="+view.getTitle()+", hashcode="+view.hashCode());
         JMenuItem menuItem = new WindowMenuItem(view);
         menuItems.add(menuItem);
 
@@ -55,6 +56,7 @@ public class WindowMenu extends JMenu implements WindowMenuView {
     public void unregister(ManagedView view) {
         JMenuItem menuItem = getMenuItem(view);
         super.remove(menuItem);
+        menuItems.remove(menuItem);
     }
 
     private JMenuItem getMenuItem(ManagedView view) {
