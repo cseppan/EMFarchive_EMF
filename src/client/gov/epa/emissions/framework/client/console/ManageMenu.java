@@ -168,7 +168,7 @@ public class ManageMenu extends JMenu {
         viewLayout.add(datasetsBrowserView, "Datasets Browser");
         parent.addToDesktop(datasetsBrowserView);
 
-        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session, session.serviceLocator());
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session);
         presenter.doDisplay(datasetsBrowserView);
     }
 

@@ -6,27 +6,25 @@ import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportView;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportView;
+import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditorView;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenter;
 import gov.epa.emissions.framework.client.meta.PropertiesEditorPresenterImpl;
-import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditorView;
 import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataView;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.services.DataService;
+import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 public class DatasetsBrowserPresenter implements Browser {
 
     private DatasetsBrowserView view;
 
-    private ServiceLocator serviceLocator;
-
     private EmfSession session;
 
-    public DatasetsBrowserPresenter(EmfSession session, ServiceLocator serviceLocator) {
+    public DatasetsBrowserPresenter(EmfSession session) {
         this.session = session;
-        this.serviceLocator = serviceLocator;
     }
 
     public void doDisplay(DatasetsBrowserView view) {
@@ -51,13 +49,18 @@ public class DatasetsBrowserPresenter implements Browser {
     }
 
     public void doRefresh() throws EmfException {
-        view.refresh(serviceLocator.dataService().getDatasets());
+        view.refresh(dataService().getDatasets());
         view.clearMessage();
+    }
+
+    private DataService dataService() {
+        return session.dataService();
     }
 
     public void doDisplayPropertiesEditor(DatasetPropertiesEditorView propertiesEditorView, EmfDataset dataset)
             throws EmfException {
-        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, serviceLocator, session,this);
+        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, session.serviceLocator(),
+                session, this);
         doDisplayPropertiesEditor(propertiesEditorView, presenter);
     }
 
@@ -82,9 +85,13 @@ public class DatasetsBrowserPresenter implements Browser {
     public void doDisplayVersionedData(VersionedDataView versionsView, EmfDataset dataset) {
         view.clearMessage();
 
-        VersionedDataPresenter presenter = new VersionedDataPresenter(session.user(), dataset, serviceLocator
-                .dataEditorService(), serviceLocator.dataViewService());
+        VersionedDataPresenter presenter = new VersionedDataPresenter(session.user(), dataset, session.serviceLocator()
+                .dataEditorService(), dataViewService());
         presenter.display(versionsView);
+    }
+
+    private DataViewService dataViewService() {
+        return session.dataViewService();
     }
 
     public void notifyUpdates() {
@@ -93,7 +100,7 @@ public class DatasetsBrowserPresenter implements Browser {
         } catch (EmfException e) {
             view.showError(e.getMessage());
         }
-        
+
     }
 
 }

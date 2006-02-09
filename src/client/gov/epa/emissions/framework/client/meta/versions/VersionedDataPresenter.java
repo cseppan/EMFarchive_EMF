@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -25,7 +25,7 @@ public class VersionedDataPresenter {
         this.viewService = viewService;
     }
 
-    public VersionedDataPresenter(User user, EmfDataset dataset, ServiceLocator serviceLocator) {
+    public VersionedDataPresenter(User user, EmfDataset dataset, EmfSession session) {
         this.user = user;
         this.dataset = dataset;
     }

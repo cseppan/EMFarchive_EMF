@@ -32,48 +32,49 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
     private DatasetsBrowserPresenter presenter;
 
-    private Mock dataServices;
+    private Mock dataService;
 
     private Mock serviceLocator;
+
+    private Mock session;
 
     protected void setUp() {
         view = mock(DatasetsBrowserView.class);
 
-        dataServices = mock(DataService.class);
+        dataService = mock(DataService.class);
         Mock dataCommonsService = mock(DataCommonsService.class);
         serviceLocator = mock(ServiceLocator.class);
-        serviceLocator.stubs().method("dataService").withNoArguments().will(returnValue(dataServices.proxy()));
+        serviceLocator.stubs().method("dataService").withNoArguments().will(returnValue(dataService.proxy()));
         serviceLocator.stubs().method("dataCommonsService").withNoArguments().will(
                 returnValue(dataCommonsService.proxy()));
 
-        Mock session = mock(EmfSession.class);
+        session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(new User()));
 
-        presenter = new DatasetsBrowserPresenter((EmfSession) session.proxy(), (ServiceLocator) serviceLocator.proxy());
+        presenter = new DatasetsBrowserPresenter((EmfSession) session.proxy());
 
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();
 
         presenter.doDisplay((DatasetsBrowserView) view.proxy());
     }
-    
-    public void testRemoveMe() {
-        assertTrue(true);
-    }
 
-    public void FIXME_testShouldCloseViewOnClickOfCloseButton() {
+    public void testShouldCloseViewOnClickOfCloseButton() {
         view.expects(once()).method("close").withNoArguments();
 
         presenter.doClose();
     }
 
-    public void FIXME_testShouldRefreshViewOnClickOfRefreshButton() throws EmfException {
+    public void testShouldRefreshViewOnClickOfRefreshButton() throws EmfException {
         EmfDataset[] datasets = new EmfDataset[0];
-        dataServices.stubs().method("getDatasets").withNoArguments().will(returnValue(datasets));
+        dataService.stubs().method("getDatasets").withNoArguments().will(returnValue(datasets));
 
         view.expects(once()).method("refresh").with(eq(datasets));
 
-        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(null, (ServiceLocator) serviceLocator.proxy());
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("dataService").will(returnValue(dataService.proxy()));
+
+        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter((EmfSession) session.proxy());
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();
         view.expects(once()).method("clearMessage").withNoArguments();
@@ -83,7 +84,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         presenter.doRefresh();
     }
 
-    public void FIXME_testShouldDisplayExportViewOnClickOfExportButton() {
+    public void testShouldDisplayExportViewOnClickOfExportButton() {
         EmfDataset dataset1 = new EmfDataset();
         dataset1.setName("name 1");
         EmfDataset[] datasets = new EmfDataset[] { dataset1 };
@@ -98,7 +99,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         presenter.doExport(exportViewProxy, (ExportPresenter) exportPresenter.proxy(), datasets);
     }
 
-    public void FIXME_testShouldDisplayImportViewOnClickOfNewButton() {
+    public void testShouldDisplayImportViewOnClickOfNewButton() {
         view.expects(once()).method("clearMessage").withNoArguments();
 
         Mock importView = mock(ImportView.class);
@@ -109,15 +110,15 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         presenter.doImport(importViewProxy, (ImportPresenter) importPresenter.proxy());
     }
 
-    public void FIXME_testShouldDisplayInformationalMessageOnClickOfExportButtonIfNoDatasetsAreSelected() {
+    public void testShouldDisplayInformationalMessageOnClickOfExportButtonIfNoDatasetsAreSelected() {
         EmfDataset[] datasets = new EmfDataset[0];
-        String message = "To Export, you will need to select at least one Dataset";
+        String message = "To Export, you will need to select at least one non-External type Dataset";
         view.expects(once()).method("showMessage").with(eq(message));
 
         presenter.doExport(null, null, datasets);
     }
 
-    public void FIXME_testShouldDisplayPropertiesEditorOnSelectionOfEditPropertiesOption() throws Exception {
+    public void testShouldDisplayPropertiesEditorOnSelectionOfEditPropertiesOption() throws Exception {
         EmfDataset dataset = new EmfDataset();
         dataset.setName("name");
 
@@ -132,7 +133,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         presenter.doDisplayPropertiesEditor(editorViewProxy, (PropertiesEditorPresenter) editorPresenter.proxy());
     }
 
-    public void FIXME_testShouldDisplayPropertiesViewerOnSelectionOfViewPropertiesOption() {
+    public void testShouldDisplayPropertiesViewerOnSelectionOfViewPropertiesOption() {
         EmfDataset dataset = new EmfDataset();
         dataset.setName("name");
 
@@ -147,7 +148,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         presenter.doDisplayPropertiesView(viewProxy, dataset);
     }
 
-    public void FIXME_testShouldDisplayVersionsEditorOnSelectionOfEditDataOption() {
+    public void testShouldDisplayVersionsEditorOnSelectionOfEditDataOption() {
         EmfDataset dataset = new EmfDataset();
         dataset.setName("name");
 
@@ -157,12 +158,16 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         serviceLocator.stubs().method("dataEditorService").withNoArguments().will(returnValue(editorService.proxy()));
 
         Mock viewService = mock(DataViewService.class);
-        serviceLocator.stubs().method("dataViewService").withNoArguments().will(returnValue(viewService.proxy()));
+        Object viewServiceProxy = viewService.proxy();
+        serviceLocator.stubs().method("dataViewService").withNoArguments().will(returnValue(viewServiceProxy));
 
         Mock editorView = mock(VersionedDataView.class);
         editorView.expects(once()).method("observe").with(new IsInstanceOf(VersionedDataPresenter.class));
         editorView.expects(once()).method("display").with(eq(dataset), new IsInstanceOf(EditVersionsPresenter.class));
 
+        session.stubs().method("serviceLocator").will(returnValue(serviceLocator.proxy()));
+        session.stubs().method("dataViewService").will(returnValue(viewServiceProxy));
+        
         VersionedDataView viewProxy = (VersionedDataView) editorView.proxy();
 
         presenter.doDisplayVersionedData(viewProxy, dataset);
