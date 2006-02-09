@@ -214,7 +214,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { type });
     }
 
-    public Note[] getNotes(int datasetId) {
+    public Note[] getNotes(long datasetId) {
         // TODO Auto-generated method stub
         return null;
     }

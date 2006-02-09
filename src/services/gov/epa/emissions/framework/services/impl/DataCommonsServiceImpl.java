@@ -298,7 +298,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Note[] getNotes(int datasetId){
+    public Note[] getNotes(long datasetId){
         // TODO Auto-generated method stub
         return null;
     }
