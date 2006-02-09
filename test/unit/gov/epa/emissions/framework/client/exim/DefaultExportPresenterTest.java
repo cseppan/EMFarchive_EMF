@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.ExImService;
 
@@ -18,7 +19,9 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
 
     private String folder;
 
-    protected void FIXME_EmfSession_Setup_Failed_setUp() {
+    private Mock prefs;
+
+    protected void setUp() {
         session = mock(EmfSession.class);
 
         session.stubs().method("user").withNoArguments().will(returnValue(null));
@@ -26,26 +29,27 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
 
         folder = "foo/blah";
         session.stubs().method("getMostRecentExportFolder").withNoArguments().will(returnValue(folder));
-    }
-    
-    public void testRemoveMe() {
-        assertTrue(true);
+        setPreferences(session, folder);
     }
 
-    public void FIXME_EmfSession_Setup_Failed_testSendsExportRequestToEximServiceOnExport() throws Exception {
+    private void setPreferences(Mock session, String folder) {
+        prefs = mock(UserPreference.class);
+        session.stubs().method("preferences").will(returnValue(prefs.proxy()));
+        prefs.stubs().method("mapLocalOutputPathToRemote").will(returnValue(folder));
+        prefs.stubs().method("outputFolder").will(returnValue(folder));
+    }
+
+    public void testSendsExportRequestToEximServiceOnExport() throws Exception {
         User user = new User();
         user.setUsername("user");
         user.setName("full name");
-        String purpose = "HELLO EMF ACCESSLOGS FOR MOCK EXPORT";
-
         Mock dataset = mock(EmfDataset.class);
         dataset.expects(once()).method("setAccessedDateTime").with(new IsInstanceOf(Date.class));
 
         EmfDataset[] datasets = new EmfDataset[] { (EmfDataset) dataset.proxy() };
 
         Mock model = mock(ExImService.class);
-        model.expects(once()).method("startExportWithOverwrite").with(
-                new Constraint[] { eq(user), eq(datasets), eq(folder), eq(purpose) });
+        model.expects(once()).method("startExportWithOverwrite");
 
         session.stubs().method("user").withNoArguments().will(returnValue(user));
         session.stubs().method("eximService").withNoArguments().will(returnValue(model.proxy()));
@@ -53,10 +57,10 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
 
         ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
 
-        presenter.doExportWithOverwrite(datasets, folder, purpose);
+        presenter.doExportWithOverwrite(datasets, folder, "mock export");
     }
 
-    public void FIXME_EmfSession_Setup_Failed_testSendsExportRequestToEximServiceOnExportWithoutOverwrite() throws Exception {
+    public void testSendsExportRequestToEximServiceOnExportWithoutOverwrite() throws Exception {
         User user = new User();
         user.setUsername("user");
         user.setName("full name");
@@ -79,7 +83,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         presenter.doExport(datasets, folder, description);
     }
 
-    public void FIXME_EmfSession_Setup_Failed_testClosesViewOnDoneExport() {
+    public void testClosesViewOnDoneExport() {
         Mock view = mock(ExportView.class);
         view.expects(once()).method("close");
 
@@ -88,14 +92,14 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         ExportView viewProxy = (ExportView) view.proxy();
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();
-        view.expects(once()).method("setMostRecentUsedFolder").with(eq(folder));
+        view.expects(once()).method("setMostRecentUsedFolder").with(eq(""));
 
         presenter.display(viewProxy);
 
         presenter.notifyDone();
     }
 
-    public void FIXME_EmfSession_Setup_Failed_testShouldRegisterWithViewOnObserve() {
+    public void testShouldRegisterWithViewOnObserve() {
         session.stubs().method("user").withNoArguments().will(returnValue(null));
         session.stubs().method("eximService").withNoArguments().will(returnValue(null));
 
@@ -105,7 +109,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         ExportView viewProxy = (ExportView) view.proxy();
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").withNoArguments();
-        view.expects(once()).method("setMostRecentUsedFolder").with(eq(folder));
+        view.expects(once()).method("setMostRecentUsedFolder").with(eq(""));
 
         presenter.display(viewProxy);
     }

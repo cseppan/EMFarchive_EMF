@@ -27,15 +27,13 @@ public class DefaultExportPresenter implements ExportPresenter {
     public void display(ExportView view) {
         this.view = view;
         view.observe(this);
-        String defaultBaseFolder = "";
-        if (lastFolder == null) {
-            defaultBaseFolder = getDefaultBaseFolder();
-        } else {
-            defaultBaseFolder = lastFolder;
-        }
-        view.setMostRecentUsedFolder(defaultBaseFolder);
+        view.setMostRecentUsedFolder(getFolder());
 
         view.display();
+    }
+
+    private String getFolder() {
+        return (lastFolder != null) ? lastFolder : getDefaultFolder();
     }
 
     public void doExportWithOverwrite(EmfDataset[] datasets, String folder, String purpose) throws EmfException {
@@ -47,9 +45,8 @@ public class DefaultExportPresenter implements ExportPresenter {
     }
 
     private void doExport(EmfDataset[] datasets, String folder, boolean overwrite, String purpose) throws EmfException {
-        for (int i = 0; i < datasets.length; i++) {
+        for (int i = 0; i < datasets.length; i++)
             datasets[i].setAccessedDateTime(new Date());
-        }
         session.setMostRecentExportFolder(folder);
 
         File dir = new File(folder);
@@ -67,7 +64,7 @@ public class DefaultExportPresenter implements ExportPresenter {
         return session.preferences().mapLocalOutputPathToRemote(dir);
     }
 
-    private String getDefaultBaseFolder() {
+    private String getDefaultFolder() {
         String folder = session.preferences().outputFolder();
         if (!new File(folder).isDirectory())
             folder = "";// default, if unspecified
