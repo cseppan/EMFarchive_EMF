@@ -76,7 +76,9 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     public void display(Version version, String table, DataAccessService service) {
         this.table = table;
+        
         updateTitle(version, table);
+        super.setName(""+version.hashCode());
 
         JPanel container = new JPanel(new BorderLayout());
 

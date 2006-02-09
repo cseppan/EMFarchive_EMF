@@ -42,7 +42,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     public void display(EmfDataset dataset) {
         super.setTitle("Dataset Properties View: " + dataset.getName());
-
+        super.setName(""+dataset.hashCode());
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);

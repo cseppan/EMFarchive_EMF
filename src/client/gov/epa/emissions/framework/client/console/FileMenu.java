@@ -32,19 +32,19 @@ public class FileMenu extends JMenu {
         super.add(createImport(session, parent.desktop(), messagePanel));
         super.addSeparator();
         super.add(createLogout(session, parent));
-        super.add(createExit());
+        super.add(createExit(parent));
 
         this.viewLayout = viewLayout;
         this.desktopManager = desktopManager;
     }
 
-    private JMenuItem createExit() {
+    private JMenuItem createExit(final EmfConsole parent) {
         JMenuItem exit = new JMenuItem("Exit");
         exit.setName("exit");
         exit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                // TODO: logout before exiting. Should prompt the user ?
-                System.exit(0);
+                ExitAndLogoutAction exit = new ExitAndLogoutAction(parent, desktopManager);
+                exit.exit();
             }
         });
         return exit;
@@ -55,20 +55,22 @@ public class FileMenu extends JMenu {
         logout.setName("logout");
         logout.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                logout(session, parent);
+                logout(session, parent, desktopManager);
             }
         });
         return logout;
     }
 
-    private void logout(EmfSession session, EmfConsole parent) {
-        UserService userServices = session.userService();
-        LoginWindow view = new LoginWindow(session.serviceLocator());
+    private void logout(EmfSession session, EmfConsole parent, DesktopManager desktopManager) {
+        ExitAndLogoutAction logout = new ExitAndLogoutAction(parent, desktopManager);
+        if (logout.logout()) {
+            UserService userServices = session.userService();
+            LoginWindow view = new LoginWindow(session.serviceLocator());
 
-        LoginPresenter presenter = new LoginPresenter(userServices);
-        presenter.display(view);
+            LoginPresenter presenter = new LoginPresenter(userServices);
+            presenter.display(view);
+        }
 
-        parent.close();
     }
 
     private JMenuItem createImport(final EmfSession session, final JDesktopPane desktop, final MessagePanel messagePanel) {

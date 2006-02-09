@@ -20,7 +20,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JDesktopPane;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -96,10 +95,13 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private void setProperties() {
         setSize();
-
-        // FIXME: prompt the user ?
-        super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        super.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         super.setResizable(true);
+    }
+
+    protected void windowClosing() {// overriden
+        ExitAndLogoutAction exitAction = new ExitAndLogoutAction(EmfConsole.this, desktopManager);
+        exitAction.exit();
     }
 
     private void setSize() {

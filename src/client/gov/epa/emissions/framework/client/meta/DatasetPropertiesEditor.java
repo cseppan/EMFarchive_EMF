@@ -114,6 +114,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     public void display(EmfDataset dataset) {
         super.setTitle("Dataset Properties Editor: " + dataset.getName());
+        super.setName(""+dataset.hashCode());
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 

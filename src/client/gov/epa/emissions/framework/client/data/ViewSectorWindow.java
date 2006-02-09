@@ -50,6 +50,8 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
 
     public void display(Sector sector) {
         super.setTitle("View Sector: " + sector.getName());
+        super.setName(""+sector.hashCode());
+        
         layout.removeAll();
         doLayout(layout, sector);
 

@@ -60,7 +60,8 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     public void display(Version version, String table, DataAccessService service) {
         updateTitle(version, table);
-
+        super.setName(""+version.hashCode());
+        
         JPanel container = new JPanel(new BorderLayout());
 
         container.add(tablePanel(version, table, service), BorderLayout.CENTER);
