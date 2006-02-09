@@ -52,3 +52,6 @@ DROP TABLE emf.notes CASCADE;
 DROP TABLE emf.note_types CASCADE;
 -- emf notes and note_types
 --
+-- emf revisions
+DROP TABLE emf.revisions;
+--

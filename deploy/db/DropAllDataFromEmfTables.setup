@@ -17,4 +17,6 @@ delete from emf.users;
 delete from emf.intended_uses;
 delete from emf.projects;
 delete from emf.regions;
-
+delete from emf.notes;
+delete from emf.note_types;
+delete from emf.revisions;

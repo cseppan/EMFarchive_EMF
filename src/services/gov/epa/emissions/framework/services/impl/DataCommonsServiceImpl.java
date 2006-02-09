@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.IntendedUse;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
+import gov.epa.emissions.framework.services.Revision;
 import gov.epa.emissions.framework.services.Status;
 
 import java.util.List;
@@ -310,6 +311,16 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public NoteType[] getNoteTypes() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public Revision[] getRevisions(int datasetId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void addRevision(Revision revision) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

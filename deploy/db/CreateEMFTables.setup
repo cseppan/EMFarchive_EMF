@@ -201,6 +201,20 @@ CREATE TABLE emf.notes
 WITHOUT OIDS;
 --emf.notes
 --
+-- emf.revisions
+CREATE TABLE emf.revisions
+(
+  id SERIAL PRIMARY KEY,
+  dataset_id int4 NOT NULL REFERENCES emf.datasets (id), 
+  version int4 NOT NULL,
+  creator int4 NOT NULL REFERENCES emf.users(id),
+  date_time timestamp,
+  what text NOT NULL,
+  why text NOT NULL
+) 
+WITHOUT OIDS;
+-- emf.revisions
+--
 -- emf ... KEYWORDS framework
 CREATE TABLE emf.emf_keywords
 (
