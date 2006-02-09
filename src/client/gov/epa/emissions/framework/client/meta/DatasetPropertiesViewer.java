@@ -3,15 +3,12 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
-import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTab;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTab;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -32,17 +29,14 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     private EmfConsole parentConsole;
 
-    private EmfSession session;
-
-    public DatasetPropertiesViewer(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
+    public DatasetPropertiesViewer(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties View", new Dimension(700, 500), desktopManager);
-        this.session = session;
         this.parentConsole = parentConsole;
     }
 
     public void display(EmfDataset dataset) {
         super.setTitle("Dataset Properties View: " + dataset.getName());
-        super.setName(""+dataset.hashCode());
+        super.setName("" + dataset.hashCode());
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
@@ -59,10 +53,10 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         tabbedPane.setName("tabbedPane");
 
         tabbedPane.addTab("Summary", createSummaryTab(dataset));
-        tabbedPane.addTab("Data", createDataTab(dataset, parentConsole));
+        tabbedPane.addTab("Data", createDataTab(parentConsole));
         tabbedPane.addTab("Keywords", createKeywordsTab());
-        tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
-        tabbedPane.addTab("Tables", createInfoTab(dataset, parentConsole));
+        tabbedPane.addTab("Logs", createLogsTab(parentConsole));
+        tabbedPane.addTab("Tables", createInfoTab(parentConsole));
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -75,22 +69,15 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         return view;
     }
 
-    private JPanel createDataTab(EmfDataset dataset, EmfConsole parentConsole) {
-        ServiceLocator serviceLocator = session.serviceLocator();
-        DataViewService dataViewService = serviceLocator.dataViewService();
-
+    private JPanel createDataTab(EmfConsole parentConsole) {
         DataTab view = new DataTab(parentConsole, desktopManager);
-        DataTabPresenter presenter = new DataTabPresenter(view, dataset, dataViewService);
-        presenter.doDisplay();
-
+        presenter.set(view);
         return view;
     }
 
-    private JPanel createInfoTab(EmfDataset dataset, EmfConsole parentConsole) {
+    private JPanel createInfoTab(EmfConsole parentConsole) {
         InfoTab view = new InfoTab(parentConsole);
-        InfoTabPresenter presenter = new InfoTabPresenter(view, dataset);
-        presenter.doDisplay();
-
+        presenter.set(view);
         return view;
     }
 
@@ -100,12 +87,10 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         return view;
     }
 
-    private JPanel createLogsTab(EmfDataset dataset, EmfConsole parentConsole) {
+    private JPanel createLogsTab(EmfConsole parentConsole) {
         try {
             LogsTab view = new LogsTab(parentConsole);
-            LogsTabPresenter presenter = new LogsTabPresenter(view, dataset, session.loggingService());
-            presenter.doDisplay();
-
+            presenter.set(view);
             return view;
         } catch (EmfException e) {
             messagePanel.setError("Could not load Logs tab. Failed communication with remote Logging Services.");

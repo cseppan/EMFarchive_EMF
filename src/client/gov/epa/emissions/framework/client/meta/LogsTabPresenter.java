@@ -8,18 +8,18 @@ public class LogsTabPresenter {
 
     private LogsTabView view;
 
-    private LoggingService services;
+    private LoggingService service;
 
     private EmfDataset dataset;
 
     public LogsTabPresenter(LogsTabView view, EmfDataset dataset, LoggingService services) {
         this.view = view;
         this.dataset = dataset;
-        this.services = services;
+        this.service = services;
     }
 
     public void doDisplay() throws EmfException {
-        view.display(services.getAccessLogs(dataset.getId()));
+        view.display(service.getAccessLogs(dataset.getId()));
     }
 
     public void doSave() {

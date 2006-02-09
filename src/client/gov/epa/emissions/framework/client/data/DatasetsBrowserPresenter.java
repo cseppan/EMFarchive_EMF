@@ -78,7 +78,7 @@ public class DatasetsBrowserPresenter implements Browser {
     public void doDisplayPropertiesView(PropertiesView propertiesView, EmfDataset dataset) {
         view.clearMessage();
 
-        PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset);
+        PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, session);
         presenter.doDisplay(propertiesView);
     }
 
