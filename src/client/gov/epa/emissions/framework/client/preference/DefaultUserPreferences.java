@@ -9,7 +9,7 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class UserPreferences {
+public class DefaultUserPreferences implements UserPreference {
 
     private static final String DEFAULT_INPUT_FOLDER = "default.input.folder";
 
@@ -23,13 +23,13 @@ public class UserPreferences {
 
     private static final String LOCAL_INPUT_DRIVE = "local.input.drive";
 
-    private static Log log = LogFactory.getLog(UserPreferences.class);
+    private static Log log = LogFactory.getLog(DefaultUserPreferences.class);
 
     public static final String EMF_PREFERENCE = "EMF_PREFERENCE";
 
     private Properties props;
 
-    public UserPreferences() throws EmfException {
+    public DefaultUserPreferences() throws EmfException {
         props = new Properties();
         try {
             FileInputStream inStream = new FileInputStream(getFile());
@@ -40,7 +40,7 @@ public class UserPreferences {
         }
     }
 
-    public UserPreferences(Properties props) {
+    public DefaultUserPreferences(Properties props) {
         this.props = props;
     }
 

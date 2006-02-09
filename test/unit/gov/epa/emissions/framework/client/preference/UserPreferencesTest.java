@@ -11,7 +11,7 @@ public class UserPreferencesTest extends TestCase {
         props.put("local.input.drive", "d:\\");
         props.put("default.input.folder", "emf_input");
 
-        UserPreferences pref = new UserPreferences(props);
+        UserPreference pref = new DefaultUserPreferences(props);
 
         assertEquals("d:\\emf_input", pref.inputFolder());
     }
@@ -21,7 +21,7 @@ public class UserPreferencesTest extends TestCase {
         props.put("local.output.drive", "d:\\");
         props.put("default.output.folder", "emf_output");
 
-        UserPreferences pref = new UserPreferences(props);
+        UserPreference pref = new DefaultUserPreferences(props);
 
         assertEquals("d:\\emf_output", pref.outputFolder());
     }
@@ -32,7 +32,7 @@ public class UserPreferencesTest extends TestCase {
         props.put("default.input.folder", "emf_input");
         props.put("remote.input.drive", "/data/");
 
-        UserPreferences pref = new UserPreferences(props);
+        UserPreference pref = new DefaultUserPreferences(props);
 
         assertEquals("/data/emf_input/orl", pref.mapLocalInputPathToRemote("d:\\emf_input\\orl"));
         assertEquals("/data/emf_input/orl/nc/ch", pref.mapLocalInputPathToRemote("d:\\emf_input\\orl\\nc\\ch"));
@@ -44,7 +44,7 @@ public class UserPreferencesTest extends TestCase {
         props.put("default.output.folder", "emf_output");
         props.put("remote.output.drive", "/data/");
         
-        UserPreferences pref = new UserPreferences(props);
+        UserPreference pref = new DefaultUserPreferences(props);
         
         assertEquals("/data/emf_output/orl", pref.mapLocalOutputPathToRemote("d:\\emf_output\\orl"));
         assertEquals("/data/emf_output/orl/nc/ch", pref.mapLocalOutputPathToRemote("d:\\emf_output\\orl\\nc\\ch"));

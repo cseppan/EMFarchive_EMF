@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.client.preference.UserPreferences;
+import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataEditorService;
@@ -35,5 +35,5 @@ public interface EmfSession {
 
     DataEditorService dataEditorService();
 
-    UserPreferences preferences();
+    UserPreference preferences();
 }
