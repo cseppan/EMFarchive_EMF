@@ -47,3 +47,8 @@ DROP TABLE regions CASCADE;
 DROP TABLE datasets_sectors CASCADE;
 -- emf datasets_sectors
 --
+-- emf notes and note_types
+DROP TABLE emf.notes CASCADE;
+DROP TABLE emf.note_types CASCADE;
+-- emf notes and note_types
+--

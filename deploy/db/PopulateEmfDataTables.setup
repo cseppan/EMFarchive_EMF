@@ -86,3 +86,11 @@ insert into emf.intended_uses values (DEFAULT, 'EIAG');
 insert into emf.intended_uses values (DEFAULT, 'ORD ');
 -- emf.intended_uses
 --
+-- emf.note_types
+insert INTO emf.note_types VALUES (DEFAULT, 'Problem');
+insert INTO emf.note_types VALUES (DEFAULT, 'Observation');
+insert INTO emf.note_types VALUES (DEFAULT, 'Question');
+insert INTO emf.note_types VALUES (DEFAULT, 'Answer');
+insert INTO emf.note_types VALUES (DEFAULT, 'Resolution');
+-- emf.note_types
+--

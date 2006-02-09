@@ -34,6 +34,16 @@ CREATE TABLE emf.users
 WITHOUT OIDS;
 -- emf.users
 --
+-- emf.note_types
+CREATE TABLE emf.note_types
+(
+  id SERIAL PRIMARY KEY,
+  type varchar(30) NOT NULL,
+  UNIQUE (type)
+)
+WITHOUT OIDS;
+-- emf.note_types
+--
 -- emf intended_uses
 CREATE TABLE emf.intended_uses
 (
@@ -173,6 +183,23 @@ CREATE TABLE emf.dataset_access_logs
 ) 
 WITHOUT OIDS;
 --emf.datasets
+--
+--emf.notes
+CREATE TABLE emf.notes
+(
+  id SERIAL PRIMARY KEY,
+  dataset_id int4 NOT NULL REFERENCES emf.datasets (id), 
+  version int4 NOT NULL,
+  name varchar(255) NOT NULL,
+  creator int4 NOT NULL REFERENCES emf.users(id),
+  date_time timestamp,
+  type int4 NOT NULL REFERENCES emf.note_types(id),
+  details text NOT NULL,
+  refers_notes text,
+  UNIQUE (dataset_id, name)
+) 
+WITHOUT OIDS;
+--emf.notes
 --
 -- emf ... KEYWORDS framework
 CREATE TABLE emf.emf_keywords
