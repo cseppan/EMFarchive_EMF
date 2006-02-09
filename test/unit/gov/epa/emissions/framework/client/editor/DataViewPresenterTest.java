@@ -2,7 +2,9 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataViewService;
+import gov.epa.emissions.framework.services.Note;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -56,4 +58,14 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         return constraint;
     }
 
+    public void testShouldAddNoteOnAdd() throws Exception {
+        Mock service = mock(DataCommonsService.class);
+        Note note = new Note();
+        service.expects(once()).method("addNote").with(same(note));
+
+        DataViewPresenter presenter = new DataViewPresenter(null, null, null, null, (DataCommonsService) service
+                .proxy());
+
+        presenter.doAdd(note);
+    }
 }
