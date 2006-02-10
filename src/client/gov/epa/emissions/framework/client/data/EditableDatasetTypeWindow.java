@@ -58,7 +58,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
         changeablesList = new ChangeablesList(this);
-        monitor = new WidgetChangesMonitor(changeablesList, this);
+        monitor = new WidgetChangesMonitor(changeablesList, manager.getParentConsole());
     }
 
     public void observe(EditableDatasetTypePresenter presenter) {
