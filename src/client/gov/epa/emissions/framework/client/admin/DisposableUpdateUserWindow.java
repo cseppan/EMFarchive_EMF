@@ -22,7 +22,7 @@ public class DisposableUpdateUserWindow extends UpdateUserWindow {
         return !super.isClosed();
     }
 
-    public void windowClosing() {
-        close();
-    }
+//    public void windowClosing() {
+//        close();
+//    }
 }

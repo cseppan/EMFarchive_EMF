@@ -38,7 +38,8 @@ public class EmfDialog extends JDialog implements CustomDialog {
     public int showDialog() {
         JOptionPane pane = new JOptionPane(message, messageType, optionType, null, null, null);
         pane.setInitialValue(null);
-        pane.setComponentOrientation(parent.getComponentOrientation());
+        if(parent != null)
+            pane.setComponentOrientation(parent.getComponentOrientation());
         pane.selectInitialValue();
 
         composeDialog(pane);

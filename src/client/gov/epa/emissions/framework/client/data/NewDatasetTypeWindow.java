@@ -1,12 +1,16 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ChangeablesList;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.WidgetChangesMonitor;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -16,7 +20,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -33,13 +37,19 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
     private TextField maxFiles;
 
-    private JComboBox derivedFrom;
+    private ComboBox derivedFrom;
+    
+    private ChangeablesList changeablesList;
+    
+    private WidgetChangesMonitor monitor;
+    
+    private EmfConsole parentConsole;
     
     private static int counter = 0;
 
     // private DatasetTypesManagerView manager;
 
-    private static final String[] types = { "External File", "CSV File", "Line-based File", "SMOKE Report File" };
+    private static final String[] types = {"CSV File", "Line-based File", "SMOKE Report File" };
 
     public NewDatasetTypeWindow(DesktopManager desktopManager) {
         super("Create New Dataset Type", new Dimension(600, 260), desktopManager);
@@ -47,6 +57,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
+        changeablesList = new ChangeablesList(this);
     }
 
     private void doLayout(JPanel layout) {
@@ -56,8 +67,14 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         layout.add(createButtonsPanel());
     }
 
-    public void observe(NewDatasetTypePresenter presenter) {
+    public void observe(NewDatasetTypePresenter presenter, EmfConsole parent) {
         this.presenter = presenter;
+        this.parentConsole = parent;
+        createChangesMonitor();
+    }
+    
+    private void createChangesMonitor() {
+        monitor = new WidgetChangesMonitor(changeablesList, parentConsole);
     }
 
     public void display() {
@@ -75,15 +92,23 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         name = new TextField("name", 40);
+        changeablesList.add(name);
+        name.addTextListener();
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         minFiles = new TextField("minfiles", "1", 20);
+        changeablesList.add(minFiles);
+        minFiles.addTextListener();
         layoutGenerator.addLabelWidgetPair("Min Files:", minFiles, panel);
 
         maxFiles = new TextField("maxfiles", "-1", 20);
+        changeablesList.add(maxFiles);
+        maxFiles.addTextListener();
         layoutGenerator.addLabelWidgetPair("Max Files:", maxFiles, panel);
 
-        derivedFrom = new JComboBox(types);
+        derivedFrom = new ComboBox("External File", types);
+        changeablesList.add(derivedFrom);
+        derivedFrom.addItemChangeListener();
         layoutGenerator.addLabelWidgetPair("Derived From:", derivedFrom, panel);
 
         // Lay out the panel.
@@ -127,6 +152,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
             public void actionPerformed(ActionEvent event) {
                 if (checkTextFields()) {
                     try {
+                        monitor.resetChanges();
                         presenter.doSave(name.getText(), minFiles.getText(), maxFiles.getText(), (String) derivedFrom
                                 .getSelectedItem());
                     } catch (EmfException e) {
@@ -138,15 +164,24 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
         return action;
     }
+    
+    public void windowClosing() {
+        checkChangesAndCloseWindow();
+    }
 
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                presenter.doClose();
+                checkChangesAndCloseWindow();
             }
         };
 
         return action;
+    }
+    
+    private void checkChangesAndCloseWindow() {
+        if(monitor.checkChanges() == JOptionPane.OK_OPTION)
+            presenter.doClose();
     }
 
     private JPanel createButtonsPanel() {

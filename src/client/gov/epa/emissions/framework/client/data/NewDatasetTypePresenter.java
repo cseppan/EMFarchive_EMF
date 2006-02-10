@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.DataCommonsService;
 
 public class NewDatasetTypePresenter {
@@ -14,10 +15,13 @@ public class NewDatasetTypePresenter {
     private EmfSession session;
     
     private HashMap mapImport, mapExport;
+    
+    private EmfConsole parentConsole;
 
-    public NewDatasetTypePresenter(EmfSession session, NewDatasetTypeView view) {
+    public NewDatasetTypePresenter(EmfSession session, NewDatasetTypeView view, EmfConsole parentConsole) {
         this.session = session;
         this.view = view;
+        this.parentConsole = parentConsole;
         mapImport = new HashMap();
         mapExport = new HashMap();
         setMap();
@@ -35,7 +39,7 @@ public class NewDatasetTypePresenter {
     }
 
     public void doDisplay() {
-        view.observe(this);
+        view.observe(this, this.parentConsole);
         view.display();
     }
 

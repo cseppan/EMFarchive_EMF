@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.ui.EmfDialog;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -103,10 +104,21 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
     }
 
     public void closeOnConfirmLosingChanges() {
-        int option = JOptionPane.showConfirmDialog(this,
-                "Would you like to Close(without saving and lose the updates)?", "Close", JOptionPane.YES_NO_OPTION);
-        if (option == 0)
+        String message = "Would you like to Close(without saving and lose the updates)?";
+        EmfDialog dialog = new EmfDialog(null, "Close", JOptionPane.QUESTION_MESSAGE,
+                message, JOptionPane.YES_NO_OPTION);
+        int option = dialog.showDialog();
+        
+        if (option == JOptionPane.YES_OPTION)
             close();
+    }
+    
+    public void windowClosing() {
+        try {
+            presenter.doClose();
+        } catch (EmfException e) {
+            panel.setError(e.getMessage());
+        }
     }
 
 }

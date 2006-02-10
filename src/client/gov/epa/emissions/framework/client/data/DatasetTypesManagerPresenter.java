@@ -49,7 +49,7 @@ public class DatasetTypesManagerPresenter {
     }
     
     public void displayNewDatasetTypeView(NewDatasetTypeView view) {
-        NewDatasetTypePresenter presenter = new NewDatasetTypePresenter(session, view);
+        NewDatasetTypePresenter presenter = new NewDatasetTypePresenter(session, view, this.view.getParentConsole());
         presenter.doDisplay();
     }
     

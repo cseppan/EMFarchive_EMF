@@ -39,7 +39,7 @@ public class UpdateMyProfileWindow extends UpdateUserWindow {
         }
     }
 
-    public void windowClosing() {
-        close();
-    }
+//    public void windowClosing() {
+//        close();
+//    }
 }

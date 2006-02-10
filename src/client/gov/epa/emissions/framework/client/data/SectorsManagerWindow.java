@@ -248,4 +248,8 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
         return view;
     }
 
+    public EmfConsole getParentConsole() {
+        return parentConsole;
+    }
+
 }
