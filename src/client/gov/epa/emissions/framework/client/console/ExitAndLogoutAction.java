@@ -1,6 +1,9 @@
 package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.commons.gui.ConfirmDialog;
+import gov.epa.emissions.framework.ui.EmfDialog;
+
+import javax.swing.JOptionPane;
 
 public class ExitAndLogoutAction {
 
@@ -31,8 +34,13 @@ public class ExitAndLogoutAction {
     }
 
     private boolean confirm(String message) {
-        ConfirmDialog dialog = new ConfirmDialog(message, "Warning", emfConsole);
-        return dialog.confirm();
+        //ConfirmDialog dialog = new ConfirmDialog(message, "Warning", emfConsole);
+        //return dialog.confirm();
+        EmfDialog emfDialog = new EmfDialog(emfConsole, "Warning", JOptionPane.QUESTION_MESSAGE,
+                message, JOptionPane.OK_CANCEL_OPTION);
+        ConfirmDialog dialog = new ConfirmDialog(emfDialog);
+        
+        return dialog.confirmYesChoice();
     }
 
     private void closeAll() {

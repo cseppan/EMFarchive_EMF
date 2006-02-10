@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.ui;
 
+import gov.epa.emissions.commons.gui.CustomDialog;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 
 import java.awt.BorderLayout;
@@ -15,7 +16,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JRootPane;
 
-public class EmfDialog extends JDialog {
+public class EmfDialog extends JDialog implements CustomDialog {
     private EmfConsole parent;
     
     private int messageType;
