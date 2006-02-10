@@ -1,15 +1,17 @@
 package gov.epa.emissions.framework.client;
 
-import javax.swing.JOptionPane;
-
 import gov.epa.emissions.commons.gui.ChangeablesList;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.ui.EmfDialog;
+
+import javax.swing.JOptionPane;
 
 public class WidgetChangesMonitor {
     private ChangeablesList list;
     
-    private EmfInternalFrame window;
+   private EmfConsole window;
     
-    public WidgetChangesMonitor(ChangeablesList list, EmfInternalFrame window) {
+    public WidgetChangesMonitor(ChangeablesList list, EmfConsole window) {
         this.list = list;
         this.window = window;
     }
@@ -24,8 +26,12 @@ public class WidgetChangesMonitor {
         String message = "Would you like to discard the changes " + System.getProperty("line.separator") + 
                 " and close the current window?";
         String title = "Please choose one";
-        if(list.hasChanges())
-            option = JOptionPane.showConfirmDialog(window, message, title, JOptionPane.OK_CANCEL_OPTION);
+        if(list.hasChanges()) {
+            EmfDialog dialog = new EmfDialog(window, title, JOptionPane.QUESTION_MESSAGE,
+                    message, JOptionPane.OK_CANCEL_OPTION);
+            option = dialog.showDialog();
+        }
+        
         return option;
     }
 
