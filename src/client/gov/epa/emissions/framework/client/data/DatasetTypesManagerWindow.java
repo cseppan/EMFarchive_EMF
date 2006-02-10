@@ -244,4 +244,8 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         selectModel.refresh();
         super.refreshLayout();
     }
+
+    public EmfConsole getParentConsole() {
+        return this.parentConsole;
+    }
 }
