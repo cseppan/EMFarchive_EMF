@@ -95,13 +95,17 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public Sector updateSector(Sector sector) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+
+            if (dao.containsSector(sector, session))
+                throw new EmfException("Sector name already in use");
+
             Sector released = dao.updateSector(sector, session);
             session.close();
 
             return released;
         } catch (RuntimeException e) {
             LOG.error("Could not update sector: " + sector.getName(), e);
-            throw new EmfException("Could not update sector: " + sector.getName());
+            throw new EmfException("Sector name already in use");
         }
     }
 
@@ -149,13 +153,17 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public DatasetType updateDatasetType(DatasetType type) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+
+            if (dao.containsDatasetType(type, session))
+                throw new EmfException("DatasetType name already in use");
+
             DatasetType locked = dao.updateDatasetType(type, session);
             session.close();
 
             return locked;
         } catch (RuntimeException e) {
-            LOG.error("Could not update DatasetType: " + type.getName(), e);
-            throw new EmfException("Could not update DatasetType: " + type.getName());
+            LOG.error("Could not update DatasetType. Name is already in use: " + type.getName(), e);
+            throw new EmfException("DatasetType name already in use");
         }
     }
 
@@ -201,11 +209,15 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addProject(Project project) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+
+            if (dao.containsProject(project, session))
+                throw new EmfException("Project name already in use");
+
             dao.add(project, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add new Project", e);
-            throw new EmfException("Could not add Project");
+            throw new EmfException("Project name already in use");
         }
     }
 
@@ -217,7 +229,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
             return (Region[]) regions.toArray(new Region[0]);
         } catch (RuntimeException e) {
-            LOG.error("Could not get all Regions", e );
+            LOG.error("Could not get all Regions", e);
             throw new EmfException("Could not get all Regions");
         }
     }
@@ -225,11 +237,15 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addRegion(Region region) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+
+            if (dao.containsRegion(region, session))
+                throw new EmfException("Region name already in use");
+
             dao.add(region, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add new Region", e);
-            throw new EmfException("Could not add Region");
+            throw new EmfException("Region name already in use");
         }
     }
 
@@ -249,22 +265,30 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addIntendedUse(IntendedUse intendedUse) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+
+            if (dao.containsIntendedUse(intendedUse, session))
+                throw new EmfException("Intended use name already in use");
+
             dao.add(intendedUse, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add new intended use", e);
-            throw new EmfException("Could not add new intended use");
+            throw new EmfException("Intended use name already in use");
         }
     }
 
     public void addCountry(Country country) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+
+            if (dao.containsCountry(country, session))
+                throw new EmfException("Country name already in use");
+
             dao.add(country, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add new country", e);
-            throw new EmfException("Could not add new country");
+            throw new EmfException("Country name already in use");
         }
     }
 
@@ -272,14 +296,14 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.containsDatasetType(type.getName(), session))
+            if (dao.containsDatasetType(type, session))
                 throw new EmfException("DatasetType name already in use");
 
             dao.add(type, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add new DatasetType", e);
-            throw new EmfException("Could not add DatasetType");
+            throw new EmfException("DatasetType name already in use");
         }
     }
 
@@ -287,40 +311,66 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.containsSector(sector.getName(), session))
+            if (dao.containsSector(sector, session))
                 throw new EmfException("Sector name already in use");
 
             dao.add(sector, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add new Sector.", e);
-            throw new EmfException("Could not add Sector");
+            throw new EmfException("Sector name already in use");
         }
     }
 
-    public Note[] getNotes(long datasetId){
-        // TODO Auto-generated method stub
-        return null;
+    public Note[] getNotes(long datasetId) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List notes = dao.getNotes(session);
+            session.close();
+
+            return (Note[]) notes.toArray(new Note[notes.size()]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Notes", e);
+            throw new EmfException("Could not get all Notes");
+        }
     }
 
-    public void addNote(Note note) {
-        // TODO Auto-generated method stub
-        
+    public void addNote(Note note) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+
+            if (dao.containsNote(note, session))
+                throw new EmfException("Note name already in use");
+
+            dao.add(note, session);
+            session.close();
+        } catch (RuntimeException e) {
+            LOG.error("Could not add new note", e);
+            throw new EmfException("Note name already in use");
+        }
     }
 
-    public NoteType[] getNoteTypes() {
-        // TODO Auto-generated method stub
-        return null;
+    public NoteType[] getNoteTypes() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List notetypes = dao.getNoteTypes(session);
+            session.close();
+
+            return (NoteType[]) notetypes.toArray(new NoteType[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Note Types", e);
+            throw new EmfException("Could not get all Note Types");
+        }
     }
 
-    public Revision[] getRevisions(int datasetId) {
+    public Revision[] getRevisions(long datasetId) {
         // TODO Auto-generated method stub
         return null;
     }
 
     public void addRevision(Revision revision) {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

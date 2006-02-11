@@ -12,7 +12,7 @@
   <property name="creator"				column="creator"				type="java.lang.String"		not-null="true"/>
   <property name="status"				column="status"					type="java.lang.String"		not-null="false"/>
 
-  <many-to-one
+  <many-to-one cascade="save-update"
             name="datasetType" 
             class="gov.epa.emissions.commons.io.DatasetType"
             column="dataset_type"/> 

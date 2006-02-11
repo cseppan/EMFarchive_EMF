@@ -1,0 +1,143 @@
+package gov.epa.emissions.framework.services;
+
+import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
+import gov.epa.emissions.framework.services.impl.DataCommonsServiceImpl;
+import gov.epa.emissions.framework.services.impl.DataServiceImpl;
+import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.impl.UserServiceImpl;
+
+import java.util.Date;
+import java.util.Random;
+
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
+
+public class DataCommonsTransportServiceTestCase extends ServicesTestCase {
+    private static final String DEFAULT_URL = "http://localhost:8080/emf/services";// default
+
+    private DataCommonsService dcs = null;
+//    private DataService ds = null;
+//    private UserService us = null;
+
+    private DataCommonsService service;
+    private DataService dataService;
+    private UserService userService;
+
+    protected void doSetUp() throws Exception {
+        HibernateSessionFactory sessionFactory = sessionFactory();
+        service = new DataCommonsServiceImpl(sessionFactory);
+        userService = new UserServiceImpl(sessionFactory);
+        dataService = new DataServiceImpl(sessionFactory);
+        
+        
+        RemoteServiceLocator rl = new RemoteServiceLocator(DEFAULT_URL);
+        dcs = rl.dataCommonsService();
+//        ds = rl.dataService();
+//        us = rl.userService();    
+    }
+
+
+    public void testShouldGetAllNoteTypes() throws EmfException {
+        NoteType[] all = dcs.getNoteTypes();
+        assertEquals("5 types",all.length,5);
+    }
+
+    public void testShouldAddNote() throws EmfException {
+        long id = Math.abs(new Random().nextInt());
+        User user = userService.getUser("emf");
+        EmfDataset dataset = newDataset();
+        dataset.setCreator(user.getUsername());
+        dataService.addDataset(dataset);
+        EmfDataset datasetFromDB = loadDataset(dataset.getName());
+        Note note = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME"+id, loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        dcs.addNote(note);
+
+        try {
+            Note[] notes = service.getNotes(datasetFromDB.getId());
+            assertEquals(notes.length,1);
+        } finally {
+            remove(note);
+            remove(dataset);
+        }
+    }
+
+    public void xtestShouldGetAllNotes() throws EmfException {
+        long id = Math.abs(new Random().nextInt());
+        User user = userService.getUser("emf");
+        EmfDataset dataset = newDataset();
+        dataset.setCreator(user.getUsername());
+        dataService.addDataset(dataset);
+        EmfDataset datasetFromDB = loadDataset(dataset.getName());
+
+        Note note1 = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME1"+id, loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        service.addNote(note1);
+        Note note2 = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME2"+id, loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        service.addNote(note2);
+
+        try {
+            Note[] notes = service.getNotes(datasetFromDB.getId());
+            assertEquals("Two notes should return", notes.length,2);
+        } finally {
+            remove(note1);
+            remove(note2);
+            remove(dataset);
+        }
+    }
+
+    private EmfDataset newDataset() {
+        Random rando = new Random();
+        long id = Math.abs(rando.nextInt());
+        EmfDataset dataset = new EmfDataset();
+
+        dataset.setName("FOO_" + id);
+        dataset.setAccessedDateTime(new Date());
+        dataset.setCreatedDateTime(new Date());
+        dataset.setDescription("DESCRIPTION");
+        dataset.setModifiedDateTime(new Date());
+        dataset.setStartDateTime(new Date());
+        dataset.setStatus("imported");
+        dataset.setYear(42);
+        dataset.setUnits("orl");
+        dataset.setTemporalResolution("t1");
+        dataset.setStopDateTime(new Date());
+
+        return dataset;
+    }
+
+    private NoteType loadNoteType(String type) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(NoteType.class).add(Restrictions.eq("type", type));
+            tx.commit();
+
+            return (NoteType) crit.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    private EmfDataset loadDataset(String name) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(EmfDataset.class).add(Restrictions.eq("name", name));
+            tx.commit();
+
+            return (EmfDataset) crit.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    protected void doTearDown() throws Exception {// no op
+    }
+
+    
+}

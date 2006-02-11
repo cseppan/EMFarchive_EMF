@@ -9,6 +9,8 @@ import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.IntendedUse;
+import gov.epa.emissions.framework.services.Note;
+import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.services.Status;
 
 import java.util.ArrayList;
@@ -153,11 +155,6 @@ public class DataCommonsDAO {
         return session.createCriteria(Sector.class).addOrder(Order.asc("name")).list();
     }
 
-    public boolean containsSector(String name, Session session) {
-        Criteria crit = session.createCriteria(Sector.class).add(Restrictions.eq("name", name));
-        return crit.uniqueResult() != null;
-    }
-
     public List getDatasetTypes(Session session) {
         return session.createCriteria(DatasetType.class).addOrder(Order.asc("name")).list();
     }
@@ -278,11 +275,6 @@ public class DataCommonsDAO {
         addObject(datasetType, session);
     }
 
-    public boolean containsDatasetType(String name, Session session) {
-        Criteria crit = session.createCriteria(DatasetType.class).add(Restrictions.eq("name", name));
-        return crit.uniqueResult() != null;
-    }
-
     public void add(Sector sector, Session session) {
         addObject(sector, session);
     }
@@ -297,6 +289,130 @@ public class DataCommonsDAO {
             tx.rollback();
             throw e;
         }
+    }
+
+    public boolean containsDatasetType(DatasetType datasetType, Session session) {
+        boolean flag = false;
+        Criteria crit = session.createCriteria(DatasetType.class).add(Restrictions.eq("name", datasetType.getName()));
+        DatasetType type = (DatasetType) crit.uniqueResult();
+
+        if ((type != null) && (type.getId()==datasetType.getId())){
+            flag = true;
+        }
+        
+        return flag;
+
+    }
+
+    public boolean containsProject(Project project, Session session) {
+        boolean flag = false;
+        
+        Criteria crit = session.createCriteria(Project.class).add(Restrictions.eq("name", project.getName()));
+        Project prj = (Project)crit.uniqueResult();
+        
+        if ((prj != null) && (prj.getId()==project.getId())){
+            flag = true;
+        }
+        
+        return flag;
+    }
+
+    public boolean containsRegion(Region region, Session session) {
+        boolean flag = false;
+        Criteria crit = session.createCriteria(Region.class).add(Restrictions.eq("name", region.getName()));
+        Region reg = (Region) crit.uniqueResult();
+
+        if ((reg != null) && (reg.getId()==region.getId())){
+            flag = true;
+        }
+        
+        return flag;
+    }
+
+    public boolean containsIntendedUse(IntendedUse intendedUse, Session session) {
+        boolean flag = false;
+
+        Criteria crit = session.createCriteria(IntendedUse.class).add(Restrictions.eq("name", intendedUse.getName()));
+        IntendedUse iu = (IntendedUse) crit.uniqueResult();
+
+        if ((iu != null) && (iu.getId()==intendedUse.getId())){
+            flag = true;
+        }
+        
+        return flag;
+    }
+
+    public boolean containsCountry(Country country, Session session) {
+        boolean flag = false;
+
+        Criteria crit = session.createCriteria(Country.class).add(Restrictions.eq("name", country.getName()));
+        Country ctry = (Country) crit.uniqueResult();
+
+        if ((ctry != null) && (ctry.getId()==country.getId())){
+            flag = true;
+        }
+        
+        return flag;
+    }
+
+    public boolean containsSector(Sector sector, Session session) {
+        boolean flag = false;
+
+        Criteria crit = session.createCriteria(Sector.class).add(Restrictions.eq("name", sector.getName()));
+        Sector sec = (Sector)crit.uniqueResult();
+
+        if ((sec != null) && (sec.getId()==sector.getId())){
+            flag = true;
+        }
+        
+        return flag;
+    }
+
+    public List getNoteTypes(Session session) {
+        Transaction tx = null;
+
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(NoteType.class);
+            tx.commit();
+
+            return crit.list();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public void add(Note note, Session session) {
+        addObject(note, session);
+    }
+
+    public List getNotes(Session session) {
+        Transaction tx = null;
+
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(Note.class);
+            tx.commit();
+
+            return crit.list();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public boolean containsNote(Note note, Session session) {
+        boolean flag = false;
+
+        Criteria crit = session.createCriteria(Note.class).add(Restrictions.eq("name", note.getName()));
+        Note nt = (Note)crit.uniqueResult();
+
+        if ((nt != null) && (nt.getId()==note.getId())){
+            flag = true;
+        }
+        
+        return flag;
     }
 
 }

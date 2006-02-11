@@ -33,7 +33,8 @@
         <mapping resource="gov/epa/emissions/framework/services/impl/Region.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/impl/Project.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/impl/IntendedUse.hbm.xml"/>
-    
+        <mapping resource="gov/epa/emissions/framework/services/impl/Note.hbm.xml"/>
+        <mapping resource="gov/epa/emissions/framework/services/impl/NoteType.hbm.xml"/>
     </session-factory>
     
 </hibernate-configuration>

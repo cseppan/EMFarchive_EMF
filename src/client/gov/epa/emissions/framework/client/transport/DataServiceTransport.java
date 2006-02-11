@@ -69,4 +69,9 @@ public class DataServiceTransport implements DataService {
         return (EmfDataset) call.requestResponse(new Object[] { locked });
     }
 
+    public void addDataset(EmfDataset dataset) {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

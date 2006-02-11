@@ -103,6 +103,14 @@
 	
 	<!-- Structs (Java Beans-style)-->
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.Note"
+		qname="ns1:Note" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.NoteType"
+		qname="ns1:NoteType" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.commons.security.User"
 		qname="ns1:User" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
@@ -180,6 +188,17 @@
 	
 	
 	<!-- Arrays of Structs -->
+
+	<arrayMapping qname="ns1:Notes" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.Note[]"
+		innerType="ns1:Note"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<arrayMapping qname="ns1:NoteTypes" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.NoteType[]"
+		innerType="ns1:NoteType"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
 	<arrayMapping qname="ns1:Regions" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.commons.io.Region[]"
 		innerType="ns1:Region"

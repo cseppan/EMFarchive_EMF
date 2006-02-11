@@ -52,7 +52,7 @@ public interface DataCommonsService {
     Status[] getStatuses(String username) throws EmfException;
 
     //Revisions
-    Revision[] getRevisions(int datasetId) throws EmfException;
+    Revision[] getRevisions(long datasetId) throws EmfException;
     void addRevision(Revision revision) throws EmfException;
     //Notes
     Note[] getNotes(long datasetId) throws EmfException;

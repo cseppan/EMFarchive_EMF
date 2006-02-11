@@ -4,12 +4,16 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.Note;
+import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.services.ServicesTestCase;
 import gov.epa.emissions.framework.services.Status;
 
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -20,11 +24,14 @@ public class DataCommonsDAOTest extends ServicesTestCase {
 
     private DataCommonsDAO dao;
 
+    private DatasetDao datasetDAO;
+
     private UserDAO userDao;
 
     protected void doSetUp() throws Exception {
         dao = new DataCommonsDAO();
         userDao = new UserDAO();
+        datasetDAO = new DatasetDao();
     }
 
     protected void doTearDown() throws Exception {// no op
@@ -260,6 +267,86 @@ public class DataCommonsDAOTest extends ServicesTestCase {
         }
     }
 
+    public void testShouldPersistNoteOnAdd() {
+        User user = userDao.get("emf", session);
+        EmfDataset dataset = newDataset();
+        dataset.setCreator(user.getUsername());
+        datasetDAO.add(dataset,session);
+        EmfDataset datasetFromDB = loadDataset(dataset.getName());
+        Note note = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME", loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+
+        dao.add(note, session);
+
+        try {
+            List allNotes = dao.getNotes(session);
+            assertEquals(1, allNotes.size());
+        } finally {
+            remove(note);
+            remove(dataset);
+        }
+    }
+
+    public void testShouldGetAllNotes() {
+        User user = userDao.get("emf", session);
+        EmfDataset dataset = newDataset();
+        dataset.setCreator(user.getUsername());
+        datasetDAO.add(dataset,session);
+        EmfDataset datasetFromDB = loadDataset(dataset.getName());
+        Note note1 = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME", loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        Note note2 = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS2","NOTE NAME 2", loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+
+        dao.add(note1, session);
+
+        dao.add(note2, session);
+        try {
+            List allNotes = dao.getNotes(session);
+            assertEquals(2, allNotes.size());
+        } finally {
+            remove(note1);
+            remove(note2);
+            remove(dataset);
+        }
+    }
+
+    private NoteType loadNoteType(String type) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(NoteType.class).add(Restrictions.eq("type", type));
+            tx.commit();
+
+            return (NoteType) crit.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    private EmfDataset newDataset() {
+        Random rando = new Random();
+        long id = Math.abs(rando.nextInt());
+        EmfDataset dataset = new EmfDataset();
+
+        dataset.setName("FOO_" + id);
+        dataset.setAccessedDateTime(new Date());
+        dataset.setCreatedDateTime(new Date());
+        dataset.setDescription("DESCRIPTION");
+        dataset.setModifiedDateTime(new Date());
+        dataset.setStartDateTime(new Date());
+        dataset.setStatus("imported");
+        dataset.setYear(42);
+        dataset.setUnits("orl");
+        dataset.setTemporalResolution("t1");
+        dataset.setStopDateTime(new Date());
+
+        return dataset;
+    }
+
+    public void testShouldGetNoteTypes() {
+        List allNoteTypes = dao.getNoteTypes(session);
+        assertEquals("5 note types", allNoteTypes.size(), 5);
+    }
+
     private Status newReadStatus(User emf) {
         Status status = new Status();
         status.setUsername(emf.getUsername());
@@ -304,6 +391,20 @@ public class DataCommonsDAOTest extends ServicesTestCase {
         Transaction tx = session.beginTransaction();
         session.delete(status);
         tx.commit();
+    }
+
+    private EmfDataset loadDataset(String name) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(EmfDataset.class).add(Restrictions.eq("name", name));
+            tx.commit();
+
+            return (EmfDataset) crit.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
 }

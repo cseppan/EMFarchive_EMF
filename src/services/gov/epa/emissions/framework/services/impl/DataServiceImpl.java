@@ -44,22 +44,30 @@ public class DataServiceImpl implements DataService {
     public void addDataset(EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+
+            if (dao.exists(dataset.getName(), session))
+                throw new EmfException("Dataset name already in use");
+
             dao.add(dataset, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add Dataset - " + dataset.getName(), e);
-            throw new EmfException("Could not get add Dataset - " + dataset.getName());
+            throw new EmfException("Dataset name already in use");
         }
     }
 
     public void updateDatasetWithoutLock(EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+
+            if (dao.exists(dataset.getName(), session))
+                throw new EmfException("Dataset name already in use");
+
             dao.updateWithoutLocking(dataset, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not get update Dataset - " + dataset.getName(), e);
-            throw new EmfException("Could not get update Dataset - " + dataset.getName());
+            throw new EmfException("Dataset name already in use");
         }
     }
 
@@ -108,13 +116,17 @@ public class DataServiceImpl implements DataService {
     public EmfDataset updateDataset(EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+
+            if (dao.exists(dataset.getName(), session))
+                throw new EmfException("Dataset name already in use");
+
             EmfDataset released = dao.update(dataset, session);
             session.close();
 
             return released;
         } catch (RuntimeException e) {
             LOG.error("Could not update Dataset: " + dataset.getName(), e);
-            throw new EmfException("Could not update Dataset: " + dataset.getName());
+            throw new EmfException("Dataset name already in use");
         }
     }
 }

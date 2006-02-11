@@ -26,11 +26,19 @@ public class Note {
     public Note() {// No argument constructor needed for hibernate mapping
     }
 
-    public Note(User creator, long id, Date date, String details, String name, NoteType type, String references, long version) {
+    public String toString(){
+       String delim=":";
+       String output = "[" + id + delim + datasetId + delim + version + delim + name + delim 
+                           + creator + delim + date + delim + noteType + delim + details + delim
+                           + references + "]";
+      return output;   
+    }
+    
+    public Note(User creator, long datasetId, Date date, String details, String name, NoteType type, String references, long version) {
         super();
         // TODO Auto-generated constructor stub
         this.creator = creator;
-        datasetId = id;
+        this.datasetId = datasetId;
         this.date = date;
         this.details = details;
         this.name = name;
