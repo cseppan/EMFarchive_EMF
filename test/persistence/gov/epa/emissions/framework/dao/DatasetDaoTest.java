@@ -82,6 +82,7 @@ public class DatasetDaoTest extends ServicesTestCase {
 
         try {
             assertTrue("Should be able to confirm existence of dataset", dao.exists(dataset.getName(), session));
+            
         } finally {
             remove(dataset);
         }

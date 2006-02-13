@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.dao;
 
+import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -21,6 +22,52 @@ public class DatasetDao {
         lockingScheme = new LockingScheme();
     }
 
+    public boolean exists(long id, Class clazz, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("id", new Long(id)));
+            tx.commit();
+
+            return crit.uniqueResult() != null;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    /*
+     * Return true if the name is already used
+     */
+    public boolean nameUsed(String name, Class clazz, Session session) {
+        boolean flag = false;
+
+        Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("name", name));
+        Sector sec = (Sector) crit.uniqueResult();
+
+        if (sec != null) {
+            flag = true;
+        }
+        return flag;
+    }
+
+    public Object current(long id, Class clazz, Session session) {
+        Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("id", new Long(id)));
+        return crit.uniqueResult();
+    }
+
+    public boolean canUpdate(EmfDataset dataset, Session session) {
+        if (!exists(dataset.getId(), EmfDataset.class, session)) {
+            return false;
+        }
+
+        EmfDataset current = (EmfDataset) current(dataset.getId(), EmfDataset.class, session);
+        if (current.getName().equals(dataset.getName()))
+            return true;
+
+        return !nameUsed(dataset.getName(), EmfDataset.class, session);
+    }
+
     public boolean exists(String name, Session session) {
         Transaction tx = null;
         try {
@@ -35,28 +82,17 @@ public class DatasetDao {
         }
     }
 
-    public boolean containsDataset(EmfDataset dataset, Session session) {
-        boolean flag = false;
-
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(EmfDataset.class).add(Restrictions.eq("name", dataset.getName()));
-            EmfDataset ds = (EmfDataset) crit.uniqueResult();
-
-            if ((ds != null) && (ds.getId() == dataset.getId())) {
-                flag = true;
-            }
-
-            tx.commit();
-
-            return flag;
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
-
-    }
+//    public boolean datasetNameUsed(String name, Session session) {
+//        boolean flag = false;
+//
+//        Criteria crit = session.createCriteria(EmfDataset.class).add(Restrictions.eq("name", name));
+//        EmfDataset iu = (EmfDataset) crit.uniqueResult();
+//
+//        if (iu != null) {
+//            flag = true;
+//        }
+//        return flag;
+//    }
 
     public List all(Session session) {
         Transaction tx = null;

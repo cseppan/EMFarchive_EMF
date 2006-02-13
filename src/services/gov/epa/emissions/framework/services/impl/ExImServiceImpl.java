@@ -85,7 +85,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     private void validateDatasetName(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
-        boolean dsNameUsed = new DatasetDao().exists(dataset.getName(), session);
+//        boolean dsNameUsed = new DatasetDao().exists(dataset.getName(), session);
+        boolean dsNameUsed = new DatasetDao().nameUsed(dataset.getName(), EmfDataset.class,session);
         session.flush();
         session.close();
         if (dsNameUsed) {

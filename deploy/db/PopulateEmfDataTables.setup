@@ -92,5 +92,10 @@ insert INTO emf.note_types VALUES (DEFAULT, 'Observation');
 insert INTO emf.note_types VALUES (DEFAULT, 'Question');
 insert INTO emf.note_types VALUES (DEFAULT, 'Answer');
 insert INTO emf.note_types VALUES (DEFAULT, 'Resolution');
+insert INTO emf.note_types VALUES (DEFAULT, 'Replaced by dataset');
+insert INTO emf.note_types VALUES (DEFAULT, 'Replaces dataset ');
 -- emf.note_types
 --
+
+
+

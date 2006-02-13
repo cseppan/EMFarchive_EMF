@@ -291,83 +291,6 @@ public class DataCommonsDAO {
         }
     }
 
-    public boolean containsDatasetType(DatasetType datasetType, Session session) {
-        boolean flag = false;
-        Criteria crit = session.createCriteria(DatasetType.class).add(Restrictions.eq("name", datasetType.getName()));
-        DatasetType type = (DatasetType) crit.uniqueResult();
-
-        if ((type != null) && (type.getId()==datasetType.getId())){
-            flag = true;
-        }
-        
-        return flag;
-
-    }
-
-    public boolean containsProject(Project project, Session session) {
-        boolean flag = false;
-        
-        Criteria crit = session.createCriteria(Project.class).add(Restrictions.eq("name", project.getName()));
-        Project prj = (Project)crit.uniqueResult();
-        
-        if ((prj != null) && (prj.getId()==project.getId())){
-            flag = true;
-        }
-        
-        return flag;
-    }
-
-    public boolean containsRegion(Region region, Session session) {
-        boolean flag = false;
-        Criteria crit = session.createCriteria(Region.class).add(Restrictions.eq("name", region.getName()));
-        Region reg = (Region) crit.uniqueResult();
-
-        if ((reg != null) && (reg.getId()==region.getId())){
-            flag = true;
-        }
-        
-        return flag;
-    }
-
-    public boolean containsIntendedUse(IntendedUse intendedUse, Session session) {
-        boolean flag = false;
-
-        Criteria crit = session.createCriteria(IntendedUse.class).add(Restrictions.eq("name", intendedUse.getName()));
-        IntendedUse iu = (IntendedUse) crit.uniqueResult();
-
-        if ((iu != null) && (iu.getId()==intendedUse.getId())){
-            flag = true;
-        }
-        
-        return flag;
-    }
-
-    public boolean containsCountry(Country country, Session session) {
-        boolean flag = false;
-
-        Criteria crit = session.createCriteria(Country.class).add(Restrictions.eq("name", country.getName()));
-        Country ctry = (Country) crit.uniqueResult();
-
-        if ((ctry != null) && (ctry.getId()==country.getId())){
-            flag = true;
-        }
-        
-        return flag;
-    }
-
-    public boolean containsSector(Sector sector, Session session) {
-        boolean flag = false;
-
-        Criteria crit = session.createCriteria(Sector.class).add(Restrictions.eq("name", sector.getName()));
-        Sector sec = (Sector)crit.uniqueResult();
-
-        if ((sec != null) && (sec.getId()==sector.getId())){
-            flag = true;
-        }
-        
-        return flag;
-    }
-
     public List getNoteTypes(Session session) {
         Transaction tx = null;
 
@@ -402,17 +325,115 @@ public class DataCommonsDAO {
         }
     }
 
-    public boolean containsNote(Note note, Session session) {
+    /*
+     * Return true if the name is already used
+     */
+    public boolean nameUsed(String name, Class clazz, Session session) {
         boolean flag = false;
 
-        Criteria crit = session.createCriteria(Note.class).add(Restrictions.eq("name", note.getName()));
-        Note nt = (Note)crit.uniqueResult();
+        Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("name", name));
+        Sector sec = (Sector) crit.uniqueResult();
 
-        if ((nt != null) && (nt.getId()==note.getId())){
+        if (sec != null) {
             flag = true;
         }
-        
         return flag;
+    }
+
+    public Object current(long id, Class clazz, Session session) {
+        Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("id", new Long(id)));
+        return crit.uniqueResult();
+    }
+
+    public boolean exists(long id, Class clazz, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("id", new Long(id)));
+            tx.commit();
+
+            return crit.uniqueResult() != null;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    /*
+     * True if sector exists in database
+     * 
+     * 1. Should Exist 2. Your id matches existing Id 3. Your name should not match another object's name
+     * 
+     */
+    public boolean canUpdate(Sector sector, Session session) {
+        if (!exists(sector.getId(), Sector.class, session)) {
+            return false;
+        }
+
+        Sector current = (Sector) current(sector.getId(), Sector.class, session);
+        if (current.getName().equals(sector.getName()))
+            return true;
+
+        return !nameUsed(sector.getName(), Sector.class, session);
+    }
+
+    public boolean canUpdate(Country country, Session session) {
+        if (!exists(country.getId(), Country.class, session)) {
+            return false;
+        }
+
+        Country current = (Country) current(country.getId(), Country.class, session);
+        if (current.getName().equals(country.getName()))
+            return true;
+
+        return !nameUsed(country.getName(), Country.class, session);
+    }
+    public boolean canUpdate(DatasetType datasetType, Session session) {
+        if (!exists(datasetType.getId(), DatasetType.class, session)) {
+            return false;
+        }
+
+        DatasetType current = (DatasetType) current(datasetType.getId(), DatasetType.class, session);
+        if (current.getName().equals(datasetType.getName()))
+            return true;
+
+        return !nameUsed(datasetType.getName(), DatasetType.class, session);
+    }
+
+    public boolean canUpdate(Project project, Session session) {
+        if (!exists(project.getId(), Project.class, session)) {
+            return false;
+        }
+
+        Project current = (Project) current(project.getId(), Project.class, session);
+        if (current.getName().equals(project.getName()))
+            return true;
+
+        return !nameUsed(project.getName(), Project.class, session);
+    }
+
+    public boolean canUpdate(Region region, Session session) {
+        if (!exists(region.getId(), Region.class, session)) {
+            return false;
+        }
+
+        Region current = (Region) current(region.getId(), Region.class, session);
+        if (current.getName().equals(region.getName()))
+            return true;
+
+        return !nameUsed(region.getName(), Region.class, session);
+    }
+
+    public boolean canUpdate(IntendedUse intendedUse, Session session) {
+        if (!exists(intendedUse.getId(), IntendedUse.class, session)) {
+            return false;
+        }
+
+        IntendedUse current = (IntendedUse) current(intendedUse.getId(), IntendedUse.class, session);
+        if (current.getName().equals(intendedUse.getName()))
+            return true;
+
+        return !nameUsed(intendedUse.getName(), IntendedUse.class, session);
     }
 
 }

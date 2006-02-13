@@ -95,8 +95,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public Sector updateSector(Sector sector) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-
-            if (dao.containsSector(sector, session))
+            
+            if (!dao.canUpdate(sector, session))
                 throw new EmfException("Sector name already in use");
 
             Sector released = dao.updateSector(sector, session);
@@ -154,7 +154,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.containsDatasetType(type, session))
+            if (!dao.canUpdate(type, session))
                 throw new EmfException("DatasetType name already in use");
 
             DatasetType locked = dao.updateDatasetType(type, session);
@@ -210,9 +210,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.containsProject(project, session))
+            if (dao.nameUsed(project.getName(),Project.class, session))
                 throw new EmfException("Project name already in use");
-
+            
             dao.add(project, session);
             session.close();
         } catch (RuntimeException e) {
@@ -238,7 +238,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.containsRegion(region, session))
+            if (dao.nameUsed(region.getName(),Region.class,session))
                 throw new EmfException("Region name already in use");
 
             dao.add(region, session);
@@ -266,7 +266,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.containsIntendedUse(intendedUse, session))
+            if (dao.nameUsed(intendedUse.getName(), IntendedUse.class,session))
                 throw new EmfException("Intended use name already in use");
 
             dao.add(intendedUse, session);
@@ -281,7 +281,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.containsCountry(country, session))
+            if (dao.nameUsed(country.getName(), Country.class, session))
                 throw new EmfException("Country name already in use");
 
             dao.add(country, session);
@@ -296,7 +296,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.containsDatasetType(type, session))
+            if (dao.nameUsed(type.getName(), DatasetType.class, session))
                 throw new EmfException("DatasetType name already in use");
 
             dao.add(type, session);
@@ -311,7 +311,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.containsSector(sector, session))
+            if (dao.nameUsed(sector.getName(),Sector.class, session))
                 throw new EmfException("Sector name already in use");
 
             dao.add(sector, session);
@@ -338,8 +338,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addNote(Note note) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-
-            if (dao.containsNote(note, session))
+            
+            if (dao.nameUsed(note.getName(),Note.class, session))
                 throw new EmfException("Note name already in use");
 
             dao.add(note, session);

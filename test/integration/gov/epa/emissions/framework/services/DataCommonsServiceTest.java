@@ -218,19 +218,21 @@ public class DataCommonsServiceTest extends ServicesTestCase {
 
         Sector[] sectors = service.getSectors();
         Sector sector = sectors[0];
-        String name = sector.getName();
+        String originalName = sector.getName();
 
         Sector modified1 = service.obtainLockedSector(owner, sector);
         assertEquals(modified1.getLockOwner(), owner.getUsername());
-        modified1.setName("TEST");
+        String testName = "TEST" + Math.random();
+        System.out.println(testName);
+        modified1.setName(testName);
 
         Sector modified2 = service.updateSector(modified1);
-        assertEquals("TEST", modified2.getName());
+        assertEquals(testName, modified2.getName());
         assertEquals(modified2.getLockOwner(), null);
 
         // restore
         Sector modified = service.obtainLockedSector(owner, sector);
-        modified.setName(name);
+        modified.setName(originalName);
         Sector modified3 = service.updateSector(modified);
         assertEquals(sector.getName(), modified3.getName());
     }
@@ -370,7 +372,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
 
     public void testShouldGetAllNoteTypes() throws EmfException {
             NoteType[] notetypes = service.getNoteTypes();
-            assertEquals("5 note types should return", notetypes.length,5);
+            assertEquals("7 note types should return", notetypes.length,7);
     }
 
     public void testShouldAddNote() throws EmfException {

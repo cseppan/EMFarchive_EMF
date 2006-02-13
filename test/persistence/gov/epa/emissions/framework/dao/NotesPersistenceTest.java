@@ -38,7 +38,7 @@ public class NotesPersistenceTest extends HibernateTestCase {
 
     public void testShouldGetAllNoteTypes() throws Exception {
       List allNoteTypes=this.loadAllNoteTypes();
-      assertEquals("5 Node Types", allNoteTypes.size(),5);
+      assertEquals("7 Node Types", allNoteTypes.size(),7);
     }
 
     public void testShouldGetOneNoteType() throws Exception {

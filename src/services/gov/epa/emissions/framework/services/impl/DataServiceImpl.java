@@ -45,7 +45,7 @@ public class DataServiceImpl implements DataService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.exists(dataset.getName(), session))
+            if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))
                 throw new EmfException("Dataset name already in use");
 
             dao.add(dataset, session);
@@ -60,7 +60,7 @@ public class DataServiceImpl implements DataService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.containsDataset(dataset, session))
+            if (!dao.canUpdate(dataset, session))
                 throw new EmfException("Dataset name already in use");
 
             dao.updateWithoutLocking(dataset, session);
@@ -117,8 +117,9 @@ public class DataServiceImpl implements DataService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (!dao.containsDataset(dataset, session))
+            if (!dao.canUpdate(dataset, session))
                 throw new EmfException("Dataset name already in use");
+
 
             EmfDataset released = dao.update(dataset, session);
             session.close();
