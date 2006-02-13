@@ -1,42 +1,12 @@
 package gov.epa.emissions.framework.client.meta.keywords;
 
-import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.Keywords;
-import gov.epa.emissions.framework.services.EmfDataset;
 
-import java.util.Set;
-import java.util.TreeSet;
+public interface EditableKeywordsTabPresenter {
 
-public class EditableKeywordsTabPresenter {
+    void display(Keywords masterKeywords);
 
-    private EditableKeywordsTabView view;
-
-    private EmfDataset dataset;
-
-    public EditableKeywordsTabPresenter(EditableKeywordsTabView view, EmfDataset dataset) {
-        this.view = view;
-        this.dataset = dataset;
-    }
-
-    public void display(Keywords masterKeywords) {
-        view.display(dataset, masterKeywords);
-    }
-
-    public void doSave() throws EmfException {
-        KeyVal[] updates = view.updates();
-        verifyDuplicates(updates);
-
-        dataset.setKeyVals(updates);
-    }
-
-    private void verifyDuplicates(KeyVal[] updates) throws EmfException {
-        Set set = new TreeSet();
-        for (int i = 0; i < updates.length; i++) {
-            String name = updates[i].getKeyword().getName();
-            if (!set.add(name))
-                throw new EmfException("duplicate keyword '" + name + "'");
-        }
-    }
+    void doSave() throws EmfException;
 
 }

@@ -162,7 +162,11 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         Button save = new Button("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 keywordsTab.commit();
-                presenter.doSave();
+                try {
+                    presenter.doSave();
+                } catch (EmfException e) {
+                    showError("Could not save dataset. Reason: " + e.getMessage());
+                }
             }
         });
         buttonsPanel.add(save);

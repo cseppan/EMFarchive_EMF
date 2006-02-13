@@ -37,21 +37,21 @@ public class NotesPersistenceTest extends HibernateTestCase {
     }
 
     public void testShouldGetAllNoteTypes() throws Exception {
-      List allNoteTypes=this.loadAllNoteTypes();
-      assertEquals("7 Node Types", allNoteTypes.size(),7);
+        List allNoteTypes = this.loadAllNoteTypes();
+        assertEquals("7 Node Types", allNoteTypes.size(), 7);
     }
 
     public void testShouldGetOneNoteType() throws Exception {
         NoteType notetype = loadNoteType("Observation");
-        assertEquals(notetype.getType(),"Observation");
-      }
-   
+        assertEquals(notetype.getType(), "Observation");
+    }
+
     public void testShouldAddANote() throws Exception {
         Random rando = new Random();
         long id = Math.abs(rando.nextInt());
         NoteType notetype;
         Note note = null;
-        
+
         User user = null;
         EmfDataset dataset = null;
 
@@ -78,14 +78,12 @@ public class NotesPersistenceTest extends HibernateTestCase {
             save(dataset);
 
             EmfDataset datasetFromDB = loadDataset(user.getUsername() + "_" + id);
-            note = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME", notetype, "abcd", dataset.getDefaultVersion());
+            note = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME", notetype, "abcd",
+                    dataset.getDefaultVersion());
             save(note);
             Note noteFromDB = loadNote("NOTE NAME");
             assertNotNull(noteFromDB);
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
+
         } finally {
             remove(note);
             remove(dataset);
@@ -148,7 +146,6 @@ public class NotesPersistenceTest extends HibernateTestCase {
             throw e;
         }
     }
-
 
     private DatasetType loadDatasetType(String name) {
         Query query = session.createQuery("SELECT types FROM DatasetType AS types WHERE name='" + name + "'");

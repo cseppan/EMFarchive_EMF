@@ -87,20 +87,16 @@ public class LoggingServiceTest extends ServicesTestCase {
         }
     }
 
-    private EmfDataset getDataset(EmfDataset dataset) {
+    private EmfDataset getDataset(EmfDataset dataset) throws EmfException {
         EmfDataset datasetFromDB = null;
 
-        try {
-            EmfDataset[] allDatasets = dataService.getDatasets();
+        EmfDataset[] allDatasets = dataService.getDatasets();
 
-            for (int i = 0; i < allDatasets.length; i++) {
-                datasetFromDB = allDatasets[i];
+        for (int i = 0; i < allDatasets.length; i++) {
+            datasetFromDB = allDatasets[i];
 
-                if (datasetFromDB.getName().equals(dataset.getName()))
-                    break;
-            }
-        } catch (EmfException e) {
-            e.printStackTrace();
+            if (datasetFromDB.getName().equals(dataset.getName()))
+                break;
         }
 
         return datasetFromDB;

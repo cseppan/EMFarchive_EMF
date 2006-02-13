@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.meta.summary;
 import java.util.Date;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
+import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -21,7 +21,7 @@ public class EditableSummaryTabPresenterTest extends MockObjectTestCase {
         Object datasetProxy = dataset.proxy();
         view.expects(once()).method("updateDataset").with(eq(datasetProxy));
 
-        EditableSummaryTabPresenter presenter = new EditableSummaryTabPresenter((EmfDataset) datasetProxy, (EditableSummaryTabView) view
+        EditableSummaryTabPresenter presenter = new EditableSummaryTabPresenterImpl((EmfDataset) datasetProxy, (EditableSummaryTabView) view
                 .proxy());
 
         presenter.doSave();

@@ -68,8 +68,6 @@ public class AccessLogPersistenceTest extends HibernateTestCase {
             Object[] logAr = allLogs.toArray();
             assertEquals(alog.getDatasetId(), ((AccessLog) logAr[0]).getDatasetId());
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
         } finally {
             remove(alog);
             remove(dataset);

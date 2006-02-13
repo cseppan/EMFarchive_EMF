@@ -58,14 +58,14 @@ public class DatasetsBrowserPresenter implements Browser {
 
     public void doDisplayPropertiesEditor(DatasetPropertiesEditorView propertiesEditorView, EmfDataset dataset)
             throws EmfException {
-        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, session, this);
-        doDisplayPropertiesEditor(propertiesEditorView, presenter);
+        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, propertiesEditorView, session,
+                this);
+        doDisplayPropertiesEditor(presenter);
     }
 
-    void doDisplayPropertiesEditor(DatasetPropertiesEditorView propertiesEditorView, PropertiesEditorPresenter presenter)
-            throws EmfException {
+    void doDisplayPropertiesEditor(PropertiesEditorPresenter presenter) throws EmfException {
         view.clearMessage();
-        presenter.doDisplay(propertiesEditorView);
+        presenter.doDisplay();
     }
 
     public void doImport(ImportView importView, ImportPresenter importPresenter) {

@@ -6,10 +6,13 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.Browser;
 import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
+import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenter;
+import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
+import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -30,14 +33,17 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
 
     private Browser browser;
 
-    public PropertiesEditorPresenterImpl(EmfDataset dataset, EmfSession session, Browser browserPresenter) {
+    private EditNotesTabPresenter notesPresenter;
+
+    public PropertiesEditorPresenterImpl(EmfDataset dataset, DatasetPropertiesEditorView view, EmfSession session,
+            Browser browser) {
         this.dataset = dataset;
         this.session = session;
-        this.browser = browserPresenter;
+        this.browser = browser;
+        this.view = view;
     }
 
-    public void doDisplay(DatasetPropertiesEditorView view) throws EmfException {
-        this.view = view;
+    public void doDisplay() throws EmfException {
         view.observe(this);
 
         dataset = session.dataService().obtainLockedDataset(session.user(), dataset);
@@ -58,14 +64,13 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         view.close();
     }
 
-    public void doSave() {
-        DataService service = dataService();
-        try {
-            updateDataset(service, summaryPresenter, keywordsPresenter);
-        } catch (EmfException e) {
-            view.showError("Could not save dataset. Reason: " + e.getMessage());
-            return;
-        }
+    public void doSave() throws EmfException {
+        save(dataService(), summaryPresenter, keywordsPresenter, notesPresenter);
+    }
+
+    void save(DataService service, EditableSummaryTabPresenter summary, EditableKeywordsTabPresenter keywords,
+            EditNotesTabPresenter notes) throws EmfException {
+        updateDataset(service, summary, keywords, notes);
 
         view.close();
         browser.notifyUpdates();
@@ -75,32 +80,33 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         return session.dataService();
     }
 
-    void updateDataset(DataService service, EditableSummaryTabPresenter summary, EditableKeywordsTabPresenter keywords)
-            throws EmfException {
+    void updateDataset(DataService service, EditableSummaryTabPresenter summary, EditableKeywordsTabPresenter keywords,
+            EditNotesTabPresenter notes) throws EmfException {
         summary.doSave();
         keywords.doSave();
+        notes.doSave();
         service.updateDataset(dataset);
     }
 
     public void set(EditableSummaryTabView summary) {
-        summaryPresenter = new EditableSummaryTabPresenter(dataset, summary);
+        summaryPresenter = new EditableSummaryTabPresenterImpl(dataset, summary);
         summary.observeChanges(this);
     }
 
     public void set(EditableKeywordsTabView keywordsView) throws EmfException {
-        keywordsPresenter = new EditableKeywordsTabPresenter(keywordsView, dataset);
+        keywordsPresenter = new EditableKeywordsTabPresenterImpl(keywordsView, dataset);
 
         Keywords keywords = new Keywords(session.dataCommonsService().getKeywords());
         keywordsPresenter.display(keywords);
     }
 
-    public void onChange() {
-        unsavedChanges = true;
+    public void set(EditNotesTabView view) throws EmfException {
+        notesPresenter = new EditNotesTabPresenterImpl(dataset, session.dataCommonsService(), view);
+        notesPresenter.display();
     }
 
-    public void set(EditNotesTabView view) throws EmfException {
-        EditNotesTabPresenter presenter = new EditNotesTabPresenter(dataset, session.dataCommonsService(), view);
-        presenter.display();
+    public void onChange() {
+        unsavedChanges = true;
     }
 
 }

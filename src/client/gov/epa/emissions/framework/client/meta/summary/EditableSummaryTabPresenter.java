@@ -1,24 +1,9 @@
 package gov.epa.emissions.framework.client.meta.summary;
 
-import java.util.Date;
-
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.EmfDataset;
 
-public class EditableSummaryTabPresenter {
+public interface EditableSummaryTabPresenter {
 
-    private EditableSummaryTabView view;
-
-    private EmfDataset dataset;
-
-    public EditableSummaryTabPresenter(EmfDataset dataset, EditableSummaryTabView view) {
-        this.dataset = dataset;
-        this.view = view;
-    }
-
-    public void doSave() throws EmfException {
-        dataset.setModifiedDateTime(new Date());
-        view.updateDataset(dataset);
-    }
+    public abstract void doSave() throws EmfException;
 
 }

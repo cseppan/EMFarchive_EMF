@@ -26,7 +26,7 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         type.stubs().method("getKeywords").withNoArguments().will(returnValue(new Keyword[0]));
         dataset.stubs().method("getDatasetType").withNoArguments().will(returnValue(type.proxy()));
 
-        EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenter((EditableKeywordsTabView) view.proxy(), (EmfDataset) dataset
+        EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenterImpl((EditableKeywordsTabView) view.proxy(), (EmfDataset) dataset
                 .proxy());
 
         presenter.display(keywords);
@@ -51,7 +51,7 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         Keywords keywords = new Keywords(keywordsList);
         view.expects(once()).method("display").with(eq(dataset.proxy()), same(keywords));
 
-        EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenter((EditableKeywordsTabView) view.proxy(), (EmfDataset) dataset
+        EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenterImpl((EditableKeywordsTabView) view.proxy(), (EmfDataset) dataset
                 .proxy());
 
         presenter.display(keywords);
@@ -64,7 +64,7 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         Mock view = mock(EditableKeywordsTabView.class);
         view.expects(once()).method("updates").withNoArguments().will(returnValue(keyvals));
 
-        EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenter((EditableKeywordsTabView) view.proxy(), ((EmfDataset) dataset
+        EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenterImpl((EditableKeywordsTabView) view.proxy(), ((EmfDataset) dataset
                 .proxy()));
 
         presenter.doSave();
@@ -79,7 +79,7 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         Mock view = mock(EditableKeywordsTabView.class);
         view.expects(once()).method("updates").withNoArguments().will(returnValue(keyvals));
 
-        EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenter((EditableKeywordsTabView) view.proxy(), ((EmfDataset) dataset
+        EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenterImpl((EditableKeywordsTabView) view.proxy(), ((EmfDataset) dataset
                 .proxy()));
 
         try {

@@ -1,19 +1,15 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.Browser;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
-import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
-import gov.epa.emissions.framework.client.meta.keywords.KeywordsTabPresenterStub;
+import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
-import gov.epa.emissions.framework.client.meta.summary.SummaryTabPresenterStub;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -23,7 +19,6 @@ import java.util.Date;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
-import org.jmock.core.stub.ThrowStub;
 
 public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
@@ -58,34 +53,18 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         session.stubs().method("dataEditorService").withNoArguments().will(returnValue(null));
 
         browser = mock(Browser.class);
-        presenter = new PropertiesEditorPresenterImpl(dataset, null, null);
+
+        DatasetPropertiesEditorView viewProxy = (DatasetPropertiesEditorView) view.proxy();
+        EmfSession sessionProxy = (EmfSession) session.proxy();
+        Browser browserProxy = (Browser) browser.proxy();
+        presenter = new PropertiesEditorPresenterImpl(dataset, viewProxy, sessionProxy, browserProxy);
     }
 
     public void testShouldCloseViewAndReleaseLockOnNotifyClose() throws Exception {
-        displayPresenter();
         view.expects(once()).method("close");
         dataService.expects(once()).method("releaseLockedDataset").with(same(dataset)).will(returnValue(dataset));
 
         presenter.doClose();
-    }
-
-    private void displayPresenter() throws Exception {
-        User owner = new User();
-        owner.setUsername("name");
-        dataset.setLockOwner(owner.getUsername());
-        dataset.setLockDate(new Date());
-
-        dataService.expects(once()).method("obtainLockedDataset").with(same(owner), same(dataset)).will(
-                returnValue(dataset));
-
-        session.stubs().method("user").withNoArguments().will(returnValue(owner));
-
-        presenter = new PropertiesEditorPresenterImpl(dataset, (EmfSession) session.proxy(), (Browser) browser.proxy());
-
-        view.expects(once()).method("observe").with(eq(presenter));
-        view.expects(once()).method("display").with(eq(dataset));
-
-        presenter.doDisplay((DatasetPropertiesEditorView) view.proxy());
     }
 
     public void testShouldDisplayViewOnDisplayAfterObtainingLock() throws Exception {
@@ -99,12 +78,13 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
         session.stubs().method("user").withNoArguments().will(returnValue(owner));
 
-        presenter = new PropertiesEditorPresenterImpl(dataset, (EmfSession) session.proxy(), null);
+        DatasetPropertiesEditorView viewProxy = (DatasetPropertiesEditorView) view.proxy();
+        presenter = new PropertiesEditorPresenterImpl(dataset, viewProxy, (EmfSession) session.proxy(), null);
 
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(eq(dataset));
 
-        presenter.doDisplay((DatasetPropertiesEditorView) view.proxy());
+        presenter.doDisplay();
     }
 
     public void testShouldRaiseErrorOnDisplayIfFailedToObtainLock() throws Exception {
@@ -122,15 +102,15 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
         session.stubs().method("user").withNoArguments().will(returnValue(user));
 
-        presenter = new PropertiesEditorPresenterImpl(dataset, (EmfSession) session.proxy(), null);
+        DatasetPropertiesEditorView viewProxy = (DatasetPropertiesEditorView) view.proxy();
+        presenter = new PropertiesEditorPresenterImpl(dataset, viewProxy, (EmfSession) session.proxy(), null);
+
         view.expects(once()).method("notifyLockFailure").with(same(dataset));
         view.expects(once()).method("observe").with(same(presenter));
-
-        presenter.doDisplay((DatasetPropertiesEditorView) view.proxy());
+        presenter.doDisplay();
     }
 
     public void testShouldContinueToCloseIfUserOkaysLosingUnsavedChanges() throws Exception {
-        displayPresenter();
         view.expects(once()).method("close");
 
         presenter.onChange();
@@ -142,7 +122,6 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldNotCloseIfUserSelectsToNotCloseOnUnsavedChanges() throws Exception {
-        displayPresenter();
         presenter.onChange();
         view.expects(once()).method("shouldContinueLosingUnsavedChanges").withNoArguments().will(
                 returnValue(Boolean.FALSE));
@@ -158,107 +137,70 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() throws Exception {
-        displayPresenter();
         dataService.expects(once()).method("updateDataset").with(eq(dataset));
-
-        Mock summaryView = mock(EditableSummaryTabView.class);
-        summaryView.expects(once()).method("updateDataset").with(eq(dataset));
-        summaryView.expects(once()).method("observeChanges").with(eq(presenter));
-
-        Mock keywordsView = mock(EditableKeywordsTabView.class);
-        keywordsView.expects(once()).method("display");
-        keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[] {}));
-
-        presenter.set((EditableSummaryTabView) summaryView.proxy());
-        presenter.set((EditableKeywordsTabView) keywordsView.proxy());
-
-        EmfDataset[] datasets = new EmfDataset[0];
-        dataService.stubs().method("getDatasets").will(returnValue(datasets));
         view.expects(once()).method("close");
-
         browser.expects(once()).method("notifyUpdates");
-        presenter.doSave();
+
+        EditableSummaryTabPresenter summaryTabProxy = summaryMockForSave();
+        EditableKeywordsTabPresenter keywordsTabProxy = keywordsMockForSave();
+        EditNotesTabPresenter notesTabProxy = notesMockForSave();
+
+        presenter.save((DataService) dataService.proxy(), summaryTabProxy, keywordsTabProxy, notesTabProxy);
     }
 
     public void testShouldSaveWithoutPromptingOnSaveIfChangesHaveOccuredInSummaryTab() throws Exception {
-        displayPresenter();
         dataService.expects(once()).method("updateDataset").with(eq(dataset));
-
-        Mock summaryView = mock(EditableSummaryTabView.class);
-        summaryView.expects(once()).method("updateDataset").with(eq(dataset));
-        summaryView.expects(atLeastOnce()).method("observeChanges").with(eq(presenter));
-
-        Mock keywordsView = mock(EditableKeywordsTabView.class);
-        keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[] {}));
-        keywordsView.expects(atLeastOnce()).method("display");
-
-        presenter.set((EditableSummaryTabView) summaryView.proxy());
-        presenter.set((EditableKeywordsTabView) keywordsView.proxy());
-
-        EmfDataset[] datasets = new EmfDataset[0];
-        dataService.stubs().method("getDatasets").will(returnValue(datasets));
         view.expects(once()).method("close");
-
-        presenter.set((EditableSummaryTabView) summaryView.proxy());
         presenter.onChange();
 
         browser.expects(once()).method("notifyUpdates");
-        presenter.doSave();
+
+        EditableSummaryTabPresenter summaryTabProxy = summaryMockForSave();
+        EditableKeywordsTabPresenter keywordsTabProxy = keywordsMockForSave();
+        EditNotesTabPresenter notesTabProxy = notesMockForSave();
+
+        presenter.save((DataService) dataService.proxy(), summaryTabProxy, keywordsTabProxy, notesTabProxy);
     }
 
     public void testShouldUpdateDatasetWithChangesFromTabsAndSaveDatasetOnUpdate() throws Exception {
         dataService.expects(once()).method("updateDataset").with(eq(dataset));
 
-        Mock summaryTab = mock(SummaryTabPresenterStub.class);
-        summaryTab.expects(once()).method("doSave");
+        EditableSummaryTabPresenter summaryTabProxy = summaryMockForSave();
+        EditableKeywordsTabPresenter keywordsTabProxy = keywordsMockForSave();
+        EditNotesTabPresenter notesTabProxy = notesMockForSave();
 
-        Mock keywordsTab = mock(KeywordsTabPresenterStub.class);
+        presenter.updateDataset((DataService) dataService.proxy(), summaryTabProxy, keywordsTabProxy, notesTabProxy);
+    }
+
+    private EditNotesTabPresenter notesMockForSave() {
+        Mock notesTab = mock(EditNotesTabPresenter.class);
+        notesTab.expects(once()).method("doSave");
+        return (EditNotesTabPresenter) notesTab.proxy();
+    }
+
+    private EditableKeywordsTabPresenter keywordsMockForSave() {
+        Mock keywordsTab = mock(EditableKeywordsTabPresenter.class);
         keywordsTab.expects(once()).method("doSave");
+        return (EditableKeywordsTabPresenter) keywordsTab.proxy();
+    }
 
-        presenter.updateDataset((DataService) dataService.proxy(), (EditableSummaryTabPresenter) summaryTab.proxy(),
-                (EditableKeywordsTabPresenter) keywordsTab.proxy());
+    private EditableSummaryTabPresenter summaryMockForSave() {
+        Mock summaryTab = mock(EditableSummaryTabPresenter.class);
+        summaryTab.expects(once()).method("doSave");
+        return (EditableSummaryTabPresenter) summaryTab.proxy();
     }
 
     public void testShouldDisplayErrorMessageOnDatasetsBrowserIfGettingUpdatedDatasetsFailOnSave() throws Exception {
-        displayPresenter();
-
         dataService.expects(once()).method("updateDataset").with(eq(dataset));
-
-        Mock summaryView = mock(EditableSummaryTabView.class);
-        summaryView.expects(once()).method("updateDataset").with(eq(dataset));
-        summaryView.expects(once()).method("observeChanges").with(eq(presenter));
-
-        Mock keywordsView = mock(EditableKeywordsTabView.class);
-        keywordsView.expects(once()).method("display");
-        keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[] {}));
-
-        presenter.set((EditableSummaryTabView) summaryView.proxy());
-        presenter.set((EditableKeywordsTabView) keywordsView.proxy());
 
         view.expects(once()).method("close");
         browser.expects(once()).method("notifyUpdates");
 
-        presenter.doSave();
-    }
+        EditableSummaryTabPresenter summaryTabProxy = summaryMockForSave();
+        EditableKeywordsTabPresenter keywordsTabProxy = keywordsMockForSave();
+        EditNotesTabPresenter notesTabProxy = notesMockForSave();
 
-    public void testShouldDisplayErrorMessageOnErrorDuringSave() throws Exception {
-        displayPresenter();
-        Mock summaryView = mock(EditableSummaryTabView.class);
-        summaryView.expects(once()).method("updateDataset").with(eq(dataset));
-        summaryView.expects(once()).method("observeChanges").with(eq(presenter));
-
-        dataService.expects(once()).method("updateDataset").with(eq(dataset)).will(
-                new ThrowStub(new EmfException("update failure")));
-        view.expects(once()).method("showError").with(eq("Could not save dataset. Reason: update failure"));
-
-        Mock keywordsView = mock(EditableKeywordsTabView.class);
-        keywordsView.expects(once()).method("display");
-        keywordsView.expects(once()).method("updates").withNoArguments().will(returnValue(new KeyVal[] {}));
-
-        presenter.set((EditableSummaryTabView) summaryView.proxy());
-        presenter.set((EditableKeywordsTabView) keywordsView.proxy());
-
-        presenter.doSave();
+        presenter.save((DataService) dataService.proxy(), summaryTabProxy, keywordsTabProxy, notesTabProxy);
     }
 
     public void testShouldDisplayNotesTabOnSetNotesTab() throws Exception {
@@ -274,8 +216,8 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         service.stubs().method("getNotes").will(returnValue(notes));
         session.stubs().method("dataCommonsService").will(returnValue(service.proxy()));
 
-        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, (EmfSession) session.proxy(),
-                null);
+        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, null, (EmfSession) session
+                .proxy(), null);
 
         presenter.set((EditNotesTabView) view.proxy());
     }

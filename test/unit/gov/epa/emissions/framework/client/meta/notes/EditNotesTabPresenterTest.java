@@ -19,7 +19,7 @@ public class EditNotesTabPresenterTest extends MockObjectTestCase {
         dataset.setId(2);
         service.stubs().method("getNotes").with(eq(dataset.getId())).will(returnValue(notes));
 
-        EditNotesTabPresenter presenter = new EditNotesTabPresenter(dataset, (DataCommonsService) service.proxy(),
+        EditNotesTabPresenter presenter = new EditNotesTabPresenterImpl(dataset, (DataCommonsService) service.proxy(),
                 (EditNotesTabView) view.proxy());
 
         presenter.display();
@@ -36,7 +36,7 @@ public class EditNotesTabPresenterTest extends MockObjectTestCase {
 
         EditNotesTabView viewProxy = (EditNotesTabView) view.proxy();
 
-        EditNotesTabPresenter presenter = new EditNotesTabPresenter(null, (DataCommonsService) service.proxy(),
+        EditNotesTabPresenter presenter = new EditNotesTabPresenterImpl(null, (DataCommonsService) service.proxy(),
                 viewProxy);
         presenter.doSave();
     }

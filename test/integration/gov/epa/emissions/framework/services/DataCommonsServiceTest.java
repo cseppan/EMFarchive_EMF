@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import org.hibernate.Criteria;
@@ -22,7 +23,9 @@ import org.hibernate.criterion.Restrictions;
 public class DataCommonsServiceTest extends ServicesTestCase {
 
     private DataCommonsService service;
+
     private DataService dataService;
+
     private UserService userService;
 
     protected void doSetUp() throws Exception {
@@ -184,7 +187,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
 
         try {
             type2.setName(newname);
-            service.updateDatasetType(type2);            
+            service.updateDatasetType(type2);
         } catch (EmfException e) {
             assertEquals("DatasetType name already in use", e.getMessage());
             return;
@@ -223,7 +226,6 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         Sector modified1 = service.obtainLockedSector(owner, sector);
         assertEquals(modified1.getLockOwner(), owner.getUsername());
         String testName = "TEST" + Math.random();
-        System.out.println(testName);
         modified1.setName(testName);
 
         Sector modified2 = service.updateSector(modified1);
@@ -260,13 +262,13 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         Sector sector1 = new Sector("Desc", name);
         service.addSector(sector1);
 
-        Sector sector2 = new Sector("Desc", name+"foobar");
+        Sector sector2 = new Sector("Desc", name + "foobar");
         service.addSector(sector2);
 
         try {
             sector2.setName(name);
             service.addSector(sector2);
-            
+
         } catch (EmfException e) {
             assertEquals("Sector name already in use", e.getMessage());
             return;
@@ -320,13 +322,13 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         Project project1 = new Project(name);
         service.addProject(project1);
 
-        Project project2 = new Project(name+"foobar");
+        Project project2 = new Project(name + "foobar");
         service.addProject(project2);
 
         try {
             project2.setName(name);
             service.addProject(project2);
-            
+
         } catch (EmfException e) {
             assertEquals("Project name already in use", e.getMessage());
             return;
@@ -371,8 +373,23 @@ public class DataCommonsServiceTest extends ServicesTestCase {
     }
 
     public void testShouldGetAllNoteTypes() throws EmfException {
-            NoteType[] notetypes = service.getNoteTypes();
-            assertEquals("7 note types should return", notetypes.length,7);
+        NoteType[] notetypes = service.getNoteTypes();
+        assertEquals("7 note types should return", getNoteTypes().size(), notetypes.length);
+    }
+
+    private List getNoteTypes() {
+        Transaction tx = null;
+
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(NoteType.class);
+            tx.commit();
+
+            return crit.list();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
     public void testShouldAddNote() throws EmfException {
@@ -382,13 +399,14 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         dataset.setCreator(user.getUsername());
         dataService.addDataset(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
-        Note note = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME"+id, loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        Note note = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME" + id,
+                loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
         service.addNote(note);
         boolean newNoteAdded = false;
         try {
             Note[] notes = service.getNotes(datasetFromDB.getId());
             for (int i = 0; i < notes.length; i++)
-                if (notes[i].getName().equalsIgnoreCase("NOTE NAME"+id))
+                if (notes[i].getName().equalsIgnoreCase("NOTE NAME" + id))
                     newNoteAdded = true;
 
             assertTrue(newNoteAdded);
@@ -406,14 +424,16 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         dataService.addDataset(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
-        Note note1 = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME1"+id, loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        Note note1 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME1" + id,
+                loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
         service.addNote(note1);
-        Note note2 = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME2"+id, loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        Note note2 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME2" + id,
+                loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
         service.addNote(note2);
 
         try {
             Note[] notes = service.getNotes(datasetFromDB.getId());
-            assertEquals("Two notes should return", notes.length,2);
+            assertEquals("Two notes should return", notes.length, 2);
         } finally {
             remove(note1);
             remove(note2);
@@ -472,5 +492,4 @@ public class DataCommonsServiceTest extends ServicesTestCase {
     protected void doTearDown() throws Exception {// no op
     }
 
-    
 }
