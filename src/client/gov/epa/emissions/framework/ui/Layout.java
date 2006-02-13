@@ -4,8 +4,8 @@ import gov.epa.emissions.framework.client.ManagedView;
 
 public interface Layout {
     
-    void position(ManagedView managedView);
+    void add(ManagedView managedView);
 
-    void unregister(ManagedView managedView);
+    void remove(ManagedView managedView);
 
 }

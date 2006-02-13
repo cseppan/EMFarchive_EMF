@@ -68,6 +68,7 @@ public class DesktopManagerTest extends MockObjectTestCase {
         managedView.expects(atLeastOnce()).method("getName").withNoArguments().will(returnValue(name));
         managedView.expects(atLeastOnce()).method("bringToFront").withNoArguments();
         managedView.expects(atLeastOnce()).method("width").withNoArguments().will(returnValue(0));
+        managedView.expects(atLeastOnce()).method("height").withNoArguments().will(returnValue(0));
         managedView.expects(atLeastOnce()).method("setPosition").withAnyArguments();
         return managedView;
     }

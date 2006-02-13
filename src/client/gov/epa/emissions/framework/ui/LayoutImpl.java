@@ -17,7 +17,7 @@ public class LayoutImpl implements Layout {
         managedViews = new Stack();
     }
 
-    public void position(ManagedView view) {
+    public void add(ManagedView view) {
         Position lastViewPosition = lastViewPosition();
         Position currentViewPosition = cascade(lastViewPosition);
         if (checkForFullWindowDisplayInsideConsole(currentViewPosition, view, console)) {
@@ -27,8 +27,8 @@ public class LayoutImpl implements Layout {
         }
         managedViews.push(view);
     }
-    
-    public void unregister(ManagedView manageView) {
+
+    public void remove(ManagedView manageView) {
         managedViews.remove(manageView);
     }
 
@@ -36,9 +36,10 @@ public class LayoutImpl implements Layout {
             EmfConsoleView console) {
         int consoleWidth = console.width() + 20;
         int consoleHeight = console.height() + 20;
-
-        return (currentViewPosition.x() + view.width() < consoleWidth)
-                && (currentViewPosition.y() + view.height() < consoleHeight);
+        int width = currentViewPosition.x() + view.width();
+        int height = currentViewPosition.y() + view.height();
+        //System.out.println("width="+width+", height="+height+"; consoleWidth="+consoleWidth+", consoleHeight="+consoleHeight);
+        return (width < consoleWidth) && (height < consoleHeight);
     }
 
     private Position lastViewPosition() {

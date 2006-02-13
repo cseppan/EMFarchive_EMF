@@ -38,13 +38,13 @@ public class DesktopManagerImpl implements DesktopManager {
         windowNames.put(name, manageView);
         windowMenu.register(manageView);
         manageView.bringToFront();
-        layout.position(manageView);
+        layout.add(manageView);
     }
 
     public void closeWindow(ManagedView manageView) {
         windowNames.remove(manageView.getName());
         windowMenu.unregister(manageView);
-        layout.unregister(manageView);
+        layout.remove(manageView);
     }
 
     public void closeAll() {
