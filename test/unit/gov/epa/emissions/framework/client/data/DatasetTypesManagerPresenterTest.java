@@ -8,7 +8,6 @@ import gov.epa.emissions.framework.services.DataCommonsService;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
-//FIXME: this test looks way too complicated
 public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayViewOnDisplay() throws Exception {
