@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.logs;
 
 import gov.epa.emissions.commons.gui.SimpleTableModel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -40,7 +40,7 @@ public class LogsTab extends JPanel implements LogsTabView {
     }
 
     private JScrollPane createSortFilterPane(AccessLog[] logs, EmfConsole parentConsole) {
-        EmfTableModel model = new EmfTableModel(new AccessLogTableData(logs));
+        EmfTableModel model = new EmfTableModel(new LogsTableData(logs));
         SimpleTableModel wrapperModel = new SimpleTableModel(model);
 
         SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, wrapperModel);

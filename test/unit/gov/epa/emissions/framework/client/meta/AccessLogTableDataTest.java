@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.framework.client.meta.logs.LogsTableData;
 import gov.epa.emissions.framework.services.AccessLog;
 
 import java.util.List;
@@ -8,12 +9,12 @@ import junit.framework.TestCase;
 
 public class AccessLogTableDataTest extends TestCase {
 
-    private AccessLogTableData data;
+    private LogsTableData data;
 
     protected void setUp() {
         AccessLog[] logs = new AccessLog[] { new AccessLog(), new AccessLog() };
 
-        data = new AccessLogTableData(logs);
+        data = new LogsTableData(logs);
     }
 
     public void testShouldHaveFiveColumns() {
@@ -55,7 +56,7 @@ public class AccessLogTableDataTest extends TestCase {
         AccessLog log2 = new AccessLog();
         AccessLog[] logs = new AccessLog[] { log1, log2 };
 
-        data = new AccessLogTableData(logs);
+        data = new LogsTableData(logs);
 
         assertEquals(log1, data.element(0));
         assertEquals(log2, data.element(1));

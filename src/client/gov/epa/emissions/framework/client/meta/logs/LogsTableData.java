@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.logs;
 
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.ui.AbstractTableData;
@@ -8,11 +8,11 @@ import gov.epa.emissions.framework.ui.Row;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccessLogTableData extends AbstractTableData {
+public class LogsTableData extends AbstractTableData {
 
     private List rows;
 
-    public AccessLogTableData(AccessLog[] logs) {
+    public LogsTableData(AccessLog[] logs) {
         this.rows = createRows(logs);
     }
 

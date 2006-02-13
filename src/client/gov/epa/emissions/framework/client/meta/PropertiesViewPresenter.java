@@ -2,8 +2,12 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.meta.info.InfoTabPresenter;
+import gov.epa.emissions.framework.client.meta.info.InfoTabView;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTabView;
+import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
+import gov.epa.emissions.framework.client.meta.logs.LogsTabView;
 import gov.epa.emissions.framework.client.meta.notes.NotesTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.NotesTabView;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTabPresenter;

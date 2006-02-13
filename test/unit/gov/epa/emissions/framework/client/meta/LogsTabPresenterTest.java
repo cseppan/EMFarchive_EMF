@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
+import gov.epa.emissions.framework.client.meta.logs.LogsTabView;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.LoggingService;
