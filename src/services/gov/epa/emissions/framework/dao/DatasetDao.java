@@ -35,6 +35,29 @@ public class DatasetDao {
         }
     }
 
+    public boolean containsDataset(EmfDataset dataset, Session session) {
+        boolean flag = false;
+
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(EmfDataset.class).add(Restrictions.eq("name", dataset.getName()));
+            EmfDataset ds = (EmfDataset) crit.uniqueResult();
+
+            if ((ds != null) && (ds.getId() == dataset.getId())) {
+                flag = true;
+            }
+
+            tx.commit();
+
+            return flag;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+
+    }
+
     public List all(Session session) {
         Transaction tx = null;
         try {

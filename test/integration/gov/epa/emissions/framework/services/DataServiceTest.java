@@ -84,7 +84,7 @@ public class DataServiceTest extends ServicesTestCase {
         }
     }
 
-    public void xtestShouldUpdateDataset() throws Exception {
+    public void testShouldUpdateDataset() throws Exception {
         User owner = userService.getUser("emf");
         EmfDataset dataset = newDataset();
 
@@ -142,7 +142,7 @@ public class DataServiceTest extends ServicesTestCase {
         }
     }
 
-    public void xtestShouldAddMultipleSectorsFromWithinDataset() throws EmfException {
+    public void testShouldAddMultipleSectorsFromWithinDataset() throws EmfException {
         User owner = userService.getUser("emf");
         Sector[] allSectors = dataCommonsService.getSectors();
 
@@ -161,7 +161,7 @@ public class DataServiceTest extends ServicesTestCase {
         }
     }
 
-    public void xtestShouldAddCountryFromWithinDataset() throws EmfException {
+    public void testShouldAddCountryFromWithinDataset() throws EmfException {
         User owner = userService.getUser("emf");
         EmfDataset dataset = newDataset();
 
@@ -179,7 +179,7 @@ public class DataServiceTest extends ServicesTestCase {
         }
     }
 
-    public void xtestShouldAddProjectFromWithinDataset() throws EmfException {
+    public void testShouldAddProjectFromWithinDataset() throws EmfException {
         User owner = userService.getUser("emf");
         EmfDataset dataset = newDataset();
 
@@ -197,7 +197,7 @@ public class DataServiceTest extends ServicesTestCase {
         }
     }
 
-    public void xtestShouldAddRegionFromWithinDataset() throws EmfException {
+    public void testShouldAddRegionFromWithinDataset() throws EmfException {
         User owner = userService.getUser("emf");
         EmfDataset dataset = newDataset();
         Region region = new Region("FOOBAR");
