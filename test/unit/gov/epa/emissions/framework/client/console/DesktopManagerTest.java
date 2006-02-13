@@ -1,33 +1,23 @@
 package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.framework.client.ManagedView;
+import gov.epa.emissions.framework.ui.Position;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.MockObjectTestCase;
 
 public class DesktopManagerTest extends MockObjectTestCase {
 
     public void testShouldRegisterOpenWindowWithWindowMenu() {
         Mock windowsMenu = mock(WindowMenuView.class);
+        Mock managedView = manageView("view");
+        Mock emfConsole = emfConsole();
 
-        Mock managedView = mock(ManagedView.class);
-        managedView.expects(once()).method("bringToFront").withNoArguments();
-
-        Mock emfConsole = mock(EmfConsoleView.class);
-        emfConsole.expects(once()).method("width").withNoArguments().will(returnValue(0));
-        emfConsole.expects(once()).method("height").withNoArguments().will(returnValue(0));
-
-        ManagedView managedViewProxy = (ManagedView) managedView.proxy();
-        managedView.expects(once()).method("getName").withNoArguments();
-        managedView.expects(once()).method("width").withNoArguments().will(returnValue(0));
-        //managedView.expects(once()).method("height").withNoArguments().will(returnValue(0));
-        managedView.expects(once()).method("setPosition").withAnyArguments();
-
-        windowsMenu.expects(once()).method("register").with(same(managedViewProxy));
+        windowsMenu.expects(once()).method("register").with(same(managedView.proxy()));
 
         DesktopManager desktopManager = new DesktopManagerImpl(((WindowMenuView) windowsMenu.proxy()),
                 (EmfConsoleView) emfConsole.proxy());
-        desktopManager.openWindow(managedViewProxy);
+        desktopManager.openWindow((ManagedView) (managedView.proxy()));
     }
 
     public void testShouldUnRegisterCloseWindowWithWindowMenu() {
@@ -35,39 +25,50 @@ public class DesktopManagerTest extends MockObjectTestCase {
         Mock managedView = mock(ManagedView.class);
 
         ManagedView managedViewProxy = (ManagedView) managedView.proxy();
-        managedView.expects(once()).method("getName").withNoArguments();
+        managedView.expects(once()).method("getName").withNoArguments().will(returnValue("view"));
         windowsMenu.expects(once()).method("unregister").with(same(managedViewProxy));
 
         DesktopManager desktopManager = new DesktopManagerImpl(((WindowMenuView) windowsMenu.proxy()), null);
         desktopManager.closeWindow(managedViewProxy);
     }
 
-    public void itestShouldCloseAllWindowsAndUnRegisterFromWindowMenu() {
-        Mock managedView1 = manageView();
-        Mock managedView2 = manageView();
+    public void testShouldCloseAllWindowsAndUnRegisterFromWindowMenu() {
+        Mock managedView1 = manageView("view1");
+        Mock managedView2 = manageView("view2");
+        managedView1.expects(once()).method("getPosition").withNoArguments().will(returnValue(new Position(0, 0)));
+        managedView1.expects(once()).method("close").withNoArguments();
+        managedView2.expects(once()).method("close").withNoArguments();
 
         Mock windowsMenu = windoswMenu();
+        Mock emfConsole = emfConsole();
 
-        DesktopManager desktopManager = new DesktopManagerImpl(((WindowMenuView) windowsMenu.proxy()), null);
+        DesktopManager desktopManager = new DesktopManagerImpl(((WindowMenuView) windowsMenu.proxy()),
+                (EmfConsoleView) emfConsole.proxy());
         desktopManager.openWindow((ManagedView) managedView1.proxy());
         desktopManager.openWindow((ManagedView) managedView2.proxy());
 
         desktopManager.closeAll();
     }
 
-    private Mock windoswMenu() {
-        Mock managedView = mock(ManagedView.class);
+    private Mock emfConsole() {
+        Mock console = mock(EmfConsoleView.class);
+        console.expects(atLeastOnce()).method("width").withNoArguments().will(returnValue(0));
+        console.expects(atLeastOnce()).method("height").withNoArguments().will(returnValue(0));
+        return console;
+    }
 
+    private Mock windoswMenu() {
         Mock windowsMenu = mock(WindowMenuView.class);
-        windowsMenu.expects(atLeastOnce()).method("register").with(eq(managedView.proxy()));
-        windowsMenu.expects(atLeastOnce()).method("unregister").with(eq(managedView.proxy()));
+        windowsMenu.expects(atLeastOnce()).method("register").with(isA(ManagedView.class));
         return windowsMenu;
     }
 
-    private Mock manageView() {
+    private Mock manageView(String name) {
         Mock managedView = mock(ManagedView.class);
-        managedView.expects(atLeastOnce()).method("close").withNoArguments();
-        managedView.expects(atLeastOnce()).method("getName").withNoArguments();
+        managedView.expects(atLeastOnce()).method("getName").withNoArguments().will(returnValue(name));
+        managedView.expects(atLeastOnce()).method("bringToFront").withNoArguments();
+        managedView.expects(atLeastOnce()).method("width").withNoArguments().will(returnValue(0));
+        managedView.expects(atLeastOnce()).method("setPosition").withAnyArguments();
         return managedView;
     }
 

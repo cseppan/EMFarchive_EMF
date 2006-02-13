@@ -28,7 +28,8 @@ public class DesktopManagerImpl implements DesktopManager {
         if (!windowNames.containsKey(name)) {
             newWindowOpened(manageView, name);
         } else {
-            manageView = null; // don't need any more; //TODO: think abt a better way to do this
+            //enforces one window per object TODO: think abt a better way to do this
+            manageView = null; // don't need any more;
             ((ManagedView) windowNames.get(name)).bringToFront();
         }
     }
