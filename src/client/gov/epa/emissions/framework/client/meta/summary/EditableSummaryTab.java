@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.summary;
 
+import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
@@ -83,13 +84,16 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     private Region[] allRegions;
 
     private IntendedUse[] allIntendedUses;
-
-    public EditableSummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel)
-            throws EmfException {
+    
+    private ChangeablesList changeablesList;
+    
+    public EditableSummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel,
+            ChangeablesList changeablesList) throws EmfException {
         super.setName("summary");
         this.dataset = dataset;
         this.service = service;
         this.messagePanel = messagePanel;
+        this.changeablesList = changeablesList;
 
         super.setLayout(new BorderLayout());
         SummaryTabComboBoxChangesListener comboxBoxListener = new SummaryTabComboBoxChangesListener();
@@ -241,11 +245,13 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         name = new TextField("name", 25);
         name.setText(dataset.getName());
         name.setMaximumSize(new Dimension(300, 15));
+        changeablesList.add(name);
 
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         // description
         description = new TextArea("description", dataset.getDescription());
+        changeablesList.add(description);
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableTextArea(description), panel);
 
         allProjects = service.getProjects();
@@ -423,15 +429,19 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     public class SummaryTabKeyListener extends KeyAdapter {
         public void keyTyped(KeyEvent e) {
-            if (changeObserver != null)
+            if (changeObserver != null) {
+                changeablesList.onChanges();
                 changeObserver.onChange();
+            }
         }
     }
 
     public class SummaryTabComboBoxChangesListener implements ItemListener {
         public void itemStateChanged(ItemEvent e) {
-            if (changeObserver != null)
+            if (changeObserver != null) {
+                changeablesList.onChanges();
                 changeObserver.onChange();
+            }
         }
     }
 

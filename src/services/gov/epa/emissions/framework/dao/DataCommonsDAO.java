@@ -371,6 +371,9 @@ public class DataCommonsDAO {
         }
 
         Sector current = (Sector) current(sector.getId(), Sector.class, session);
+        // The current object is saved in the session.  Hibernate cannot persist our
+        // object with the same id.
+        session.clear();
         if (current.getName().equals(sector.getName()))
             return true;
 
@@ -383,6 +386,9 @@ public class DataCommonsDAO {
         }
 
         Country current = (Country) current(country.getId(), Country.class, session);
+        // The current object is saved in the session.  Hibernate cannot persist our
+        // object with the same id.
+        session.clear();
         if (current.getName().equals(country.getName()))
             return true;
 
@@ -394,6 +400,9 @@ public class DataCommonsDAO {
         }
 
         DatasetType current = (DatasetType) current(datasetType.getId(), DatasetType.class, session);
+        // The current object is saved in the session.  Hibernate cannot persist our
+        // object with the same id.
+        session.clear();
         if (current.getName().equals(datasetType.getName()))
             return true;
 
@@ -406,6 +415,9 @@ public class DataCommonsDAO {
         }
 
         Project current = (Project) current(project.getId(), Project.class, session);
+        // The current object is saved in the session.  Hibernate cannot persist our
+        // object with the same id.
+        session.clear();
         if (current.getName().equals(project.getName()))
             return true;
 
@@ -418,6 +430,9 @@ public class DataCommonsDAO {
         }
 
         Region current = (Region) current(region.getId(), Region.class, session);
+        // The current object is saved in the session.  Hibernate cannot persist our
+        // object with the same id.
+        session.clear();
         if (current.getName().equals(region.getName()))
             return true;
 
@@ -430,6 +445,9 @@ public class DataCommonsDAO {
         }
 
         IntendedUse current = (IntendedUse) current(intendedUse.getId(), IntendedUse.class, session);
+        // The current object is saved in the session.  Hibernate cannot persist our
+        // object with the same id.
+        session.clear();
         if (current.getName().equals(intendedUse.getName()))
             return true;
 

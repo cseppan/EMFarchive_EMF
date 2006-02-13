@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -44,6 +45,8 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private EmfSession session;
 
     private EditableKeywordsTab keywordsTab;
+    
+    private ChangeablesList changeablesList;
 
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
@@ -68,7 +71,8 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private JPanel createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
         try {
-            EditableSummaryTab view = new EditableSummaryTab(dataset, session.dataCommonsService(), messagePanel);
+            EditableSummaryTab view = new EditableSummaryTab(dataset, session.dataCommonsService(), messagePanel,
+                    changeablesList);
             presenter.set(view);
             return view;
         } catch (EmfException e) {

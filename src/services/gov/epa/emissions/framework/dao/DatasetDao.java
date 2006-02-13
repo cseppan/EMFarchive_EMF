@@ -62,6 +62,10 @@ public class DatasetDao {
         }
 
         EmfDataset current = (EmfDataset) current(dataset.getId(), EmfDataset.class, session);
+
+        // The current object is saved in the session.  Hibernate cannot persist our
+        // object with the same id.
+        session.clear();
         if (current.getName().equals(dataset.getName()))
             return true;
 
