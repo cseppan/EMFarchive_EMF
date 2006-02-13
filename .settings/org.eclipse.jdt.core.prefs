@@ -1,4 +1,4 @@
-#Tue Dec 27 10:28:03 EST 2005
+#Mon Feb 13 10:01:53 EST 2006
 eclipse.preferences.version=1
 org.eclipse.jdt.core.builder.cleanOutputFolder=clean
 org.eclipse.jdt.core.builder.duplicateResourceTask=warning
@@ -64,8 +64,8 @@ org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=error
 org.eclipse.jdt.core.compiler.problem.varargsArgumentNeedCast=warning
 org.eclipse.jdt.core.compiler.source=1.4
 org.eclipse.jdt.core.compiler.taskCaseSensitive=enabled
-org.eclipse.jdt.core.compiler.taskPriorities=NORMAL,HIGH
-org.eclipse.jdt.core.compiler.taskTags=TODO,FIXME
+org.eclipse.jdt.core.compiler.taskPriorities=NORMAL,NORMAL,HIGH,NORMAL,NORMAL,NORMAL,NORMAL
+org.eclipse.jdt.core.compiler.taskTags=NOTE,TODO,FIXME,CLEANUP,BUG,ENHANCE,PERFORMANCE
 org.eclipse.jdt.core.formatter.align_type_members_on_columns=false
 org.eclipse.jdt.core.formatter.alignment_for_arguments_in_allocation_expression=16
 org.eclipse.jdt.core.formatter.alignment_for_arguments_in_enum_constant=16
