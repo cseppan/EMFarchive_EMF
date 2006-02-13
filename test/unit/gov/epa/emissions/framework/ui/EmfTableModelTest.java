@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Project;
 import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.IntendedUse;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,7 +37,8 @@ public class EmfTableModelTest extends MockObjectTestCase {
         dataset1.setStartDateTime(new Date());
         dataset1.setModifiedDateTime(new Date());
         dataset1.setProject(new Project("p1"));
-        
+        dataset1.setIntendedUse(new IntendedUse("CEP"));
+
         datasetList.add(dataset1);
 
         dataset2 = new EmfDataset();
@@ -48,7 +50,8 @@ public class EmfTableModelTest extends MockObjectTestCase {
         dataset2.setStartDateTime(new Date());
         dataset2.setModifiedDateTime(new Date());
         dataset2.setProject(new Project("p2"));
-        
+        dataset1.setIntendedUse(new IntendedUse("EPA"));
+
         datasetList.add(dataset2);
 
         tableData = new EmfDatasetTableData(new EmfDataset[] { dataset1, dataset2 });
@@ -57,17 +60,18 @@ public class EmfTableModelTest extends MockObjectTestCase {
     }
 
     public void testShouldReturnColumnsNames() {
-        assertEquals(8, model.getColumnCount());
+        assertEquals(9, model.getColumnCount());
 
         assertEquals("Name", model.getColumnName(0));
         assertEquals("Last Modified Date", model.getColumnName(1));
         assertEquals("Type", model.getColumnName(2));
         assertEquals("Status", model.getColumnName(3));
         assertEquals("Creator", model.getColumnName(4));
-        assertEquals("Region", model.getColumnName(5));
+        assertEquals("Intended Use", model.getColumnName(5));
         assertEquals("Project", model.getColumnName(6));
-        assertEquals("Start Date", model.getColumnName(7));
-        
+        assertEquals("Region", model.getColumnName(7));
+        assertEquals("Start Date", model.getColumnName(8));
+
     }
 
     public void testShouldReturnRowsEqualingNumberOfDatasets() {
@@ -76,16 +80,17 @@ public class EmfTableModelTest extends MockObjectTestCase {
 
     public void testShouldReturnUserAttributesAtSpecifiedIndex() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-        
+
         assertEquals(dataset1.getName(), model.getValueAt(0, 0));
         assertEquals(dateFormat.format(dataset1.getModifiedDateTime()), model.getValueAt(0, 1));
         assertEquals(dataset1.getDatasetTypeName(), model.getValueAt(0, 2));
         assertEquals(dataset1.getStatus(), model.getValueAt(0, 3));
         assertEquals(dataset1.getCreator(), model.getValueAt(0, 4));
-        assertEquals(dataset1.getRegion(), model.getValueAt(0, 5));
+        assertEquals(dataset1.getIntendedUse(), model.getValueAt(0, 5));
         assertEquals(dataset1.getProject(), model.getValueAt(0, 6));
-        assertEquals(dateFormat.format(dataset1.getStartDateTime()), model.getValueAt(0, 7));
-        
+        assertEquals(dataset1.getRegion(), model.getValueAt(0, 7));
+        assertEquals(dateFormat.format(dataset1.getStartDateTime()), model.getValueAt(0, 8));
+
     }
 
     public void testShouldMarkEmailColumnAsEditable() {

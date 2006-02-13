@@ -11,17 +11,9 @@ public class WindowMenuPresenter {
     public WindowMenuPresenter(WindowMenuView view) {
         this.view = view;
     }
-    
-    public void setDesktopManager(DesktopManager desktopManager){
+
+    public void setDesktopManager(DesktopManager desktopManager) {
         this.desktopManager = desktopManager;
-    }
-
-    public void notifyAdd(ManagedView managedView) {
-        view.register(managedView);
-    }
-
-    public void notifyRemove(ManagedView managedView) {
-        view.unregister(managedView);
     }
 
     public void select(ManagedView managedView) {
@@ -29,7 +21,11 @@ public class WindowMenuPresenter {
     }
 
     public void closeAll() {
-       desktopManager.closeAll();
+        desktopManager.closeAll();
+    }
+
+    public void addPermanently(ManagedView managedView) {
+        view.addPermanently(managedView);
     }
 
 }

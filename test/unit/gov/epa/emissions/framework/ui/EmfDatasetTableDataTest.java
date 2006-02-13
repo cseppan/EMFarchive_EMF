@@ -22,7 +22,8 @@ public class EmfDatasetTableDataTest extends TestCase {
         assertEquals(String.class, data.getColumnClass(4));
         assertEquals(String.class, data.getColumnClass(5));
         assertEquals(String.class, data.getColumnClass(6));
-        assertEquals(Date.class, data.getColumnClass(7));
+        assertEquals(String.class, data.getColumnClass(7));
+        assertEquals(Date.class, data.getColumnClass(8));
     }
 
     public void testShouldFormatDates() {
@@ -44,7 +45,7 @@ public class EmfDatasetTableDataTest extends TestCase {
         Row row = (Row) rows.get(0);
         DateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         assertEquals(format.format(modifiedDate), row.getValueAt(1));
-        assertEquals(format.format(startDate), row.getValueAt(7));
+        assertEquals(format.format(startDate), row.getValueAt(8));
         
     }
 
@@ -61,6 +62,6 @@ public class EmfDatasetTableDataTest extends TestCase {
         assertEquals(1, rows.size());
 
         Row row = (Row) rows.get(0);
-        assertEquals("N/A", row.getValueAt(7));
+        assertEquals("N/A", row.getValueAt(8));
     }
 }

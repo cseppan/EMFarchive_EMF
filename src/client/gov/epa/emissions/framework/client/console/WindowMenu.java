@@ -5,30 +5,37 @@ import gov.epa.emissions.framework.client.ManagedView;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 public class WindowMenu extends JMenu implements WindowMenuView {
 
-    private List menuItems;
+    private List permanaentMenuItems;
+
+    private SortedSet menuItems;
 
     private WindowMenuPresenter presenter;
 
     public WindowMenu() {
         super("Window");
         super.setName("window");
+        menuItems = new TreeSet();
+        permanaentMenuItems = new ArrayList();
+
         JMenuItem closeAllMenuItem = new JMenuItem("Close All");
         closeAllMenuItem.addActionListener(closeAll());
-        super.add(closeAllMenuItem);
-        menuItems = new ArrayList();
+        permanaentMenuItems.add(closeAllMenuItem);
+        refreshMenuItems();
     }
 
     public void setWindowMenuViewPresenter(WindowMenuPresenter presenter) {
         this.presenter = presenter;
-
     }
 
     private ActionListener closeAll() {
@@ -40,22 +47,41 @@ public class WindowMenu extends JMenu implements WindowMenuView {
         return listener;
     }
 
+    public void addPermanently(ManagedView managedView) {
+        JMenuItem menuItem = new WindowMenuItem(managedView);
+        super.add(menuItem);
+        permanaentMenuItems.add(menuItem);
+        refreshMenuItems();
+    }
+
     public void register(ManagedView view) {
         JMenuItem menuItem = new WindowMenuItem(view);
         menuItems.add(menuItem);
 
-        super.add(menuItem);
-        refreshLayout();
+        refreshMenuItems();
+
     }
 
-    private void refreshLayout() {
+    private void refreshMenuItems() {
+        super.removeAll();
+        addMenuItems(permanaentMenuItems);
+        if (!menuItems.isEmpty()) {
+            super.addSeparator();
+            addMenuItems(menuItems);
+        }
         super.validate();
+    }
+
+    private void addMenuItems(Collection menuItems) {
+        for (Iterator iter = menuItems.iterator(); iter.hasNext();) {
+            super.add((JMenuItem) iter.next());
+        }
     }
 
     public void unregister(ManagedView view) {
         JMenuItem menuItem = getMenuItem(view);
-        super.remove(menuItem);
         menuItems.remove(menuItem);
+        refreshMenuItems();
     }
 
     private JMenuItem getMenuItem(ManagedView view) {
@@ -67,7 +93,7 @@ public class WindowMenu extends JMenu implements WindowMenuView {
         return null;
     }
 
-    public class WindowMenuItem extends JMenuItem {
+    public class WindowMenuItem extends JMenuItem implements Comparable {
 
         final private ManagedView view;
 
@@ -85,6 +111,11 @@ public class WindowMenu extends JMenu implements WindowMenuView {
 
         private ManagedView view() {
             return view;
+        }
+
+        public int compareTo(Object menuItem) {
+            String OtherName = ((WindowMenuItem) menuItem).view().getName();
+            return this.view().getName().compareTo(OtherName);
         }
 
     }

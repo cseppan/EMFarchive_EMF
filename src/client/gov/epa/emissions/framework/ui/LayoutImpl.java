@@ -23,7 +23,7 @@ public class LayoutImpl implements Layout {
         if (checkForFullWindowDisplayInsideConsole(currentViewPosition, view, console)) {
             view.setPosition(currentViewPosition);
         } else {
-            view.setPosition(new Position(0, 0));
+            view.setPosition(new Position(20, 20));
         }
         managedViews.push(view);
     }
@@ -34,11 +34,10 @@ public class LayoutImpl implements Layout {
 
     private boolean checkForFullWindowDisplayInsideConsole(Position currentViewPosition, ManagedView view,
             EmfConsoleView console) {
-        int consoleWidth = console.width() + 20;
-        int consoleHeight = console.height() + 20;
+        int consoleWidth = console.width() - 20; //inset
+        int consoleHeight = console.height() - 20; //inset
         int width = currentViewPosition.x() + view.width();
         int height = currentViewPosition.y() + view.height();
-        //System.out.println("width="+width+", height="+height+"; consoleWidth="+consoleWidth+", consoleHeight="+consoleHeight);
         return (width < consoleWidth) && (height < consoleHeight);
     }
 

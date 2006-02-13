@@ -86,7 +86,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     private void showStatus() {
         DataCommonsService statusServices = serviceLocator.dataCommonsService();
         StatusWindow status = new StatusWindow(this, desktop, desktopManager);
-        windowMenuPresenter.notifyAdd(status);
+        windowMenuPresenter.addPermanently(status);
 
         desktop.add(status);
 

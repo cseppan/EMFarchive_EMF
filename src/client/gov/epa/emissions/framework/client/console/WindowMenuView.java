@@ -9,4 +9,6 @@ public interface WindowMenuView {
     void unregister(ManagedView view);
 
     void setWindowMenuViewPresenter(WindowMenuPresenter presenter);
+
+    void addPermanently(ManagedView managedView);
 }
