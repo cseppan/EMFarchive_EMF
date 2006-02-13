@@ -11,17 +11,23 @@ public class EditNotesTabPresenter {
 
     private DataCommonsService service;
 
-    public EditNotesTabPresenter(EmfDataset dataset, DataCommonsService service) {
+    private EditNotesTabView view;
+
+    public EditNotesTabPresenter(EmfDataset dataset, DataCommonsService service, EditNotesTabView view) {
         this.dataset = dataset;
         this.service = service;
+        this.view = view;
     }
 
-    public void display(NotesTabView view) throws EmfException {
+    public void display() throws EmfException {
         Note[] notes = service.getNotes(dataset.getId());
         view.display(notes);
     }
 
-    public void doAdd(Note note) throws EmfException {
-        service.addNote(note);
+    public void doSave() throws EmfException {
+        Note[] additions = view.additions();
+        for (int i = 0; i < additions.length; i++) {
+            service.addNote(additions[i]);
+        }
     }
 }

@@ -10,13 +10,14 @@ import gov.epa.emissions.framework.client.data.Browser;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTabPresenterStub;
+import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTabPresenterStub;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.Note;
 
 import java.util.Date;
 
@@ -36,7 +37,7 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
 
     private Mock dataCommonsService;
 
-    private Mock locator;
+    private Mock session;
 
     private Mock browser;
 
@@ -51,13 +52,13 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         dataCommonsService = mock(DataCommonsService.class);
         dataCommonsService.stubs().method("getKeywords").withNoArguments().will(returnValue(new Keyword[0]));
 
-        locator = mock(ServiceLocator.class);
-        locator.stubs().method("dataService").withNoArguments().will(returnValue(dataService.proxy()));
-        locator.stubs().method("dataCommonsService").withNoArguments().will(returnValue(dataCommonsService.proxy()));
-        locator.stubs().method("dataEditorService").withNoArguments().will(returnValue(null));
+        session = mock(EmfSession.class);
+        session.stubs().method("dataService").withNoArguments().will(returnValue(dataService.proxy()));
+        session.stubs().method("dataCommonsService").withNoArguments().will(returnValue(dataCommonsService.proxy()));
+        session.stubs().method("dataEditorService").withNoArguments().will(returnValue(null));
 
         browser = mock(Browser.class);
-        presenter = new PropertiesEditorPresenterImpl(dataset, (ServiceLocator) locator.proxy(), null, null);
+        presenter = new PropertiesEditorPresenterImpl(dataset, null, null);
     }
 
     public void testShouldCloseViewAndReleaseLockOnNotifyClose() throws Exception {
@@ -77,11 +78,9 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         dataService.expects(once()).method("obtainLockedDataset").with(same(owner), same(dataset)).will(
                 returnValue(dataset));
 
-        Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(owner));
 
-        presenter = new PropertiesEditorPresenterImpl(dataset, (ServiceLocator) locator.proxy(), (EmfSession) session
-                .proxy(), (Browser) browser.proxy());
+        presenter = new PropertiesEditorPresenterImpl(dataset, (EmfSession) session.proxy(), (Browser) browser.proxy());
 
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(eq(dataset));
@@ -98,11 +97,9 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         dataService.expects(once()).method("obtainLockedDataset").with(same(owner), same(dataset)).will(
                 returnValue(dataset));
 
-        Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(owner));
 
-        presenter = new PropertiesEditorPresenterImpl(dataset, (ServiceLocator) locator.proxy(), (EmfSession) session
-                .proxy(), null);
+        presenter = new PropertiesEditorPresenterImpl(dataset, (EmfSession) session.proxy(), null);
 
         view.expects(once()).method("observe").with(eq(presenter));
         view.expects(once()).method("display").with(eq(dataset));
@@ -123,11 +120,9 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         dataService.expects(once()).method("obtainLockedDataset").with(same(user), same(dataset)).will(
                 returnValue(dataset));
 
-        Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(user));
 
-        presenter = new PropertiesEditorPresenterImpl(dataset, (ServiceLocator) locator.proxy(), (EmfSession) session
-                .proxy(), null);
+        presenter = new PropertiesEditorPresenterImpl(dataset, (EmfSession) session.proxy(), null);
         view.expects(once()).method("notifyLockFailure").with(same(dataset));
         view.expects(once()).method("observe").with(same(presenter));
 
@@ -266,4 +261,22 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         presenter.doSave();
     }
 
+    public void testShouldDisplayNotesTabOnSetNotesTab() throws Exception {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("test");
+        dataset.setDatasetType(new DatasetType());
+
+        Mock view = mock(EditNotesTabView.class);
+        view.expects(once()).method("display");
+
+        Mock service = mock(DataCommonsService.class);
+        Note[] notes = new Note[0];
+        service.stubs().method("getNotes").will(returnValue(notes));
+        session.stubs().method("dataCommonsService").will(returnValue(service.proxy()));
+
+        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, (EmfSession) session.proxy(),
+                null);
+
+        presenter.set((EditNotesTabView) view.proxy());
+    }
 }

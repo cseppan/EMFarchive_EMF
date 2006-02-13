@@ -7,9 +7,10 @@ import gov.epa.emissions.framework.client.data.Browser;
 import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
+import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenter;
+import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -25,16 +26,12 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
 
     private EditableKeywordsTabPresenter keywordsPresenter;
 
-    private ServiceLocator serviceLocator;
-
     private EmfSession session;
 
     private Browser browser;
 
-    public PropertiesEditorPresenterImpl(EmfDataset dataset, ServiceLocator serviceLocator, EmfSession session,
-            Browser browserPresenter) {
+    public PropertiesEditorPresenterImpl(EmfDataset dataset, EmfSession session, Browser browserPresenter) {
         this.dataset = dataset;
-        this.serviceLocator = serviceLocator;
         this.session = session;
         this.browser = browserPresenter;
     }
@@ -43,7 +40,7 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         this.view = view;
         view.observe(this);
 
-        dataset = serviceLocator.dataService().obtainLockedDataset(session.user(), dataset);
+        dataset = session.dataService().obtainLockedDataset(session.user(), dataset);
 
         if (!dataset.isLocked(session.user())) {// view mode, locked by another user
             view.notifyLockFailure(dataset);
@@ -75,7 +72,7 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
     }
 
     private DataService dataService() {
-        return serviceLocator.dataService();
+        return session.dataService();
     }
 
     void updateDataset(DataService service, EditableSummaryTabPresenter summary, EditableKeywordsTabPresenter keywords)
@@ -93,12 +90,17 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
     public void set(EditableKeywordsTabView keywordsView) throws EmfException {
         keywordsPresenter = new EditableKeywordsTabPresenter(keywordsView, dataset);
 
-        Keywords keywords = new Keywords(serviceLocator.dataCommonsService().getKeywords());
+        Keywords keywords = new Keywords(session.dataCommonsService().getKeywords());
         keywordsPresenter.display(keywords);
     }
 
     public void onChange() {
         unsavedChanges = true;
+    }
+
+    public void set(EditNotesTabView view) throws EmfException {
+        EditNotesTabPresenter presenter = new EditNotesTabPresenter(dataset, session.dataCommonsService(), view);
+        presenter.display();
     }
 
 }

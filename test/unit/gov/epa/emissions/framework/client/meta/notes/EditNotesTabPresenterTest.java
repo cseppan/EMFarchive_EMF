@@ -11,7 +11,7 @@ public class EditNotesTabPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayViewOnDisplay() throws Exception {
         Note[] notes = new Note[0];
-        Mock view = mock(NotesTabView.class);
+        Mock view = mock(EditNotesTabView.class);
         view.expects(once()).method("display").with(eq(notes));
 
         Mock service = mock(DataCommonsService.class);
@@ -19,19 +19,25 @@ public class EditNotesTabPresenterTest extends MockObjectTestCase {
         dataset.setId(2);
         service.stubs().method("getNotes").with(eq(dataset.getId())).will(returnValue(notes));
 
-        EditNotesTabPresenter presenter = new EditNotesTabPresenter(dataset, (DataCommonsService) service.proxy());
+        EditNotesTabPresenter presenter = new EditNotesTabPresenter(dataset, (DataCommonsService) service.proxy(),
+                (EditNotesTabView) view.proxy());
 
-        presenter.display((NotesTabView) view.proxy());
+        presenter.display();
     }
 
-    public void testShouldAddNoteOnAdd() throws Exception {
+    public void testShouldAddNoteOnSave() throws Exception {
         Mock service = mock(DataCommonsService.class);
         Note note = new Note();
         service.expects(once()).method("addNote").with(same(note));
 
-        EditNotesTabPresenter presenter = new EditNotesTabPresenter(null, (DataCommonsService) service.proxy());
+        Mock view = mock(EditNotesTabView.class);
+        Note[] notes = new Note[] { note };
+        view.expects(once()).method("additions").will(returnValue(notes));
 
-        presenter.doAdd(note);
+        EditNotesTabView viewProxy = (EditNotesTabView) view.proxy();
+
+        EditNotesTabPresenter presenter = new EditNotesTabPresenter(null, (DataCommonsService) service.proxy(),
+                viewProxy);
+        presenter.doSave();
     }
-
 }

@@ -14,6 +14,7 @@ import gov.epa.emissions.framework.client.meta.info.InfoTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
+import gov.epa.emissions.framework.client.meta.notes.EditNotesTab;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -56,6 +57,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
         tabbedPane.addTab("Summary", createSummaryTab(dataset, messagePanel));
         tabbedPane.addTab("Keywords", createKeywordsTab());
+        tabbedPane.addTab("Notes", createNotesTab(parentConsole));
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
         tabbedPane.addTab("Tables", createInfoTab(dataset, parentConsole));
 
@@ -94,6 +96,17 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         }
     }
 
+    private JPanel createNotesTab(EmfConsole parentConsole) {
+        try {
+            EditNotesTab view = new EditNotesTab(parentConsole);
+            presenter.set(view);
+            return view;
+        } catch (EmfException e) {
+            messagePanel.setError("Could not load Notes tab. Failed communication with remote EMF Services.");
+            return createErrorTab("Could not load Notes tab. Failed communication with remote EMF Services.");
+        }
+    }
+
     private JPanel createLogsTab(EmfDataset dataset, EmfConsole parentConsole) {
         try {
             LogsTab view = new LogsTab(parentConsole);
@@ -118,7 +131,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     public void display(EmfDataset dataset) {
         super.setTitle("Dataset Properties Editor: " + dataset.getName());
-        super.setName("datasetPropertiesEditor:"+dataset.getId());
+        super.setName("datasetPropertiesEditor:" + dataset.getId());
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 

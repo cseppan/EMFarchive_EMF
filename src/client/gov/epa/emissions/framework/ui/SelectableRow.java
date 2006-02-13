@@ -19,6 +19,11 @@ public class SelectableRow implements Row {
         columns = createCols(values);
     }
 
+    public SelectableRow(RowSource rowSource) {
+        this(rowSource.source(), rowSource.values());
+        this.rowSource = rowSource;
+    }
+
     private Map createCols(Object[] values) {
         Map columns = new HashMap();
         columns.put(new Integer(0), new Column(selected));// select col
@@ -27,11 +32,6 @@ public class SelectableRow implements Row {
         }
 
         return columns;
-    }
-
-    public SelectableRow(RowSource rowSource) {
-        this(rowSource.source(), rowSource.values());
-        this.rowSource = rowSource;
     }
 
     public Object getValueAt(int column) {
