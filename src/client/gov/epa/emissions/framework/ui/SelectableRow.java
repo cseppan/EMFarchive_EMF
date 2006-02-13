@@ -3,23 +3,33 @@ package gov.epa.emissions.framework.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ViewableRow implements Row {
+public class SelectableRow implements Row {
     private Map columns;
 
     private Object source;
 
     private RowSource rowSource;
 
-    public ViewableRow(Object source, Object[] values) {
-        this.source = source;
+    private Boolean selected;
 
-        columns = new HashMap();
-        for (int i = 0; i < values.length; i++) {
-            columns.put(new Integer(i), new Column(values[i]));
-        }
+    public SelectableRow(Object source, Object[] values) {
+        this.source = source;
+        selected = Boolean.FALSE;
+
+        columns = createCols(values);
     }
 
-    public ViewableRow(RowSource rowSource) {
+    private Map createCols(Object[] values) {
+        Map columns = new HashMap();
+        columns.put(new Integer(0), new Column(selected));// select col
+        for (int i = 0; i < values.length; i++) {
+            columns.put(new Integer(i + 1), new Column(values[i]));
+        }
+
+        return columns;
+    }
+
+    public SelectableRow(RowSource rowSource) {
         this(rowSource.source(), rowSource.values());
         this.rowSource = rowSource;
     }
@@ -48,7 +58,17 @@ public class ViewableRow implements Row {
     }
 
     public void setValueAt(Object value, int column) {
-        // No Op
+        switch (column) {
+        case 0:
+            selected = (Boolean) value;
+            break;
+        default:
+            throw new RuntimeException("cannot edit column - " + column);
+        }
+    }
+
+    public boolean isSelected() {
+        return selected.booleanValue();
     }
 
 }

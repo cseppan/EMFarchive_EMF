@@ -48,7 +48,8 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     private DesktopManager desktopManager;
 
-    public VersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole, DesktopManager desktopManager) {
+    public VersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole,
+            DesktopManager desktopManager) {
         super.setLayout(new BorderLayout());
         setBorder();
 
@@ -79,7 +80,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
         JPanel container = new JPanel(new BorderLayout());
 
         JPanel right = new JPanel();
-        right.setBorder(BorderFactory.createEmptyBorder(0,0,5,5));
+        right.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 5));
         right.add(new JLabel("Default Version: "));
 
         String name = versionsSet.getDefaultVersionName(dataset.getDefaultVersion());

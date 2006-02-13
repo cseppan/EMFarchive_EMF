@@ -2,8 +2,11 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.meta.notes.NotesTabView;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.LoggingService;
+import gov.epa.emissions.framework.services.Note;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -86,5 +89,24 @@ public class PropertiesViewPresenterTest extends MockObjectTestCase {
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, (EmfSession) session.proxy());
 
         presenter.set((LogsTabView) view.proxy());
+    }
+    
+    public void testShouldDisplayNotesTabOnSetNotesTab() throws Exception {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("test");
+        dataset.setDatasetType(new DatasetType());
+        
+        Mock view = mock(NotesTabView.class);
+        view.expects(once()).method("display");
+        
+        Mock session = mock(EmfSession.class);
+        Mock service = mock(DataCommonsService.class);
+        Note[] notes = new Note[0];
+        service.stubs().method("getNotes").will(returnValue(notes));
+        session.stubs().method("dataCommonsService").will(returnValue(service.proxy()));
+        
+        PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, (EmfSession) session.proxy());
+        
+        presenter.set((NotesTabView) view.proxy());
     }
 }

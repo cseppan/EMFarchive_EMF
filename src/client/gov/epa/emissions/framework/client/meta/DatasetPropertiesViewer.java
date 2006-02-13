@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTab;
+import gov.epa.emissions.framework.client.meta.notes.NotesTab;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTab;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -55,6 +56,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         tabbedPane.addTab("Summary", createSummaryTab(dataset));
         tabbedPane.addTab("Data", createDataTab(parentConsole));
         tabbedPane.addTab("Keywords", createKeywordsTab());
+        tabbedPane.addTab("Notes", createNotesTab(parentConsole));
         tabbedPane.addTab("Logs", createLogsTab(parentConsole));
         tabbedPane.addTab("Tables", createInfoTab(parentConsole));
 
@@ -85,6 +87,17 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         KeywordsTab view = new KeywordsTab();
         presenter.set(view);
         return view;
+    }
+
+    private JPanel createNotesTab(EmfConsole parentConsole) {
+        try {
+            NotesTab view = new NotesTab(parentConsole);
+            presenter.set(view);
+            return view;
+        } catch (EmfException e) {
+            messagePanel.setError("Could not load Notes tab. Failed communication with remote EMF Services.");
+            return createErrorTab("Could not load Notes tab. Failed communication with remote EMF Services.");
+        }
     }
 
     private JPanel createLogsTab(EmfConsole parentConsole) {

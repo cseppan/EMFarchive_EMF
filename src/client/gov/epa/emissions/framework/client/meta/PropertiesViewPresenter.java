@@ -4,6 +4,8 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTabView;
+import gov.epa.emissions.framework.client.meta.notes.NotesTabPresenter;
+import gov.epa.emissions.framework.client.meta.notes.NotesTabView;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTabPresenter;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTabView;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -55,6 +57,11 @@ public class PropertiesViewPresenter {
     public void set(LogsTabView view) throws EmfException {
         LogsTabPresenter presenter = new LogsTabPresenter(view, dataset, session.loggingService());
         presenter.doDisplay();
+    }
+
+    public void set(NotesTabView view) throws EmfException {
+        NotesTabPresenter presenter = new NotesTabPresenter(dataset, session.dataCommonsService());
+        presenter.display(view);
     }
 
 }

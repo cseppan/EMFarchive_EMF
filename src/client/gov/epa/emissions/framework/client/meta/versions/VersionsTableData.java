@@ -21,7 +21,6 @@ public class VersionsTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        // TODO: convert these into 'TableColumn' (w/ properties: name, editable)
         return new String[] { "Select", "Name", "Version", "Base", "Is Final?", "Date" };
     }
 

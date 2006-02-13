@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.ui;
 
-
 public class ReadableRowSource implements RowSource {
 
     private Object[] values;
@@ -22,7 +21,7 @@ public class ReadableRowSource implements RowSource {
     }
 
     public void validate(int rowNumber) {
-        // FIXME: add valiate code before save
+        // FIXME: add validate code before save
     }
 
 }
