@@ -51,4 +51,12 @@ public abstract class EmfFrame extends JFrame implements EmfView {
     public void refreshLayout() {
         super.validate();
     }
+
+    public int height() {
+        return (int) super.getSize().getHeight();
+    }
+
+    public int width() {
+        return (int) super.getSize().getWidth();
+    }
 }

@@ -26,6 +26,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 //FIXME: split this class up into smaller ones...getting too big
+
 public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private JDesktopPane desktop;
@@ -59,7 +60,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         user = session.user();
         this.serviceLocator = session.serviceLocator();
         windowMenuView = createWindowMenu();
-        this.desktopManager = new DesktopManagerImpl(windowMenuView);
+        this.desktopManager = new DesktopManagerImpl(windowMenuView, this);
         this.windowMenuPresenter.setDesktopManager(desktopManager);
         this.windowMenuView.setWindowMenuViewPresenter(windowMenuPresenter);
         this.viewLayout = new CascadeLayout(this);

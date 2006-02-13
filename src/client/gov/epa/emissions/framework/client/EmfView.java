@@ -15,4 +15,8 @@ public interface EmfView {
     Position getPosition();
 
     void setPosition(Position position);
+    
+    int height();
+    
+    int width();
 }

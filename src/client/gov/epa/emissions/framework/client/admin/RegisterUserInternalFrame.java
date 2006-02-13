@@ -12,7 +12,7 @@ public class RegisterUserInternalFrame extends ReusableInteralFrame implements R
     public RegisterUserInternalFrame(PostRegisterStrategy postRegisterStrategy, JDesktopPane desktop,
             DesktopManager desktopManager) {
         super("Register New User", desktop, desktopManager);
-        
+        super.setName("registerNewUser");
         view = new RegisterUserPanel(postRegisterStrategy, new CloseViewOnCancelStrategy(), this, new AddAdminOption());
 
         super.dimensions(view.getSize());

@@ -67,6 +67,7 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
         counter++;
         String name = "Create New Sector "+counter;
         super.setTitle(name);
+        super.setName("createNewSector:"+counter);
         layout.removeAll();
         doLayout(layout, sector);
 

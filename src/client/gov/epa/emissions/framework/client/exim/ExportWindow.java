@@ -41,6 +41,8 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
 
     public ExportWindow(EmfDataset[] datasets, DesktopManager desktopManager) {
         super(title(datasets), desktopManager);
+        super.setName("exportWindow:"+hashCode());
+        
         this.datasets = datasets;
 
         this.getContentPane().add(createLayout());

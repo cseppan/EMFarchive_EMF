@@ -67,7 +67,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     public void display(DatasetType type, Keyword[] keywords) {
         super.setTitle("Edit Dataset Type: " + type.getName());
-        super.setName(""+type.hashCode());
+        super.setName("datasetTypeEditor:"+type.getId());
         
         layout.removeAll();
         doLayout(layout, type, keywords);

@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client;
 
+import gov.epa.emissions.commons.gui.ChangeObserver;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.ui.Position;
-import gov.epa.emissions.commons.gui.ChangeObserver;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -21,7 +21,6 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
                 true, // closable
                 true, // maximizable
                 true);// iconifiable
-        setName(""+hashCode());
         this.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosing(InternalFrameEvent event) {
                 windowClosing();
@@ -47,12 +46,11 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
         } catch (PropertyVetoException e) {
             throw new RuntimeException("could not bring the window - " + super.getTitle() + " to front of the desktop");
         }
-        display();
+        super.setVisible(true);
     }
 
     public void display() {
-        super.setVisible(true);
-        desktopManager.registerOpenWindow(this);
+        desktopManager.openWindow(this);
     }
 
     public Position getPosition() {
@@ -69,7 +67,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     }
 
     public void close() {
-        desktopManager.unregisterCloseWindow(this);
+        desktopManager.closeWindow(this);
     }
 
     protected void dimensions(Dimension size) {
@@ -80,16 +78,24 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     protected void dimensions(int width, int height) {
         this.dimensions(new Dimension(width, height));
     }
-    
+
     public void signalChanges() {
-        if(!this.getTitle().endsWith(" *"))
+        if (!this.getTitle().endsWith(" *"))
             this.setTitle(this.getTitle() + " *");
     }
-    
+
     public void signalSaved() {
         String title = this.getTitle();
         int starPosition = title.indexOf(" *");
-        if(starPosition >= 0)
+        if (starPosition >= 0)
             this.setTitle(title.substring(0, starPosition));
+    }
+
+    public int height() {
+        return (int) super.getSize().getHeight();
+    }
+
+    public int width() {
+        return (int) super.getSize().getWidth();
     }
 }

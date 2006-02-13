@@ -29,6 +29,8 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
 
     public VersionedDataWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Data Versions Editor", new Dimension(750, 350), parentConsole.desktop(),desktopManager);
+        super.setName("dataVersionsEditor");
+        
         this.parentConsole = parentConsole;
         layout = new JPanel();
         this.getContentPane().add(layout);

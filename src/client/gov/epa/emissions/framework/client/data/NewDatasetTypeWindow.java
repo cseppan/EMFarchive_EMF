@@ -81,6 +81,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         counter++;
         String name = "Create New Dataset Type"+counter;
         super.setTitle(name);
+        super.setName("createNewDatasetType:"+counter);
         layout.removeAll();
         doLayout(layout);
 

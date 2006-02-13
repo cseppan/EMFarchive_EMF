@@ -4,9 +4,9 @@ import gov.epa.emissions.framework.client.ManagedView;
 
 public interface DesktopManager {
     
-    public void registerOpenWindow(ManagedView manageView);
+    public void openWindow(ManagedView manageView);
     
-    public void unregisterCloseWindow(ManagedView manageView);
+    public void closeWindow(ManagedView manageView);
 
     public void closeAll();
     

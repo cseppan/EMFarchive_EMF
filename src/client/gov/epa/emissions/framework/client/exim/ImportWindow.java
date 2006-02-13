@@ -57,6 +57,8 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     public ImportWindow(DataCommonsService service, JDesktopPane desktop, DesktopManager desktopManager)
             throws EmfException {
         super("Import Dataset", new Dimension(650, 300), desktop, desktopManager);
+        super.setName("importDatasets");
+        
         this.service = service;
 
         this.getContentPane().add(createLayout());

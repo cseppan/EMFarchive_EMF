@@ -51,6 +51,8 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     public DatasetTypesManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Type Manager", new Dimension(600, 300), parentConsole.desktop(), desktopManager);
+        super.setName("datasetTypeManager");
+        
         this.parentConsole = parentConsole;
 
         layout = new JPanel();

@@ -26,7 +26,7 @@ public abstract class ViewUserWindow extends EmfInternalFrame implements UserVie
 
     public ViewUserWindow(DesktopManager desktopManager) {
         super("User: ", new Dimension(350, 425), desktopManager);
-
+        
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -34,7 +34,7 @@ public abstract class ViewUserWindow extends EmfInternalFrame implements UserVie
 
     public void display(User user) {
         doLayout(user);
-        super.setName(""+user.hashCode());
+        super.setName("userView:"+user.getId());
         
         super.setTitle("User: " + user.getUsername());
         super.dimensions(layout.getSize());
