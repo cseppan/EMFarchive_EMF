@@ -60,6 +60,7 @@ public class PropertiesViewPresenterTest extends MockObjectTestCase {
         
         Mock view = mock(DataTabView.class);
         view.expects(once()).method("display");
+        view.expects(once()).method("observe");
         
         Mock session = mock(EmfSession.class);
         session.stubs().method("dataViewService");

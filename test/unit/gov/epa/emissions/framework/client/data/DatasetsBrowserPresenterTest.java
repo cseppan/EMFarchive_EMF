@@ -155,11 +155,8 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("clearMessage").withNoArguments();
 
         Mock editorService = mock(DataEditorService.class);
-        serviceLocator.stubs().method("dataEditorService").withNoArguments().will(returnValue(editorService.proxy()));
-
         Mock viewService = mock(DataViewService.class);
         Object viewServiceProxy = viewService.proxy();
-        serviceLocator.stubs().method("dataViewService").withNoArguments().will(returnValue(viewServiceProxy));
 
         Mock editorView = mock(VersionedDataView.class);
         editorView.expects(once()).method("observe").with(new IsInstanceOf(VersionedDataPresenter.class));
@@ -167,6 +164,7 @@ public class DatasetsBrowserPresenterTest extends MockObjectTestCase {
 
         session.stubs().method("serviceLocator").will(returnValue(serviceLocator.proxy()));
         session.stubs().method("dataViewService").will(returnValue(viewServiceProxy));
+        session.stubs().method("dataEditorService").will(returnValue(editorService.proxy()));
         
         VersionedDataView viewProxy = (VersionedDataView) editorView.proxy();
 

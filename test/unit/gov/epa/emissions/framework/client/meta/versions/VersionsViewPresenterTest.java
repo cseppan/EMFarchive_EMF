@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.versions;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.editor.DataView;
 import gov.epa.emissions.framework.client.editor.DataViewPresenter;
 import gov.epa.emissions.framework.services.DataViewService;
@@ -27,8 +28,15 @@ public class VersionsViewPresenterTest extends MockObjectTestCase {
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
         dataView.expects(once()).method("observe").with(new IsInstanceOf(DataViewPresenter.class));
 
-        VersionsViewPresenter presenter = new VersionsViewPresenter(null, serviceProxy);
+        VersionsViewPresenter presenter = new VersionsViewPresenter(null, session(serviceProxy));
         presenter.doView(version, table, (DataView) dataView.proxy());
+    }
+
+    private EmfSession session(DataViewService service) {
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("dataViewService").will(returnValue(service));
+
+        return (EmfSession) session.proxy();
     }
 
     public void testShouldRaiseErrorWhenAttemptedToViewNonFinalVersionOnDisplay() throws Exception {
@@ -52,7 +60,7 @@ public class VersionsViewPresenterTest extends MockObjectTestCase {
 
         service.stubs().method("getVersions").with(eq(new Long(dataset.getId()))).will(returnValue(versions));
 
-        VersionsViewPresenter presenter = new VersionsViewPresenter(dataset, (DataViewService) service.proxy());
+        VersionsViewPresenter presenter = new VersionsViewPresenter(dataset, session((DataViewService) service.proxy()));
         view.expects(once()).method("observe").with(same(presenter));
         view.expects(once()).method("display").with(eq(versions), eq(internalSources));
 

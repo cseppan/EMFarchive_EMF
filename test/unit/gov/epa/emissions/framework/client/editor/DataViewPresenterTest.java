@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataViewService;
@@ -28,10 +29,19 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         Mock view = mock(DataView.class);
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
 
-        DataViewPresenter p = new DataViewPresenter(version, table, (DataView) view.proxy(), serviceProxy);
+        EmfSession session = session(serviceProxy, null);
+        DataViewPresenter p = new DataViewPresenter(version, table, (DataView) view.proxy(), session);
         view.expects(once()).method("observe").with(same(p));
 
         p.display();
+    }
+
+    private EmfSession session(DataViewService viewService, DataCommonsService commons) {
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("dataViewService").will(returnValue(viewService));
+        session.stubs().method("dataCommonsService").will(returnValue(commons));
+
+        return (EmfSession) session.proxy();
     }
 
     public void testShouldCloseViewAndCloseDataEditSessionOnClose() throws Exception {
@@ -45,8 +55,8 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         Constraint constraint = tokenConstraint(version, table);
         service.expects(once()).method("closeSession").with(constraint);
 
-        DataViewPresenter p = new DataViewPresenter(version, table, (DataView) view.proxy(), (DataViewService) service
-                .proxy());
+        EmfSession session = session((DataViewService) service.proxy(), null);
+        DataViewPresenter p = new DataViewPresenter(version, table, (DataView) view.proxy(), session);
 
         p.doClose();
     }
@@ -63,9 +73,10 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         Note note = new Note();
         service.expects(once()).method("addNote").with(same(note));
 
-        DataViewPresenter presenter = new DataViewPresenter(null, null, null, null, (DataCommonsService) service
-                .proxy());
+        EmfSession session = session(null, (DataCommonsService) service.proxy());
+        DataViewPresenter presenter = new DataViewPresenter(null, null, null, session);
 
         presenter.doAdd(note);
     }
+
 }

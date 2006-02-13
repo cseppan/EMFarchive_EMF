@@ -14,7 +14,6 @@ import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataView;
 import gov.epa.emissions.framework.services.DataService;
-import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 public class DatasetsBrowserPresenter implements Browser {
@@ -85,13 +84,8 @@ public class DatasetsBrowserPresenter implements Browser {
     public void doDisplayVersionedData(VersionedDataView versionsView, EmfDataset dataset) {
         view.clearMessage();
 
-        VersionedDataPresenter presenter = new VersionedDataPresenter(session.user(), dataset, session.serviceLocator()
-                .dataEditorService(), dataViewService());
+        VersionedDataPresenter presenter = new VersionedDataPresenter(session.user(), dataset, session);
         presenter.display(versionsView);
-    }
-
-    private DataViewService dataViewService() {
-        return session.dataViewService();
     }
 
     public void notifyUpdates() {

@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.editor;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataEditorService;
 
@@ -27,6 +28,13 @@ public class DataEditorPresenter {
         this.version = version;
         this.table = table;
         this.service = service;
+    }
+    
+    public DataEditorPresenter(User user, Version version, String table, EmfSession session) {
+        this.user = user;
+        this.version = version;
+        this.table = table;
+        this.service = session.dataEditorService();
     }
 
     public void display(DataEditorView view) throws EmfException {

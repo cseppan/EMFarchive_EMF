@@ -34,14 +34,22 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
         dataView.expects(once()).method("observe").with(new IsInstanceOf(DataViewPresenter.class));
 
-        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null, null, serviceProxy);
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null, session(null, serviceProxy));
         presenter.doView(version, table, (DataView) dataView.proxy());
+    }
+
+    private EmfSession session(DataEditorService editor, DataViewService view) {
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("dataEditorService").will(returnValue(editor));
+        session.stubs().method("dataViewService").will(returnValue(view));
+        
+        return (EmfSession) session.proxy();
     }
 
     public void testShouldRaiseErrorWhenAttemptedToViewNonFinalVersionOnDisplay() throws Exception {
         Version version = new Version();
 
-        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null, null, null);
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null, null);
 
         try {
             presenter.doView(version, null, null);
@@ -69,7 +77,7 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         Mock session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(null));
 
-        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null, serviceProxy, null);
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null, session(serviceProxy, null));
         presenter.doEdit(version, table, (DataEditorView) dataView.proxy());
     }
 
@@ -86,7 +94,7 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         Version version = new Version();
         version.markFinal();
 
-        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null, null, null);
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null, null);
 
         try {
             presenter.doEdit(version, null, null);
@@ -122,9 +130,8 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         InternalSource[] internalSources = new InternalSource[0];
 
         service.stubs().method("getVersions").with(eq(new Long(dataset.getId()))).will(returnValue(versions));
-
-        EditVersionsPresenter presenter = new EditVersionsPresenter(null, dataset, (DataEditorService) service.proxy(),
-                null);
+        EmfSession session = session((DataEditorService) service.proxy(), null);
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, dataset, session);
         view.expects(once()).method("observe").with(same(presenter));
         view.expects(once()).method("display").with(eq(versions), eq(internalSources));
 
@@ -163,7 +170,7 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         version.setVersion(2);
         version.markFinal();
 
-        EditVersionsPresenter p = new EditVersionsPresenter(null, null, null, null);
+        EditVersionsPresenter p = new EditVersionsPresenter(null, null, null);
 
         try {
             p.doMarkFinal(new Version[] { version });

@@ -43,9 +43,4 @@ public class InfoTabPresenterTest extends MockObjectTestCase {
         presenter.doDisplay();
     }
 
-    public void testShouldDoNothingOnSave() {
-        DataTabPresenter presenter = new DataTabPresenter(null, null, null);
-        presenter.doSave();
-    }
-
 }

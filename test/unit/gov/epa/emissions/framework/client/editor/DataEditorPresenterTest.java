@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataEditorService;
 
@@ -36,10 +37,18 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("updateLockPeriod")
                 .with(new IsInstanceOf(Date.class), new IsInstanceOf(Date.class));
 
-        DataEditorPresenter p = new DataEditorPresenter(user, version, table, serviceProxy);
+        
+        DataEditorPresenter p = new DataEditorPresenter(user, version, table, session(serviceProxy));
         view.expects(once()).method("observe").with(same(p));
 
         p.display((DataEditorView) view.proxy());
+    }
+
+    private EmfSession session(DataEditorService service) {
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("dataEditorService").will(returnValue(service));
+        
+        return (EmfSession) session.proxy();
     }
 
     public void testShouldAbortWithNotificationIfUnableToObtainLockOnDisplay() throws Exception {
@@ -57,7 +66,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Mock view = mock(DataEditorView.class);
         view.expects(once()).method("notifyLockFailure");
 
-        DataEditorPresenter p = new DataEditorPresenter(user, version, table, serviceProxy);
+        DataEditorPresenter p = new DataEditorPresenter(user, version, table, session(serviceProxy));
 
         p.display((DataEditorView) view.proxy());
     }
@@ -140,7 +149,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("updateLockPeriod")
                 .with(new IsInstanceOf(Date.class), new IsInstanceOf(Date.class));
 
-        DataEditorPresenter p = new DataEditorPresenter(user, version, table, serviceProxy);
+        DataEditorPresenter p = new DataEditorPresenter(user, version, table, session(serviceProxy));
         view.expects(once()).method("observe").with(same(p));
         p.display((DataEditorView) view.proxy());
 

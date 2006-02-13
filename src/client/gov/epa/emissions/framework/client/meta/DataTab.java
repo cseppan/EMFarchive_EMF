@@ -6,8 +6,6 @@ import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.versions.VersionsPanel;
-import gov.epa.emissions.framework.client.meta.versions.VersionsViewPresenter;
-import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.awt.BorderLayout;
@@ -23,34 +21,39 @@ public class DataTab extends JPanel implements DataTabView {
 
     private DesktopManager desktopManager;
 
+    private DataTabPresenter presenter;
+
     public DataTab(EmfConsole parentConsole, DesktopManager desktopManager) {
         setName("dataTab");
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
     }
 
-    public void display(EmfDataset dataset, DataViewService service) {
+    public void observe(DataTabPresenter presenter) {
+        this.presenter = presenter;
+    }
+
+    public void display(EmfDataset dataset) {
         super.setLayout(new BorderLayout());
 
         messagePanel = new SingleLineMessagePanel();
         add(messagePanel, BorderLayout.PAGE_START);
-        add(createLayout(dataset, service, messagePanel), BorderLayout.CENTER);
+        add(createLayout(dataset, messagePanel), BorderLayout.CENTER);
     }
 
-    private JPanel createLayout(EmfDataset dataset, DataViewService service, MessagePanel messagePanel) {
+    private JPanel createLayout(EmfDataset dataset, MessagePanel messagePanel) {
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
-        container.add(versionsPanel(dataset, service, messagePanel));
+        container.add(versionsPanel(dataset, messagePanel));
 
         return container;
     }
 
-    private VersionsPanel versionsPanel(EmfDataset dataset, DataViewService service, MessagePanel messagePanel) {
+    private VersionsPanel versionsPanel(EmfDataset dataset, MessagePanel messagePanel) {
         VersionsPanel versionsPanel = new VersionsPanel(dataset, messagePanel, parentConsole, desktopManager);
-        VersionsViewPresenter versionsPresenter = new VersionsViewPresenter(dataset, service);
         try {
-            versionsPresenter.display(versionsPanel);
+            presenter.displayVersions(versionsPanel);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

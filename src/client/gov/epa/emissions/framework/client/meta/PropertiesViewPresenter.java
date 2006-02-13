@@ -48,7 +48,7 @@ public class PropertiesViewPresenter {
     }
 
     public void set(DataTabView view) {
-        DataTabPresenter presenter = new DataTabPresenter(view, dataset, session.dataViewService());
+        DataTabPresenter presenter = new DataTabPresenter(view, dataset, session);
         presenter.doDisplay();
     }
 

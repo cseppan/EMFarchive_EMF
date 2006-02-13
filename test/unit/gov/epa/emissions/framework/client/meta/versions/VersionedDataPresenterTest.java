@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.jmock.Mock;
@@ -14,10 +15,16 @@ public class VersionedDataPresenterTest extends MockObjectTestCase {
 
         view.expects(once()).method("display").with(same(dataset), new IsInstanceOf(EditVersionsPresenter.class));
 
-        VersionedDataPresenter p = new VersionedDataPresenter(null, dataset, null, null);
+        Mock session = mockSession();
+
+        VersionedDataPresenter p = new VersionedDataPresenter(null, dataset, (EmfSession) session.proxy());
         view.expects(once()).method("observe").with(same(p));
 
         p.display((VersionedDataView) view.proxy());
+    }
+
+    private Mock mockSession() {
+        return mock(EmfSession.class);
     }
 
     public void testShouldCloseViewOnClose() {
@@ -33,7 +40,7 @@ public class VersionedDataPresenterTest extends MockObjectTestCase {
 
         view.expects(once()).method("display").with(same(dataset), new IsInstanceOf(EditVersionsPresenter.class));
 
-        VersionedDataPresenter p = new VersionedDataPresenter(null, dataset, null, null);
+        VersionedDataPresenter p = new VersionedDataPresenter(null, dataset, (EmfSession) mockSession().proxy());
         view.expects(once()).method("observe").with(same(p));
 
         p.display((VersionedDataView) view.proxy());
