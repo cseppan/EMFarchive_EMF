@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.IntendedUse;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
+import gov.epa.emissions.framework.services.Revision;
 import gov.epa.emissions.framework.services.Status;
 
 import java.util.ArrayList;
@@ -306,8 +307,27 @@ public class DataCommonsDAO {
         }
     }
 
+    public void add(Revision revision, Session session) {
+        addObject(revision, session);
+    }
+
     public void add(Note note, Session session) {
         addObject(note, session);
+    }
+
+    public List getRevisions(Session session) {
+        Transaction tx = null;
+
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(Revision.class);
+            tx.commit();
+
+            return crit.list();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
     public List getNotes(Session session) {

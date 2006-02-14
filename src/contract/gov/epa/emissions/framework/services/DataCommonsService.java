@@ -58,13 +58,12 @@ public interface DataCommonsService {
 
     // Revisions
     Revision[] getRevisions(long datasetId) throws EmfException;
-
     void addRevision(Revision revision) throws EmfException;
 
     // Notes
     Note[] getNotes(long datasetId) throws EmfException;
-
     void addNote(Note note) throws EmfException;
+    void addNotes(Note[] notes) throws EmfException;
 
     // Note types
     NoteType[] getNoteTypes() throws EmfException;

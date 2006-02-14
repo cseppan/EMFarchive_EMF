@@ -252,4 +252,9 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         // TODO Auto-generated method stub
         
     }
+
+    public void addNotes(Note[] notes) {
+        // NOTE Auto-generated method stub
+        
+    }
 }

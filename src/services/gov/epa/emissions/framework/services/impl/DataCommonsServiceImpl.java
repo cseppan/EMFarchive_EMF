@@ -373,4 +373,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     }
 
+    public void addNotes(Note[] notes) {
+        // NOTE Auto-generated method stub
+        
+    }
+
 }

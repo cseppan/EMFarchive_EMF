@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
+import gov.epa.emissions.framework.services.Revision;
 import gov.epa.emissions.framework.services.ServicesTestCase;
 import gov.epa.emissions.framework.services.Status;
 
@@ -264,6 +265,53 @@ public class DataCommonsDAOTest extends ServicesTestCase {
             assertEquals(1, messages.size());
         } finally {
             remove(status);
+        }
+    }
+
+    public void testShouldPersistRevisionOnAdd() {
+        Revision rev = null;
+        
+        User user = userDao.get("emf", session);
+        EmfDataset dataset = newDataset();
+        dataset.setCreator(user.getUsername());
+        datasetDAO.add(dataset,session);
+        EmfDataset datasetFromDB = loadDataset(dataset.getName());
+        rev = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT ONE", "WHY ONE", "NOTE ONE");
+
+        dao.add(rev, session);
+
+        try {
+            List allRevisions = dao.getRevisions(session);
+            assertEquals(1, allRevisions.size());
+        } finally {
+            remove(rev);
+            remove(dataset);
+        }
+    }
+
+    public void testShouldAddANDGetThreeRevisions() {
+        Revision rev1=null,rev2=null,rev3=null;
+
+        User user = userDao.get("emf", session);
+        EmfDataset dataset = newDataset();
+        dataset.setCreator(user.getUsername());
+        datasetDAO.add(dataset,session);
+        EmfDataset datasetFromDB = loadDataset(dataset.getName());
+        
+        rev1 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT ONE", "WHY ONE", "NOTE ONE");
+        rev2 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT TWO", "WHY TWO", "NOTE TWO");
+        rev3 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT THREE", "WHY THREE", "NOTE THREE");
+        dao.add(rev1, session);
+        dao.add(rev2, session);
+        dao.add(rev3, session);
+        try {
+            List allRevisions = dao.getRevisions(session);
+            assertEquals(3, allRevisions.size());
+        } finally {
+            remove(rev1);
+            remove(rev2);
+            remove(rev3);
+            remove(dataset);
         }
     }
 
