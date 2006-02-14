@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.NoteType;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.core.Constraint;
 
 public class EditNotesTabPresenterTest extends MockObjectTestCase {
 
@@ -18,13 +19,14 @@ public class EditNotesTabPresenterTest extends MockObjectTestCase {
         Note[] notes = new Note[0];
         NoteType[] noteTypes = new NoteType[0];
         Version[] versions = new Version[0];
+        EmfDataset dataset = new EmfDataset();
 
         Mock view = mock(EditNotesTabView.class);
         User user = new User();
-        view.expects(once()).method("display").with(same(user), same(notes), same(noteTypes), same(versions));
+        Constraint[] constraints = { same(user), same(dataset), same(notes), same(noteTypes), same(versions) };
+        view.expects(once()).method("display").with(constraints);
 
         Mock dataCommons = mock(DataCommonsService.class);
-        EmfDataset dataset = new EmfDataset();
         dataset.setId(2);
         dataCommons.stubs().method("getNotes").with(eq(dataset.getId())).will(returnValue(notes));
         dataCommons.stubs().method("getNoteTypes").will(returnValue(noteTypes));

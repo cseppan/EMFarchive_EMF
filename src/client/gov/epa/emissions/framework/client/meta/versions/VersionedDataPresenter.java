@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
-import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfDataset;
 
@@ -10,12 +9,9 @@ public class VersionedDataPresenter {
 
     private EmfDataset dataset;
 
-    private User user;
-
     private EmfSession session;
 
-    public VersionedDataPresenter(User user, EmfDataset dataset, EmfSession session) {
-        this.user = user;
+    public VersionedDataPresenter(EmfDataset dataset, EmfSession session) {
         this.dataset = dataset;
         this.session = session;
     }
@@ -24,7 +20,7 @@ public class VersionedDataPresenter {
         this.view = view;
         view.observe(this);
 
-        EditVersionsPresenter versionsPresenter = new EditVersionsPresenter(user, dataset, session);
+        EditVersionsPresenter versionsPresenter = new EditVersionsPresenter(dataset, session);
         view.display(dataset, versionsPresenter);
     }
 

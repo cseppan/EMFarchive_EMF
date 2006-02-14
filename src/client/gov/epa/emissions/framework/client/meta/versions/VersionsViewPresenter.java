@@ -31,7 +31,7 @@ public class VersionsViewPresenter {
         if (!version.isFinalVersion())
             throw new EmfException("Can only view a 'final' Version");
 
-        DataViewPresenter presenter = new DataViewPresenter(version, table, view, session);
+        DataViewPresenter presenter = new DataViewPresenter(dataset, version, table, view, session);
         presenter.display();
     }
 

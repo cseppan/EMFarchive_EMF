@@ -37,17 +37,17 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("updateLockPeriod")
                 .with(new IsInstanceOf(Date.class), new IsInstanceOf(Date.class));
 
-        
-        DataEditorPresenter p = new DataEditorPresenter(user, version, table, session(serviceProxy));
+        DataEditorPresenter p = new DataEditorPresenter(version, table, session(user, serviceProxy));
         view.expects(once()).method("observe").with(same(p));
 
         p.display((DataEditorView) view.proxy());
     }
 
-    private EmfSession session(DataEditorService service) {
+    private EmfSession session(User user, DataEditorService service) {
         Mock session = mock(EmfSession.class);
         session.stubs().method("dataEditorService").will(returnValue(service));
-        
+        session.stubs().method("user").will(returnValue(user));
+
         return (EmfSession) session.proxy();
     }
 
@@ -66,7 +66,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         Mock view = mock(DataEditorView.class);
         view.expects(once()).method("notifyLockFailure");
 
-        DataEditorPresenter p = new DataEditorPresenter(user, version, table, session(serviceProxy));
+        DataEditorPresenter p = new DataEditorPresenter(version, table, session(user, serviceProxy));
 
         p.display((DataEditorView) view.proxy());
     }
@@ -114,7 +114,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         Mock tablePresenter = mock(EditableTablePresenter.class);
         tablePresenter.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
-        
+
         DataEditorPresenter p = displayPresenter(view, service, tablePresenter);
 
         p.doClose();
@@ -129,7 +129,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         Mock tablePresenter = mock(EditableTablePresenter.class);
         tablePresenter.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
-        
+
         DataEditorPresenter p = displayPresenter(view, service, tablePresenter);
 
         p.doClose();
@@ -149,7 +149,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("updateLockPeriod")
                 .with(new IsInstanceOf(Date.class), new IsInstanceOf(Date.class));
 
-        DataEditorPresenter p = new DataEditorPresenter(user, version, table, session(serviceProxy));
+        DataEditorPresenter p = new DataEditorPresenter(version, table, session(user, serviceProxy));
         view.expects(once()).method("observe").with(same(p));
         p.display((DataEditorView) view.proxy());
 
@@ -172,9 +172,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldDisplayTableViewOnDisplayTableView() throws Exception {
-        Mock service = mock(DataEditorService.class);
-
-        DataEditorPresenter p = new DataEditorPresenter(null, null, null, (DataEditorService) service.proxy());
+        DataEditorPresenter p = new DataEditorPresenter(null, null, null);
 
         Mock tablePresenter = mock(EditableTablePresenter.class);
         tablePresenter.expects(once()).method("observe");

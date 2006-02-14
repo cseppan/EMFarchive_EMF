@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataAccessToken;
@@ -11,8 +10,6 @@ public class DataEditorPresenter {
 
     private DataEditorView view;
 
-    private DataEditorService service;
-
     private Version version;
 
     private String table;
@@ -21,27 +18,19 @@ public class DataEditorPresenter {
 
     private EditableTablePresenter tablePresenter;
 
-    private User user;
+    private EmfSession session;
 
-    public DataEditorPresenter(User user, Version version, String table, DataEditorService service) {
-        this.user = user;
+    public DataEditorPresenter(Version version, String table, EmfSession session) {
         this.version = version;
         this.table = table;
-        this.service = service;
-    }
-    
-    public DataEditorPresenter(User user, Version version, String table, EmfSession session) {
-        this.user = user;
-        this.version = version;
-        this.table = table;
-        this.service = session.dataEditorService();
+        this.session = session;
     }
 
     public void display(DataEditorView view) throws EmfException {
         token = new DataAccessToken(version, table);
-        token = service.openSession(user, token);
+        token = dataEditorService().openSession(session.user(), token);
 
-        if (!token.isLocked(user)) {// abort
+        if (!token.isLocked(session.user())) {// abort
             view.notifyLockFailure(token);
             return;
         }
@@ -49,15 +38,20 @@ public class DataEditorPresenter {
         display(token, view);
     }
 
+    private DataEditorService dataEditorService() {
+        return session.dataEditorService();
+    }
+
     private void display(DataAccessToken token, DataEditorView view) {
         this.view = view;
         view.observe(this);
-        view.display(version, table, service);
+        view.display(version, table, dataEditorService());
         view.updateLockPeriod(token.lockStart(), token.lockEnd());
     }
 
     public void displayTable(EditablePageManagerView tableView) throws EmfException {
-        EditableTablePresenter tablePresenter = new EditableTablePresenterImpl(version, table, tableView, service);
+        EditableTablePresenter tablePresenter = new EditableTablePresenterImpl(version, table, tableView,
+                dataEditorService());
         displayTable(tablePresenter);
     }
 
@@ -71,22 +65,22 @@ public class DataEditorPresenter {
         if (hasChanges() && !view.confirmDiscardChanges())
             return;
 
-        service.closeSession(token);
+        dataEditorService().closeSession(token);
         view.close();
     }
 
     private boolean hasChanges() throws EmfException {
-        return tablePresenter.hasChanges() || service.hasChanges(token);
+        return tablePresenter.hasChanges() || dataEditorService().hasChanges(token);
     }
 
     public void doDiscard() throws EmfException {
-        service.discard(token);
+        dataEditorService().discard(token);
     }
 
     public void doSave() throws EmfException {
         tablePresenter.submitChanges();
         try {
-            token = service.save(token);
+            token = dataEditorService().save(token);
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
         } catch (EmfException e) {
             view.notifySaveFailure(e.getMessage());

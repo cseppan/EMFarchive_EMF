@@ -26,8 +26,8 @@ public class EditNotesTabPresenterImpl implements EditNotesTabPresenter {
         Note[] notes = service().getNotes(dataset.getId());
         NoteType[] types = service().getNoteTypes();
         Version[] versions = session.dataEditorService().getVersions(dataset.getId());
-        
-        view.display(session.user(), notes, types, versions);
+
+        view.display(session.user(), dataset, notes, types, versions);
     }
 
     private DataCommonsService service() {

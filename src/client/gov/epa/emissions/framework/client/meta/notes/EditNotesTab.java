@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.SimpleTableModel;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -32,16 +33,17 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         super.setLayout(new BorderLayout());
     }
 
-    public void display(User user, Note[] notes, NoteType[] types, Version[] versions) {
+    public void display(User user, EmfDataset dataset, Note[] notes, NoteType[] types, Version[] versions) {
         super.removeAll();
-        super.add(createLayout(user, notes, types, versions, parentConsole), BorderLayout.CENTER);
+        super.add(createLayout(user, dataset, notes, types, versions, parentConsole), BorderLayout.CENTER);
     }
 
-    private JPanel createLayout(User user, Note[] notes, NoteType[] types, Version[] versions, EmfConsole parentConsole) {
+    private JPanel createLayout(User user, EmfDataset dataset, Note[] notes, NoteType[] types, Version[] versions,
+            EmfConsole parentConsole) {
         JPanel layout = new JPanel(new BorderLayout());
 
         layout.add(createSortFilterPane(notes, parentConsole), BorderLayout.CENTER);
-        layout.add(controlPanel(user, types, versions), BorderLayout.PAGE_END);
+        layout.add(controlPanel(user, dataset, types, versions), BorderLayout.PAGE_END);
 
         return layout;
     }
@@ -60,12 +62,13 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         return scrollPane;
     }
 
-    private JPanel controlPanel(final User user, final NoteType[] types, final Version[] versions) {
+    private JPanel controlPanel(final User user, final EmfDataset dataset, final NoteType[] types,
+            final Version[] versions) {
         JPanel panel = new JPanel(new BorderLayout());
 
         Button add = new Button("Add", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doNewNote(user, types, versions);
+                doNewNote(user, dataset, types, versions);
             }
         });
         panel.add(add, BorderLayout.LINE_END);
@@ -73,9 +76,9 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         return panel;
     }
 
-    protected void doNewNote(User user, NoteType[] types, Version[] versions) {
-        NewNoteDialog dialog = new NewNoteDialog(user, types, versions, parentConsole);
-        dialog.run();
+    protected void doNewNote(User user, EmfDataset dataset, NoteType[] types, Version[] versions) {
+        NewNoteDialog dialog = new NewNoteDialog(parentConsole);
+        dialog.display(user, dataset, types, versions);
 
         if (dialog.shouldCreate()) {
             tableData.add(dialog.note());

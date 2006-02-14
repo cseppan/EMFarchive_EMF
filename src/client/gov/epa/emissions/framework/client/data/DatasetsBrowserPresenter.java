@@ -83,7 +83,7 @@ public class DatasetsBrowserPresenter implements Browser {
     public void doDisplayVersionedData(VersionedDataView versionsView, EmfDataset dataset) {
         view.clearMessage();
 
-        VersionedDataPresenter presenter = new VersionedDataPresenter(session.user(), dataset, session);
+        VersionedDataPresenter presenter = new VersionedDataPresenter(dataset, session);
         presenter.display(versionsView);
     }
 

@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.ui.Dialog;
@@ -26,7 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class NewNoteDialog extends Dialog {
+public class NewNoteDialog extends Dialog implements NewNoteView {
 
     private TextField name;
 
@@ -46,16 +47,23 @@ public class NewNoteDialog extends Dialog {
 
     private User user;
 
-    public NewNoteDialog(User user, NoteType[] types, Version[] versions, EmfConsole parent) {
+    private EmfDataset dataset;
+
+    public NewNoteDialog(EmfConsole parent) {
         super("Create new Note", parent);
         super.setSize(new Dimension(550, 250));
 
+        super.center();
+    }
+
+    public void display(User user, EmfDataset dataset, NoteType[] types, Version[] versions) {
         this.user = user;
+        this.dataset = dataset;
         versionsSet = new VersionsSet(versions);
         this.types = types;
 
         super.getContentPane().add(createLayout(types, versionsSet));
-        super.center();
+        super.show();
     }
 
     private JPanel createLayout(NoteType[] types, VersionsSet versionsSet) {
@@ -149,10 +157,6 @@ public class NewNoteDialog extends Dialog {
         super.dispose();
     }
 
-    public void run() {
-        show();
-    }
-
     public boolean shouldCreate() {
         return shouldCreate;
     }
@@ -166,6 +170,7 @@ public class NewNoteDialog extends Dialog {
         note.setNoteType(type());
         note.setDate(new Date());
         note.setCreator(user);
+        note.setDatasetId(dataset.getId());
 
         return note;
     }

@@ -3,9 +3,11 @@ package gov.epa.emissions.framework.client.editor;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.meta.notes.NewNoteView;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataViewService;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
 
@@ -32,7 +34,7 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
 
         EmfSession session = session(serviceProxy, null);
-        DataViewPresenter p = new DataViewPresenter(version, table, (DataView) view.proxy(), session);
+        DataViewPresenter p = new DataViewPresenter(null, version, table, (DataView) view.proxy(), session);
         view.expects(once()).method("observe").with(same(p));
 
         p.display();
@@ -58,7 +60,7 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("closeSession").with(constraint);
 
         EmfSession session = session((DataViewService) service.proxy(), null);
-        DataViewPresenter p = new DataViewPresenter(version, table, (DataView) view.proxy(), session);
+        DataViewPresenter p = new DataViewPresenter(null, version, table, (DataView) view.proxy(), session);
 
         p.doClose();
     }
@@ -80,15 +82,15 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("addNote").with(same(note));
 
         EmfSession session = session(null, (DataCommonsService) service.proxy());
-        DataViewPresenter presenter = new DataViewPresenter(null, null, null, session);
+        DataViewPresenter presenter = new DataViewPresenter(null, null, null, null, session);
 
         Mock view = mock(NewNoteView.class);
-        long datasetId = 2;
-        view.stubs().method("display").with(same(user), eq(datasetId), same(types), same(versions));
+        EmfDataset dataset = new EmfDataset();
+        view.stubs().method("display").with(same(user), same(dataset), same(types), same(versions));
         view.stubs().method("shouldCreate").will(returnValue(Boolean.TRUE));
         view.stubs().method("note").will(returnValue(note));
 
-        presenter.addNote((NewNoteView) view.proxy(), user, datasetId, types, versions);
+        presenter.addNote((NewNoteView) view.proxy(), user, dataset, types, versions);
     }
 
 }

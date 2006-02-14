@@ -4,9 +4,11 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.meta.notes.NewNoteView;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataViewService;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.NoteType;
 
 public class DataViewPresenter {
@@ -21,7 +23,10 @@ public class DataViewPresenter {
 
     private EmfSession session;
 
-    public DataViewPresenter(Version version, String table, DataView view, EmfSession session) {
+    private EmfDataset dataset;
+
+    public DataViewPresenter(EmfDataset dataset, Version version, String table, DataView view, EmfSession session) {
+        this.dataset = dataset;
         this.version = version;
         this.table = table;
         this.view = view;
@@ -51,13 +56,14 @@ public class DataViewPresenter {
 
     public void doAddNote(NewNoteView view) throws EmfException {
         NoteType[] types = commonsService().getNoteTypes();
-        Version[] versions = session.dataEditorService().getVersions(version.getDatasetId());
+        Version[] versions = session.dataEditorService().getVersions(dataset.getId());
 
-        addNote(view, session.user(), version.getDatasetId(), types, versions);
+        addNote(view, session.user(), dataset, types, versions);
     }
 
-    void addNote(NewNoteView view, User user, long datasetId, NoteType[] types, Version[] versions) throws EmfException {
-        view.display(user, datasetId, types, versions);
+    void addNote(NewNoteView view, User user, EmfDataset dataset, NoteType[] types, Version[] versions)
+            throws EmfException {
+        view.display(user, dataset, types, versions);
         if (view.shouldCreate())
             commonsService().addNote(view.note());
     }
