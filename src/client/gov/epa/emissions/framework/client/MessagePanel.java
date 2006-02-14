@@ -1,10 +1,12 @@
 package gov.epa.emissions.framework.client;
 
+import gov.epa.emissions.commons.gui.MessageBoard;
+
 import java.awt.Color;
 
 import javax.swing.JPanel;
 
-public abstract class MessagePanel extends JPanel {
+public abstract class MessagePanel extends JPanel implements MessageBoard {
 
     protected MessagePanel() {
         super.setName("messagePanel");

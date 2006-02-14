@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.summary;
 import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
+import gov.epa.emissions.commons.gui.FormattedTextField;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
@@ -29,22 +30,17 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.InputVerifier;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.JFormattedTextField.AbstractFormatter;
 
 //FIXME: super long class..break it up
 public class EditableSummaryTab extends JPanel implements EditableSummaryTabView {
@@ -167,6 +163,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         intendedUseCombo = new EditableComboBox(allIntendedUses);
         IntendedUse intendedUse = dataset.getIntendedUse();
         intendedUseCombo.setSelectedItem(intendedUse);
+        changeablesList.add(intendedUseCombo);
+        intendedUseCombo.addListeners();
     }
 
     private String format(Date date) {
@@ -179,8 +177,12 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // time period
-        startDateTime = new FormattedTextField("startDateTime", dataset.getStartDateTime(), DATE_FORMATTER);
-        endDateTime = new FormattedTextField("endDateTime", dataset.getStopDateTime(), DATE_FORMATTER);
+        startDateTime = new FormattedTextField("startDateTime", dataset.getStartDateTime(), DATE_FORMATTER, messagePanel);
+        endDateTime = new FormattedTextField("endDateTime", dataset.getStopDateTime(), DATE_FORMATTER, messagePanel);
+        changeablesList.add(startDateTime);
+        changeablesList.add(endDateTime);
+        startDateTime.addTextListener();
+        endDateTime.addTextListener();
         layoutGenerator.addLabelWidgetPair("Time Period Start:", startDateTime, panel);
         layoutGenerator.addLabelWidgetPair("Time Period End:", endDateTime, panel);
 
@@ -193,7 +195,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         temporalResolutionsCombo.addItemListener(comboxBoxListener);
         String temporalResolution = dataset.getTemporalResolution();
         temporalResolutionsCombo.setSelectedItem(temporalResolution);
-
+        changeablesList.add(temporalResolutionsCombo);
+        temporalResolutionsCombo.addItemChangeListener();
         layoutGenerator.addLabelWidgetPair("Temporal Resolution:", temporalResolutionsCombo, panel);
 
         sectorsCombo = new ComboBox("Choose a sector", service.getSectors());
@@ -205,6 +208,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         sectorsCombo.setName("sectors");
         sectorsCombo.setPreferredSize(new Dimension(175, 20));
         sectorsCombo.addItemListener(comboxBoxListener);
+        changeablesList.add(sectorsCombo);
+        sectorsCombo.addItemChangeListener();
         layoutGenerator.addLabelWidgetPair("Sector:", sectorsCombo, panel);
 
         allRegions = service.getRegions();
@@ -213,6 +218,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         regionsCombo.setName("regionsComboModel");
         regionsCombo.setPreferredSize(new Dimension(125, 20));
         regionsCombo.addItemListener(comboxBoxListener);
+        changeablesList.add(regionsCombo);
+        regionsCombo.addListeners();
         layoutGenerator.addLabelWidgetPair("Region:", regionsCombo, panel);
         Region region = dataset.getRegion();
         regionsCombo.setSelectedItem(region);
@@ -225,6 +232,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         countriesCombo.setPreferredSize(new Dimension(175, 20));
         Country country = dataset.getCountry();
         countriesCombo.setSelectedItem(country);
+        changeablesList.add(countriesCombo);
+        countriesCombo.addItemChangeListener();
 
         layoutGenerator.addLabelWidgetPair("Country:", countriesCombo, panel);
 
@@ -246,12 +255,14 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         name.setText(dataset.getName());
         name.setMaximumSize(new Dimension(300, 15));
         changeablesList.add(name);
+        name.addTextListener();
 
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         // description
         description = new TextArea("description", dataset.getDescription());
         changeablesList.add(description);
+        description.addTextListener();
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableTextArea(description), panel);
 
         allProjects = service.getProjects();
@@ -260,6 +271,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         projectsCombo.setName("projects");
         projectsCombo.setPreferredSize(new Dimension(250, 20));
         projectsCombo.addItemListener(comboxBoxListener);
+        changeablesList.add(projectsCombo);
+        projectsCombo.addListeners();
         layoutGenerator.addLabelWidgetPair("Project:", projectsCombo, panel);
 
         // creator
@@ -378,44 +391,6 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         }
     }
 
-    public class FormattedTextField extends JFormattedTextField {
-
-        public FormattedTextField(String name, Object value, Format format) {
-            super(format);
-            super.setName(name);
-            super.setValue(value);
-            super.setColumns(10);
-
-            super.setInputVerifier(new FormattedTextFieldVerifier());
-        }
-
-    }
-
-    public class FormattedTextFieldVerifier extends InputVerifier {
-        public boolean verify(JComponent input) {
-            JFormattedTextField ftf = (JFormattedTextField) input;
-            AbstractFormatter formatter = ftf.getFormatter();
-            String text = ftf.getText();
-            if (text.trim().length() == 0) {// need not validate empty field
-                return true;
-            }
-            try {
-                formatter.stringToValue(text);
-                messagePanel.clear();
-            } catch (ParseException pe) {
-                messagePanel.setError("Invalid date - " + text + ".  Please use the format - "
-                        + DATE_FORMATTER.toPattern());
-                return false;
-            }
-
-            return true;
-        }
-
-        public boolean shouldYieldFocus(JComponent input) {
-            return verify(input);
-        }
-    }
-
     private void listenForKeyEvents(KeyListener keyListener) {
         name.addKeyListener(keyListener);
         description.addKeyListener(keyListener);
@@ -429,19 +404,15 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     public class SummaryTabKeyListener extends KeyAdapter {
         public void keyTyped(KeyEvent e) {
-            if (changeObserver != null) {
-                changeablesList.onChanges();
+            if (changeObserver != null)
                 changeObserver.onChange();
-            }
         }
     }
 
     public class SummaryTabComboBoxChangesListener implements ItemListener {
         public void itemStateChanged(ItemEvent e) {
-            if (changeObserver != null) {
-                changeablesList.onChanges();
+            if (changeObserver != null)
                 changeObserver.onChange();
-            }
         }
     }
 

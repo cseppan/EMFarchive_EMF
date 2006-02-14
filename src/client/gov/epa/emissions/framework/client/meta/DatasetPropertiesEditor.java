@@ -2,12 +2,12 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ChangeablesList;
-import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.WidgetChangesMonitor;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.info.InfoTab;
@@ -18,6 +18,7 @@ import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTab;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.ui.EmfDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -45,14 +46,17 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private EmfSession session;
 
     private EditableKeywordsTab keywordsTab;
-
+    
     private ChangeablesList changeablesList;
+    
+    private WidgetChangesMonitor monitor;
 
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
-        this.changeablesList = new ChangeablesList(this);
+        changeablesList = new ChangeablesList(this);
+        monitor = new WidgetChangesMonitor(changeablesList, this.parentConsole);
     }
 
     private JTabbedPane createTabbedPane(EmfDataset dataset, MessagePanel messagePanel) {
@@ -163,6 +167,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         Button save = new Button("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 keywordsTab.commit();
+                monitor.resetChanges();
                 try {
                     presenter.doSave();
                 } catch (EmfException e) {
@@ -174,11 +179,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
         Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doClose();
-                } catch (EmfException e) {
-                    showError("Could not close. Reason - " + e.getMessage());
-                }
+                closeWindow();
             }
         });
         getRootPane().setDefaultButton(close);
@@ -198,15 +199,15 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     public boolean shouldContinueLosingUnsavedChanges() {
-        String message = "Would you like to Close(without saving and lose the updates)?";
-        String title = "Close";
-        return new ConfirmDialog(message, title, this).confirm();
+        return (monitor.checkChanges() == JOptionPane.OK_OPTION);
     }
 
     public void notifyLockFailure(EmfDataset dataset) {
-        String message = "Cannot edit Properties of Dataset: " + dataset.getName() + " as it was locked by User:"
-                + dataset.getLockOwner() + "(at " + format(dataset.getLockDate()) + ")";
-        JOptionPane.showMessageDialog(this, message);
+        String message = "Cannot edit Properties of Dataset: " + dataset.getName() + System.getProperty("line.separator") 
+            + " as it was locked by User: " + dataset.getLockOwner() + "(at " + format(dataset.getLockDate()) + ")";
+        EmfDialog dialog = new EmfDialog(parentConsole, "Message", 
+                JOptionPane.PLAIN_MESSAGE, message, JOptionPane.DEFAULT_OPTION);
+        dialog.showDialog();
     }
 
     private String format(Date lockDate) {
@@ -215,12 +216,15 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     public void windowClosing() {
-        try {
-            presenter.doClose();
-        } catch (EmfException e) {
-            showError("Could not close. Reason - " + e.getMessage());
-            return;
-        }
+        closeWindow();
+    }
+    
+    private void closeWindow() {
+            try {
+                presenter.doClose();
+            } catch (EmfException e) {
+                showError("Could not close. Reason - " + e.getMessage());
+            }
     }
 
 }

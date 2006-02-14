@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.gui.FormattedTextField;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
-import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab.FormattedTextField;
 
 import java.text.ParseException;
 import java.util.Date;
