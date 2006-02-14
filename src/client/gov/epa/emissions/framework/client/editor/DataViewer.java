@@ -68,10 +68,8 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         super.setName("dataViewer:" + version.getDatasetId() + ":" + version.getId());
 
         JPanel container = new JPanel(new BorderLayout());
-
         container.add(tablePanel(version, table, service), BorderLayout.CENTER);
         container.add(controlsPanel(), BorderLayout.PAGE_END);
-
         layout.add(container, BorderLayout.CENTER);
 
         super.display();
@@ -110,14 +108,25 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     private JPanel controlsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.add(leftPanel(), BorderLayout.LINE_START);
+        panel.add(rightPanel(), BorderLayout.LINE_END);
 
+        return panel;
+    }
+
+    private JPanel leftPanel() {
+        JPanel leftPanel = new JPanel();
         Button addNote = new Button("Add Note", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doAddNote();
             }
         });
-        panel.add(addNote, BorderLayout.LINE_START);
+        leftPanel.add(addNote);
+        return leftPanel;
+    }
 
+    private JPanel rightPanel() {
+        JPanel rightPanel = new JPanel();
         Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
@@ -127,9 +136,8 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
                 }
             }
         });
-        panel.add(close, BorderLayout.LINE_END);
-
-        return panel;
+        rightPanel.add(close);
+        return rightPanel;
     }
 
     private void doAddNote() {

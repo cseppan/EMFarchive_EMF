@@ -9,6 +9,8 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.notes.NewNoteDialog;
 import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -42,10 +44,13 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private JLabel lockInfo;
 
-    public DataEditor(EmfDataset dataset, DesktopManager desktopManager) {
+    private EmfConsole parent;
+
+    public DataEditor(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         super("Data Editor: " + dataset.getName(), desktopManager);
         setDimension();
         this.dataset = dataset;
+        this.parent = parent;
 
         layout = new JPanel(new BorderLayout());
         layout.add(topPanel(), BorderLayout.PAGE_START);
@@ -76,15 +81,13 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     public void display(Version version, String table, DataAccessService service) {
         this.table = table;
-        
+
         updateTitle(version, table);
-        super.setName("dataEditor:"+version.getDatasetId()+":"+version.getId());
+        super.setName("dataEditor:" + version.getDatasetId() + ":" + version.getId());
 
         JPanel container = new JPanel(new BorderLayout());
-
         container.add(tablePanel(version, table), BorderLayout.CENTER);
         container.add(controlPanel(), BorderLayout.PAGE_END);
-
         layout.add(container, BorderLayout.CENTER);
 
         super.display();
@@ -128,7 +131,27 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private JPanel controlPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.add(leftControlPanel(), BorderLayout.LINE_START);
         panel.add(rightControlPanel(), BorderLayout.LINE_END);
+
+        return panel;
+    }
+
+    private JPanel leftControlPanel() {
+        JPanel panel = new JPanel();
+
+        Button addNote = new Button("Add Note", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                messagePanel.clear();
+                NewNoteDialog view = new NewNoteDialog(parent);
+                try {
+                    presenter.doAddNote(view);
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+        });
+        panel.add(addNote);
 
         return panel;
     }

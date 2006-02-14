@@ -53,7 +53,8 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
 
     private DesktopManager desktopManager;
 
-    public EditVersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole, DesktopManager desktopManger) {
+    public EditVersionsPanel(EmfDataset dataset, MessagePanel messagePanel, EmfConsole parentConsole,
+            DesktopManager desktopManger) {
         super.setLayout(new BorderLayout());
         setBorder();
 
@@ -330,7 +331,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     }
 
     private void showEditor(String table, Version version) {
-        DataEditor view = new DataEditor(dataset, desktopManager);
+        DataEditor view = new DataEditor(dataset, parentConsole, desktopManager);
         parentConsole.addToDesktop(view);
         try {
             if (dataset.getInternalSources().length > 0)

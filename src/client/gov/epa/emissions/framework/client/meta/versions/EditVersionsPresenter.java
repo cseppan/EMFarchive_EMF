@@ -55,7 +55,7 @@ public class EditVersionsPresenter {
             throw new EmfException("Cannot edit a Version(" + version.getVersion()
                     + ") that is Final. Please choose 'View'.");
 
-        DataEditorPresenter presenter = new DataEditorPresenter(version, table, session);
+        DataEditorPresenter presenter = new DataEditorPresenter(dataset, version, table, session);
         presenter.display(view);
     }
 
