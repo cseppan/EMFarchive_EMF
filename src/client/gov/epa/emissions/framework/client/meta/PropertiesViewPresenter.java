@@ -10,6 +10,8 @@ import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabView;
 import gov.epa.emissions.framework.client.meta.notes.NotesTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.NotesTabView;
+import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabPresenter;
+import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabView;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTabPresenter;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTabView;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -65,6 +67,11 @@ public class PropertiesViewPresenter {
 
     public void set(NotesTabView view) throws EmfException {
         NotesTabPresenter presenter = new NotesTabPresenter(dataset, session.dataCommonsService());
+        presenter.display(view);
+    }
+
+    public void set(RevisionsTabView view) throws EmfException {
+        RevisionsTabPresenter presenter = new RevisionsTabPresenter(dataset, session.dataCommonsService());
         presenter.display(view);
     }
 
