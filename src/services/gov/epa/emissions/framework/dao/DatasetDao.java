@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.dao;
 
-import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -40,15 +39,8 @@ public class DatasetDao {
      * Return true if the name is already used
      */
     public boolean nameUsed(String name, Class clazz, Session session) {
-        boolean flag = false;
-
         Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("name", name));
-        Sector sec = (Sector) crit.uniqueResult();
-
-        if (sec != null) {
-            flag = true;
-        }
-        return flag;
+        return crit.uniqueResult() != null;
     }
 
     public Object current(long id, Class clazz, Session session) {
@@ -62,10 +54,7 @@ public class DatasetDao {
         }
 
         EmfDataset current = (EmfDataset) current(dataset.getId(), EmfDataset.class, session);
-
-        // The current object is saved in the session.  Hibernate cannot persist our
-        // object with the same id.
-        session.clear();
+        session.clear();// clear to flush current
         if (current.getName().equals(dataset.getName()))
             return true;
 
@@ -85,18 +74,6 @@ public class DatasetDao {
             throw e;
         }
     }
-
-//    public boolean datasetNameUsed(String name, Session session) {
-//        boolean flag = false;
-//
-//        Criteria crit = session.createCriteria(EmfDataset.class).add(Restrictions.eq("name", name));
-//        EmfDataset iu = (EmfDataset) crit.uniqueResult();
-//
-//        if (iu != null) {
-//            flag = true;
-//        }
-//        return flag;
-//    }
 
     public List all(Session session) {
         Transaction tx = null;

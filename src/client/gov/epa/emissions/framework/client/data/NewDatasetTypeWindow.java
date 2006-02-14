@@ -38,22 +38,19 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
     private TextField maxFiles;
 
     private ComboBox derivedFrom;
-    
+
     private ChangeablesList changeablesList;
-    
+
     private WidgetChangesMonitor monitor;
-    
+
     private EmfConsole parentConsole;
-    
+
     private static int counter = 0;
 
-    // private DatasetTypesManagerView manager;
-
-    private static final String[] types = {"CSV File", "Line-based File", "SMOKE Report File" };
+    private static final String[] types = { "CSV File", "Line-based File", "SMOKE Report File" };
 
     public NewDatasetTypeWindow(DesktopManager desktopManager) {
         super("Create New Dataset Type", new Dimension(600, 260), desktopManager);
-        // this.manager = manager;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -72,16 +69,16 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         this.parentConsole = parent;
         createChangesMonitor();
     }
-    
+
     private void createChangesMonitor() {
         monitor = new WidgetChangesMonitor(changeablesList, parentConsole);
     }
 
     public void display() {
         counter++;
-        String name = "Create New Dataset Type"+counter;
+        String name = "Create New Dataset Type" + counter;
         super.setTitle(name);
-        super.setName("createNewDatasetType:"+counter);
+        super.setName("createNewDatasetType:" + counter);
         layout.removeAll();
         doLayout(layout);
 
@@ -165,7 +162,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
         return action;
     }
-    
+
     public void windowClosing() {
         checkChangesAndCloseWindow();
     }
@@ -179,9 +176,9 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
         return action;
     }
-    
+
     private void checkChangesAndCloseWindow() {
-        if(monitor.checkChanges() == JOptionPane.OK_OPTION)
+        if (monitor.checkChanges() == JOptionPane.OK_OPTION)
             presenter.doClose();
     }
 

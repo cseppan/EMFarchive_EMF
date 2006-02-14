@@ -16,9 +16,12 @@ public class NotesTableData extends AbstractTableData {
 
     private Note[] values;
 
+    private List additions;
+
     public NotesTableData(Note[] values) {
         this.values = values;
         this.rows = createRows(values);
+        this.additions = new ArrayList();
     }
 
     public String[] columns() {
@@ -37,8 +40,9 @@ public class NotesTableData extends AbstractTableData {
         return rows;
     }
 
-    public void add(Note version) {
-        rows.add(row(version));
+    public void add(Note note) {
+        additions.add(note);
+        rows.add(row(note));
     }
 
     private List createRows(Note[] values) {
@@ -71,6 +75,10 @@ public class NotesTableData extends AbstractTableData {
 
     public Note[] getValues() {
         return values;
+    }
+
+    public Note[] additions() {
+        return (Note[]) additions.toArray(new Note[0]);
     }
 
 }

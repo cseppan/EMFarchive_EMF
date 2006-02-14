@@ -81,7 +81,7 @@ public class NotesTableDataTest extends TestCase {
         assertEquals(note0.getDetails(), row.getValueAt(3));
         assertEquals(note0.getReferences(), row.getValueAt(4));
         assertEquals(note0.getCreator().getName(), row.getValueAt(5));
-        
+
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         assertEquals(dateFormat.format(note0.getDate()), row.getValueAt(6));
     }
@@ -103,14 +103,17 @@ public class NotesTableDataTest extends TestCase {
 
     public void testShouldAddRowOnAddingNewNote() {
         int count = data.rows().size();
-        
+
         Note note = new Note();
         note.setName("note");
         note.setCreator(new User());
         note.setDate(new Date());
         note.setNoteType(new NoteType("type"));
-        
+
         data.add(note);
-        assertEquals(count + 1, data.rows().size());
+        data.add(note);
+        
+        assertEquals(count + 2, data.rows().size());
+        assertEquals(2, data.additions().length);
     }
 }

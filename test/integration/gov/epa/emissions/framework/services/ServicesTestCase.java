@@ -9,7 +9,6 @@ import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.db.EmfDatabaseSetup;
-import gov.epa.emissions.framework.db.ExImDbUpdate;
 import gov.epa.emissions.framework.db.LocalHibernateConfiguration;
 import gov.epa.emissions.framework.db.VersionedTable;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
@@ -19,14 +18,18 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
 import junit.framework.TestCase;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
 
 public abstract class ServicesTestCase extends TestCase {
 
@@ -105,8 +108,17 @@ public abstract class ServicesTestCase extends TestCase {
     }
 
     public void deleteAllDatasets() throws Exception {
-        ExImDbUpdate dbUpdate = new ExImDbUpdate();
-        dbUpdate.deleteAllDatasets();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            List all = session.createCriteria(EmfDataset.class).addOrder(Order.asc("name")).list();
+            for (Iterator iter = all.iterator(); iter.hasNext();)
+                session.delete(iter.next());
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
     protected void createVersionedTable(String table, Datasource datasource, Column[] cols) throws Exception {

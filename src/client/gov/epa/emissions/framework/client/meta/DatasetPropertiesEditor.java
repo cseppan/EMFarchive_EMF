@@ -45,13 +45,14 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private EmfSession session;
 
     private EditableKeywordsTab keywordsTab;
-    
+
     private ChangeablesList changeablesList;
 
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
+        this.changeablesList = new ChangeablesList(this);
     }
 
     private JTabbedPane createTabbedPane(EmfDataset dataset, MessagePanel messagePanel) {

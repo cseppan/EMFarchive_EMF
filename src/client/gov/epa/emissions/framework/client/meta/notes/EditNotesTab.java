@@ -1,14 +1,20 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.SimpleTableModel;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.Note;
+import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 
-import javax.swing.BoxLayout;
+import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -16,29 +22,33 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
     private EmfConsole parentConsole;
 
+    private NotesTableData tableData;
+
+    private EmfTableModel model;
+
     public EditNotesTab(EmfConsole parentConsole) {
-        super.setName("logsTab");
+        super.setName("editNotesTab");
         this.parentConsole = parentConsole;
-
-        super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        super.setLayout(new BorderLayout());
     }
 
-    public void display(Note[] notes) {
+    public void display(User user, Note[] notes, NoteType[] types, Version[] versions) {
         super.removeAll();
-        super.add(createLayout(notes, parentConsole));
+        super.add(createLayout(user, notes, types, versions, parentConsole), BorderLayout.CENTER);
     }
 
-    private JPanel createLayout(Note[] notes, EmfConsole parentConsole) {
-        JPanel layout = new JPanel();
+    private JPanel createLayout(User user, Note[] notes, NoteType[] types, Version[] versions, EmfConsole parentConsole) {
+        JPanel layout = new JPanel(new BorderLayout());
 
-        layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
-        layout.add(createSortFilterPane(notes, parentConsole));
+        layout.add(createSortFilterPane(notes, parentConsole), BorderLayout.CENTER);
+        layout.add(controlPanel(user, types, versions), BorderLayout.PAGE_END);
 
         return layout;
     }
 
     private JScrollPane createSortFilterPane(Note[] notes, EmfConsole parentConsole) {
-        EmfTableModel model = new EmfTableModel(new NotesTableData(notes));
+        tableData = new NotesTableData(notes);
+        model = new EmfTableModel(tableData);
         SimpleTableModel wrapperModel = new SimpleTableModel(model);
 
         SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, wrapperModel);
@@ -50,9 +60,31 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         return scrollPane;
     }
 
+    private JPanel controlPanel(final User user, final NoteType[] types, final Version[] versions) {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        Button add = new Button("Add", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doNewNote(user, types, versions);
+            }
+        });
+        panel.add(add, BorderLayout.LINE_END);
+
+        return panel;
+    }
+
+    protected void doNewNote(User user, NoteType[] types, Version[] versions) {
+        NewNoteDialog dialog = new NewNoteDialog(user, types, versions, parentConsole);
+        dialog.run();
+
+        if (dialog.shouldCreate()) {
+            tableData.add(dialog.note());
+            model.refresh();
+        }
+    }
+
     public Note[] additions() {
-        // NOTE Auto-generated method stub
-        return null;
+        return tableData.additions();
     }
 
 }

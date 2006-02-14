@@ -62,4 +62,13 @@ public class VersionsSet {
         return null;
     }
 
+    public Version version(String name) {
+        for (int i = 0; i < versions.length; i++) {
+            if (versions[i].getName().equals(name))
+                return versions[i];
+        }
+
+        return null;
+    }
+
 }

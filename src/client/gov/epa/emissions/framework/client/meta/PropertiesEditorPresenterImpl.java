@@ -101,7 +101,7 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
     }
 
     public void set(EditNotesTabView view) throws EmfException {
-        notesPresenter = new EditNotesTabPresenterImpl(dataset, session.dataCommonsService(), view);
+        notesPresenter = new EditNotesTabPresenterImpl(dataset, session, view);
         notesPresenter.display();
     }
 

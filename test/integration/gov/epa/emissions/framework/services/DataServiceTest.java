@@ -32,7 +32,6 @@ public class DataServiceTest extends ServicesTestCase {
         service = new DataServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
         dataCommonsService = new DataCommonsServiceImpl(sessionFactory);
-    
         deleteAllDatasets();
     }
 

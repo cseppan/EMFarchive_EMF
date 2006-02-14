@@ -433,7 +433,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
 
         try {
             Note[] notes = service.getNotes(datasetFromDB.getId());
-            assertEquals("Two notes should return", notes.length, 2);
+            assertEquals("Two notes should return", 2, notes.length);
         } finally {
             remove(note1);
             remove(note2);

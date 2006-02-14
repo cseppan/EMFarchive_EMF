@@ -11,9 +11,9 @@ import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 import gov.epa.emissions.framework.services.DataCommonsService;
+import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.Note;
 
 import java.util.Date;
 
@@ -211,11 +211,15 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         Mock view = mock(EditNotesTabView.class);
         view.expects(once()).method("display");
 
-        Mock service = mock(DataCommonsService.class);
-        Note[] notes = new Note[0];
-        service.stubs().method("getNotes").will(returnValue(notes));
-        session.stubs().method("dataCommonsService").will(returnValue(service.proxy()));
-
+        Mock dataCommons = mock(DataCommonsService.class);
+        dataCommons.stubs().method(ANYTHING);
+        session.stubs().method("dataCommonsService").will(returnValue(dataCommons.proxy()));
+        
+        Mock dataEditor = mock(DataEditorService.class);
+        dataEditor.stubs().method(ANYTHING);
+        session.stubs().method("dataEditorService").will(returnValue(dataEditor.proxy()));
+        session.stubs().method("user");
+       
         PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, null, (EmfSession) session
                 .proxy(), null);
 

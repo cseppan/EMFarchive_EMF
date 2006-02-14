@@ -5,13 +5,12 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Dialog;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -71,12 +70,8 @@ public class NewVersionDialog extends Dialog {
     }
 
     private String[] versionNames(Version[] versions) {
-        List names = new ArrayList();
-        for (int i = 0; i < versions.length; i++) {
-            if (versions[i].isFinalVersion())
-                names.add(versions[i].getName());
-        }
-        return (String[]) names.toArray(new String[0]);
+        VersionsSet set = new VersionsSet(versions);
+        return set.names();
     }
 
     private JComboBox createVersionsCombo(DefaultComboBoxModel model) {

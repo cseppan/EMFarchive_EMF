@@ -13,18 +13,21 @@ public interface DataCommonsService {
     // Keywords
     Keyword[] getKeywords() throws EmfException;
 
-    //Projects
+    // Projects
     Project[] getProjects() throws EmfException;
+
     void addProject(Project project) throws EmfException;
 
     // intended use
     IntendedUse[] getIntendedUses() throws EmfException;
+
     void addIntendedUse(IntendedUse intendedUse) throws EmfException;
-    
-    //Regions
+
+    // Regions
     Region[] getRegions() throws EmfException;
+
     void addRegion(Region region) throws EmfException;
-    
+
     // Countries
     Country[] getCountries() throws EmfException;
 
@@ -34,12 +37,14 @@ public interface DataCommonsService {
     Sector obtainLockedSector(User owner, Sector sector) throws EmfException;
 
     Sector updateSector(Sector sector) throws EmfException;
+
     void addSector(Sector sector) throws EmfException;
 
     Sector releaseLockedSector(Sector sector) throws EmfException;
 
     // DatasetType
     DatasetType[] getDatasetTypes() throws EmfException;
+
     void addDatasetType(DatasetType type) throws EmfException;
 
     DatasetType obtainLockedDatasetType(User owner, DatasetType type) throws EmfException;
@@ -51,13 +56,16 @@ public interface DataCommonsService {
     // Status
     Status[] getStatuses(String username) throws EmfException;
 
-    //Revisions
+    // Revisions
     Revision[] getRevisions(long datasetId) throws EmfException;
+
     void addRevision(Revision revision) throws EmfException;
-    //Notes
+
+    // Notes
     Note[] getNotes(long datasetId) throws EmfException;
+
     void addNote(Note note) throws EmfException;
 
-    //Note types
+    // Note types
     NoteType[] getNoteTypes() throws EmfException;
 }
