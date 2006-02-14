@@ -210,7 +210,8 @@ CREATE TABLE emf.revisions
   creator int4 NOT NULL REFERENCES emf.users(id),
   date_time timestamp,
   what text NOT NULL,
-  why text NOT NULL
+  why text NOT NULL,
+  refers_notes text
 ) 
 WITHOUT OIDS;
 -- emf.revisions

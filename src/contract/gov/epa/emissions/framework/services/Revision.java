@@ -26,11 +26,13 @@ public class Revision {
     private String what;
 
     private String why;
+    
+    private String references;
 
     public Revision() {// No argument constructor needed for hibernate mapping
     }
 
-    public Revision(User creator, long datasetId, Date date, long version, String what, String why) {
+    public Revision(User creator, long datasetId, Date date, long version, String what, String why, String references) {
         super();
         // TODO Auto-generated constructor stub
         this.creator = creator;
@@ -39,6 +41,7 @@ public class Revision {
         this.version = version;
         this.what = what;
         this.why = why;
+        this.references=references;
     }
 
     public User getCreator() {
@@ -95,6 +98,14 @@ public class Revision {
 
     public void setWhy(String why) {
         this.why = why;
+    }
+
+    public String getReferences() {
+        return references;
+    }
+
+    public void setReferences(String references) {
+        this.references = references;
     }
 
 }

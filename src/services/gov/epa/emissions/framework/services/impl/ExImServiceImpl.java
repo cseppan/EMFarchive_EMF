@@ -233,9 +233,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             // Loop through the collection and start import for the file
             for (int i = 0; i < fileNamesForImport.length; i++) {
                 String fileName = fileNamesForImport[i];
-                log.debug("#### Filename: " + fileName);
                 String importFileName = fileName + "_" + DATE_FORMATTER.format(new Date());
-                log.debug("modified filename: " + importFileName);
                 EmfDataset dataset = new EmfDataset();
                 dataset.setName(importFileName);
                 dataset.setCreator(user.getName());
