@@ -108,10 +108,15 @@ public abstract class ServicesTestCase extends TestCase {
     }
 
     public void deleteAllDatasets() throws Exception {
+        dropAll(Note.class);
+        dropAll(EmfDataset.class);
+    }
+
+    protected void dropAll(Class clazz) {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            List all = session.createCriteria(EmfDataset.class).addOrder(Order.asc("name")).list();
+            List all = session.createCriteria(clazz).addOrder(Order.asc("name")).list();
             for (Iterator iter = all.iterator(); iter.hasNext();)
                 session.delete(iter.next());
             tx.commit();

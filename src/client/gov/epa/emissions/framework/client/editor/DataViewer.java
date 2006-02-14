@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Dimensions;
@@ -29,11 +30,14 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     private EmfDataset dataset;
 
-    public DataViewer(EmfDataset dataset, DesktopManager desktopManager) {
-        super("Data Viewer [Dataset:" + dataset.getName(),desktopManager);
+    private EmfConsole parent;
+
+    public DataViewer(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
+        super("Data Viewer [Dataset:" + dataset.getName(), desktopManager);
         setDimension();
         this.dataset = dataset;
-        
+        this.parent = parent;
+
         layout = new JPanel(new BorderLayout());
         layout.add(topPanel(), BorderLayout.PAGE_START);
 
@@ -60,8 +64,8 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     public void display(Version version, String table, DataAccessService service) {
         updateTitle(version, table);
-        super.setName("dataViewer:"+version.getDatasetId()+":"+version.getId());
-        
+        super.setName("dataViewer:" + version.getDatasetId() + ":" + version.getId());
+
         JPanel container = new JPanel(new BorderLayout());
 
         container.add(tablePanel(version, table, service), BorderLayout.CENTER);
@@ -88,7 +92,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         try {
             tablePresenter.doDisplayFirst();
         } catch (EmfException e) {
-            messagePanel.setError("Could not display table: " + table + ". Reason: " + e.getMessage());
+            messagePanel.setError(e.getMessage());
         }
 
         return tableView;
@@ -106,6 +110,13 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
     private JPanel controlsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
+        Button addNote = new Button("Add Note", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                doAddNote();
+            }
+        });
+        panel.add(addNote, BorderLayout.LINE_START);
+
         Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
@@ -118,6 +129,15 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         panel.add(close, BorderLayout.LINE_END);
 
         return panel;
+    }
+
+    private void doAddNote() {
+        NewNoteDialog view = new NewNoteDialog(parent);
+        try {
+            presenter.doAddNote(view);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
     }
 
 }

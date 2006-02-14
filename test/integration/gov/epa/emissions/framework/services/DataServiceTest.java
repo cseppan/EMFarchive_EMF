@@ -11,7 +11,6 @@ import gov.epa.emissions.framework.services.impl.DataServiceImpl;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
-import java.util.Date;
 import java.util.Random;
 
 import org.hibernate.Criteria;
@@ -95,11 +94,7 @@ public class DataServiceTest extends ServicesTestCase {
             assertEquals("TEST dataset", released.getDescription());
             assertEquals(released.getLockOwner(), null);
             assertFalse("Lock should be released on update", released.isLocked());
-        }catch(Exception e){
-            e.printStackTrace();
-            throw e;
-        }
-        finally {
+        } finally {
             remove(dataset);
         }
     }
@@ -212,106 +207,36 @@ public class DataServiceTest extends ServicesTestCase {
         }
     }
 
-  public void testShouldFailOnAttemptToAddDatasetWithDuplicateName() throws EmfException {
-        String newname = "MyDataset" + Math.abs(new Random().nextInt());
-        EmfDataset dataset1 = new EmfDataset();
+    public void testShouldFailOnAttemptToAddDatasetWithDuplicateName() throws EmfException {
+        EmfDataset dataset1 = newDataset();
+        
         EmfDataset dataset2 = new EmfDataset();
-
-        User creator = userService.getUser("emf");
-
-        dataset1 = new EmfDataset();
-        dataset1.setName(newname);
-        dataset1.setAccessedDateTime(new Date());
-        dataset1.setCreatedDateTime(new Date());
-        dataset1.setCreator(creator.getUsername());
-        dataset1.setDescription("DESCRIPTION");
-        dataset1.setModifiedDateTime(new Date());
-        dataset1.setStartDateTime(new Date());
-        dataset1.setStatus("imported");
-        dataset1.setYear(42);
-        dataset1.setUnits("orl");
-        dataset1.setTemporalResolution("t1");
-        dataset1.setStopDateTime(new Date());
-
-        service.addDataset(dataset1);
-
-        dataset2 = new EmfDataset();
-        dataset2.setName(newname);
-        dataset2.setAccessedDateTime(new Date());
-        dataset2.setCreatedDateTime(new Date());
-        dataset2.setCreator(creator.getUsername());
-        dataset2.setDescription("DESCRIPTION");
-        dataset2.setModifiedDateTime(new Date());
-        dataset2.setStartDateTime(new Date());
-        dataset2.setStatus("imported");
-        dataset2.setYear(42);
-        dataset2.setUnits("orl");
-        dataset2.setTemporalResolution("t1");
-        dataset2.setStopDateTime(new Date());
+        dataset2.setName(dataset1.getName());
+        dataset2.setCreator(dataset1.getCreator());
 
         try {
             service.addDataset(dataset2);
         } catch (EmfException e) {
             assertEquals("Dataset name already in use", e.getMessage());
             return;
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
-
             remove(dataset1);
         }
     }
 
-  public void testShouldFailOnAttemptToUpdateDatasetWithDuplicateName() throws EmfException {
-      String newname = "MyDataset" + Math.abs(new Random().nextInt());
-      EmfDataset dataset1 = new EmfDataset();
-      EmfDataset dataset2 = new EmfDataset();
+    public void testShouldFailOnAttemptToUpdateDatasetWithDuplicateName() throws EmfException {
+        EmfDataset dataset1 = newDataset();
 
-      User creator = userService.getUser("emf");
-
-      dataset1 = new EmfDataset();
-      dataset1.setName(newname);
-      dataset1.setAccessedDateTime(new Date());
-      dataset1.setCreatedDateTime(new Date());
-      dataset1.setCreator(creator.getUsername());
-      dataset1.setDescription("DESCRIPTION");
-      dataset1.setModifiedDateTime(new Date());
-      dataset1.setStartDateTime(new Date());
-      dataset1.setStatus("imported");
-      dataset1.setYear(42);
-      dataset1.setUnits("orl");
-      dataset1.setTemporalResolution("t1");
-      dataset1.setStopDateTime(new Date());
-
-      service.addDataset(dataset1);
-
-      dataset2 = new EmfDataset();
-      dataset2.setName(newname+"foobar");
-      dataset2.setAccessedDateTime(new Date());
-      dataset2.setCreatedDateTime(new Date());
-      dataset2.setCreator(creator.getUsername());
-      dataset2.setDescription("DESCRIPTION");
-      dataset2.setModifiedDateTime(new Date());
-      dataset2.setStartDateTime(new Date());
-      dataset2.setStatus("imported");
-      dataset2.setYear(42);
-      dataset2.setUnits("orl");
-      dataset2.setTemporalResolution("t1");
-      dataset2.setStopDateTime(new Date());
-      service.addDataset(dataset2);
-
-      try {
-          dataset2.setName(newname);
-          service.updateDataset(dataset2);
-      } catch (EmfException e) {
-          assertEquals("Dataset name already in use", e.getMessage());
-          return;
-      } catch (Exception e) {
-          e.printStackTrace();
-      } finally {
-
-          remove(dataset1);
-      }
-  }
+        EmfDataset dataset2 = newDataset();
+        try {
+            dataset2.setName(dataset1.getName());
+            service.updateDataset(dataset2);
+        } catch (EmfException e) {
+            assertEquals("Dataset name already in use", e.getMessage());
+            return;
+        } finally {
+            remove(dataset1);
+        }
+    }
 
 }

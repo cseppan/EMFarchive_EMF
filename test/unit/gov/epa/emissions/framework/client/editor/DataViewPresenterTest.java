@@ -1,11 +1,13 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.Note;
+import gov.epa.emissions.framework.services.NoteType;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -68,15 +70,25 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         return constraint;
     }
 
-    public void testShouldAddNoteOnAdd() throws Exception {
-        Mock service = mock(DataCommonsService.class);
+    public void testShouldRunNewNoteViewAndAddNoteOnAddNote() throws Exception {
         Note note = new Note();
+        NoteType[] types = new NoteType[0];
+        Version[] versions = new Version[0];
+        User user = new User();
+
+        Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("addNote").with(same(note));
 
         EmfSession session = session(null, (DataCommonsService) service.proxy());
         DataViewPresenter presenter = new DataViewPresenter(null, null, null, session);
 
-        presenter.doAdd(note);
+        Mock view = mock(NewNoteView.class);
+        long datasetId = 2;
+        view.stubs().method("display").with(same(user), eq(datasetId), same(types), same(versions));
+        view.stubs().method("shouldCreate").will(returnValue(Boolean.TRUE));
+        view.stubs().method("note").will(returnValue(note));
+
+        presenter.addNote((NewNoteView) view.proxy(), user, datasetId, types, versions);
     }
 
 }

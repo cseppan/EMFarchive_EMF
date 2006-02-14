@@ -193,6 +193,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
             return;
         } finally {
             remove(type1);
+            remove(type2);
         }
     }
 
@@ -416,7 +417,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         }
     }
 
-    public void testShouldGetAllNotes() throws EmfException {
+    public void testShouldGetAllNotes() throws Exception {
         long id = Math.abs(new Random().nextInt());
         User user = userService.getUser("emf");
         EmfDataset dataset = newDataset();
@@ -424,6 +425,8 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         dataService.addDataset(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
+        int notesBeforeAdd = service.getNotes(datasetFromDB.getId()).length;
+        
         Note note1 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME1" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
         service.addNote(note1);
@@ -433,7 +436,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
 
         try {
             Note[] notes = service.getNotes(datasetFromDB.getId());
-            assertEquals("Two notes should return", 2, notes.length);
+            assertEquals("Two notes should return", notesBeforeAdd + 2, notes.length);
         } finally {
             remove(note1);
             remove(note2);

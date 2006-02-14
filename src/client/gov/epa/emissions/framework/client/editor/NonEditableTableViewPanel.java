@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
-import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -14,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -53,8 +49,6 @@ public class NonEditableTableViewPanel extends JPanel implements NonEditablePage
 
         pageContainer = new JPanel(new BorderLayout());
         super.add(pageContainer, BorderLayout.CENTER);
-
-        add(notesPanel(), BorderLayout.PAGE_END);
         setBorder();
     }
 
@@ -74,28 +68,12 @@ public class NonEditableTableViewPanel extends JPanel implements NonEditablePage
         return sortFilterPanel;
     }
 
-    private JPanel notesPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        JPanel notesLabelPanel = new JPanel(new BorderLayout());
-        notesLabelPanel.add(new JLabel("Notes"), BorderLayout.LINE_START);
-        panel.add(notesLabelPanel);
-
-        TextArea notes = new TextArea("Notes", "Notes will be coming soon...");
-        notes.setEditable(false);
-        panel.add(new ScrollableTextArea(notes));
-
-        return panel;
-    }
-
     public void observe(TablePresenter presenter) {
         paginationPanel.init(presenter);
         sortFilterPanel.init(presenter);
     }
 
     public void display(Page page) {
-        // TODO: refresh table w/ new data? or remove and add back the table?
         pageContainer.removeAll();
 
         paginationPanel.updateStatus(page);

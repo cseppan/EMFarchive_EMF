@@ -1,12 +1,13 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataViewService;
-import gov.epa.emissions.framework.services.Note;
+import gov.epa.emissions.framework.services.NoteType;
 
 public class DataViewPresenter {
 
@@ -38,7 +39,7 @@ public class DataViewPresenter {
     }
 
     public void display() throws EmfException {
-        viewService().openSession(token);
+        token = viewService().openSession(token);
         view.observe(this);
         view.display(version, table, viewService());
     }
@@ -48,8 +49,17 @@ public class DataViewPresenter {
         view.close();
     }
 
-    public void doAdd(Note note) throws EmfException {
-        commonsService().addNote(note);
+    public void doAddNote(NewNoteView view) throws EmfException {
+        NoteType[] types = commonsService().getNoteTypes();
+        Version[] versions = session.dataEditorService().getVersions(version.getDatasetId());
+
+        addNote(view, session.user(), version.getDatasetId(), types, versions);
+    }
+
+    void addNote(NewNoteView view, User user, long datasetId, NoteType[] types, Version[] versions) throws EmfException {
+        view.display(user, datasetId, types, versions);
+        if (view.shouldCreate())
+            commonsService().addNote(view.note());
     }
 
 }

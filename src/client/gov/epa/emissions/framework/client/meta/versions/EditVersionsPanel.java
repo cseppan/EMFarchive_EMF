@@ -295,7 +295,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     }
 
     private void showView(String table, Version version) {
-        DataViewer view = new DataViewer(dataset, desktopManager);
+        DataViewer view = new DataViewer(dataset, parentConsole, desktopManager);
         parentConsole.addToDesktop(view);
         try {
             if (dataset.getInternalSources().length > 0)

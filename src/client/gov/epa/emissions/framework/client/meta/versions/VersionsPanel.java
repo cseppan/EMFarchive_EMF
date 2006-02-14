@@ -176,7 +176,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
     }
 
     private void showView(String table, Version version) {
-        DataViewer view = new DataViewer(dataset, desktopManager);
+        DataViewer view = new DataViewer(dataset, parentConsole, desktopManager);
         parentConsole.addToDesktop(view);
         try {
             presenter.doView(version, table, view);
