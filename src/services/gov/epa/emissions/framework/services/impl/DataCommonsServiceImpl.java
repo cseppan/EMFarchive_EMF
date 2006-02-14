@@ -363,14 +363,29 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Revision[] getRevisions(long datasetId) {
-        // TODO Auto-generated method stub
-        return null;
+    public Revision[] getRevisions(long datasetId) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List revisions = dao.getRevisions(session);
+            session.close();
+
+            return (Revision[]) revisions.toArray(new Revision[revisions.size()]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Revisions", e);
+            throw new EmfException("Could not get all Revisions");
+        }
     }
 
-    public void addRevision(Revision revision) {
-        // TODO Auto-generated method stub
-
+    public void addRevision(Revision revision) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            
+            dao.add(revision, session);
+            session.close();
+        } catch (RuntimeException e) {
+            LOG.error("Could not add revision", e);
+            throw new EmfException("Could not add revision");
+        }
     }
 
     public void addNotes(Note[] notes) {

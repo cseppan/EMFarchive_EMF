@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.IntendedUse;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
+import gov.epa.emissions.framework.services.Revision;
 import gov.epa.emissions.framework.services.Status;
 
 import javax.xml.namespace.QName;
@@ -65,6 +66,8 @@ public class EmfMappings extends Mappings {
 
         bean(call, Note.class, note());
         bean(call, NoteType.class, notetype());
+        bean(call, Revision.class, revision());
+        
     }
 
     private void registerArrays(Call call) {
@@ -96,6 +99,7 @@ public class EmfMappings extends Mappings {
 
         array(call, Note[].class, notes());
         array(call, NoteType[].class, notetypes());
+        array(call, Revision[].class, revisions());
     }
 
     public QName logs() {
@@ -233,5 +237,14 @@ public class EmfMappings extends Mappings {
     public QName notes() {
         return qname("Notes");
     }
+
+    public QName revision() {
+        return qname("Revision");
+    }
+
+    public QName revisions() {
+        return qname("Revisions");
+    }
+
 
 }

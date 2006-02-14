@@ -243,14 +243,24 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (NoteType[]) call.requestResponse(new Object[] {});
     }
 
-    public Revision[] getRevisions(long datasetId){
-        // TODO Auto-generated method stub
-        return null;
+    public Revision[] getRevisions(long datasetId) throws EmfException{
+        EmfCall call = call();
+
+        call.addLongParam("datasetId");
+        call.setOperation("getRevisions");
+        call.setReturnType(mappings.revisions());
+
+        return (Revision[]) call.requestResponse(new Object[] { new Long(datasetId) });
     }
 
-    public void addRevision(Revision revision){
-        // TODO Auto-generated method stub
-        
+    public void addRevision(Revision revision) throws EmfException{
+        EmfCall call = call();
+
+        call.addParam("revision", mappings.revision());
+        call.setOperation("addRevision");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { revision });
     }
 
     public void addNotes(Note[] notes) {

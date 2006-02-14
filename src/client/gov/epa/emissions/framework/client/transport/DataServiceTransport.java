@@ -69,8 +69,14 @@ public class DataServiceTransport implements DataService {
         return (EmfDataset) call.requestResponse(new Object[] { locked });
     }
 
-    public void addDataset(EmfDataset dataset) {
-        // TODO Auto-generated method stub
+    public void addDataset(EmfDataset dataset) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addDataset");
+        call.addParam("dataset", mappings.dataset());
+        call.setVoidReturnType();
+        
+        call.request(new Object[] { dataset });
         
     }
 
