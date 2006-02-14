@@ -49,8 +49,6 @@ public class DataServiceImpl implements DataService {
                 throw new EmfException("Dataset name already in use");
 
             dao.add(dataset, session);
-System.out.println("AFter DAO add " + dataset.getId());
-
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add Dataset - " + dataset.getName(), e);

@@ -234,6 +234,16 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { note });
     }
 
+    public void addNotes(Note[] notes) throws EmfException {
+        EmfCall call = call();
+
+        call.addParam("notes", mappings.notes());
+        call.setOperation("addNotes");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { notes });
+    }
+
     public NoteType[] getNoteTypes() throws EmfException {
         EmfCall call = call();
 
@@ -263,8 +273,4 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { revision });
     }
 
-    public void addNotes(Note[] notes) {
-        // NOTE Auto-generated method stub
-        
-    }
 }

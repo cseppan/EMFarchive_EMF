@@ -350,6 +350,12 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
+    public void addNotes(Note[] notes) throws EmfException {
+        for (int i = 0; i < notes.length; i++) {
+          this.addNote(notes[i]);   
+        }
+    }
+
     public NoteType[] getNoteTypes() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
@@ -388,9 +394,5 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addNotes(Note[] notes) {
-        // NOTE Auto-generated method stub
-        
-    }
 
 }

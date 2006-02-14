@@ -477,6 +477,34 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         }
     }
 
+    public void testShouldAddMultipleNotes() throws Exception {
+        long id = Math.abs(new Random().nextInt());
+        User user = userService.getUser("emf");
+        EmfDataset dataset = newDataset();
+        dataset.setCreator(user.getUsername());
+        dataService.addDataset(dataset);
+        EmfDataset datasetFromDB = loadDataset(dataset.getName());
+
+        int notesBeforeAdd = service.getNotes(datasetFromDB.getId()).length;
+        
+        Note note1 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME1" + id,
+                loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        Note note2 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME2" + id,
+                loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+
+        Note[] notesToAdd = new Note[]{note1, note2};
+        service.addNotes(notesToAdd);
+        
+        try {
+            Note[] notes = service.getNotes(datasetFromDB.getId());
+            assertEquals("Two notes should return", notesBeforeAdd + 2, notes.length);
+        } finally {
+            remove(note1);
+            remove(note2);
+            remove(dataset);
+        }
+    }
+
     public void testShouldGetAllNotes() throws Exception {
         long id = Math.abs(new Random().nextInt());
         User user = userService.getUser("emf");
