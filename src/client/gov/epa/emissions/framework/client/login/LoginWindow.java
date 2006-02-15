@@ -160,12 +160,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
 
         JButton register = new Button("Register New User", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    launchRegisterUser();
-                } catch (Exception exc) {
-                    messagePanel.setError(exc.getMessage());
-                }
-                close();
+                doRegisterNewUser();
             }
         });
         register.setToolTipText("Register as a new user");
@@ -175,8 +170,18 @@ public class LoginWindow extends EmfFrame implements LoginView {
 
         panel.add(registerPanel, BorderLayout.WEST);
         panel.add(forgotPasswordPanel, BorderLayout.EAST);
-        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         return panel;
+    }
+
+    private void doRegisterNewUser() {
+        try {
+            launchRegisterUser();
+        } catch (Exception ex) {
+            messagePanel.setError(ex.getMessage());
+            return;
+        }
+        close();
     }
 
     private void launchRegisterUser() throws Exception {
