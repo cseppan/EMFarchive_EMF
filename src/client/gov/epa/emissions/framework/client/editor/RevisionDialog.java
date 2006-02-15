@@ -38,7 +38,7 @@ public class RevisionDialog extends Dialog {
     private Version version;
 
     public RevisionDialog(EmfConsole parent) {
-        super("Create new Note", parent);
+        super("Add Revision", parent);
         super.setSize(new Dimension(550, 250));
 
         super.center();

@@ -2,8 +2,6 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ChangeablesList;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
-import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
@@ -16,7 +14,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
@@ -27,13 +24,12 @@ public class EditablePagePanel extends JPanel {
     private EmfTableModel tableModel;
 
     private ScrollableTable table;
-    
+
     private MessagePanel messagePanel;
-    
+
     private ChangeablesList listOfChangeables;
 
-    public EditablePagePanel(EditablePage page, MessagePanel messagePanel, 
-            ChangeablesList listOfChangeables) {
+    public EditablePagePanel(EditablePage page, MessagePanel messagePanel, ChangeablesList listOfChangeables) {
         this.listOfChangeables = listOfChangeables;
         super.setLayout(new BorderLayout());
         super.add(doLayout(page), BorderLayout.CENTER);
@@ -66,29 +62,7 @@ public class EditablePagePanel extends JPanel {
         JPanel buttonsPanel = buttonsPanel(tableData);
         panel.add(buttonsPanel);
 
-        panel.add(notesPanel());
-
-        TextArea notes = new TextArea("Notes", "");
-        listOfChangeables.add(notes);
-        notes.addTextListener();
-        panel.add(new ScrollableTextArea(notes));
-
         return panel;
-    }
-
-    private JPanel notesPanel() {
-        JPanel container = new JPanel(new BorderLayout());
-
-        JPanel labelsPanel = new JPanel();
-        labelsPanel.add(new JLabel("Notes"));
-
-        JLabel comingSoon = new JLabel("(Coming Soon)");
-        comingSoon.setForeground(Color.BLUE);
-        labelsPanel.add(comingSoon);
-
-        container.add(labelsPanel, BorderLayout.LINE_START);
-
-        return container;
     }
 
     private JScrollPane table(TableData tableData) {
