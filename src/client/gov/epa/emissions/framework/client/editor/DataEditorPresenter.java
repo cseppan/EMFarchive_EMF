@@ -10,10 +10,11 @@ import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.NoteType;
+import gov.epa.emissions.framework.services.Revision;
 
 public class DataEditorPresenter {
 
-    private DataEditorView view;
+    DataEditorView view;
 
     private Version version;
 
@@ -46,14 +47,14 @@ public class DataEditorPresenter {
         display(token, view);
     }
 
-    private DataEditorService dataEditorService() {
+    DataEditorService dataEditorService() {
         return session.dataEditorService();
     }
 
     private void display(DataAccessToken token, DataEditorView view) {
         this.view = view;
         view.observe(this);
-        view.display(version, table, dataEditorService());
+        view.display(version, table, session.user(), dataEditorService());
         view.updateLockPeriod(token.lockStart(), token.lockEnd());
     }
 
@@ -69,31 +70,41 @@ public class DataEditorPresenter {
         tablePresenter.doDisplayFirst();
     }
 
-    public void doClose() throws EmfException {
-        if (hasChanges() && !view.confirmDiscardChanges())
-            return;
-
-        dataEditorService().closeSession(token);
-        view.close();
+    public void doClose(Revision revision) throws EmfException {
+        close(closingRule(), commonsService(), revision);
     }
 
-    private boolean hasChanges() throws EmfException {
-        return tablePresenter.hasChanges() || dataEditorService().hasChanges(token);
+    void close(ClosingRule closingRule, DataCommonsService commonsService, Revision revision) throws EmfException {
+        closingRule.close();
+        commonsService.addRevision(revision);
+    }
+
+    private ClosingRule closingRule() {
+        return new ClosingRule(view, tablePresenter, dataEditorService(), token);
     }
 
     public void doDiscard() throws EmfException {
-        dataEditorService().discard(token);
+        discard(dataEditorService(), token);
+    }
+
+    void discard(DataEditorService service, DataAccessToken token) throws EmfException {
+        service.discard(token);
     }
 
     public void doSave() throws EmfException {
+        save(view, token, tablePresenter, dataEditorService(), closingRule());
+    }
+
+    void save(DataEditorView view, DataAccessToken token, EditableTablePresenter tablePresenter,
+            DataEditorService service, ClosingRule closingRule) throws EmfException {
         tablePresenter.submitChanges();
         try {
-            token = dataEditorService().save(token);
+            token = service.save(token);
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
         } catch (EmfException e) {
             view.notifySaveFailure(e.getMessage());
-            doDiscard();
-            doClose();
+            discard(service, token);
+            closingRule.proceedWithClose();
         }
     }
 

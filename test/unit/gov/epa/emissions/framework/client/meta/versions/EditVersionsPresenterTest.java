@@ -66,19 +66,19 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayEditableTableViewOnEdit() throws Exception {
         Version version = new Version();
         String table = "table";
+        User user = new User();
 
         Mock service = mock(DataEditorService.class);
         service.expects(once()).method("openSession").withAnyArguments().will(returnValue(token()));
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
         Mock dataView = mock(DataEditorView.class);
-        dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
+        dataView.expects(once()).method("display").with(same(version), eq(table), same(user), same(serviceProxy));
         dataView.expects(once()).method("observe").with(new IsInstanceOf(DataEditorPresenter.class));
         dataView.expects(once()).method("updateLockPeriod").with(new IsInstanceOf(Date.class),
                 new IsInstanceOf(Date.class));
 
         Mock session = mock(EmfSession.class);
-        User user = new User();
         session.stubs().method("user").withNoArguments().will(returnValue(user));
 
         EditVersionsPresenter presenter = new EditVersionsPresenter(null, session(user, serviceProxy, null));

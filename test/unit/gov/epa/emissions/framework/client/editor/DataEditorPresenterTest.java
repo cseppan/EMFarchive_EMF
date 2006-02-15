@@ -1,9 +1,6 @@
 package gov.epa.emissions.framework.client.editor;
 
-import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -14,6 +11,7 @@ import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
+import gov.epa.emissions.framework.services.Revision;
 
 import java.util.Date;
 
@@ -38,7 +36,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
         Mock view = mock(DataEditorView.class);
-        view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
+        view.expects(once()).method("display").with(eq(version), eq(table), same(user), same(serviceProxy));
         view.expects(once()).method("updateLockPeriod")
                 .with(new IsInstanceOf(Date.class), new IsInstanceOf(Date.class));
 
@@ -96,88 +94,28 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldCloseViewAndCloseDataEditSessionOnClose() throws Exception {
-        Mock view = mock(DataEditorView.class);
-        view.expects(once()).method("close").withNoArguments();
+        Mock closingRule = mock(ClosingRule.class);
+        closingRule.expects(once()).method("close");
 
-        Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("closeSession").with(new IsInstanceOf(DataAccessToken.class));
-        service.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
+        Mock service = mock(DataCommonsService.class);
 
-        Mock tablePresenter = mock(EditableTablePresenter.class);
-        tablePresenter.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
-        DataEditorPresenter p = displayPresenter(view, service, tablePresenter);
+        Revision revision = new Revision();
+        service.expects(once()).method("addRevision").with(same(revision));
 
-        p.doClose();
-    }
+        DataCommonsService serviceProxy = (DataCommonsService) service.proxy();
+        EmfSession session = session(null, null, serviceProxy);
 
-    public void testShouldCloseIfConfirmDiscardAndChangesExistOnClose() throws Exception {
-        Mock view = mock(DataEditorView.class);
-        view.expects(once()).method("close").withNoArguments();
-
-        Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("closeSession").with(new IsInstanceOf(DataAccessToken.class));
-
-        service.stubs().method("hasChanges").will(returnValue(Boolean.TRUE));
-        view.expects(once()).method("confirmDiscardChanges").will(returnValue(Boolean.TRUE));
-
-        Mock tablePresenter = mock(EditableTablePresenter.class);
-        tablePresenter.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
-
-        DataEditorPresenter p = displayPresenter(view, service, tablePresenter);
-
-        p.doClose();
-    }
-
-    public void testShouldNotCloseIfConfirmDiscardIsNoAndChangesExistOnClose() throws Exception {
-        Mock view = mock(DataEditorView.class);
-        Mock service = mock(DataEditorService.class);
-
-        service.stubs().method("hasChanges").will(returnValue(Boolean.TRUE));
-        view.expects(once()).method("confirmDiscardChanges").will(returnValue(Boolean.FALSE));
-
-        Mock tablePresenter = mock(EditableTablePresenter.class);
-        tablePresenter.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
-
-        DataEditorPresenter p = displayPresenter(view, service, tablePresenter);
-
-        p.doClose();
-    }
-
-    private DataEditorPresenter displayPresenter(Mock view, Mock service, Mock tablePresenter) throws EmfException {
-        Version version = new Version();
-        String table = "table";
-
-        DataAccessToken token = successToken();
-        User user = new User();
-        service.expects(once()).method("openSession").with(same(user), new IsInstanceOf(DataAccessToken.class)).will(
-                returnValue(token));
-
-        DataEditorService serviceProxy = (DataEditorService) service.proxy();
-        view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
-        view.expects(once()).method("updateLockPeriod")
-                .with(new IsInstanceOf(Date.class), new IsInstanceOf(Date.class));
-
-        EmfSession session = session(user, serviceProxy, null);
-        DataEditorPresenter p = new DataEditorPresenter(null, version, table, session);
-        view.expects(once()).method("observe").with(same(p));
-        p.display((DataEditorView) view.proxy());
-
-        tablePresenter.expects(once()).method("observe");
-        tablePresenter.expects(once()).method("doDisplayFirst");
-        p.displayTable((EditableTablePresenter) tablePresenter.proxy());
-
-        return p;
+        DataEditorPresenter p = new DataEditorPresenter(null, null, null, session);
+        p.close((ClosingRule) closingRule.proxy(), serviceProxy, revision);
     }
 
     public void testShouldDiscardChangesOnDiscard() throws Exception {
-        Mock view = mock(DataEditorView.class);
-
         Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("discard").with(new IsInstanceOf(DataAccessToken.class));
+        DataAccessToken token = new DataAccessToken();
+        service.expects(once()).method("discard").with(same(token));
 
-        DataEditorPresenter p = displayPresenter(view, service, mock(EditableTablePresenter.class));
-
-        p.doDiscard();
+        DataEditorPresenter p = new DataEditorPresenter(null, null, null, null);
+        p.discard((DataEditorService) service.proxy(), token);
     }
 
     public void testShouldDisplayTableViewOnDisplayTableView() throws Exception {
@@ -192,67 +130,50 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
     public void testShouldSubmitAnyChangesAndSaveChangesOnSave() throws Exception {
         Mock view = mock(DataEditorView.class);
-
-        Mock service = mock(DataEditorService.class);
-        Mock token = mock(DataAccessToken.class);
-        token.stubs().method("lockStart").will(returnValue(new Date()));
-        token.stubs().method("lockEnd").will(returnValue(new Date()));
-
-        service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class)).will(
-                returnValue(token.proxy()));
-
-        DataEditorPresenter p = displayPresenter(view, service, mock(EditableTablePresenter.class));
-
-        Mock tableView = displayTableView(service, p);
         view.expects(once()).method("updateLockPeriod");
 
-        ChangeSet changeset = new ChangeSet();
-        changeset.addDeleted(new VersionedRecord());
-        tableView.stubs().method("changeset").withNoArguments().will(returnValue(changeset));
-        service.expects(once()).method("submit").with(new IsInstanceOf(DataAccessToken.class), same(changeset),
-                ANYTHING);
+        Mock service = mock(DataEditorService.class);
+        DataAccessToken token = new DataAccessToken();
+        Version version = new Version();
+        token.setVersion(version);
+        service.expects(once()).method("save").with(same(token)).will(returnValue(token));
+        DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
-        p.doSave();
+        DataEditorView viewProxy = (DataEditorView) view.proxy();
+
+        Mock tablePresenter = mock(EditableTablePresenter.class);
+        tablePresenter.expects(once()).method("submitChanges");
+        EditableTablePresenter tablePresenterProxy = (EditableTablePresenter) tablePresenter.proxy();
+
+        DataEditorPresenter p = new DataEditorPresenter(null, version, null, null);
+        p.save(viewProxy, token, tablePresenterProxy, serviceProxy, null);
     }
 
-    public void testOnSaveShouldDiscardChangesCloseSessionAndNotifyUserOfFailureIfLockWasOwnedByAnotherUser()
-            throws Exception {
+    public void testOnSaveShouldDiscardChangesCloseSessionAndNotifyUserOfFailureIfSaveFails() throws Exception {
         Mock view = mock(DataEditorView.class);
         view.expects(once()).method("notifySaveFailure").with(eq("Failure"));
-        view.expects(once()).method("close").withNoArguments();
 
         Mock service = mock(DataEditorService.class);
         service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class)).will(
                 throwException(new EmfException("Failure")));
-        service.expects(once()).method("closeSession").with(new IsInstanceOf(DataAccessToken.class));
-        service.stubs().method("hasChanges").will(returnValue(Boolean.FALSE));
 
-        DataEditorPresenter p = displayPresenter(view, service, mock(EditableTablePresenter.class));
-        Mock tableView = displayTableView(service, p);
+        DataAccessToken token = new DataAccessToken();
+        service.expects(once()).method("discard").with(same(token));
 
-        ChangeSet changeset = new ChangeSet();
-        changeset.addDeleted(new VersionedRecord());
-        tableView.stubs().method("changeset").withNoArguments().will(returnValue(changeset));
-        service.expects(once()).method("submit").with(new IsInstanceOf(DataAccessToken.class), same(changeset),
-                ANYTHING);
+        DataEditorView viewProxy = (DataEditorView) view.proxy();
 
-        service.expects(once()).method("discard").with(new IsInstanceOf(DataAccessToken.class));
+        Mock tablePresenter = mock(EditableTablePresenter.class);
+        tablePresenter.expects(once()).method("submitChanges");
+        EditableTablePresenter tablePresenterProxy = (EditableTablePresenter) tablePresenter.proxy();
 
-        p.doSave();
-    }
+        DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
-    private Mock displayTableView(Mock service, DataEditorPresenter p) throws EmfException {
-        Mock tableView = mock(EditablePageManagerView.class);
-        tableView.expects(once()).method("observe").with(new IsInstanceOf(EditableTablePresenterImpl.class));
-        tableView.expects(once()).method("display").with(new IsInstanceOf(Page.class));
-        tableView.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
-        service.stubs().method("getPage").withAnyArguments().will(returnValue(new Page()));
+        Mock closingRule = mock(ClosingRule.class);
+        closingRule.expects(once()).method("proceedWithClose");
+        ClosingRule closingRuleProxy = (ClosingRule) closingRule.proxy();
 
-        service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        tableView.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
-
-        p.displayTable((EditablePageManagerView) tableView.proxy());
-        return tableView;
+        DataEditorPresenter p = new DataEditorPresenter(null, null, null, null);
+        p.save(viewProxy, token, tablePresenterProxy, serviceProxy, closingRuleProxy);
     }
 
     private Constraint tokenConstraint(Version version, String table) {
@@ -282,4 +203,21 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         presenter.addNote((NewNoteView) view.proxy(), user, dataset, types, versions);
     }
+
+    public void testShouldSaveRevisionOnClose() throws Exception {
+        Mock service = mock(DataCommonsService.class);
+
+        Revision revision = new Revision();
+        service.expects(once()).method("addRevision").with(same(revision));
+
+        DataCommonsService serviceProxy = (DataCommonsService) service.proxy();
+        EmfSession session = session(null, null, serviceProxy);
+        DataEditorPresenter presenter = new DataEditorPresenter(null, null, null, session);
+
+        Mock closingRule = mock(ClosingRule.class);
+        closingRule.expects(once()).method("close");
+
+        presenter.close((ClosingRule) closingRule.proxy(), serviceProxy, revision);
+    }
+
 }

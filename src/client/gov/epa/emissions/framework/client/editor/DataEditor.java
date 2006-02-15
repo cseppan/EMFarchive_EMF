@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
@@ -15,6 +16,7 @@ import gov.epa.emissions.framework.client.meta.notes.NewNoteDialog;
 import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.Revision;
 import gov.epa.emissions.framework.ui.Dimensions;
 import gov.epa.emissions.framework.ui.EmfDialog;
 
@@ -40,17 +42,21 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private EmfDataset dataset;
 
-    private EditablePageContainer tableView;
+    private EditablePageContainer pageContainer;
 
     private String table;
 
     private JLabel lockInfo;
-    
+
     private ChangeablesList changeablesList;
 
     private WidgetChangesMonitor monitor;
 
     private EmfConsole parent;
+
+    private Version version;
+
+    private User user;
 
     public DataEditor(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         super("Data Editor: " + dataset.getName(), desktopManager);
@@ -87,8 +93,10 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         this.presenter = presenter;
     }
 
-    public void display(Version version, String table, DataAccessService service) {
+    public void display(Version version, String table, User user, DataAccessService service) {
         this.table = table;
+        this.version = version;
+        this.user = user;
 
         updateTitle(version, table);
         super.setName("dataEditor:" + version.getDatasetId() + ":" + version.getId());
@@ -114,16 +122,15 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private JPanel tablePanel(Version version, String table) {
         InternalSource source = source(table, dataset.getInternalSources());
-        tableView = new EditablePageContainer(dataset, version, source, messagePanel,
-                changeablesList);
+        pageContainer = new EditablePageContainer(dataset, version, source, messagePanel, changeablesList);
         displayTable(table);
 
-        return tableView;
+        return pageContainer;
     }
 
     private void displayTable(String table) {
         try {
-            presenter.displayTable(tableView);
+            presenter.displayTable(pageContainer);
         } catch (EmfException e) {
             displayError("Could not display table: " + table + ". Reason: " + e.getMessage());
         }
@@ -240,7 +247,13 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private void doClose() throws EmfException {
         clearMessages();
-        presenter.doClose();
+        presenter.doClose(revision());
+    }
+
+    private Revision revision() {
+        RevisionDialog dialog = new RevisionDialog(parent);
+        dialog.display(user, dataset, version);
+        return dialog.revision();
     }
 
     private void doDiscard() {
@@ -262,11 +275,10 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     public void notifyLockFailure(DataAccessToken token) {
         Version version = token.getVersion();
         String message = "Cannot edit Version: " + version.getName() + "(" + version.getVersion() + ") of Dataset: "
-                + dataset.getName() + System.getProperty("line.separator") 
-                + " as it was locked by User: " + version.getLockOwner() + "(at "
-                + format(version.getLockDate()) + ")";
-        EmfDialog dialog = new EmfDialog(null, "Message", 
-                JOptionPane.PLAIN_MESSAGE, message, JOptionPane.DEFAULT_OPTION);
+                + dataset.getName() + System.getProperty("line.separator") + " as it was locked by User: "
+                + version.getLockOwner() + "(at " + format(version.getLockDate()) + ")";
+        EmfDialog dialog = new EmfDialog(null, "Message", JOptionPane.PLAIN_MESSAGE, message,
+                JOptionPane.DEFAULT_OPTION);
         dialog.showDialog();
     }
 
@@ -276,15 +288,15 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     public void notifySaveFailure(String message) {
-        EmfDialog dialog = new EmfDialog(null, "Message", 
-                JOptionPane.PLAIN_MESSAGE, message, JOptionPane.DEFAULT_OPTION);
+        EmfDialog dialog = new EmfDialog(null, "Message", JOptionPane.PLAIN_MESSAGE, message,
+                JOptionPane.DEFAULT_OPTION);
         dialog.showDialog();
     }
 
     public boolean confirmDiscardChanges() {
         return (monitor.checkChanges() == JOptionPane.OK_OPTION);
     }
-    
+
     private void closeWindow() {
         try {
             doClose();

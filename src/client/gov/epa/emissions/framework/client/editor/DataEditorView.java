@@ -3,12 +3,13 @@ package gov.epa.emissions.framework.client.editor;
 import java.util.Date;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.ManagedView;
 import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataAccessToken;
 
 public interface DataEditorView extends ManagedView {
-    void display(Version version, String table, DataAccessService service);
+    void display(Version version, String table, User user, DataAccessService service);
 
     void observe(DataEditorPresenter presenter);
 
