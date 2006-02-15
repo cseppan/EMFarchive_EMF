@@ -2,12 +2,13 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ConfirmDialog;
+import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
+import gov.epa.emissions.framework.client.WidgetChangesMonitor;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteDialog;
@@ -15,6 +16,7 @@ import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Dimensions;
+import gov.epa.emissions.framework.ui.EmfDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -43,6 +45,10 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private String table;
 
     private JLabel lockInfo;
+    
+    private ChangeablesList changeablesList;
+
+    private WidgetChangesMonitor monitor;
 
     private EmfConsole parent;
 
@@ -55,6 +61,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         layout = new JPanel(new BorderLayout());
         layout.add(topPanel(), BorderLayout.PAGE_START);
 
+        changeablesList = new ChangeablesList(this);
+        monitor = new WidgetChangesMonitor(changeablesList, null);
         this.getContentPane().add(layout);
     }
 
@@ -106,7 +114,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private JPanel tablePanel(Version version, String table) {
         InternalSource source = source(table, dataset.getInternalSources());
-        tableView = new EditablePageContainer(dataset, version, source, messagePanel);
+        tableView = new EditablePageContainer(dataset, version, source, messagePanel,
+                changeablesList);
         displayTable(table);
 
         return tableView;
@@ -214,6 +223,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private void doSave() {
         clearMessages();
         try {
+            monitor.resetChanges();
             presenter.doSave();
             displayMessage("Saved changes.");
         } catch (EmfException e) {
@@ -246,22 +256,18 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     public void windowClosing() {
-        try {
-            doClose();
-        } catch (EmfException e) {
-            displayError("Could not Close. Reason: " + e.getMessage());
-            return;
-        }
-
-        super.close();
+        closeWindow();
     }
 
     public void notifyLockFailure(DataAccessToken token) {
         Version version = token.getVersion();
         String message = "Cannot edit Version: " + version.getName() + "(" + version.getVersion() + ") of Dataset: "
-                + dataset.getName() + " as it was locked by User: " + version.getLockOwner() + "(at "
+                + dataset.getName() + System.getProperty("line.separator") 
+                + " as it was locked by User: " + version.getLockOwner() + "(at "
                 + format(version.getLockDate()) + ")";
-        JOptionPane.showMessageDialog(this, message);
+        EmfDialog dialog = new EmfDialog(null, "Message", 
+                JOptionPane.PLAIN_MESSAGE, message, JOptionPane.DEFAULT_OPTION);
+        dialog.showDialog();
     }
 
     private String format(Date lockDate) {
@@ -270,13 +276,21 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     public void notifySaveFailure(String message) {
-        JOptionPane.showMessageDialog(this, message);
+        EmfDialog dialog = new EmfDialog(null, "Message", 
+                JOptionPane.PLAIN_MESSAGE, message, JOptionPane.DEFAULT_OPTION);
+        dialog.showDialog();
     }
 
     public boolean confirmDiscardChanges() {
-        String message = "Would you like to Close(without Save) and Lose the Changes?";
-        String title = "Close";
-        return new ConfirmDialog(message, title, this).confirm();
+        return (monitor.checkChanges() == JOptionPane.OK_OPTION);
+    }
+    
+    private void closeWindow() {
+        try {
+            doClose();
+        } catch (EmfException e) {
+            displayError("Could not close. Reason - " + e.getMessage());
+        }
     }
 
 }

@@ -64,7 +64,7 @@ public class NonEditableTableViewPanel extends JPanel implements NonEditablePage
     }
 
     private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
-        sortFilterPanel = new DataSortFilterPanel(messagePanel);
+        sortFilterPanel = new DataSortFilterPanel(messagePanel, null);
         return sortFilterPanel;
     }
 

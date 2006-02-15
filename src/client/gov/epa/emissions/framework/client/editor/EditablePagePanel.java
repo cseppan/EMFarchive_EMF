@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.client.MessagePanel;
@@ -26,10 +27,14 @@ public class EditablePagePanel extends JPanel {
     private EmfTableModel tableModel;
 
     private ScrollableTable table;
-
+    
     private MessagePanel messagePanel;
+    
+    private ChangeablesList listOfChangeables;
 
-    public EditablePagePanel(EditablePage page, MessagePanel messagePanel) {
+    public EditablePagePanel(EditablePage page, MessagePanel messagePanel, 
+            ChangeablesList listOfChangeables) {
+        this.listOfChangeables = listOfChangeables;
         super.setLayout(new BorderLayout());
         super.add(doLayout(page), BorderLayout.CENTER);
 
@@ -64,6 +69,8 @@ public class EditablePagePanel extends JPanel {
         panel.add(notesPanel());
 
         TextArea notes = new TextArea("Notes", "");
+        listOfChangeables.add(notes);
+        notes.addTextListener();
         panel.add(new ScrollableTextArea(notes));
 
         return panel;
@@ -86,6 +93,8 @@ public class EditablePagePanel extends JPanel {
 
     private JScrollPane table(TableData tableData) {
         tableModel = new EmfTableModel(tableData);
+        listOfChangeables.add(tableModel);
+        tableModel.addDataChangeListener();
         table = new ScrollableTable(tableModel);
         return table;
     }

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.gui.PasswordField;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.Widget;
@@ -22,7 +23,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 
 public class EditableUserProfilePanel extends JPanel {
 
@@ -34,26 +34,29 @@ public class EditableUserProfilePanel extends JPanel {
 
     private TextField name;
 
-    private JTextField affiliation;
+    private TextField affiliation;
 
-    private JTextField phone;
+    private TextField phone;
 
-    private JTextField email;
+    private TextField email;
 
     private MessagePanel messagePanel;
 
     private AdminOption adminOption;
 
     private PopulateUserStrategy populateUserStrategy;
+    
+    private ChangeablesList changeablesList;
 
     private User user;
 
     // FIXME: one to many params ?
     public EditableUserProfilePanel(User user, Widget usernameWidget, Action okAction, Action cancelAction,
-            AdminOption adminOption, PopulateUserStrategy populateUserStrategy) {
+            AdminOption adminOption, PopulateUserStrategy populateUserStrategy, ChangeablesList changeablesList) {
         this.user = user;
         this.adminOption = adminOption;
         this.populateUserStrategy = populateUserStrategy;
+        this.changeablesList = changeablesList;
 
         createLayout(user, usernameWidget, okAction, cancelAction, adminOption);
         this.setSize(new Dimension(375, 425));
@@ -155,18 +158,34 @@ public class EditableUserProfilePanel extends JPanel {
         valuesPanel.setLayout(new BoxLayout(valuesPanel, BoxLayout.Y_AXIS));
 
         name = new TextField("name", user.getName(), 15);
+        if(changeablesList != null) {
+            changeablesList.add(name);
+            name.addTextListener();
+        }
         valuesPanel.add(name);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
 
         affiliation = new TextField("affiliation", user.getAffiliation(), 15);
+        if(changeablesList != null) {
+            changeablesList.add(affiliation);
+            affiliation.addTextListener();
+        }
         valuesPanel.add(affiliation);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
 
         phone = new TextField("phone", user.getPhone(), 15);
+        if(changeablesList != null) {
+            changeablesList.add(phone);
+            phone.addTextListener();
+        }
         valuesPanel.add(phone);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
 
         email = new TextField("email", user.getEmail(), 15);
+        if(changeablesList != null) {
+            changeablesList.add(email);
+            email.addTextListener();
+        }
         valuesPanel.add(email);
 
         panel.add(valuesPanel);

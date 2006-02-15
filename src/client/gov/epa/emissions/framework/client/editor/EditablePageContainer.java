@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -34,8 +35,11 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
     private EditablePagePanel editablePagePanel;
 
     private DataSortFilterPanel sortFilterPanel;
+    
+    private ChangeablesList changeablesList;
 
-    public EditablePageContainer(EmfDataset dataset, Version version, InternalSource source, MessagePanel messagePanel) {
+    public EditablePageContainer(EmfDataset dataset, Version version, InternalSource source, 
+            MessagePanel messagePanel, ChangeablesList changeablesList) {
         super(new BorderLayout());
         super.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
@@ -43,6 +47,7 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
         this.version = version;
         this.source = source;
         this.messagePanel = messagePanel;
+        this.changeablesList = changeablesList;
 
         doLayout(messagePanel);
     }
@@ -66,7 +71,7 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
     }
 
     private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
-        sortFilterPanel = new DataSortFilterPanel(messagePanel);
+        sortFilterPanel = new DataSortFilterPanel(messagePanel, changeablesList);
         return sortFilterPanel;
     }
 
@@ -87,7 +92,7 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
 
     private EditablePagePanel createEditablePage(Page page) {
         editablePage = new EditablePage((int) dataset.getId(), version, page, cols());
-        editablePagePanel = new EditablePagePanel(editablePage, messagePanel);
+        editablePagePanel = new EditablePagePanel(editablePage, messagePanel, changeablesList);
 
         return editablePagePanel;
     }

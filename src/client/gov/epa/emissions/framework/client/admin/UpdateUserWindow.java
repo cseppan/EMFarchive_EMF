@@ -71,7 +71,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
     private EditableUserProfilePanel createUserProfilePanel(Widget username, Action saveAction, Action closeAction,
             AdminOption adminOption) {
         EditableUserProfilePanel panel = new EditableUserProfilePanel(user, username, saveAction, closeAction,
-                adminOption, new PopulateUserOnUpdateStrategy(user));
+                adminOption, new PopulateUserOnUpdateStrategy(user), null);
 
         panel.addEditListener(new KeyAdapter() {
             public void keyTyped(KeyEvent event) {
