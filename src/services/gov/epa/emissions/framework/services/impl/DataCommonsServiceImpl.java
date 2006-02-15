@@ -350,10 +350,30 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public void addNotes(Note[] notes) throws EmfException {
+    public void addNotesB(Note[] notes) throws EmfException {
         for (int i = 0; i < notes.length; i++) {
           this.addNote(notes[i]);   
         }
+    }
+
+    public void addNotes(Note[] notes) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+
+            for (int i = 0; i < notes.length; i++) {
+               Note note = notes[i];
+               
+               if (dao.nameUsed(note.getName(),Note.class, session))
+                   throw new EmfException("Note name already in use");
+
+               dao.add(note, session);
+            }
+            session.close();
+        } catch (RuntimeException e) {
+            LOG.error("Could not add new note", e);
+            throw new EmfException("Note name already in use");
+        }
+    
     }
 
     public NoteType[] getNoteTypes() throws EmfException {
