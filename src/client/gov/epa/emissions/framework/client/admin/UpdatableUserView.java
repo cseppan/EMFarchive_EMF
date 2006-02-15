@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.ManagedView;
 
 public interface UpdatableUserView extends ManagedView {
@@ -11,5 +12,7 @@ public interface UpdatableUserView extends ManagedView {
      * any user edits (i.e. data changes)
      */
     void closeOnConfirmLosingChanges();
+
+    void display(User user);
 
 }

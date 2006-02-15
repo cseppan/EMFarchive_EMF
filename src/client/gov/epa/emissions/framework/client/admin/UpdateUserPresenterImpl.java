@@ -35,7 +35,7 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
         this.updateView = update;
         updateView.observe(this);
 
-        updateView.display();
+        updateView.display(user);
     }
 
     public void doSave() throws EmfException {

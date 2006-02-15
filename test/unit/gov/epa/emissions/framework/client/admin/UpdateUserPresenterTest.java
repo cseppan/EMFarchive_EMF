@@ -116,7 +116,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         UpdateUserPresenter presenter = new UpdateUserPresenterImpl((EmfSession) session.proxy(), user,
                 (UserService) service.proxy());
         view.expects(once()).method("observe").with(eq(presenter));
-        view.expects(once()).method("display").withNoArguments();
+        view.expects(once()).method("display").with(same(user));
 
         return presenter;
     }

@@ -27,13 +27,22 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
 
     private EditableUserProfilePanel panel;
 
-    public UpdateUserWindow(User user, AdminOption adminOption, DesktopManager desktopManager) {
-        super("Update User: " + user.getUsername(), desktopManager);
+    private AdminOption adminOption;
 
-        this.windowTitle = "Update User: " + user.getUsername();
-        super.setName("updateUser"+user.getId());
-        
+    public UpdateUserWindow(AdminOption adminOption, DesktopManager desktopManager) {
+        super("Update User", desktopManager);
+        this.adminOption = adminOption;
+
+        super.setResizable(false);
+    }
+
+    public UpdateUserWindow(DesktopManager desktopManager) {
+        this(new NoAdminOption(), desktopManager);
+    }
+
+    public void display(User user) {
         this.user = user;
+        setEmbellishments(user);
 
         JPanel container = new JPanel();
         panel = createLayout(adminOption);
@@ -41,11 +50,14 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
 
         super.getContentPane().add(container);
         super.dimensions(panel.getSize());
-        super.setResizable(false);
+        
+        super.display();
     }
 
-    public UpdateUserWindow(User user, DesktopManager desktopManager) {
-        this(user, new NoAdminOption(), desktopManager);
+    private void setEmbellishments(User user) {
+        super.setTitle("Update User: " + user.getUsername());
+        this.windowTitle = "Update User: " + user.getUsername();
+        super.setName("updateUser" + user.getId());
     }
 
     private EditableUserProfilePanel createLayout(AdminOption adminOption) {
@@ -105,14 +117,14 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
 
     public void closeOnConfirmLosingChanges() {
         String message = "Would you like to Close(without saving and lose the updates)?";
-        EmfDialog dialog = new EmfDialog(null, "Close", JOptionPane.QUESTION_MESSAGE,
-                message, JOptionPane.YES_NO_OPTION);
+        EmfDialog dialog = new EmfDialog(null, "Close", JOptionPane.QUESTION_MESSAGE, message,
+                JOptionPane.YES_NO_OPTION);
         int option = dialog.showDialog();
-        
+
         if (option == JOptionPane.YES_OPTION)
             close();
     }
-    
+
     public void windowClosing() {
         try {
             presenter.doClose();

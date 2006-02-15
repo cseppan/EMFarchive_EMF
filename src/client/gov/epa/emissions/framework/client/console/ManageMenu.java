@@ -173,7 +173,7 @@ public class ManageMenu extends JMenu {
     }
 
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
-        UpdateMyProfileWindow updatable = new UpdateMyProfileWindow(session.user(), parent.desktop(), desktopManager);
+        UpdateMyProfileWindow updatable = new UpdateMyProfileWindow(parent.desktop(), desktopManager);
         parent.addToDesktop(updatable);
 
         ViewMyProfileWindow viewable = new ViewMyProfileWindow(parent.desktop(), desktopManager);
