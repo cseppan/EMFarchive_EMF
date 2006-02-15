@@ -29,7 +29,6 @@ import junit.framework.TestCase;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 
 public abstract class ServicesTestCase extends TestCase {
 
@@ -109,6 +108,7 @@ public abstract class ServicesTestCase extends TestCase {
 
     public void deleteAllDatasets() throws Exception {
         dropAll(Note.class);
+        dropAll(Revision.class);
         dropAll(EmfDataset.class);
     }
 
@@ -116,7 +116,7 @@ public abstract class ServicesTestCase extends TestCase {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            List all = session.createCriteria(clazz).addOrder(Order.asc("name")).list();
+            List all = session.createCriteria(clazz).list();
             for (Iterator iter = all.iterator(); iter.hasNext();)
                 session.delete(iter.next());
             tx.commit();
