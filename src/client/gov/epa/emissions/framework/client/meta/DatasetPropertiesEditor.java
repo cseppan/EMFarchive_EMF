@@ -199,7 +199,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     public boolean shouldContinueLosingUnsavedChanges() {
-        return (monitor.checkChanges() == JOptionPane.OK_OPTION);
+        return monitor.checkChanges();
     }
 
     public void notifyLockFailure(EmfDataset dataset) {
@@ -207,7 +207,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
             + " as it was locked by User: " + dataset.getLockOwner() + "(at " + format(dataset.getLockDate()) + ")";
         EmfDialog dialog = new EmfDialog(parentConsole, "Message", 
                 JOptionPane.PLAIN_MESSAGE, message, JOptionPane.DEFAULT_OPTION);
-        dialog.showDialog();
+        dialog.confirm();
     }
 
     private String format(Date lockDate) {

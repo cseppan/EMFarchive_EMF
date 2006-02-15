@@ -23,7 +23,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.border.EtchedBorder;
@@ -45,13 +44,13 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     private DatasetTypesManagerView manager;
 
     private DatasetTypeKeywordsPanel keywordsPanel;
-    
+
     private ChangeablesList changeablesList;
-    
+
     private WidgetChangesMonitor monitor;
 
     public EditableDatasetTypeWindow(DatasetTypesManagerView manager, DesktopManager desktopManager) {
-        super("Edit Dataset Type", new Dimension(600, 500),desktopManager);
+        super("Edit Dataset Type", new Dimension(600, 500), desktopManager);
 
         this.manager = manager;
         layout = new JPanel();
@@ -67,8 +66,8 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     public void display(DatasetType type, Keyword[] keywords) {
         super.setTitle("Edit Dataset Type: " + type.getName());
-        super.setName("datasetTypeEditor:"+type.getId());
-        
+        super.setName("datasetTypeEditor:" + type.getId());
+
         layout.removeAll();
         doLayout(layout, type, keywords);
 
@@ -139,7 +138,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    if(name.getText().equals(""))
+                    if (name.getText().equals(""))
                         messagePanel.setError("Name field should be a non-empty string.");
                     else {
                         keywordsPanel.commit();
@@ -168,14 +167,14 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
         return action;
     }
-    
+
     private void checkChangesAndCloseWindow() {
         try {
-            if(monitor.checkChanges() == JOptionPane.OK_OPTION)
+            if (monitor.checkChanges())
                 presenter.doClose();
         } catch (EmfException e) {
             messagePanel.setError("Could not close. Reason: " + e.getMessage());
         }
     }
-   
+
 }

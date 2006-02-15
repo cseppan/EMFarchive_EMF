@@ -279,7 +279,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
                 + version.getLockOwner() + "(at " + format(version.getLockDate()) + ")";
         EmfDialog dialog = new EmfDialog(null, "Message", JOptionPane.PLAIN_MESSAGE, message,
                 JOptionPane.DEFAULT_OPTION);
-        dialog.showDialog();
+        dialog.confirm();
     }
 
     private String format(Date lockDate) {
@@ -290,11 +290,11 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     public void notifySaveFailure(String message) {
         EmfDialog dialog = new EmfDialog(null, "Message", JOptionPane.PLAIN_MESSAGE, message,
                 JOptionPane.DEFAULT_OPTION);
-        dialog.showDialog();
+        dialog.confirm();
     }
 
     public boolean confirmDiscardChanges() {
-        return (monitor.checkChanges() == JOptionPane.OK_OPTION);
+        return monitor.checkChanges();
     }
 
     private void closeWindow() {

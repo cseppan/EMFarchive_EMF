@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.admin;
 
+import gov.epa.emissions.commons.gui.ChangeObserver;
 import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.gui.TextFieldWidget;
 import gov.epa.emissions.commons.gui.Widget;
@@ -13,7 +14,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class RegisterUserPanel extends JPanel {
@@ -31,22 +31,22 @@ public class RegisterUserPanel extends JPanel {
     private EditableUserProfilePanel panel;
 
     private User user;
-    
+
     private ChangeablesList changeablesList;
-    
+
     private WidgetChangesMonitor monitor;
 
     public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, RegisterCancelStrategy cancelStrategy,
-            EmfView parent) {
-        this(postRegisterStrategy, cancelStrategy, parent, new NoAdminOption());
+            EmfView parent, ChangeObserver changeObserver) {
+        this(postRegisterStrategy, cancelStrategy, parent, new NoAdminOption(), changeObserver);
     }
 
     public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, RegisterCancelStrategy cancelStrategy,
-            EmfView parent, AdminOption adminOption) {
+            EmfView parent, AdminOption adminOption, ChangeObserver changeObserver) {
         this.postRegisterStrategy = postRegisterStrategy;
         this.cancelStrategy = cancelStrategy;
         this.container = parent;
-        changeablesList = new ChangeablesList((RegisterUserInternalFrame)container);
+        changeablesList = new ChangeablesList(changeObserver);
         monitor = new WidgetChangesMonitor(changeablesList, null);
 
         createLayout(adminOption);
@@ -100,11 +100,11 @@ public class RegisterUserPanel extends JPanel {
     public RegisterUserPresenter getPresenter() {
         return presenter;
     }
-    
+
     public boolean confirmDiscardChanges() {
-        return (monitor.checkChanges() == JOptionPane.OK_OPTION);
+        return monitor.checkChanges();
     }
-    
+
     public void closeWindow() {
         confirmDiscardChanges();
         cancelStrategy.execute(presenter);

@@ -15,6 +15,7 @@ import javax.swing.event.InternalFrameEvent;
 public abstract class EmfInternalFrame extends JInternalFrame implements ManagedView, ChangeObserver {
 
     protected DesktopManager desktopManager;
+    private ChangeObserver changeObserver;
 
     public EmfInternalFrame(String title, DesktopManager desktopManager) {
         super(title, true, // resizable
@@ -28,6 +29,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
             }
         });
         this.desktopManager = desktopManager;
+        changeObserver = new DefaultChangeObserver(this);
         super.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
@@ -80,15 +82,11 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     }
 
     public void signalChanges() {
-        if (!this.getTitle().endsWith(" *"))
-            this.setTitle(this.getTitle() + " *");
+        changeObserver.signalChanges();
     }
 
     public void signalSaved() {
-        String title = this.getTitle();
-        int starPosition = title.indexOf(" *");
-        if (starPosition >= 0)
-            this.setTitle(title.substring(0, starPosition));
+        changeObserver.signalSaved();    
     }
 
     public int height() {

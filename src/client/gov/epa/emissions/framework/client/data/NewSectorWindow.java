@@ -22,7 +22,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -41,9 +40,9 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
     private SectorCriteriaTableData criteriaTableData;
 
     private SectorsManagerView sectorManager;
-    
+
     private ChangeablesList changeablesList;
-    
+
     private WidgetChangesMonitor monitor;
 
     private static int counter;
@@ -65,9 +64,9 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
 
     public void display(Sector sector) {
         counter++;
-        String name = "Create New Sector "+counter;
+        String name = "Create New Sector " + counter;
         super.setTitle(name);
-        super.setName("createNewSector:"+counter);
+        super.setName("createNewSector:" + counter);
         layout.removeAll();
         doLayout(layout, sector);
 
@@ -145,8 +144,7 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
                     if (!name.getText().equals("")) {
                         monitor.resetChanges();
                         presenter.doSave(sectorManager);
-                    }
-                    else
+                    } else
                         messagePanel.setError("Name field should be a non-empty string.");
                 } catch (EmfException e) {
                     messagePanel.setError("Could not save. Reason: " + e.getMessage());
@@ -170,9 +168,9 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
 
         return action;
     }
-    
+
     private void checkChangesAndCloseWindow() {
-        if(monitor.checkChanges() == JOptionPane.OK_OPTION)
+        if (monitor.checkChanges())
             presenter.doClose();
     }
 

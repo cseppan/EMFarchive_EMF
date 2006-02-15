@@ -21,18 +21,17 @@ public class WidgetChangesMonitor {
         list.onChanges();
     }
     
-    public int checkChanges() {
-        int option = JOptionPane.OK_OPTION;
+    public boolean checkChanges() {
         String message = "Would you like to discard the changes " + System.getProperty("line.separator") + 
                 " and close the current window?";
         String title = "Please choose one";
         if(list.hasChanges()) {
             EmfDialog dialog = new EmfDialog(window, title, JOptionPane.QUESTION_MESSAGE,
                     message, JOptionPane.OK_CANCEL_OPTION);
-            option = dialog.showDialog();
+            return dialog.confirm();
         }
         
-        return option;
+        return false;
     }
 
 }

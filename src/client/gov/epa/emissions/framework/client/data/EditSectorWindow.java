@@ -22,7 +22,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -41,14 +40,13 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
     private SectorCriteriaTableData criteriaTableData;
 
     private SectorsManagerView sectorManager;
-    
+
     private ChangeablesList changeablesList;
-    
+
     private WidgetChangesMonitor monitor;
 
-
     public EditSectorWindow(SectorsManagerView sectorManager, DesktopManager desktopManager) {
-        super("Edit Sector", new Dimension(550, 400),desktopManager);
+        super("Edit Sector", new Dimension(550, 400), desktopManager);
 
         this.sectorManager = sectorManager;
         layout = new JPanel();
@@ -64,8 +62,8 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
 
     public void display(Sector sector) {
         super.setTitle("Edit Sector: " + sector.getName());
-        super.setName("sectorEditor:"+sector.getId());
-        
+        super.setName("sectorEditor:" + sector.getId());
+
         layout.removeAll();
         doLayout(layout, sector);
 
@@ -140,11 +138,10 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
                 sector.setDescription(description.getText());
                 sector.setSectorCriteria(criteriaTableData.sources());
                 try {
-                    if(!name.getText().equals("")) {
+                    if (!name.getText().equals("")) {
                         monitor.resetChanges();
                         presenter.doSave(sectorManager);
-                    }
-                    else
+                    } else
                         messagePanel.setError("Name field should be a non-empty string.");
                 } catch (EmfException e) {
                     messagePanel.setError("Could not save. Reason: " + e.getMessage());
@@ -168,9 +165,9 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
 
         return action;
     }
-    
+
     private void checkChangesAndCloseWindow() {
-        if(monitor.checkChanges() == JOptionPane.OK_OPTION)
+        if (monitor.checkChanges())
             try {
                 presenter.doClose();
             } catch (EmfException e) {

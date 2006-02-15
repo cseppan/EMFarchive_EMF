@@ -50,7 +50,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
 
         super.getContentPane().add(container);
         super.dimensions(panel.getSize());
-        
+
         super.display();
     }
 
@@ -119,9 +119,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
         String message = "Would you like to Close(without saving and lose the updates)?";
         EmfDialog dialog = new EmfDialog(null, "Close", JOptionPane.QUESTION_MESSAGE, message,
                 JOptionPane.YES_NO_OPTION);
-        int option = dialog.showDialog();
-
-        if (option == JOptionPane.YES_OPTION)
+        if (dialog.confirm())
             close();
     }
 

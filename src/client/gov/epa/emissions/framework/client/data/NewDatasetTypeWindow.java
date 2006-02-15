@@ -20,7 +20,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -178,7 +177,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
     }
 
     private void checkChangesAndCloseWindow() {
-        if (monitor.checkChanges() == JOptionPane.OK_OPTION)
+        if (monitor.checkChanges())
             presenter.doClose();
     }
 
