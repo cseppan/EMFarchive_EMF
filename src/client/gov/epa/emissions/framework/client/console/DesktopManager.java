@@ -8,6 +8,6 @@ public interface DesktopManager {
     
     public void closeWindow(ManagedView manageView);
 
-    public void closeAll();
+    public boolean closeAll();
     
 }

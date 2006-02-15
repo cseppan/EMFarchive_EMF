@@ -7,4 +7,8 @@ public interface ManagedView extends EmfView {
     String getName();
 
     boolean isAlive();
+    
+    boolean hasChanges();
+    
+    void forceClose();
 }

@@ -37,8 +37,10 @@ public class DesktopManagerTest extends MockObjectTestCase {
         Mock managedView2 = manageView("view2");
         managedView1.expects(once()).method("getPosition").withNoArguments().will(returnValue(new Position(0, 0)));
         managedView1.expects(once()).method("close").withNoArguments();
+        managedView1.expects(once()).method("hasChanges").withNoArguments().will(returnValue(false));
         managedView2.expects(once()).method("close").withNoArguments();
-
+        managedView2.expects(once()).method("hasChanges").withNoArguments().will(returnValue(false));
+        
         Mock windowsMenu = windoswMenu();
         Mock emfConsole = emfConsole();
 

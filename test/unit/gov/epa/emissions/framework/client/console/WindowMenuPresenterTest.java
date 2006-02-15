@@ -30,7 +30,7 @@ public class WindowMenuPresenterTest extends MockObjectTestCase {
     public void testShouldCloseAllOnBeingSelectedFromMenu() {
         Mock mock = mock(DesktopManager.class);
         presenter.setDesktopManager((DesktopManager) mock.proxy());
-        mock.expects(once()).method("closeAll").withNoArguments();
+        mock.expects(once()).method("closeAll").withNoArguments().will(returnValue(true));
         presenter.closeAll();
     }
 }

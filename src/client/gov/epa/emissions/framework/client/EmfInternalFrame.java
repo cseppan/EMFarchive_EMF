@@ -15,6 +15,7 @@ import javax.swing.event.InternalFrameEvent;
 public abstract class EmfInternalFrame extends JInternalFrame implements ManagedView, ChangeObserver {
 
     protected DesktopManager desktopManager;
+
     private ChangeObserver changeObserver;
 
     public EmfInternalFrame(String title, DesktopManager desktopManager) {
@@ -86,7 +87,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     }
 
     public void signalSaved() {
-        changeObserver.signalSaved();    
+        changeObserver.signalSaved();
     }
 
     public int height() {
@@ -95,5 +96,14 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
 
     public int width() {
         return (int) super.getSize().getWidth();
+    }
+
+    public boolean hasChanges() {
+        return false;
+    }
+
+    public void forceClose() {
+        dispose();
+        close();
     }
 }

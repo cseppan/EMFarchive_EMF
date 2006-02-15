@@ -18,7 +18,10 @@ public class ExitAndLogoutAction {
     public boolean logout() {
         String message = "Do you want to logout?";
         if (confirm(message)) {
-            closeAll();
+            if (desktopManager.closeAll()) {
+                emfConsole.close();
+                return true;
+            }
         }
         return false;
     }
@@ -26,21 +29,18 @@ public class ExitAndLogoutAction {
     public boolean exit() {
         String message = "Do you want to exit?";
         if (confirm(message)) {
-            closeAll();
-            System.exit(0);
+            if (desktopManager.closeAll()) {
+                emfConsole.close();
+                System.exit(0);
+            }
         }
         return false;
     }
 
     private boolean confirm(String message) {
-        EmfDialog emfDialog = new EmfDialog(emfConsole, "Warning", JOptionPane.QUESTION_MESSAGE,
-                message, JOptionPane.OK_CANCEL_OPTION);
+        EmfDialog emfDialog = new EmfDialog(emfConsole, "Warning", JOptionPane.QUESTION_MESSAGE, message,
+                JOptionPane.OK_CANCEL_OPTION);
         return emfDialog.confirm();
-    }
-
-    private void closeAll() {
-        desktopManager.closeAll();
-        emfConsole.close();
     }
 
 }

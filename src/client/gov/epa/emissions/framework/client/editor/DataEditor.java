@@ -293,6 +293,11 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         dialog.confirm();
     }
 
+    // FIXME: remove this code after we pull the monitor and changeablesList
+    public boolean hasChanges() {
+        return changeablesList.hasChanges();
+    }
+
     public boolean confirmDiscardChanges() {
         return monitor.checkChanges();
     }
