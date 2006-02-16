@@ -16,6 +16,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -46,7 +48,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
     private static int counter = 0;
 
-    private static final String[] types = { "CSV File", "Line-based File", "SMOKE Report File" };
+    private static final String[] types = { "External File", "CSV File", "Line-based File", "SMOKE Report File" };
 
     public NewDatasetTypeWindow(DesktopManager desktopManager) {
         super("Create New Dataset Type", new Dimension(600, 260), desktopManager);
@@ -93,19 +95,28 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         name.addTextListener();
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
-        minFiles = new TextField("minfiles", "1", 20);
+        minFiles = new TextField("minfiles", 20);
         changeablesList.add(minFiles);
         minFiles.addTextListener();
         layoutGenerator.addLabelWidgetPair("Min Files:", minFiles, panel);
 
-        maxFiles = new TextField("maxfiles", "-1", 20);
+        maxFiles = new TextField("maxfiles", 20);
         changeablesList.add(maxFiles);
         maxFiles.addTextListener();
         layoutGenerator.addLabelWidgetPair("Max Files:", maxFiles, panel);
 
-        derivedFrom = new ComboBox("External File", types);
+        derivedFrom = new ComboBox("", types);
         changeablesList.add(derivedFrom);
         derivedFrom.addItemChangeListener();
+        derivedFrom.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                minFiles.setText("1");
+                if(((String)e.getItem()).equalsIgnoreCase(types[0]))
+                    maxFiles.setText("-1");
+                else
+                    maxFiles.setText("1");
+            }
+        });
         layoutGenerator.addLabelWidgetPair("Derived From:", derivedFrom, panel);
 
         // Lay out the panel.
