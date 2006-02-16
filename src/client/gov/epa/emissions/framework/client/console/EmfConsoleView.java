@@ -13,4 +13,6 @@ public interface EmfConsoleView {
 
     int width();
 
+    boolean confirm();
+
 }

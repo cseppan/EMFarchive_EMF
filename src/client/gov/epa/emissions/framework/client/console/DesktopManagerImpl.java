@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.client.console;
 
-import gov.epa.emissions.commons.gui.Confirm;
 import gov.epa.emissions.framework.client.ManagedView;
-import gov.epa.emissions.framework.ui.EmfDialog;
 import gov.epa.emissions.framework.ui.Layout;
 import gov.epa.emissions.framework.ui.LayoutImpl;
 
@@ -10,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.JOptionPane;
 
 public class DesktopManagerImpl implements DesktopManager {
 
@@ -21,9 +17,12 @@ public class DesktopManagerImpl implements DesktopManager {
 
     private Layout layout;
 
+    private EmfConsoleView consoleView;
+
     public DesktopManagerImpl(WindowMenuView windowMenu, EmfConsoleView consoleView) {
         this.windowMenu = windowMenu;
         this.windowNames = new HashMap();
+        this.consoleView = consoleView;
         this.layout = new LayoutImpl(consoleView);
     }
 
@@ -65,10 +64,7 @@ public class DesktopManagerImpl implements DesktopManager {
 
     private boolean checkForUnSavedWindows(Map windowNames) {
         if (!windowNames.isEmpty()) {
-            String msg = "Could not close some windows, because they have unsaved changes.\nDo you want to force closing of these windows ";
-            Confirm confirm = new EmfDialog(null, "Warning", JOptionPane.QUESTION_MESSAGE, msg,
-                    JOptionPane.YES_NO_OPTION);
-            if (confirm.confirm()) {
+           if(consoleView.confirm()){
                 forceWindowClose(windowNames);
             }
             return false;

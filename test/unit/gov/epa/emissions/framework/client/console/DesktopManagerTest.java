@@ -32,18 +32,16 @@ public class DesktopManagerTest extends MockObjectTestCase {
         desktopManager.closeWindow(managedViewProxy);
     }
 
-    //FIXME: this is not a unit test !
-    public void FIXME_testShouldCloseAllWindowsAndUnRegisterFromWindowMenu() {
+    public void testShouldCloseAllWindowsAndUnRegisterFromWindowMenu() {
         Mock managedView1 = manageView("view1");
         Mock managedView2 = manageView("view2");
         managedView1.expects(once()).method("getPosition").withNoArguments().will(returnValue(new Position(0, 0)));
-        managedView1.expects(once()).method("close").withNoArguments();
-        managedView1.expects(once()).method("hasChanges").withNoArguments().will(returnValue(false));
-        managedView2.expects(once()).method("close").withNoArguments();
-        managedView2.expects(once()).method("hasChanges").withNoArguments().will(returnValue(false));
+        setCloseRealatedExpections(managedView1);
+        setCloseRealatedExpections(managedView2);
 
         Mock windowsMenu = windowsMenu();
         Mock emfConsole = emfConsole();
+        emfConsole.expects(atLeastOnce()).method("confirm").withNoArguments().will(returnValue(true));
 
         DesktopManager desktopManager = new DesktopManagerImpl(((WindowMenuView) windowsMenu.proxy()),
                 (EmfConsoleView) emfConsole.proxy());
@@ -51,6 +49,12 @@ public class DesktopManagerTest extends MockObjectTestCase {
         desktopManager.openWindow((ManagedView) managedView2.proxy());
 
         desktopManager.closeAll();
+    }
+
+    private void setCloseRealatedExpections(Mock managedView) {
+        managedView.expects(once()).method("close").withNoArguments();
+        managedView.expects(once()).method("hasChanges").withNoArguments().will(returnValue(false));
+        managedView.expects(once()).method("forceClose").withNoArguments();
     }
 
     private Mock emfConsole() {

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.console;
 
+import gov.epa.emissions.commons.gui.Confirm;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.ConcurrentTaskRunner;
 import gov.epa.emissions.framework.EmfException;
@@ -10,6 +11,7 @@ import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.Dimensions;
+import gov.epa.emissions.framework.ui.EmfDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -49,6 +51,8 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     private WindowMenuView windowMenuView;
 
     private DesktopManager desktopManager;
+
+    private Confirm emfConfirmDialog;
 
     // TODO: split the login & logout menu/actions in a separate class ??
     public EmfConsole(EmfSession session) {
@@ -177,6 +181,18 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     public void addToDesktop(Component view) {
         desktop.add(view);
+    }
+
+    public boolean confirm() {
+        emfConfirmDialog = emfConfirmDialog();
+        return emfConfirmDialog.confirm();
+    }
+
+    private Confirm emfConfirmDialog() {
+        String msg = "Could not close some windows, because they have unsaved changes.\nDo you want to force closing of these windows ";
+        Confirm emfConfirmDialog = new EmfDialog(null, "Warning", JOptionPane.QUESTION_MESSAGE, msg,
+                JOptionPane.YES_NO_OPTION);
+        return emfConfirmDialog;
     }
 
 }
