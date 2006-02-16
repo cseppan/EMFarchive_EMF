@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.gui.ChangeablesList;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -36,10 +36,10 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
 
     private DataSortFilterPanel sortFilterPanel;
     
-    private ChangeablesList changeablesList;
+    private ManageChangeables changeablesList;
 
     public EditablePageContainer(EmfDataset dataset, Version version, InternalSource source, 
-            MessagePanel messagePanel, ChangeablesList changeablesList) {
+            MessagePanel messagePanel, ManageChangeables changeablesList) {
         super(new BorderLayout());
         super.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 

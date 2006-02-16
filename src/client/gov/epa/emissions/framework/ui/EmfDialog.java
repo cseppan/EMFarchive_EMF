@@ -1,23 +1,14 @@
 package gov.epa.emissions.framework.ui;
 
 import gov.epa.emissions.commons.gui.Confirm;
-import gov.epa.emissions.framework.client.console.EmfConsole;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.Component;
 
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.JRootPane;
 
-public class EmfDialog extends JDialog implements Confirm {
-    private EmfConsole parent;
+public class EmfDialog implements Confirm {
+    
+    private Component parent;
 
     private int messageType;
 
@@ -25,21 +16,27 @@ public class EmfDialog extends JDialog implements Confirm {
 
     private int optionType;
 
-    public EmfDialog(EmfConsole parent, String title, int messageType, Object message, int optionType) {
-        super(parent, title, true);
-        super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        this.parent = parent;
+    private String title;
+
+
+    public EmfDialog(Component component, String title, int messageType, Object message, int optionType) {
+        this.title = title;
+        this.parent = component;
         this.messageType = messageType;
         this.message = message;
         this.optionType = optionType;
     }
 
     public boolean confirm() {
-        int option = showDialog();
-        return option == JOptionPane.YES_OPTION || option == JOptionPane.NO_OPTION;
+        int option = showDialogNew();
+        return option == JOptionPane.YES_OPTION || option == JOptionPane.OK_OPTION;
     }
 
-    private int showDialog() {
+    private int showDialogNew() {
+        return JOptionPane.showConfirmDialog(parent,message,title, optionType,messageType);
+    }
+
+/*    private int showDialog() {
         JOptionPane pane = new JOptionPane(message, messageType, optionType, null, null, null);
         pane.setInitialValue(null);
         if (parent != null)
@@ -124,4 +121,5 @@ public class EmfDialog extends JDialog implements Confirm {
             }
         });
     }
+   */
 }

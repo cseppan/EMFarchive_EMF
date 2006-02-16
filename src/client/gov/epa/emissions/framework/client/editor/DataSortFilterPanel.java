@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ChangeablesList;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.EmfException;
@@ -24,9 +24,9 @@ public class DataSortFilterPanel extends JPanel {
 
     private MessagePanel messagePanel;
     
-    private ChangeablesList listOfChangeables;
+    private ManageChangeables listOfChangeables;
 
-    public DataSortFilterPanel(MessagePanel messagePanel, ChangeablesList listOfChangeables) {
+    public DataSortFilterPanel(MessagePanel messagePanel, ManageChangeables listOfChangeables) {
         this.listOfChangeables = listOfChangeables;
         this.messagePanel = messagePanel;
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -60,7 +60,7 @@ public class DataSortFilterPanel extends JPanel {
         sortOrder = new TextArea("sortOrder", "", 30, 2);
         sortOrder.setToolTipText(sortOrder.getText());
         if(listOfChangeables != null) {
-            listOfChangeables.add(sortOrder);
+            listOfChangeables.addChangeable(sortOrder);
             sortOrder.addTextListener();
         }
         panel.add(new ScrollableTextArea(sortOrder));
@@ -75,7 +75,7 @@ public class DataSortFilterPanel extends JPanel {
         rowFilter = new TextArea("rowFilter", "", 30, 2);
         rowFilter.setToolTipText(rowFilter.getText());
         if(listOfChangeables != null) {
-            listOfChangeables.add(rowFilter);
+            listOfChangeables.addChangeable(rowFilter);
             rowFilter.addTextListener();
         }
         panel.add(new ScrollableTextArea(rowFilter));

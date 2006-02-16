@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
@@ -9,7 +8,6 @@ import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.client.WidgetChangesMonitor;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -41,10 +39,6 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
 
     private SectorsManagerView sectorManager;
 
-    private ChangeablesList changeablesList;
-
-    private WidgetChangesMonitor monitor;
-
     private static int counter;
 
     public NewSectorWindow(SectorsManagerView sectorManager, DesktopManager desktopManager) {
@@ -53,8 +47,6 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
         this.sectorManager = sectorManager;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
-        changeablesList = new ChangeablesList(this);
-        monitor = new WidgetChangesMonitor(changeablesList, sectorManager.getParentConsole());
         super.getContentPane().add(layout);
     }
 
@@ -87,12 +79,12 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         name = new TextField("name", sector.getName(), 20);
-        changeablesList.add(name);
+        addChangeable(name);
         name.addTextListener();
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         description = new TextArea("description", sector.getDescription(), 40);
-        changeablesList.add(description);
+        addChangeable(description);
         description.addTextListener();
         ScrollableTextArea descTextArea = new ScrollableTextArea(description);
         descTextArea.setMinimumSize(new Dimension(80, 80));
@@ -142,7 +134,7 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
                 sector.setSectorCriteria(criteriaTableData.sources());
                 try {
                     if (!name.getText().equals("")) {
-                        monitor.resetChanges();
+                        resetChanges();
                         presenter.doSave(sectorManager);
                     } else
                         messagePanel.setError("Name field should be a non-empty string.");
@@ -170,7 +162,7 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
     }
 
     private void checkChangesAndCloseWindow() {
-        if (monitor.checkChanges())
+        if (checkChanges())
             presenter.doClose();
     }
 

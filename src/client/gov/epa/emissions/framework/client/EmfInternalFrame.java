@@ -2,6 +2,9 @@ package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ChangeObserver;
+import gov.epa.emissions.commons.gui.Changeable;
+import gov.epa.emissions.commons.gui.ChangeablesList;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.ui.Position;
 
@@ -13,11 +16,15 @@ import javax.swing.JInternalFrame;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-public abstract class EmfInternalFrame extends JInternalFrame implements ManagedView, ChangeObserver {
+public abstract class EmfInternalFrame extends JInternalFrame implements ManagedView, ChangeObserver, ManageChangeables {
 
     protected DesktopManager desktopManager;
 
     private ChangeObserver changeObserver;
+    
+    private ChangeablesList changeablesList;
+
+    private WidgetChangesMonitor monitor;
 
     public EmfInternalFrame(String title, DesktopManager desktopManager) {
         super(title, true, // resizable
@@ -31,6 +38,8 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
             }
         });
         this.desktopManager = desktopManager;
+        changeablesList = new ChangeablesList(this);
+        monitor = new WidgetChangesMonitor(changeablesList, this);
         changeObserver = new DefaultChangeObserver(this);
         super.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
@@ -100,14 +109,21 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     }
 
     public boolean hasChanges() {
-        return false;
+        return changeablesList.hasChanges();
     }
 
-    public void forceClose() {
-        dispose();
-        close();
+    public void resetChanges() {
+        monitor.resetChanges();
     }
-
+    
+    public void addChangeable(Changeable changeable){
+        changeablesList.add(changeable);
+    }
+    
+    public boolean checkChanges(){
+        return monitor.checkChanges();
+    }
+    
     protected void setDefaultButton(Button button) {
         getRootPane().setDefaultButton(button);
     }

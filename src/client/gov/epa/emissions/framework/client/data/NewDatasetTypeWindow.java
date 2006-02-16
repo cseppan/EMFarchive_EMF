@@ -1,15 +1,12 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.client.WidgetChangesMonitor;
 import gov.epa.emissions.framework.client.console.DesktopManager;
-import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -40,12 +37,6 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
     private ComboBox derivedFrom;
 
-    private ChangeablesList changeablesList;
-
-    private WidgetChangesMonitor monitor;
-
-    private EmfConsole parentConsole;
-
     private static int counter = 0;
 
     private static final String[] types = { "External File", "CSV File", "Line-based File", "SMOKE Report File" };
@@ -55,7 +46,6 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
-        changeablesList = new ChangeablesList(this);
     }
 
     private void doLayout(JPanel layout) {
@@ -65,14 +55,8 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         layout.add(createButtonsPanel());
     }
 
-    public void observe(NewDatasetTypePresenter presenter, EmfConsole parent) {
+    public void observe(NewDatasetTypePresenter presenter) {
         this.presenter = presenter;
-        this.parentConsole = parent;
-        createChangesMonitor();
-    }
-
-    private void createChangesMonitor() {
-        monitor = new WidgetChangesMonitor(changeablesList, parentConsole);
     }
 
     public void display() {
@@ -91,22 +75,22 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         name = new TextField("name", 40);
-        changeablesList.add(name);
+        addChangeable(name);
         name.addTextListener();
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         minFiles = new TextField("minfiles", 20);
-        changeablesList.add(minFiles);
+        addChangeable(minFiles);
         minFiles.addTextListener();
         layoutGenerator.addLabelWidgetPair("Min Files:", minFiles, panel);
 
         maxFiles = new TextField("maxfiles", 20);
-        changeablesList.add(maxFiles);
+        addChangeable(maxFiles);
         maxFiles.addTextListener();
         layoutGenerator.addLabelWidgetPair("Max Files:", maxFiles, panel);
 
         derivedFrom = new ComboBox("", types);
-        changeablesList.add(derivedFrom);
+        addChangeable(derivedFrom);
         derivedFrom.addItemChangeListener();
         derivedFrom.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
@@ -160,7 +144,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
             public void actionPerformed(ActionEvent event) {
                 if (checkTextFields()) {
                     try {
-                        monitor.resetChanges();
+                        resetChanges();
                         presenter.doSave(name.getText(), minFiles.getText(), maxFiles.getText(), (String) derivedFrom
                                 .getSelectedItem());
                     } catch (EmfException e) {
@@ -188,7 +172,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
     }
 
     private void checkChangesAndCloseWindow() {
-        if (monitor.checkChanges())
+        if (checkChanges())
             presenter.doClose();
     }
 

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client;
 
+
 public interface ManagedView extends EmfView {
 
     void bringToFront();
@@ -10,5 +11,7 @@ public interface ManagedView extends EmfView {
     
     boolean hasChanges();
     
-    void forceClose();
+    void resetChanges();
+    
+    boolean checkChanges(); //FIXME: do we need this method
 }

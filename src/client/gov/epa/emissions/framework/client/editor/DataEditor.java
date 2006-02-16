@@ -2,12 +2,10 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
-import gov.epa.emissions.framework.client.WidgetChangesMonitor;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteDialog;
@@ -48,10 +46,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private JLabel lockInfo;
 
-    private ChangeablesList changeablesList;
-
-    private WidgetChangesMonitor monitor;
-
     private EmfConsole parent;
 
     private Version version;
@@ -67,8 +61,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         layout = new JPanel(new BorderLayout());
         layout.add(topPanel(), BorderLayout.PAGE_START);
 
-        changeablesList = new ChangeablesList(this);
-        monitor = new WidgetChangesMonitor(changeablesList, null);
         this.getContentPane().add(layout);
     }
 
@@ -122,7 +114,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private JPanel tablePanel(Version version, String table) {
         InternalSource source = source(table, dataset.getInternalSources());
-        pageContainer = new EditablePageContainer(dataset, version, source, messagePanel, changeablesList);
+        pageContainer = new EditablePageContainer(dataset, version, source, messagePanel, this);
         displayTable(table);
 
         return pageContainer;
@@ -230,7 +222,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private void doSave() {
         clearMessages();
         try {
-            monitor.resetChanges();
+            resetChanges();
             presenter.doSave();
             displayMessage("Saved changes.");
         } catch (EmfException e) {
@@ -293,13 +285,9 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         dialog.confirm();
     }
 
-    // FIXME: remove this code after we pull the monitor and changeablesList
-    public boolean hasChanges() {
-        return changeablesList.hasChanges();
-    }
 
     public boolean confirmDiscardChanges() {
-        return monitor.checkChanges();
+        return checkChanges();
     }
 
     private void closeWindow() {

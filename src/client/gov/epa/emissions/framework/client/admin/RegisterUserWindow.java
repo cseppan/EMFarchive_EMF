@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.gui.ChangeObserver;
+import gov.epa.emissions.commons.gui.Changeable;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.DefaultChangeObserver;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.login.LaunchLoginOnCancelStrategy;
@@ -8,7 +10,7 @@ import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
 import java.awt.Point;
 
-public class RegisterUserWindow extends EmfFrame implements RegisterUserView, ChangeObserver {
+public class RegisterUserWindow extends EmfFrame implements RegisterUserView, ChangeObserver, ManageChangeables {
 
     private RegisterUserPanel view;
 
@@ -20,7 +22,7 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView, Ch
         super("RegisterUser", "Register New User");
         onCancelStrategy = new LaunchLoginOnCancelStrategy(serviceLocator);
         changeObserver = new DefaultChangeObserver(this);
-        view = new RegisterUserPanel(postRegisterStrategy, onCancelStrategy, this, changeObserver);
+        view = new RegisterUserPanel(postRegisterStrategy, onCancelStrategy, this, changeObserver, this);
         this.getContentPane().add(view);
 
         this.setSize(view.getSize());
@@ -43,6 +45,11 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView, Ch
 
     public void signalSaved() {
         changeObserver.signalSaved();
+    }
+
+    public void addChangeable(Changeable changeable) {
+        // NOTE Auto-generated method stub
+        
     }
 
 }

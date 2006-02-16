@@ -1,11 +1,9 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.WidgetChangesMonitor;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.info.InfoTab;
@@ -47,16 +45,10 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private EditableKeywordsTab keywordsTab;
     
-    private ChangeablesList changeablesList;
-    
-    private WidgetChangesMonitor monitor;
-
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
-        changeablesList = new ChangeablesList(this);
-        monitor = new WidgetChangesMonitor(changeablesList, this.parentConsole);
     }
 
     private JTabbedPane createTabbedPane(EmfDataset dataset, MessagePanel messagePanel) {
@@ -77,7 +69,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private JPanel createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
         try {
             EditableSummaryTab view = new EditableSummaryTab(dataset, session.dataCommonsService(), messagePanel,
-                    changeablesList);
+                    this);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
@@ -167,7 +159,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         Button save = new Button("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 keywordsTab.commit();
-                monitor.resetChanges();
+                resetChanges();
                 try {
                     presenter.doSave();
                 } catch (EmfException e) {
@@ -198,8 +190,9 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         messagePanel.setError(message);
     }
 
+    //FIXME: can't we replace this method or move to emf internal frame
     public boolean shouldContinueLosingUnsavedChanges() {
-        return monitor.checkChanges();
+        return checkChanges();
     }
 
     public void notifyLockFailure(EmfDataset dataset) {

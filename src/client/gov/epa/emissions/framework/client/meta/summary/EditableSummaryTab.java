@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.meta.summary;
 
-import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.FormattedTextField;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
@@ -81,10 +81,10 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private IntendedUse[] allIntendedUses;
     
-    private ChangeablesList changeablesList;
+    private ManageChangeables changeablesList;
     
     public EditableSummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel,
-            ChangeablesList changeablesList) throws EmfException {
+            ManageChangeables changeablesList) throws EmfException {
         super.setName("summary");
         this.dataset = dataset;
         this.service = service;
@@ -163,7 +163,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         intendedUseCombo = new EditableComboBox(allIntendedUses);
         IntendedUse intendedUse = dataset.getIntendedUse();
         intendedUseCombo.setSelectedItem(intendedUse);
-        changeablesList.add(intendedUseCombo);
+        changeablesList.addChangeable(intendedUseCombo);
         intendedUseCombo.addListeners();
     }
 
@@ -179,8 +179,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         // time period
         startDateTime = new FormattedTextField("startDateTime", dataset.getStartDateTime(), DATE_FORMATTER, messagePanel);
         endDateTime = new FormattedTextField("endDateTime", dataset.getStopDateTime(), DATE_FORMATTER, messagePanel);
-        changeablesList.add(startDateTime);
-        changeablesList.add(endDateTime);
+        changeablesList.addChangeable(startDateTime);
+        changeablesList.addChangeable(endDateTime);
         startDateTime.addTextListener();
         endDateTime.addTextListener();
         layoutGenerator.addLabelWidgetPair("Time Period Start:", startDateTime, panel);
@@ -195,7 +195,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         temporalResolutionsCombo.addItemListener(comboxBoxListener);
         String temporalResolution = dataset.getTemporalResolution();
         temporalResolutionsCombo.setSelectedItem(temporalResolution);
-        changeablesList.add(temporalResolutionsCombo);
+        changeablesList.addChangeable(temporalResolutionsCombo);
         temporalResolutionsCombo.addItemChangeListener();
         layoutGenerator.addLabelWidgetPair("Temporal Resolution:", temporalResolutionsCombo, panel);
 
@@ -208,7 +208,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         sectorsCombo.setName("sectors");
         sectorsCombo.setPreferredSize(new Dimension(175, 20));
         sectorsCombo.addItemListener(comboxBoxListener);
-        changeablesList.add(sectorsCombo);
+        changeablesList.addChangeable(sectorsCombo);
         sectorsCombo.addItemChangeListener();
         layoutGenerator.addLabelWidgetPair("Sector:", sectorsCombo, panel);
 
@@ -218,7 +218,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         regionsCombo.setName("regionsComboModel");
         regionsCombo.setPreferredSize(new Dimension(125, 20));
         regionsCombo.addItemListener(comboxBoxListener);
-        changeablesList.add(regionsCombo);
+        changeablesList.addChangeable(regionsCombo);
         regionsCombo.addListeners();
         layoutGenerator.addLabelWidgetPair("Region:", regionsCombo, panel);
         Region region = dataset.getRegion();
@@ -232,7 +232,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         countriesCombo.setPreferredSize(new Dimension(175, 20));
         Country country = dataset.getCountry();
         countriesCombo.setSelectedItem(country);
-        changeablesList.add(countriesCombo);
+        changeablesList.addChangeable(countriesCombo);
         countriesCombo.addItemChangeListener();
 
         layoutGenerator.addLabelWidgetPair("Country:", countriesCombo, panel);
@@ -254,14 +254,14 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         name = new TextField("name", 25);
         name.setText(dataset.getName());
         name.setMaximumSize(new Dimension(300, 15));
-        changeablesList.add(name);
+        changeablesList.addChangeable(name);
         name.addTextListener();
 
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         // description
         description = new TextArea("description", dataset.getDescription());
-        changeablesList.add(description);
+        changeablesList.addChangeable(description);
         description.addTextListener();
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableTextArea(description), panel);
 
@@ -271,7 +271,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         projectsCombo.setName("projects");
         projectsCombo.setPreferredSize(new Dimension(250, 20));
         projectsCombo.addItemListener(comboxBoxListener);
-        changeablesList.add(projectsCombo);
+        changeablesList.addChangeable(projectsCombo);
         projectsCombo.addListeners();
         layoutGenerator.addLabelWidgetPair("Project:", projectsCombo, panel);
 

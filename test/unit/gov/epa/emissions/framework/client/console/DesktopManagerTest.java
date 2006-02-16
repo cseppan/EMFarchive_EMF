@@ -52,9 +52,9 @@ public class DesktopManagerTest extends MockObjectTestCase {
     }
 
     private void setCloseRealatedExpections(Mock managedView) {
-        managedView.expects(once()).method("close").withNoArguments();
-        managedView.expects(once()).method("hasChanges").withNoArguments().will(returnValue(false));
-        managedView.expects(once()).method("forceClose").withNoArguments();
+        managedView.expects(atLeastOnce()).method("close").withNoArguments();
+        managedView.expects(atLeastOnce()).method("hasChanges").withNoArguments().will(returnValue(false));
+        managedView.expects(atLeastOnce()).method("resetChanges").withNoArguments();
     }
 
     private Mock emfConsole() {
