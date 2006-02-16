@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client;
 
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ChangeObserver;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.ui.Position;
@@ -105,5 +106,9 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     public void forceClose() {
         dispose();
         close();
+    }
+
+    protected void setDefaultButton(Button button) {
+        getRootPane().setDefaultButton(button);
     }
 }

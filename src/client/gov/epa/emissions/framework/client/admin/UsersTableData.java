@@ -3,10 +3,9 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
-import gov.epa.emissions.framework.ui.SelectableRow;
+import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class UsersTableData extends AbstractTableData {
@@ -21,7 +20,7 @@ public class UsersTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Select", "Username", "Name", "Email", "Is Admin ?" };
+        return new String[] { "Username", "Name", "Email", "Is Admin ?" };
     }
 
     public Class getColumnClass(int col) {
@@ -45,23 +44,11 @@ public class UsersTableData extends AbstractTableData {
     }
 
     private Row row(User user) {
-        return new SelectableRow(new UserRowSource(user));
+        return new ViewableRow(new UserRowSource(user));
     }
 
     public boolean isEditable(int col) {
         return (col == 0) ? true : false;
-    }
-
-    public User[] selected() {
-        List selected = new ArrayList();
-
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            SelectableRow row = (SelectableRow) iter.next();
-            if (row.isSelected())
-                selected.add(row.source());
-        }
-
-        return (User[]) selected.toArray(new User[0]);
     }
 
     public User[] getValues() {

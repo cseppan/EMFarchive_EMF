@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client;
 
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.ui.Position;
 
 import java.awt.Point;
@@ -59,4 +60,9 @@ public abstract class EmfFrame extends JFrame implements EmfView {
     public int width() {
         return (int) super.getSize().getWidth();
     }
+
+    protected void setDefaultButton(Button button) {
+        getRootPane().setDefaultButton(button);
+    }
+
 }

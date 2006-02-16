@@ -32,12 +32,11 @@ public class UsersTableDataTest extends TestCase {
 
     public void testShouldHaveFiveColumns() {
         String[] columns = data.columns();
-        assertEquals(5, columns.length);
-        assertEquals("Select", columns[0]);
-        assertEquals("Username", columns[1]);
-        assertEquals("Name", columns[2]);
-        assertEquals("Email", columns[3]);
-        assertEquals("Is Admin ?", columns[4]);
+        assertEquals(4, columns.length);
+        assertEquals("Username", columns[0]);
+        assertEquals("Name", columns[1]);
+        assertEquals("Email", columns[2]);
+        assertEquals("Is Admin ?", columns[3]);
     }
 
     public void testShouldReturnBooleanAsColumnClassForSelectAndIsAdminColsAndStringForAllOtherCols() {
@@ -65,26 +64,15 @@ public class UsersTableDataTest extends TestCase {
         List rows = data.rows();
 
         Row row = (Row) rows.get(0);
-        assertEquals(Boolean.FALSE, row.getValueAt(0));
-        assertEquals(user0.getUsername(), row.getValueAt(1));
-        assertEquals(user0.getName(), row.getValueAt(2));
-        assertEquals(user0.getEmail(), row.getValueAt(3));
-        assertEquals(user0.isAdmin(), ((Boolean) row.getValueAt(4)).booleanValue());
+        assertEquals(user0.getUsername(), row.getValueAt(0));
+        assertEquals(user0.getName(), row.getValueAt(1));
+        assertEquals(user0.getEmail(), row.getValueAt(2));
+        assertEquals(user0.isAdmin(), ((Boolean) row.getValueAt(3)).booleanValue());
     }
 
     public void testShouldReturnARowRepresentingANoteEntry() {
         assertEquals(user0, data.element(0));
         assertEquals(user1, data.element(1));
-    }
-
-    public void testShouldReturnSelectedNotes() {
-        List rows = data.rows();
-        Row row = (Row) rows.get(1);
-        row.setValueAt(Boolean.TRUE, 0);
-
-        User[] users = data.selected();
-        assertEquals(1, users.length);
-        assertSame(user1, users[0]);
     }
 
 }

@@ -48,7 +48,7 @@ public class ManageMenu extends JMenu {
         super.add(createSectors(session.dataCommonsService(), parent, messagePanel));
         super.addSeparator();
 
-        addUsers(session.user(), messagePanel);
+        manageUsers(session.user(), messagePanel);
         super.add(createMyProfile(session, messagePanel));
     }
 
@@ -68,7 +68,7 @@ public class ManageMenu extends JMenu {
         return menuItem;
     }
 
-    private void addUsers(User user, final MessagePanel messagePanel) {
+    private void manageUsers(User user, final MessagePanel messagePanel) {
         if (user.isAdmin()) {
             JMenuItem users = new JMenuItem("Users");
             users.addActionListener(new ActionListener() {

@@ -81,13 +81,13 @@ public class LoginWindow extends EmfFrame implements LoginView {
         layout.setVgap(15);
         container.setLayout(layout);
 
-        JButton signIn = new Button("Log In", new AbstractAction() {
+        Button signIn = new Button("Log In", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doSignIn();
             }
         });
         container.add(signIn);
-        getRootPane().setDefaultButton(signIn);
+        setDefaultButton(signIn);
 
         JButton cancel = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
