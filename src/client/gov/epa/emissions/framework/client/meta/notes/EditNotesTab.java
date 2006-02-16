@@ -71,7 +71,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
                 doNewNote(user, dataset, types, versions);
             }
         });
-        panel.add(add, BorderLayout.LINE_END);
+        panel.add(add, BorderLayout.LINE_START);
 
         return panel;
     }

@@ -58,8 +58,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private EmfConsole parentConsole;
 
-    private JScrollPane sortFilterPane;
-
     private EmfSession session;
 
     private EmfTableModel model;
@@ -86,12 +84,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private void createLayout(JPanel layout, EmfConsole parentConsole) {
         layout.removeAll();
-
         layout.setLayout(new BorderLayout());
 
         layout.add(createTopPanel(), BorderLayout.NORTH);
-        sortFilterPane = createSortFilterPane(parentConsole);
-        layout.add(sortFilterPane, BorderLayout.CENTER);
+        layout.add(createSortFilterPane(parentConsole), BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
     }
 
@@ -239,7 +235,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private List getSelectedDatasets() {
         int[] selected = selectModel.getSelectedIndexes();
-
         return model.elements(selected);
     }
 
