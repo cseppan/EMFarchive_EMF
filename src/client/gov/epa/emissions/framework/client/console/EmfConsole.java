@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.ConcurrentTaskRunner;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.MessagePanel;
@@ -60,7 +61,8 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         user = session.user();
         this.serviceLocator = session.serviceLocator();
         windowMenuView = createWindowMenu();
-        this.desktopManager = new DesktopManagerImpl(windowMenuView, this);
+        //FIXME: what's w/ the DesktopManagerTest?
+//        this.desktopManager = new DesktopManagerImpl(windowMenuView, this);
         this.windowMenuPresenter.setDesktopManager(desktopManager);
         this.windowMenuView.setWindowMenuViewPresenter(windowMenuPresenter);
         this.viewLayout = new CascadeLayout(this);
@@ -171,7 +173,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         manageMenu.observe(presenter);
     }
 
-    public void displayUserManager() {
+    public void displayUserManager() throws EmfException {
         manageMenu.displayUserManager();
     }
 
