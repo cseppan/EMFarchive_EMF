@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.console;
 
+import gov.epa.emissions.framework.EmfException;
+
 public class EmfConsolePresenter {
 
     private EmfConsoleView view;
@@ -7,11 +9,11 @@ public class EmfConsolePresenter {
     public void display(EmfConsoleView view) {
         this.view = view;
         view.observe(this);
-        
+
         view.display();
     }
 
-    public void notifyManageUsers() {
+    public void notifyManageUsers() throws EmfException {
         view.displayUserManager();
     }
 

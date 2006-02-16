@@ -53,12 +53,13 @@ public class ManageMenu extends JMenu {
         super.add(createSectors(session.dataCommonsService(), parent, messagePanel));
         super.addSeparator();
 
-        addUsers(session.user());
+        addUsers(session.user(), messagePanel);
         super.add(createMyProfile(session, messagePanel));
     }
-    
-    public ManageMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, ViewLayout viewLayout, DesktopManager desktopManager) {
-        this(session,parent,messagePanel,viewLayout);
+
+    public ManageMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, ViewLayout viewLayout,
+            DesktopManager desktopManager) {
+        this(session, parent, messagePanel, viewLayout);
         this.desktopManager = desktopManager;
     }
 
@@ -73,12 +74,16 @@ public class ManageMenu extends JMenu {
         return menuItem;
     }
 
-    private void addUsers(User user) {
+    private void addUsers(User user, final MessagePanel messagePanel) {
         if (user.isAdmin()) {
             JMenuItem users = new JMenuItem("Users");
             users.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    presenter.notifyManageUsers();
+                    try {
+                        presenter.notifyManageUsers();
+                    } catch (EmfException e) {
+                        messagePanel.setError(e.getMessage());
+                    }
                 }
             });
 
@@ -164,7 +169,7 @@ public class ManageMenu extends JMenu {
         if (viewLayout.activate("Datasets Browser"))
             return;
 
-        DatasetsBrowserWindow datasetsBrowserView = new DatasetsBrowserWindow(session, parent,desktopManager);
+        DatasetsBrowserWindow datasetsBrowserView = new DatasetsBrowserWindow(session, parent, desktopManager);
         viewLayout.add(datasetsBrowserView, "Datasets Browser");
         parent.addToDesktop(datasetsBrowserView);
 
@@ -187,18 +192,18 @@ public class ManageMenu extends JMenu {
         }
     }
 
-    public void displayUserManager() {
+    public void displayUserManager() throws EmfException {
         if (viewLayout.activate("Users Manager"))
             return;
 
-        UserService userServices = session.userService();
+        UserService userService = session.userService();
 
-        UsersManager usesrManagerView = new UsersManager(session, userServices, parent, desktopManager);
+        UsersManager usesrManagerView = new UsersManager(session, parent, desktopManager);
         viewLayout.add(usesrManagerView, "Users Manager");
         parent.addToDesktop(usesrManagerView);
 
         ViewLayout userManagerViewLayout = new CascadeLayout(usesrManagerView);
-        UsersManagerPresenter presenter = new UsersManagerPresenter(session, userServices, userManagerViewLayout);
+        UsersManagerPresenter presenter = new UsersManagerPresenter(session, userService, userManagerViewLayout);
         presenter.display(usesrManagerView);
     }
 

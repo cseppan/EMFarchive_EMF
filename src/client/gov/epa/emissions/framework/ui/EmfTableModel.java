@@ -11,16 +11,16 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
-public class EmfTableModel extends AbstractTableModel implements RefreshableTableModel,Changeable {
+public class EmfTableModel extends AbstractTableModel implements RefreshableTableModel, Changeable {
 
     private TableHeader header;
 
     private List rows;
 
     protected TableData tableData;
-    
+
     private ChangeablesList listOfChangeables;
-    
+
     private boolean changed = false;
 
     public EmfTableModel(TableData tableData) {
@@ -75,9 +75,9 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
         if (isCellEditable(row, col))
             tableData.setValueAt(value, row, col);
     }
-    
+
     public void addDataChangeListener() {
-        this.addTableModelListener(new TableModelListener(){
+        this.addTableModelListener(new TableModelListener() {
             public void tableChanged(TableModelEvent e) {
                 notifyChanges();
             }
@@ -87,7 +87,7 @@ public class EmfTableModel extends AbstractTableModel implements RefreshableTabl
     public void clear() {
         this.changed = false;
     }
-    
+
     private void notifyChanges() {
         changed = true;
         this.listOfChangeables.onChanges();

@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.ui.Position;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
-public class DesktopManagerTest extends MockObjectTestCase {
+public abstract class DesktopManagerTestCase extends MockObjectTestCase {
 
     public void testShouldRegisterOpenWindowWithWindowMenu() {
         Mock windowsMenu = mock(WindowMenuView.class);
@@ -41,7 +41,7 @@ public class DesktopManagerTest extends MockObjectTestCase {
         managedView2.expects(once()).method("close").withNoArguments();
         managedView2.expects(once()).method("hasChanges").withNoArguments().will(returnValue(false));
         
-        Mock windowsMenu = windoswMenu();
+        Mock windowsMenu = windowsMenu();
         Mock emfConsole = emfConsole();
 
         DesktopManager desktopManager = new DesktopManagerImpl(((WindowMenuView) windowsMenu.proxy()),
@@ -59,7 +59,7 @@ public class DesktopManagerTest extends MockObjectTestCase {
         return console;
     }
 
-    private Mock windoswMenu() {
+    private Mock windowsMenu() {
         Mock windowsMenu = mock(WindowMenuView.class);
         windowsMenu.expects(atLeastOnce()).method("register").with(isA(ManagedView.class));
         return windowsMenu;

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.console;
 
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.console.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.console.EmfConsoleView;
 
@@ -24,9 +25,9 @@ public class EmfConsolePresenterTest extends MockObjectTestCase {
         presenter.display((EmfConsoleView) view.proxy());
     }
 
-    public void testShouldDisplayUserManagerOnNotifyManagerUsers() {
+    public void testShouldDisplayUserManagerOnNotifyManagerUsers() throws EmfException {
         presenter.display((EmfConsoleView) view.proxy());
-        
+
         view.expects(once()).method("displayUserManager").withNoArguments();
 
         presenter.notifyManageUsers();

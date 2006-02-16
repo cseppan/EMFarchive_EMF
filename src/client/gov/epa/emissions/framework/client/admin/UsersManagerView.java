@@ -9,13 +9,11 @@ public interface UsersManagerView extends EmfView {
 
     void refresh();
 
-    void showMessage(String message);
-
-    void clearMessage();
-
-    boolean promptDelete(User[] users);
-
     UpdatableUserView getUpdateUserView(User user);
 
     UserView getUserView();
+
+    void refresh(User[] users);
+
+    void display(User[] users);
 }

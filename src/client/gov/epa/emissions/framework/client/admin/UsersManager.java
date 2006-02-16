@@ -3,8 +3,8 @@ package gov.epa.emissions.framework.client.admin;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
+import gov.epa.emissions.commons.gui.SimpleTableModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -13,28 +13,21 @@ import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.UserService;
-import gov.epa.mims.analysisengine.table.OverallTableModel;
+import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
@@ -44,76 +37,48 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
     private SortFilterSelectModel selectModel;
 
-    private UserManagerTableModel model;
-
     private JPanel layout;
 
     private MessagePanel messagePanel;
 
     private EmfConsole parentConsole;
 
-    private SortFilterSelectionPanel sortFilterSelectPanel;
-
     private EmfSession session;
 
+    private UsersTableData tableData;
+
+    private EmfTableModel model;
+
     // FIXME: this class needs to be refactored into smaller components
-    public UsersManager(EmfSession session, UserService userServices, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("User Manager", new Dimension(550, 300), parentConsole.desktop(),desktopManager);
+    public UsersManager(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
+        super("User Manager", new Dimension(550, 300), parentConsole.desktop(), desktopManager);
         super.setName("userManager");
-        
+
         this.session = session;
         this.parentConsole = parentConsole;
-
-        model = new UserManagerTableModel(userServices);
-        selectModel = new SortFilterSelectModel(model);
 
         layout = new JPanel();
         this.getContentPane().add(layout);
 
-        // FIXME: OverallTableModel has a bug w/ respect to row-count &
-        // cannot refresh itself. So, we will regen the layout on every
-        // refresh - it's a HACK. Will need to be addressed
-        createLayout(parentConsole);
     }
 
-    private void createLayout(JFrame parentConsole) {
+    public void display(User[] users) {
         layout.removeAll();
-        sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        createLayout(layout, sortFilterSelectPanel);
-        listenForUpdateSelection(sortFilterSelectPanel.getTable());
-    }
 
-    private void listenForUpdateSelection(final JTable table) {
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        table.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent event) {
-                if (event.getClickCount() == 2) {
-                    // FIXME: hack - need to use Overall Table Model to get
-                    // 'selected row'
-                    int selectedRow = table.getSelectedRow();
-                    OverallTableModel overallTableModel = sortFilterSelectPanel.getOverallTableModel();
-                    User user = model.getUser(overallTableModel.getBaseModelRowIndex(selectedRow));
-                    updateUser(user);
-                }
-            }
-        });
+        tableData = new UsersTableData(users);
+        model = new EmfTableModel(tableData);
+        createLayout(layout);
     }
 
     private void updateUsers() {
-        List users = getSelectedUsers();
-        try {
-            presenter.doUpdateUsers((User[]) users.toArray(new User[0]));
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
+        User[] selected = getSelectedUsers();
+        if (selected.length == 0) {
+            showMessage("To update, please select at least one User.");
+            return;
         }
-    }
 
-    private void updateUser(User updateUser) {
-        UpdatableUserView updatable = getUpdateUserView(updateUser);
-        UserView viewable = getUserView();
         try {
-            presenter.doUpdateUser(updateUser, updatable, viewable);
+            presenter.doUpdateUsers(selected);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -126,7 +91,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosed(InternalFrameEvent event) {
-                doSimpleRefresh();
+                refresh();
             }
         });
 
@@ -139,18 +104,20 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosed(InternalFrameEvent event) {
-                doSimpleRefresh();
+                refresh();
             }
         });
 
         return view;
     }
 
-    private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
+    private void createLayout(JPanel layout) {
+        SimpleTableModel wrapperModel = new SimpleTableModel(model);
+        SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, wrapperModel);
         layout.setLayout(new BorderLayout());
 
-        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
-        sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
+        JScrollPane scrollPane = new JScrollPane(panel);
+        panel.setPreferredSize(new Dimension(450, 120));
 
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel, BorderLayout.NORTH);
@@ -165,7 +132,8 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                presenter.doCloseView();
+                messagePanel.clear();
+                presenter.doClose();
             }
         });
         closePanel.add(closeButton);
@@ -180,10 +148,9 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     private JPanel createCrudPanel() {
-
-
         Action newAction = new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
+                messagePanel.clear();
                 displayRegisterUser();
             }
         };
@@ -191,6 +158,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
         Action deleteAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
                 deleteUsers();
             }
         };
@@ -200,10 +168,11 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
         ConfirmDialog confirmUpdateDialog = new ConfirmDialog(messageTooManyWindows, "Warning", this);
         Action updateAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
                 updateUsers();
             }
         };
-        SelectAwareButton updateButton = new SelectAwareButton("Update",updateAction,selectModel,confirmUpdateDialog);
+        SelectAwareButton updateButton = new SelectAwareButton("Update", updateAction, selectModel, confirmUpdateDialog);
 
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
@@ -215,33 +184,33 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     // FIXME: if no users are selected, add appropriate behavior to Presenter
-    private List getSelectedUsers() {
-        List users = new ArrayList();
-
+    private User[] getSelectedUsers() {
         int[] selected = selectModel.getSelectedIndexes();
         if (selected.length == 0)
-            return users;
-        for (int i = 0; i < selected.length; i++) {
-            users.add(model.getUser(selected[i]));
-        }
+            return new User[0];
 
-        return users;
+        return tableData.selected();
     }
 
     private void deleteUsers() {
-        List users = getSelectedUsers();
+        User[] selected = getSelectedUsers();
+        if (selected.length == 0) {
+            showMessage("To delete, please select at least one User.");
+            return;
+        }
+
+        if (!promptDelete(selected))
+            return;
+
         try {
-            presenter.doDelete((User[]) users.toArray(new User[0]));
+            presenter.doDelete(selected);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
-            // TODO: temp, until the HACK is addressed (then, use refresh)
-            doSimpleRefresh();
         }
     }
 
-    public void showMessage(String message) {
+    private void showMessage(String message) {
         messagePanel.setMessage(message);
-        doSimpleRefresh();
     }
 
     public boolean promptDelete(User[] users) {
@@ -261,14 +230,6 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
         RegisterUserInternalFrame registerUserView = new RegisterUserInternalFrame(new NoOpPostRegisterStrategy(),
                 desktop, desktopManager);
         desktop.add(registerUserView);
-
-        // FIXME: should be notifying the Presenter
-        registerUserView.addInternalFrameListener(new InternalFrameAdapter() {
-            public void internalFrameClosed(InternalFrameEvent event) {
-                refresh();
-            }
-        });
-
         presenter.doRegisterNewUser(registerUserView);
     }
 
@@ -277,21 +238,18 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     public void refresh() {
-        model.refresh();
-        selectModel.refresh();
-        // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
-        createLayout(parentConsole);
-        super.refreshLayout();
-    }
-
-    private void doSimpleRefresh() {
-        model.refresh();
-        selectModel.refresh();
-        super.refreshLayout();
-    }
-
-    public void clearMessage() {
         messagePanel.clear();
+        refresh(tableData.getValues());
+    }
+
+    public void refresh(User[] users) {
+        messagePanel.clear();
+
+        model.refresh(new UsersTableData(users));
+        selectModel.refresh();
+
+        // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
+        createLayout(layout);
         super.refreshLayout();
     }
 

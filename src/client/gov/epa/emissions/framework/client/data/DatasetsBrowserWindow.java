@@ -342,6 +342,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         super.refreshLayout();
     }
 
+    //COMPLEX: is this readable?
     private void checkKeyVals(EmfDataset[] datasets) throws EmfException {
         for (int i = 0; i < datasets.length; i++) {
             KeyVal[] keyVals = datasets[i].getKeyVals();
