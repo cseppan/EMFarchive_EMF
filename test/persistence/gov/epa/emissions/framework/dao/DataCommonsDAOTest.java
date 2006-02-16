@@ -281,13 +281,14 @@ public class DataCommonsDAOTest extends ServicesTestCase {
         dao.add(rev, session);
 
         try {
-            List allRevisions = dao.getRevisions(session);
+            List allRevisions = dao.getRevisions(datasetFromDB.getId(),session);
             assertEquals(1, allRevisions.size());
         } finally {
             remove(rev);
             remove(dataset);
         }
     }
+
 
     public void testShouldAddANDGetThreeRevisions() {
         Revision rev1=null,rev2=null,rev3=null;
@@ -305,7 +306,7 @@ public class DataCommonsDAOTest extends ServicesTestCase {
         dao.add(rev2, session);
         dao.add(rev3, session);
         try {
-            List allRevisions = dao.getRevisions(session);
+            List allRevisions = dao.getRevisions(datasetFromDB.getId(),session);
             assertEquals(3, allRevisions.size());
         } finally {
             remove(rev1);
@@ -326,7 +327,7 @@ public class DataCommonsDAOTest extends ServicesTestCase {
         dao.add(note, session);
 
         try {
-            List allNotes = dao.getNotes(session);
+            List allNotes = dao.getNotes(datasetFromDB.getId(),session);
             assertEquals(1, allNotes.size());
         } finally {
             remove(note);
@@ -347,9 +348,11 @@ public class DataCommonsDAOTest extends ServicesTestCase {
 
         dao.add(note2, session);
         try {
-            List allNotes = dao.getNotes(session);
+            List allNotes = dao.getNotes(datasetFromDB.getId(),session);
             assertEquals(2, allNotes.size());
-        } finally {
+        } catch(Exception e){
+          e.printStackTrace();   
+        }finally {
             remove(note1);
             remove(note2);
             remove(dataset);

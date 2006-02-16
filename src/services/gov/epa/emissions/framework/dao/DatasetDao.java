@@ -96,6 +96,7 @@ public class DatasetDao {
             session.save(dataset);
             tx.commit();
         } catch (HibernateException e) {
+            e.printStackTrace();
             tx.rollback();
             throw e;
         }

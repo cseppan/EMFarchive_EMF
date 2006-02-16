@@ -325,7 +325,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public Note[] getNotes(long datasetId) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            List notes = dao.getNotes(session);
+            List notes = dao.getNotes(datasetId, session);
             session.close();
 
             return (Note[]) notes.toArray(new Note[notes.size()]);
@@ -392,7 +392,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public Revision[] getRevisions(long datasetId) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            List revisions = dao.getRevisions(session);
+            List revisions = dao.getRevisions(datasetId,session);
             session.close();
 
             return (Revision[]) revisions.toArray(new Revision[revisions.size()]);

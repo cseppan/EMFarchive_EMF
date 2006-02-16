@@ -315,12 +315,12 @@ public class DataCommonsDAO {
         addObject(note, session);
     }
 
-    public List getRevisions(Session session) {
+    public List getRevisions(long datasetId, Session session) {
         Transaction tx = null;
 
         try {
             tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(Revision.class);
+            Criteria crit = session.createCriteria(Revision.class).add(Restrictions.eq("datasetId", new Long(datasetId)));
             tx.commit();
 
             return crit.list();
@@ -330,12 +330,12 @@ public class DataCommonsDAO {
         }
     }
 
-    public List getNotes(Session session) {
+    public List getNotes(long datasetId, Session session) {
         Transaction tx = null;
 
         try {
             tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(Note.class);
+            Criteria crit = session.createCriteria(Note.class).add(Restrictions.eq("datasetId", new Long(datasetId)));
             tx.commit();
 
             return crit.list();

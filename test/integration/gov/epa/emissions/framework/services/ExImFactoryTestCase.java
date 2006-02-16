@@ -2,12 +2,11 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Exporter;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.impl.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.VersionedExporterFactory;
 
-public class FIXME_ExImFactoryTestOLD extends ServicesTestCase {
+public class ExImFactoryTestCase extends ServicesTestCase {
     private DataCommonsService service;
 
     // private VersionedImporterFactory importerFactory;
@@ -35,17 +34,22 @@ public class FIXME_ExImFactoryTestOLD extends ServicesTestCase {
         super.tearDown();
     }
 
-    public void testShouldCreateAllExportersFromDatasetTypesTable() throws EmfException {
+    public void testShouldCreateAllExportersFromDatasetTypesTable() throws Exception {
 
-        for (int i = 0; i < allDatasetTypes.length; i++) {
-            DatasetType dst = allDatasetTypes[i];
-            // Class dstClass = Class.forName(dst.getImporterClassName());
-            dataset.setDatasetType(dst);
+        try {
+            for (int i = 0; i < allDatasetTypes.length; i++) {
+                DatasetType dst = allDatasetTypes[i];
+//                Class dstClass = Class.forName(dst.getImporterClassName());
+                dataset.setDatasetType(dst);
 
-            if (!ignore(dst)) {
-                Exporter exporter = exporterFactory.create(dataset, 0);
-                assertTrue("Importer cannot be null ", exporter != null);
+                if (!ignore(dst)) {
+                    Exporter exporter = exporterFactory.create(dataset, 0);
+                    assertTrue("Importer cannot be null ", exporter != null);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
 
     }

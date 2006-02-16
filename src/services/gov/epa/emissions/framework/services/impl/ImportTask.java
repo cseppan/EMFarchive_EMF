@@ -42,6 +42,7 @@ public class ImportTask implements Runnable {
         try {
             setStartStatus();
             dataService.addDataset(dataset);
+            dataset.setCreator(user.getUsername());
             dataset.setStatus("Start Import");
             importer.run();
 

@@ -179,8 +179,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         
         DatasetType dst = dataset.getDatasetType();
         
-        //if (dst.isExternal()) exportable=false;
-        if (dst.getExporterClassName().equals("")) exportable=false;
+        
+        if ((dst.getExporterClassName().equals("")) || (dst.getExporterClassName()==null) ) exportable=false;
         
         return (exportable);
     }
@@ -217,7 +217,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     public void startMultipleFileImport(User user, String folderPath, String[] fileNames, DatasetType datasetType)
             throws EmfException {
         String[] fileNamesForImport = null;
-
+        
         try {
             File folder = validatePath(folderPath);
 
@@ -236,7 +236,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 String importFileName = fileName + "_" + DATE_FORMATTER.format(new Date());
                 EmfDataset dataset = new EmfDataset();
                 dataset.setName(importFileName);
-                dataset.setCreator(user.getName());
+                dataset.setCreator(user.getUsername());
                 dataset.setDatasetType(datasetType);
                 dataset.setCreatedDateTime(new Date());
                 dataset.setModifiedDateTime(new Date());
