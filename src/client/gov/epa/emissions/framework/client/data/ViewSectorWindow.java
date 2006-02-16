@@ -6,10 +6,10 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
-import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.TableData;
 
 import java.awt.BorderLayout;

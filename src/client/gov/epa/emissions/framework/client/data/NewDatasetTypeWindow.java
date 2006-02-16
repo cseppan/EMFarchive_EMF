@@ -6,11 +6,11 @@ import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
-import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.WidgetChangesMonitor;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

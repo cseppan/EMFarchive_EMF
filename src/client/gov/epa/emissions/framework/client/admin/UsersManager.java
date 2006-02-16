@@ -8,12 +8,13 @@ import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
-import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshButton;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
 import java.awt.BorderLayout;
@@ -112,17 +113,30 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     private void createLayout(JPanel layout) {
-        SimpleTableModel wrapperModel = new SimpleTableModel(model);
-        SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, wrapperModel);
         layout.setLayout(new BorderLayout());
+        layout.add(topPanel(), BorderLayout.NORTH);
+        layout.add(sortFilterScrollPane(), BorderLayout.CENTER);
+        layout.add(createControlPanel(), BorderLayout.SOUTH);
+    }
 
-        JScrollPane scrollPane = new JScrollPane(panel);
-        panel.setPreferredSize(new Dimension(450, 120));
+    private JPanel topPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
 
         messagePanel = new SingleLineMessagePanel();
-        layout.add(messagePanel, BorderLayout.NORTH);
-        layout.add(scrollPane, BorderLayout.CENTER);
-        layout.add(createControlPanel(), BorderLayout.SOUTH);
+        panel.add(messagePanel, BorderLayout.CENTER);
+
+        Button button = new RefreshButton(presenter, "Refresh Datasets", messagePanel);
+        panel.add(button, BorderLayout.EAST);
+
+        return panel;
+    }
+
+    private JScrollPane sortFilterScrollPane() {
+        SimpleTableModel wrapperModel = new SimpleTableModel(model);
+        SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, wrapperModel);
+        JScrollPane scrollPane = new JScrollPane(panel);
+        panel.setPreferredSize(new Dimension(450, 120));
+        return scrollPane;
     }
 
     private JPanel createControlPanel() {

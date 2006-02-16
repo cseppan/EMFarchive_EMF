@@ -5,14 +5,14 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
-import gov.epa.emissions.framework.client.MessagePanel;
-import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteDialog;
 import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Dimensions;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

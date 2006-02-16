@@ -5,8 +5,9 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.TaskRunner;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.Status;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 
-public class StatusPresenter {
+public class StatusPresenter implements RefreshObserver {
 
     private DataCommonsService service;
 

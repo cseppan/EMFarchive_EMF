@@ -5,8 +5,8 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.io.InternalSource;
-import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

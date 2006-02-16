@@ -6,7 +6,7 @@ import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.Label;
-import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;

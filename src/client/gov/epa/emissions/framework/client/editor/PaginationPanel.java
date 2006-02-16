@@ -2,9 +2,9 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.ui.IconButton;
 import gov.epa.emissions.framework.ui.ImageResources;
+import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 
 import java.awt.BorderLayout;

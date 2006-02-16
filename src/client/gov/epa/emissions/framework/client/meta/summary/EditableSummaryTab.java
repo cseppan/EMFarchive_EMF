@@ -15,11 +15,11 @@ import gov.epa.emissions.commons.io.importer.TemporalResolution;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.Label;
-import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.IntendedUse;
+import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

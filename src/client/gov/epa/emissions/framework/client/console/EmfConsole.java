@@ -5,15 +5,13 @@ import gov.epa.emissions.framework.ConcurrentTaskRunner;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.MessagePanel;
-import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.status.StatusPresenter;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.ui.CascadeLayout;
 import gov.epa.emissions.framework.ui.Dimensions;
-import gov.epa.emissions.framework.ui.ViewLayout;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -44,8 +42,6 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private StatusPresenter presenter;
 
-    private ViewLayout viewLayout;
-
     private static String aboutMessage = "<html><center>Emissions Modeling Framework (EMF)<br>"
             + "Version: Beta 2.1 - 1/30/2006<br>" + "Developed by the Carolina Environmental Program<br>"
             + "University of North Carolina at Chapel Hill</center></html>";
@@ -61,11 +57,10 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         user = session.user();
         this.serviceLocator = session.serviceLocator();
         windowMenuView = createWindowMenu();
-        //FIXME: what's w/ the DesktopManagerTest?
-//        this.desktopManager = new DesktopManagerImpl(windowMenuView, this);
+        // FIXME: what's w/ the DesktopManagerTest?
+        // this.desktopManager = new DesktopManagerImpl(windowMenuView, this);
         this.windowMenuPresenter.setDesktopManager(desktopManager);
         this.windowMenuView.setWindowMenuViewPresenter(windowMenuPresenter);
-        this.viewLayout = new CascadeLayout(this);
         messagePanel = new SingleLineMessagePanel();
 
         setProperties();
@@ -130,7 +125,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private JMenu createFileMenu(EmfSession session) {
-        return new FileMenu(session, this, messagePanel, viewLayout, desktopManager);
+        return new FileMenu(session, this, messagePanel, desktopManager);
     }
 
     public void doClose() {
@@ -146,7 +141,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private JMenu createManageMenu(EmfSession session) {
-        manageMenu = new ManageMenu(session, this, messagePanel, viewLayout, desktopManager);
+        manageMenu = new ManageMenu(session, this, messagePanel, desktopManager);
 
         return manageMenu;
     }

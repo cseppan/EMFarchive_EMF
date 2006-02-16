@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.Component;
 import java.awt.Container;

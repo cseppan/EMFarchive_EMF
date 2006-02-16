@@ -9,9 +9,7 @@ import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
-import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.exim.DatasetsBrowserAwareImportPresenter;
@@ -27,13 +25,14 @@ import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfDatasetTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
-import gov.epa.emissions.framework.ui.ImageResources;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshButton;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -41,7 +40,6 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -120,34 +118,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.CENTER);
 
-        panel.add(createRefreshPanel(), BorderLayout.EAST);
+        Button button = new RefreshButton(presenter, "Refresh Datasets", messagePanel);
+        panel.add(button, BorderLayout.EAST);
 
         return panel;
-    }
-
-    private JPanel createRefreshPanel() {
-        JButton button = new JButton(refreshIcon());
-        button.setToolTipText("Refresh Datasets");
-        button.setName("refresh");
-        button.setBorderPainted(false);
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doRefresh();
-                } catch (EmfException e) {
-                    showError(e.getMessage());
-                }
-            }
-        });
-
-        JPanel panel = new JPanel();
-        panel.add(button);
-
-        return panel;
-    }
-
-    private ImageIcon refreshIcon() {
-        return new ImageResources().refresh("Refresh Datasets");
     }
 
     private JPanel createControlPanel() {
@@ -315,7 +289,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     public void close() {
-        //super.dispose(); //why dispose -- reusable frames
+        // super.dispose(); //why dispose -- reusable frames
         super.close();
     }
 
@@ -342,7 +316,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         super.refreshLayout();
     }
 
-    //COMPLEX: is this readable?
+    // COMPLEX: is this readable?
     private void checkKeyVals(EmfDataset[] datasets) throws EmfException {
         for (int i = 0; i < datasets.length; i++) {
             KeyVal[] keyVals = datasets[i].getKeyVals();

@@ -4,22 +4,19 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.UserService;
-import gov.epa.emissions.framework.ui.ViewLayout;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 
-public class UsersManagerPresenter {
+public class UsersManagerPresenter implements RefreshObserver {
 
     private UsersManagerView view;
 
     private UserService service;
 
-    private ViewLayout layoutManager;
-
     private EmfSession session;
 
-    public UsersManagerPresenter(EmfSession session, UserService service, ViewLayout layoutManager) {
+    public UsersManagerPresenter(EmfSession session, UserService service) {
         this.session = session;
         this.service = service;
-        this.layoutManager = layoutManager;
     }
 
     public void doClose() {
@@ -54,8 +51,6 @@ public class UsersManagerPresenter {
     }
 
     public void doRegisterNewUser(RegisterUserDesktopView registerUserView) {
-        layoutManager.add(registerUserView, "Register New User");
-
         RegisterUserPresenter registerPresenter = new RegisterUserPresenter(service);
         registerPresenter.display(registerUserView);
 
@@ -64,17 +59,16 @@ public class UsersManagerPresenter {
 
     public void doUpdateUser(User updateUser, UpdatableUserView updatable, UserView viewable) throws EmfException {
         UpdateUserPresenter updatePresenter = new UpdateUserPresenterImpl(session, updateUser, service);
-        updateUser(updateUser, updatable, viewable, updatePresenter);
+        updateUser(updatable, viewable, updatePresenter);
     }
 
-    void updateUser(User user, UpdatableUserView updatable, UserView viewable, UpdateUserPresenter updatePresenter)
+    void updateUser(UpdatableUserView updatable, UserView viewable, UpdateUserPresenter updatePresenter)
             throws EmfException {
-        showUpdateUser(user, updatable, viewable, updatePresenter);
+        showUpdateUser(updatable, viewable, updatePresenter);
     }
 
-    private void showUpdateUser(User updateUser, UpdatableUserView updatable, UserView viewable,
-            UpdateUserPresenter updatePresenter) throws EmfException {
-        layoutManager.add(updatable, "Update - " + updateUser.getUsername());
+    private void showUpdateUser(UpdatableUserView updatable, UserView viewable, UpdateUserPresenter updatePresenter)
+            throws EmfException {
         updatePresenter.display(updatable, viewable);
         view.refresh();
     }

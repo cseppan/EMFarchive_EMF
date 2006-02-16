@@ -2,13 +2,12 @@ package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
 import gov.epa.emissions.framework.services.UserService;
-import gov.epa.emissions.framework.ui.ViewLayout;
+import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,13 +18,10 @@ import javax.swing.JMenuItem;
 
 public class FileMenu extends JMenu {
 
-    private ViewLayout viewLayout;
-
     private DesktopManager desktopManager;
 
     // FIXME: where's the associated Presenter ?
-    public FileMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, ViewLayout viewLayout,
-            DesktopManager desktopManager) {
+    public FileMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel, DesktopManager desktopManager) {
         super("File");
         super.setName("file");
 
@@ -34,7 +30,6 @@ public class FileMenu extends JMenu {
         super.add(createLogout(session, parent));
         super.add(createExit(parent));
 
-        this.viewLayout = viewLayout;
         this.desktopManager = desktopManager;
     }
 
@@ -91,11 +86,7 @@ public class FileMenu extends JMenu {
     }
 
     protected void displayImport(EmfSession session, JDesktopPane desktop) throws EmfException, Exception {
-        if (viewLayout.activate("Import Dataset - FileMenu"))
-            return;
-
         ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktop, desktopManager);
-        viewLayout.add(importView, "Import Dataset - FileMenu");
         desktop.add(importView);
 
         ImportPresenter presenter = new ImportPresenter(session, session.user(), session.eximService());

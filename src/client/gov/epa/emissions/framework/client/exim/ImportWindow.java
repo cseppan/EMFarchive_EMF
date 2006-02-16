@@ -4,14 +4,14 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
-import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.ImageResources;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

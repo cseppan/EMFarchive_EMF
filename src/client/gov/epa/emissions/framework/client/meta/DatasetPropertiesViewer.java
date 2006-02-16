@@ -3,8 +3,6 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
-import gov.epa.emissions.framework.client.MessagePanel;
-import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.info.InfoTab;
@@ -14,6 +12,8 @@ import gov.epa.emissions.framework.client.meta.notes.NotesTab;
 import gov.epa.emissions.framework.client.meta.revisions.RevisionsTab;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTab;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

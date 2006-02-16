@@ -2,8 +2,8 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ChangeablesList;
-import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 import gov.epa.emissions.framework.ui.TableData;
 

@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.framework.client.MessagePanel;
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.console.StatusActions;
+import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.io.File;
 import java.util.ArrayList;

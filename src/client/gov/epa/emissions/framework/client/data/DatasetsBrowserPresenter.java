@@ -15,8 +15,9 @@ import gov.epa.emissions.framework.client.meta.versions.VersionedDataPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataView;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 
-public class DatasetsBrowserPresenter implements Browser {
+public class DatasetsBrowserPresenter implements Browser, RefreshObserver {
 
     private DatasetsBrowserView view;
 

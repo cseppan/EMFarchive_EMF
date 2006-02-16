@@ -2,10 +2,10 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.client.MessagePanel;
-import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.ui.Border;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

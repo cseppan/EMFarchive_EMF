@@ -1,11 +1,13 @@
 package gov.epa.emissions.framework.client.status;
 
-import gov.epa.emissions.framework.client.MessagePanel;
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
-import gov.epa.emissions.framework.client.SingleLineMessagePanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.ui.ImageResources;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshButton;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.TextAreaTableCellRenderer;
 
 import java.awt.BorderLayout;
@@ -40,7 +42,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
     public StatusWindow(Container parent, JDesktopPane desktop, DesktopManager desktopManager) {
         super("Status", desktop, desktopManager);
         super.setName("status");
-        
+
         position(parent);
         super.setContentPane(createLayout());
 
@@ -94,27 +96,12 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         return button;
     }
 
-    private JButton createRefreshButton() {
-        JButton button = new JButton(refreshIcon());
-        button.setToolTipText("Refresh the Status messages");
-        button.setName("refresh");
-        button.setBorderPainted(false);
-
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                presenter.doRefresh();
-            }
-        });
-
-        return button;
+    private Button createRefreshButton() {
+        return new RefreshButton(presenter, "Refresh the Status messages", messagePanel);
     }
 
     private ImageIcon trashIcon() {
         return new ImageResources().trash("Clear Messages");
-    }
-
-    private ImageIcon refreshIcon() {
-        return new ImageResources().refresh("Refresh Status Messages");
     }
 
     private JScrollPane createTable() {
@@ -150,7 +137,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
     public void close() {
         super.dispose();
-        //don't try to unregister, since we didn't register with the desktopManager
+        // don't try to unregister, since we didn't register with the desktopManager
     }
 
     public void display() {

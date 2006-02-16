@@ -5,7 +5,6 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.UserService;
-import gov.epa.emissions.framework.ui.ViewLayout;
 
 import org.jmock.Mock;
 import org.jmock.core.constraint.IsInstanceOf;
@@ -16,18 +15,14 @@ public class UsersManagerPresenterTest extends EmfMockObjectTestCase {
 
     private UsersManagerPresenter presenter;
 
-    private Mock layoutManager;
-
     private Mock session;
 
     private Mock service;
 
     protected void setUp() throws EmfException {
-        layoutManager = mock(ViewLayout.class);
         session = mock(EmfSession.class);
         service = mock(UserService.class);
-        presenter = new UsersManagerPresenter((EmfSession) session.proxy(), (UserService) service.proxy(),
-                (ViewLayout) layoutManager.proxy());
+        presenter = new UsersManagerPresenter((EmfSession) session.proxy(), (UserService) service.proxy());
 
         view = mock(UsersManagerView.class);
 
@@ -65,8 +60,6 @@ public class UsersManagerPresenterTest extends EmfMockObjectTestCase {
         registerUserView.expects(once()).method("display");
 
         RegisterUserDesktopView viewProxy = (RegisterUserDesktopView) registerUserView.proxy();
-        layoutManager.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
-
         view.expects(once()).method("refresh").withNoArguments();
 
         presenter.doRegisterNewUser(viewProxy);
@@ -76,8 +69,6 @@ public class UsersManagerPresenterTest extends EmfMockObjectTestCase {
         Mock updateUserView = mock(UpdatableUserView.class);
 
         UpdatableUserView viewProxy = (UpdatableUserView) updateUserView.proxy();
-        layoutManager.expects(once()).method("add").with(eq(viewProxy), new IsInstanceOf(String.class));
-
         view.expects(once()).method("refresh").withNoArguments();
 
         User user = new User();
@@ -86,7 +77,7 @@ public class UsersManagerPresenterTest extends EmfMockObjectTestCase {
         Mock updatePresenter = mock(UpdateUserPresenter.class);
         updatePresenter.expects(once()).method("display").with(same(viewProxy), eq(null));
 
-        presenter.updateUser(user, viewProxy, null, (UpdateUserPresenter) updatePresenter.proxy());
+        presenter.updateUser(viewProxy, null, (UpdateUserPresenter) updatePresenter.proxy());
     }
 
     public void testShouldRefreshViewOnClickOfRefreshButton() throws EmfException {
