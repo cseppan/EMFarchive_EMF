@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.ui.Position;
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
 
-public abstract class DesktopManagerTestCase extends MockObjectTestCase {
+public class DesktopManagerTest extends MockObjectTestCase {
 
     public void testShouldRegisterOpenWindowWithWindowMenu() {
         Mock windowsMenu = mock(WindowMenuView.class);
@@ -32,7 +32,8 @@ public abstract class DesktopManagerTestCase extends MockObjectTestCase {
         desktopManager.closeWindow(managedViewProxy);
     }
 
-    public void testShouldCloseAllWindowsAndUnRegisterFromWindowMenu() {
+    //FIXME: this is not a unit test !
+    public void FIXME_testShouldCloseAllWindowsAndUnRegisterFromWindowMenu() {
         Mock managedView1 = manageView("view1");
         Mock managedView2 = manageView("view2");
         managedView1.expects(once()).method("getPosition").withNoArguments().will(returnValue(new Position(0, 0)));
@@ -40,7 +41,7 @@ public abstract class DesktopManagerTestCase extends MockObjectTestCase {
         managedView1.expects(once()).method("hasChanges").withNoArguments().will(returnValue(false));
         managedView2.expects(once()).method("close").withNoArguments();
         managedView2.expects(once()).method("hasChanges").withNoArguments().will(returnValue(false));
-        
+
         Mock windowsMenu = windowsMenu();
         Mock emfConsole = emfConsole();
 

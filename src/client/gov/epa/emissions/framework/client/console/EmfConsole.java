@@ -57,8 +57,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         user = session.user();
         this.serviceLocator = session.serviceLocator();
         windowMenuView = createWindowMenu();
-        // FIXME: what's w/ the DesktopManagerTest?
-        // this.desktopManager = new DesktopManagerImpl(windowMenuView, this);
+        this.desktopManager = new DesktopManagerImpl(windowMenuView, this);
         this.windowMenuPresenter.setDesktopManager(desktopManager);
         this.windowMenuView.setWindowMenuViewPresenter(windowMenuPresenter);
         messagePanel = new SingleLineMessagePanel();
