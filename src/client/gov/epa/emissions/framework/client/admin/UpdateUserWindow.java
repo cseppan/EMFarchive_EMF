@@ -120,7 +120,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
     }
 
     public void closeOnConfirmLosingChanges() {
-        String message = "Would you like to Close(without saving and lose the updates)?";
+        String message = "Would you like to close without saving and lose your updates?";
         EmfDialog dialog = new EmfDialog(parent, "Close", JOptionPane.QUESTION_MESSAGE, message,
                 JOptionPane.YES_NO_OPTION);
         if (dialog.confirm())
