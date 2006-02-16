@@ -189,8 +189,8 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     }
 
     private Confirm emfConfirmDialog() {
-        String msg = "Could not close some windows, because they have unsaved changes.\nDo you want to force closing of these windows ";
-        Confirm emfConfirmDialog = new EmfDialog(this, "Warning", JOptionPane.QUESTION_MESSAGE, msg,
+        String msg = "Some windows have unsaved changes.\nDo you want to continue closing these windows?";
+        Confirm emfConfirmDialog = new EmfDialog(this, "Unsaved Changes Exist", JOptionPane.QUESTION_MESSAGE, msg,
                 JOptionPane.YES_NO_OPTION);
         return emfConfirmDialog;
     }
