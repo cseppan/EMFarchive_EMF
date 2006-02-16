@@ -49,8 +49,6 @@ public class UsersManagerPresenterTest extends EmfMockObjectTestCase {
         User ownerProxy = (User) owner.proxy();
         stub(session, "user", ownerProxy);
 
-        view.expects(once()).method("refresh").withNoArguments();
-
         Mock user = mock(User.class);
         User userProxy = (User) user.proxy();
         stub(user, "getUsername", "matts");
@@ -60,7 +58,10 @@ public class UsersManagerPresenterTest extends EmfMockObjectTestCase {
         service.expects(once()).method("obtainLocked").with(same(ownerProxy), same(userProxy)).will(
                 returnValue(userProxy));
 
-        presenter.doDelete(new User[] { userProxy });
+        User[] users = new User[] { userProxy };
+        view.expects(once()).method("refresh");
+
+        presenter.doDelete(users);
     }
 
     public void testShouldAbortWhenFailedToObtainLockOnNotifyDelete() throws Exception {
@@ -85,7 +86,7 @@ public class UsersManagerPresenterTest extends EmfMockObjectTestCase {
         } catch (EmfException e) {
             return;
         }
-        
+
         fail("Should have raised an error if failed to delete user");
     }
 

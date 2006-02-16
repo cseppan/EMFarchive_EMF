@@ -37,7 +37,7 @@ public class UsersManagerPresenter implements RefreshObserver {
         for (int i = 0; i < users.length; i++)
             doDelete(users[i]);
 
-        view.refresh();
+        view.refresh(service.getUsers());
     }
 
     private void doDelete(User userToDelete) throws EmfException {
