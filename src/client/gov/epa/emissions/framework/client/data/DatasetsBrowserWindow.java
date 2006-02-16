@@ -27,6 +27,7 @@ import gov.epa.emissions.framework.ui.EmfDatasetTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.SortCriteria;
 
@@ -45,7 +46,7 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class DatasetsBrowserWindow extends ReusableInteralFrame implements DatasetsBrowserView {
+public class DatasetsBrowserWindow extends ReusableInteralFrame implements DatasetsBrowserView, RefreshObserver {
 
     private SortFilterSelectModel selectModel;
 
@@ -81,7 +82,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         // cannot refresh itself. So, we will regen the layout on every
         // refresh - it's a HACK. Will need to be addressed
         createLayout(layout, parentConsole);
-
     }
 
     private void createLayout(JPanel layout, EmfConsole parentConsole) {
@@ -118,7 +118,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.CENTER);
 
-        Button button = new RefreshButton(presenter, "Refresh Datasets", messagePanel);
+        Button button = new RefreshButton(this, "Refresh Datasets", messagePanel);
         panel.add(button, BorderLayout.EAST);
 
         return panel;
@@ -293,10 +293,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         super.close();
     }
 
-    public void display() {
-        super.display();
-    }
-
     public void refresh(EmfDataset[] datasets) {
         model.refresh(new EmfDatasetTableData(datasets));
         selectModel.refresh();
@@ -344,6 +340,10 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                     throw new EmfException("Cannot export: Keyword " + keyVals[j].getKeyword()
                             + "does not have a value for dataset " + datasets[i].getName());
         }
+    }
+
+    public void doRefresh() throws EmfException {
+        presenter.doRefresh();
     }
 
 }

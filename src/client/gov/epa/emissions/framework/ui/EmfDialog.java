@@ -25,7 +25,6 @@ public class EmfDialog extends JDialog implements Confirm {
 
     private int optionType;
 
-
     public EmfDialog(EmfConsole parent, String title, int messageType, Object message, int optionType) {
         super(parent, title, true);
         super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);

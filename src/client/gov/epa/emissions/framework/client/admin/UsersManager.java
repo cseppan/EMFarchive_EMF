@@ -59,7 +59,6 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
         layout = new JPanel();
         this.getContentPane().add(layout);
-
     }
 
     public void display(User[] users) {
@@ -85,8 +84,8 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     public UpdatableUserView getUpdateUserView(User updateUser) {
-        UpdateUserWindow view = updateUser.equals(session.user()) ? new DisposableUpdateUserWindow(desktopManager)
-                : new DisposableUpdateUserWindow(new AddAdminOption(), desktopManager);
+        UpdateUserWindow view = updateUser.equals(session.user()) ? new DisposableUpdateUserWindow(parentConsole,
+                desktopManager) : new DisposableUpdateUserWindow(parentConsole, new AddAdminOption(), desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
@@ -201,7 +200,6 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
         return crudPanel;
     }
 
-    // FIXME: if no users are selected, add appropriate behavior to Presenter
     private User[] getSelectedUsers() {
         if (selectModel.getSelectedCount() == 0)
             return new User[0];

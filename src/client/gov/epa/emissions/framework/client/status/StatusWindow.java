@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.Status;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.TextAreaTableCellRenderer;
 
@@ -29,7 +30,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-public class StatusWindow extends ReusableInteralFrame implements StatusView {
+public class StatusWindow extends ReusableInteralFrame implements StatusView, RefreshObserver {
 
     private MessagePanel messagePanel;
 
@@ -73,8 +74,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
         getRootPane().setDefaultButton(clearButton);
         container.add(clearButton);
 
-        JButton refreshButton = createRefreshButton();
-        container.add(refreshButton);
+        container.add(createRefreshButton());
 
         panel.add(container, BorderLayout.EAST);
 
@@ -97,7 +97,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
     }
 
     private Button createRefreshButton() {
-        return new RefreshButton(presenter, "Refresh the Status messages", messagePanel);
+        return new RefreshButton(this, "Refresh the Status messages", messagePanel);
     }
 
     private ImageIcon trashIcon() {
@@ -162,6 +162,10 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView {
 
     public void clear() {
         statusTableModel.clear();
+    }
+
+    public void doRefresh() {
+        presenter.doRefresh();
     }
 
 }

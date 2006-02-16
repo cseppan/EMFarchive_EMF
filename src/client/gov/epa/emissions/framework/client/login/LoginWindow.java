@@ -13,15 +13,13 @@ import gov.epa.emissions.framework.client.console.EmfConsolePresenter;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
-//import java.awt.event.MouseAdapter;
-//import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -53,7 +51,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
         JPanel layoutPanel = createLayout();
 
         this.setSize(new Dimension(350, 225));
-        this.setLocation(new Point(400, 200));
+        this.setLocation(ScreenUtils.getPointToCenter(this));
 
         this.getContentPane().add(layoutPanel);
     }

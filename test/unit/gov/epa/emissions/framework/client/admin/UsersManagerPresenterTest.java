@@ -6,6 +6,8 @@ import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.UserService;
 
+import java.util.Date;
+
 import org.jmock.Mock;
 import org.jmock.core.constraint.IsInstanceOf;
 
@@ -40,18 +42,51 @@ public class UsersManagerPresenterTest extends EmfMockObjectTestCase {
         presenter.doClose();
     }
 
-    public void testShouldDeleteUserOnNotifyDelete() throws Exception {
-        User user = new User();
-        user.setUsername("joe");
-        stub(session, "user", user);
+    public void testShouldDeleteUserAfterObtainingLockOnNotifyDelete() throws Exception {
+        Mock owner = mock(User.class);
+        stub(owner, "getUsername", "joe");
+
+        User ownerProxy = (User) owner.proxy();
+        stub(session, "user", ownerProxy);
 
         view.expects(once()).method("refresh").withNoArguments();
 
-        User matts = new User();
-        matts.setUsername("matts");
-        service.expects(once()).method("deleteUser").with(same(matts));
+        Mock user = mock(User.class);
+        User userProxy = (User) user.proxy();
+        stub(user, "getUsername", "matts");
+        stub(user, "isLocked", ownerProxy, new Boolean(true));
 
-        presenter.doDelete(new User[] { matts });
+        service.expects(once()).method("deleteUser").with(same(userProxy));
+        service.expects(once()).method("obtainLocked").with(same(ownerProxy), same(userProxy)).will(
+                returnValue(userProxy));
+
+        presenter.doDelete(new User[] { userProxy });
+    }
+
+    public void testShouldAbortWhenFailedToObtainLockOnNotifyDelete() throws Exception {
+        Mock owner = mock(User.class);
+        stub(owner, "getUsername", "joe");
+
+        User ownerProxy = (User) owner.proxy();
+        stub(session, "user", ownerProxy);
+
+        Mock user = mock(User.class);
+        User userProxy = (User) user.proxy();
+        stub(user, "getUsername", "matts");
+        stub(user, "getLockOwner", null);
+        stub(user, "getLockDate", new Date());
+        stub(user, "isLocked", ownerProxy, new Boolean(false));
+
+        service.expects(once()).method("obtainLocked").with(same(ownerProxy), same(userProxy)).will(
+                returnValue(userProxy));
+
+        try {
+            presenter.doDelete(new User[] { userProxy });
+        } catch (EmfException e) {
+            return;
+        }
+        
+        fail("Should have raised an error if failed to delete user");
     }
 
     public void testShouldDisplayRegisterNewUserViewOnDisplayRegisterNewUser() {

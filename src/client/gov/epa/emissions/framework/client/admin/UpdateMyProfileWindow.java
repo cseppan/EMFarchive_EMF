@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,8 +13,8 @@ public class UpdateMyProfileWindow extends UpdateUserWindow {
 
     private JDesktopPane desktop;
 
-    public UpdateMyProfileWindow(JDesktopPane desktop, DesktopManager desktopManager) {
-        super(desktopManager);
+    public UpdateMyProfileWindow(EmfConsole parentConsole, JDesktopPane desktop, DesktopManager desktopManager) {
+        super(parentConsole, desktopManager);
         this.desktop = desktop;
     }
 

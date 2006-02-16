@@ -9,6 +9,10 @@ public abstract class EmfMockObjectTestCase extends MockObjectTestCase {
         mock.stubs().method(method).will(returnValue(returnValue));
     }
 
+    protected void stub(Mock mock, String method, Object param, Object returnValue) {
+        mock.stubs().method(method).with(eq(param)).will(returnValue(returnValue));
+    }
+
     protected void expectsOnce(Mock mock, String method, Object arg) {
         mock.expects(once()).method(method).with(eq(arg));
     }

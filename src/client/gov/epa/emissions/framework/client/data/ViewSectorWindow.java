@@ -37,7 +37,7 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
     private SingleLineMessagePanel messagePanel;
 
     public ViewSectorWindow(DesktopManager desktopManager) {
-        super("View Sector", new Dimension(550, 400),desktopManager);
+        super("View Sector", new Dimension(550, 400), desktopManager);
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -50,8 +50,8 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
 
     public void display(Sector sector) {
         super.setTitle("View Sector: " + sector.getName());
-        super.setName("sectorView:"+sector.getId());
-        
+        super.setName("sectorView:" + sector.getId());
+
         layout.removeAll();
         doLayout(layout, sector);
 
@@ -87,9 +87,9 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
         TextArea description = new TextArea("description", sector.getDescription(), 40);
         description.setEditable(false);
         ScrollableTextArea descTextArea = new ScrollableTextArea(description);
-        descTextArea.setMinimumSize(new Dimension(80,80));
+        descTextArea.setMinimumSize(new Dimension(80, 80));
         layoutGenerator.addLabelWidgetPair("Description:", descTextArea, panel);
- 
+
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY

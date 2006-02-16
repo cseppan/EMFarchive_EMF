@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.ui.EmfDialog;
 
 import java.awt.event.ActionEvent;
@@ -29,15 +30,18 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
 
     private AdminOption adminOption;
 
-    public UpdateUserWindow(AdminOption adminOption, DesktopManager desktopManager) {
+    private EmfConsole parent;
+
+    public UpdateUserWindow(EmfConsole parent, AdminOption adminOption, DesktopManager desktopManager) {
         super("Update User", desktopManager);
+        this.parent = parent;
         this.adminOption = adminOption;
 
         super.setResizable(false);
     }
 
-    public UpdateUserWindow(DesktopManager desktopManager) {
-        this(new NoAdminOption(), desktopManager);
+    public UpdateUserWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
+        this(parentConsole, new NoAdminOption(), desktopManager);
     }
 
     public void display(User user) {
@@ -117,7 +121,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
 
     public void closeOnConfirmLosingChanges() {
         String message = "Would you like to Close(without saving and lose the updates)?";
-        EmfDialog dialog = new EmfDialog(null, "Close", JOptionPane.QUESTION_MESSAGE, message,
+        EmfDialog dialog = new EmfDialog(parent, "Close", JOptionPane.QUESTION_MESSAGE, message,
                 JOptionPane.YES_NO_OPTION);
         if (dialog.confirm())
             close();
