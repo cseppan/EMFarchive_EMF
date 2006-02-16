@@ -27,7 +27,7 @@ public class ExitAndLogoutAction {
     }
 
     public boolean exit() {
-        String message = "Do you want to exit?";
+        String message = "Do you want to exit the Emission Modeling Framework?";
         if (confirm(message)) {
             if (desktopManager.closeAll()) {
                 emfConsole.close();
@@ -38,7 +38,7 @@ public class ExitAndLogoutAction {
     }
 
     private boolean confirm(String message) {
-        EmfDialog emfDialog = new EmfDialog(emfConsole, "Warning", JOptionPane.QUESTION_MESSAGE, message,
+        EmfDialog emfDialog = new EmfDialog(emfConsole, "Logout/Exit Confirmation", JOptionPane.QUESTION_MESSAGE, message,
                 JOptionPane.OK_CANCEL_OPTION);
         return emfDialog.confirm();
     }
