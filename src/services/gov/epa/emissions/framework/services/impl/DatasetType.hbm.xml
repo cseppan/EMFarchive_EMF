@@ -13,6 +13,7 @@
         <property name="minFiles" column="min_files" type="integer" not-null="true" length="4"/>
         <property name="maxFiles" column="max_files" type="integer" not-null="true" length="4"/>
         <property name="external" column="external" type="boolean" not-null="true"/>
+        <property name="defaultSortOrder" column="default_sortorder" type="java.lang.String" not-null="true"/>
         <property name="importerClassName" column="importer_classname" type="java.lang.String" not-null="false"/>
         <property name="exporterClassName" column="exporter_classname" type="java.lang.String" not-null="false"/>
         <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>

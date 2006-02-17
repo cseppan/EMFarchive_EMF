@@ -117,6 +117,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         DatasetType newtype = new DatasetType(newname);
         newtype.setDescription("MyDatasetType, newly added type.");
         newtype.setKeywords(new Keyword[0]);
+        newtype.setDefaultSortOrder("default sort order string goes here");
         int existingTypes = service.getDatasetTypes().length;
 
         service.addDatasetType(newtype);
@@ -156,6 +157,8 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         String newname = "MyDatasetType" + Math.abs(new Random().nextInt());
         DatasetType type1 = new DatasetType(newname);
         type1.setDescription("MyDatasetType, newly added type.");
+        type1.setDefaultSortOrder("default sort order string goes here");
+
         type1.setKeywords(new Keyword[0]);
         service.addDatasetType(type1);
 
@@ -178,11 +181,13 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         DatasetType type1 = new DatasetType(newname);
         type1.setDescription("MyDatasetType, newly added type.");
         type1.setKeywords(new Keyword[0]);
+        type1.setDefaultSortOrder("default sort order string goes here");
         service.addDatasetType(type1);
 
         DatasetType type2 = new DatasetType(newname + "foobar");
         type2.setDescription("duplicate type");
         type2.setKeywords(new Keyword[0]);
+        type2.setDefaultSortOrder("default sort order string goes here");
         service.addDatasetType(type2);
 
         try {

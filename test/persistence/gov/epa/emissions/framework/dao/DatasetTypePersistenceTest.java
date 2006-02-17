@@ -30,7 +30,7 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
         type.setName("NAME");
         type.setMaxFiles(1);
         type.setMinFiles(1);
-
+        type.setDefaultSortOrder("abc");
         save(type);
         DatasetType loadedType = load("NAME");
         assertNotNull("DatasetType with name - 'NAME' should have been persisted ", loadedType);
@@ -40,6 +40,7 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
         DatasetType type = new DatasetType();
         type.setDescription("TEST");
         type.setName("NAME");
+        type.setDefaultSortOrder("abc");
         type.addKeyword(new Keyword("key1"));
         type.addKeyword(new Keyword("key2"));
 
@@ -55,6 +56,7 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
         DatasetType type = new DatasetType();
         type.setDescription("TEST");
         type.setName("NAME");
+        type.setDefaultSortOrder("abc");
         type.addKeyword(new Keyword("key1"));
         type.addKeyword(new Keyword("key2"));
 
