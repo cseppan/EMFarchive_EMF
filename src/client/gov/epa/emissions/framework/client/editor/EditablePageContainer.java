@@ -71,7 +71,7 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
     }
 
     private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
-        sortFilterPanel = new DataSortFilterPanel(messagePanel, changeablesList);
+        sortFilterPanel = new DataSortFilterPanel(messagePanel, changeablesList, dataset);
         return sortFilterPanel;
     }
 

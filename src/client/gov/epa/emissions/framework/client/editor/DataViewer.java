@@ -84,7 +84,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
 
     private JPanel tablePanel(Version version, String table, DataAccessService service) {
         NonEditableTableViewPanel tableView = new NonEditableTableViewPanel(
-                source(table, dataset.getInternalSources()), messagePanel);
+                source(table, dataset.getInternalSources()), messagePanel, dataset);
         TablePresenter tablePresenter = new ViewableTablePresenter(version, table, tableView, service);
         tablePresenter.observe();
 

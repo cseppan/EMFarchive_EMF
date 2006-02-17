@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.Label;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
@@ -25,10 +26,13 @@ public class DataSortFilterPanel extends JPanel {
     private MessagePanel messagePanel;
     
     private ManageChangeables listOfChangeables;
+    
+    private EmfDataset dataset;
 
-    public DataSortFilterPanel(MessagePanel messagePanel, ManageChangeables listOfChangeables) {
+    public DataSortFilterPanel(MessagePanel messagePanel, ManageChangeables listOfChangeables, EmfDataset dataset) {
         this.listOfChangeables = listOfChangeables;
         this.messagePanel = messagePanel;
+        this.dataset = dataset;
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         super.add(rowFilterPanel());
@@ -57,7 +61,7 @@ public class DataSortFilterPanel extends JPanel {
         JPanel panel = new JPanel();
 
         panel.add(new Label("Sort Order"));
-        sortOrder = new TextArea("sortOrder", "", 30, 2);
+        sortOrder = new TextArea("sortOrder", dataset.getDatasetType().getDefaultSortOrder(), 30, 2);
         sortOrder.setToolTipText(sortOrder.getText());
         if(listOfChangeables != null) {
             listOfChangeables.addChangeable(sortOrder);

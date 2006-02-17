@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
@@ -29,10 +30,13 @@ public class NonEditableTableViewPanel extends JPanel implements NonEditablePage
     private ScrollableTable table;
 
     private DataSortFilterPanel sortFilterPanel;
+    
+    private EmfDataset dataset;
 
-    public NonEditableTableViewPanel(InternalSource source, MessagePanel messagePanel) {
+    public NonEditableTableViewPanel(InternalSource source, MessagePanel messagePanel, EmfDataset dataset) {
         super(new BorderLayout());
         this.source = source;
+        this.dataset = dataset;
         doLayout(messagePanel);
     }
 
@@ -64,7 +68,7 @@ public class NonEditableTableViewPanel extends JPanel implements NonEditablePage
     }
 
     private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
-        sortFilterPanel = new DataSortFilterPanel(messagePanel, null);
+        sortFilterPanel = new DataSortFilterPanel(messagePanel, null, dataset);
         return sortFilterPanel;
     }
 
