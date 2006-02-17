@@ -27,7 +27,6 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
 
     public void display(EmfDataset dataset, Keywords masterKeywords) {
         super.removeAll();
-        //TODO: where to do this removal?
         removeDatasetTypeKeywords(dataset,masterKeywords);
         super.add(createLayout(dataset, masterKeywords));
     }

@@ -239,14 +239,35 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void doDisplayPropertiesViewer() {
-        List datasets = getSelectedDatasets();
+
+        List datasets = updateSelectedDatasets(getSelectedDatasets());
 
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
-            DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
+            DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
             desktop.add(view);
             EmfDataset dataset = (EmfDataset) iter.next();
             presenter.doDisplayPropertiesView(view, dataset);
         }
+    }
+
+    private List updateSelectedDatasets(List selectedDatasets) {
+        // FIXME: update only datasets that user selected
+        List updatedDatasets = new ArrayList();
+        try {
+            EmfDataset[] updatedAllDatasets1 = session.dataService().getDatasets();
+            for (int i = 0; i < selectedDatasets.size(); i++) {
+                EmfDataset selDataset = (EmfDataset) selectedDatasets.get(i);
+                for (int j = 0; j < updatedAllDatasets1.length; j++) {
+                    if(selDataset.getId()== updatedAllDatasets1[j].getId()){
+                        updatedDatasets.add(updatedAllDatasets1[j]);
+                        break;
+                    }
+                }
+            }
+        } catch (EmfException e) {
+            showError(e.getMessage());
+        }
+        return updatedDatasets;
     }
 
     protected void doDisplayPropertiesEditor() {

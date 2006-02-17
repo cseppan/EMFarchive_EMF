@@ -207,8 +207,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     public UpdatableUserView getUpdateUserView(User updateUser) {
-        UpdateUserWindow view = updateUser.equals(session.user()) ? new DisposableUpdateUserWindow(parentConsole,
-                desktopManager) : new DisposableUpdateUserWindow(parentConsole, new AddAdminOption(), desktopManager);
+        UpdateUserWindow view = updateUser.equals(session.user()) ? new DisposableUpdateUserWindow(desktopManager) : new DisposableUpdateUserWindow(new AddAdminOption(), desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {

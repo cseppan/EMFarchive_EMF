@@ -269,7 +269,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         String message = "Cannot edit Version: " + version.getName() + "(" + version.getVersion() + ") of Dataset: "
                 + dataset.getName() + System.getProperty("line.separator") + " as it was locked by User: "
                 + version.getLockOwner() + "(at " + format(version.getLockDate()) + ")";
-        EmfDialog dialog = new EmfDialog(parent, "Message", JOptionPane.PLAIN_MESSAGE, message,
+        EmfDialog dialog = new EmfDialog(this, "Message", JOptionPane.PLAIN_MESSAGE, message,
                 JOptionPane.DEFAULT_OPTION);
         dialog.confirm();
     }
@@ -280,7 +280,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     public void notifySaveFailure(String message) {
-        EmfDialog dialog = new EmfDialog(parent, "Message", JOptionPane.PLAIN_MESSAGE, message,
+        EmfDialog dialog = new EmfDialog(this, "Message", JOptionPane.PLAIN_MESSAGE, message,
                 JOptionPane.DEFAULT_OPTION);
         dialog.confirm();
     }

@@ -198,7 +198,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     public void notifyLockFailure(EmfDataset dataset) {
         String message = "Cannot edit Properties of Dataset: " + dataset.getName() + System.getProperty("line.separator") 
             + " as it was locked by User: " + dataset.getLockOwner() + "(at " + format(dataset.getLockDate()) + ")";
-        EmfDialog dialog = new EmfDialog(parentConsole, "Message", 
+        EmfDialog dialog = new EmfDialog(this, "Message", 
                 JOptionPane.PLAIN_MESSAGE, message, JOptionPane.DEFAULT_OPTION);
         dialog.confirm();
     }
