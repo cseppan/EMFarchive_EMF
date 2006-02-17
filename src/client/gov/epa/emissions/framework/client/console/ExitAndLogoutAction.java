@@ -16,7 +16,7 @@ public class ExitAndLogoutAction {
     }
 
     public boolean logout() {
-        String message = "Do you want to logout?";
+        String message = "Do you want to log out of the Emission Modeling Framework?";
         if (confirm(message)) {
             if (desktopManager.closeAll()) {
                 emfConsole.close();
