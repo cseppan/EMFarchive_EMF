@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.DefaultChangeObserver;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.login.LaunchLoginOnCancelStrategy;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.Point;
 
@@ -26,7 +27,7 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView, Ch
         this.getContentPane().add(view);
 
         this.setSize(view.getSize());
-        this.setLocation(new Point(400, 200));
+        this.setLocation(ScreenUtils.getPointToCenter(this));
         display();
     }
 
