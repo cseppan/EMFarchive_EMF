@@ -98,7 +98,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
 
     private JPanel createCriteriaPanel(Sector sector) {
         criteriaTableData = new SectorCriteriaTableData(sector.getSectorCriteria());
-        JPanel panel = new SectorCriteriaPanel("", criteriaTableData);
+        JPanel panel = new SectorCriteriaPanel("", criteriaTableData, this);
         panel.setBorder(BorderFactory.createTitledBorder("Criteria"));
 
         return panel;

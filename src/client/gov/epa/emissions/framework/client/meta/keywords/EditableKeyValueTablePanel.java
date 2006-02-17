@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.gui.EditableTable;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.data.EditableTablePanel;
 import gov.epa.emissions.framework.ui.TableData;
 
@@ -8,8 +9,8 @@ import javax.swing.JScrollPane;
 
 public class EditableKeyValueTablePanel extends EditableTablePanel {
 
-    public EditableKeyValueTablePanel(String label, EditableKeyValueTableData tableData) {
-        super(label, tableData);
+    public EditableKeyValueTablePanel(String label, EditableKeyValueTableData tableData, ManageChangeables changeablesList) {
+        super(label, tableData, changeablesList);
     }
     
     protected JScrollPane table(TableData tableData) {

@@ -6,10 +6,14 @@ import gov.epa.emissions.commons.gui.TextFieldWidget;
 import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfView;
+import gov.epa.emissions.framework.client.ManagedView;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -32,6 +36,8 @@ public class RegisterUserPanel extends JPanel {
     private User user;
 
     private ManageChangeables changeablesList;
+    
+    private String parentWindowTitle;
 
     public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, RegisterCancelStrategy cancelStrategy,
             EmfView parent, ChangeObserver changeObserver, ManageChangeables changeablesList) {
@@ -44,9 +50,14 @@ public class RegisterUserPanel extends JPanel {
         this.cancelStrategy = cancelStrategy;
         this.container = parent;
         this.changeablesList = changeablesList;
+        this.parentWindowTitle = getParentWindowTitle();
         createLayout(adminOption);
 
         this.setSize(new Dimension(375, 425));
+    }
+    
+    private String getParentWindowTitle() {
+        return ((EmfView)changeablesList).getTitle();
     }
 
     private void createLayout(AdminOption adminOption) {
@@ -57,8 +68,7 @@ public class RegisterUserPanel extends JPanel {
         };
         Action cancelAction = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                confirmDiscardChanges();
-                cancelStrategy.execute(presenter);
+                closeWindow();
             }
         };
 
@@ -66,7 +76,17 @@ public class RegisterUserPanel extends JPanel {
         Widget username = new TextFieldWidget("username", user.getUsername(), 10);
         panel = new EditableUserProfilePanel(user, username, okAction, cancelAction, adminOption,
                 new PopulateUserOnRegisterStrategy(user), changeablesList);
+        panel.addEditListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) {
+                if(changeablesList instanceof ManagedView)
+                    markAsEdited((ManagedView)changeablesList);
+            }
+        });
         this.add(panel);
+    }
+    
+    private void markAsEdited(ManagedView window) {
+        window.setTitle(parentWindowTitle + " *");
     }
 
     private void registerUser() {
@@ -98,13 +118,15 @@ public class RegisterUserPanel extends JPanel {
     }
 
     public boolean confirmDiscardChanges() {
+        if(changeablesList instanceof EmfInternalFrame)
+            return ((EmfInternalFrame)changeablesList).checkChanges();
+        
         return true;
-        //FIXME: return monitor.checkChanges();
     }
 
     public void closeWindow() {
-        confirmDiscardChanges();
-        cancelStrategy.execute(presenter);
+        if(confirmDiscardChanges())
+            cancelStrategy.execute(presenter);
     }
 
 }

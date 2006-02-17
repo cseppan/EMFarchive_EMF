@@ -32,7 +32,7 @@ public class WidgetChangesMonitor {
             return dialog.confirm();
         }
         
-        return false;
+        return true;
     }
 
 }

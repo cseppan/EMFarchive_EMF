@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.Editor;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.io.Keyword;
 
 import java.awt.BorderLayout;
@@ -14,8 +15,8 @@ public class DatasetTypeKeywordsPanel extends JPanel implements Editor {
 
     private EditableTablePanel editableTablePanel;
 
-    public DatasetTypeKeywordsPanel(KeywordsTableData tableData, Keyword[] keywords) {
-        editableTablePanel = new EditableTablePanel("Keywords", tableData);
+    public DatasetTypeKeywordsPanel(KeywordsTableData tableData, Keyword[] keywords, ManageChangeables changeablesList) {
+        editableTablePanel = new EditableTablePanel("Keywords", tableData, changeablesList);
         editableTablePanel.setColumnEditor(cellEditor(keywords), 1, "Select from the list");
 
         super.setLayout(new BorderLayout());

@@ -22,15 +22,14 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 
 public class EditableUserProfilePanel extends JPanel {
 
     private Widget username;
 
-    private JPasswordField password;
+    private PasswordField password;
 
-    private JPasswordField confirmPassword;
+    private PasswordField confirmPassword;
 
     private TextField name;
 
@@ -110,10 +109,15 @@ public class EditableUserProfilePanel extends JPanel {
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
 
         username = usernameWidget;
+        username.addChangeable(changeablesList);
         valuesPanel.add(usernameWidget.element());
         password = new PasswordField("password", 10);
+        changeablesList.addChangeable(password);
+        password.addListeners();
         valuesPanel.add(password);
         confirmPassword = new PasswordField("confirmPassword", 10);
+        changeablesList.addChangeable(confirmPassword);
+        confirmPassword.addListeners();
         valuesPanel.add(confirmPassword);
 
         panel.add(valuesPanel);

@@ -101,7 +101,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private JPanel createKeywordsPanel(DatasetType type, Keyword[] keywords) {
         keywordsTableData = new KeywordsTableData(type.getKeywords(), new Keywords(keywords));
-        keywordsPanel = new DatasetTypeKeywordsPanel(keywordsTableData, keywords);
+        keywordsPanel = new DatasetTypeKeywordsPanel(keywordsTableData, keywords, this);
         keywordsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 
         return keywordsPanel;

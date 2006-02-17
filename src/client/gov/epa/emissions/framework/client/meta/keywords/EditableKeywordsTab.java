@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.gui.Editor;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
@@ -15,8 +16,11 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
     private EditableKeyValueTableData tableData;
 
     private EditableKeywordsPanel editableKeywordsPanel;
+    
+    private ManageChangeables changeablesList;
 
-    public EditableKeywordsTab() {
+    public EditableKeywordsTab(ManageChangeables changeablesList) {
+        this.changeablesList = changeablesList;
         super.setName("keywordsTab");
         super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     }
@@ -37,7 +41,7 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
 
     private JPanel createLayout(EmfDataset dataset, Keywords masterKeywords) {
         tableData = new EditableKeyValueTableData(dataset, masterKeywords);
-        editableKeywordsPanel = new EditableKeywordsPanel("", tableData, masterKeywords);
+        editableKeywordsPanel = new EditableKeywordsPanel("", tableData, masterKeywords, changeablesList);
         return editableKeywordsPanel;
     }
 

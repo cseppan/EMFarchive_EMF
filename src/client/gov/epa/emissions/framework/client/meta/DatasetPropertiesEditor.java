@@ -87,7 +87,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private JPanel createKeywordsTab() {
-        keywordsTab = new EditableKeywordsTab();
+        keywordsTab = new EditableKeywordsTab(this);
         try {
             presenter.set(keywordsTab);
             return keywordsTab;

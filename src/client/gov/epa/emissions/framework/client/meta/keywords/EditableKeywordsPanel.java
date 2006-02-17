@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.gui.Editor;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.client.data.EditableTablePanel;
@@ -16,8 +17,8 @@ public class EditableKeywordsPanel extends JPanel implements Editor {
 
     private EditableTablePanel editableTablePanel;
 
-    public EditableKeywordsPanel(String label, EditableKeyValueTableData tableData, Keywords masterKeywords) {
-        editableTablePanel = new EditableKeyValueTablePanel(label, tableData);
+    public EditableKeywordsPanel(String label, EditableKeyValueTableData tableData, Keywords masterKeywords, ManageChangeables changeablesList) {
+        editableTablePanel = new EditableKeyValueTablePanel(label, tableData, changeablesList);
         editableTablePanel.setColumnEditor(keywordColumnEditor(masterKeywords), 1, "Select from the list");
 
         super.setLayout(new BorderLayout());

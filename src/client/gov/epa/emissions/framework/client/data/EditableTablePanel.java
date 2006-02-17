@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.Editor;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.SelectableEmfTableData;
@@ -25,8 +26,11 @@ public class EditableTablePanel extends JPanel implements Editor{
     protected EmfTableModel tableModel;
 
     protected EditableTable table;
+    
+    protected ManageChangeables changeablesList;
 
-    public EditableTablePanel(String label, SelectableEmfTableData tableData) {
+    public EditableTablePanel(String label, SelectableEmfTableData tableData, ManageChangeables changeablesList) {
+        this.changeablesList = changeablesList;
         super.setLayout(new BorderLayout());
         super.add(doLayout(label, tableData), BorderLayout.CENTER);
     }
@@ -52,7 +56,11 @@ public class EditableTablePanel extends JPanel implements Editor{
 
     protected JScrollPane table(TableData tableData) {
         tableModel = new EmfTableModel(tableData);
+        changeablesList.addChangeable(tableModel);
+        tableModel.addDataChangeListener();
         table = new EditableTable(tableModel);
+        changeablesList.addChangeable(table);
+        table.addListeners();
 
         return new JScrollPane(table);
     }
