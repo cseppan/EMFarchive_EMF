@@ -113,7 +113,7 @@ public class DataViewServiceTest extends ServicesTestCase {
     }
 
     public void testShouldApplyConstraintsAndReturnFirstPage() throws Exception {
-        String rowFilter = "AND POLL = '100414'";
+        String rowFilter = "POLL = '100414'";
         String sortOrder = "POLL, ANN_EMIS";
         Page page = service.applyConstraints(token(), rowFilter, sortOrder);
 
