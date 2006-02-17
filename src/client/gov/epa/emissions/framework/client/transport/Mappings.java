@@ -43,7 +43,7 @@ public class Mappings {
     }
 
     public void addStringParam(Call call, String id) {
-        call.addParameter(id, Constants.XSD_BOOLEAN, ParameterMode.IN);
+        call.addParameter(id, Constants.XSD_STRING, ParameterMode.IN);
     }
 
     public void addBooleanParameter(Call call, String id) {

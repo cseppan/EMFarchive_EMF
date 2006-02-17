@@ -152,9 +152,13 @@ public class DataEditorServiceTransport implements DataEditorService {
         return (Page) call.requestResponse(new Object[] { token, rowFilter, sortOrder });
     }
 
-    public TableMetaData getTableMetaData(String table) {
-        // NOTE Auto-generated method stub
-        return null;
+    public TableMetaData getTableMetaData(String table) throws EmfException {
+        call.addStringParam("table");
+
+        call.setOperation("getTableMetaData");
+        call.setReturnType(mappings.tablemetadata());
+        
+        return (TableMetaData)call.requestResponse(new Object[] { table });
     }
 
 }

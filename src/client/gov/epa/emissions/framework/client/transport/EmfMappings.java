@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
+import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.Country;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.ExternalSource;
@@ -14,6 +15,7 @@ import gov.epa.emissions.commons.io.Project;
 import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.io.SectorCriteria;
+import gov.epa.emissions.commons.io.TableMetaData;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.DataAccessToken;
@@ -67,7 +69,10 @@ public class EmfMappings extends Mappings {
         bean(call, Note.class, note());
         bean(call, NoteType.class, notetype());
         bean(call, Revision.class, revision());
-        
+
+        bean(call, TableMetaData.class, tablemetadata());
+        bean(call, ColumnMetaData.class, columnmetadata());
+
     }
 
     private void registerArrays(Call call) {
@@ -100,6 +105,8 @@ public class EmfMappings extends Mappings {
         array(call, Note[].class, notes());
         array(call, NoteType[].class, notetypes());
         array(call, Revision[].class, revisions());
+        array(call, ColumnMetaData[].class, columnmetadatas());
+
     }
 
     public QName logs() {
@@ -246,5 +253,16 @@ public class EmfMappings extends Mappings {
         return qname("Revisions");
     }
 
+    public QName tablemetadata() {
+        return qname("TableMetaData");
+    }
+
+    public QName columnmetadata() {
+        return qname("ColumnMetaData");
+    }
+
+    public QName columnmetadatas() {
+        return qname("ColumnMetaDatas");
+    }
 
 }
