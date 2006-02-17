@@ -9,8 +9,6 @@ import gov.epa.emissions.framework.client.login.LaunchLoginOnCancelStrategy;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
-import java.awt.Point;
-
 public class RegisterUserWindow extends EmfFrame implements RegisterUserView, ChangeObserver, ManageChangeables {
 
     private RegisterUserPanel view;
@@ -50,7 +48,7 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView, Ch
 
     public void addChangeable(Changeable changeable) {
         // NOTE Auto-generated method stub
-        
+
     }
 
 }

@@ -1,13 +1,17 @@
 package gov.epa.emissions.framework.services.editor;
 
+import java.sql.SQLException;
+
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.TableDefinitionDelegate;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Versions;
+import gov.epa.emissions.commons.io.TableMetaData;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
@@ -221,6 +225,18 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
             LOG.error("Could not confirm changes for Version: " + version.getDatasetId() + ". Reason: " + e);
             throw new EmfException("Could not confirm changes for Version: " + version.getDatasetId());
         }
+    }
+
+    public TableMetaData getTableMetaData(String table) throws EmfException{
+        try {
+            TableDefinitionDelegate tdd = new TableDefinitionDelegate(dbServer.getEmissionsDatasource().getConnection());
+
+            return tdd.getTableMetaData(table);
+        } catch (SQLException e) {
+            LOG.error("Database error. Failed to get table metadata for table: ",e);
+            throw new EmfException("Database error");
+        }
+        
     }
 
 }

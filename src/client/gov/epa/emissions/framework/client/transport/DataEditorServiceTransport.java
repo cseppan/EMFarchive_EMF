@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.TableMetaData;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataAccessToken;
@@ -149,6 +150,11 @@ public class DataEditorServiceTransport implements DataEditorService {
         call.setReturnType(mappings.page());
 
         return (Page) call.requestResponse(new Object[] { token, rowFilter, sortOrder });
+    }
+
+    public TableMetaData getTableMetaData(String table) {
+        // NOTE Auto-generated method stub
+        return null;
     }
 
 }
