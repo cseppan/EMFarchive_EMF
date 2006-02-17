@@ -61,6 +61,7 @@ public class DataCommonsServiceTransport implements DataCommonsService {
 
         call.addParam("owner", mappings.user());
         call.addParam("sector", mappings.sector());
+        call.setOperation("obtainLockedSector");
         call.setReturnType(mappings.sector());
 
         return (Sector) call.requestResponse(new Object[] { owner, sector });

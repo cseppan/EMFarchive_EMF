@@ -36,7 +36,8 @@ public class VersionedImporterFactory {
             return new VersionedImporter(importer, dataset, dbServer);
         } catch (Exception e) {
             log.error("Failed to create importer", e);
-            throw new ImporterException("EMF server error: Could not create importer");
+            Throwable t = e.getCause();
+            throw new ImporterException("Importer error: " + t==null? e.getMessage():t.getMessage());
         }
     }
 

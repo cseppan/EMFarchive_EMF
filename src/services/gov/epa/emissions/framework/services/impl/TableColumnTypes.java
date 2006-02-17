@@ -24,14 +24,5 @@ public class TableColumnTypes {
                 EMFConstants.EMF_EMISSIONS_SCHEMA);
     }
 
-    public static void main(String[] args) {
-        try {
-            new TableColumnTypes();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (InfrastructureException e) {
-            e.printStackTrace();
-        }
-    }
 
 }
