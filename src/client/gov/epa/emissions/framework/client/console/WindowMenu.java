@@ -16,7 +16,7 @@ import javax.swing.JMenuItem;
 
 public class WindowMenu extends JMenu implements WindowMenuView {
 
-    private List permanaentMenuItems;
+    private List permanentMenuItems;
 
     private SortedSet menuItems;
 
@@ -26,11 +26,11 @@ public class WindowMenu extends JMenu implements WindowMenuView {
         super("Window");
         super.setName("window");
         menuItems = new TreeSet();
-        permanaentMenuItems = new ArrayList();
+        permanentMenuItems = new ArrayList();
 
         JMenuItem closeAllMenuItem = new JMenuItem("Close All");
         closeAllMenuItem.addActionListener(closeAll());
-        permanaentMenuItems.add(closeAllMenuItem);
+        permanentMenuItems.add(closeAllMenuItem);
         refreshMenuItems();
     }
 
@@ -50,7 +50,7 @@ public class WindowMenu extends JMenu implements WindowMenuView {
     public void addPermanently(ManagedView managedView) {
         JMenuItem menuItem = new WindowMenuItem(managedView);
         super.add(menuItem);
-        permanaentMenuItems.add(menuItem);
+        permanentMenuItems.add(menuItem);
         refreshMenuItems();
     }
 
@@ -64,7 +64,7 @@ public class WindowMenu extends JMenu implements WindowMenuView {
 
     private void refreshMenuItems() {
         super.removeAll();
-        addMenuItems(permanaentMenuItems);
+        addMenuItems(permanentMenuItems);
         if (!menuItems.isEmpty()) {
             super.addSeparator();
             addMenuItems(menuItems);
