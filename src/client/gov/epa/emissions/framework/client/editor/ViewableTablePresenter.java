@@ -2,8 +2,13 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataAccessService;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
 
 public class ViewableTablePresenter implements TablePresenter {
 
@@ -13,8 +18,12 @@ public class ViewableTablePresenter implements TablePresenter {
 
     private DataAccessService service;
 
-    public ViewableTablePresenter(Version version, String table, NonEditablePageManagerView view, DataAccessService service) {
+    private InternalSource source;
+
+    public ViewableTablePresenter(Version version, String table, InternalSource source,
+            NonEditablePageManagerView view, DataAccessService service) {
         delegate = new TablePaginator(version, table, view, service);
+        this.source = source;
         this.view = view;
         this.service = service;
     }
@@ -52,8 +61,18 @@ public class ViewableTablePresenter implements TablePresenter {
     }
 
     public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
+        validateColsInSortOrder(sortOrder, source.getCols());
         Page page = service.applyConstraints(delegate.token(), rowFilter, sortOrder);
         view.display(page);
+    }
+
+    private void validateColsInSortOrder(String sortOrder, String[] cols) throws EmfException {
+        List colsList = Arrays.asList(cols);
+        for (StringTokenizer tokenizer = new StringTokenizer(sortOrder, ","); tokenizer.hasMoreTokens();) {
+            String col = tokenizer.nextToken().trim().toLowerCase();
+            if (!colsList.contains(col) && !colsList.contains(col.toUpperCase()))
+                throw new EmfException("Sort Order contains an invalid column: " + col);
+        }
     }
 
 }

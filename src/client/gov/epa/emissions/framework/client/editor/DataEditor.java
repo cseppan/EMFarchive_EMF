@@ -285,7 +285,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         dialog.confirm();
     }
 
-
     public boolean confirmDiscardChanges() {
         return checkChanges();
     }

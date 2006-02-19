@@ -1,8 +1,13 @@
 package gov.epa.emissions.framework.client.editor;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataEditorService;
@@ -15,9 +20,12 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
 
     private DataEditorService service;
 
-    public EditableTablePresenterImpl(Version version, String table, EditablePageManagerView view,
-            DataEditorService service) {
+    private InternalSource source;
+
+    public EditableTablePresenterImpl(Version version, String table, InternalSource source,
+            EditablePageManagerView view, DataEditorService service) {
         this.service = service;
+        this.source = source;
         this.view = view;
 
         paginator = new TablePaginator(version, table, view, service);
@@ -83,8 +91,18 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
     }
 
     public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
+        validateColsInSortOrder(sortOrder, source.getCols());
         Page page = service.applyConstraints(token(), rowFilter, sortOrder);
         view.display(page);
+    }
+
+    private void validateColsInSortOrder(String sortOrder, String[] cols) throws EmfException {
+        List colsList = Arrays.asList(cols);
+        for (StringTokenizer tokenizer = new StringTokenizer(sortOrder, ","); tokenizer.hasMoreTokens();) {
+            String col = tokenizer.nextToken().trim().toLowerCase();
+            if (!colsList.contains(col) && !colsList.contains(col.toUpperCase()))
+                throw new EmfException("Sort Order contains an invalid column: " + col);
+        }
     }
 
 }
