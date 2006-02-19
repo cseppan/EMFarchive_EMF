@@ -26,6 +26,14 @@ public class ScrollableTable extends JScrollPane {
         setColWidthsBasedOnColNames(table);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowSelectionAllowed(true);
+        if (tableModel.getRowCount() == 1)
+        {
+            if ((tableModel.getColumnClass(0).isInstance(Boolean.TRUE)) &&
+                 tableModel.getColumnName(0).equalsIgnoreCase("Select"))   
+            {    
+               tableModel.setValueAt(Boolean.TRUE,0,0);
+            }   
+        }
 
         return table;
     }
