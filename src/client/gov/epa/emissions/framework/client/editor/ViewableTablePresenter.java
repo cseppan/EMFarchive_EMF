@@ -64,11 +64,12 @@ public class ViewableTablePresenter implements TablePresenter {
         validateColsInSortOrder(sortOrder, source.getCols());
         Page page = service.applyConstraints(delegate.token(), rowFilter, sortOrder);
         view.display(page);
+        view.updateFilteredRecordsCount(delegate.totalRecords());
     }
 
     private void validateColsInSortOrder(String sortOrder, String[] cols) throws EmfException {
         List colsList = Arrays.asList(cols);
-        for (StringTokenizer tokenizer = new StringTokenizer(sortOrder, ","); tokenizer.hasMoreTokens();) {
+        for (StringTokenizer tokenizer = new StringTokenizer(sortOrder.trim(), ","); tokenizer.hasMoreTokens();) {
             String col = tokenizer.nextToken().trim().toLowerCase();
             if (!colsList.contains(col) && !colsList.contains(col.toUpperCase()))
                 throw new EmfException("Sort Order contains an invalid column: " + col);

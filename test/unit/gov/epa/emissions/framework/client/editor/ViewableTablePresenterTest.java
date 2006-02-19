@@ -42,6 +42,10 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         service.expects(once()).method("applyConstraints").with(new IsInstanceOf(DataAccessToken.class), eq(rowFilter),
                 eq(sortOrder)).will(returnValue(page));
         view.expects(once()).method("display").with(same(page));
+        
+        Integer filtered = new Integer(10);
+        service.stubs().method("getTotalRecords").will(returnValue(filtered));
+        view.expects(once()).method("updateFilteredRecordsCount").with(eq(filtered));
 
         p.doApplyConstraints(rowFilter, sortOrder);
     }
@@ -66,18 +70,18 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
 
         fail("Should have raised an exception when Sort Order contains invalid cols");
     }
-    
+
     public void testShouldRaiseExceptionIfOneOfColsInSortOrderIsInvalidOnApplyConstraints() {
         Mock view = mock(NonEditablePageManagerView.class);
         Mock service = mock(DataEditorService.class);
-        
+
         Mock source = mock(InternalSource.class);
         String[] cols = { "col1", "col2", "col3" };
         source.stubs().method("getCols").will(returnValue(cols));
-        
+
         TablePresenter p = new ViewableTablePresenter(null, "table", (InternalSource) source.proxy(),
                 (NonEditablePageManagerView) view.proxy(), (DataAccessService) service.proxy());
-        
+
         String sortOrder = "col3, invalid-row";
         try {
             p.doApplyConstraints(null, sortOrder);
@@ -85,8 +89,32 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
             assertEquals("Sort Order contains an invalid column: invalid-row", e.getMessage());
             return;
         }
-        
+
         fail("Should have raised an exception when Sort Order contains invalid cols");
+    }
+
+    public void testShouldIgnoreWhenSortOrderIsEmptyOnApplyConstraints() throws EmfException {
+        Mock view = mock(NonEditablePageManagerView.class);
+        Mock service = mock(DataEditorService.class);
+
+        Mock source = mock(InternalSource.class);
+        String[] cols = { "col1", "col2", "col3" };
+        source.stubs().method("getCols").will(returnValue(cols));
+
+        TablePresenter p = new ViewableTablePresenter(null, "table", (InternalSource) source.proxy(),
+                (NonEditablePageManagerView) view.proxy(), (DataAccessService) service.proxy());
+
+        String rowFilter = "rowFilter";
+        String sortOrder = "   ";
+        service.expects(once()).method("applyConstraints").with(new IsInstanceOf(DataAccessToken.class), eq(rowFilter),
+                eq(sortOrder));
+        view.expects(once()).method("display");
+
+        Integer filtered = new Integer(10);
+        service.stubs().method("getTotalRecords").will(returnValue(filtered));
+        view.expects(once()).method("updateFilteredRecordsCount").with(eq(filtered));
+
+        p.doApplyConstraints(rowFilter, sortOrder);
     }
 
     public void testShouldFetchTotalRecords() throws Exception {

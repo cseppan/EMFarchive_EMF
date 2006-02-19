@@ -38,7 +38,7 @@ public class PaginationPanel extends JPanel {
 
     private JSlider slider;
 
-    private JLabel totalRecords;
+    private JLabel filteredRecords;
 
     public PaginationPanel(MessagePanel messagePanel) {
         super(new BorderLayout());
@@ -64,11 +64,16 @@ public class PaginationPanel extends JPanel {
         current.setToolTipText("Range of displayed records");
         panel.add(current);
 
-        JLabel totalName = new JLabel("Total: ");
-        panel.add(totalName);
-        totalRecords = new JLabel("" + totalRecordsCount);
-        totalRecords.setToolTipText("Total Records");
-        panel.add(totalRecords);
+        JLabel filtered = new JLabel("Filtered: ");
+        panel.add(filtered);
+        filteredRecords = new JLabel("" + totalRecordsCount);
+        filteredRecords.setToolTipText("Filtered Records");
+        panel.add(filteredRecords);
+
+        panel.add(new JLabel("Total: "));
+        JLabel totalRecordsLabel = new JLabel("" + totalRecordsCount);
+        totalRecordsLabel.setToolTipText("Total Records");
+        panel.add(totalRecordsLabel);
 
         return panel;
     }
@@ -151,10 +156,10 @@ public class PaginationPanel extends JPanel {
         slider.setValue(page.getMin());
     }
 
-    public void updateTotalRecordsCount(int total) {
-        totalRecords.setText("" + total);
-        slider.setMaximum(total);
-        recordInput.setRange(1, total);
+    public void updateFilteredRecordsCount(int filtered) {
+        filteredRecords.setText("" + filtered);
+        slider.setMaximum(filtered);
+        recordInput.setRange(1, filtered);
     }
 
     private boolean verifyInput(JSlider slider) {

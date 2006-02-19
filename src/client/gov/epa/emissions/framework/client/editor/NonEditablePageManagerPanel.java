@@ -107,6 +107,10 @@ public class NonEditablePageManagerPanel extends JPanel implements NonEditablePa
         return (String[]) cols.toArray(new String[0]);
     }
 
+    public void updateFilteredRecordsCount(int filtered) {
+        paginationPanel.updateFilteredRecordsCount(filtered);
+    }
+
     public void scrollToPageEnd() {
         table.selectLastRow();
     }

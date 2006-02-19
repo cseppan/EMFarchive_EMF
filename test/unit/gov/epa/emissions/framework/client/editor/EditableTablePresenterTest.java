@@ -46,6 +46,34 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
                 eq(sortOrder)).will(returnValue(page));
         view.expects(once()).method("display").with(same(page));
 
+        Integer filtered = new Integer(10);
+        service.stubs().method("getTotalRecords").will(returnValue(filtered));
+        view.expects(once()).method("updateFilteredRecordsCount").with(eq(filtered));
+
+        p.doApplyConstraints(rowFilter, sortOrder);
+    }
+
+    public void testShouldIgnoreWhenSortOrderIsEmptyOnApplyConstraints() throws EmfException {
+        Mock view = mock(EditablePageManagerView.class);
+        Mock service = mock(DataEditorService.class);
+
+        Mock source = mock(InternalSource.class);
+        String[] cols = { "col1", "col2", "col3" };
+        source.stubs().method("getCols").will(returnValue(cols));
+
+        TablePresenter p = new EditableTablePresenterImpl(null, "table", (InternalSource) source.proxy(),
+                (EditablePageManagerView) view.proxy(), (DataEditorService) service.proxy());
+
+        String rowFilter = "rowFilter";
+        String sortOrder = "    ";
+        service.expects(once()).method("applyConstraints").with(new IsInstanceOf(DataAccessToken.class), eq(rowFilter),
+                eq(sortOrder));
+        view.expects(once()).method("display");
+
+        Integer filtered = new Integer(10);
+        service.stubs().method("getTotalRecords").will(returnValue(filtered));
+        view.expects(once()).method("updateFilteredRecordsCount").with(eq(filtered));
+
         p.doApplyConstraints(rowFilter, sortOrder);
     }
 
@@ -114,7 +142,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
+        view.stubs().method("updateFilteredRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
@@ -138,7 +166,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
+        view.stubs().method("updateFilteredRecordsCount").with(eq(new Integer(20)));
 
         TablePresenter p = new EditableTablePresenterImpl(new Version(), "table", null, (EditablePageManagerView) view
                 .proxy(), (DataEditorService) service.proxy());
@@ -160,7 +188,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
+        view.stubs().method("updateFilteredRecordsCount").with(eq(new Integer(20)));
 
         TablePresenter p = new EditableTablePresenterImpl(new Version(), "table", null, (EditablePageManagerView) view
                 .proxy(), (DataEditorService) service.proxy());
@@ -181,7 +209,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
+        view.stubs().method("updateFilteredRecordsCount").with(eq(new Integer(20)));
 
         TablePresenter p = new EditableTablePresenterImpl(new Version(), "table", null, (EditablePageManagerView) view
                 .proxy(), (DataEditorService) service.proxy());
@@ -203,7 +231,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
+        view.stubs().method("updateFilteredRecordsCount").with(eq(new Integer(20)));
 
         TablePresenter p = new EditableTablePresenterImpl(new Version(), "table", null, (EditablePageManagerView) view
                 .proxy(), (DataEditorService) service.proxy());
@@ -225,7 +253,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.stubs().method("scrollToPageEnd").withNoArguments();
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
+        view.stubs().method("updateFilteredRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
@@ -249,7 +277,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.stubs().method("scrollToPageEnd").withNoArguments();
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
+        view.stubs().method("updateFilteredRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
@@ -274,7 +302,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
+        view.stubs().method("updateFilteredRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
@@ -299,7 +327,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
+        view.stubs().method("updateFilteredRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
@@ -336,7 +364,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.expects(atLeastOnce()).method("display").with(eq(page2));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
+        view.stubs().method("updateFilteredRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
@@ -379,7 +407,7 @@ public class EditableTablePresenterTest extends MockObjectTestCase {
         view.stubs().method("changeset").withNoArguments().will(returnValue(new ChangeSet()));
 
         service.stubs().method("getTotalRecords").will(returnValue(new Integer(20)));
-        view.stubs().method("updateTotalRecordsCount").with(eq(new Integer(20)));
+        view.stubs().method("updateFilteredRecordsCount").with(eq(new Integer(20)));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));

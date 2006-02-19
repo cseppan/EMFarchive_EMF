@@ -113,8 +113,8 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
         return editablePage != null ? editablePage.changeset() : new ChangeSet();
     }
 
-    public void updateTotalRecordsCount(int total) {
-        paginationPanel.updateTotalRecordsCount(total);
+    public void updateFilteredRecordsCount(int filtered) {
+        paginationPanel.updateFilteredRecordsCount(filtered);
     }
 
     public void scrollToPageEnd() {

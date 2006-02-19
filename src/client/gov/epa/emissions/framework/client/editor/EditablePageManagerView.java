@@ -7,6 +7,6 @@ public interface EditablePageManagerView extends TableView {
 
     ChangeSet changeset();
 
-    void updateTotalRecordsCount(int total);
+    void updateFilteredRecordsCount(int filtered);
 
 }
