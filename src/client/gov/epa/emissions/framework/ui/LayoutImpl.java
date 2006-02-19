@@ -23,7 +23,7 @@ public class LayoutImpl implements Layout {
         if (checkForFullWindowDisplayInsideConsole(currentViewPosition, view, console)) {
             view.setPosition(currentViewPosition);
         } else {
-            view.setPosition(new Position(20, 20));
+            view.setPosition(new Position(0, 0));
         }
         managedViews.push(view);
     }
@@ -46,7 +46,8 @@ public class LayoutImpl implements Layout {
             ManagedView view = (ManagedView) managedViews.pop();
             return view.getPosition();
         } catch (EmptyStackException e) {
-            return new Position(0, 0);
+            /* this will get adjusted to 0,0 when 20 is added in x and y */
+            return new Position(-20, -20);
         }
     }
 
