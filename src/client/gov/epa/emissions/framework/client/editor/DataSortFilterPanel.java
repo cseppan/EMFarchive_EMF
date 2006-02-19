@@ -13,7 +13,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
@@ -24,23 +23,73 @@ public class DataSortFilterPanel extends JPanel {
     private TextArea sortOrder;
 
     private MessagePanel messagePanel;
-    
+
     private ManageChangeables listOfChangeables;
-    
+
     private EmfDataset dataset;
+
+    private JPanel actionPanel;
 
     public DataSortFilterPanel(MessagePanel messagePanel, ManageChangeables listOfChangeables, EmfDataset dataset) {
         this.listOfChangeables = listOfChangeables;
         this.messagePanel = messagePanel;
         this.dataset = dataset;
-        super.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        super.add(rowFilterPanel());
-        super.add(sortOrderPanel());
+        super.add(sortFilterPanel());
+        super.add(controlPanel());
     }
 
-    private JPanel actionPanel(final TablePresenter presenter, final MessagePanel messagePanel) {
-        JPanel panel = new JPanel(new BorderLayout());
+    private JPanel sortFilterPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        panel.add(sortOrderPanel());
+        panel.add(rowFilterPanel());
+
+        return panel;
+    }
+
+    private JPanel controlPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        actionPanel = new JPanel(new BorderLayout());
+        panel.add(actionPanel);
+
+        return panel;
+    }
+
+    private JPanel sortOrderPanel() {
+        JPanel panel = new JPanel();
+
+        panel.add(new Label("Sort Order"));
+        sortOrder = new TextArea("sortOrder", dataset.getDatasetType().getDefaultSortOrder(), 30, 2);
+        sortOrder.setToolTipText(sortOrder.getText());
+        if (listOfChangeables != null) {
+            listOfChangeables.addChangeable(sortOrder);
+            sortOrder.addTextListener();
+        }
+        panel.add(ScrollableTextArea.createWithVerticalScrollBar(sortOrder));
+
+        return panel;
+    }
+
+    private JPanel rowFilterPanel() {
+        JPanel panel = new JPanel();
+
+        panel.add(new Label("Row Filter"));
+        rowFilter = new TextArea("rowFilter", "", 30, 2);
+        rowFilter.setToolTipText(rowFilter.getText());
+        if (listOfChangeables != null) {
+            listOfChangeables.addChangeable(rowFilter);
+            rowFilter.addTextListener();
+        }
+        panel.add(ScrollableTextArea.createWithVerticalScrollBar(rowFilter));
+
+        return panel;
+    }
+
+    public void init(final TablePresenter presenter) {
         Button apply = new Button("Apply", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -52,44 +101,8 @@ public class DataSortFilterPanel extends JPanel {
                 }
             }
         });
-        panel.add(apply, BorderLayout.LINE_END);
-
-        return panel;
-    }
-
-    private JPanel sortOrderPanel() {
-        JPanel panel = new JPanel();
-
-        panel.add(new Label("Sort Order"));
-        sortOrder = new TextArea("sortOrder", dataset.getDatasetType().getDefaultSortOrder(), 30, 2);
-        sortOrder.setToolTipText(sortOrder.getText());
-        if(listOfChangeables != null) {
-            listOfChangeables.addChangeable(sortOrder);
-            sortOrder.addTextListener();
-        }
-        panel.add(new ScrollableTextArea(sortOrder));
-
-        return panel;
-    }
-
-    private JPanel rowFilterPanel() {
-        JPanel panel = new JPanel();
-
-        panel.add(new Label("Row Filter"));
-        rowFilter = new TextArea("rowFilter", "", 30, 2);
-        rowFilter.setToolTipText(rowFilter.getText());
-        if(listOfChangeables != null) {
-            listOfChangeables.addChangeable(rowFilter);
-            rowFilter.addTextListener();
-        }
-        panel.add(new ScrollableTextArea(rowFilter));
-
-        return panel;
-    }
-
-    public void init(TablePresenter presenter) {
-        super.add(actionPanel(presenter, messagePanel));
-        super.add(Box.createVerticalStrut(10));
+        apply.setToolTipText("Apply the Row Filter & Sort Order constraints to the table");
+        actionPanel.add(apply, BorderLayout.LINE_END);
     }
 
 }

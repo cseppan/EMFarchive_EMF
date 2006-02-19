@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
-public class NonEditableTableViewPanel extends JPanel implements NonEditablePageManagerView {
+public class NonEditablePageManagerPanel extends JPanel implements NonEditablePageManagerView {
 
     private EmfTableModel tableModel;
 
@@ -30,10 +30,10 @@ public class NonEditableTableViewPanel extends JPanel implements NonEditablePage
     private ScrollableTable table;
 
     private DataSortFilterPanel sortFilterPanel;
-    
+
     private EmfDataset dataset;
 
-    public NonEditableTableViewPanel(InternalSource source, MessagePanel messagePanel, EmfDataset dataset) {
+    public NonEditablePageManagerPanel(InternalSource source, MessagePanel messagePanel, EmfDataset dataset) {
         super(new BorderLayout());
         this.source = source;
         this.dataset = dataset;
@@ -58,11 +58,16 @@ public class NonEditableTableViewPanel extends JPanel implements NonEditablePage
 
     private JPanel topPanel(MessagePanel messagePanel) {
         JPanel panel = new JPanel(new BorderLayout());
-
         panel.add(sortFilterPanel(messagePanel), BorderLayout.LINE_START);
+        panel.add(paginationPanel(messagePanel), BorderLayout.LINE_END);
 
+        return panel;
+    }
+
+    private JPanel paginationPanel(MessagePanel messagePanel) {
+        JPanel panel = new JPanel();
         paginationPanel = new PaginationPanel(messagePanel);
-        panel.add(paginationPanel, BorderLayout.LINE_END);
+        panel.add(paginationPanel);
 
         return panel;
     }
