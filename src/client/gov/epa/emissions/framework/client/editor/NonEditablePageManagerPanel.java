@@ -58,8 +58,8 @@ public class NonEditablePageManagerPanel extends JPanel implements NonEditablePa
 
     private JPanel topPanel(MessagePanel messagePanel) {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(sortFilterPanel(messagePanel), BorderLayout.LINE_START);
-        panel.add(paginationPanel(messagePanel), BorderLayout.LINE_END);
+        panel.add(sortFilterPanel(messagePanel), BorderLayout.CENTER);
+        panel.add(paginationPanel(messagePanel), BorderLayout.EAST);
 
         return panel;
     }

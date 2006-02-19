@@ -62,10 +62,10 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
     private JPanel topPanel(MessagePanel messagePanel) {
         JPanel panel = new JPanel(new BorderLayout());
 
-        panel.add(sortFilterPanel(messagePanel), BorderLayout.LINE_START);
+        panel.add(sortFilterPanel(messagePanel), BorderLayout.CENTER);
 
         paginationPanel = new PaginationPanel(messagePanel);
-        panel.add(paginationPanel, BorderLayout.LINE_END);
+        panel.add(paginationPanel, BorderLayout.EAST);
 
         return panel;
     }

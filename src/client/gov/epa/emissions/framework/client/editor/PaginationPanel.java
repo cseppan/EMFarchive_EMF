@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -43,6 +44,7 @@ public class PaginationPanel extends JPanel {
     public PaginationPanel(MessagePanel messagePanel) {
         super(new BorderLayout());
         this.messagePanel = messagePanel;
+        this.setMinimumSize(new Dimension(300,300));
     }
 
     private void doLayout(int totalRecordsCount) {
@@ -58,21 +60,21 @@ public class PaginationPanel extends JPanel {
     private JPanel recordsPanel(int totalRecordsCount) {
         JPanel panel = new JPanel();
 
-        JLabel currentName = new JLabel("Current: ");
+        JLabel currentName = new JLabel("Current:");
         panel.add(currentName);
         current = new JLabel("               ");
         current.setToolTipText("Range of displayed records");
         panel.add(current);
 
-        JLabel filtered = new JLabel("Filtered: ");
+        JLabel filtered = new JLabel("Filtered:");
         panel.add(filtered);
         filteredRecords = new JLabel("" + totalRecordsCount);
-        filteredRecords.setToolTipText("Filtered Records");
+        filteredRecords.setToolTipText("Number of records in dataset matching the filter");
         panel.add(filteredRecords);
 
-        panel.add(new JLabel("Total: "));
+        panel.add(new JLabel("of"));
         JLabel totalRecordsLabel = new JLabel("" + totalRecordsCount);
-        totalRecordsLabel.setToolTipText("Total Records");
+        totalRecordsLabel.setToolTipText("Total number of records in dataset");
         panel.add(totalRecordsLabel);
 
         return panel;
