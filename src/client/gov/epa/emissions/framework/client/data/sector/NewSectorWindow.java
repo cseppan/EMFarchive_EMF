@@ -36,6 +36,8 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
     private TextArea description;
 
     private SectorCriteriaTableData criteriaTableData;
+    
+    private SectorCriteriaPanel criteriaPanel;
 
     private static int counter;
 
@@ -98,10 +100,10 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
 
     private JPanel createCriteriaPanel(Sector sector) {
         criteriaTableData = new SectorCriteriaTableData(sector.getSectorCriteria());
-        JPanel panel = new SectorCriteriaPanel("", criteriaTableData, this);
-        panel.setBorder(BorderFactory.createTitledBorder("Criteria"));
+        criteriaPanel = new SectorCriteriaPanel("", criteriaTableData, this);
+        criteriaPanel.setBorder(BorderFactory.createTitledBorder("Criteria"));
 
-        return panel;
+        return criteriaPanel;
     }
 
     private JPanel createButtonsPanel(Sector sector) {
@@ -131,6 +133,7 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
                 sector.setSectorCriteria(criteriaTableData.sources());
                 try {
                     if (!name.getText().equals("")) {
+                        criteriaPanel.commit();
                         resetChanges();
                         presenter.doSave();
                     } else
