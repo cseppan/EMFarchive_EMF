@@ -9,7 +9,7 @@ import org.jmock.MockObjectTestCase;
 public class LayoutTest extends MockObjectTestCase {
 
     public void testShouldAddOneViewAndLayoutTheView() {
-        Position position = new Position(20, 20);
+        Position position = new Position(0, 0);
         ManagedView manageView = (ManagedView) manageView(position, 200, 200).proxy();
         EmfConsoleView emfConsoleView = emfConsoleProxy();
         Layout layout = new LayoutImpl(emfConsoleView);
@@ -17,7 +17,7 @@ public class LayoutTest extends MockObjectTestCase {
     }
 
     public void testShouldRemoveViewFromStackWhenRemoveIsCalled() {
-        ManagedView manageView = (ManagedView) manageView(new Position(20, 20), 200, 200).proxy();
+        ManagedView manageView = (ManagedView) manageView(new Position(0, 0), 200, 200).proxy();
         EmfConsoleView emfConsoleView = emfConsoleProxy();
 
         Layout layout = new LayoutImpl(emfConsoleView);
@@ -26,8 +26,8 @@ public class LayoutTest extends MockObjectTestCase {
     }
 
     public void testShouldPositionWindowRelativeToTheLastWindowAdded() {
-        ManagedView managedView1 = (ManagedView) manageViewWithGetPosition(new Position(20, 20), 200, 200).proxy();
-        ManagedView managedView2 = (ManagedView) manageView(new Position(40, 40), 200, 200).proxy();
+        ManagedView managedView1 = (ManagedView) manageViewWithGetPosition(new Position(0, 0), 200, 200).proxy();
+        ManagedView managedView2 = (ManagedView) manageView(new Position(20, 20), 200, 200).proxy();
 
         EmfConsoleView emfConsoleView = emfConsoleProxy();
 
@@ -37,8 +37,8 @@ public class LayoutTest extends MockObjectTestCase {
     }
 
     public void testShouldPositionWindowToTheUpperLeftHandCornerIfWindowWidthDoesNotDisplayInsideConsoleView() {
-        ManagedView managedView1 = (ManagedView) manageViewWithGetPosition(new Position(20, 20), 200, 200).proxy();
-        ManagedView managedView2 = (ManagedView) manageView(new Position(20, 20), 700, 200).proxy();
+        ManagedView managedView1 = (ManagedView) manageViewWithGetPosition(new Position(0, 0), 200, 200).proxy();
+        ManagedView managedView2 = (ManagedView) manageView(new Position(0, 0), 700, 200).proxy();
 
         EmfConsoleView emfConsoleView = emfConsoleProxy();
 
@@ -48,8 +48,8 @@ public class LayoutTest extends MockObjectTestCase {
     }
 
     public void testShouldPositionWindowToTheUpperLeftHandCornerIfWindowHeightDoesNotDisplayInsideConsoleView() {
-        ManagedView managedView1 = (ManagedView) manageViewWithGetPosition(new Position(20, 20), 200, 200).proxy();
-        ManagedView managedView2 = (ManagedView) manageView(new Position(20, 20), 200, 500).proxy();
+        ManagedView managedView1 = (ManagedView) manageViewWithGetPosition(new Position(0, 0), 200, 200).proxy();
+        ManagedView managedView2 = (ManagedView) manageView(new Position(0, 0), 200, 500).proxy();
 
         EmfConsoleView emfConsoleView = emfConsoleProxy();
 
