@@ -223,7 +223,7 @@ public class EmfDataset implements Dataset, Lockable {
 
         Dataset otherDataset = (Dataset) other;
 
-        return (name.equals(otherDataset.getName()));
+        return (id == otherDataset.getId());
     }
 
     public String getStatus() {

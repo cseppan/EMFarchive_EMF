@@ -4,6 +4,6 @@ import gov.epa.emissions.framework.EmfException;
 
 public interface EditableSummaryTabPresenter {
 
-    public abstract void doSave() throws EmfException;
+    void doSave() throws EmfException;
 
 }

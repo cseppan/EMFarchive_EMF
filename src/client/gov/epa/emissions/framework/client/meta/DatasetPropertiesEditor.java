@@ -163,7 +163,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
                 try {
                     presenter.doSave();
                 } catch (EmfException e) {
-                    showError("Could not save dataset. Reason: " + e.getMessage());
+                    showError(e.getMessage());
                 }
             }
         });

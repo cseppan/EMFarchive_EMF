@@ -24,7 +24,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
 
     private DataCommonsService service;
 
-    private DataService dataService;
+    private DataServiceImpl dataService;
 
     private UserService userService;
 
@@ -33,6 +33,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         service = new DataCommonsServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
         dataService = new DataServiceImpl(sessionFactory);
+        super.deleteAllDatasets();
     }
 
     public void testShouldReturnCompleteListOfSectors() throws EmfException {
@@ -400,7 +401,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
 
     public void testShouldAddRevision() throws EmfException {
         Revision rev = null;
-        
+
         long id = Math.abs(new Random().nextInt());
         User user = userService.getUser("emf");
         EmfDataset dataset = newDataset();
@@ -408,27 +409,26 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         dataService.addDataset(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
-        rev = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT"+id, "WHY ONE", "NOTE ONE");
+        rev = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT" + id,
+                "WHY ONE", "NOTE ONE");
         service.addRevision(rev);
 
         boolean newRevisionAdded = false;
         try {
             Revision[] revisions = service.getRevisions(datasetFromDB.getId());
             for (int i = 0; i < revisions.length; i++)
-                if (revisions[i].getWhat().equalsIgnoreCase("WHAT"+id))
+                if (revisions[i].getWhat().equalsIgnoreCase("WHAT" + id))
                     newRevisionAdded = true;
 
             assertTrue(newRevisionAdded);
-        } catch (Exception e){
-            e.printStackTrace();
-        }finally {
+        } finally {
             remove(rev);
             remove(dataset);
         }
     }
 
     public void testShouldAddAndGetThreeRevisions() throws Exception {
-        Revision rev1=null,rev2=null,rev3=null;
+        Revision rev1 = null, rev2 = null, rev3 = null;
 
         long id = Math.abs(new Random().nextInt());
         User user = userService.getUser("emf");
@@ -438,14 +438,17 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
         int revisionsBeforeAdd = service.getRevisions(datasetFromDB.getId()).length;
-        
-        rev1 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT ONE"+id, "WHY ONE", "NOTE ONE");
-        rev2 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT TWO"+id, "WHY TWO", "NOTE TWO");
-        rev3 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT THREE"+id, "WHY THREE", "NOTE THREE");
+
+        rev1 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT ONE" + id,
+                "WHY ONE", "NOTE ONE");
+        rev2 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT TWO" + id,
+                "WHY TWO", "NOTE TWO");
+        rev3 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT THREE" + id,
+                "WHY THREE", "NOTE THREE");
         service.addRevision(rev1);
         service.addRevision(rev2);
         service.addRevision(rev3);
-        
+
         try {
             Revision[] revisions = service.getRevisions(datasetFromDB.getId());
             assertEquals("Three Revisions should return", revisionsBeforeAdd + 3, revisions.length);
@@ -453,7 +456,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
             remove(rev1);
             remove(rev2);
             remove(rev3);
-            
+
             remove(dataset);
         }
     }
@@ -491,15 +494,15 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
         int notesBeforeAdd = service.getNotes(datasetFromDB.getId()).length;
-        
+
         Note note1 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME1" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
         Note note2 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME2" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
 
-        Note[] notesToAdd = new Note[]{note1, note2};
+        Note[] notesToAdd = new Note[] { note1, note2 };
         service.addNotes(notesToAdd);
-        
+
         try {
             Note[] notes = service.getNotes(datasetFromDB.getId());
             assertEquals("Two notes should return", notesBeforeAdd + 2, notes.length);
@@ -519,7 +522,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
         int notesBeforeAdd = service.getNotes(datasetFromDB.getId()).length;
-        
+
         Note note1 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME1" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
         service.addNote(note1);

@@ -20,7 +20,7 @@ import org.hibernate.criterion.Restrictions;
 
 public class DataServiceTest extends ServicesTestCase {
 
-    private DataService service;
+    private DataServiceImpl service;
 
     private UserService userService;
 
@@ -206,10 +206,25 @@ public class DataServiceTest extends ServicesTestCase {
             remove(region);
         }
     }
+    
+    public void testShouldUpdateDatsetName() throws EmfException {
+        User owner = userService.getUser("emf");
+        EmfDataset dataset = newDataset();
+
+        try {
+            EmfDataset locked = service.obtainLockedDataset(owner, dataset);
+            locked.setName("TEST dataset");
+
+            EmfDataset released = service.updateDataset(locked);
+            assertEquals("TEST dataset", released.getName());
+        } finally {
+            remove(dataset);
+        }
+    }
 
     public void testShouldFailOnAttemptToAddDatasetWithDuplicateName() throws EmfException {
         EmfDataset dataset1 = newDataset();
-        
+
         EmfDataset dataset2 = new EmfDataset();
         dataset2.setName(dataset1.getName());
         dataset2.setCreator(dataset1.getCreator());

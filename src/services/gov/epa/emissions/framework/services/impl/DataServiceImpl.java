@@ -52,7 +52,7 @@ public class DataServiceImpl implements DataService {
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add Dataset - " + dataset.getName(), e);
-            throw new EmfException("Dataset name already in use");
+            throw new EmfException("Could not add Dataset - " + dataset.getName());
         }
     }
 
@@ -66,8 +66,8 @@ public class DataServiceImpl implements DataService {
             dao.updateWithoutLocking(dataset, session);
             session.close();
         } catch (RuntimeException e) {
-            LOG.error("Could not get update Dataset - " + dataset.getName(), e);
-            throw new EmfException("Dataset name already in use");
+            LOG.error("Could not update Dataset - " + dataset.getName(), e);
+            throw new EmfException("Could not update Dataset - " + dataset.getName());
         }
     }
 
@@ -120,14 +120,13 @@ public class DataServiceImpl implements DataService {
             if (!dao.canUpdate(dataset, session))
                 throw new EmfException("Dataset name already in use");
 
-
             EmfDataset released = dao.update(dataset, session);
             session.close();
 
             return released;
         } catch (RuntimeException e) {
             LOG.error("Could not update Dataset: " + dataset.getName(), e);
-            throw new EmfException("Dataset name already in use");
+            throw new EmfException("Could not update Dataset: " + dataset.getName());
         }
     }
 }

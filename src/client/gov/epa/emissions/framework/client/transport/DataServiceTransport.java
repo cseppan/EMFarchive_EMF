@@ -28,16 +28,6 @@ public class DataServiceTransport implements DataService {
         return (EmfDataset[]) call.requestResponse(new Object[] {});
     }
 
-    public void updateDatasetWithoutLock(EmfDataset dataset) throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("updateDatasetWithoutLock");
-        call.addParam("dataset", mappings.dataset());
-        call.setVoidReturnType();
-
-        call.request(new Object[] { dataset });
-    }
-
     public EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
         EmfCall call = call();
 
@@ -67,17 +57,6 @@ public class DataServiceTransport implements DataService {
         call.setReturnType(mappings.dataset());
 
         return (EmfDataset) call.requestResponse(new Object[] { locked });
-    }
-
-    public void addDataset(EmfDataset dataset) throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("addDataset");
-        call.addParam("dataset", mappings.dataset());
-        call.setVoidReturnType();
-        
-        call.request(new Object[] { dataset });
-        
     }
 
 }

@@ -270,18 +270,19 @@ public class DataCommonsDAOTest extends ServicesTestCase {
 
     public void testShouldPersistRevisionOnAdd() {
         Revision rev = null;
-        
+
         User user = userDao.get("emf", session);
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
-        datasetDAO.add(dataset,session);
+        datasetDAO.add(dataset, session);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
-        rev = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT ONE", "WHY ONE", "NOTE ONE");
+        rev = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT ONE", "WHY ONE",
+                "NOTE ONE");
 
         dao.add(rev, session);
 
         try {
-            List allRevisions = dao.getRevisions(datasetFromDB.getId(),session);
+            List allRevisions = dao.getRevisions(datasetFromDB.getId(), session);
             assertEquals(1, allRevisions.size());
         } finally {
             remove(rev);
@@ -289,24 +290,26 @@ public class DataCommonsDAOTest extends ServicesTestCase {
         }
     }
 
-
     public void testShouldAddANDGetThreeRevisions() {
-        Revision rev1=null,rev2=null,rev3=null;
+        Revision rev1 = null, rev2 = null, rev3 = null;
 
         User user = userDao.get("emf", session);
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
-        datasetDAO.add(dataset,session);
+        datasetDAO.add(dataset, session);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
-        
-        rev1 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT ONE", "WHY ONE", "NOTE ONE");
-        rev2 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT TWO", "WHY TWO", "NOTE TWO");
-        rev3 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT THREE", "WHY THREE", "NOTE THREE");
+
+        rev1 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT ONE",
+                "WHY ONE", "NOTE ONE");
+        rev2 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT TWO",
+                "WHY TWO", "NOTE TWO");
+        rev3 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT THREE",
+                "WHY THREE", "NOTE THREE");
         dao.add(rev1, session);
         dao.add(rev2, session);
         dao.add(rev3, session);
         try {
-            List allRevisions = dao.getRevisions(datasetFromDB.getId(),session);
+            List allRevisions = dao.getRevisions(datasetFromDB.getId(), session);
             assertEquals(3, allRevisions.size());
         } finally {
             remove(rev1);
@@ -320,14 +323,15 @@ public class DataCommonsDAOTest extends ServicesTestCase {
         User user = userDao.get("emf", session);
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
-        datasetDAO.add(dataset,session);
+        datasetDAO.add(dataset, session);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
-        Note note = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME", loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        Note note = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME",
+                loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
 
         dao.add(note, session);
 
         try {
-            List allNotes = dao.getNotes(datasetFromDB.getId(),session);
+            List allNotes = dao.getNotes(datasetFromDB.getId(), session);
             assertEquals(1, allNotes.size());
         } finally {
             remove(note);
@@ -339,20 +343,20 @@ public class DataCommonsDAOTest extends ServicesTestCase {
         User user = userDao.get("emf", session);
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
-        datasetDAO.add(dataset,session);
+        datasetDAO.add(dataset, session);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
-        Note note1 = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME", loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
-        Note note2 = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS2","NOTE NAME 2", loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        Note note1 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME",
+                loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        Note note2 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS2", "NOTE NAME 2",
+                loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
 
         dao.add(note1, session);
 
         dao.add(note2, session);
         try {
-            List allNotes = dao.getNotes(datasetFromDB.getId(),session);
+            List allNotes = dao.getNotes(datasetFromDB.getId(), session);
             assertEquals(2, allNotes.size());
-        } catch(Exception e){
-          e.printStackTrace();   
-        }finally {
+        } finally {
             remove(note1);
             remove(note2);
             remove(dataset);

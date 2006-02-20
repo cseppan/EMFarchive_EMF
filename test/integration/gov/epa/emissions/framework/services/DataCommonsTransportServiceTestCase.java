@@ -20,11 +20,11 @@ public class DataCommonsTransportServiceTestCase extends ServicesTestCase {
     private static final String DEFAULT_URL = "http://localhost:8080/emf/services";// default
 
     private DataCommonsService dcs = null;
-//    private DataService ds = null;
-//    private UserService us = null;
 
     private DataCommonsService service;
-    private DataService dataService;
+
+    private DataServiceImpl dataService;
+
     private UserService userService;
 
     protected void doSetUp() throws Exception {
@@ -32,18 +32,14 @@ public class DataCommonsTransportServiceTestCase extends ServicesTestCase {
         service = new DataCommonsServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
         dataService = new DataServiceImpl(sessionFactory);
-        
-        
+
         RemoteServiceLocator rl = new RemoteServiceLocator(DEFAULT_URL);
         dcs = rl.dataCommonsService();
-//        ds = rl.dataService();
-//        us = rl.userService();    
     }
-
 
     public void testShouldGetAllNoteTypes() throws EmfException {
         NoteType[] all = dcs.getNoteTypes();
-        assertEquals("5 types",all.length,5);
+        assertEquals("5 types", all.length, 5);
     }
 
     public void testShouldAddNote() throws EmfException {
@@ -53,12 +49,13 @@ public class DataCommonsTransportServiceTestCase extends ServicesTestCase {
         dataset.setCreator(user.getUsername());
         dataService.addDataset(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
-        Note note = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME"+id, loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        Note note = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME" + id,
+                loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
         dcs.addNote(note);
 
         try {
             Note[] notes = service.getNotes(datasetFromDB.getId());
-            assertEquals(notes.length,1);
+            assertEquals(notes.length, 1);
         } finally {
             remove(note);
             remove(dataset);
@@ -73,14 +70,16 @@ public class DataCommonsTransportServiceTestCase extends ServicesTestCase {
         dataService.addDataset(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
-        Note note1 = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME1"+id, loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        Note note1 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME1" + id,
+                loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
         service.addNote(note1);
-        Note note2 = new Note(user,datasetFromDB.getId(),new Date(),"NOTE DETAILS","NOTE NAME2"+id, loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
+        Note note2 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME2" + id,
+                loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
         service.addNote(note2);
 
         try {
             Note[] notes = service.getNotes(datasetFromDB.getId());
-            assertEquals("Two notes should return", notes.length,2);
+            assertEquals("Two notes should return", notes.length, 2);
         } finally {
             remove(note1);
             remove(note2);
@@ -139,5 +138,4 @@ public class DataCommonsTransportServiceTestCase extends ServicesTestCase {
     protected void doTearDown() throws Exception {// no op
     }
 
-    
 }

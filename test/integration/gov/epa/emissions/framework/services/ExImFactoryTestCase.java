@@ -35,46 +35,17 @@ public class ExImFactoryTestCase extends ServicesTestCase {
     }
 
     public void testShouldCreateAllExportersFromDatasetTypesTable() throws Exception {
+        for (int i = 0; i < allDatasetTypes.length; i++) {
+            DatasetType dst = allDatasetTypes[i];
+            // Class dstClass = Class.forName(dst.getImporterClassName());
+            dataset.setDatasetType(dst);
 
-        try {
-            for (int i = 0; i < allDatasetTypes.length; i++) {
-                DatasetType dst = allDatasetTypes[i];
-//                Class dstClass = Class.forName(dst.getImporterClassName());
-                dataset.setDatasetType(dst);
-
-                if (!ignore(dst)) {
-                    Exporter exporter = exporterFactory.create(dataset, 0);
-                    assertTrue("Importer cannot be null ", exporter != null);
-                }
+            if (!ignore(dst)) {
+                Exporter exporter = exporterFactory.create(dataset, 0);
+                assertTrue("Importer cannot be null ", exporter != null);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
         }
-
     }
-
-    // public void testShouldCreateAllImportersFromDatasetTypesTable() throws EmfException{
-    //        
-    // try {
-    // System.out.println("Total number of datasettypes= " + allDatasetTypes.length);
-    // for (int i = 0; i < allDatasetTypes.length; i++) {
-    // DatasetType dst = allDatasetTypes[i];
-    // //Class dstClass = Class.forName(dst.getImporterClassName());
-    // dataset.setDatasetType(dst);
-    //                
-    // System.out.println("#" + i + ":" + dst.getName());
-    // if (!ignore(dst)){
-    // Importer importer = importerFactory.create(dataset, path, fileName);
-    // assertTrue("Importer cannot be null ", importer!=null);
-    // }
-    // }
-    // } catch (ImporterException e) {
-    // e.printStackTrace();
-    // throw new EmfException("importer factory failed to create importer. Reason: Importer Exception");
-    // }
-    //
-    // }
 
     /*
      * This method is a hack because these importers need files present to be created
