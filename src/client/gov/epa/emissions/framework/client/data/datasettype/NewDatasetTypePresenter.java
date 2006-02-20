@@ -61,6 +61,7 @@ public class NewDatasetTypePresenter {
         newType.setKeywords(new Keyword[0]);
         newType.setMinFiles(Integer.parseInt(minfiles));
         newType.setMaxFiles(Integer.parseInt(maxfiles));
+        newType.setDefaultSortOrder("");
         newType.setImporterClassName((String)mapImport.get(type));
         newType.setExporterClassName((String)mapExport.get(type));
         newType.setExternal(type.equalsIgnoreCase("External File"));
