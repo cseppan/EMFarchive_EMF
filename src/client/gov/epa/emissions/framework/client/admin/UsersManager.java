@@ -168,7 +168,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
                 updateUsers();
             }
         };
-        SelectAwareButton updateButton = new SelectAwareButton("Update", updateAction, selectModel, confirmUpdateDialog);
+        SelectAwareButton updateButton = new SelectAwareButton("Edit", updateAction, selectModel, confirmUpdateDialog);
 
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
