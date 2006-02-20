@@ -34,7 +34,7 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
             new ViewableDatasetTypePresenterImpl(viewable, type).doDisplay();
             return;
         }
-        
+
         editable.observe(this);
         Keyword[] keywords = dataCommonsService().getKeywords();
         editable.display(type, keywords);
@@ -57,12 +57,9 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
         editable.close();
     }
 
-    public void doSave(String name, String description, Keyword[] keywords, DatasetTypesManagerView manager)
-            throws EmfException {
+    public void doSave(String name, String description, Keyword[] keywords) throws EmfException {
         update(name, description, keywords);
         type = service().updateDatasetType(type);
-
-        manager.refresh();
         closeView();
     }
 

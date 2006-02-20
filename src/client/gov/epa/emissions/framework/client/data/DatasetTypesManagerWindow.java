@@ -10,9 +10,10 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshButton;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -33,7 +34,7 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 //FIXME: very similar to SectorsManager. Refactor ?
-public class DatasetTypesManagerWindow extends ReusableInteralFrame implements DatasetTypesManagerView {
+public class DatasetTypesManagerWindow extends ReusableInteralFrame implements DatasetTypesManagerView, RefreshObserver {
 
     private DatasetTypesManagerPresenter presenter;
 
@@ -47,12 +48,10 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     private EmfConsole parentConsole;
 
-    private DataCommonsService service;
-
     public DatasetTypesManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Type Manager", new Dimension(600, 300), parentConsole.desktop(), desktopManager);
         super.setName("datasetTypeManager");
-        
+
         this.parentConsole = parentConsole;
 
         layout = new JPanel();
@@ -63,20 +62,13 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         this.presenter = presenter;
     }
 
-    public void refresh() {
-        try {
-            doLayout(service.getDatasetTypes());
-        } catch (EmfException e) {
-            messagePanel.setError("Could not refresh. Problem communicating with remote services.");
-        }
-
+    public void refresh(DatasetType[] types) {
+        doLayout(types);
         super.refreshLayout();
     }
 
-    public void display(DataCommonsService service) throws EmfException {
-        this.service = service;
-
-        doLayout(service.getDatasetTypes());
+    public void display(DatasetType[] types) {
+        doLayout(types);
         super.display();
     }
 
@@ -95,10 +87,21 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
         sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
 
-        messagePanel = new SingleLineMessagePanel();
-        layout.add(messagePanel, BorderLayout.NORTH);
+        layout.add(createTopPanel(), BorderLayout.NORTH);
         layout.add(scrollPane, BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
+    }
+
+    private JPanel createTopPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        messagePanel = new SingleLineMessagePanel();
+        panel.add(messagePanel, BorderLayout.CENTER);
+
+        Button button = new RefreshButton(this, "Refresh Dataset Types", messagePanel);
+        panel.add(button, BorderLayout.EAST);
+
+        return panel;
     }
 
     private JPanel createControlPanel() {
@@ -214,7 +217,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private EditableDatasetTypeView editableView() {
-        EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(this, desktopManager);
+        EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
@@ -249,5 +252,9 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     public EmfConsole getParentConsole() {
         return this.parentConsole;
+    }
+
+    public void doRefresh() throws EmfException {
+        presenter.doRefresh();
     }
 }

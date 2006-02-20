@@ -1,27 +1,26 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.DataCommonsService;
 
 import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
 
-public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
+public class DatasetTypesManagerPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldDisplayViewOnDisplay() throws Exception {
+        Mock view = mock(DatasetTypesManagerView.class);
+        DatasetType[] types = {};
+        view.expects(once()).method("display").with(same(types));
+
         Mock service = mock(DataCommonsService.class);
+        stub(service, "getDatasetTypes", types);
         DataCommonsService serviceProxy = (DataCommonsService) service.proxy();
 
-        Mock view = mock(DatasetTypesManagerView.class);
-        view.expects(once()).method("display").with(same(serviceProxy));
-
-        Mock locator = mock(ServiceLocator.class);
-        locator.stubs().method("dataCommonsService").withNoArguments().will(returnValue(serviceProxy));
-
         Mock session = mock(EmfSession.class);
-        session.stubs().method("serviceLocator").withNoArguments().will(returnValue(locator.proxy()));
+        session.stubs().method("dataCommonsService").withNoArguments().will(returnValue(serviceProxy));
 
         DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((EmfSession) session.proxy(),
                 (DatasetTypesManagerView) view.proxy());
@@ -60,4 +59,25 @@ public class DatasetTypesManagerPresenterTest extends MockObjectTestCase {
         p.view((ViewableDatasetTypePresenter) presenter.proxy());
     }
 
+    public void testShouldRefreshViewOnClickOfRefreshButton() throws EmfException {
+        Mock view = mock(DatasetTypesManagerView.class);
+        DatasetType[] types = {};
+        view.expects(once()).method("display").with(same(types));
+
+        Mock service = mock(DataCommonsService.class);
+        stub(service, "getDatasetTypes", types);
+        DataCommonsService serviceProxy = (DataCommonsService) service.proxy();
+
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("dataCommonsService").withNoArguments().will(returnValue(serviceProxy));
+
+        DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter((EmfSession) session.proxy(),
+                (DatasetTypesManagerView) view.proxy());
+        view.expects(once()).method("observe").with(eq(p));
+
+        view.expects(once()).method("refresh").with(eq(types));
+
+        p.doDisplay();
+        p.doRefresh();
+    }
 }

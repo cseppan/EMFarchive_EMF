@@ -39,14 +39,11 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private KeywordsTableData keywordsTableData;
 
-    private DatasetTypesManagerView manager;
-
     private DatasetTypeKeywordsPanel keywordsPanel;
 
-    public EditableDatasetTypeWindow(DatasetTypesManagerView manager, DesktopManager desktopManager) {
+    public EditableDatasetTypeWindow(DesktopManager desktopManager) {
         super("Edit Dataset Type", new Dimension(600, 500), desktopManager);
 
-        this.manager = manager;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -135,7 +132,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
                     else {
                         keywordsPanel.commit();
                         resetChanges();
-                        presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), manager);
+                        presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources());
                     }
                 } catch (EmfException e) {
                     messagePanel.setError("Could not save. Reason: " + e.getMessage());

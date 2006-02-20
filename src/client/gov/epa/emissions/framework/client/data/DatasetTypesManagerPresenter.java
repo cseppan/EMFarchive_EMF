@@ -3,9 +3,10 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
+import gov.epa.emissions.framework.services.DataCommonsService;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 
-public class DatasetTypesManagerPresenter {
+public class DatasetTypesManagerPresenter implements RefreshObserver {
 
     private DatasetTypesManagerView view;
 
@@ -18,11 +19,11 @@ public class DatasetTypesManagerPresenter {
 
     public void doDisplay() throws EmfException {
         view.observe(this);
-        view.display(serviceLocator().dataCommonsService());
+        view.display(service().getDatasetTypes());
     }
 
-    private ServiceLocator serviceLocator() {
-        return session.serviceLocator();
+    private DataCommonsService service() {
+        return session.dataCommonsService();
     }
 
     public void doClose() {
@@ -47,10 +48,14 @@ public class DatasetTypesManagerPresenter {
     void view(ViewableDatasetTypePresenter presenter) throws EmfException {
         presenter.doDisplay();
     }
-    
+
     public void displayNewDatasetTypeView(NewDatasetTypeView view) {
         NewDatasetTypePresenter presenter = new NewDatasetTypePresenter(session, view);
         presenter.doDisplay();
     }
-    
+
+    public void doRefresh() throws EmfException {
+        view.refresh(service().getDatasetTypes());
+    }
+
 }
