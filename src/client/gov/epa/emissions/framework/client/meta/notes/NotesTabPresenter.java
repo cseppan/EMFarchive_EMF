@@ -18,6 +18,10 @@ public class NotesTabPresenter {
 
     public void display(NotesTabView view) throws EmfException {
         Note[] notes = service.getNotes(dataset.getId());
-        view.display(notes);
+        view.display(notes, this);
+    }
+
+    public void doViewNote(Note note, NoteView view) {
+        view.display(note);
     }
 }
