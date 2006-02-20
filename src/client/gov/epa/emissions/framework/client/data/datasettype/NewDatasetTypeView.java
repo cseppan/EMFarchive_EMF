@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.datasettype;
 
 import gov.epa.emissions.framework.client.ManagedView;
 

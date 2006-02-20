@@ -1,9 +1,13 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.datasettype;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerPresenter;
+import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerView;
+import gov.epa.emissions.framework.client.data.datasettype.EditableDatasetTypePresenter;
+import gov.epa.emissions.framework.client.data.datasettype.ViewableDatasetTypePresenter;
 import gov.epa.emissions.framework.services.DataCommonsService;
 
 import org.jmock.Mock;

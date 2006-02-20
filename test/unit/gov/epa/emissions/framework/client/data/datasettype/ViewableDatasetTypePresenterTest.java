@@ -1,6 +1,9 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.datasettype;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.framework.client.data.datasettype.ViewableDatasetTypePresenter;
+import gov.epa.emissions.framework.client.data.datasettype.ViewableDatasetTypePresenterImpl;
+import gov.epa.emissions.framework.client.data.datasettype.ViewableDatasetTypeView;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
