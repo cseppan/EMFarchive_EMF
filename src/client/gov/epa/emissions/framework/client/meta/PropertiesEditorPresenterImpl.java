@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.data.Browser;
 import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenterImpl;
@@ -31,15 +30,11 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
 
     private EmfSession session;
 
-    private Browser browser;
-
     private EditNotesTabPresenter notesPresenter;
 
-    public PropertiesEditorPresenterImpl(EmfDataset dataset, DatasetPropertiesEditorView view, EmfSession session,
-            Browser browser) {
+    public PropertiesEditorPresenterImpl(EmfDataset dataset, DatasetPropertiesEditorView view, EmfSession session) {
         this.dataset = dataset;
         this.session = session;
-        this.browser = browser;
         this.view = view;
     }
 
@@ -73,7 +68,6 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         updateDataset(service, summary, keywords, notes);
 
         view.close();
-        browser.notifyUpdates();
     }
 
     private DataService dataService() {
