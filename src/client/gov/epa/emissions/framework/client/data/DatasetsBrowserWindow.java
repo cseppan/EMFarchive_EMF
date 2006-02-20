@@ -247,7 +247,11 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     protected void doDisplayPropertiesViewer() {
 
         List datasets = updateSelectedDatasets(getSelectedDatasets());
-
+        if (datasets.isEmpty())
+        {
+            messagePanel.setMessage("Please select one or more Datasets");
+            return;
+        }
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
             DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
             desktop.add(view);
@@ -279,6 +283,11 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     protected void doDisplayPropertiesEditor() {
         List datasets = getSelectedDatasets();
 
+        if (datasets.isEmpty())
+        {
+            messagePanel.setMessage("Please select one or more Datasets");
+            return;
+        }
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
             EmfDataset dataset = (EmfDataset) iter.next();
             DatasetPropertiesEditor view = new DatasetPropertiesEditor(session, parentConsole, desktopManager);
@@ -294,6 +303,11 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     protected void doDisplayVersionedData() {
         List datasets = getSelectedDatasets();
 
+        if (datasets.isEmpty())
+        {
+            messagePanel.setMessage("Please select one or more Datasets");
+            return;
+        }
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
             VersionedDataWindow view = new VersionedDataWindow(parentConsole, desktopManager);
             desktop.add(view);
