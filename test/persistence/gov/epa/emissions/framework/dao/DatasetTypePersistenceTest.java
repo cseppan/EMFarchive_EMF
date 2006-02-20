@@ -86,7 +86,7 @@ public class DatasetTypePersistenceTest extends HibernateTestCase {
             PostgresDbUpdate update = new PostgresDbUpdate();
             update.deleteAll("emf.dataset_types_keywords");
             update.delete("emf.dataset_types", "name", name + "");
-            update.deleteAll("emf.emf_keywords");
+            update.deleteAll("emf.keywords");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

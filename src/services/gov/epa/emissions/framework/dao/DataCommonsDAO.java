@@ -14,32 +14,17 @@ import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.services.Revision;
 import gov.epa.emissions.framework.services.Status;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 public class DataCommonsDAO {
-    private static Log log = LogFactory.getLog(DataCommonsDAO.class);
-
-    private static final String GET_EMF_KEYWORDS_QUERY = "select kw from Keyword as kw order by keyword";
-
-    private static final String GET_COUNTRY_QUERY = "select country from Country as country order by name";
-
-    private static final String GET_REGIONS_QUERY = "select region from Region as region order by name";
-
-    private static final String GET_PROJECTS_QUERY = "select project from Project as project order by name";
-
-    private static final String GET_INTENDEDUSES_QUERY = "select intendeduse from IntendedUse as intendeduse order by name";
 
     private LockingScheme lockingScheme;
 
@@ -47,28 +32,8 @@ public class DataCommonsDAO {
         lockingScheme = new LockingScheme();
     }
 
-    public List getEmfKeywords(Session session) {
-        Transaction tx = null;
-
-        ArrayList allKeywords = null;
-        try {
-            allKeywords = new ArrayList();
-
-            tx = session.beginTransaction();
-
-            Query query = session.createQuery(GET_EMF_KEYWORDS_QUERY);
-            Iterator iter = query.iterate();
-            while (iter.hasNext()) {
-                Keyword kw = (Keyword) iter.next();
-                allKeywords.add(kw);
-            }
-
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
-        return allKeywords;
+    public List getKeywords(Session session) {
+        return session.createCriteria(Keyword.class).addOrder(Order.asc("name")).list();
     }
 
     public void add(Region region, Session session) {
@@ -80,76 +45,15 @@ public class DataCommonsDAO {
     }
 
     public List getRegions(Session session) {
-        ArrayList regions = null;
-        Transaction tx = null;
-
-        try {
-            tx = session.beginTransaction();
-            regions = new ArrayList();
-            Query query = session.createQuery(GET_REGIONS_QUERY);
-
-            Iterator iter = query.iterate();
-            while (iter.hasNext()) {
-                Region region = (Region) iter.next();
-                regions.add(region);
-            }
-
-            tx.commit();
-        } catch (HibernateException e) {
-            log.error(e);
-            tx.rollback();
-            throw e;
-        }
-        return regions;
+        return session.createCriteria(Region.class).addOrder(Order.asc("name")).list();
     }
 
     public List getProjects(Session session) {
-        ArrayList projects = null;
-        Transaction tx = null;
-
-        try {
-            tx = session.beginTransaction();
-            projects = new ArrayList();
-            Query query = session.createQuery(GET_PROJECTS_QUERY);
-
-            Iterator iter = query.iterate();
-            while (iter.hasNext()) {
-                Project project = (Project) iter.next();
-                projects.add(project);
-            }
-
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
-        return projects;
+        return session.createCriteria(Project.class).addOrder(Order.asc("name")).list();
     }
 
     public List getCountries(Session session) {
-        ArrayList countries = null;
-
-        Transaction tx = null;
-
-        try {
-            tx = session.beginTransaction();
-            countries = new ArrayList();
-            Query query = session.createQuery(GET_COUNTRY_QUERY);
-
-            Iterator iter = query.iterate();
-            while (iter.hasNext()) {
-                Country cntry = (Country) iter.next();
-                countries.add(cntry);
-            }
-
-            tx.commit();
-        } catch (HibernateException e) {
-            log.error(e);
-            tx.rollback();
-            throw e;
-        }
-
-        return countries;
+        return session.createCriteria(Country.class).addOrder(Order.asc("name")).list();
     }
 
     public List getSectors(Session session) {
@@ -210,15 +114,7 @@ public class DataCommonsDAO {
     }
 
     public void add(Status status, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            session.save(status);
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        addObject(status, session);
     }
 
     private void removeReadStatus(String username, Session session) {
@@ -242,26 +138,7 @@ public class DataCommonsDAO {
     }
 
     public List getIntendedUses(Session session) {
-        ArrayList intendeduses = null;
-        Transaction tx = null;
-
-        try {
-            tx = session.beginTransaction();
-            intendeduses = new ArrayList();
-            Query query = session.createQuery(GET_INTENDEDUSES_QUERY);
-
-            Iterator iter = query.iterate();
-            while (iter.hasNext()) {
-                IntendedUse intendedUse = (IntendedUse) iter.next();
-                intendeduses.add(intendedUse);
-            }
-
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
-        return intendeduses;
+        return session.createCriteria(IntendedUse.class).addOrder(Order.asc("name")).list();
     }
 
     public void add(IntendedUse intendedUse, Session session) {
@@ -293,18 +170,7 @@ public class DataCommonsDAO {
     }
 
     public List getNoteTypes(Session session) {
-        Transaction tx = null;
-
-        try {
-            tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(NoteType.class);
-            tx.commit();
-
-            return crit.list();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        return session.createCriteria(NoteType.class).list();
     }
 
     public void add(Revision revision, Session session) {
@@ -316,33 +182,11 @@ public class DataCommonsDAO {
     }
 
     public List getRevisions(long datasetId, Session session) {
-        Transaction tx = null;
-
-        try {
-            tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(Revision.class).add(Restrictions.eq("datasetId", new Long(datasetId)));
-            tx.commit();
-
-            return crit.list();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        return session.createCriteria(Revision.class).add(Restrictions.eq("datasetId", new Long(datasetId))).list();
     }
 
     public List getNotes(long datasetId, Session session) {
-        Transaction tx = null;
-
-        try {
-            tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(Note.class).add(Restrictions.eq("datasetId", new Long(datasetId)));
-            tx.commit();
-
-            return crit.list();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        return session.createCriteria(Note.class).add(Restrictions.eq("datasetId", new Long(datasetId))).list();
     }
 
     /*
@@ -384,7 +228,7 @@ public class DataCommonsDAO {
         }
 
         Sector current = (Sector) current(sector.getId(), Sector.class, session);
-        // The current object is saved in the session.  Hibernate cannot persist our
+        // The current object is saved in the session. Hibernate cannot persist our
         // object with the same id.
         session.clear();
         if (current.getName().equals(sector.getName()))
@@ -393,78 +237,19 @@ public class DataCommonsDAO {
         return !nameUsed(sector.getName(), Sector.class, session);
     }
 
-    public boolean canUpdate(Country country, Session session) {
-        if (!exists(country.getId(), Country.class, session)) {
-            return false;
-        }
-
-        Country current = (Country) current(country.getId(), Country.class, session);
-        // The current object is saved in the session.  Hibernate cannot persist our
-        // object with the same id.
-        session.clear();
-        if (current.getName().equals(country.getName()))
-            return true;
-
-        return !nameUsed(country.getName(), Country.class, session);
-    }
     public boolean canUpdate(DatasetType datasetType, Session session) {
         if (!exists(datasetType.getId(), DatasetType.class, session)) {
             return false;
         }
 
         DatasetType current = (DatasetType) current(datasetType.getId(), DatasetType.class, session);
-        // The current object is saved in the session.  Hibernate cannot persist our
+        // The current object is saved in the session. Hibernate cannot persist our
         // object with the same id.
         session.clear();
         if (current.getName().equals(datasetType.getName()))
             return true;
 
         return !nameUsed(datasetType.getName(), DatasetType.class, session);
-    }
-
-    public boolean canUpdate(Project project, Session session) {
-        if (!exists(project.getId(), Project.class, session)) {
-            return false;
-        }
-
-        Project current = (Project) current(project.getId(), Project.class, session);
-        // The current object is saved in the session.  Hibernate cannot persist our
-        // object with the same id.
-        session.clear();
-        if (current.getName().equals(project.getName()))
-            return true;
-
-        return !nameUsed(project.getName(), Project.class, session);
-    }
-
-    public boolean canUpdate(Region region, Session session) {
-        if (!exists(region.getId(), Region.class, session)) {
-            return false;
-        }
-
-        Region current = (Region) current(region.getId(), Region.class, session);
-        // The current object is saved in the session.  Hibernate cannot persist our
-        // object with the same id.
-        session.clear();
-        if (current.getName().equals(region.getName()))
-            return true;
-
-        return !nameUsed(region.getName(), Region.class, session);
-    }
-
-    public boolean canUpdate(IntendedUse intendedUse, Session session) {
-        if (!exists(intendedUse.getId(), IntendedUse.class, session)) {
-            return false;
-        }
-
-        IntendedUse current = (IntendedUse) current(intendedUse.getId(), IntendedUse.class, session);
-        // The current object is saved in the session.  Hibernate cannot persist our
-        // object with the same id.
-        session.clear();
-        if (current.getName().equals(intendedUse.getName()))
-            return true;
-
-        return !nameUsed(intendedUse.getName(), IntendedUse.class, session);
     }
 
 }
