@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.SimpleTableModel;
+import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -25,7 +25,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
     private NotesTableData tableData;
 
-    private EmfTableModel model;
+    private SortFilterSelectModel selectModel;
 
     public EditNotesTab(EmfConsole parentConsole) {
         super.setName("editNotesTab");
@@ -50,10 +50,9 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
     private JScrollPane createSortFilterPane(Note[] notes, EmfConsole parentConsole) {
         tableData = new NotesTableData(notes);
-        model = new EmfTableModel(tableData);
-        SimpleTableModel wrapperModel = new SimpleTableModel(model);
+        selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
 
-        SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, wrapperModel);
+        SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, selectModel);
         panel.getTable().setName("notesTable");
 
         JScrollPane scrollPane = new JScrollPane(panel);
@@ -82,7 +81,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
         if (dialog.shouldCreate()) {
             tableData.add(dialog.note());
-            model.refresh();
+            selectModel.refresh();
         }
     }
 
