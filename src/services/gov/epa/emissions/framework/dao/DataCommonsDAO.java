@@ -61,7 +61,7 @@ public class DataCommonsDAO {
     }
 
     public List getDatasetTypes(Session session) {
-        return session.createCriteria(DatasetType.class).addOrder(Order.asc("name")).list();
+        return session.createCriteria(DatasetType.class).addOrder(Order.asc("name").ignoreCase()).list();
     }
 
     public Sector obtainLockedSector(User user, Sector sector, Session session) {
