@@ -348,6 +348,8 @@ public class DataCommonsServiceTest extends ServicesTestCase {
 
     public void testShouldGetAllStatusesAndRemovePreviouslyRead() throws Exception {
         User owner = userService.getUser("emf");
+        service.getStatuses(owner.getUsername());
+
         newStatus(owner.getUsername());
 
         Status[] firstRead = service.getStatuses(owner.getUsername());
