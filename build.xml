@@ -203,7 +203,7 @@
 	<target name="all-dev-tests" depends="unit-tests, integration-tests, persistence-tests" />
 	<target name="all-tests" depends="all-dev-tests, uat-tests" />
 	<target name="run-uat" description="Deploys application to Tomcat, runs all UAT tests, and stops Tomcat">
-		<antcall target="run-integration-tests">
+		<antcall target="run-webservice-tests">
 			<param name="tests-target" value="uat-tests" />
 		</antcall>
 	</target>
@@ -215,12 +215,12 @@
 	<target name="nirvana" description="Deploys application to Tomcat, runs ALL (except UAT) tests, and stops Tomcat" depends="clean, init, all-dev-tests" />
 
 	<target name="moksha" description="Deploys application to Tomcat, runs ALL tests, and stops Tomcat">
-		<antcall target="run-integration-tests">
+		<antcall target="run-webservice-tests">
 			<param name="tests-target" value="all-tests" />
 		</antcall>
 	</target>
 
-	<target name="run-integration-tests" depends="tomcat-stop, simple-deploy" description="delegate target used by other targets to run integration tests">
+	<target name="run-webservice-tests" depends="tomcat-stop, simple-deploy" description="delegate target used by other targets to run integration tests">
 		<!-- start tomcat & (all tests + stop tomcat) in parallel -->
 		<parallel>
 			<ant target="tomcat-start" />
