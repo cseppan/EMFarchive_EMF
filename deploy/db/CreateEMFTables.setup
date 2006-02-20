@@ -264,11 +264,11 @@ CREATE TABLE emf.internal_sources
   dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
   list_index int4,
   datasource varchar(255) NOT NULL,
-  table_name varchar(255) NOT NULL UNIQUE,
+  table_name varchar(255) NOT NULL,
   table_type varchar(255) NOT NULL,
   table_columns text NOT NULL,
   file_size int4 NOT NULL, 
-  UNIQUE (dataset_id, datasource)
+  UNIQUE (dataset_id, datasource,table_name)
 ) 
 WITHOUT OIDS;
 -- emf internal and external sources
