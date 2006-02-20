@@ -42,9 +42,10 @@ public class CreateDownloadFilesList {
 	}
     
     private File[] getFiles(String dir) {
-        String[] fileNames = new File(dir).list();
+        File path = new File(dir);
+        String[] fileNames = path.list();
         try {
-            String[] jarFiles = new FilePatternMatcher("*.jar").matchingNames(fileNames);
+            String[] jarFiles = new FilePatternMatcher(path, "*.jar").matchingNames(fileNames);
             File[] jars = new File[jarFiles.length];
             for(int i = 0; i < jarFiles.length; i++)
                 jars[i] = new File(dir, jarFiles[i]);

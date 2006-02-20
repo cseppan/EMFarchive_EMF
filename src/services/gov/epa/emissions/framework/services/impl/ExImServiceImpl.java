@@ -224,7 +224,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 String fileName = fileNames[0];
 
                 // The fileName is a regular expression that maps to a collection of files.
-                FilePatternMatcher fpm = new FilePatternMatcher(fileName);
+                FilePatternMatcher fpm = new FilePatternMatcher(folder, fileName);
                 String[] allFilesInFolder = folder.list();
                 fileNamesForImport = fpm.matchingNames(allFilesInFolder);
             }

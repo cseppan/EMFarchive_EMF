@@ -50,8 +50,9 @@ public class ClientBatchFile {
     }
 
     private String[] getJarFiles() throws Exception {
-        String[] fileNames = new File(batchFile.getParent() + "\\lib").list();
-        return new FilePatternMatcher("*.jar").matchingNames(fileNames);
+        File libDir = new File(batchFile.getParent() + "\\lib");
+        String[] fileNames = libDir.list();
+        return new FilePatternMatcher(libDir, "*.jar").matchingNames(fileNames);
     }
     
 //    public static void main(String[] args) {
