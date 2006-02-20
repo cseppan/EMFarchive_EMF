@@ -36,6 +36,8 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     private SingleLineMessagePanel messagePanel;
 
     private TextField name;
+    
+    private TextField sortOrder;
 
     private TextArea description;
 
@@ -90,8 +92,13 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         descScrollableTextArea.setMinimumSize(new Dimension(80, 80));
         layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, panel);
 
+        sortOrder = new TextField("sortOrder", type.getDefaultSortOrder(), 40);
+        addChangeable(sortOrder);
+        sortOrder.addTextListener();
+        layoutGenerator.addLabelWidgetPair("Default Sort Order:", sortOrder, panel);
+        
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 0, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -134,7 +141,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
                     else {
                         keywordsPanel.commit();
                         resetChanges();
-                        presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources());
+                        presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), sortOrder.getText());
                     }
                 } catch (EmfException e) {
                     messagePanel.setError("Could not save. Reason: " + e.getMessage());

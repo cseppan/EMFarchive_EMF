@@ -94,12 +94,14 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
     public void testShouldUpdateSectorAndCloseOnSave() throws Exception {
         String name = "name";
         String desc = "desc";
+        String sortOrder = "default sortOrder";
         Keyword[] keywords = {};
 
         Mock type = mock(DatasetType.class);
         type.expects(once()).method("setName").with(same(name));
         type.expects(once()).method("setDescription").with(same(desc));
         type.expects(once()).method("setKeywords").with(same(keywords));
+        type.expects(once()).method("setDefaultSortOrder").with(same(sortOrder));
         DatasetType typeProxy = (DatasetType) type.proxy();
 
         Mock view = mock(EditableDatasetTypeView.class);
@@ -115,23 +117,25 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenterImpl((EmfSession) session.proxy(),
                 (EditableDatasetTypeView) view.proxy(), null, typeProxy);
 
-        presenter.doSave(name, desc, keywords);
+        presenter.doSave(name, desc, keywords, sortOrder);
     }
 
     public void testShouldFailWithErrorIfDuplicateKeywordsInKeyValsOnSave() {
         String name = "name";
         String desc = "desc";
-
+        String sortOrder = "default sortOrder";
+        
         Mock type = mock(DatasetType.class);
         type.expects(once()).method("setName").with(same(name));
         type.expects(once()).method("setDescription").with(same(desc));
-
+        type.expects(once()).method("setDefaultSortOrder").with(same(sortOrder));
+        
         EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenterImpl(null, null, null,
                 ((DatasetType) type.proxy()));
 
         Keyword key1 = new Keyword("1");
         try {
-            presenter.doSave(name, desc, new Keyword[] { key1, key1 });
+            presenter.doSave(name, desc, new Keyword[] { key1, key1 }, sortOrder);
         } catch (EmfException e) {
             assertEquals("duplicate keyword: '1'", e.getMessage());
             return;

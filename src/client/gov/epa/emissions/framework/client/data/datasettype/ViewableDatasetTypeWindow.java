@@ -3,10 +3,10 @@ package gov.epa.emissions.framework.client.data.datasettype;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
-import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.ViewableKeywordsTableData;
@@ -82,16 +82,22 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Name:", new Label("name", type.getName()), panel);
+        TextField name = new TextField("name", type.getName(), 40);
+        name.setEditable(false);
+        layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         TextArea description = new TextArea("description", type.getDescription(), 40);
         description.setEditable(false);
         ScrollableTextArea descScrollableTextArea = new ScrollableTextArea(description);
         descScrollableTextArea.setMinimumSize(new Dimension(80, 80));
         layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, panel);
+        
+        TextField sortOrder = new TextField("sortOrder", type.getDefaultSortOrder(), 40);
+        sortOrder.setEditable(false);
+        layoutGenerator.addLabelWidgetPair("Default Sort Order:", sortOrder, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 0, // initialX, initialY
                 10, 10);// xPad, yPad
 

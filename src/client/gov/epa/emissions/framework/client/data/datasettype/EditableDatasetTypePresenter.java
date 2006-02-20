@@ -9,7 +9,7 @@ public interface EditableDatasetTypePresenter {
 
     void doClose() throws EmfException;
 
-    void doSave(String name, String description, Keyword[] keywords)
+    void doSave(String name, String description, Keyword[] keywords, String sortOrder)
             throws EmfException;
 
 }

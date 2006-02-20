@@ -57,15 +57,16 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
         editable.close();
     }
 
-    public void doSave(String name, String description, Keyword[] keywords) throws EmfException {
-        update(name, description, keywords);
+    public void doSave(String name, String description, Keyword[] keywords, String sortOrder) throws EmfException {
+        update(name, description, keywords, sortOrder);
         type = service().updateDatasetType(type);
         closeView();
     }
 
-    private void update(String name, String description, Keyword[] keywords) throws EmfException {
+    private void update(String name, String description, Keyword[] keywords, String sortOrder) throws EmfException {
         type.setName(name);
         type.setDescription(description);
+        type.setDefaultSortOrder(sortOrder);
 
         verifyDuplicates(keywords);
         type.setKeywords(keywords);
