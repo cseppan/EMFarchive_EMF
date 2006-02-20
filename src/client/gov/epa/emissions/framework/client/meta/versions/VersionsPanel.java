@@ -71,7 +71,9 @@ public class VersionsPanel extends JPanel implements VersionsView {
 
     public void display(Version[] versions, InternalSource[] sources) {
         VersionsSet versionsSet = new VersionsSet(versions);
-        add(topPanel(sources), BorderLayout.PAGE_START);
+
+        if (sources.length != 0)
+            add(topPanel(sources), BorderLayout.PAGE_START);
         add(tablePanel(versions), BorderLayout.CENTER);
         add(bottomPanel(versionsSet), BorderLayout.SOUTH);
     }
