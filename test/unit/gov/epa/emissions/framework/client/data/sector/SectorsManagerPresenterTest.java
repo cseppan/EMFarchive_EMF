@@ -1,6 +1,10 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.sector;
 
 import gov.epa.emissions.commons.io.Sector;
+import gov.epa.emissions.framework.client.data.sector.EditableSectorPresenter;
+import gov.epa.emissions.framework.client.data.sector.SectorsManagerPresenter;
+import gov.epa.emissions.framework.client.data.sector.SectorsManagerView;
+import gov.epa.emissions.framework.client.data.sector.ViewableSectorPresenter;
 import gov.epa.emissions.framework.services.DataCommonsService;
 
 import org.jmock.Mock;

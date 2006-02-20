@@ -1,8 +1,14 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.sector;
 
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.data.sector.EditableSectorPresenter;
+import gov.epa.emissions.framework.client.data.sector.EditableSectorPresenterImpl;
+import gov.epa.emissions.framework.client.data.sector.EditableSectorView;
+import gov.epa.emissions.framework.client.data.sector.SectorsManagerView;
+import gov.epa.emissions.framework.client.data.sector.ViewableSectorPresenterImpl;
+import gov.epa.emissions.framework.client.data.sector.ViewableSectorView;
 import gov.epa.emissions.framework.services.DataCommonsService;
 
 import java.util.Date;

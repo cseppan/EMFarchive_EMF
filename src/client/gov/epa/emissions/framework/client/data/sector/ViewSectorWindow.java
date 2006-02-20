@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.sector;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;

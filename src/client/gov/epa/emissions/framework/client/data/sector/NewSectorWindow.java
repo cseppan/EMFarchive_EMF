@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.sector;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
@@ -23,9 +23,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class EditSectorWindow extends DisposableInteralFrame implements EditableSectorView {
+public class NewSectorWindow extends DisposableInteralFrame implements NewSectorView {
 
-    private EditableSectorPresenter presenter;
+    private NewSectorPresenter presenter;
 
     private JPanel layout;
 
@@ -39,8 +39,10 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
 
     private SectorsManagerView sectorManager;
 
-    public EditSectorWindow(SectorsManagerView sectorManager, DesktopManager desktopManager) {
-        super("Edit Sector", new Dimension(550, 400), desktopManager);
+    private static int counter;
+
+    public NewSectorWindow(SectorsManagerView sectorManager, DesktopManager desktopManager) {
+        super("Create New Sector", new Dimension(550, 400), desktopManager);
 
         this.sectorManager = sectorManager;
         layout = new JPanel();
@@ -48,14 +50,15 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
         super.getContentPane().add(layout);
     }
 
-    public void observe(EditableSectorPresenter presenter) {
+    public void observe(NewSectorPresenter presenter) {
         this.presenter = presenter;
     }
 
     public void display(Sector sector) {
-        super.setTitle("Edit Sector: " + sector.getName());
-        super.setName("sectorEditor:" + sector.getId());
-
+        counter++;
+        String name = "Create New Sector " + counter;
+        super.setTitle(name);
+        super.setName("createNewSector:" + counter);
         layout.removeAll();
         doLayout(layout, sector);
 
@@ -160,11 +163,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
 
     private void checkChangesAndCloseWindow() {
         if (checkChanges())
-            try {
-                presenter.doClose();
-            } catch (EmfException e) {
-                messagePanel.setError("Could not close. Reason: " + e.getMessage());
-            }
+            presenter.doClose();
     }
 
 }

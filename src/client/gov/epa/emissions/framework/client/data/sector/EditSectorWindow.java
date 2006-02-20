@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.sector;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
@@ -23,9 +23,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class NewSectorWindow extends DisposableInteralFrame implements NewSectorView {
+public class EditSectorWindow extends DisposableInteralFrame implements EditableSectorView {
 
-    private NewSectorPresenter presenter;
+    private EditableSectorPresenter presenter;
 
     private JPanel layout;
 
@@ -39,10 +39,8 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
 
     private SectorsManagerView sectorManager;
 
-    private static int counter;
-
-    public NewSectorWindow(SectorsManagerView sectorManager, DesktopManager desktopManager) {
-        super("Create New Sector", new Dimension(550, 400), desktopManager);
+    public EditSectorWindow(SectorsManagerView sectorManager, DesktopManager desktopManager) {
+        super("Edit Sector", new Dimension(550, 400), desktopManager);
 
         this.sectorManager = sectorManager;
         layout = new JPanel();
@@ -50,15 +48,14 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
         super.getContentPane().add(layout);
     }
 
-    public void observe(NewSectorPresenter presenter) {
+    public void observe(EditableSectorPresenter presenter) {
         this.presenter = presenter;
     }
 
     public void display(Sector sector) {
-        counter++;
-        String name = "Create New Sector " + counter;
-        super.setTitle(name);
-        super.setName("createNewSector:" + counter);
+        super.setTitle("Edit Sector: " + sector.getName());
+        super.setName("sectorEditor:" + sector.getId());
+
         layout.removeAll();
         doLayout(layout, sector);
 
@@ -163,7 +160,11 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
 
     private void checkChangesAndCloseWindow() {
         if (checkChanges())
-            presenter.doClose();
+            try {
+                presenter.doClose();
+            } catch (EmfException e) {
+                messagePanel.setError("Could not close. Reason: " + e.getMessage());
+            }
     }
 
 }

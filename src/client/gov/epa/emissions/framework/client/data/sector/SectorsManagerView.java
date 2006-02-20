@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.data;
+package gov.epa.emissions.framework.client.data.sector;
 
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ManagedView;
