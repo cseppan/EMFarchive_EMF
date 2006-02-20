@@ -11,7 +11,6 @@ import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.NoteType;
-import gov.epa.emissions.framework.services.Revision;
 
 public class DataEditorPresenter {
 
@@ -28,6 +27,8 @@ public class DataEditorPresenter {
     private EmfSession session;
 
     private EmfDataset dataset;
+
+    private boolean changesSaved;
 
     public DataEditorPresenter(EmfDataset dataset, Version version, String table, EmfSession session) {
         this.dataset = dataset;
@@ -81,17 +82,20 @@ public class DataEditorPresenter {
         tablePresenter.doDisplayFirst();
     }
 
-    public void doClose(Revision revision) throws EmfException {
-        close(closingRule(), commonsService(), revision);
+    public void doClose() throws EmfException {
+        close(closingRule(), areChangesSaved());
     }
 
-    void close(ClosingRule closingRule, DataCommonsService commonsService, Revision revision) throws EmfException {
-        closingRule.close();
-        commonsService.addRevision(revision);
+    boolean areChangesSaved() {
+        return changesSaved;
+    }
+
+    void close(ClosingRule closingRule, boolean changesSaved) throws EmfException {
+        closingRule.close(changesSaved);
     }
 
     private ClosingRule closingRule() {
-        return new ClosingRule(view, tablePresenter, dataEditorService(), token);
+        return new ClosingRule(view, tablePresenter, session, token);
     }
 
     public void doDiscard() throws EmfException {
@@ -100,6 +104,7 @@ public class DataEditorPresenter {
 
     void discard(DataEditorService service, DataAccessToken token) throws EmfException {
         service.discard(token);
+        clearChangesSaved();
     }
 
     public void doSave() throws EmfException {
@@ -112,11 +117,17 @@ public class DataEditorPresenter {
         try {
             token = service.save(token);
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
+            changesSaved = true;
         } catch (EmfException e) {
+            clearChangesSaved();
             view.notifySaveFailure(e.getMessage());
             discard(service, token);
-            closingRule.proceedWithClose();
+            closingRule.proceedWithClose(areChangesSaved());
         }
+    }
+
+    private void clearChangesSaved() {
+        changesSaved = false;
     }
 
     public void doAddNote(NewNoteView view) throws EmfException {
@@ -136,4 +147,5 @@ public class DataEditorPresenter {
         if (view.shouldCreate())
             commonsService().addNote(view.note());
     }
+
 }

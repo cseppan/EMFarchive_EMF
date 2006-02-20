@@ -1,47 +1,67 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataEditorService;
 
 public class ClosingRule {
 
     private EditableTablePresenter tablePresenter;
 
-    private DataEditorService service;
-
     private DataAccessToken token;
 
     private DataEditorView view;
 
+    private EmfSession session;
+
     public ClosingRule() {// To support unit testing
     }
 
-    public ClosingRule(DataEditorView view, EditableTablePresenter tablePresenter, DataEditorService service,
+    public ClosingRule(DataEditorView view, EditableTablePresenter tablePresenter, EmfSession session,
             DataAccessToken token) {
         this.view = view;
         this.tablePresenter = tablePresenter;
-        this.service = service;
+        this.session = session;
         this.token = token;
     }
 
     public boolean hasChanges() throws EmfException {
-        return tablePresenter.hasChanges() || service.hasChanges(token);
+        return tablePresenter.hasChanges() || dataEditorService().hasChanges(token);
     }
 
-    public void close() throws EmfException {
+    private DataEditorService dataEditorService() {
+        return session.dataEditorService();
+    }
+
+    private DataCommonsService dataCommonsService() {
+        return session.dataCommonsService();
+    }
+
+    public void close(boolean changesSaved) throws EmfException {
         if (shouldCancelClose())
             return;
 
-        proceedWithClose();
+        proceedWithClose(changesSaved);
     }
 
     public boolean shouldCancelClose() throws EmfException {
         return hasChanges() && !view.confirmDiscardChanges();
     }
 
-    public void proceedWithClose() throws EmfException {
-        service.closeSession(token);
+    public void proceedWithClose(boolean changesSaved) throws EmfException {
+        if (changesSaved)
+            saveRevision();
+
+        dataEditorService().closeSession(token);
         view.close();
+    }
+
+    private void saveRevision() throws EmfException {
+        if (!view.verifyRevisionInput())
+            throw new EmfException("Please enter 'revision' information before closing");
+
+        dataCommonsService().addRevision(view.revision());
     }
 }

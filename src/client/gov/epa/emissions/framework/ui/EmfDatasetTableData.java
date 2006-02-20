@@ -35,7 +35,7 @@ public class EmfDatasetTableData extends AbstractTableData {
             EmfDataset dataset = datasets[i];
             Object[] values = { dataset.getName(), format(dataset.getModifiedDateTime()), dataset.getDatasetTypeName(),
                     dataset.getStatus(), dataset.getCreator(), dataset.getIntendedUse(), dataset.getProject(),
-                    dataset.getRegion(), formatStartDate(dataset.getStartDateTime()) };
+                    dataset.getRegion(), format(dataset.getStartDateTime()) };
 
             Row row = new ViewableRow(dataset, values);
             rows.add(row);
@@ -44,12 +44,8 @@ public class EmfDatasetTableData extends AbstractTableData {
         return rows;
     }
 
-    private String formatStartDate(Date date) {
-        return (date == null) ? "N/A" : dateFormat.format(date);
-    }
-
     private String format(Date date) {
-        return dateFormat.format(date);
+        return (date == null) ? "N/A" : dateFormat.format(date);
     }
 
     public boolean isEditable(int col) {

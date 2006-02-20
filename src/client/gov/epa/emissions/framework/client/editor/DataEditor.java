@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -51,6 +52,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private Version version;
 
     private User user;
+
+    private RevisionPanel revisionPanel;
 
     public DataEditor(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         super("Data Editor: " + dataset.getName(), desktopManager);
@@ -95,7 +98,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
         JPanel container = new JPanel(new BorderLayout());
         container.add(tablePanel(version, table), BorderLayout.CENTER);
-        container.add(controlPanel(), BorderLayout.PAGE_END);
+        container.add(bottomPanel(), BorderLayout.PAGE_END);
         layout.add(container, BorderLayout.CENTER);
 
         super.display();
@@ -135,6 +138,21 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         }
 
         return null;
+    }
+
+    private JPanel bottomPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        panel.add(revisionPanel());
+        panel.add(controlPanel());
+
+        return panel;
+    }
+
+    private JPanel revisionPanel() {
+        revisionPanel = new RevisionPanel(user, dataset, version);
+        return revisionPanel;
     }
 
     private JPanel controlPanel() {
@@ -239,13 +257,15 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private void doClose() throws EmfException {
         clearMessages();
-        presenter.doClose(revision());
+        presenter.doClose();
     }
 
-    private Revision revision() {
-        RevisionDialog dialog = new RevisionDialog(parent);
-        dialog.display(user, dataset, version);
-        return dialog.revision();
+    public Revision revision() {
+        return revisionPanel.revision();
+    }
+
+    public boolean verifyRevisionInput() {
+        return revisionPanel.verifyInput();
     }
 
     private void doDiscard() {

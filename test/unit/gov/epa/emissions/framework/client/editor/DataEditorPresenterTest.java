@@ -11,7 +11,6 @@ import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
-import gov.epa.emissions.framework.services.Revision;
 
 import java.util.Date;
 
@@ -93,22 +92,6 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         return (DataAccessToken) mock.proxy();
     }
 
-    public void testShouldCloseViewAndCloseDataEditSessionOnClose() throws Exception {
-        Mock closingRule = mock(ClosingRule.class);
-        closingRule.expects(once()).method("close");
-
-        Mock service = mock(DataCommonsService.class);
-
-        Revision revision = new Revision();
-        service.expects(once()).method("addRevision").with(same(revision));
-
-        DataCommonsService serviceProxy = (DataCommonsService) service.proxy();
-        EmfSession session = session(null, null, serviceProxy);
-
-        DataEditorPresenter p = new DataEditorPresenter(null, null, null, session);
-        p.close((ClosingRule) closingRule.proxy(), serviceProxy, revision);
-    }
-
     public void testShouldDiscardChangesOnDiscard() throws Exception {
         Mock service = mock(DataEditorService.class);
         DataAccessToken token = new DataAccessToken();
@@ -147,6 +130,8 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         DataEditorPresenter p = new DataEditorPresenter(null, version, null, null);
         p.save(viewProxy, token, tablePresenterProxy, serviceProxy, null);
+        
+        assertTrue("Changes should be saved on save", p.areChangesSaved());
     }
 
     public void testOnSaveShouldDiscardChangesCloseSessionAndNotifyUserOfFailureIfSaveFails() throws Exception {
@@ -174,6 +159,8 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         DataEditorPresenter p = new DataEditorPresenter(null, null, null, null);
         p.save(viewProxy, token, tablePresenterProxy, serviceProxy, closingRuleProxy);
+        
+        assertFalse("Changes should not be saved on discard", p.areChangesSaved());
     }
 
     private Constraint tokenConstraint(Version version, String table) {
@@ -204,20 +191,17 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         presenter.addNote((NewNoteView) view.proxy(), user, dataset, types, versions);
     }
 
-    public void testShouldSaveRevisionOnClose() throws Exception {
+    public void testShouldCloseWithChangedSavedOnClose() throws Exception {
         Mock service = mock(DataCommonsService.class);
-
-        Revision revision = new Revision();
-        service.expects(once()).method("addRevision").with(same(revision));
 
         DataCommonsService serviceProxy = (DataCommonsService) service.proxy();
         EmfSession session = session(null, null, serviceProxy);
         DataEditorPresenter presenter = new DataEditorPresenter(null, null, null, session);
 
         Mock closingRule = mock(ClosingRule.class);
-        closingRule.expects(once()).method("close");
+        closingRule.expects(once()).method("close").with(eq(Boolean.TRUE));
 
-        presenter.close((ClosingRule) closingRule.proxy(), serviceProxy, revision);
+        presenter.close((ClosingRule) closingRule.proxy(), true);
     }
 
 }
