@@ -42,7 +42,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public Keyword[] getKeywords() throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            List keywords = dao.getEmfKeywords(session);
+            List keywords = dao.getKeywords(session);
             session.close();
 
             return (Keyword[]) keywords.toArray(new Keyword[keywords.size()]);

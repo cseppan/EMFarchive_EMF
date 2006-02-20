@@ -1,10 +1,15 @@
 package gov.epa.emissions.framework.dao;
 
+import gov.epa.emissions.commons.io.Country;
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.commons.io.Project;
+import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.IntendedUse;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.services.Revision;
@@ -36,6 +41,76 @@ public class DataCommonsDAOTest extends ServicesTestCase {
     }
 
     protected void doTearDown() throws Exception {// no op
+    }
+
+    public void testShouldGetAllKeywords() {
+        int totalBeforeAdd = dao.getKeywords(session).size();
+        Keyword keyword = new Keyword("test" + Math.random());
+        add(keyword);
+
+        try {
+            List keywords = dao.getKeywords(session);
+            assertEquals(totalBeforeAdd + 1, keywords.size());
+            assertSame(keyword, keywords.get(0));
+        } finally {
+            remove(keyword);
+        }
+    }
+
+    public void testShouldGetAllCountries() {
+        int totalBeforeAdd = dao.getCountries(session).size();
+        Country country = new Country("test" + Math.random());
+        add(country);
+
+        try {
+            List countries = dao.getCountries(session);
+            assertEquals(totalBeforeAdd + 1, countries.size());
+            assertTrue(countries.contains(country));
+        } finally {
+            remove(country);
+        }
+    }
+
+    public void testShouldGetAllProjects() {
+        int totalBeforeAdd = dao.getProjects(session).size();
+        Project project = new Project("test" + Math.random());
+        add(project);
+
+        try {
+            List list = dao.getProjects(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(project));
+        } finally {
+            remove(project);
+        }
+    }
+
+    public void testShouldGetAllRegions() {
+        int totalBeforeAdd = dao.getRegions(session).size();
+        Region region = new Region("test" + Math.random());
+        add(region);
+
+        try {
+            List list = dao.getRegions(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(region));
+        } finally {
+            remove(region);
+        }
+    }
+
+    public void testShouldGetAllIntendedUses() {
+        int totalBeforeAdd = dao.getIntendedUses(session).size();
+        IntendedUse newElement = new IntendedUse("test" + Math.random());
+        add(newElement);
+
+        try {
+            List list = dao.getIntendedUses(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(newElement));
+        } finally {
+            remove(newElement);
+        }
     }
 
     public void testShouldGetAllSectors() {
@@ -428,24 +503,6 @@ public class DataCommonsDAOTest extends ServicesTestCase {
             tx.rollback();
             throw e;
         }
-    }
-
-    private void add(Status status) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            session.save(status);
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
-    }
-
-    private void remove(Status status) {
-        Transaction tx = session.beginTransaction();
-        session.delete(status);
-        tx.commit();
     }
 
     private EmfDataset loadDataset(String name) {

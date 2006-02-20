@@ -138,4 +138,16 @@ public abstract class ServicesTestCase extends TestCase {
         tx.commit();
     }
 
+    protected void add(Object object) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.save(object);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
 }
