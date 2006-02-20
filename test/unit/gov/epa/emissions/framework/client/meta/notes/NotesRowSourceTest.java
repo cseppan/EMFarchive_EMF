@@ -13,6 +13,7 @@ public class NotesRowSourceTest extends TestCase {
     public void testShouldFillValuesInAppropriatePositions() {
         Note note = new Note();
         note.setName("note0");
+        note.setVersion(2);
         note.setCreator(new User());
         note.setDate(new Date());
         note.setNoteType(new NoteType("type0"));
@@ -20,15 +21,17 @@ public class NotesRowSourceTest extends TestCase {
         NotesRowSource source = new NotesRowSource(note);
 
         Object[] values = source.values();
-        assertEquals(6, values.length);
+        assertEquals(7, values.length);
         assertEquals(note.getName(), values[0]);
         assertEquals(note.getNoteType().getType(), values[1]);
-        assertEquals(note.getDetails(), values[2]);
-        assertEquals(note.getReferences(), values[3]);
-        assertEquals(note.getCreator().getName(), values[4]);
+        assertEquals(note.getVersion(), ((Long)values[2]).longValue());
+        assertEquals(note.getCreator().getName(), values[3]);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        assertEquals(dateFormat.format(note.getDate()), values[5]);
+        assertEquals(dateFormat.format(note.getDate()), values[4]);
+
+        assertEquals(note.getReferences(), values[5]);
+        assertEquals(note.getDetails(), values[6]);
     }
 
     public void testShouldTrackOriginalSource() {

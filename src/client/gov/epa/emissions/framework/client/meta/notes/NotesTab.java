@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
-import gov.epa.emissions.commons.gui.SimpleTableModel;
+import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -39,9 +39,9 @@ public class NotesTab extends JPanel implements NotesTabView {
 
     private JScrollPane createSortFilterPane(Note[] notes, EmfConsole parentConsole) {
         EmfTableModel model = new EmfTableModel(new NotesTableData(notes));
-        SimpleTableModel wrapperModel = new SimpleTableModel(model);
+        SortFilterSelectModel selectModel = new SortFilterSelectModel(model);
 
-        SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, wrapperModel);
+        SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, selectModel);
         panel.getTable().setName("notesTable");
 
         JScrollPane scrollPane = new JScrollPane(panel);

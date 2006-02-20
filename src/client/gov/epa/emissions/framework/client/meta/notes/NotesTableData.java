@@ -3,11 +3,10 @@ package gov.epa.emissions.framework.client.meta.notes;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
-import gov.epa.emissions.framework.ui.SelectableRow;
+import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 public class NotesTableData extends AbstractTableData {
@@ -25,13 +24,13 @@ public class NotesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Select", "Name", "Type", "Details", "References", "Creator", "Date" };
+        return new String[] { "Name", "Type", "Version", "Creator", "Date", "References", "Details" };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 0)
-            return Boolean.class;
-        if (col == 6)
+        if (col == 2)
+            return Long.class;
+        if (col == 4)
             return Date.class;
         return String.class;
     }
@@ -54,23 +53,11 @@ public class NotesTableData extends AbstractTableData {
     }
 
     private Row row(Note note) {
-        return new SelectableRow(new NotesRowSource(note));
+        return new ViewableRow(new NotesRowSource(note));
     }
 
     public boolean isEditable(int col) {
-        return (col == 0) ? true : false;
-    }
-
-    public Note[] selected() {
-        List selected = new ArrayList();
-
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            SelectableRow row = (SelectableRow) iter.next();
-            if (row.isSelected())
-                selected.add(row.source());
-        }
-
-        return (Note[]) selected.toArray(new Note[0]);
+        return true;
     }
 
     public Note[] getValues() {
