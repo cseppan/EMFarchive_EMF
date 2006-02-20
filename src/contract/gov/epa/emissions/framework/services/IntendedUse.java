@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services;
 
 import java.io.Serializable;
 
-public class IntendedUse implements Serializable {
+public class IntendedUse implements Serializable, Comparable {
 
     private long id;
 
@@ -55,6 +55,10 @@ public class IntendedUse implements Serializable {
 
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public int compareTo(Object o) {
+        return name.compareTo(((IntendedUse)o).getName());
     }
 
 }

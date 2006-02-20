@@ -64,7 +64,7 @@
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/saaj-api.jar"/>
 	<classpathentry kind="lib" path="lib/saaj-impl.jar"/>
-	<classpathentry kind="lib" path="lib/analysis-engine-0.1.1.jar"/>
+	<classpathentry sourcepath="/AnalysisEngine" kind="lib" path="lib/analysis-engine-0.1.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Commons"/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>
