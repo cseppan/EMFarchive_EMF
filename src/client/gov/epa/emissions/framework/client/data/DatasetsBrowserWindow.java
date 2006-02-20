@@ -62,6 +62,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private EmfTableModel model;
 
+    private JPanel browserPanel;
+
     public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
             throws EmfException {
         super("Datasets Browser", new Dimension(850, 450), parentConsole.desktop(), desktopManager);
@@ -87,19 +89,23 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         layout.setLayout(new BorderLayout());
 
         layout.add(createTopPanel(), BorderLayout.NORTH);
-        layout.add(createSortFilterPane(parentConsole), BorderLayout.CENTER);
+        layout.add(createBrowserPanel(parentConsole), BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
     }
 
-    private JScrollPane createSortFilterPane(EmfConsole parentConsole) {
+    private JPanel createBrowserPanel(EmfConsole parentConsole) {
+        browserPanel = new JPanel(new BorderLayout());
+        browserPanel.add(sortFilterPane(parentConsole));
+        
+        return browserPanel;
+    }
+
+    private JScrollPane sortFilterPane(EmfConsole parentConsole) {
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
-        SortCriteria sortCriteria = sortCriteria();
-        panel.sort(sortCriteria);
+        panel.sort(sortCriteria());
         panel.getTable().setName("datasetsTable");
-
-        JScrollPane scrollPane = new JScrollPane(panel);
         panel.setPreferredSize(new Dimension(450, 120));
-
+        JScrollPane scrollPane = new JScrollPane(panel);
         return scrollPane;
     }
 
@@ -314,7 +320,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         selectModel.refresh();
 
         // TODO: A HACK, until we fix row-count issues w/ SortFilterSelectPanel
-        createLayout(layout, parentConsole);
+        browserPanel.removeAll();
+        browserPanel.add(sortFilterPane(parentConsole));
         super.refreshLayout();
     }
 
