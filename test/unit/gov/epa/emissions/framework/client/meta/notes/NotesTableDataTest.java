@@ -39,7 +39,7 @@ public class NotesTableDataTest extends TestCase {
     public void testShouldHaveSevenColumns() {
         String[] columns = data.columns();
         assertEquals(7, columns.length);
-        assertEquals("Name", columns[0]);
+        assertEquals("Summary", columns[0]);
         assertEquals("Type", columns[1]);
         assertEquals("Version", columns[2]);
         assertEquals("Creator", columns[3]);
@@ -58,9 +58,9 @@ public class NotesTableDataTest extends TestCase {
         assertEquals(String.class, data.getColumnClass(6));
     }
 
-    public void testAllColumnsShouldBeEditable() {
+    public void testAllColumnsShouldBeUneditable() {
         for (int i = 0; i < 7; i++)
-            assertTrue("All cells should be editable", data.isEditable(1));
+            assertFalse("All cells should be editable", data.isEditable(1));
     }
 
     public void testShouldReturnTheRowsCorrespondingToTotalCount() {
