@@ -255,16 +255,17 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
      */
     private void doImport() {
         clearMessagePanel();
-
+        String message = "Started import. Please monitor the Status window to track your Import request.";
+        
         try {
             if (box.isSelected()) {
                 presenter.doImport(folder.getText(), filename.getText(), (DatasetType) datasetTypesModel
                         .getSelectedItem());
+                messagePanel.setMessage(message);
             } else {
                 if (!name.getText().equals("")) {
                     presenter.doImport(folder.getText(), filename.getText(), name.getText(),
                             (DatasetType) datasetTypesModel.getSelectedItem());
-                    String message = "Started import. Please monitor the Status window to track your Import request.";
                     messagePanel.setMessage(message);
                 } else {
                     messagePanel.setError("Dataset Name field should be a non-empty string.");
