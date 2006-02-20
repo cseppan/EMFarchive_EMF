@@ -38,7 +38,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
     private SingleLineMessagePanel messagePanel;
 
     public ViewableDatasetTypeWindow(DesktopManager desktopManager) {
-        super("View Dataset Type", new Dimension(550, 400), desktopManager);
+        super("View Dataset Type", new Dimension(600, 500), desktopManager);
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));

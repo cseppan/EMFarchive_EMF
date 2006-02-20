@@ -79,6 +79,11 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         name.addTextListener();
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
+        derivedFrom = new ComboBox("Choose one:", types);
+        addChangeable(derivedFrom);
+        derivedFrom.addItemChangeListener();
+        layoutGenerator.addLabelWidgetPair("Derived From:", derivedFrom, panel);
+        
         minFiles = new TextField("minfiles", 20);
         addChangeable(minFiles);
         minFiles.addTextListener();
@@ -89,20 +94,19 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         maxFiles.addTextListener();
         layoutGenerator.addLabelWidgetPair("Max Files:", maxFiles, panel);
 
-        derivedFrom = new ComboBox("", types);
-        addChangeable(derivedFrom);
-        derivedFrom.addItemChangeListener();
         derivedFrom.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 minFiles.setText("1");
-                if(((String)e.getItem()).equalsIgnoreCase(types[0]))
+                minFiles.setEditable(false);
+                maxFiles.setText("1");
+                maxFiles.setEditable(false);
+                if(((String)e.getItem()).equalsIgnoreCase(types[0])) {
                     maxFiles.setText("-1");
-                else
-                    maxFiles.setText("1");
+                    maxFiles.setEditable(true);
+                }
             }
         });
-        layoutGenerator.addLabelWidgetPair("Derived From:", derivedFrom, panel);
-
+        
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
                 5, 0, // initialX, initialY
@@ -112,6 +116,9 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
     }
 
     private boolean isDigit(String text) {
+        if(text.length() == 0)
+            return false;
+        
         if (!Character.isDigit(text.charAt(0)) && text.charAt(0) != '-')
             return false;
 
@@ -131,6 +138,8 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
             messagePanel.setError("Min Files field should only contain a number.");
         else if (!isDigit(maxFiles.getText()))
             messagePanel.setError("Max Files field should only contain a number.");
+        else if (derivedFrom.getSelectedItem() == null)
+            messagePanel.setError("Derived From field should have a value.");
         else {
             messagePanel.clear();
             return true;
@@ -156,7 +165,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
         return action;
     }
-
+    
     public void windowClosing() {
         checkChangesAndCloseWindow();
     }
