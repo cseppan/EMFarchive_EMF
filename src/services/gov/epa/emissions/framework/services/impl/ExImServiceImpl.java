@@ -138,8 +138,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 }
             }
         } catch (Exception e) {
-            log.error("Exception attempting to start export of file to folder: " + dirName, e);
-            throw new EmfException("Exception attempting to start export of file to folder");
+            log.error("Export of  - folder= " + dirName, e);
+            throw new EmfException("Export of Dataset failed: "+e.getMessage());
         }
     }
 
@@ -168,8 +168,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
             }
         } catch (Exception e) {
-            log.error("Exception attempting to start export of file to folder: " + dirName, e);
-            throw new EmfException("Exception attempting to start export of file to folder");
+            log.error("Export of Dataset failed - folder= " + dirName, e);
+            throw new EmfException("Export of Dataset failed: "+e.getMessage());
         }
     }
 
@@ -245,8 +245,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             }
 
         } catch (ImporterException e) {
-            log.error("Exception attempting to start export of file to folder: " + folderPath, e);
-            throw new EmfException("Exception attempting to start export of file to folder");
+            log.error("Export of Dataset failed - folder= " + folderPath, e);
+            throw new EmfException("Export of Dataset failed: "+e.getMessage());
         }
 
     }
