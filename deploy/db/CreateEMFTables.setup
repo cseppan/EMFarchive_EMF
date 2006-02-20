@@ -136,7 +136,7 @@ CREATE TABLE emf.dataset_types
   min_files int4 NOT NULL DEFAULT 1,
   max_files int4 NOT NULL DEFAULT 1,
   "external" bool NOT NULL DEFAULT false,
-  default_sortorder text NOT NULL DEFAULT '',
+  default_sortorder text NULL DEFAULT '',
   importer_classname varchar(255),
   exporter_classname varchar(255),
   lock_owner varchar(255),
@@ -218,10 +218,10 @@ WITHOUT OIDS;
 -- emf.revisions
 --
 -- emf ... KEYWORDS framework
-CREATE TABLE emf.emf_keywords
+CREATE TABLE emf.keywords
 (
   id SERIAL PRIMARY KEY,
-  keyword varchar(255) NOT NULL UNIQUE
+  name varchar(255) NOT NULL UNIQUE
 ) 
 WITHOUT OIDS;
 --
@@ -230,7 +230,7 @@ CREATE TABLE emf.dataset_types_keywords
   id SERIAL PRIMARY KEY,
   dataset_type_id int4 NOT NULL REFERENCES emf.dataset_types(id),
   list_index int4,
-  keyword_id int4 NOT NULL REFERENCES emf.emf_keywords (id),
+  keyword_id int4 NOT NULL REFERENCES emf.keywords (id),
   UNIQUE (dataset_type_id, keyword_id)
 ) 
 WITHOUT OIDS;
@@ -240,7 +240,7 @@ CREATE TABLE emf.datasets_keywords
   id SERIAL PRIMARY KEY,
   list_index int4,
   dataset_id int4 NOT NULL REFERENCES emf.datasets (id), 
-  keyword_id int4 NOT NULL REFERENCES emf.emf_keywords (id), 
+  keyword_id int4 NOT NULL REFERENCES emf.keywords (id), 
   value varchar(255) NOT NULL,
   UNIQUE (dataset_id, keyword_id)
 ) 

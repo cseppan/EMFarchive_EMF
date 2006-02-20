@@ -9,7 +9,7 @@ delete from emf.sectors;
 delete from emf.status;
 delete from emf.sector_criteria;
 delete from emf.datasets_keywords;
-delete from emf.emf_keywords;
+delete from emf.keywords;
 delete from emf.dataset_types_keywords;
 delete from emf.external_sources;
 delete from emf.internal_sources;

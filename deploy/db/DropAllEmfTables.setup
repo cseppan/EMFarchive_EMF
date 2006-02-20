@@ -19,7 +19,7 @@ DROP TABLE emf.sector_criteria CASCADE;
 --
 -- emf ... KEYWORDS framework
 DROP TABLE emf.datasets_keywords CASCADE;
-DROP TABLE emf.emf_keywords CASCADE;
+DROP TABLE emf.keywords CASCADE;
 DROP TABLE emf.dataset_types_keywords CASCADE;
 -- emf ... KEYWORDS framework
 --
