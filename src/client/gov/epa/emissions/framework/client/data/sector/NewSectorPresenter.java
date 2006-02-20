@@ -17,7 +17,7 @@ public class NewSectorPresenter {
         this.sector = sector;
         this.view = view;
     }
-    
+
     public void doDisplay() {
         view.observe(this);
         view.display(sector);
@@ -31,11 +31,9 @@ public class NewSectorPresenter {
         view.close();
     }
 
-    public void doSave(SectorsManagerView sectorManager) throws EmfException {
+    public void doSave() throws EmfException {
         service().addSector(sector);
-
-        sectorManager.refresh();
         doClose();
     }
-    
+
 }

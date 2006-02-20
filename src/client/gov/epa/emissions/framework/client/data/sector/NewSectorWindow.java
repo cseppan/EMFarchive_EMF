@@ -37,14 +37,11 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
 
     private SectorCriteriaTableData criteriaTableData;
 
-    private SectorsManagerView sectorManager;
-
     private static int counter;
 
-    public NewSectorWindow(SectorsManagerView sectorManager, DesktopManager desktopManager) {
+    public NewSectorWindow(DesktopManager desktopManager) {
         super("Create New Sector", new Dimension(550, 400), desktopManager);
 
-        this.sectorManager = sectorManager;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -135,7 +132,7 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
                 try {
                     if (!name.getText().equals("")) {
                         resetChanges();
-                        presenter.doSave(sectorManager);
+                        presenter.doSave();
                     } else
                         messagePanel.setError("Name field should be a non-empty string.");
                 } catch (EmfException e) {

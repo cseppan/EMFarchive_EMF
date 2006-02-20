@@ -21,7 +21,7 @@ public class SectorsManagerPresenter {
 
     public void doDisplay() throws EmfException {
         view.observe(this);
-        view.display(service);
+        view.display(service.getSectors());
     }
 
     public void doClose() {
@@ -33,7 +33,7 @@ public class SectorsManagerPresenter {
         EditableSectorPresenter p = new EditableSectorPresenterImpl(session, editSectorView, displaySectorView, sector);
         edit(p);
     }
-    
+
     public void displayNewSector(Sector sector, NewSectorView newSectorView) {
         NewSectorPresenter p = new NewSectorPresenter(session, sector, newSectorView);
         p.doDisplay();
@@ -50,6 +50,10 @@ public class SectorsManagerPresenter {
 
     void view(ViewableSectorPresenter presenter) {
         presenter.doDisplay();
+    }
+
+    public void doRefresh() throws EmfException {
+        view.refresh(service.getSectors());
     }
 
 }

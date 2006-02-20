@@ -8,6 +8,6 @@ public interface EditableSectorPresenter {
     
     void doClose() throws EmfException;
 
-    void doSave(SectorsManagerView sectorManager) throws EmfException;
+    void doSave() throws EmfException;
 
 }

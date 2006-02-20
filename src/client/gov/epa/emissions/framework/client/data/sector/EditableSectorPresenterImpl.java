@@ -34,7 +34,7 @@ public class EditableSectorPresenterImpl implements EditableSectorPresenter {
         editable.observe(this);
         editable.display(sector);
     }
-    
+
     private DataCommonsService service() {
         return session.dataCommonsService();
     }
@@ -48,10 +48,8 @@ public class EditableSectorPresenterImpl implements EditableSectorPresenter {
         editable.close();
     }
 
-    public void doSave(SectorsManagerView sectorManager) throws EmfException {
+    public void doSave() throws EmfException {
         sector = service().updateSector(sector);
-
-        sectorManager.refresh();
         closeView();
     }
 

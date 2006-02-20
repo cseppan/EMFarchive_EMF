@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.data.sector;
 
+import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
@@ -9,9 +10,10 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.RefreshButton;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
@@ -32,7 +34,7 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
 //FIXME: look at the common design b/w this and UserManagerWindow. Refactor ?
-public class SectorsManagerWindow extends ReusableInteralFrame implements SectorsManagerView {
+public class SectorsManagerWindow extends ReusableInteralFrame implements SectorsManagerView, RefreshObserver {
 
     private SectorsManagerPresenter presenter;
 
@@ -46,12 +48,10 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
 
     private EmfConsole parentConsole;
 
-    private DataCommonsService service;
-
     public SectorsManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Sector Manager", new Dimension(475, 300), parentConsole.desktop(), desktopManager);
         super.setName("sectorManager");
-        
+
         this.parentConsole = parentConsole;
 
         layout = new JPanel();
@@ -62,20 +62,18 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
         this.presenter = presenter;
     }
 
-    public void display(DataCommonsService service) throws EmfException {
-        this.service = service;
-        doLayout(service.getSectors());
+    public void display(Sector[] sectors) {
+        doLayout(sectors);
         super.display();
     }
 
-    public void refresh() {
-        try {
-            doLayout(service.getSectors());
-        } catch (EmfException e) {
-            messagePanel.setError("Could not refresh. Problem communicating with remote services.");
-        }
-
+    public void refresh(Sector[] sectors) {
+        doLayout(sectors);
         super.refreshLayout();
+    }
+
+    public void doRefresh() throws EmfException {
+        presenter.doRefresh();
     }
 
     // FIXME: this table refresh sequence applies to every SortFilterTableModel.
@@ -101,10 +99,21 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
         JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
         sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
 
-        messagePanel = new SingleLineMessagePanel();
-        layout.add(messagePanel, BorderLayout.NORTH);
+        layout.add(createTopPanel(), BorderLayout.NORTH);
         layout.add(scrollPane, BorderLayout.CENTER);
         layout.add(createControlPanel(), BorderLayout.SOUTH);
+    }
+
+    private JPanel createTopPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        messagePanel = new SingleLineMessagePanel();
+        panel.add(messagePanel, BorderLayout.CENTER);
+
+        Button button = new RefreshButton(this, "Refresh Sectors", messagePanel);
+        panel.add(button, BorderLayout.EAST);
+
+        return panel;
     }
 
     private JPanel createControlPanel() {
@@ -225,7 +234,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     }
 
     private EditableSectorView editSectorView() {
-        EditSectorWindow view = new EditSectorWindow(this, desktopManager);
+        EditSectorWindow view = new EditSectorWindow(desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
@@ -238,7 +247,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     }
 
     private NewSectorView newSectorView() {
-        NewSectorWindow view = new NewSectorWindow(this, desktopManager);
+        NewSectorWindow view = new NewSectorWindow(desktopManager);
         desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {

@@ -73,23 +73,22 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private void doLayout(DatasetType[] types) {
-        model = new EmfTableModel(new DatasetTypesTableData(types));
-        selectModel = new SortFilterSelectModel(model);
-        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-
-        createLayout(layout, sortFilterSelectPanel);
-    }
-
-    private void createLayout(JPanel layout, JPanel sortFilterSelectPanel) {
         layout.removeAll();
         layout.setLayout(new BorderLayout());
 
-        JScrollPane scrollPane = new JScrollPane(sortFilterSelectPanel);
+        layout.add(createTopPanel(), BorderLayout.NORTH);
+        layout.add(createSortFilterScrollPane(types), BorderLayout.CENTER);
+        layout.add(createControlPanel(), BorderLayout.SOUTH);
+    }
+
+    private JScrollPane createSortFilterScrollPane(DatasetType[] types) {
+        model = new EmfTableModel(new DatasetTypesTableData(types));
+        selectModel = new SortFilterSelectModel(model);
+        
+        SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
 
-        layout.add(createTopPanel(), BorderLayout.NORTH);
-        layout.add(scrollPane, BorderLayout.CENTER);
-        layout.add(createControlPanel(), BorderLayout.SOUTH);
+        return new JScrollPane(sortFilterSelectPanel);
     }
 
     private JPanel createTopPanel() {

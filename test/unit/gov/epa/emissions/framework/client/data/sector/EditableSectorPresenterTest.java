@@ -3,12 +3,6 @@ package gov.epa.emissions.framework.client.data.sector;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.data.sector.EditableSectorPresenter;
-import gov.epa.emissions.framework.client.data.sector.EditableSectorPresenterImpl;
-import gov.epa.emissions.framework.client.data.sector.EditableSectorView;
-import gov.epa.emissions.framework.client.data.sector.SectorsManagerView;
-import gov.epa.emissions.framework.client.data.sector.ViewableSectorPresenterImpl;
-import gov.epa.emissions.framework.client.data.sector.ViewableSectorView;
 import gov.epa.emissions.framework.services.DataCommonsService;
 
 import java.util.Date;
@@ -78,7 +72,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
         user.setUsername("user");
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("releaseLockedSector").with(same(sector)).will(returnValue(sector));
-        
+
         Mock session = session(user, service.proxy());
 
         EditableSectorPresenter presenter = new EditableSectorPresenterImpl((EmfSession) session.proxy(),
@@ -102,10 +96,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
         EditableSectorPresenter presenter = new EditableSectorPresenterImpl((EmfSession) session.proxy(),
                 (EditableSectorView) view.proxy(), null, sector);
 
-        Mock sectorManagerView = mock(SectorsManagerView.class);
-        sectorManagerView.expects(once()).method("refresh").withNoArguments();
-
-        presenter.doSave((SectorsManagerView) sectorManagerView.proxy());
+        presenter.doSave();
     }
 
 }

@@ -1,10 +1,7 @@
 package gov.epa.emissions.framework.client.data.sector;
 
 import gov.epa.emissions.commons.io.Sector;
-import gov.epa.emissions.framework.client.data.sector.EditableSectorPresenter;
-import gov.epa.emissions.framework.client.data.sector.SectorsManagerPresenter;
-import gov.epa.emissions.framework.client.data.sector.SectorsManagerView;
-import gov.epa.emissions.framework.client.data.sector.ViewableSectorPresenter;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataCommonsService;
 
 import org.jmock.Mock;
@@ -20,12 +17,31 @@ public class SectorsManagerPresenterTest extends MockObjectTestCase {
         DataCommonsService servicesProxy = (DataCommonsService) service.proxy();
 
         Mock view = mock(SectorsManagerView.class);
-        view.expects(once()).method("display").with(same(servicesProxy));
+        view.expects(once()).method("display").with(same(sectors));
 
         SectorsManagerPresenter p = new SectorsManagerPresenter(null, (SectorsManagerView) view.proxy(), servicesProxy);
         view.expects(once()).method("observe").with(eq(p));
 
         p.doDisplay();
+    }
+
+    public void testShouldRefreshViewOnClickOfRefreshButton() throws EmfException {
+        Sector[] sectors = {};
+
+        Mock service = mock(DataCommonsService.class);
+        service.stubs().method("getSectors").withNoArguments().will(returnValue(sectors));
+        DataCommonsService servicesProxy = (DataCommonsService) service.proxy();
+
+        Mock view = mock(SectorsManagerView.class);
+        view.expects(once()).method("display").with(same(sectors));
+
+        SectorsManagerPresenter p = new SectorsManagerPresenter(null, (SectorsManagerView) view.proxy(), servicesProxy);
+        view.expects(once()).method("observe").with(eq(p));
+
+        p.doDisplay();
+
+        view.expects(once()).method("refresh").with(eq(sectors));
+        p.doRefresh();
     }
 
     public void testShouldCloseViewOnClose() throws Exception {
