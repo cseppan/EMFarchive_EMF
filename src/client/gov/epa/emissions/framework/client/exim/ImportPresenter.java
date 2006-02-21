@@ -38,6 +38,10 @@ public class ImportPresenter {
 
         service.startMultipleFileImport(user, mapToRemote(directory), new String[] { filename }, type);
     }
+    
+    public void doImport(String directory, String[] filenames, DatasetType type) throws EmfException {
+        service.startMultipleFileImport(user, mapToRemote(directory), filenames, type);
+    }
 
     public void doImport(String directory, String filename, String datasetName, DatasetType type) throws EmfException {
         if (datasetName.length() == 0)

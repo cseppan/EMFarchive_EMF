@@ -221,6 +221,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 FilePatternMatcher fpm = new FilePatternMatcher(folder, fileName);
                 String[] allFilesInFolder = folder.list();
                 fileNamesForImport = fpm.matchingNames(allFilesInFolder);
+            } else {
+                fileNamesForImport = fileNames;
             }
 
             // Loop through the collection and start import for the file

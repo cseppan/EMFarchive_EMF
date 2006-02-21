@@ -53,6 +53,8 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private JCheckBox box;
 
     private static File lastFolder = null;
+    
+    private boolean singleFile = true;
 
     public ImportWindow(DataCommonsService service, JDesktopPane desktop, DesktopManager desktopManager)
             throws EmfException {
@@ -173,12 +175,22 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     private void selectFile() {
         FileChooser chooser = new FileChooser("Select File", new File(folder.getText()), ImportWindow.this);
-
         chooser.setTitle("Select a " + datasetTypesModel.getSelectedItem().toString() + " File");
-        File file = chooser.choose();
+        File[] file = chooser.choose();
         if (file == null)
             return;
-
+        
+        if(file.length == 1) {
+            this.singleFile = true;
+            singleFile(file[0]);
+        }
+        else {
+            this.singleFile = false;
+            multipleFiles(file);
+        }
+    }
+    
+    private void singleFile(File file) {
         if (file.isDirectory()) {
             folder.setText(file.getAbsolutePath());
             filename.setText("");
@@ -192,6 +204,21 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         // name.setText(formatDatasetName(file.getName()));
         name.setText(file.getName());
         lastFolder = file.getParentFile();
+    }
+    
+    private void multipleFiles(File[] file) {
+        for(int i = 0; i < file.length; i++) {
+            if (!file[i].isDirectory()) {
+                if(i == 0)
+                    filename.setText(file[i].getName());
+                else
+                    filename.setText(filename.getText() + ":" + file[i].getName());
+            }
+        }
+
+        folder.setText(file[0].getParent());
+        name.setText(filename.getText());
+        lastFolder = file[0].getParentFile();
     }
 
     private void registerForEditEvents(JTextField name, JTextField directory, JTextField filename) {
@@ -262,6 +289,10 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
                 presenter.doImport(folder.getText(), filename.getText(), (DatasetType) datasetTypesModel
                         .getSelectedItem());
                 messagePanel.setMessage(message);
+            } else if(!singleFile) {
+                presenter.doImport(folder.getText(), datasetNames(), (DatasetType) datasetTypesModel
+                        .getSelectedItem());
+                messagePanel.setMessage(message);
             } else {
                 if (!name.getText().equals("")) {
                     presenter.doImport(folder.getText(), filename.getText(), name.getText(),
@@ -274,6 +305,13 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
+    }
+    
+    private String[] datasetNames() {
+        if(!singleFile)
+            return name.getText().split(":");
+        
+        return new String[] {name.getText()};
     }
 
     public void clearMessagePanel() {

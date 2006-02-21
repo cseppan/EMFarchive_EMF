@@ -22,6 +22,7 @@ public class FileChooser {
         this.parent = parent;
 
         chooser = new JFileChooser(folder);
+        chooser.setMultiSelectionEnabled(true);
         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     }
 
@@ -29,8 +30,8 @@ public class FileChooser {
         chooser.setDialogTitle(title);
     }
 
-    public File choose() {
+    public File[] choose() {
         int result = chooser.showDialog(parent, action);
-        return (result == JFileChooser.APPROVE_OPTION) ? chooser.getSelectedFile() : null;
+        return (result == JFileChooser.APPROVE_OPTION) ? chooser.getSelectedFiles() : null;
     }
 }

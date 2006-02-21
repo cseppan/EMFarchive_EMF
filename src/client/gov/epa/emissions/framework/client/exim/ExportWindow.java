@@ -198,16 +198,16 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         FileChooser chooser = new FileChooser("Select Folder", new File(folder.getText()), ExportWindow.this);
 
         chooser.setTitle("Select a folder");
-        File file = chooser.choose();
+        File[] file = chooser.choose();
         if (file == null)
             return;
 
-        if (file.isDirectory()) {
-            folder.setText(file.getAbsolutePath());
+        if (file[0].isDirectory()) {
+            folder.setText(file[0].getAbsolutePath());
         }
 
-        if (file.isFile()) {
-            folder.setText(file.getParent());
+        if (file[0].isFile()) {
+            folder.setText(file[0].getParent());
         }
     }
 
