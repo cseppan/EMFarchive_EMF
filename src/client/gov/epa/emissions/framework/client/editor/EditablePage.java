@@ -142,9 +142,8 @@ public class EditablePage extends AbstractTableData implements SelectableEmfTabl
         record.setVersion(version.getVersion());
         record.setDeleteVersions("");
         List tokens = new ArrayList();
-        for (int i = 0; i < cols.length - 1; i++)
+        for (int i = 0; i < cols.length; i++)
             tokens.add("");
-        tokens.add("!");
         record.setTokens((String[]) tokens.toArray(new String[0]));
 
         rows.add(row(record));

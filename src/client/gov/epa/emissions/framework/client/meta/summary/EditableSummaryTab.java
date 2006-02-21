@@ -301,7 +301,16 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     }
 
     public void updateDataset(EmfDataset dataset) {
-        dataset.setName(name.getText());
+        if(!name.getText().equals("")) {
+            messagePanel.clear();
+            changeObserver.alert(false);
+            dataset.setName(name.getText());
+        }
+        else {
+            messagePanel.setError("Name field should be a non-empty string.");
+            changeObserver.alert(true);
+            return;
+        }
         dataset.setDescription(description.getText());
         updateProject();
         dataset.setStartDateTime(toDate(startDateTime.getText()));

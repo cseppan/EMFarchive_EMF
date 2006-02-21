@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.ui.TableData;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -123,6 +124,10 @@ public class EditableTablePanel extends JPanel implements Editor{
 
     public void commit() {
         table.commit();
+    }
+    
+    public void addListener(KeyListener keyListener) {
+        table.addKeyListener(keyListener);
     }
 
 }

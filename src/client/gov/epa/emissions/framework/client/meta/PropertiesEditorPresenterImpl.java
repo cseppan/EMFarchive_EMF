@@ -24,7 +24,7 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
 
     private EditableSummaryTabPresenter summaryPresenter;
 
-    private boolean unsavedChanges;
+    private boolean unsavedChanges, alert;
 
     private EditableKeywordsTabPresenter keywordsPresenter;
 
@@ -36,6 +36,7 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         this.dataset = dataset;
         this.session = session;
         this.view = view;
+        this.alert = false;
     }
 
     public void doDisplay() throws EmfException {
@@ -67,7 +68,8 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
             EditNotesTabPresenter notes) throws EmfException {
         updateDataset(service, summary, keywords, notes);
 
-        view.close();
+        if(!alert)
+            view.close();
     }
 
     private DataService dataService() {
@@ -79,7 +81,8 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         summary.doSave();
         keywords.doSave();
         notes.doSave();
-        service.updateDataset(dataset);
+        if(!alert)
+            service.updateDataset(dataset);
     }
 
     public void set(EditableSummaryTabView summary) {
@@ -92,6 +95,7 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
 
         Keywords keywords = new Keywords(session.dataCommonsService().getKeywords());
         keywordsPresenter.display(keywords);
+        keywordsView.observeChanges(this);
     }
 
     public void set(EditNotesTabView view) throws EmfException {
@@ -101,6 +105,10 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
 
     public void onChange() {
         unsavedChanges = true;
+    }
+    
+    public void alert(boolean alert){
+        this.alert = alert;
     }
 
 }

@@ -3,10 +3,12 @@ package gov.epa.emissions.framework.client.meta.keywords;
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.io.Keyword;
-import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.client.data.EditableTablePanel;
+import gov.epa.emissions.framework.client.data.Keywords;
 
 import java.awt.BorderLayout;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyListener;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
@@ -16,7 +18,9 @@ import javax.swing.table.TableCellEditor;
 public class EditableKeywordsPanel extends JPanel implements Editor {
 
     private EditableTablePanel editableTablePanel;
-
+    
+    private JComboBox comboBox;
+    
     public EditableKeywordsPanel(String label, EditableKeyValueTableData tableData, Keywords masterKeywords, ManageChangeables changeablesList) {
         editableTablePanel = new EditableKeyValueTablePanel(label, tableData, changeablesList);
         editableTablePanel.setColumnEditor(keywordColumnEditor(masterKeywords), 1, "Select from the list");
@@ -26,7 +30,7 @@ public class EditableKeywordsPanel extends JPanel implements Editor {
     }
 
     private TableCellEditor keywordColumnEditor(Keywords masterKeywords) {
-        JComboBox comboBox = new JComboBox();
+        comboBox = new JComboBox();
         comboBox.setEditable(true);
         Keyword[] list = masterKeywords.all();
         for (int i = 0; i < list.length; i++)
@@ -34,7 +38,15 @@ public class EditableKeywordsPanel extends JPanel implements Editor {
         
         return new DefaultCellEditor(comboBox);
     }
-
+    
+    public void addListener(KeyListener keyListener) {
+        editableTablePanel.addListener(keyListener);
+    }
+    
+    public void addComboBoxListener(ItemListener itemListener) {
+        comboBox.addItemListener(itemListener);
+    }
+    
     public void commit() {
         editableTablePanel.commit();
     }
