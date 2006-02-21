@@ -63,12 +63,17 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
         layout = new JPanel(new BorderLayout());
         layout.add(topPanel(), BorderLayout.PAGE_START);
-
+ 
         this.getContentPane().add(layout);
     }
 
     private void setDimension() {
         Dimension dim = new Dimensions().getSize(0.7, 0.7);
+        int height = (int)dim.getHeight();
+        if (dim.getWidth() < 850)
+        {
+            dim.setSize(850,height);
+        }
         setSize(dim);
     }
 
