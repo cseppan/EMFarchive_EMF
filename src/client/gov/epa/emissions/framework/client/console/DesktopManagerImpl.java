@@ -66,6 +66,7 @@ public class DesktopManagerImpl implements DesktopManager {
         if (!windowNames.isEmpty()) {
            if(consoleView.confirm()){
                 forceWindowClose(windowNames);
+                return true;
             }
             return false;
         }

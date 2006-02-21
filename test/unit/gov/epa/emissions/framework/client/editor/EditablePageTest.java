@@ -181,7 +181,7 @@ public class EditablePageTest extends TestCase {
         assertEquals(cols.length, blankRecord.tokens().size());
         for (int i = 0; i < cols.length - 1; i++)
             assertEquals("", blankRecord.token(i));
-        assertEquals("!", blankRecord.token(cols.length - 1));
+        assertEquals("", blankRecord.token(cols.length - 1));
 
         ChangeSet changeset = data.changeset();
         assertEquals(1, changeset.getNewRecords().length);
