@@ -48,6 +48,7 @@ public class DatasetPersistenceTest extends HibernateTestCase {
     public void testVerifySimplePropertiesAreStored() throws Exception {
         Country country = new Country("FR" + Math.random());
         Project project = new Project("P1" + Math.random());
+        Sector sector = new Sector("", "S1" + Math.random());
         EmfDataset dataset = new EmfDataset();
         User owner = userDAO.get("emf", session);
 
@@ -66,7 +67,8 @@ public class DatasetPersistenceTest extends HibernateTestCase {
             dataset.setName(datasetName);
             dataset.setProject(project);
             dataset.setRegion(region);
-            dataset.setSectors(new Sector[] { new Sector("", "S1" + Math.random()) });
+            
+            dataset.setSectors(new Sector[] { sector });
             dataset.setStartDateTime(new Date());
             dataset.setStatus("imported");
             dataset.setYear(42);
@@ -85,7 +87,7 @@ public class DatasetPersistenceTest extends HibernateTestCase {
             save(dataset);
         } finally {
             remove(dataset);
-
+            remove(sector);
             remove(country);
             remove(region);
             remove(project);
