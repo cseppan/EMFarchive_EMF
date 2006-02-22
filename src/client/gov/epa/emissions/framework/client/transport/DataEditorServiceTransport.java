@@ -152,10 +152,10 @@ public class DataEditorServiceTransport implements DataEditorService {
         return (Page) call.requestResponse(new Object[] { token, rowFilter, sortOrder });
     }
 
-    public TableMetadata getTableMetaData(String table) throws EmfException {
+    public TableMetadata getTableMetadata(String table) throws EmfException {
         call.addStringParam("table");
 
-        call.setOperation("getTableMetaData");
+        call.setOperation("getTableMetadata");
         call.setReturnType(mappings.tablemetadata());
         
         return (TableMetadata)call.requestResponse(new Object[] { table });

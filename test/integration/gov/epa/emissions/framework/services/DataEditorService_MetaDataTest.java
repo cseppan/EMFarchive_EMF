@@ -96,7 +96,7 @@ public class DataEditorService_MetaDataTest extends ServicesTestCase {
 
 
      public void testShouldGetTheMetaDataForTable() throws Exception {
-      TableMetadata tmd = service.getTableMetaData(table);
+      TableMetadata tmd = service.getTableMetadata(table);
       assertEquals("Should have 14 columns",tmd.getCols().length,14);
       ColumnMetaData[] cmd = tmd.getCols();
       assertEquals("column name should match",cmd[0].getName(),"record_id");

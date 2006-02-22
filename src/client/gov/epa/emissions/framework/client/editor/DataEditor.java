@@ -96,7 +96,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         this.table = table;
         this.version = version;
         this.user = user;
-        TableMetadata tableMetadata = service.getTableMetaData(table);
+        TableMetadata tableMetadata = service.getTableMetadata(table);
+        
         updateTitle(version, table);
         super.setName("dataEditor:" + version.getDatasetId() + ":" + version.getId());
 

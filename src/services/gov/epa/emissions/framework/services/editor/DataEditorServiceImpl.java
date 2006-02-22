@@ -227,7 +227,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
     }
 
-    public TableMetadata getTableMetaData(String table) throws EmfException{
+    public TableMetadata getTableMetadata(String table) throws EmfException{
         try {
             TableDefinition definition = dbServer.getEmissionsDatasource().tableDefinition();
             return definition.getTableMetaData(table);

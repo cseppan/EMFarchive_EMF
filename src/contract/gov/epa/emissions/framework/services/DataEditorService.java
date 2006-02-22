@@ -25,6 +25,6 @@ public interface DataEditorService extends DataAccessService {
 
     void closeSession(DataAccessToken token) throws EmfException;
     
-    TableMetadata getTableMetaData(String table) throws EmfException;
+    TableMetadata getTableMetadata(String table) throws EmfException;
 
 }
