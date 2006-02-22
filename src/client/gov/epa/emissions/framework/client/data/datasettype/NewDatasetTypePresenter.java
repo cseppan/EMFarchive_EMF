@@ -62,6 +62,8 @@ public class NewDatasetTypePresenter {
         newType.setMinFiles(Integer.parseInt(minfiles));
         newType.setMaxFiles(Integer.parseInt(maxfiles));
         newType.setDefaultSortOrder("");
+        if(type.equalsIgnoreCase("Line-based File"))
+            newType.setDefaultSortOrder("Line_Number");
         newType.setImporterClassName((String)mapImport.get(type));
         newType.setExporterClassName((String)mapExport.get(type));
         newType.setExternal(type.equalsIgnoreCase("External File"));

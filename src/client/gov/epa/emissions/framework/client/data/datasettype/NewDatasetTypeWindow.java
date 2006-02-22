@@ -103,6 +103,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
                 if(((String)e.getItem()).equalsIgnoreCase(types[0])) {
                     maxFiles.setText("-1");
                     maxFiles.setEditable(true);
+                    minFiles.setEditable(true);
                 }
             }
         });
