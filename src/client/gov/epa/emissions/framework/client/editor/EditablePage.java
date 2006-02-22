@@ -4,20 +4,19 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
+import gov.epa.emissions.commons.io.ColumnMetaData;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
 import gov.epa.emissions.framework.ui.SelectableEmfTableData;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 public class EditablePage extends AbstractTableData implements SelectableEmfTableData {
     private List rows;
-
-    private String[] cols;
 
     private int datasetId;
 
@@ -25,10 +24,12 @@ public class EditablePage extends AbstractTableData implements SelectableEmfTabl
 
     private ChangeSet changeset;
 
-    public EditablePage(int datasetId, Version version, Page page, String[] cols) {
+    private TableMetadata tableMetadata;
+
+    public EditablePage(int datasetId, Version version, Page page, TableMetadata tableMetadata) {
         this.datasetId = datasetId;
         this.version = version;
-        this.cols = cols;
+        this.tableMetadata = tableMetadata;
         this.rows = createRows(page);
 
         changeset = new ChangeSet();
@@ -38,8 +39,11 @@ public class EditablePage extends AbstractTableData implements SelectableEmfTabl
     public String[] columns() {
         List list = new ArrayList();
         list.add("Select");
-        list.addAll(Arrays.asList(cols));
-
+        ColumnMetaData[] cols = tableMetadata.getCols();
+        for (int i = 0; i < cols.length; i++) {
+            list.add(cols[i].getName());
+        }
+        
         return (String[]) list.toArray(new String[0]);
     }
 
@@ -142,7 +146,7 @@ public class EditablePage extends AbstractTableData implements SelectableEmfTabl
         record.setVersion(version.getVersion());
         record.setDeleteVersions("");
         List tokens = new ArrayList();
-        for (int i = 0; i < cols.length; i++)
+        for (int i = 0; i < tableMetadata.getCols().length; i++)
             tokens.add("");
         record.setTokens((String[]) tokens.toArray(new String[0]));
 

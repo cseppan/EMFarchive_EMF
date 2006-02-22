@@ -107,8 +107,8 @@
 		qname="ns1:ColumnMetaData" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
-		languageSpecificType="java:gov.epa.emissions.commons.io.TableMetaData"
-		qname="ns1:TableMetaData" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		languageSpecificType="java:gov.epa.emissions.commons.io.TableMetadata"
+		qname="ns1:TableMetadata" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.Revision"

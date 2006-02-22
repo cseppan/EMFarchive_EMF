@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -113,6 +114,11 @@ public class NonEditablePageManagerPanel extends JPanel implements NonEditablePa
 
     public void scrollToPageEnd() {
         table.selectLastRow();
+    }
+
+    public TableMetadata tableMetadata() {
+        //FIXME: Auto-generated method stub
+        return null;
     }
 
 }

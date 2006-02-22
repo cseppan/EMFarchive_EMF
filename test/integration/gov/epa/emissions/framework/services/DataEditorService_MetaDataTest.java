@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.DataFormatFactory;
-import gov.epa.emissions.commons.io.TableMetaData;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.io.importer.VersionedDataFormatFactory;
@@ -96,8 +96,7 @@ public class DataEditorService_MetaDataTest extends ServicesTestCase {
 
 
      public void testShouldGetTheMetaDataForTable() throws Exception {
-      TableMetaData tmd = service.getTableMetaData(table);
-      assertEquals("Table name should match",tmd.getTable(),table);
+      TableMetadata tmd = service.getTableMetaData(table);
       assertEquals("Should have 14 columns",tmd.getCols().length,14);
       ColumnMetaData[] cmd = tmd.getCols();
       assertEquals("column name should match",cmd[0].getName(),"record_id");

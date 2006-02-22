@@ -15,7 +15,7 @@ import gov.epa.emissions.commons.io.Project;
 import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.io.SectorCriteria;
-import gov.epa.emissions.commons.io.TableMetaData;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.AccessLog;
 import gov.epa.emissions.framework.services.DataAccessToken;
@@ -70,7 +70,7 @@ public class EmfMappings extends Mappings {
         bean(call, NoteType.class, notetype());
         bean(call, Revision.class, revision());
 
-        bean(call, TableMetaData.class, tablemetadata());
+        bean(call, TableMetadata.class, tablemetadata());
         bean(call, ColumnMetaData.class, columnmetadata());
 
     }
@@ -254,7 +254,7 @@ public class EmfMappings extends Mappings {
     }
 
     public QName tablemetadata() {
-        return qname("TableMetaData");
+        return qname("TableMetadata");
     }
 
     public QName columnmetadata() {

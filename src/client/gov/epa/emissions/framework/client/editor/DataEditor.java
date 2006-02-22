@@ -2,15 +2,15 @@ package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteDialog;
-import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Revision;
 import gov.epa.emissions.framework.ui.Dimensions;
@@ -63,16 +63,15 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
         layout = new JPanel(new BorderLayout());
         layout.add(topPanel(), BorderLayout.PAGE_START);
- 
+
         this.getContentPane().add(layout);
     }
 
     private void setDimension() {
         Dimension dim = new Dimensions().getSize(0.7, 0.7);
-        int height = (int)dim.getHeight();
-        if (dim.getWidth() < 850)
-        {
-            dim.setSize(850,height);
+        int height = (int) dim.getHeight();
+        if (dim.getWidth() < 850) {
+            dim.setSize(850, height);
         }
         setSize(dim);
     }
@@ -93,16 +92,16 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         this.presenter = presenter;
     }
 
-    public void display(Version version, String table, User user, DataAccessService service) {
+    public void display(Version version, String table, User user, DataEditorService service) throws EmfException {
         this.table = table;
         this.version = version;
         this.user = user;
-
+        TableMetadata tableMetadata = service.getTableMetaData(table);
         updateTitle(version, table);
         super.setName("dataEditor:" + version.getDatasetId() + ":" + version.getId());
 
         JPanel container = new JPanel(new BorderLayout());
-        container.add(tablePanel(version, table), BorderLayout.CENTER);
+        container.add(tablePanel(version, table, tableMetadata), BorderLayout.CENTER);
         container.add(bottomPanel(), BorderLayout.PAGE_END);
         layout.add(container, BorderLayout.CENTER);
 
@@ -120,9 +119,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         lockInfo.setText("Lock expires at " + format(end) + "  ");
     }
 
-    private JPanel tablePanel(Version version, String table) {
-        InternalSource source = source(table, dataset.getInternalSources());
-        pageContainer = new EditablePageContainer(dataset, version, source, messagePanel, this);
+    private JPanel tablePanel(Version version, String table, TableMetadata tableMetadata) {
+        pageContainer = new EditablePageContainer(dataset, version, tableMetadata, messagePanel, this);
         displayTable(table);
 
         return pageContainer;
@@ -134,15 +132,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         } catch (EmfException e) {
             displayError("Could not display table: " + table + ". Reason: " + e.getMessage());
         }
-    }
-
-    private InternalSource source(String table, InternalSource[] sources) {
-        for (int i = 0; i < sources.length; i++) {
-            if (sources[i].getTable().equals(table))
-                return sources[i];
-        }
-
-        return null;
     }
 
     private JPanel bottomPanel() {

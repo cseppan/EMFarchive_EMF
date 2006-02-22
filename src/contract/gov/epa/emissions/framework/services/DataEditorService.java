@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.io.TableMetaData;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 
@@ -24,6 +24,7 @@ public interface DataEditorService extends DataAccessService {
     DataAccessToken openSession(User user, DataAccessToken token) throws EmfException;
 
     void closeSession(DataAccessToken token) throws EmfException;
-    TableMetaData getTableMetaData(String table) throws EmfException;
+    
+    TableMetadata getTableMetaData(String table) throws EmfException;
 
 }

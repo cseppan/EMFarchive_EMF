@@ -53,7 +53,7 @@ public class DataEditorPresenter {
         return session.dataEditorService();
     }
 
-    private void display(DataAccessToken token, DataEditorView view) {
+    private void display(DataAccessToken token, DataEditorView view) throws EmfException {
         this.view = view;
         view.observe(this);
         view.display(version, table, session.user(), dataEditorService());

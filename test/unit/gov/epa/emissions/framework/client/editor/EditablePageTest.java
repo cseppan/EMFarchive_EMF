@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
+import gov.epa.emissions.commons.io.ColumnMetaData;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;
@@ -26,6 +28,8 @@ public class EditablePageTest extends TestCase {
 
     private Version version;
 
+    private TableMetadata tableMetadata;
+
     protected void setUp() {
         page = new Page();
 
@@ -41,7 +45,20 @@ public class EditablePageTest extends TestCase {
         datasetId = 2;
         version = new Version();
         version.setVersion(34);
-        data = new EditablePage(datasetId, version, page, cols);
+        tableMetadata = tableMetadata();
+        data = new EditablePage(datasetId, version, page, tableMetadata);
+    }
+
+    private TableMetadata tableMetadata() {
+        ColumnMetaData col0 = new ColumnMetaData(cols[0],"String",10);
+        ColumnMetaData col1 = new ColumnMetaData(cols[1],"String",10);
+        ColumnMetaData col2 = new ColumnMetaData(cols[2],"String",10);
+        TableMetadata tableMetadata = new TableMetadata();
+        tableMetadata.addColumnMetaData(col0);
+        tableMetadata.addColumnMetaData(col1);
+        tableMetadata.addColumnMetaData(col2);
+        
+        return tableMetadata;
     }
 
     public void testShouldHaveThreeColumns() {
