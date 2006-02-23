@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.data.viewer;
 
 import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.client.data.DataSortFilterPanel;
 import gov.epa.emissions.framework.client.data.PaginationPanel;
@@ -12,8 +11,6 @@ import gov.epa.emissions.framework.ui.ScrollableTable;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -23,8 +20,6 @@ import javax.swing.border.CompoundBorder;
 public class NonEditablePageManagerPanel extends JPanel implements NonEditablePageManagerView {
 
     private EmfTableModel tableModel;
-
-    private InternalSource source;
 
     private JPanel pageContainer;
 
@@ -36,9 +31,11 @@ public class NonEditablePageManagerPanel extends JPanel implements NonEditablePa
 
     private EmfDataset dataset;
 
-    public NonEditablePageManagerPanel(InternalSource source, MessagePanel messagePanel, EmfDataset dataset) {
+    private TableMetadata tableMetadata;
+
+    public NonEditablePageManagerPanel(MessagePanel messagePanel, EmfDataset dataset, TableMetadata tableMetadata) {
         super(new BorderLayout());
-        this.source = source;
+        this.tableMetadata = tableMetadata;
         this.dataset = dataset;
         doLayout(messagePanel);
     }
@@ -93,21 +90,9 @@ public class NonEditablePageManagerPanel extends JPanel implements NonEditablePa
     }
 
     private ScrollableTable table(Page page) {
-        tableModel = new EmfTableModel(new ViewablePage(page, cols()));
+        tableModel = new EmfTableModel(new ViewablePage(tableMetadata, page));
         table = new ScrollableTable(tableModel);
         return table;
-    }
-
-    // Filter out the first four (version-specific cols)
-    private String[] cols() {
-        // TODO: should these cols come from the Page/Service?
-        List cols = new ArrayList();
-
-        String[] allCols = source.getCols();
-        for (int i = 4; i < allCols.length; i++)
-            cols.add(allCols[i]);
-
-        return (String[]) cols.toArray(new String[0]);
     }
 
     public void updateFilteredRecordsCount(int filtered) {
@@ -119,8 +104,7 @@ public class NonEditablePageManagerPanel extends JPanel implements NonEditablePa
     }
 
     public TableMetadata tableMetadata() {
-        //FIXME: Auto-generated method stub
-        return null;
+        return tableMetadata;
     }
 
 }

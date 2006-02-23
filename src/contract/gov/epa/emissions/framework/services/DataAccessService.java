@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
 
 public interface DataAccessService {
@@ -18,5 +19,7 @@ public interface DataAccessService {
 
     // version-related
     Version[] getVersions(long datasetId) throws EmfException;
+    
+    TableMetadata getTableMetadata(String table) throws EmfException;
 
 }

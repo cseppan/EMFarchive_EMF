@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.data.viewer;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -83,9 +83,14 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
     }
 
     private JPanel tablePanel(Version version, String table, DataAccessService service) {
-        InternalSource source = source(table, dataset.getInternalSources());
-        NonEditablePageManagerPanel tableView = new NonEditablePageManagerPanel(source, messagePanel, dataset);
-        TablePresenter tablePresenter = new ViewableTablePresenter(version, table, source, tableView, service);
+        TableMetadata tableMetadata = null;
+        try {
+            tableMetadata = service.getTableMetadata(table);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+        NonEditablePageManagerPanel tableView = new NonEditablePageManagerPanel(messagePanel, dataset, tableMetadata);
+        TablePresenter tablePresenter = new ViewableTablePresenter(version, table, tableMetadata, tableView, service);
         tablePresenter.observe();
 
         try {
@@ -95,15 +100,6 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         }
 
         return tableView;
-    }
-
-    private InternalSource source(String table, InternalSource[] sources) {
-        for (int i = 0; i < sources.length; i++) {
-            if (sources[i].getTable().equals(table))
-                return sources[i];
-        }
-
-        return null;
     }
 
     private JPanel controlsPanel() {

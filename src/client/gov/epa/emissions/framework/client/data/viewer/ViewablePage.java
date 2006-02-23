@@ -2,33 +2,36 @@ package gov.epa.emissions.framework.client.data.viewer;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
+import gov.epa.emissions.commons.io.ColumnMetaData;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ViewablePage extends AbstractTableData {
 
     private List rows;
 
-    private String[] cols;
+    private TableMetadata tableMetadata;
 
-    public ViewablePage(Page page, String[] cols) {
-        this.cols = cols;
+    public ViewablePage(TableMetadata tableMetadata, Page page) {
+        this.tableMetadata = tableMetadata;
         this.rows = createRows(page);
     }
 
     public Class getColumnClass(int col) {
-        // TODO: need to use InternalSource + other? to lookup correct Class
-        return String.class;
+        return String.class; //TODO: return the acutal class type
     }
 
     public String[] columns() {
         List result = new ArrayList();
+        ColumnMetaData[] cols = tableMetadata.getCols();
         for (int i = 0; i < cols.length; i++)
-            result.add(cols[i]);
+            result.add(cols[i].getName());
 
         return (String[]) result.toArray(new String[0]);
     }
@@ -55,7 +58,14 @@ public class ViewablePage extends AbstractTableData {
     }
 
     private String[] values(VersionedRecord record) {
-        return record.getTokens();
-    }
+        List allTokens = new ArrayList();
+        allTokens.add(new String("" + record.getRecordId()));
+        allTokens.add(new String("" + record.getDatasetId()));
+        allTokens.add(new String("" + record.getVersion()));
+        allTokens.add(record.getDeleteVersions());
 
+        String[] tokens = record.getTokens();
+        allTokens.addAll(Arrays.asList(tokens));
+        return (String[]) allTokens.toArray(new String[0]);
+    }
 }

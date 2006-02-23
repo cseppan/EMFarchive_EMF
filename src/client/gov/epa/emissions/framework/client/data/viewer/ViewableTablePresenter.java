@@ -2,7 +2,8 @@ package gov.epa.emissions.framework.client.data.viewer;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.commons.io.ColumnMetaData;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.TablePaginator;
 import gov.epa.emissions.framework.services.DataAccessService;
@@ -19,12 +20,12 @@ public class ViewableTablePresenter implements TablePresenter {
 
     private DataAccessService service;
 
-    private InternalSource source;
+    private TableMetadata tableMetadata;
 
-    public ViewableTablePresenter(Version version, String table, InternalSource source,
+    public ViewableTablePresenter(Version version, String table, TableMetadata tableMetadata,
             NonEditablePageManagerView view, DataAccessService service) {
         delegate = new TablePaginator(version, table, view, service);
-        this.source = source;
+        this.tableMetadata = tableMetadata;
         this.view = view;
         this.service = service;
     }
@@ -62,10 +63,19 @@ public class ViewableTablePresenter implements TablePresenter {
     }
 
     public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
-        validateColsInSortOrder(sortOrder, source.getCols());
+        validateColsInSortOrder(sortOrder, cols());
         Page page = service.applyConstraints(delegate.token(), rowFilter, sortOrder);
         view.display(page);
         view.updateFilteredRecordsCount(delegate.totalRecords());
+    }
+
+    private String[] cols() {
+        ColumnMetaData[] cols = tableMetadata.getCols();
+        String[] colNames = new String[cols.length];
+        for (int i = 0; i < cols.length; i++) {
+            colNames[i] = cols[i].getName();
+        }
+        return colNames;
     }
 
     private void validateColsInSortOrder(String sortOrder, String[] cols) throws EmfException {

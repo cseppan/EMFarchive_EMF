@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataViewService;
@@ -89,5 +90,16 @@ public class DataViewServiceTransport implements DataViewService {
 
         return (Version[]) call.requestResponse(new Object[] { new Long(datasetId) });
     }
+
+    public TableMetadata getTableMetadata(String table) throws EmfException {
+        call.addStringParam("table");
+
+        call.setOperation("getTableMetadata");
+        call.setReturnType(mappings.tablemetadata());
+        
+        return (TableMetadata)call.requestResponse(new Object[] { table });
+    }
+    
+    
 
 }

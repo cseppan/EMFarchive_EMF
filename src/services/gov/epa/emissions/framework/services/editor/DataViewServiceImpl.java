@@ -1,11 +1,15 @@
 package gov.epa.emissions.framework.services.editor;
 
+import java.sql.SQLException;
+
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Page;
+import gov.epa.emissions.commons.db.TableDefinition;
 import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.InfrastructureException;
 import gov.epa.emissions.framework.services.DataAccessToken;
@@ -97,6 +101,17 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
     protected void finalize() throws Throwable {
         accessor.shutdown();
         super.finalize();
+    }
+
+    public TableMetadata getTableMetadata(String table) throws EmfException {
+        try {
+            TableDefinition definition = dbServer.getEmissionsDatasource().tableDefinition();
+            return definition.getTableMetaData(table);
+        } catch (SQLException e) {
+            LOG.error("Database error. Failed to get table metadata for table: ", e);
+            throw new EmfException("Database error");
+        }
+
     }
 
 }

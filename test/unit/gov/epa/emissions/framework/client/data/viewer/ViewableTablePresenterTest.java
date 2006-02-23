@@ -2,15 +2,13 @@ package gov.epa.emissions.framework.client.data.viewer;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.Dataset;
-import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.data.viewer.NonEditablePageManagerView;
-import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
-import gov.epa.emissions.framework.client.data.viewer.ViewableTablePresenter;
 import gov.epa.emissions.framework.services.DataAccessService;
-import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataEditorService;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -32,11 +30,10 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         Mock view = mock(NonEditablePageManagerView.class);
         Mock service = mock(DataEditorService.class);
 
-        Mock source = mock(InternalSource.class);
         String[] cols = { "col1", "col2", "col3" };
-        source.stubs().method("getCols").will(returnValue(cols));
+        TableMetadata tableMetadata = tableMetadata(cols);
 
-        TablePresenter p = new ViewableTablePresenter(null, "table", (InternalSource) source.proxy(),
+        TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata,
                 (NonEditablePageManagerView) view.proxy(), (DataAccessService) service.proxy());
 
         String rowFilter = "rowFilter";
@@ -57,11 +54,10 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         Mock view = mock(NonEditablePageManagerView.class);
         Mock service = mock(DataEditorService.class);
 
-        Mock source = mock(InternalSource.class);
         String[] cols = { "col1", "col2", "col3" };
-        source.stubs().method("getCols").will(returnValue(cols));
+        TableMetadata tableMetadata = tableMetadata(cols);
 
-        TablePresenter p = new ViewableTablePresenter(null, "table", (InternalSource) source.proxy(),
+        TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata,
                 (NonEditablePageManagerView) view.proxy(), (DataAccessService) service.proxy());
 
         String sortOrder = "invalid-row";
@@ -74,15 +70,15 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         fail("Should have raised an exception when Sort Order contains invalid cols");
     }
 
+
     public void testShouldRaiseExceptionIfOneOfColsInSortOrderIsInvalidOnApplyConstraints() {
         Mock view = mock(NonEditablePageManagerView.class);
         Mock service = mock(DataEditorService.class);
 
-        Mock source = mock(InternalSource.class);
         String[] cols = { "col1", "col2", "col3" };
-        source.stubs().method("getCols").will(returnValue(cols));
+        TableMetadata tableMetadata = tableMetadata(cols);
 
-        TablePresenter p = new ViewableTablePresenter(null, "table", (InternalSource) source.proxy(),
+        TablePresenter p = new ViewableTablePresenter(null, "table",tableMetadata,
                 (NonEditablePageManagerView) view.proxy(), (DataAccessService) service.proxy());
 
         String sortOrder = "col3, invalid-row";
@@ -100,11 +96,10 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         Mock view = mock(NonEditablePageManagerView.class);
         Mock service = mock(DataEditorService.class);
 
-        Mock source = mock(InternalSource.class);
         String[] cols = { "col1", "col2", "col3" };
-        source.stubs().method("getCols").will(returnValue(cols));
+        TableMetadata tableMetadata = tableMetadata(cols);
 
-        TablePresenter p = new ViewableTablePresenter(null, "table", (InternalSource) source.proxy(),
+        TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata,
                 (NonEditablePageManagerView) view.proxy(), (DataAccessService) service.proxy());
 
         String rowFilter = "rowFilter";
@@ -118,6 +113,14 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         view.expects(once()).method("updateFilteredRecordsCount").with(eq(filtered));
 
         p.doApplyConstraints(rowFilter, sortOrder);
+    }
+    
+    private TableMetadata tableMetadata(String[] cols) {
+        TableMetadata table  = new TableMetadata();
+        for (int i = 0; i < cols.length; i++) {
+            table.addColumnMetaData(new ColumnMetaData(cols[i],"java.lang.String",10));
+        }
+        return table;
     }
 
     public void testShouldFetchTotalRecords() throws Exception {
