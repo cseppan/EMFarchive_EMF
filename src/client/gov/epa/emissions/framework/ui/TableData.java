@@ -8,6 +8,7 @@ public interface TableData {
 
     Class getColumnClass(int col);
 
+    //list of Row objects
     List rows();
 
     boolean isEditable(int col);
