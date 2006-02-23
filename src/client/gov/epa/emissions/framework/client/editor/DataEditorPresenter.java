@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.gui.ChangeObserver;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
@@ -12,7 +13,7 @@ import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.NoteType;
 
-public class DataEditorPresenter {
+public class DataEditorPresenter implements ChangeObserver {
 
     DataEditorView view;
 
@@ -146,6 +147,14 @@ public class DataEditorPresenter {
         view.display(user, dataset, types, versions);
         if (view.shouldCreate())
             commonsService().addNote(view.note());
+    }
+
+    public void signalChanges() {
+        view.enableButtons();
+    }
+
+    public void signalSaved() {
+        view.disableButtons();
     }
 
 }

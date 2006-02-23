@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.ui.TableData;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -123,6 +124,10 @@ public class EditablePagePanel extends JPanel {
 
     public void scrollToPageEnd() {
         table.moveToBottom();
+    }
+    
+    public void addListener(KeyListener keyListener) {
+        table.addListener(keyListener);
     }
 
 }

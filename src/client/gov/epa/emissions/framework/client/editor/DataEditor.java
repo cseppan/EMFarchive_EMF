@@ -21,6 +21,9 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,7 +57,9 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private User user;
 
     private RevisionPanel revisionPanel;
-
+    
+    private Button save, discard;
+    
     public DataEditor(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         super("Data Editor: " + dataset.getName(), desktopManager);
         setDimension();
@@ -123,6 +128,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private JPanel tablePanel(Version version, String table, TableMetadata tableMetadata) {
         pageContainer = new EditablePageContainer(dataset, version, tableMetadata, messagePanel, this);
         displayTable(table);
+        addListener(new DataEditorKeyListener());
 
         return pageContainer;
     }
@@ -202,23 +208,25 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     private Button saveButton() {
-        Button save = new Button("Save", new AbstractAction() {
+        save = new Button("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
             }
         });
         save.setToolTipText("Save your changes");
+        save.setEnabled(false);
         return save;
     }
 
     private Button discardButton() {
         // TODO: prompts for Discard and Close (if changes exist)
-        Button discard = new Button("Discard", new AbstractAction() {
+        discard = new Button("Discard", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doDiscard();
             }
         });
         discard.setToolTipText("Discard your changes");
+        discard.setEnabled(false);
         return discard;
     }
 
@@ -241,7 +249,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         } catch (EmfException e) {
             displayError("Could not Save. Reason: " + e.getMessage());
         }
-
+        
+        presenter.signalSaved();
         displayTable(table);
     }
 
@@ -271,7 +280,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         } catch (EmfException e) {
             displayError("Could not Discard. Reason: " + e.getMessage());
         }
-
+        
+        presenter.signalSaved();
         displayTable(table);
     }
 
@@ -310,6 +320,27 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         } catch (EmfException e) {
             displayError("Could not close. Reason - " + e.getMessage());
         }
+    }
+    
+    private void addListener(KeyListener listener) {
+        pageContainer.addListener(listener);
+    }
+    
+    public class DataEditorKeyListener extends KeyAdapter {
+        public void keyTyped(KeyEvent e) {
+            //if (hasChanges())
+                presenter.signalChanges();
+        }
+    }
+
+    public void enableButtons() {
+        save.setEnabled(true);
+        discard.setEnabled(true);
+    }
+
+    public void disableButtons() {
+        save.setEnabled(false);
+        discard.setEnabled(false);
     }
 
 }

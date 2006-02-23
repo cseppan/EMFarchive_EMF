@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.ui;
 
+import java.awt.event.KeyListener;
+
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -70,6 +72,10 @@ public class ScrollableTable extends JScrollPane {
     public void selectLastRow() {
         int total = table.getModel().getRowCount();
         table.setRowSelectionInterval(total - 1, total - 1);
+    }
+    
+    public void addListener(KeyListener listener) {
+        table.addKeyListener(listener);
     }
 
 }
