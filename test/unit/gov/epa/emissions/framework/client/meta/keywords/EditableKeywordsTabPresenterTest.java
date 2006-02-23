@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.data.Keywords;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.jmock.Mock;

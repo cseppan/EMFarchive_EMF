@@ -6,6 +6,7 @@ import abbot.tester.JTableTester;
 
 import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.meta.DatasetPropertiesEditor;
 

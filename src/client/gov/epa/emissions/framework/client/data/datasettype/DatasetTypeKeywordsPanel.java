@@ -3,8 +3,7 @@ package gov.epa.emissions.framework.client.data.datasettype;
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.io.Keyword;
-import gov.epa.emissions.framework.client.data.EditableTablePanel;
-import gov.epa.emissions.framework.client.data.KeywordsTableData;
+import gov.epa.emissions.framework.ui.EditableTablePanel;
 
 import java.awt.BorderLayout;
 

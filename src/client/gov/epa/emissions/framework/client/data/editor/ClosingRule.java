@@ -1,0 +1,67 @@
+package gov.epa.emissions.framework.client.data.editor;
+
+import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataCommonsService;
+import gov.epa.emissions.framework.services.DataEditorService;
+
+public class ClosingRule {
+
+    private EditableTablePresenter tablePresenter;
+
+    private DataAccessToken token;
+
+    private DataEditorView view;
+
+    private EmfSession session;
+
+    public ClosingRule() {// To support unit testing
+    }
+
+    public ClosingRule(DataEditorView view, EditableTablePresenter tablePresenter, EmfSession session,
+            DataAccessToken token) {
+        this.view = view;
+        this.tablePresenter = tablePresenter;
+        this.session = session;
+        this.token = token;
+    }
+
+    public boolean hasChanges() throws EmfException {
+        return tablePresenter.hasChanges() || dataEditorService().hasChanges(token);
+    }
+
+    private DataEditorService dataEditorService() {
+        return session.dataEditorService();
+    }
+
+    private DataCommonsService dataCommonsService() {
+        return session.dataCommonsService();
+    }
+
+    public void close(boolean changesSaved) throws EmfException {
+        if (shouldCancelClose())
+            return;
+
+        proceedWithClose(changesSaved);
+    }
+
+    public boolean shouldCancelClose() throws EmfException {
+        return hasChanges() && !view.confirmDiscardChanges();
+    }
+
+    public void proceedWithClose(boolean changesSaved) throws EmfException {
+        if (changesSaved)
+            saveRevision();
+
+        dataEditorService().closeSession(token);
+        view.close();
+    }
+
+    private void saveRevision() throws EmfException {
+        if (!view.verifyRevisionInput())
+            throw new EmfException("Please enter 'revision' information before closing");
+
+        dataCommonsService().addRevision(view.revision());
+    }
+}
