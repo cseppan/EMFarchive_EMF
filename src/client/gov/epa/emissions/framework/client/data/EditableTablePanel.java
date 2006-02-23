@@ -57,11 +57,8 @@ public class EditableTablePanel extends JPanel implements Editor{
 
     protected JScrollPane table(TableData tableData) {
         tableModel = new EmfTableModel(tableData);
-        changeablesList.addChangeable(tableModel);
-        tableModel.addDataChangeListener();
         table = new EditableTable(tableModel);
         changeablesList.addChangeable(table);
-        table.addListeners();
 
         return new JScrollPane(table);
     }

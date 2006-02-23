@@ -19,6 +19,12 @@ public class ScrollableTable extends JScrollPane {
         table = table(tableModel);
         super.setViewportView(table);
     }
+    
+    public ScrollableTable(JTable table) {
+        super(VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        this.table = table;
+        super.setViewportView(table);
+    }
 
     private JTable table(EmfTableModel tableModel) {
         JTable table = new JTable(tableModel);

@@ -15,11 +15,8 @@ public class EditableKeyValueTablePanel extends EditableTablePanel {
     
     protected JScrollPane table(TableData tableData) {
         tableModel = new KeywordTableModel((EditableKeyValueTableData) tableData);
-        changeablesList.addChangeable(tableModel);
-        tableModel.addDataChangeListener();
         table = new EditableTable(tableModel);
         changeablesList.addChangeable(table);
-        table.addListeners();
 
         return new JScrollPane(table);
     }
