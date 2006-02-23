@@ -274,8 +274,7 @@ public class DataCommonsServiceTest extends ServicesTestCase {
 
         try {
             sector2.setName(name);
-            service.addSector(sector2);
-
+            service.updateSector(sector2);
         } catch (EmfException e) {
             assertEquals("Sector name already in use", e.getMessage());
             return;
@@ -311,37 +310,15 @@ public class DataCommonsServiceTest extends ServicesTestCase {
         String name = "MyProject" + Math.abs(new Random().nextInt());
         Project project1 = new Project(name);
         service.addProject(project1);
-        Project project2 = new Project(name);
+
         try {
+            Project project2 = new Project(name);
             service.addProject(project2);
         } catch (EmfException e) {
             assertEquals("Project name already in use", e.getMessage());
             return;
         } finally {
             remove(project1);
-        }
-
-        fail("Should have failed to add Sector w/ duplicate name");
-    }
-
-    public void testShouldFailOnAttemptToUpdateProjectWithDuplicateName() throws EmfException {
-        String name = "Myproject" + Math.abs(new Random().nextInt());
-        Project project1 = new Project(name);
-        service.addProject(project1);
-
-        Project project2 = new Project(name + "foobar");
-        service.addProject(project2);
-
-        try {
-            project2.setName(name);
-            service.addProject(project2);
-
-        } catch (EmfException e) {
-            assertEquals("Project name already in use", e.getMessage());
-            return;
-        } finally {
-            remove(project1);
-            remove(project2);
         }
 
         fail("Should have failed to add Sector w/ duplicate name");
