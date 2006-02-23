@@ -57,9 +57,9 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private User user;
 
     private RevisionPanel revisionPanel;
-    
+
     private Button save, discard;
-    
+
     public DataEditor(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         super("Data Editor: " + dataset.getName(), desktopManager);
         setDimension();
@@ -102,7 +102,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         this.version = version;
         this.user = user;
         TableMetadata tableMetadata = service.getTableMetadata(table);
-        
+
         updateTitle(version, table);
         super.setName("dataEditor:" + version.getDatasetId() + ":" + version.getId());
 
@@ -249,8 +249,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         } catch (EmfException e) {
             displayError("Could not Save. Reason: " + e.getMessage());
         }
-        
-        presenter.signalSaved();
+
+        disableButtons();
         displayTable(table);
     }
 
@@ -280,8 +280,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         } catch (EmfException e) {
             displayError("Could not Discard. Reason: " + e.getMessage());
         }
-        
-        presenter.signalSaved();
+
+        enableButtons();
         displayTable(table);
     }
 
@@ -321,15 +321,14 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
             displayError("Could not close. Reason - " + e.getMessage());
         }
     }
-    
+
     private void addListener(KeyListener listener) {
         pageContainer.addListener(listener);
     }
-    
+
     public class DataEditorKeyListener extends KeyAdapter {
         public void keyTyped(KeyEvent e) {
-            //if (hasChanges())
-                presenter.signalChanges();
+            enableButtons();
         }
     }
 

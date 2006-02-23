@@ -11,7 +11,7 @@ import gov.epa.emissions.framework.services.Revision;
 import java.util.Date;
 
 public interface DataEditorView extends ManagedView {
-    
+
     void display(Version version, String table, User user, DataEditorService service) throws EmfException;
 
     void observe(DataEditorPresenter presenter);
@@ -27,8 +27,5 @@ public interface DataEditorView extends ManagedView {
     Revision revision();
 
     boolean verifyRevisionInput();
-    
-    void enableButtons();
-    
-    void disableButtons();
+
 }
