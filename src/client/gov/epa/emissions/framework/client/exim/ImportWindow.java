@@ -19,6 +19,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -282,6 +284,11 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
      */
     private void doImport() {
         clearMessagePanel();
+        if(!nameBeginWithLetter()) {
+            messagePanel.setError("Dataset name has to begin with a letter");
+            return;
+        }
+        
         String message = "Started import. Please monitor the Status window to track your Import request.";
         
         try {
@@ -294,22 +301,36 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
                         .getSelectedItem());
                 messagePanel.setMessage(message);
             } else {
-                if (!name.getText().equals("")) {
-                    presenter.doImport(folder.getText(), filename.getText(), name.getText(),
-                            (DatasetType) datasetTypesModel.getSelectedItem());
-                    messagePanel.setMessage(message);
-                } else {
-                    messagePanel.setError("Dataset Name field should be a non-empty string.");
+                presenter.doImport(folder.getText(), filename.getText(), name.getText(),
+                        (DatasetType) datasetTypesModel.getSelectedItem());
+                messagePanel.setMessage(message);
                 }
-            }
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
     }
     
+    private boolean nameBeginWithLetter() {
+        String[] names = datasetNames();
+        for(int i = 0; i < names.length; i++) {
+            if(names[i].equals("") || Character.isDigit(names[i].charAt(0)))
+                return false;
+        }
+        
+        return true;
+    }
+    
     private String[] datasetNames() {
-        if(!singleFile)
-            return name.getText().split(":");
+        if(!singleFile) {
+            String temp = name.getText();
+            String[] names = temp.split(":");
+            List list = new ArrayList();
+            for(int i = 0; i < names.length; i++)
+                list.add(names[i]);
+            if(temp.lastIndexOf(":") == temp.length()-1) //to catch the last empty name
+                list.add("");
+            return (String[])list.toArray(new String[0]);
+        }
         
         return new String[] {name.getText()};
     }
