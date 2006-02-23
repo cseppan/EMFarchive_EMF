@@ -82,7 +82,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         name = new TextField("", 40);
-        layoutGenerator.addLabelWidgetPair("Name", name, panel);
+        layoutGenerator.addLabelWidgetPair("Summary", name, panel);
 
         typesModel = new DefaultComboBoxModel(typeNames(types));
         JComboBox typesCombo = createCombo(typesModel);
