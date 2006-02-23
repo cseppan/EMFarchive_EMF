@@ -22,6 +22,7 @@ public class NotesTableDataTest extends TestCase {
 
     protected void setUp() {
         note0 = new Note();
+        note0.setId(234);
         note0.setName("note0");
         note0.setCreator(new User());
         note0.setDate(new Date());
@@ -38,14 +39,15 @@ public class NotesTableDataTest extends TestCase {
 
     public void testShouldHaveSevenColumns() {
         String[] columns = data.columns();
-        assertEquals(7, columns.length);
-        assertEquals("Summary", columns[0]);
-        assertEquals("Type", columns[1]);
-        assertEquals("Version", columns[2]);
-        assertEquals("Creator", columns[3]);
-        assertEquals("Date", columns[4]);
-        assertEquals("References", columns[5]);
-        assertEquals("Details", columns[6]);
+        assertEquals(8, columns.length);
+        assertEquals("Id", columns[0]);
+        assertEquals("Summary", columns[1]);
+        assertEquals("Type", columns[2]);
+        assertEquals("Version", columns[3]);
+        assertEquals("Creator", columns[4]);
+        assertEquals("Date", columns[5]);
+        assertEquals("References", columns[6]);
+        assertEquals("Details", columns[7]);
     }
 
     public void testShouldReturnBooleanAsColumnClassForSelectColDateForDateColAndStringForAllOtherCols() {
@@ -73,16 +75,17 @@ public class NotesTableDataTest extends TestCase {
         List rows = data.rows();
 
         Row row = (Row) rows.get(0);
-        assertEquals(note0.getName(), row.getValueAt(0));
-        assertEquals(note0.getNoteType().getType(), row.getValueAt(1));
-        assertEquals(note0.getVersion(), ((Long)row.getValueAt(2)).longValue());
-        assertEquals(note0.getCreator().getName(), row.getValueAt(3));
+        assertEquals(new Long(note0.getId()), row.getValueAt(0));
+        assertEquals(note0.getName(), row.getValueAt(1));
+        assertEquals(note0.getNoteType().getType(), row.getValueAt(2));
+        assertEquals(note0.getVersion(), ((Long)row.getValueAt(3)).longValue());
+        assertEquals(note0.getCreator().getName(), row.getValueAt(4));
 
         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        assertEquals(dateFormat.format(note0.getDate()), row.getValueAt(4));
+        assertEquals(dateFormat.format(note0.getDate()), row.getValueAt(5));
 
-        assertEquals(note0.getDetails(), row.getValueAt(5));
-        assertEquals(note0.getReferences(), row.getValueAt(6));
+        assertEquals(note0.getDetails(), row.getValueAt(6));
+        assertEquals(note0.getReferences(), row.getValueAt(7));
     }
 
     public void testShouldReturnARowRepresentingANoteEntry() {

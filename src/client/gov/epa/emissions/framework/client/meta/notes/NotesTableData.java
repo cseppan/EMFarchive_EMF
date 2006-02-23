@@ -24,7 +24,7 @@ public class NotesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Summary", "Type", "Version", "Creator", "Date", "References", "Details" };
+        return new String[] { "Id", "Summary", "Type", "Version", "Creator", "Date", "References", "Details" };
     }
 
     public Class getColumnClass(int col) {

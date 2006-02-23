@@ -19,8 +19,9 @@ public class NotesRowSource implements RowSource {
     }
 
     public Object[] values() {
-        return new Object[] { note.getName(), note.getNoteType().getType(), new Long(note.getVersion()),
-                note.getCreator().getName(), format(note.getDate()), note.getReferences(), note.getDetails() };
+        return new Object[] { new Long(note.getId()), note.getName(), note.getNoteType().getType(),
+                new Long(note.getVersion()), note.getCreator().getName(), format(note.getDate()), note.getReferences(),
+                note.getDetails() };
     }
 
     private Object format(Date date) {
