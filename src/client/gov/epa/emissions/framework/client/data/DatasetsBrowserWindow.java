@@ -50,8 +50,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     private SortFilterSelectModel selectModel;
 
-    private JPanel layout;
-
     private MessagePanel messagePanel;
 
     private DatasetsBrowserPresenter presenter;
@@ -75,28 +73,24 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         model = new EmfTableModel(new EmfDatasetTableData(services.getDatasets()));
         selectModel = new SortFilterSelectModel(model);
 
-        layout = new JPanel();
-        this.getContentPane().add(layout);
-
-        // FIXME: OverallTableModel has a bug w/ respect to row-count &
-        // cannot refresh itself. So, we will regen the layout on every
-        // refresh - it's a HACK. Will need to be addressed
-        createLayout(layout, parentConsole);
+        this.getContentPane().add(createLayout(parentConsole));
     }
 
-    private void createLayout(JPanel layout, EmfConsole parentConsole) {
-        layout.removeAll();
-        layout.setLayout(new BorderLayout());
+    private JPanel createLayout(EmfConsole parentConsole) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
 
-        layout.add(createTopPanel(), BorderLayout.NORTH);
-        layout.add(createBrowserPanel(parentConsole), BorderLayout.CENTER);
-        layout.add(createControlPanel(), BorderLayout.SOUTH);
+        panel.add(createTopPanel(), BorderLayout.NORTH);
+        panel.add(createBrowserPanel(parentConsole), BorderLayout.CENTER);
+        panel.add(createControlPanel(), BorderLayout.SOUTH);
+
+        return panel;
     }
 
     private JPanel createBrowserPanel(EmfConsole parentConsole) {
         browserPanel = new JPanel(new BorderLayout());
         browserPanel.add(sortFilterPane(parentConsole));
-        
+
         return browserPanel;
     }
 
@@ -105,8 +99,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         panel.sort(sortCriteria());
         panel.getTable().setName("datasetsTable");
         panel.setPreferredSize(new Dimension(450, 120));
-        JScrollPane scrollPane = new JScrollPane(panel);
-        return scrollPane;
+
+        return new JScrollPane(panel);
     }
 
     private SortCriteria sortCriteria() {
@@ -247,8 +241,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     protected void doDisplayPropertiesViewer() {
 
         List datasets = updateSelectedDatasets(getSelectedDatasets());
-        if (datasets.isEmpty())
-        {
+        if (datasets.isEmpty()) {
             messagePanel.setMessage("Please select one or more Datasets");
             return;
         }
@@ -268,7 +261,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             for (int i = 0; i < selectedDatasets.size(); i++) {
                 EmfDataset selDataset = (EmfDataset) selectedDatasets.get(i);
                 for (int j = 0; j < updatedAllDatasets1.length; j++) {
-                    if(selDataset.getId()== updatedAllDatasets1[j].getId()){
+                    if (selDataset.getId() == updatedAllDatasets1[j].getId()) {
                         updatedDatasets.add(updatedAllDatasets1[j]);
                         break;
                     }
@@ -283,8 +276,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     protected void doDisplayPropertiesEditor() {
         List datasets = getSelectedDatasets();
 
-        if (datasets.isEmpty())
-        {
+        if (datasets.isEmpty()) {
             messagePanel.setMessage("Please select one or more Datasets");
             return;
         }
@@ -303,8 +295,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     protected void doDisplayVersionedData() {
         List datasets = getSelectedDatasets();
 
-        if (datasets.isEmpty())
-        {
+        if (datasets.isEmpty()) {
             messagePanel.setMessage("Please select one or more Datasets");
             return;
         }

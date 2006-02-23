@@ -27,6 +27,8 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
     private SortFilterSelectModel selectModel;
 
+    private JPanel tablePanel;
+
     public EditNotesTab(EmfConsole parentConsole) {
         super.setName("editNotesTab");
         this.parentConsole = parentConsole;
@@ -42,22 +44,28 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
             EmfConsole parentConsole) {
         JPanel layout = new JPanel(new BorderLayout());
 
-        layout.add(createSortFilterPane(notes, parentConsole), BorderLayout.CENTER);
+        layout.add(tablePanel(notes, parentConsole), BorderLayout.CENTER);
         layout.add(controlPanel(user, dataset, types, versions), BorderLayout.PAGE_END);
 
         return layout;
     }
 
-    private JScrollPane createSortFilterPane(Note[] notes, EmfConsole parentConsole) {
+    private JPanel tablePanel(Note[] notes, EmfConsole parentConsole) {
         tableData = new NotesTableData(notes);
         selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
 
-        SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, selectModel);
-        panel.getTable().setName("notesTable");
+        tablePanel = new JPanel(new BorderLayout());
+        tablePanel.add(createSortFilterPanel(parentConsole));
 
-        JScrollPane scrollPane = new JScrollPane(panel);
-        panel.setPreferredSize(new Dimension(450, 60));
+        return tablePanel;
+    }
 
+    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
+        SortFilterTablePanel sortFilterPanel = new SortFilterTablePanel(parentConsole, selectModel);
+        sortFilterPanel.getTable().setName("notesTable");
+
+        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
+        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
         return scrollPane;
     }
 
@@ -79,10 +87,16 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         NewNoteDialog dialog = new NewNoteDialog(parentConsole);
         dialog.display(user, dataset, types, versions);
 
-        if (dialog.shouldCreate()) {
-            tableData.add(dialog.note());
-            selectModel.refresh();
-        }
+        if (dialog.shouldCreate())
+            addNote(dialog.note());
+    }
+
+    private void addNote(Note note) {
+        tableData.add(note);
+        selectModel.refresh();
+
+        tablePanel.removeAll();
+        tablePanel.add(createSortFilterPanel(parentConsole));
     }
 
     public Note[] additions() {
