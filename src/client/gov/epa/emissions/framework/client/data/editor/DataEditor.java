@@ -243,11 +243,12 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private void doSave() {
         clearMessages();
         try {
-            resetChanges();
             presenter.doSave();
+            resetChanges();
             displayMessage("Saved changes.");
         } catch (EmfException e) {
             displayError("Could not Save. Reason: " + e.getMessage());
+            return;
         }
 
         disableButtons();
