@@ -148,7 +148,7 @@ public class EditablePage extends AbstractTableData implements SelectableEmfTabl
         List tokens = new ArrayList();
         for (int i = 0; i < tableMetadata.getCols().length; i++)
             tokens.add("");
-        record.setTokens((String[]) tokens.toArray(new String[0]));
+        record.setTokens(tokens.toArray());
 
         rows.add(row(record));
         changeset.addNew(record);

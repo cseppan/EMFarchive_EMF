@@ -24,9 +24,15 @@ public class ViewablePage extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        return String.class; //TODO: return the acutal class type
+        // ColumnMetaData[] cols = tableMetadata.getCols();
+        // return classType(cols[col].getType());
+        return String.class;
     }
 
+    /*
+     * private Class classType(String type) { try { return Class.forName(type); } catch (ClassNotFoundException e) {
+     * throw new RuntimeException(e.getMessage());//TODO: exception what we should do } }
+     */
     public String[] columns() {
         List result = new ArrayList();
         ColumnMetaData[] cols = tableMetadata.getCols();
@@ -49,7 +55,7 @@ public class ViewablePage extends AbstractTableData {
         VersionedRecord[] records = page.getRecords();
 
         for (int i = 0; i < records.length; i++) {
-            String[] values = values(records[i]);
+            Object[] values = values(records[i]);
             Row row = new ViewableRow(records[i], values);
             rows.add(row);
         }
@@ -57,15 +63,15 @@ public class ViewablePage extends AbstractTableData {
         return rows;
     }
 
-    private String[] values(VersionedRecord record) {
+    private Object[] values(VersionedRecord record) {
         List allTokens = new ArrayList();
-        allTokens.add(new String("" + record.getRecordId()));
-        allTokens.add(new String("" + record.getDatasetId()));
-        allTokens.add(new String("" + record.getVersion()));
+        allTokens.add(new Integer("" + record.getRecordId()));
+        allTokens.add(new Long("" + record.getDatasetId()));
+        allTokens.add(new Long("" + record.getVersion()));
         allTokens.add(record.getDeleteVersions());
 
-        String[] tokens = record.getTokens();
+        Object[] tokens = record.getTokens();
         allTokens.addAll(Arrays.asList(tokens));
-        return (String[]) allTokens.toArray(new String[0]);
+        return allTokens.toArray();
     }
 }

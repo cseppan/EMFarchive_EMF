@@ -24,7 +24,7 @@ public class NonEditablePageDataTest extends TestCase {
     private TableMetadata tableMetadata(String[] cols) {
         TableMetadata table = new TableMetadata();
         for (int i = 0; i < cols.length; i++) {
-            table.addColumnMetaData(new ColumnMetaData(cols[i], "java.lang.String", 10));
+            table.addColumnMetaData(new ColumnMetaData(cols[i],"java.lang.String", 10));
         }
         return table;
     }

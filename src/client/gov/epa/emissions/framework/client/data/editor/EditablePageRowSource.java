@@ -32,7 +32,7 @@ public class EditablePageRowSource implements RowSource {
             return;
         }
         
-        source.replace(column - 1, (String) val);
+        source.replace(column - 1, val);
     }
 
     public Object source() {
