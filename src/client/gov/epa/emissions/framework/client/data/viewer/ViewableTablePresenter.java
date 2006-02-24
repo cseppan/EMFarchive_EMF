@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.TablePaginator;
+import gov.epa.emissions.framework.client.data.TablePaginatorImpl;
 import gov.epa.emissions.framework.services.DataAccessService;
 
 import java.util.Arrays;
@@ -22,9 +23,17 @@ public class ViewableTablePresenter implements TablePresenter {
 
     private TableMetadata tableMetadata;
 
-    public ViewableTablePresenter(Version version, String table, TableMetadata tableMetadata,
-            PageManagerView view, DataAccessService service) {
-        delegate = new TablePaginator(version, table, view, service);
+    public ViewableTablePresenter(Version version, String table, TableMetadata tableMetadata, PageManagerView view,
+            DataAccessService service) {
+        delegate = new TablePaginatorImpl(version, table, view, service);
+        this.tableMetadata = tableMetadata;
+        this.view = view;
+        this.service = service;
+    }
+
+    public ViewableTablePresenter(TablePaginator paginator, TableMetadata tableMetadata, PageManagerView view,
+            DataAccessService service) {
+        delegate = paginator;
         this.tableMetadata = tableMetadata;
         this.view = view;
         this.service = service;

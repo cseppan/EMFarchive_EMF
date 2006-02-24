@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.TablePaginator;
+import gov.epa.emissions.framework.client.data.TablePaginatorImpl;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataEditorService;
 
@@ -29,7 +30,7 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
         this.source = source;
         this.view = view;
 
-        paginator = new TablePaginator(version, table, view, service);
+        paginator = new TablePaginatorImpl(version, table, view, service);
     }
 
     public void observe() {

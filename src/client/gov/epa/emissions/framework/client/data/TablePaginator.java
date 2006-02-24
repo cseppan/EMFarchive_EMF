@@ -1,96 +1,30 @@
 package gov.epa.emissions.framework.client.data;
 
-import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.DataAccessToken;
 
-public class TablePaginator {
+public interface TablePaginator {
 
-    private DataAccessService service;
+    void doDisplayNext() throws EmfException;
 
-    private String table;
+    void doDisplayPrevious() throws EmfException;
 
-    private Page page;
+    int pageNumber();
 
-    private Version version;
+    void doDisplay(int pageNumber) throws EmfException;
 
-    private TableView view;
+    void reload() throws EmfException;
 
-    public TablePaginator(Version version, String table, TableView view, DataAccessService service) {
-        page = new Page();// page 0, uninitialized
+    void doDisplayFirst() throws EmfException;
 
-        this.version = version;
-        this.table = table;
+    void doDisplayLast() throws EmfException;
 
-        this.view = view;
-        this.service = service;
-    }
+    void doDisplayPageWithRecord(int record) throws EmfException;
 
-    public void doDisplayNext() throws EmfException {
-        int pageNumber = pageNumber();
-        if (pageNumber < pageCount())
-            pageNumber++;
+    int totalRecords() throws EmfException;
 
-        doDisplay(pageNumber);
-    }
+    DataAccessToken token();
 
-    public void doDisplayPrevious() throws EmfException {
-        int pageNumber = pageNumber();
-        if (pageNumber > 1)
-            pageNumber--;
-
-        doDisplay(pageNumber);
-    }
-
-    public int pageNumber() {
-        return page.getNumber();
-    }
-
-    public void doDisplay(int pageNumber) throws EmfException {
-        if (pageNumber() == pageNumber)
-            return;
-
-        page = service.getPage(token(), pageNumber);
-        view.display(page);
-    }
-
-    public void doDisplayFirst() throws EmfException {
-        if (pageNumber() != 1)
-            doDisplay(1);
-    }
-
-    public void doDisplayLast() throws EmfException {
-        int pageCount = pageCount();
-        if (pageNumber() != pageCount) {
-            doDisplay(pageCount);
-            view.scrollToPageEnd();
-        }
-    }
-
-    private int pageCount() throws EmfException {
-        return service.getPageCount(token());
-    }
-
-    public void doDisplayPageWithRecord(int record) throws EmfException {
-        if (isCurrent(record))
-            return;
-
-        page = service.getPageWithRecord(token(), record);
-        view.display(page);
-    }
-
-    public int totalRecords() throws EmfException {
-        return service.getTotalRecords(token());
-    }
-
-    public DataAccessToken token() {
-        return new DataAccessToken(version, table);
-    }
-
-    public boolean isCurrent(int record) {
-        return page.contains(record);
-    }
+    boolean isCurrent(int record);
 
 }
