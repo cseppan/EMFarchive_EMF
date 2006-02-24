@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
-public class NonEditablePageManagerPanel extends JPanel implements NonEditablePageManagerView {
+public class NonEditablePageManagerPanel extends JPanel implements PageManagerView {
 
     private EmfTableModel tableModel;
 

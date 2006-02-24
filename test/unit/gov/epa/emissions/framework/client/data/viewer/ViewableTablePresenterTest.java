@@ -17,9 +17,9 @@ import org.jmock.core.constraint.IsInstanceOf;
 public class ViewableTablePresenterTest extends MockObjectTestCase {
 
     public void testShouldObserveViewOnObserve() {
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
 
-        TablePresenter p = new ViewableTablePresenter(null, "table", null, (NonEditablePageManagerView) view.proxy(),
+        TablePresenter p = new ViewableTablePresenter(null, "table", null, (PageManagerView) view.proxy(),
                 null);
         view.expects(once()).method("observe").with(same(p));
 
@@ -27,14 +27,14 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldDisplayPageOneAfterApplyingConstraintsOnApplyConstraints() throws EmfException {
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         Mock service = mock(DataEditorService.class);
 
         String[] cols = { "col1", "col2", "col3" };
         TableMetadata tableMetadata = tableMetadata(cols);
 
         TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata,
-                (NonEditablePageManagerView) view.proxy(), (DataAccessService) service.proxy());
+                (PageManagerView) view.proxy(), (DataAccessService) service.proxy());
 
         String rowFilter = "rowFilter";
         String sortOrder = "COL2";
@@ -51,14 +51,14 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldRaiseExceptionIfInvalidColsAreSpecifiedInSortOrderOnApplyConstraints() {
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         Mock service = mock(DataEditorService.class);
 
         String[] cols = { "col1", "col2", "col3" };
         TableMetadata tableMetadata = tableMetadata(cols);
 
         TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata,
-                (NonEditablePageManagerView) view.proxy(), (DataAccessService) service.proxy());
+                (PageManagerView) view.proxy(), (DataAccessService) service.proxy());
 
         String sortOrder = "invalid-row";
         try {
@@ -72,14 +72,14 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
 
 
     public void testShouldRaiseExceptionIfOneOfColsInSortOrderIsInvalidOnApplyConstraints() {
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         Mock service = mock(DataEditorService.class);
 
         String[] cols = { "col1", "col2", "col3" };
         TableMetadata tableMetadata = tableMetadata(cols);
 
         TablePresenter p = new ViewableTablePresenter(null, "table",tableMetadata,
-                (NonEditablePageManagerView) view.proxy(), (DataAccessService) service.proxy());
+                (PageManagerView) view.proxy(), (DataAccessService) service.proxy());
 
         String sortOrder = "col3, invalid-row";
         try {
@@ -93,14 +93,14 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldIgnoreWhenSortOrderIsEmptyOnApplyConstraints() throws EmfException {
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         Mock service = mock(DataEditorService.class);
 
         String[] cols = { "col1", "col2", "col3" };
         TableMetadata tableMetadata = tableMetadata(cols);
 
         TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata,
-                (NonEditablePageManagerView) view.proxy(), (DataAccessService) service.proxy());
+                (PageManagerView) view.proxy(), (DataAccessService) service.proxy());
 
         String rowFilter = "rowFilter";
         String sortOrder = "   ";
@@ -140,13 +140,13 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (NonEditablePageManagerView) view
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (PageManagerView) view
                 .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayNext();
@@ -158,13 +158,13 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(21)))
                 .will(returnValue(page));
 
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (NonEditablePageManagerView) view
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (PageManagerView) view
                 .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplay(21);
@@ -176,13 +176,13 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         service.stubs().method("getPageWithRecord").with(isA(DataAccessToken.class), eq(new Integer(21))).will(
                 returnValue(page));
 
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (NonEditablePageManagerView) view
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (PageManagerView) view
                 .proxy(), (DataAccessService) service.proxy());
 
         p.doDisplayPageWithRecord(21);
@@ -193,13 +193,13 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         Page page = new Page();
         services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(returnValue(page));
 
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (NonEditablePageManagerView) view
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (PageManagerView) view
                 .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayFirst();
@@ -211,13 +211,13 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         page.setNumber(1);
         services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(1))).will(returnValue(page));
 
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (NonEditablePageManagerView) view
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (PageManagerView) view
                 .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayFirst();
@@ -231,14 +231,14 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         service.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(20))).will(returnValue(page));
         service.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
         view.stubs().method("scrollToPageEnd").withNoArguments();
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (NonEditablePageManagerView) view
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (PageManagerView) view
                 .proxy(), (DataAccessService) service.proxy());
 
         p.doDisplayLast();
@@ -251,14 +251,14 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         service.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(20))).will(returnValue(page));
         service.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         view.expects(once()).method("display").with(eq(page));
         view.stubs().method("scrollToPageEnd").withNoArguments();
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (NonEditablePageManagerView) view
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (PageManagerView) view
                 .proxy(), (DataAccessService) service.proxy());
 
         p.doDisplayLast();
@@ -273,13 +273,13 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         services.stubs().method("getPage").with(isA(DataAccessToken.class), eq(new Integer(2))).will(returnValue(page));
         services.stubs().method("getPageCount").with(isA(DataAccessToken.class)).will(returnValue(new Integer(20)));
 
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (NonEditablePageManagerView) view
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (PageManagerView) view
                 .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayNext();
@@ -299,14 +299,14 @@ public class ViewableTablePresenterTest extends MockObjectTestCase {
         services.expects(once()).method("getPage").with(isA(DataAccessToken.class), eq(new Integer(2))).will(
                 returnValue(page2));
 
-        Mock view = mock(NonEditablePageManagerView.class);
+        Mock view = mock(PageManagerView.class);
         view.expects(atLeastOnce()).method("display").with(eq(page1));
         view.expects(once()).method("display").with(eq(page2));
 
         Mock dataset = mock(Dataset.class);
         dataset.stubs().method("getId").withNoArguments().will(returnValue(new Long(2)));
 
-        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (NonEditablePageManagerView) view
+        TablePresenter p = new ViewableTablePresenter(new Version(), "table", null, (PageManagerView) view
                 .proxy(), (DataAccessService) services.proxy());
 
         p.doDisplayNext();

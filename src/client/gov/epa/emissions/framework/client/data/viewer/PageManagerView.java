@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.data.viewer;
 
 import gov.epa.emissions.framework.client.data.TableView;
 
-public interface NonEditablePageManagerView extends TableView {
+public interface PageManagerView extends TableView {
 
     void observe(TablePresenter presenter);
 
