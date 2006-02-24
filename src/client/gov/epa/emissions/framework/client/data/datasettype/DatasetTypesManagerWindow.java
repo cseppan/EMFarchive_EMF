@@ -21,7 +21,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,8 +29,6 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
 
 //FIXME: very similar to SectorsManager. Refactor ?
 public class DatasetTypesManagerWindow extends ReusableInteralFrame implements DatasetTypesManagerView, RefreshObserver {
@@ -84,7 +81,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     private JScrollPane createSortFilterScrollPane(DatasetType[] types) {
         model = new EmfTableModel(new DatasetTypesTableData(types));
         selectModel = new SortFilterSelectModel(model);
-        
+
         SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
         sortFilterSelectPanel.setPreferredSize(new Dimension(450, 120));
 
@@ -188,65 +185,26 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         presenter.displayNewDatasetTypeView(newTypeView());
     }
 
-    // generic. Could be moved into 'SortFilterSelectModel' ? - FIXME
     private List selected() {
-        List elements = new ArrayList();
-
-        int[] selected = selectModel.getSelectedIndexes();
-        if (selected.length == 0)
-            return elements;
-        for (int i = 0; i < selected.length; i++) {
-            elements.add(model.element(selected[i]));
-        }
-
-        return elements;
+        return selectModel.selected();
     }
 
     private ViewableDatasetTypeWindow viewableView() {
         ViewableDatasetTypeWindow view = new ViewableDatasetTypeWindow(desktopManager);
         desktop.add(view);
-
-        view.addInternalFrameListener(new InternalFrameAdapter() {
-            public void internalFrameClosed(InternalFrameEvent event) {
-                doTableRefresh();
-            }
-        });
-
         return view;
     }
 
     private EditableDatasetTypeView editableView() {
         EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(desktopManager);
         desktop.add(view);
-
-        view.addInternalFrameListener(new InternalFrameAdapter() {
-            public void internalFrameClosed(InternalFrameEvent event) {
-                doTableRefresh();
-            }
-        });
-
         return view;
     }
 
     private NewDatasetTypeView newTypeView() {
         NewDatasetTypeWindow view = new NewDatasetTypeWindow(desktopManager);
         desktop.add(view);
-
-        view.addInternalFrameListener(new InternalFrameAdapter() {
-            public void internalFrameClosed(InternalFrameEvent event) {
-                doTableRefresh();
-            }
-        });
-
         return view;
-    }
-
-    // FIXME: this table refresh sequence applies to every SortFilterTableModel.
-    // Refactor
-    private void doTableRefresh() {
-        model.refresh();
-        selectModel.refresh();
-        super.refreshLayout();
     }
 
     public EmfConsole getParentConsole() {

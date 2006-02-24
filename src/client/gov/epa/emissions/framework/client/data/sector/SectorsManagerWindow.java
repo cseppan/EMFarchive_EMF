@@ -30,8 +30,6 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
 
 //FIXME: look at the common design b/w this and UserManagerWindow. Refactor ?
 public class SectorsManagerWindow extends ReusableInteralFrame implements SectorsManagerView, RefreshObserver {
@@ -74,14 +72,6 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
 
     public void doRefresh() throws EmfException {
         presenter.doRefresh();
-    }
-
-    // FIXME: this table refresh sequence applies to every SortFilterTableModel.
-    // Refactor
-    private void doTableRefresh() {
-        model.refresh();
-        selectModel.refresh();
-        super.refreshLayout();
     }
 
     private void doLayout(Sector[] sectors) {
@@ -223,39 +213,18 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     private ViewSectorWindow displaySectorView() {
         ViewSectorWindow view = new ViewSectorWindow(desktopManager);
         desktop.add(view);
-
-        view.addInternalFrameListener(new InternalFrameAdapter() {
-            public void internalFrameClosed(InternalFrameEvent event) {
-                doTableRefresh();
-            }
-        });
-
         return view;
     }
 
     private EditableSectorView editSectorView() {
         EditSectorWindow view = new EditSectorWindow(desktopManager);
         desktop.add(view);
-
-        view.addInternalFrameListener(new InternalFrameAdapter() {
-            public void internalFrameClosed(InternalFrameEvent event) {
-                doTableRefresh();
-            }
-        });
-
         return view;
     }
 
     private NewSectorView newSectorView() {
         NewSectorWindow view = new NewSectorWindow(desktopManager);
         desktop.add(view);
-
-        view.addInternalFrameListener(new InternalFrameAdapter() {
-            public void internalFrameClosed(InternalFrameEvent event) {
-                doTableRefresh();
-            }
-        });
-
         return view;
     }
 
