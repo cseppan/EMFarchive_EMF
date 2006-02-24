@@ -12,7 +12,7 @@ import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 import java.util.Date;
 import java.util.Random;
 
-public class LoggingServiceTest extends ServicesTestCase {
+public class LoggingServiceTest extends ServiceTestCase {
 
     private LoggingServiceImpl logService;
 

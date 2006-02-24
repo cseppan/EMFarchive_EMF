@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.Random;
 
 //FIXME: revisit this test. Does not Assert !
-public abstract class ExImServiceTestCase extends ServicesTestCase {
+public abstract class ExImServiceTestCase extends ServiceTestCase {
 
     protected ExImService eximService;
 

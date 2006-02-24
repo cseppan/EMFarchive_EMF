@@ -20,7 +20,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class DataCommonsServiceTest extends ServicesTestCase {
+public class DataCommonsServiceTest extends ServiceTestCase {
 
     private DataCommonsService service;
 

@@ -6,8 +6,6 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.io.Column;
-import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.db.EmfDatabaseSetup;
 import gov.epa.emissions.framework.db.LocalHibernateConfiguration;
 import gov.epa.emissions.framework.db.VersionedTable;
@@ -15,8 +13,6 @@ import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +26,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-public abstract class ServicesTestCase extends TestCase {
+public abstract class ServiceTestCase extends TestCase {
 
     private EmfDatabaseSetup dbSetup;
 
@@ -45,7 +41,7 @@ public abstract class ServicesTestCase extends TestCase {
 
     abstract protected void doSetUp() throws Exception;
 
-    protected Properties config() throws IOException, FileNotFoundException {
+    protected Properties config() throws Exception {
         String folder = "test";
         File conf = new File(folder, "postgres.conf");
 
@@ -93,12 +89,6 @@ public abstract class ServicesTestCase extends TestCase {
     protected void dropData(String table, Datasource datasource) throws Exception, SQLException {
         DataModifier modifier = datasource.dataModifier();
         modifier.dropAll(table);
-    }
-
-    protected ServiceLocator serviceLocator() throws Exception {
-        Properties config = config();
-        String baseUrl = config.getProperty("emf.services.url");
-        return new RemoteServiceLocator(baseUrl);
     }
 
     protected HibernateSessionFactory sessionFactory() throws Exception {

@@ -14,7 +14,7 @@ import gov.epa.emissions.framework.services.editor.DataAccessorImpl;
 import gov.epa.emissions.framework.services.editor.DefaultVersionedRecordsWriterFactory;
 import gov.epa.emissions.framework.services.editor.VersionedRecordsWriterFactory;
 
-public class DataAccessorTest extends ServicesTestCase {
+public class DataAccessorTest extends ServiceTestCase {
 
     private DataAccessor accessor;
 

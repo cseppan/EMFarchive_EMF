@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.services.impl.DataCommonsServiceImpl;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.VersionedExporterFactory;
 
-public class ExImFactoryTestCase extends ServicesTestCase {
+public class ExImFactoryTestCase extends ServiceTestCase {
     private DataCommonsService service;
 
     // private VersionedImporterFactory importerFactory;

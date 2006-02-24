@@ -19,7 +19,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.Random;
 
-public class DataEditorService_VersionsTest extends ServicesTestCase {
+public class DataEditorService_VersionsTest extends ServiceTestCase {
 
     private DataEditorService service;
 

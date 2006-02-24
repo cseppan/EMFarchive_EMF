@@ -17,7 +17,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.Random;
 
-public class DataViewServiceTest extends ServicesTestCase {
+public class DataViewServiceTest extends ServiceTestCase {
 
     private DataViewService service;
 

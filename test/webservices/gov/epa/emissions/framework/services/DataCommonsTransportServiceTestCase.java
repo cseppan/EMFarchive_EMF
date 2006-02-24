@@ -16,7 +16,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class DataCommonsTransportServiceTestCase extends ServicesTestCase {
+public class DataCommonsTransportServiceTestCase extends ServiceTestCase {
     private static final String DEFAULT_URL = "http://localhost:8080/emf/services";// default
 
     private DataCommonsService dcs = null;

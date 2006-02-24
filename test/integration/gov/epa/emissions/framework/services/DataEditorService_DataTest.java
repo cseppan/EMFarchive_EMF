@@ -25,7 +25,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.Random;
 
-public class DataEditorService_DataTest extends ServicesTestCase {
+public class DataEditorService_DataTest extends ServiceTestCase {
 
     private DataEditorServiceImpl service;
 

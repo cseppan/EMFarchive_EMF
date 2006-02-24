@@ -20,7 +20,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.Random;
 
-public class DataEditorService_MetaDataTest extends ServicesTestCase {
+public class DataEditorService_MetaDataTest extends ServiceTestCase {
 
     private DataEditorServiceImpl service;
 

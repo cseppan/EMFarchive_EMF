@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.io.Country;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.ServicesTestCase;
+import gov.epa.emissions.framework.services.ServiceTestCase;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class DatasetDaoTest extends ServicesTestCase {
+public class DatasetDaoTest extends ServiceTestCase {
 
     private DatasetDao dao;
 

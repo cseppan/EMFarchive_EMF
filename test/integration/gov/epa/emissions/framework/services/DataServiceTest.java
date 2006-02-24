@@ -18,7 +18,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class DataServiceTest extends ServicesTestCase {
+public class DataServiceTest extends ServiceTestCase {
 
     private DataServiceImpl service;
 

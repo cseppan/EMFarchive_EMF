@@ -13,7 +13,7 @@ import gov.epa.emissions.framework.services.IntendedUse;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.services.Revision;
-import gov.epa.emissions.framework.services.ServicesTestCase;
+import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.Status;
 
 import java.util.Date;
@@ -26,7 +26,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class DataCommonsDAOTest extends ServicesTestCase {
+public class DataCommonsDAOTest extends ServiceTestCase {
 
     private DataCommonsDAO dao;
 
