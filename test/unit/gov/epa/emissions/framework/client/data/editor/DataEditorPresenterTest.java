@@ -3,11 +3,8 @@ package gov.epa.emissions.framework.client.data.editor;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.data.editor.ClosingRule;
-import gov.epa.emissions.framework.client.data.editor.DataEditorPresenter;
-import gov.epa.emissions.framework.client.data.editor.DataEditorView;
-import gov.epa.emissions.framework.client.data.editor.EditableTablePresenter;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteView;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataCommonsService;
@@ -19,12 +16,11 @@ import gov.epa.emissions.framework.services.NoteType;
 import java.util.Date;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Constraint;
 import org.jmock.core.constraint.HasPropertyWithValue;
 import org.jmock.core.constraint.IsInstanceOf;
 
-public class DataEditorPresenterTest extends MockObjectTestCase {
+public class DataEditorPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldLoadTablesOfDatasetOnDisplay() throws Exception {
         Version version = new Version();
@@ -102,16 +98,15 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("discard").with(same(token));
 
         DataEditorPresenter p = new DataEditorPresenter(null, null, null, null);
-        p.discard((DataEditorService) service.proxy(), token);
+        Mock tablePresenter = setupTablePresenterToDisplay();
+
+        p.discard((DataEditorService) service.proxy(), token, (EditableTablePresenter) tablePresenter.proxy());
     }
 
     public void testShouldDisplayTableViewOnDisplayTableView() throws Exception {
         DataEditorPresenter p = new DataEditorPresenter(null, null, null, null);
-
-        Mock tablePresenter = mock(EditableTablePresenter.class);
-        tablePresenter.expects(once()).method("observe");
-        tablePresenter.expects(once()).method("doDisplayFirst");
-
+        Mock tablePresenter = setupTablePresenterToDisplay();
+        
         p.displayTable((EditableTablePresenter) tablePresenter.proxy());
     }
 
@@ -128,13 +123,13 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         DataEditorView viewProxy = (DataEditorView) view.proxy();
 
-        Mock tablePresenter = mock(EditableTablePresenter.class);
+        Mock tablePresenter = setupTablePresenterToDisplay();
         tablePresenter.expects(once()).method("submitChanges");
         EditableTablePresenter tablePresenterProxy = (EditableTablePresenter) tablePresenter.proxy();
 
         DataEditorPresenter p = new DataEditorPresenter(null, version, null, null);
         p.save(viewProxy, token, tablePresenterProxy, serviceProxy, null);
-        
+
         assertTrue("Changes should be saved on save", p.areChangesSaved());
     }
 
@@ -151,7 +146,7 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         DataEditorView viewProxy = (DataEditorView) view.proxy();
 
-        Mock tablePresenter = mock(EditableTablePresenter.class);
+        Mock tablePresenter = setupTablePresenterToDisplay();
         tablePresenter.expects(once()).method("submitChanges");
         EditableTablePresenter tablePresenterProxy = (EditableTablePresenter) tablePresenter.proxy();
 
@@ -163,8 +158,16 @@ public class DataEditorPresenterTest extends MockObjectTestCase {
 
         DataEditorPresenter p = new DataEditorPresenter(null, null, null, null);
         p.save(viewProxy, token, tablePresenterProxy, serviceProxy, closingRuleProxy);
-        
+
         assertFalse("Changes should not be saved on discard", p.areChangesSaved());
+    }
+
+    private Mock setupTablePresenterToDisplay() {
+        Mock tablePresenter = mock(EditableTablePresenter.class);
+        tablePresenter.expects(once()).method("observe");
+        tablePresenter.expects(once()).method("doDisplayFirst");
+        
+        return tablePresenter;
     }
 
     private Constraint tokenConstraint(Version version, String table) {

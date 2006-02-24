@@ -62,8 +62,7 @@ public class DataEditorPresenter {
 
     public void displayTable(EditablePageManagerView tableView) throws EmfException {
         InternalSource source = source(table, dataset.getInternalSources());
-        EditableTablePresenter tablePresenter = new EditableTablePresenterImpl(version, table, source, tableView,
-                dataEditorService());
+        tablePresenter = new EditableTablePresenterImpl(version, table, source, tableView, dataEditorService());
         displayTable(tablePresenter);
     }
 
@@ -77,7 +76,6 @@ public class DataEditorPresenter {
     }
 
     void displayTable(EditableTablePresenter tablePresenter) throws EmfException {
-        this.tablePresenter = tablePresenter;
         tablePresenter.observe();
         tablePresenter.doDisplayFirst();
     }
@@ -99,11 +97,13 @@ public class DataEditorPresenter {
     }
 
     public void doDiscard() throws EmfException {
-        discard(dataEditorService(), token);
+        discard(dataEditorService(), token, tablePresenter);
     }
 
-    void discard(DataEditorService service, DataAccessToken token) throws EmfException {
+    void discard(DataEditorService service, DataAccessToken token, EditableTablePresenter tablePresenter)
+            throws EmfException {
         service.discard(token);
+        displayTable(tablePresenter);
         clearChangesSaved();
     }
 
@@ -116,12 +116,13 @@ public class DataEditorPresenter {
         tablePresenter.submitChanges();
         try {
             token = service.save(token);
+            displayTable(tablePresenter);
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
             changesSaved = true;
         } catch (EmfException e) {
             clearChangesSaved();
             view.notifySaveFailure(e.getMessage());
-            discard(service, token);
+            discard(service, token, tablePresenter);
             closingRule.proceedWithClose(areChangesSaved());
         }
     }

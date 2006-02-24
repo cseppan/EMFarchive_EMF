@@ -46,8 +46,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private EditablePageContainer pageContainer;
 
-    private String table;
-
     private JLabel lockInfo;
 
     private EmfConsole parent;
@@ -98,7 +96,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     public void display(Version version, String table, User user, DataEditorService service) throws EmfException {
-        this.table = table;
         this.version = version;
         this.user = user;
         TableMetadata tableMetadata = service.getTableMetadata(table);
@@ -252,7 +249,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         }
 
         disableButtons();
-        displayTable(table);
     }
 
     private void clearMessages() {
@@ -283,7 +279,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         }
 
         enableButtons();
-        displayTable(table);
     }
 
     public void windowClosing() {
