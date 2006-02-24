@@ -8,4 +8,6 @@ public interface EditableTablePresenter extends TablePresenter {
     boolean hasChanges();
 
     void submitChanges() throws EmfException;
+
+    void reloadCurrent() throws EmfException;
 }

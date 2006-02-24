@@ -55,7 +55,7 @@ public class TablePaginatorImpl implements TablePaginator {
         loadPage(pageNumber);
     }
 
-    public void reload() throws EmfException {
+    public void reloadCurrent() throws EmfException {
         loadPage(pageNumber());
     }
 

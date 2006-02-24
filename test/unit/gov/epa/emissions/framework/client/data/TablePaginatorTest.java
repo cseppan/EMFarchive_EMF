@@ -62,7 +62,7 @@ public class TablePaginatorTest extends EmfMockObjectTestCase {
                 .proxy());
 
         paginator.doDisplay(3);
-        paginator.reload();
+        paginator.reloadCurrent();
     }
 
     public void testShouldDisplayFirstPage() throws Exception {

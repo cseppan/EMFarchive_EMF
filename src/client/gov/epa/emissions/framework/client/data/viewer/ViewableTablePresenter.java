@@ -25,10 +25,7 @@ public class ViewableTablePresenter implements TablePresenter {
 
     public ViewableTablePresenter(Version version, String table, TableMetadata tableMetadata, PageManagerView view,
             DataAccessService service) {
-        delegate = new TablePaginatorImpl(version, table, view, service);
-        this.tableMetadata = tableMetadata;
-        this.view = view;
-        this.service = service;
+        this(new TablePaginatorImpl(version, table, view, service), tableMetadata, view, service);
     }
 
     public ViewableTablePresenter(TablePaginator paginator, TableMetadata tableMetadata, PageManagerView view,

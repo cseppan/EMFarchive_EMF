@@ -26,15 +26,25 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
 
     public EditableTablePresenterImpl(Version version, String table, InternalSource source,
             EditablePageManagerView view, DataEditorService service) {
+        this(new TablePaginatorImpl(version, table, view, service), source, view, service);
+    }
+
+    public EditableTablePresenterImpl(TablePaginator paginator, InternalSource source, EditablePageManagerView view,
+            DataEditorService service) {
         this.service = service;
         this.source = source;
         this.view = view;
 
-        paginator = new TablePaginatorImpl(version, table, view, service);
+        this.paginator = paginator;
     }
 
     public void observe() {
         view.observe(this);
+    }
+
+    public void reloadCurrent() throws EmfException {
+        submitChanges();
+        paginator.reloadCurrent();
     }
 
     public void doDisplayNext() throws EmfException {

@@ -13,7 +13,7 @@ public interface TablePaginator {
 
     void doDisplay(int pageNumber) throws EmfException;
 
-    void reload() throws EmfException;
+    void reloadCurrent() throws EmfException;
 
     void doDisplayFirst() throws EmfException;
 
