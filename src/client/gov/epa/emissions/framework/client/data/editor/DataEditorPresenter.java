@@ -116,7 +116,7 @@ public class DataEditorPresenter {
         tablePresenter.submitChanges();
         try {
             token = service.save(token);
-            displayTable(tablePresenter);
+            tablePresenter.reloadCurrent();
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
             changesSaved = true;
         } catch (EmfException e) {

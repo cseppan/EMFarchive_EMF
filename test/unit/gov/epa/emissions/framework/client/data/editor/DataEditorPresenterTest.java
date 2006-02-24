@@ -122,9 +122,10 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
         DataEditorView viewProxy = (DataEditorView) view.proxy();
+        Mock tablePresenter = mock(EditableTablePresenter.class);
+        expects(tablePresenter, "reloadCurrent");
+        expects(tablePresenter, "submitChanges");
 
-        Mock tablePresenter = setupTablePresenterToDisplay();
-        tablePresenter.expects(once()).method("submitChanges");
         EditableTablePresenter tablePresenterProxy = (EditableTablePresenter) tablePresenter.proxy();
 
         DataEditorPresenter p = new DataEditorPresenter(null, version, null, null);
