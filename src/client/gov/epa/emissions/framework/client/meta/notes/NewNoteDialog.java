@@ -50,6 +50,8 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
 
     private EmfDataset dataset;
 
+    private String version;
+
     public NewNoteDialog(EmfConsole parent) {
         super("Create new Note", parent);
         super.setSize(new Dimension(550, 250));
@@ -57,10 +59,23 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         super.center();
     }
 
+    public void display(User user, EmfDataset dataset, Version version, NoteType[] types, Version[] versions) {
+        versionsSet = new VersionsSet(versions);
+        this.version = version.getName();
+
+        doDisplay(user, dataset, types);
+    }
+
     public void display(User user, EmfDataset dataset, NoteType[] types, Version[] versions) {
+        versionsSet = new VersionsSet(versions);
+        version = versionsSet.getDefaultVersionName(dataset);
+
+        doDisplay(user, dataset, types);
+    }
+
+    private void doDisplay(User user, EmfDataset dataset, NoteType[] types) {
         this.user = user;
         this.dataset = dataset;
-        versionsSet = new VersionsSet(versions);
         this.types = types;
 
         super.getContentPane().add(createLayout(types, versionsSet));
@@ -97,6 +112,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
 
         versionsModel = new DefaultComboBoxModel(versionsSet.names());
         JComboBox versionsCombo = createCombo(versionsModel);
+        versionsCombo.setSelectedItem(version);
         layoutGenerator.addLabelWidgetPair("Version", versionsCombo, panel);
 
         // Lay out the panel.

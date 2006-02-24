@@ -85,7 +85,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
         right.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 5));
         right.add(new JLabel("Default Version: "));
 
-        String name = versionsSet.getDefaultVersionName(dataset.getDefaultVersion());
+        String name = versionsSet.getVersionName(dataset.getDefaultVersion());
         if (name == null)
         {
             name = "N/A";

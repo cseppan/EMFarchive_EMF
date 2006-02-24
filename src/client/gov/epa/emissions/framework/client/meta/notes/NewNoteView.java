@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
 
 public interface NewNoteView {
-    void display(User user, EmfDataset dataset, NoteType[] types, Version[] versions);
+    void display(User user, EmfDataset dataset, Version version, NoteType[] types, Version[] versions);
 
     boolean shouldCreate();
 

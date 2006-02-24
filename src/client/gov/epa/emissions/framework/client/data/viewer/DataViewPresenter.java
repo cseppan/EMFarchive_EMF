@@ -63,7 +63,7 @@ public class DataViewPresenter {
 
     void addNote(NewNoteView view, User user, EmfDataset dataset, NoteType[] types, Version[] versions)
             throws EmfException {
-        view.display(user, dataset, types, versions);
+        view.display(user, dataset, version, types, versions);
         if (view.shouldCreate())
             commonsService().addNote(view.note());
     }

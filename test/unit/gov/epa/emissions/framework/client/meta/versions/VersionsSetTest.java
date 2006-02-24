@@ -19,6 +19,6 @@ public class VersionsSetTest extends TestCase {
             assertTrue(vnums[j].intValue() == Integer.parseInt(vnames[j]));
         
         assertTrue(vset.name(3).equals(""+3));
-        assertTrue(vset.getDefaultVersionName(10).equals(""+10));
+        assertTrue(vset.getVersionName(10).equals(""+10));
     }
 }

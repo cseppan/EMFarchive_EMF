@@ -111,7 +111,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     }
 
     private String getDefaultVersion(VersionsSet versionsSet) {
-        String name = versionsSet.getDefaultVersionName(dataset.getDefaultVersion());
+        String name = versionsSet.getVersionName(dataset.getDefaultVersion());
         return displayableVersion(name, dataset.getDefaultVersion());
     }
 

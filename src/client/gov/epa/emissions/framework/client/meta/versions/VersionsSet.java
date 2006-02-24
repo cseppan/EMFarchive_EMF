@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,11 +52,11 @@ public class VersionsSet {
         return null;
     }
 
-    public String getDefaultVersionName(int defaultVersion) {
+    public String getVersionName(int version) {
         Integer[] versions = versions();
         for (int i = 0; i < versions.length; i++) {
             int val = versions[i].intValue();
-            if (val == defaultVersion)
+            if (val == version)
                 return name(val);
         }
 
@@ -69,6 +70,10 @@ public class VersionsSet {
         }
 
         return null;
+    }
+
+    public String getDefaultVersionName(EmfDataset dataset) {
+        return getVersionName(dataset.getDefaultVersion());
     }
 
 }

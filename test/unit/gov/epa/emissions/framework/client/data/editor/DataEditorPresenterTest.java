@@ -106,7 +106,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
     public void testShouldDisplayTableViewOnDisplayTableView() throws Exception {
         DataEditorPresenter p = new DataEditorPresenter(null, null, null, null);
         Mock tablePresenter = setupTablePresenterToDisplay();
-        
+
         p.displayTable((EditableTablePresenter) tablePresenter.proxy());
     }
 
@@ -167,7 +167,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         Mock tablePresenter = mock(EditableTablePresenter.class);
         tablePresenter.expects(once()).method("observe");
         tablePresenter.expects(once()).method("doDisplayFirst");
-        
+
         return tablePresenter;
     }
 
@@ -188,11 +188,13 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         service.expects(once()).method("addNote").with(same(note));
 
         EmfSession session = session(user, null, (DataCommonsService) service.proxy());
-        DataEditorPresenter presenter = new DataEditorPresenter(null, null, null, session);
+        Version version = new Version();
+        DataEditorPresenter presenter = new DataEditorPresenter(null, version, null, session);
 
         Mock view = mock(NewNoteView.class);
         EmfDataset dataset = new EmfDataset();
-        view.stubs().method("display").with(same(user), same(dataset), same(types), same(versions));
+        Constraint[] constraints = { same(user), same(dataset), same(version), same(types), same(versions) };
+        view.stubs().method("display").with(constraints);
         view.stubs().method("shouldCreate").will(returnValue(Boolean.TRUE));
         view.stubs().method("note").will(returnValue(note));
 

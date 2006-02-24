@@ -84,11 +84,13 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("addNote").with(same(note));
 
         EmfSession session = session(null, (DataCommonsService) service.proxy());
-        DataViewPresenter presenter = new DataViewPresenter(null, null, null, null, session);
+        Version version = new Version();
+        DataViewPresenter presenter = new DataViewPresenter(null, version, null, null, session);
 
         Mock view = mock(NewNoteView.class);
         EmfDataset dataset = new EmfDataset();
-        view.stubs().method("display").with(same(user), same(dataset), same(types), same(versions));
+        Constraint[] constraints = {same(user), same(dataset), same(version), same(types), same(versions)};
+        view.stubs().method("display").with(constraints );
         view.stubs().method("shouldCreate").will(returnValue(Boolean.TRUE));
         view.stubs().method("note").will(returnValue(note));
 
