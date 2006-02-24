@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 public class NotesTab extends JPanel implements NotesTabView {
 
     private EmfConsole parentConsole;
+    private SortFilterSelectModel selectModel;
 
     public NotesTab(EmfConsole parentConsole) {
         super.setName("notesTab");
@@ -39,7 +40,7 @@ public class NotesTab extends JPanel implements NotesTabView {
 
     private JScrollPane createSortFilterPane(Note[] notes, EmfConsole parentConsole) {
         EmfTableModel model = new EmfTableModel(new NotesTableData(notes));
-        SortFilterSelectModel selectModel = new SortFilterSelectModel(model);
+        selectModel = new SortFilterSelectModel(model);
 
         SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, selectModel);
         panel.getTable().setName("notesTable");
