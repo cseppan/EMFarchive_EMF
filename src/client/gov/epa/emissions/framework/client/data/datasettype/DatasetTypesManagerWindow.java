@@ -46,7 +46,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     private EmfConsole parentConsole;
 
     public DatasetTypesManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Dataset Type Manager", new Dimension(600, 300), parentConsole.desktop(), desktopManager);
+        super("Dataset Type Manager", new Dimension(600, 300), desktopManager);
         super.setName("datasetTypeManager");
 
         this.parentConsole = parentConsole;
@@ -191,19 +191,16 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     private ViewableDatasetTypeWindow viewableView() {
         ViewableDatasetTypeWindow view = new ViewableDatasetTypeWindow(desktopManager);
-        desktop.add(view);
         return view;
     }
 
     private EditableDatasetTypeView editableView() {
         EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(desktopManager);
-        desktop.add(view);
         return view;
     }
 
     private NewDatasetTypeView newTypeView() {
         NewDatasetTypeWindow view = new NewDatasetTypeWindow(desktopManager);
-        desktop.add(view);
         return view;
     }
 

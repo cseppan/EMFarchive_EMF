@@ -19,11 +19,14 @@ public class DesktopManagerImpl implements DesktopManager {
 
     private EmfConsoleView consoleView;
 
-    public DesktopManagerImpl(WindowMenuView windowMenu, EmfConsoleView consoleView) {
+    private EmfDesktop desktop;
+
+    public DesktopManagerImpl(WindowMenuView windowMenu, EmfConsoleView consoleView, EmfDesktop desktop) {
         this.windowMenu = windowMenu;
         this.windowNames = new HashMap();
         this.consoleView = consoleView;
         this.layout = new LayoutImpl(consoleView);
+        this.desktop = desktop;
     }
 
     public void openWindow(ManagedView manageView) {
@@ -32,14 +35,16 @@ public class DesktopManagerImpl implements DesktopManager {
             newWindowOpened(manageView, name);
         } else {
             // enforces one window per object TODO: think abt a better way to do this
-            manageView = null; // don't need any more;
-            ((ManagedView) windowNames.get(name)).bringToFront();
+            ManagedView cachedView = (ManagedView) windowNames.get(name);
+            cachedView.bringToFront();
         }
     }
 
     private void newWindowOpened(ManagedView manageView, String name) {
         windowNames.put(name, manageView);
         windowMenu.register(manageView);
+        
+        desktop.add(manageView);
         manageView.bringToFront();
         layout.add(manageView);
     }
@@ -64,7 +69,7 @@ public class DesktopManagerImpl implements DesktopManager {
 
     private boolean checkForUnSavedWindows(Map windowNames) {
         if (!windowNames.isEmpty()) {
-           if(consoleView.confirm()){
+            if (consoleView.confirm()) {
                 forceWindowClose(windowNames);
                 return true;
             }
@@ -81,6 +86,10 @@ public class DesktopManagerImpl implements DesktopManager {
             view.resetChanges();
             view.close();
         }
+    }
+
+    public void ensurePresence(ManagedView view) {
+        desktop.ensurePresence(view);
     }
 
 }

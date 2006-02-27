@@ -21,7 +21,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -47,7 +46,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     private EmfConsole parentConsole;
 
     public SectorsManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Sector Manager", new Dimension(475, 300), parentConsole.desktop(), desktopManager);
+        super("Sector Manager", new Dimension(475, 300), desktopManager);
         super.setName("sectorManager");
 
         this.parentConsole = parentConsole;
@@ -195,37 +194,21 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
         super.refreshLayout();
     }
 
-    // generic. Could be moved into 'SortFilterSelectModel' ? - FIXME
     private List selected() {
-        List elements = new ArrayList();
-
-        int[] selected = selectModel.getSelectedIndexes();
-        if (selected.length == 0)
-            return elements;
-        for (int i = 0; i < selected.length; i++) {
-            elements.add(model.element(selected[i]));
-        }
-
-        return elements;
+        return selectModel.selected();
     }
 
     // FIXME: this table refresh sequence applies to every CRUD panel. Refactor
     private ViewSectorWindow displaySectorView() {
-        ViewSectorWindow view = new ViewSectorWindow(desktopManager);
-        desktop.add(view);
-        return view;
+        return new ViewSectorWindow(desktopManager);
     }
 
     private EditableSectorView editSectorView() {
-        EditSectorWindow view = new EditSectorWindow(desktopManager);
-        desktop.add(view);
-        return view;
+        return new EditSectorWindow(desktopManager);
     }
 
     private NewSectorView newSectorView() {
-        NewSectorWindow view = new NewSectorWindow(desktopManager);
-        desktop.add(view);
-        return view;
+        return new NewSectorWindow(desktopManager);
     }
 
     public EmfConsole getParentConsole() {

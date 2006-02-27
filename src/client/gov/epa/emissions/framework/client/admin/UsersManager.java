@@ -51,7 +51,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
     // FIXME: this class needs to be refactored into smaller components
     public UsersManager(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("User Manager", new Dimension(550, 300), parentConsole.desktop(), desktopManager);
+        super("User Manager", new Dimension(550, 300), desktopManager);
         super.setName("userManager");
 
         this.session = session;
@@ -181,7 +181,6 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
     public UserView getUserView() {
         ViewUserWindow view = new DisposableViewUserWindow(desktopManager);
-        desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosed(InternalFrameEvent event) {
@@ -211,7 +210,6 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
                 updateUser), desktopManager);
         DisposableUpdateUserWindow updateUserWindow = new DisposableUpdateUserWindow(desktopManager);
         UpdateUserWindow view = updateUser.equals(session.user()) ? updateUserWindow : updateUserWindowWithAdmin;
-        desktop.add(view);
 
         view.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosed(InternalFrameEvent event) {
@@ -263,8 +261,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
 
     private void displayRegisterUser() {
         RegisterUserInternalFrame registerUserView = new RegisterUserInternalFrame(new NoOpPostRegisterStrategy(),
-                desktop, desktopManager);
-        desktop.add(registerUserView);
+                desktopManager);
         presenter.doRegisterNewUser(registerUserView);
     }
 

@@ -1,12 +1,12 @@
 package gov.epa.emissions.framework.client.console;
 
+import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.ManagedView;
 import gov.epa.emissions.framework.ui.Position;
 
 import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
 
-public class DesktopManagerTest extends MockObjectTestCase {
+public class DesktopManagerTest extends EmfMockObjectTestCase {
 
     public void testShouldRegisterOpenWindowWithWindowMenu() {
         Mock windowsMenu = mock(WindowMenuView.class);
@@ -15,8 +15,11 @@ public class DesktopManagerTest extends MockObjectTestCase {
 
         windowsMenu.expects(once()).method("register").with(same(managedView.proxy()));
 
+        Mock desktop = mock(EmfDesktop.class);
+        expects(desktop, 1, "add");
+
         DesktopManager desktopManager = new DesktopManagerImpl(((WindowMenuView) windowsMenu.proxy()),
-                (EmfConsoleView) emfConsole.proxy());
+                (EmfConsoleView) emfConsole.proxy(), (EmfDesktop) desktop.proxy());
         desktopManager.openWindow((ManagedView) (managedView.proxy()));
     }
 
@@ -28,7 +31,7 @@ public class DesktopManagerTest extends MockObjectTestCase {
         managedView.expects(once()).method("getName").withNoArguments().will(returnValue("view"));
         windowsMenu.expects(once()).method("unregister").with(same(managedViewProxy));
 
-        DesktopManager desktopManager = new DesktopManagerImpl(((WindowMenuView) windowsMenu.proxy()), null);
+        DesktopManager desktopManager = new DesktopManagerImpl(((WindowMenuView) windowsMenu.proxy()), null, null);
         desktopManager.closeWindow(managedViewProxy);
     }
 
@@ -43,12 +46,42 @@ public class DesktopManagerTest extends MockObjectTestCase {
         Mock emfConsole = emfConsole();
         emfConsole.expects(atLeastOnce()).method("confirm").withNoArguments().will(returnValue(true));
 
+        Mock desktop = mock(EmfDesktop.class);
+        expects(desktop, 2, "add");
+
         DesktopManager desktopManager = new DesktopManagerImpl(((WindowMenuView) windowsMenu.proxy()),
-                (EmfConsoleView) emfConsole.proxy());
+                (EmfConsoleView) emfConsole.proxy(), (EmfDesktop) desktop.proxy());
         desktopManager.openWindow((ManagedView) managedView1.proxy());
         desktopManager.openWindow((ManagedView) managedView2.proxy());
 
         desktopManager.closeAll();
+    }
+
+    public void testShouldAddViewToDesktopOnOpenWindow() {
+        Mock managedView1 = manageView("view");
+        ManagedView viewProxy = (ManagedView) managedView1.proxy();
+
+        Mock windowsMenu = windowsMenu();
+        Mock emfConsole = emfConsole();
+
+        Mock desktop = mock(EmfDesktop.class);
+        desktop.expects(once()).method("add").with(same(viewProxy));
+
+        DesktopManager desktopManager = new DesktopManagerImpl(((WindowMenuView) windowsMenu.proxy()),
+                (EmfConsoleView) emfConsole.proxy(), (EmfDesktop) desktop.proxy());
+        desktopManager.openWindow(viewProxy);
+    }
+
+    public void testShouldDelegateEnsuringPresenceToDesktopOnEnsurePresence() {
+        Mock managedView = mock(ManagedView.class);
+        ManagedView viewProxy = (ManagedView) managedView.proxy();
+
+        Mock desktop = mock(EmfDesktop.class);
+        desktop.expects(once()).method("ensurePresence").with(same(viewProxy));
+
+        DesktopManager desktopManager = new DesktopManagerImpl(null, null, (EmfDesktop) desktop.proxy());
+
+        desktopManager.ensurePresence(viewProxy);
     }
 
     private void setCloseRealatedExpections(Mock managedView) {

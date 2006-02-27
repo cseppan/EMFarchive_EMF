@@ -86,7 +86,6 @@ public class NotesTab extends JPanel implements NotesTabView {
         List selected = selectModel.selected();
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             ViewNoteWindow view = new ViewNoteWindow(desktopManager);
-            parentConsole.desktop().add(view);
             presenter.doViewNote((Note) iter.next(), view);    
         }
     }

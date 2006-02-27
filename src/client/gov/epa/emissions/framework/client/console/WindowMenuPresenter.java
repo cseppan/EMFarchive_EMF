@@ -26,6 +26,7 @@ public class WindowMenuPresenter {
 
     public void addPermanently(ManagedView managedView) {
         view.addPermanently(managedView);
+        desktopManager.ensurePresence(managedView);
     }
 
 }

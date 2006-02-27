@@ -23,7 +23,6 @@ import java.util.Date;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -40,8 +39,8 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
 
     private StatusPresenter presenter;
 
-    public StatusWindow(Container parent, JDesktopPane desktop, DesktopManager desktopManager) {
-        super("Status", desktop, desktopManager);
+    public StatusWindow(Container parent, DesktopManager desktopManager) {
+        super("Status", desktopManager);
         super.setName("status");
 
         position(parent);

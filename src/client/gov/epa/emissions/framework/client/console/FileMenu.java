@@ -12,7 +12,6 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JDesktopPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
@@ -25,7 +24,7 @@ public class FileMenu extends JMenu {
         super("File");
         super.setName("file");
 
-        super.add(createImport(session, parent.desktop(), messagePanel));
+        super.add(createImport(session, messagePanel));
         super.addSeparator();
         super.add(createLogout(session, parent));
         super.add(createExit(parent));
@@ -68,15 +67,13 @@ public class FileMenu extends JMenu {
 
     }
 
-    private JMenuItem createImport(final EmfSession session, final JDesktopPane desktop, final MessagePanel messagePanel) {
+    private JMenuItem createImport(final EmfSession session, final MessagePanel messagePanel) {
         JMenuItem importMenu = new JMenuItem("Import");
         importMenu.setName("import");
         importMenu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    displayImport(session, desktop);
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
+                    displayImport(session);
                 } catch (Exception e) {
                     messagePanel.setError(e.getMessage());
                 }
@@ -85,10 +82,8 @@ public class FileMenu extends JMenu {
         return importMenu;
     }
 
-    protected void displayImport(EmfSession session, JDesktopPane desktop) throws EmfException, Exception {
-        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktop, desktopManager);
-        desktop.add(importView);
-
+    protected void displayImport(EmfSession session) throws EmfException, Exception {
+        ImportWindow importView = new ImportWindow(session.dataCommonsService(), desktopManager);
         ImportPresenter presenter = new ImportPresenter(session, session.user(), session.eximService());
         presenter.display(importView);
     }

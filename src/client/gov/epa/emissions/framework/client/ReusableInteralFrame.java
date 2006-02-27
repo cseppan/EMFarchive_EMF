@@ -3,23 +3,16 @@ package gov.epa.emissions.framework.client;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 
 import java.awt.Dimension;
-import java.util.Arrays;
-import java.util.List;
 
-import javax.swing.JDesktopPane;
 
 public abstract class ReusableInteralFrame extends EmfInternalFrame {
 
-    protected JDesktopPane desktop;
-
-    public ReusableInteralFrame(String title, Dimension dimension, JDesktopPane desktop, DesktopManager desktopManager) {
+    public ReusableInteralFrame(String title, Dimension dimension, DesktopManager desktopManager) {
         super(title, dimension, desktopManager);
-        this.desktop = desktop;
     }
 
-    public ReusableInteralFrame(String title, JDesktopPane desktop, DesktopManager desktopManager) {
+    public ReusableInteralFrame(String title, DesktopManager desktopManager) {
         super(title, desktopManager);
-        this.desktop = desktop;
     }
 
     public void windowClosing() {
@@ -32,15 +25,8 @@ public abstract class ReusableInteralFrame extends EmfInternalFrame {
     }
 
     public void bringToFront() {
-        ensurePresenceOnDesktop(desktop);
+        desktopManager.ensurePresence(this);
         super.bringToFront();
-    }
-
-    private void ensurePresenceOnDesktop(JDesktopPane desktop) {
-        List componentsList = Arrays.asList(desktop.getAllFrames());
-        if (!componentsList.contains(this)) {
-            desktop.add(this);
-        }
     }
 
     public boolean isAlive() {

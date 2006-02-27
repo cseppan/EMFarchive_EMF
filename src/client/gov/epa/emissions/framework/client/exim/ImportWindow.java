@@ -29,7 +29,6 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDesktopPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -58,9 +57,9 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     
     private boolean singleFile = true;
 
-    public ImportWindow(DataCommonsService service, JDesktopPane desktop, DesktopManager desktopManager)
+    public ImportWindow(DataCommonsService service, DesktopManager desktopManager)
             throws EmfException {
-        super("Import Dataset", new Dimension(650, 300), desktop, desktopManager);
+        super("Import Dataset", new Dimension(650, 300), desktopManager);
         super.setName("importDatasets");
         
         this.service = service;

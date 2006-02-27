@@ -36,7 +36,6 @@ public class ViewNoteWindow extends DisposableInteralFrame implements NoteView {
 
         doLayout(note);
         super.display();
-        System.out.println("displayed view - " + name);
     }
 
     private void doLayout(Note note) {

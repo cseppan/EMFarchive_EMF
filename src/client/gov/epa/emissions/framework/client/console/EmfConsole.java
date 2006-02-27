@@ -1,21 +1,17 @@
 package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.commons.gui.Confirm;
-import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.ConcurrentTaskRunner;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.status.StatusPresenter;
 import gov.epa.emissions.framework.client.status.StatusWindow;
-import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.Dimensions;
 import gov.epa.emissions.framework.ui.EmfDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,12 +26,6 @@ import javax.swing.JOptionPane;
 
 public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
-    private JDesktopPane desktop;
-
-    private User user;
-
-    private ServiceLocator serviceLocator;
-
     private MessagePanel messagePanel;
 
     private WindowMenuPresenter windowMenuPresenter;
@@ -48,49 +38,44 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
             + "Version: Beta 3 - 2/20/2006<br>" + "Developed by the Carolina Environmental Program<br>"
             + "University of North Carolina at Chapel Hill</center></html>";
 
-    private WindowMenuView windowMenuView;
-
     private DesktopManager desktopManager;
 
     private Confirm emfConfirmDialog;
 
-    // TODO: split the login & logout menu/actions in a separate class ??
+    private EmfSession session;
+
     public EmfConsole(EmfSession session) {
         super("EMF Console", "Emissions Modeling Framework (EMF):  " + session.user().getName() + "("
                 + session.user().getUsername() + ")");
-        user = session.user();
-        this.serviceLocator = session.serviceLocator();
-        windowMenuView = createWindowMenu();
-        this.desktopManager = new DesktopManagerImpl(windowMenuView, this);
-        this.windowMenuPresenter.setDesktopManager(desktopManager);
-        this.windowMenuView.setWindowMenuViewPresenter(windowMenuPresenter);
-        messagePanel = new SingleLineMessagePanel();
+        this.session = session;
 
         setProperties();
-        setLayout(session);
+        createLayout(session);
         showStatus();
     }
 
-    private void setLayout(EmfSession session) {
-        desktop = new JDesktopPane();
-        desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
+    private void createLayout(EmfSession session) {
+        WindowMenu windowMenu = createWindowMenu();
 
+        this.desktopManager = createDesktopManager(windowMenu);
+        this.windowMenuPresenter.setDesktopManager(desktopManager);
+
+        super.setJMenuBar(createMenuBar(windowMenu, session));
+    }
+
+    private DesktopManager createDesktopManager(WindowMenu windowMenu) {
+        JDesktopPane desktop = new JDesktopPane();
+        desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
         this.setContentPane(desktop);
 
-        JMenuBar menuBar = createMenuBar(session);
-        super.setJMenuBar(menuBar);
-
-        menuBar.add(messagePanel);
+        return new DesktopManagerImpl(windowMenu, this, new EmfDesktopImpl(desktop));
     }
 
     private void showStatus() {
-        DataCommonsService statusServices = serviceLocator.dataCommonsService();
-        StatusWindow status = new StatusWindow(this, desktop, desktopManager);
+        StatusWindow status = new StatusWindow(this, desktopManager);
         windowMenuPresenter.addPermanently(status);
 
-        desktop.add(status);
-
-        presenter = new StatusPresenter(user, statusServices, new ConcurrentTaskRunner());
+        presenter = new StatusPresenter(session.user(), session.dataCommonsService(), new ConcurrentTaskRunner());
         presenter.display(status);
     }
 
@@ -110,21 +95,26 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         super.setSize(dim);
     }
 
-    private JMenuBar createMenuBar(EmfSession session) {
+    private JMenuBar createMenuBar(WindowMenu windowMenu, EmfSession session) {
         JMenuBar menubar = new JMenuBar();
 
         menubar.add(createFileMenu(session));
         menubar.add(createManageMenu(session));
-        menubar.add((WindowMenu) windowMenuView);
+        menubar.add(windowMenu);
         menubar.add(createHelpMenu());
+
+        messagePanel = new SingleLineMessagePanel();
+        menubar.add(messagePanel);
 
         return menubar;
     }
 
-    private WindowMenuView createWindowMenu() {
-        WindowMenuView windowsMenu = new WindowMenu();
-        windowMenuPresenter = new WindowMenuPresenter(windowsMenu);
-        return windowsMenu;
+    private WindowMenu createWindowMenu() {
+        WindowMenu windowMenu = new WindowMenu();
+        windowMenuPresenter = new WindowMenuPresenter(windowMenu);
+        windowMenu.setWindowMenuViewPresenter(windowMenuPresenter);
+
+        return windowMenu;
     }
 
     private JMenu createFileMenu(EmfSession session) {
@@ -173,14 +163,6 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     public void displayUserManager() throws EmfException {
         manageMenu.displayUserManager();
-    }
-
-    public JDesktopPane desktop() {
-        return desktop;
-    }
-
-    public void addToDesktop(Component view) {
-        desktop.add(view);
     }
 
     public boolean confirm() {

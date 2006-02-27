@@ -297,7 +297,6 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
 
     private void showView(String table, Version version) {
         DataViewer view = new DataViewer(dataset, parentConsole, desktopManager);
-        parentConsole.addToDesktop(view);
         try {
             if (dataset.getInternalSources().length > 0)
                 presenter.doView(version, table, view);
@@ -332,7 +331,6 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
 
     private void showEditor(String table, Version version) {
         DataEditor view = new DataEditor(dataset, parentConsole, desktopManager);
-        parentConsole.addToDesktop(view);
         try {
             if (dataset.getInternalSources().length > 0)
                 presenter.doEdit(version, table, view);

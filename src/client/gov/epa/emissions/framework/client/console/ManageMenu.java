@@ -137,34 +137,25 @@ public class ManageMenu extends JMenu {
 
     protected void displayDatasetTypes(EmfConsole parent) throws EmfException {
         DatasetTypesManagerWindow view = new DatasetTypesManagerWindow(parent, desktopManager);
-        parent.addToDesktop(view);
-
         DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(session, view);
         presenter.doDisplay();
     }
 
     protected void displaySectors(DataCommonsService service, EmfConsole parent) throws EmfException {
         SectorsManagerWindow view = new SectorsManagerWindow(parent, desktopManager);
-        parent.addToDesktop(view);
-
         SectorsManagerPresenter presenter = new SectorsManagerPresenter(session, view, service);
         presenter.doDisplay();
     }
 
     private void displayDatasets(EmfConsole parent) throws EmfException {
         DatasetsBrowserWindow datasetsBrowserView = new DatasetsBrowserWindow(session, parent, desktopManager);
-        parent.addToDesktop(datasetsBrowserView);
-
         DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session);
         presenter.doDisplay(datasetsBrowserView);
     }
 
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
-        UpdateMyProfileWindow updatable = new UpdateMyProfileWindow(parent.desktop(), desktopManager);
-        parent.addToDesktop(updatable);
-
-        ViewMyProfileWindow viewable = new ViewMyProfileWindow(parent.desktop(), desktopManager);
-        parent.addToDesktop(viewable);
+        UpdateMyProfileWindow updatable = new UpdateMyProfileWindow(desktopManager);
+        ViewMyProfileWindow viewable = new ViewMyProfileWindow(desktopManager);
 
         UpdateUserPresenter presenter = new UpdateUserPresenterImpl(session, session.user(), session.userService());
         try {
@@ -176,10 +167,7 @@ public class ManageMenu extends JMenu {
 
     public void displayUserManager() throws EmfException {
         UserService userService = session.userService();
-
         UsersManager usesrManagerView = new UsersManager(session, parent, desktopManager);
-        parent.addToDesktop(usesrManagerView);
-
         UsersManagerPresenter presenter = new UsersManagerPresenter(session, userService);
         presenter.display(usesrManagerView);
     }
