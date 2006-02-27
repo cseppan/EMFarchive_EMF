@@ -6,7 +6,6 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.TableMetadata;
-import gov.epa.emissions.framework.client.data.editor.EditablePage;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.util.List;
@@ -125,12 +124,13 @@ public class EditablePageTest extends TestCase {
         assertSame(record1, changeset.getDeletedRecords()[0]);
     }
 
-    public void FIXME_testShouldAddPreExistingRecordsThatAreModifiedToChangeSet() {
+    public void testShouldAddPreExistingRecordsThatAreModifiedToChangeSet() {
         data.setValueAt("modified-1", 0, 1);
         data.setValueAt("modified-2", 0, 2);
         data.setValueAt("modified-12", 1, 2);
 
-        assertEquals(2, data.rows().size());
+        List rows = data.rows();
+        assertEquals(2, rows.size());
 
         ChangeSet changeset = data.changeset();
         assertEquals(0, changeset.getNewRecords().length);
@@ -145,7 +145,7 @@ public class EditablePageTest extends TestCase {
         assertEquals("modified-12", updated2.token(1));
     }
 
-    public void FIXME_testModificationsToBlankRowShouldNotImpactChangeSet() {
+    public void testModificationsToBlankRowShouldNotImpactChangeSet() {
         data.addBlankRow();
         assertEquals(3, data.rows().size());
 

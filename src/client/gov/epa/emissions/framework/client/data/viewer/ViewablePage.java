@@ -24,15 +24,18 @@ public class ViewablePage extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        // ColumnMetaData[] cols = tableMetadata.getCols();
-        // return classType(cols[col].getType());
-        return String.class;
+        ColumnMetaData[] cols = tableMetadata.getCols();
+        return classType(cols[col].getType());
     }
 
-    /*
-     * private Class classType(String type) { try { return Class.forName(type); } catch (ClassNotFoundException e) {
-     * throw new RuntimeException(e.getMessage());//TODO: exception what we should do } }
-     */
+    private Class classType(String type) {
+        try {
+            return Class.forName(type);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e.getMessage());// TODO: exception what we should do
+        }
+    }
+
     public String[] columns() {
         List result = new ArrayList();
         ColumnMetaData[] cols = tableMetadata.getCols();
