@@ -4,6 +4,6 @@ import gov.epa.emissions.framework.services.Revision;
 
 public interface RevisionsTabView {
 
-    void display(Revision[] revisions);
+    void display(Revision[] revisions, RevisionsTabPresenter presenter);
 
 }

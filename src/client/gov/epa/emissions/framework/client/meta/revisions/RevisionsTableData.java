@@ -3,11 +3,10 @@ package gov.epa.emissions.framework.client.meta.revisions;
 import gov.epa.emissions.framework.services.Revision;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
-import gov.epa.emissions.framework.ui.SelectableRow;
+import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 public class RevisionsTableData extends AbstractTableData {
@@ -22,7 +21,7 @@ public class RevisionsTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Select", "What", "Why", "References", "Version", "Creator", "Date" };
+        return new String[] { "What", "Why", "References", "Version", "Creator", "Date" };
     }
 
     public Class getColumnClass(int col) {
@@ -46,23 +45,11 @@ public class RevisionsTableData extends AbstractTableData {
     }
 
     private Row row(Revision revision) {
-        return new SelectableRow(new RevisionsRowSource(revision));
+        return new ViewableRow(new RevisionsRowSource(revision));
     }
 
     public boolean isEditable(int col) {
         return (col == 0) ? true : false;
-    }
-
-    public Revision[] selected() {
-        List selected = new ArrayList();
-
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            SelectableRow row = (SelectableRow) iter.next();
-            if (row.isSelected())
-                selected.add(row.source());
-        }
-
-        return (Revision[]) selected.toArray(new Revision[0]);
     }
 
     public Revision[] getValues() {

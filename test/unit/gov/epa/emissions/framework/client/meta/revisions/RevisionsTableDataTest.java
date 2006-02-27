@@ -40,14 +40,13 @@ public class RevisionsTableDataTest extends TestCase {
 
     public void testShouldHaveSevenColumns() {
         String[] columns = data.columns();
-        assertEquals(7, columns.length);
-        assertEquals("Select", columns[0]);
-        assertEquals("What", columns[1]);
-        assertEquals("Why", columns[2]);
-        assertEquals("References", columns[3]);
-        assertEquals("Version", columns[4]);
-        assertEquals("Creator", columns[5]);
-        assertEquals("Date", columns[6]);
+        assertEquals(6, columns.length);
+        assertEquals("What", columns[0]);
+        assertEquals("Why", columns[1]);
+        assertEquals("References", columns[2]);
+        assertEquals("Version", columns[3]);
+        assertEquals("Creator", columns[4]);
+        assertEquals("Date", columns[5]);
     }
 
     public void testShouldReturnBooleanAsColumnClassForSelectColDateForDateColAndStringForAllOtherCols() {
@@ -77,31 +76,20 @@ public class RevisionsTableDataTest extends TestCase {
         List rows = data.rows();
 
         Row row = (Row) rows.get(0);
-        assertEquals(Boolean.FALSE, row.getValueAt(0));
 
-        assertEquals(revision0.getWhat(), row.getValueAt(1));
-        assertEquals(revision0.getWhy(), row.getValueAt(2));
-        assertEquals(revision0.getReferences(), row.getValueAt(3));
-        assertEquals(revision0.getVersion(), ((Long) row.getValueAt(4)).longValue());
-        assertEquals(revision0.getCreator().getName(), row.getValueAt(5));
+        assertEquals(revision0.getWhat(), row.getValueAt(0));
+        assertEquals(revision0.getWhy(), row.getValueAt(1));
+        assertEquals(revision0.getReferences(), row.getValueAt(2));
+        assertEquals(revision0.getVersion(), ((Long) row.getValueAt(3)).longValue());
+        assertEquals(revision0.getCreator().getName(), row.getValueAt(4));
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        assertEquals(dateFormat.format(revision0.getDate()), row.getValueAt(6));
+        assertEquals(dateFormat.format(revision0.getDate()), row.getValueAt(5));
     }
 
     public void testShouldReturnARowRepresentingANoteEntry() {
         assertEquals(revision0, data.element(0));
         assertEquals(revision1, data.element(1));
-    }
-
-    public void testShouldReturnSelectedNotes() {
-        List rows = data.rows();
-        Row row = (Row) rows.get(1);
-        row.setValueAt(Boolean.TRUE, 0);
-
-        Revision[] revisions = data.selected();
-        assertEquals(1, revisions.length);
-        assertSame(revision1, revisions[0]);
     }
 
 }

@@ -12,7 +12,6 @@ public class RevisionsTabPresenterTest extends MockObjectTestCase {
     public void testShouldDisplayViewOnDisplay() throws Exception {
         Revision[] revisions = new Revision[0];
         Mock view = mock(RevisionsTabView.class);
-        view.expects(once()).method("display").with(eq(revisions));
 
         Mock service = mock(DataCommonsService.class);
         EmfDataset dataset = new EmfDataset();
@@ -20,8 +19,19 @@ public class RevisionsTabPresenterTest extends MockObjectTestCase {
         service.stubs().method("getRevisions").with(eq(dataset.getId())).will(returnValue(revisions));
 
         RevisionsTabPresenter presenter = new RevisionsTabPresenter(dataset, (DataCommonsService) service.proxy());
+        view.expects(once()).method("display").with(eq(revisions), same(presenter));
 
         presenter.display((RevisionsTabView) view.proxy());
     }
 
+    public void testShouldDisplayNoteViewOnDisplayNote() throws Exception {
+        EmfDataset dataset = new EmfDataset();
+        RevisionsTabPresenter presenter = new RevisionsTabPresenter(dataset, null);
+
+        Revision revision = new Revision();
+        Mock view = mock(RevisionView.class);
+        view.expects(once()).method("display").with(same(revision), same(dataset));
+
+        presenter.doViewRevision(revision, (RevisionView) view.proxy());
+    }
 }

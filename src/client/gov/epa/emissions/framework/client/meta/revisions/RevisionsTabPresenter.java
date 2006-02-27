@@ -18,6 +18,10 @@ public class RevisionsTabPresenter {
 
     public void display(RevisionsTabView view) throws EmfException {
         Revision[] revisions = service.getRevisions(dataset.getId());
-        view.display(revisions);
+        view.display(revisions, this);
+    }
+
+    public void doViewRevision(Revision revision, RevisionView view) {
+        view.display(revision, dataset);
     }
 }
