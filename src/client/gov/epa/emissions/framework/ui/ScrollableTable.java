@@ -19,7 +19,7 @@ public class ScrollableTable extends JScrollPane {
         table = table(tableModel);
         super.setViewportView(table);
     }
-    
+
     public ScrollableTable(JTable table) {
         super(VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.table = table;
@@ -34,13 +34,11 @@ public class ScrollableTable extends JScrollPane {
         setColWidthsBasedOnColNames(table);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowSelectionAllowed(true);
-        if (tableModel.getRowCount() == 1)
-        {
-            if ((tableModel.getColumnClass(0).isInstance(Boolean.TRUE)) &&
-                 tableModel.getColumnName(0).equalsIgnoreCase("Select"))   
-            {    
-               tableModel.setValueAt(Boolean.TRUE,0,0);
-            }   
+        if (tableModel.getRowCount() == 1) {
+            if ((tableModel.getColumnClass(0).isInstance(Boolean.TRUE))
+                    && tableModel.getColumnName(0).equalsIgnoreCase("Select")) {
+                tableModel.setValueAt(Boolean.TRUE, 0, 0);
+            }
         }
 
         return table;
@@ -79,7 +77,7 @@ public class ScrollableTable extends JScrollPane {
         int total = table.getModel().getRowCount();
         table.setRowSelectionInterval(total - 1, total - 1);
     }
-    
+
     public void addListener(KeyListener listener) {
         table.addKeyListener(listener);
     }

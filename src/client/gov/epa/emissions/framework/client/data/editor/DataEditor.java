@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ChangeAwareButton;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
@@ -56,7 +57,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private RevisionPanel revisionPanel;
 
-    private Button save, discard;
+    private ChangeAwareButton save, discard;
 
     public DataEditor(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         super("Data Editor: " + dataset.getName(), desktopManager);
@@ -205,19 +206,32 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     private Button saveButton() {
-        save = new Button("Save", new AbstractAction() {
+        save = new ChangeAwareButton("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
             }
         });
+       
         save.setToolTipText("Save your changes");
         save.setEnabled(false);
         return save;
     }
+    
+    public void signalChanges() {
+        save.signalChanges();
+        discard.signalChanges();
+        super.signalChanges();
+    }
+
+    public void signalSaved() {
+        save.signalSaved();
+        discard.signalSaved();
+        super.signalSaved();
+    }
 
     private Button discardButton() {
         // TODO: prompts for Discard and Close (if changes exist)
-        discard = new Button("Discard", new AbstractAction() {
+        discard = new ChangeAwareButton("Discard", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doDiscard();
             }
