@@ -81,7 +81,6 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
         derivedFrom = new ComboBox("Choose one:", types);
         addChangeable(derivedFrom);
-        derivedFrom.addItemChangeListener();
         layoutGenerator.addLabelWidgetPair("Derived From:", derivedFrom, panel);
         
         minFiles = new TextField("minfiles", 20);

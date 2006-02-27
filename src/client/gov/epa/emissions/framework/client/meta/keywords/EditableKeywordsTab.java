@@ -5,13 +5,7 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.services.EmfDataset;
-
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
@@ -21,10 +15,8 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
     private EditableKeyValueTableData tableData;
 
     private EditableKeywordsPanel editableKeywordsPanel;
-    
+
     private ManageChangeables changeablesList;
-    
-    private ChangeObserver changeObserver;
 
     public EditableKeywordsTab(ManageChangeables changeablesList) {
         this.changeablesList = changeablesList;
@@ -34,7 +26,7 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
 
     public void display(EmfDataset dataset, Keywords masterKeywords) {
         super.removeAll();
-        removeDatasetTypeKeywords(dataset,masterKeywords);
+        removeDatasetTypeKeywords(dataset, masterKeywords);
         super.add(createLayout(dataset, masterKeywords));
     }
 
@@ -48,7 +40,6 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
     private JPanel createLayout(EmfDataset dataset, Keywords masterKeywords) {
         tableData = new EditableKeyValueTableData(dataset, masterKeywords);
         editableKeywordsPanel = new EditableKeywordsPanel("", tableData, masterKeywords, changeablesList);
-        listenForKeyEvents();
         return editableKeywordsPanel;
     }
 
@@ -57,30 +48,7 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
     }
 
     public void commit() {
-       editableKeywordsPanel.commit();
-    }
-    
-    private void listenForKeyEvents() {
-        editableKeywordsPanel.addListener(new KeyTabKeyListener());
-        editableKeywordsPanel.addComboBoxListener(new KeyTabComboBoxChangesListener());
-    }
-
-    public void observeChanges(ChangeObserver observer) {
-        this.changeObserver = observer;
-    }
-    
-    public class KeyTabKeyListener extends KeyAdapter {
-        public void keyTyped(KeyEvent e) {
-            if (changeObserver != null)
-                changeObserver.onChange();
-        }
-    }
-
-    public class KeyTabComboBoxChangesListener implements ItemListener {
-        public void itemStateChanged(ItemEvent e) {
-            if (changeObserver != null)
-                changeObserver.onChange();
-        }
+        editableKeywordsPanel.commit();
     }
 
 }

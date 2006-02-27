@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenterImpl;
@@ -16,7 +15,7 @@ import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 import gov.epa.emissions.framework.services.DataService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
-public class PropertiesEditorPresenterImpl implements ChangeObserver, PropertiesEditorPresenter {
+public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter {
 
     private EmfDataset dataset;
 
@@ -24,7 +23,7 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
 
     private EditableSummaryTabPresenter summaryPresenter;
 
-    private boolean unsavedChanges, alert;
+    private boolean alert;
 
     private EditableKeywordsTabPresenter keywordsPresenter;
 
@@ -53,9 +52,6 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
     }
 
     public void doClose() throws EmfException {
-        if (unsavedChanges && !view.shouldContinueLosingUnsavedChanges())
-            return;
-
         dataService().releaseLockedDataset(dataset);
         view.close();
     }
@@ -68,7 +64,7 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
             EditNotesTabPresenter notes) throws EmfException {
         updateDataset(service, summary, keywords, notes);
 
-        if(!alert)
+        if (!alert)
             view.close();
     }
 
@@ -81,13 +77,12 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         summary.doSave();
         keywords.doSave();
         notes.doSave();
-        if(!alert)
+        if (!alert)
             service.updateDataset(dataset);
     }
 
     public void set(EditableSummaryTabView summary) {
         summaryPresenter = new EditableSummaryTabPresenterImpl(dataset, summary);
-        summary.observeChanges(this);
     }
 
     public void set(EditableKeywordsTabView keywordsView) throws EmfException {
@@ -95,7 +90,6 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
 
         Keywords keywords = new Keywords(session.dataCommonsService().getKeywords());
         keywordsPresenter.display(keywords);
-        keywordsView.observeChanges(this);
     }
 
     public void set(EditNotesTabView view) throws EmfException {
@@ -103,11 +97,7 @@ public class PropertiesEditorPresenterImpl implements ChangeObserver, Properties
         notesPresenter.display();
     }
 
-    public void onChange() {
-        unsavedChanges = true;
-    }
-    
-    public void alert(boolean alert){
+    public void alert(boolean alert) {
         this.alert = alert;
     }
 

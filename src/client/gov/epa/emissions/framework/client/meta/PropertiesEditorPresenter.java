@@ -17,8 +17,6 @@ public interface PropertiesEditorPresenter {
 
     void set(EditableKeywordsTabView keywordsView) throws EmfException;
 
-    void onChange();
-
     void set(EditNotesTabView view) throws EmfException;
 
 }

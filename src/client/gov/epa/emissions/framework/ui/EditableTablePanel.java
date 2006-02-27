@@ -19,12 +19,12 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-public class EditableTablePanel extends JPanel implements Editor{
+public class EditableTablePanel extends JPanel implements Editor {
 
     protected EmfTableModel tableModel;
 
     protected EditableTable table;
-    
+
     protected ManageChangeables changeablesList;
 
     public EditableTablePanel(String label, SelectableEmfTableData tableData, ManageChangeables changeablesList) {
@@ -68,9 +68,8 @@ public class EditableTablePanel extends JPanel implements Editor{
     private JPanel buttonsPanel(final SelectableEmfTableData tableData) {
         JPanel container = new JPanel();
 
- //       Label add = new Label("Add", "<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Add</a></html>");
         JButton add = new JButton("Add");
-        add.setMargin(new Insets(2,2,2,2));
+        add.setMargin(new Insets(2, 2, 2, 2));
         add.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event) {
                 tableData.addBlankRow();
@@ -79,9 +78,8 @@ public class EditableTablePanel extends JPanel implements Editor{
         });
         container.add(add);
 
-//       Label remove = new Label("Remove", "<html>&nbsp;&nbsp;&nbsp;&nbsp;<a href=''>Remove</a></html>");
         JButton remove = new JButton("Remove");
-        remove.setMargin(new Insets(2,2,2,2));
+        remove.setMargin(new Insets(2, 2, 2, 2));
         remove.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event) {
                 tableData.removeSelected();
@@ -119,7 +117,7 @@ public class EditableTablePanel extends JPanel implements Editor{
     public void commit() {
         table.commit();
     }
-    
+
     public void addListener(KeyListener keyListener) {
         table.addKeyListener(keyListener);
     }

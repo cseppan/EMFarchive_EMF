@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -29,9 +30,12 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
     private JPanel tablePanel;
 
-    public EditNotesTab(EmfConsole parentConsole) {
+    private ManageChangeables changeables;
+
+    public EditNotesTab(EmfConsole parentConsole, ManageChangeables changeables) {
         super.setName("editNotesTab");
         this.parentConsole = parentConsole;
+        this.changeables = changeables;
         super.setLayout(new BorderLayout());
     }
 
@@ -52,6 +56,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
     private JPanel tablePanel(Note[] notes, EmfConsole parentConsole) {
         tableData = new NotesTableData(notes);
+        changeables.addChangeable(tableData);
         selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
 
         tablePanel = new JPanel(new BorderLayout());

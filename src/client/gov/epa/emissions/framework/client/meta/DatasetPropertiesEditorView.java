@@ -11,8 +11,6 @@ public interface DatasetPropertiesEditorView extends ManagedView {
 
     void showError(String message);
 
-    boolean shouldContinueLosingUnsavedChanges();
-
     void notifyLockFailure(EmfDataset dataset);
 
 }

@@ -8,7 +8,6 @@ import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPrese
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
-import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataService;
@@ -104,47 +103,9 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
         presenter.doDisplay();
     }
 
-    public void testShouldContinueToCloseIfUserOkaysLosingUnsavedChanges() throws Exception {
-        view.expects(once()).method("close");
-
-        presenter.onChange();
-        view.expects(once()).method("shouldContinueLosingUnsavedChanges").withNoArguments().will(
-                returnValue(Boolean.TRUE));
-        dataService.expects(once()).method("releaseLockedDataset").with(same(dataset)).will(returnValue(dataset));
-
-        presenter.doClose();
-    }
-
-    public void testShouldNotCloseIfUserSelectsToNotCloseOnUnsavedChanges() throws Exception {
-        presenter.onChange();
-        view.expects(once()).method("shouldContinueLosingUnsavedChanges").withNoArguments().will(
-                returnValue(Boolean.FALSE));
-
-        presenter.doClose();
-    }
-
-    public void testShouldAddAsOnChangeListenerToSummaryTabOnAddingSummaryTab() {
-        Mock summaryView = mock(EditableSummaryTabView.class);
-        summaryView.expects(once()).method("observeChanges").with(eq(presenter));
-
-        presenter.set((EditableSummaryTabView) summaryView.proxy());
-    }
-
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() throws Exception {
         dataService.expects(once()).method("updateDataset").with(eq(dataset));
         view.expects(once()).method("close");
-
-        EditableSummaryTabPresenter summaryTabProxy = summaryMockForSave();
-        EditableKeywordsTabPresenter keywordsTabProxy = keywordsMockForSave();
-        EditNotesTabPresenter notesTabProxy = notesMockForSave();
-
-        presenter.save((DataService) dataService.proxy(), summaryTabProxy, keywordsTabProxy, notesTabProxy);
-    }
-
-    public void testShouldSaveWithoutPromptingOnSaveIfChangesHaveOccuredInSummaryTab() throws Exception {
-        dataService.expects(once()).method("updateDataset").with(eq(dataset));
-        view.expects(once()).method("close");
-        presenter.onChange();
 
         EditableSummaryTabPresenter summaryTabProxy = summaryMockForSave();
         EditableKeywordsTabPresenter keywordsTabProxy = keywordsMockForSave();

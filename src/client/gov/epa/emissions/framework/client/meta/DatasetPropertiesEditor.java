@@ -44,7 +44,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private EmfSession session;
 
     private EditableKeywordsTab keywordsTab;
-    
+
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
         this.session = session;
@@ -68,8 +68,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private JPanel createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
         try {
-            EditableSummaryTab view = new EditableSummaryTab(dataset, session.dataCommonsService(), messagePanel,
-                    this);
+            EditableSummaryTab view = new EditableSummaryTab(dataset, session.dataCommonsService(), messagePanel, this);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
@@ -99,7 +98,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private JPanel createNotesTab(EmfConsole parentConsole) {
         try {
-            EditNotesTab view = new EditNotesTab(parentConsole);
+            EditNotesTab view = new EditNotesTab(parentConsole, this);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
@@ -190,16 +189,12 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         messagePanel.setError(message);
     }
 
-    //FIXME: can't we replace this method or move to emf internal frame
-    public boolean shouldContinueLosingUnsavedChanges() {
-        return checkChanges();
-    }
-
     public void notifyLockFailure(EmfDataset dataset) {
-        String message = "Cannot edit Properties of Dataset: " + dataset.getName() + System.getProperty("line.separator") 
-            + " as it was locked by User: " + dataset.getLockOwner() + "(at " + format(dataset.getLockDate()) + ")";
-        EmfDialog dialog = new EmfDialog(this, "Message", 
-                JOptionPane.PLAIN_MESSAGE, message, JOptionPane.DEFAULT_OPTION);
+        String message = "Cannot edit Properties of Dataset: " + dataset.getName()
+                + System.getProperty("line.separator") + " as it was locked by User: " + dataset.getLockOwner()
+                + "(at " + format(dataset.getLockDate()) + ")";
+        EmfDialog dialog = new EmfDialog(this, "Message", JOptionPane.PLAIN_MESSAGE, message,
+                JOptionPane.DEFAULT_OPTION);
         dialog.confirm();
     }
 
@@ -211,13 +206,14 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     public void windowClosing() {
         closeWindow();
     }
-    
+
     private void closeWindow() {
-            try {
+        try {
+            if (checkChanges())
                 presenter.doClose();
-            } catch (EmfException e) {
-                showError("Could not close. Reason - " + e.getMessage());
-            }
+        } catch (EmfException e) {
+            showError("Could not close. Reason - " + e.getMessage());
+        }
     }
 
 }

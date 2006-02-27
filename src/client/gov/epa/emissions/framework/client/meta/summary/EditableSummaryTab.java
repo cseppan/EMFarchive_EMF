@@ -13,7 +13,6 @@ import gov.epa.emissions.commons.io.Region;
 import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.ChangeObserver;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.DataCommonsService;
@@ -25,11 +24,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -59,8 +53,6 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private MessagePanel messagePanel;
 
-    private ChangeObserver changeObserver;
-
     private EditableComboBox intendedUseCombo;
 
     private ComboBox sectorsCombo;
@@ -80,9 +72,9 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     private Region[] allRegions;
 
     private IntendedUse[] allIntendedUses;
-    
+
     private ManageChangeables changeablesList;
-    
+
     public EditableSummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel,
             ManageChangeables changeablesList) throws EmfException {
         super.setName("summary");
@@ -92,20 +84,17 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         this.changeablesList = changeablesList;
 
         super.setLayout(new BorderLayout());
-        SummaryTabComboBoxChangesListener comboxBoxListener = new SummaryTabComboBoxChangesListener();
-        super.add(createOverviewSection(comboxBoxListener), BorderLayout.PAGE_START);
-        super.add(createLowerSection(comboxBoxListener), BorderLayout.CENTER);
-
-        listenForKeyEvents(new SummaryTabKeyListener());
+        super.add(createOverviewSection(), BorderLayout.PAGE_START);
+        super.add(createLowerSection(), BorderLayout.CENTER);
     }
 
-    private JPanel createLowerSection(SummaryTabComboBoxChangesListener comboxBoxListener) throws EmfException {
+    private JPanel createLowerSection() throws EmfException {
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel();
-        container.add(createTimeSpaceSection(comboxBoxListener));
+        container.add(createTimeSpaceSection());
         container.add(createStatusSection());
-        
+
         panel.add(container, BorderLayout.LINE_START);
 
         return panel;
@@ -164,25 +153,23 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         IntendedUse intendedUse = dataset.getIntendedUse();
         intendedUseCombo.setSelectedItem(intendedUse);
         changeablesList.addChangeable(intendedUseCombo);
-        intendedUseCombo.addListeners();
     }
 
     private String format(Date date) {
         return DATE_FORMATTER.format(date);
     }
 
-    private JPanel createTimeSpaceSection(SummaryTabComboBoxChangesListener comboxBoxListener) throws EmfException {
+    private JPanel createTimeSpaceSection() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // time period
-        startDateTime = new FormattedTextField("startDateTime", dataset.getStartDateTime(), DATE_FORMATTER, messagePanel);
+        startDateTime = new FormattedTextField("startDateTime", dataset.getStartDateTime(), DATE_FORMATTER,
+                messagePanel);
         endDateTime = new FormattedTextField("endDateTime", dataset.getStopDateTime(), DATE_FORMATTER, messagePanel);
         changeablesList.addChangeable(startDateTime);
         changeablesList.addChangeable(endDateTime);
-        startDateTime.addTextListener();
-        endDateTime.addTextListener();
         layoutGenerator.addLabelWidgetPair("Time Period Start:", startDateTime, panel);
         layoutGenerator.addLabelWidgetPair("Time Period End:", endDateTime, panel);
 
@@ -192,11 +179,9 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         temporalResolutionsCombo.setSelectedItem(dataset.getTemporalResolution());
         temporalResolutionsCombo.setName("temporalResolutions");
         temporalResolutionsCombo.setPreferredSize(new Dimension(170, 20));
-        temporalResolutionsCombo.addItemListener(comboxBoxListener);
         String temporalResolution = dataset.getTemporalResolution();
         temporalResolutionsCombo.setSelectedItem(temporalResolution);
         changeablesList.addChangeable(temporalResolutionsCombo);
-        temporalResolutionsCombo.addItemChangeListener();
         layoutGenerator.addLabelWidgetPair("Temporal Resolution:", temporalResolutionsCombo, panel);
 
         sectorsCombo = new ComboBox("Choose a sector", service.getSectors());
@@ -207,9 +192,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         }
         sectorsCombo.setName("sectors");
         sectorsCombo.setPreferredSize(new Dimension(175, 20));
-        sectorsCombo.addItemListener(comboxBoxListener);
         changeablesList.addChangeable(sectorsCombo);
-        sectorsCombo.addItemChangeListener();
         layoutGenerator.addLabelWidgetPair("Sector:", sectorsCombo, panel);
 
         allRegions = service.getRegions();
@@ -217,9 +200,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         regionsCombo.setSelectedItem(dataset.getRegion());
         regionsCombo.setName("regionsComboModel");
         regionsCombo.setPreferredSize(new Dimension(125, 20));
-        regionsCombo.addItemListener(comboxBoxListener);
         changeablesList.addChangeable(regionsCombo);
-        regionsCombo.addListeners();
         layoutGenerator.addLabelWidgetPair("Region:", regionsCombo, panel);
         Region region = dataset.getRegion();
         regionsCombo.setSelectedItem(region);
@@ -228,12 +209,10 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         countriesCombo = new ComboBox("Choose a country", service.getCountries());
         countriesCombo.setSelectedItem(dataset.getCountry());
         countriesCombo.setName("countries");
-        countriesCombo.addItemListener(comboxBoxListener);
         countriesCombo.setPreferredSize(new Dimension(175, 20));
         Country country = dataset.getCountry();
         countriesCombo.setSelectedItem(country);
         changeablesList.addChangeable(countriesCombo);
-        countriesCombo.addItemChangeListener();
 
         layoutGenerator.addLabelWidgetPair("Country:", countriesCombo, panel);
 
@@ -245,7 +224,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         return panel;
     }
 
-    private JPanel createOverviewSection(SummaryTabComboBoxChangesListener comboxBoxListener) throws EmfException {
+    private JPanel createOverviewSection() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
@@ -270,9 +249,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         projectsCombo.setSelectedItem(dataset.getProject());
         projectsCombo.setName("projects");
         projectsCombo.setPreferredSize(new Dimension(250, 20));
-        projectsCombo.addItemListener(comboxBoxListener);
         changeablesList.addChangeable(projectsCombo);
-        projectsCombo.addListeners();
         layoutGenerator.addLabelWidgetPair("Project:", projectsCombo, panel);
 
         // creator
@@ -301,14 +278,11 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
     }
 
     public void updateDataset(EmfDataset dataset) {
-        if(!name.getText().equals("")) {
+        if (!name.getText().equals("")) {
             messagePanel.clear();
-            changeObserver.alert(false);
             dataset.setName(name.getText());
-        }
-        else {
+        } else {
             messagePanel.setError("Name field should be a non-empty string.");
-            changeObserver.alert(true);
             return;
         }
         dataset.setDescription(description.getText());
@@ -327,7 +301,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         if (selected instanceof String) {
             String projectName = (String) selected;
             if (projectName.length() > 0) {
-                Project project = project(projectName);//checking for duplicates
+                Project project = project(projectName);// checking for duplicates
                 dataset.setProject(project);
             }
         } else if (selected instanceof Project) {
@@ -337,19 +311,19 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private Project project(String projectName) {
         for (int i = 0; i < allProjects.length; i++) {
-            if(projectName.equals(allProjects[i].getName())){
+            if (projectName.equals(allProjects[i].getName())) {
                 return allProjects[i];
             }
         }
         return new Project(projectName);
     }
-    
+
     private void updateRegion() {
         Object selected = regionsCombo.getSelectedItem();
         if (selected instanceof String) {
             String regionName = (String) selected;
             if (regionName.length() > 0) {
-                Region region = region(regionName);//checking for duplicates
+                Region region = region(regionName);// checking for duplicates
                 dataset.setRegion(region);
             }
         } else if (selected instanceof Region) {
@@ -359,19 +333,19 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private Region region(String region) {
         for (int i = 0; i < allRegions.length; i++) {
-            if(region.equals(allRegions[i].getName())){
+            if (region.equals(allRegions[i].getName())) {
                 return allRegions[i];
             }
         }
         return new Region(region);
     }
-    
+
     private void updateIntendedUse() {
         Object selected = intendedUseCombo.getSelectedItem();
         if (selected instanceof String) {
             String intendedUseName = (String) selected;
             if (intendedUseName.length() > 0) {
-                IntendedUse intendedUse = intendedUse(intendedUseName);//checking for duplicates
+                IntendedUse intendedUse = intendedUse(intendedUseName);// checking for duplicates
                 dataset.setIntendedUse(intendedUse);
             }
         } else if (selected instanceof IntendedUse) {
@@ -381,13 +355,13 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private IntendedUse intendedUse(String intendedUseName) {
         for (int i = 0; i < allIntendedUses.length; i++) {
-            if(intendedUseName.equals(allIntendedUses[i].getName())){
+            if (intendedUseName.equals(allIntendedUses[i].getName())) {
                 return allIntendedUses[i];
             }
         }
         return new IntendedUse(intendedUseName);
     }
-    
+
     private Date toDate(String text) {
         if (text == null || text.length() == 0)
             return null;
@@ -397,31 +371,6 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         } catch (ParseException e) {
             throw new RuntimeException("could not parse Date - " + text + ". Expected format - "
                     + DATE_FORMATTER.toPattern());
-        }
-    }
-
-    private void listenForKeyEvents(KeyListener keyListener) {
-        name.addKeyListener(keyListener);
-        description.addKeyListener(keyListener);
-        startDateTime.addKeyListener(keyListener);
-        endDateTime.addKeyListener(keyListener);
-    }
-
-    public void observeChanges(ChangeObserver observer) {
-        this.changeObserver = observer;
-    }
-
-    public class SummaryTabKeyListener extends KeyAdapter {
-        public void keyTyped(KeyEvent e) {
-            if (changeObserver != null)
-                changeObserver.onChange();
-        }
-    }
-
-    public class SummaryTabComboBoxChangesListener implements ItemListener {
-        public void itemStateChanged(ItemEvent e) {
-            if (changeObserver != null)
-                changeObserver.onChange();
         }
     }
 

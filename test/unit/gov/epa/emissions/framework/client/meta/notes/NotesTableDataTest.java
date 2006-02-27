@@ -1,6 +1,9 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
+import gov.epa.emissions.commons.gui.ChangeObserver;
+import gov.epa.emissions.commons.gui.ChangeablesList;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.ui.Row;
@@ -10,9 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.jmock.Mock;
 
-public class NotesTableDataTest extends TestCase {
+public class NotesTableDataTest extends EmfMockObjectTestCase {
 
     private NotesTableData data;
 
@@ -102,6 +105,11 @@ public class NotesTableDataTest extends TestCase {
         note.setDate(new Date());
         note.setNoteType(new NoteType("type"));
 
+        Mock observer = mock(ChangeObserver.class);
+        expects(observer, 2, "signalSaved");
+        ChangeablesList changeablesList = new ChangeablesList((ChangeObserver) observer.proxy());
+        
+        data.observe(changeablesList);
         data.add(note);
         data.add(note);
 

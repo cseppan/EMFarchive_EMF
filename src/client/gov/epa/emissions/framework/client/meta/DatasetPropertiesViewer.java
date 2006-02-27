@@ -33,11 +33,8 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     private EmfConsole parentConsole;
 
-    // private EmfSession session;
-
     public DatasetPropertiesViewer(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties View", new Dimension(700, 500), desktopManager);
-        // this.session = session;
         this.parentConsole = parentConsole;
     }
 

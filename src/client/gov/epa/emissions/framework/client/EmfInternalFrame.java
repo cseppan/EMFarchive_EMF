@@ -21,7 +21,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     protected DesktopManager desktopManager;
 
     private ChangeObserver changeObserver;
-    
+
     private ChangeablesList changeablesList;
 
     private WidgetChangesMonitor monitor;
@@ -31,17 +31,23 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
                 true, // closable
                 true, // maximizable
                 true);// iconifiable
+        this.desktopManager = desktopManager;
+        changeablesList = new ChangeablesList(this);
+        monitor = new WidgetChangesMonitor(changeablesList, this);
+        changeObserver = new DefaultChangeObserver(this);
+
+        addWindowClosingTrap();
+    }
+
+    private void addWindowClosingTrap() {
+        super.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        
         this.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosing(InternalFrameEvent event) {
                 windowClosing();
                 super.internalFrameClosing(event);
             }
         });
-        this.desktopManager = desktopManager;
-        changeablesList = new ChangeablesList(this);
-        monitor = new WidgetChangesMonitor(changeablesList, this);
-        changeObserver = new DefaultChangeObserver(this);
-        super.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
     public EmfInternalFrame(String title, Dimension dimension, DesktopManager desktopManager) {
@@ -115,15 +121,15 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     public void resetChanges() {
         monitor.resetChanges();
     }
-    
-    public void addChangeable(Changeable changeable){
+
+    public void addChangeable(Changeable changeable) {
         changeablesList.add(changeable);
     }
-    
-    public boolean checkChanges(){
+
+    public boolean checkChanges() {
         return monitor.checkChanges();
     }
-    
+
     protected void setDefaultButton(Button button) {
         getRootPane().setDefaultButton(button);
     }

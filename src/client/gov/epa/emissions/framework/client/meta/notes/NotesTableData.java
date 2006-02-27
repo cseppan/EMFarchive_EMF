@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.framework.services.Note;
-import gov.epa.emissions.framework.ui.AbstractTableData;
+import gov.epa.emissions.framework.ui.ChangeableTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class NotesTableData extends AbstractTableData {
+public class NotesTableData extends ChangeableTableData {
 
     private List rows;
 
@@ -42,6 +42,7 @@ public class NotesTableData extends AbstractTableData {
     public void add(Note note) {
         additions.add(note);
         rows.add(row(note));
+        notifyChanges();
     }
 
     private List createRows(Note[] values) {
