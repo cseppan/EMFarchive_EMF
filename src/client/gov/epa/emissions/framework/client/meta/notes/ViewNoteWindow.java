@@ -3,11 +3,11 @@ package gov.epa.emissions.framework.client.meta.notes;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.Note;
-import gov.epa.emissions.framework.ui.Dialog;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -17,29 +17,31 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class ViewNoteDialog extends Dialog implements NoteView {
+public class ViewNoteWindow extends DisposableInteralFrame implements NoteView {
 
-    public ViewNoteDialog(EmfConsole parent) {
-        super("Note", parent);
-        super.setSize(new Dimension(550, 250));
+    private JPanel layout;
 
-        super.center();
+    public ViewNoteWindow(DesktopManager desktopManager) {
+        super("View Note", new Dimension(350, 250), desktopManager);
+
+        layout = new JPanel();
+        layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
+        super.getContentPane().add(layout);
     }
 
     public void display(Note note) {
-        super.setTitle("Note: " + note.getName());
-        super.getContentPane().add(createLayout(note));
-        super.show();
+        String name = "View Note: " + note.getName();
+        super.setTitle(name);
+        super.setName(name);
+
+        doLayout(note);
+        super.display();
+        System.out.println("displayed view - " + name);
     }
 
-    private JPanel createLayout(Note note) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        panel.add(inputPanel(note));
-        panel.add(buttonsPanel());
-
-        return panel;
+    private void doLayout(Note note) {
+        layout.add(inputPanel(note));
+        layout.add(buttonsPanel());
     }
 
     private JPanel inputPanel(Note note) {
@@ -76,10 +78,6 @@ public class ViewNoteDialog extends Dialog implements NoteView {
         panel.add(ok);
 
         return panel;
-    }
-
-    protected void close() {
-        super.dispose();
     }
 
 }

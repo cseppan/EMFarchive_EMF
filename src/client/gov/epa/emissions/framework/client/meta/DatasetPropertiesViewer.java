@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
-import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.info.InfoTab;
@@ -34,11 +33,11 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     private EmfConsole parentConsole;
 
-    //private EmfSession session;
+    // private EmfSession session;
 
-    public DatasetPropertiesViewer(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
+    public DatasetPropertiesViewer(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties View", new Dimension(700, 500), desktopManager);
-        //this.session = session;
+        // this.session = session;
         this.parentConsole = parentConsole;
     }
 
@@ -99,7 +98,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     private JPanel createNotesTab(EmfConsole parentConsole) {
         try {
-            NotesTab view = new NotesTab(parentConsole);
+            NotesTab view = new NotesTab(parentConsole, desktopManager);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
