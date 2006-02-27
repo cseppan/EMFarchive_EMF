@@ -34,7 +34,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MMddyy_HHmm");
 
-    private VersionedImporterFactory importerFactory;
+    private ImporterFactory importerFactory;
 
     private VersionedExporterFactory exporterFactory;
 
@@ -54,7 +54,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     private void init(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
 
-        importerFactory = new VersionedImporterFactory(dbServer, dbServer.getSqlDataTypes());
+        importerFactory = new ImporterFactory(dbServer, dbServer.getSqlDataTypes());
         exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes());
 
         // TODO: thread pooling policy
@@ -86,16 +86,17 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     private void validateDatasetName(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
-        boolean dsNameUsed = new DatasetDao().nameUsed(dataset.getName(), EmfDataset.class, session);
+        boolean nameUsed = new DatasetDao().nameUsed(dataset.getName(), EmfDataset.class, session);
         session.flush();
         session.close();
-        if (dsNameUsed) {
+        if (nameUsed) {
             log.error("Dataset name " + dataset.getName() + " is already used");
             throw new EmfException("Dataset name is already used");
         }
     }
 
-    public void startImport(User user, String folderPath, String fileName, EmfDataset dataset) throws EmfException {
+    public void importDatasetUsingSingleFile(User user, String folderPath, String fileName, EmfDataset dataset)
+            throws EmfException {
         try {
             File path = validatePath(folderPath);
 
@@ -104,12 +105,32 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
             svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
 
-            Importer importer = importerFactory.create(dataset, path, fileName);
-            ImportTask eximTask = new ImportTask(user, fileName, dataset, svcHolder, importer);
+            Importer importer = importerFactory.createVersioned(dataset, path, fileName);
+            ImportTask eximTask = new ImportTask(user, new String[] { fileName }, dataset, svcHolder, importer);
 
             threadPool.execute(eximTask);
         } catch (Exception e) {
             log.error("Exception attempting to start import of file: " + fileName, e);
+            throw new EmfException("Import of file failed: " + e.getMessage());
+        }
+    }
+
+    public void importDatasetUsingMultipleFiles(User user, String folderPath, String[] filenames, EmfDataset dataset)
+            throws EmfException {
+        try {
+            File path = validatePath(folderPath);
+
+            validateDatasetName(dataset);
+            Services svcHolder = new Services();
+            svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
+            svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
+
+            Importer importer = importerFactory.create(dataset, path, filenames);
+            ImportTask eximTask = new ImportTask(user, filenames, dataset, svcHolder, importer);
+
+            threadPool.execute(eximTask);
+        } catch (Exception e) {
+            log.error("Exception attempting to import multiple files into a single Dataset", e);
             throw new EmfException("Import of file failed: " + e.getMessage());
         }
     }
@@ -207,23 +228,17 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return prefix + name + "_" + date.toLowerCase() + suffix;
     }
 
-    public void startMultipleFileImport(User user, String folderPath, String[] fileNames, DatasetType datasetType)
-            throws EmfException {
+    public void importDatasetForEveryFileInPattern(User user, String folderPath, String filePattern,
+            DatasetType datasetType) throws EmfException {
         String[] fileNamesForImport = null;
 
         try {
             File folder = validatePath(folderPath);
 
-            if (fileNames.length == 1) {
-                String fileName = fileNames[0];
-
-                // The fileName is a regular expression that maps to a collection of files.
-                FilePatternMatcher fpm = new FilePatternMatcher(folder, fileName);
-                String[] allFilesInFolder = folder.list();
-                fileNamesForImport = fpm.matchingNames(allFilesInFolder);
-            } else {
-                fileNamesForImport = fileNames;
-            }
+            // The fileName is a regular expression that maps to a collection of files.
+            FilePatternMatcher fpm = new FilePatternMatcher(folder, filePattern);
+            String[] allFilesInFolder = folder.list();
+            fileNamesForImport = fpm.matchingNames(allFilesInFolder);
 
             // Loop through the collection and start import for the file
             for (int i = 0; i < fileNamesForImport.length; i++) {
@@ -237,13 +252,18 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
                 dataset.setModifiedDateTime(new Date());
                 dataset.setAccessedDateTime(new Date());
 
-                startImport(user, folderPath, fileName, dataset);
+                importDatasetUsingSingleFile(user, folderPath, fileName, dataset);
             }
 
         } catch (ImporterException e) {
             log.error("Export of Dataset failed - folder= " + folderPath, e);
-            throw new EmfException("Export of Dataset failed: "+e.getMessage());
+            throw new EmfException("Export of Dataset failed: " + e.getMessage());
         }
+
+    }
+
+    public void importDatasetForEachFile(User user, String folderPath, String[] fileName, DatasetType datasetType) {
+        // NOTE Auto-generated method stub
 
     }
 

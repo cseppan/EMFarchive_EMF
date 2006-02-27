@@ -32,6 +32,6 @@ public class FileChooser {
 
     public File[] choose() {
         int result = chooser.showDialog(parent, action);
-        return (result == JFileChooser.APPROVE_OPTION) ? chooser.getSelectedFiles() : null;
+        return (result == JFileChooser.APPROVE_OPTION) ? chooser.getSelectedFiles() : new File[0];
     }
 }

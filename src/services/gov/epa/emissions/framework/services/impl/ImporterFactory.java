@@ -16,32 +16,34 @@ import java.lang.reflect.Constructor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class VersionedImporterFactory {
-    private static Log log = LogFactory.getLog(VersionedImporterFactory.class);
+public class ImporterFactory {
+    private static Log log = LogFactory.getLog(ImporterFactory.class);
 
     private DbServer dbServer;
 
     private SqlDataTypes sqlDataTypes;
 
-    public VersionedImporterFactory(DbServer dbServer, SqlDataTypes sqlDataTypes) {
+    public ImporterFactory(DbServer dbServer, SqlDataTypes sqlDataTypes) {
         this.dbServer = dbServer;
         this.sqlDataTypes = sqlDataTypes;
     }
 
-    public Importer create(EmfDataset dataset, File folder, String filename) throws ImporterException {
+    public Importer createVersioned(EmfDataset dataset, File folder, String filename) throws ImporterException {
         String[] filePatterns = new String[] { filename };
+        Importer importer = create(dataset, folder, filePatterns);
+        return new VersionedImporter(importer, dataset, dbServer);
+    }
 
+    public Importer create(EmfDataset dataset, File folder, String[] filePatterns) throws ImporterException {
         try {
-            Importer importer = create(dataset, folder, filePatterns);
-            return new VersionedImporter(importer, dataset, dbServer);
+            return doCreate(dataset, folder, filePatterns);
         } catch (Exception e) {
             log.error("Failed to create importer", e);
-            Throwable t = e.getCause();
-            throw new ImporterException("Importer error: " + t==null? e.getMessage():t.getMessage());
+            throw new ImporterException(e.getMessage());
         }
     }
 
-    private Importer create(EmfDataset dataset, File folder, String[] filePatterns) throws Exception {
+    private Importer doCreate(EmfDataset dataset, File folder, String[] filePatterns) throws Exception {
         String importerClassName = dataset.getDatasetType().getImporterClassName();
         Class importerClass = Class.forName(importerClassName);
 

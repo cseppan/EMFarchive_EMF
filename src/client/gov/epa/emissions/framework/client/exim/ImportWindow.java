@@ -19,8 +19,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -51,17 +49,16 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     private JTextField folder;
 
-    private JCheckBox box;
+    private JCheckBox isMultipleDatasets;
 
     private static File lastFolder = null;
-    
-    private boolean singleFile = true;
 
-    public ImportWindow(DataCommonsService service, DesktopManager desktopManager)
-            throws EmfException {
+    private File[] fileSelected;
+
+    public ImportWindow(DataCommonsService service, DesktopManager desktopManager) throws EmfException {
         super("Import Dataset", new Dimension(650, 300), desktopManager);
         super.setName("importDatasets");
-        
+
         this.service = service;
 
         this.getContentPane().add(createLayout());
@@ -92,7 +89,8 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesComboBox, panel);
         datasetTypesComboBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                boxChecked();
+                clearTextField();
+                multipleDatasetsSelected();
             }
         });
 
@@ -108,13 +106,13 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         name = new TextField("name", 35);
         layoutGenerator.addLabelWidgetPair("Dataset Name", name, panel);
 
-        box = new JCheckBox("Create Multiple Datasets");
-        box.addActionListener(new ActionListener() {
+        isMultipleDatasets = new JCheckBox("Create Multiple Datasets");
+        isMultipleDatasets.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                boxChecked();
+                multipleDatasetsSelected();
             }
         });
-        layoutGenerator.addLabelWidgetPair("", box, panel);
+        layoutGenerator.addLabelWidgetPair("", isMultipleDatasets, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
@@ -126,23 +124,35 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         return panel;
     }
 
-    private void boxChecked() {
+    private void clearTextField() {
+        filename.setText("");
+        name.setText("");
+        messagePanel.clear();
+    }
+
+    private void multipleDatasetsSelected() {
         enableAll();
-        if (box.isSelected()) {
+        if (isMultipleDatasets.isSelected()) {
             name.setEnabled(false);
             name.setVisible(false);
             checkMinFiles();
         }
     }
 
+    private boolean meetMultipleFileCondition() {
+        DatasetType datasetType = (DatasetType) datasetTypesModel.getSelectedItem();
+        if (fileSelected.length > 1 && !isMultipleDatasets.isSelected() && datasetType.getMaxFiles() == 1) {
+            messagePanel.setError("Please check Create Multiple Datasets box.");
+            return false;
+        }
+
+        return true;
+    }
+
     private void checkMinFiles() {
         DatasetType dt = (DatasetType) datasetTypesModel.getSelectedItem();
-        if (dt.getMinFiles() > 1) {
-            String message = "Sorry. You cannot create multiple datasets on this dataset type.";
-            messagePanel.setError(message);
-            folder.setEnabled(false);
-            filename.setEnabled(false);
-        }
+        if (dt.getMinFiles() > 1)
+            messagePanel.setError("Sorry. You cannot create multiple datasets for this dataset type.");
     }
 
     private void enableAll() {
@@ -158,7 +168,6 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         for (int i = 0; i < allDatasetTypes.length; i++) {
             allTypesWithMessage[i + 1] = allDatasetTypes[i];
         }
-
     }
 
     private JButton importFileButton() {
@@ -177,20 +186,13 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private void selectFile() {
         FileChooser chooser = new FileChooser("Select File", new File(folder.getText()), ImportWindow.this);
         chooser.setTitle("Select a " + datasetTypesModel.getSelectedItem().toString() + " File");
-        File[] file = chooser.choose();
-        if (file == null)
-            return;
-        
-        if(file.length == 1) {
-            this.singleFile = true;
-            singleFile(file[0]);
-        }
-        else {
-            this.singleFile = false;
-            multipleFiles(file);
-        }
+        fileSelected = chooser.choose();
+        if (fileSelected.length == 1)
+            singleFile(fileSelected[0]);
+        else
+            multipleFiles(fileSelected);
     }
-    
+
     private void singleFile(File file) {
         if (file.isDirectory()) {
             folder.setText(file.getAbsolutePath());
@@ -201,24 +203,22 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
         folder.setText(file.getParent());
         filename.setText(file.getName());
-        // For demo #3 changing the filename
-        // name.setText(formatDatasetName(file.getName()));
         name.setText(file.getName());
         lastFolder = file.getParentFile();
     }
-    
+
     private void multipleFiles(File[] file) {
-        for(int i = 0; i < file.length; i++) {
+        for (int i = 0; i < file.length; i++) {
             if (!file[i].isDirectory()) {
-                if(i == 0)
+                if (i == 0)
                     filename.setText(file[i].getName());
                 else
-                    filename.setText(filename.getText() + ":" + file[i].getName());
+                    filename.setText(filename.getText() + ", " + file[i].getName());
             }
         }
 
         folder.setText(file[0].getParent());
-        name.setText(filename.getText());
+        name.setText("");
         lastFolder = file[0].getParentFile();
     }
 
@@ -282,56 +282,59 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
      * 
      */
     private void doImport() {
+        String message = "Started import. Please monitor the Status window to track your Import request.";
+        DatasetType datasetType = (DatasetType) datasetTypesModel.getSelectedItem();
+
         clearMessagePanel();
-        if(!nameBeginWithLetter()) {
-            messagePanel.setError("Dataset name has to begin with a letter");
+        if (filename.getText().equals("")) {
+            messagePanel.setError("Nothing to import.");
             return;
         }
-        
-        String message = "Started import. Please monitor the Status window to track your Import request.";
-        
+        if (!meetMultipleFileCondition())
+            return;
+        if (!nameBeginWithLetter(name.getText()))
+            return;
+
         try {
-            if (box.isSelected()) {
-                presenter.doImport(folder.getText(), filename.getText(), (DatasetType) datasetTypesModel
-                        .getSelectedItem());
-                messagePanel.setMessage(message);
-            } else if(!singleFile) {
-                presenter.doImport(folder.getText(), datasetNames(), (DatasetType) datasetTypesModel
-                        .getSelectedItem());
-                messagePanel.setMessage(message);
-            } else {
-                presenter.doImport(folder.getText(), filename.getText(), name.getText(),
-                        (DatasetType) datasetTypesModel.getSelectedItem());
-                messagePanel.setMessage(message);
-                }
+            if (isMultipleDatasets.isSelected() && fileSelected.length == 1) {
+                presenter.doImportDatasetForEveryFileInPattern(folder.getText(), filename.getText(), datasetType);
+            }
+
+            if (fileSelected.length > 1 && datasetType.getMaxFiles() == 1) {
+                presenter.doImportDatasetForEachFile(folder.getText(), datasetNames(), datasetType);
+            }
+
+            if (fileSelected.length > 1 && datasetType.getMinFiles() > 1) {
+                presenter.doImportDatasetUsingMultipleFiles(folder.getText(), datasetNames(), name.getText(),
+                        datasetType);
+            }
+
+            if (fileSelected.length == 1 && datasetType.getMaxFiles() == 1) {
+                presenter.doImportDatasetUsingSingleFile(folder.getText(), filename.getText(), name.getText(),
+                        datasetType);
+            }
+
+            messagePanel.setMessage(message);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
     }
-    
-    private boolean nameBeginWithLetter() {
-        String[] names = datasetNames();
-        for(int i = 0; i < names.length; i++) {
-            if(names[i].equals("") || Character.isDigit(names[i].charAt(0)))
-                return false;
+
+    private boolean nameBeginWithLetter(String name) {
+        if (!name.equals("") && Character.isDigit(name.charAt(0))) {
+            messagePanel.setError("Dataset name has to begin with a letter");
+            return false;
         }
-        
+
         return true;
     }
-    
+
     private String[] datasetNames() {
-        if(!singleFile) {
-            String temp = name.getText();
-            String[] names = temp.split(":");
-            List list = new ArrayList();
-            for(int i = 0; i < names.length; i++)
-                list.add(names[i]);
-            if(temp.lastIndexOf(":") == temp.length()-1) //to catch the last empty name
-                list.add("");
-            return (String[])list.toArray(new String[0]);
-        }
-        
-        return new String[] {name.getText()};
+        String[] names = new String[fileSelected.length];
+        for (int i = 0; i < names.length; i++)
+            names[i] = fileSelected[i].getName();
+
+        return names;
     }
 
     public void clearMessagePanel() {

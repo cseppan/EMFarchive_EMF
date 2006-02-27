@@ -53,19 +53,19 @@ public class ImportPresenterTest extends MockObjectTestCase {
         user.setName("full name");
 
         Mock model = mock(ExImService.class);
-        model.expects(once()).method("startImport");
+        model.expects(once()).method("importDatasetUsingSingleFile");
 
         ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), user, (ExImService) model.proxy());
 
         prefs.stubs().method("mapLocalInputPathToRemote");
-        presenter.doImport("dir", "filename", "dataset", type);
+        presenter.doImportDatasetUsingSingleFile("dir", "filename", "dataset", type);
     }
 
     public void testDuringImportRaisesExceptionOnBlankFilename() {
         ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), null, null);
 
         try {
-            presenter.doImport("dir", "", "dataset name", new DatasetType("ORL NonRoad"));
+            presenter.doImportDatasetUsingSingleFile("dir", "", "dataset name", new DatasetType("ORL NonRoad"));
         } catch (EmfException e) {
             assertEquals("Filename should be specified", e.getMessage());
             return;
@@ -78,7 +78,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), null, null);
 
         try {
-            presenter.doImport("dir", "filename", "", new DatasetType("ORL NonRoad"));
+            presenter.doImportDatasetUsingSingleFile("dir", "filename", "", new DatasetType("ORL NonRoad"));
         } catch (EmfException e) {
             assertEquals("Dataset Name should be specified", e.getMessage());
             return;
@@ -91,7 +91,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
         ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), null, null);
 
         try {
-            presenter.doImport("", "file.txt", "dataset name", new DatasetType("ORL NonRoad"));
+            presenter.doImportDatasetUsingSingleFile("", "file.txt", "dataset name", new DatasetType("ORL NonRoad"));
         } catch (EmfException e) {
             assertEquals("Folder should be specified", e.getMessage());
             return;

@@ -13,13 +13,13 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
-public class VersionedImporterFactoryTest extends MockObjectTestCase {
+public class ImporterFactoryTest extends MockObjectTestCase {
 
     public void testShouldBeAbleCreateOrlImporterr() throws Exception {
         Mock types = mock(SqlDataTypes.class);
         types.stubs().method(ANYTHING).withAnyArguments().will(returnValue(""));
 
-        VersionedImporterFactory factory = new VersionedImporterFactory(dbServer(), (SqlDataTypes) types.proxy());
+        ImporterFactory factory = new ImporterFactory(dbServer(), (SqlDataTypes) types.proxy());
 
         DatasetType datasetType = new DatasetType();
         datasetType.setImporterClassName(ORLOnRoadImporter.class.getName());
@@ -27,7 +27,7 @@ public class VersionedImporterFactoryTest extends MockObjectTestCase {
         dataset.setDatasetType(datasetType);
         dataset.setName("name");
 
-        Importer importer = factory.create(dataset, null, "file");
+        Importer importer = factory.createVersioned(dataset, null, "file");
 
         assertEquals(VersionedImporter.class.getName(), importer.getClass().getName());
     }
@@ -36,14 +36,14 @@ public class VersionedImporterFactoryTest extends MockObjectTestCase {
         Mock sqlTypes = mock(SqlDataTypes.class);
         sqlTypes.stubs().method(ANYTHING).withAnyArguments().will(returnValue(""));
         
-        VersionedImporterFactory factory = new VersionedImporterFactory(dbServer(), (SqlDataTypes) sqlTypes.proxy());
+        ImporterFactory factory = new ImporterFactory(dbServer(), (SqlDataTypes) sqlTypes.proxy());
 
         DatasetType datasetType = new DatasetType();
         datasetType.setImporterClassName(TemporalProfileImporter.class.getName());
         EmfDataset dataset = new EmfDataset();
         dataset.setDatasetType(datasetType);
 
-        Importer exporter = factory.create(dataset, null, "file");
+        Importer exporter = factory.createVersioned(dataset, null, "file");
 
         assertEquals(VersionedImporter.class.getName(), exporter.getClass().getName());
     }

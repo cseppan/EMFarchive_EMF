@@ -55,7 +55,7 @@ public abstract class ExImServiceTestCase extends ServiceTestCase {
         File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
         String filename = "NonPoint_WithComments.txt";
 
-        eximService.startImport(user, repository.getAbsolutePath(), filename, dataset);
+        eximService.importDatasetUsingSingleFile(user, repository.getAbsolutePath(), filename, dataset);
 
         // FIXME: verify that import is complete
     }
@@ -65,9 +65,7 @@ public abstract class ExImServiceTestCase extends ServiceTestCase {
 
         File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
 
-        String[] fileNames = new String[] { "*.txt" };
-
-        eximService.startMultipleFileImport(user, repository.getAbsolutePath(), fileNames,
+        eximService.importDatasetForEveryFileInPattern(user, repository.getAbsolutePath(), "*.txt",
                 externalDatasetType(dataCommonsService));
     }
 
@@ -91,7 +89,7 @@ public abstract class ExImServiceTestCase extends ServiceTestCase {
         // import
         File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
         String filename = "NonPoint_WithComments.txt";
-        eximService.startImport(user, repository.getAbsolutePath(), filename, dataset);
+        eximService.importDatasetUsingSingleFile(user, repository.getAbsolutePath(), filename, dataset);
 
         // FIXME: verify that import is complete
 
@@ -117,7 +115,7 @@ public abstract class ExImServiceTestCase extends ServiceTestCase {
         // import
         File repository = new File(System.getProperty("user.dir"), "test/data/orl/nc/");
         String filename = "NonPoint_WithComments.txt";
-        eximService.startImport(user, repository.getAbsolutePath(), filename, dataset);
+        eximService.importDatasetUsingSingleFile(user, repository.getAbsolutePath(), filename, dataset);
 
         // FIXME: verify that import is complete
 

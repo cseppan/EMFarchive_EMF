@@ -26,11 +26,11 @@ public class ImportTask implements Runnable {
 
     private EmfDataset dataset;
 
-    private String fileName;
+    private String[] fileNames;
 
-    public ImportTask(User user, String fileName, EmfDataset dataset, Services services, Importer importer) {
+    public ImportTask(User user, String[] fileNames, EmfDataset dataset, Services services, Importer importer) {
         this.user = user;
-        this.fileName = fileName;
+        this.fileNames = fileNames;
         this.dataset = dataset;
         this.dataService = services.getData();
         this.statusServices = services.getStatus();
@@ -39,6 +39,12 @@ public class ImportTask implements Runnable {
     }
 
     public void run() {
+        String fileName = fileNames[0];
+        
+        if(fileNames.length > 1)
+            for(int i = 1; i < fileNames.length; i++)
+                fileName += ", " + fileNames[i];
+        
         try {
             setStartStatus();
             dataService.addDataset(dataset);
