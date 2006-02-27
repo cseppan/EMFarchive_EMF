@@ -11,7 +11,7 @@ public class Services {
         return data;
     }
 
-    public void setDataSvc(DataServiceImpl data) {
+    public void setDataService(DataServiceImpl data) {
         this.data = data;
     }
 
@@ -27,7 +27,7 @@ public class Services {
         return status;
     }
 
-    public void setStatusSvc(StatusServiceImpl status) {
+    public void setStatusService(StatusServiceImpl status) {
         this.status = status;
     }
 

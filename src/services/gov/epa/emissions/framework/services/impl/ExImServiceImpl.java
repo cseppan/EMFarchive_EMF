@@ -101,12 +101,12 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             File path = validatePath(folderPath);
 
             validateDatasetName(dataset);
-            Services svcHolder = new Services();
-            svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
-            svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
+            Services services = new Services();
+            services.setDataService(new DataServiceImpl(sessionFactory));
+            services.setStatusService(new StatusServiceImpl(sessionFactory));
 
             Importer importer = importerFactory.createVersioned(dataset, path, fileName);
-            ImportTask eximTask = new ImportTask(user, new String[] { fileName }, dataset, svcHolder, importer);
+            ImportTask eximTask = new ImportTask(user, new String[] { fileName }, dataset, services, importer);
 
             threadPool.execute(eximTask);
         } catch (Exception e) {
@@ -119,14 +119,10 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             throws EmfException {
         try {
             File path = validatePath(folderPath);
-
             validateDatasetName(dataset);
-            Services svcHolder = new Services();
-            svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
-            svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
-
+            Services services = services();
             Importer importer = importerFactory.create(dataset, path, filenames);
-            ImportTask eximTask = new ImportTask(user, filenames, dataset, svcHolder, importer);
+            ImportTask eximTask = new ImportTask(user, filenames, dataset, services, importer);
 
             threadPool.execute(eximTask);
         } catch (Exception e) {
@@ -152,13 +148,13 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             for (int i = 0; i < datasets.length; i++) {
 
                 EmfDataset dataset = datasets[i];
-                Services svcHolder = services();
-                if (isExportable(dataset, svcHolder, user)) {
+                Services services = services();
+                if (isExportable(dataset, services, user)) {
                     File file = validateExportFile(path, getCleanDatasetName(dataset), overwrite);
                     Exporter exporter = exporterFactory.create(dataset, dataset.getDefaultVersion());
                     AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset
                             .getAccessedDateTime(), "Version " + dataset.getDefaultVersion(), purpose, dirName);
-                    ExportTask eximTask = new ExportTask(user, file, dataset, svcHolder, accesslog, exporter);
+                    ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, exporter);
                     threadPool.execute(eximTask);
                 }
             }
@@ -171,20 +167,21 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     }
 
     private Services services() {
-        Services svcHolder = new Services();
-        svcHolder.setLogSvc(new LoggingServiceImpl(sessionFactory));
-        svcHolder.setStatusSvc(new StatusServiceImpl(sessionFactory));
-        svcHolder.setDataSvc(new DataServiceImpl(sessionFactory));
-        return svcHolder;
+        Services services = new Services();
+        services.setLogSvc(new LoggingServiceImpl(sessionFactory));
+        services.setStatusService(new StatusServiceImpl(sessionFactory));
+        services.setDataService(new DataServiceImpl(sessionFactory));
+
+        return services;
     }
 
-    private boolean isExportable(EmfDataset dataset, Services svcHolder, User user) {
+    private boolean isExportable(EmfDataset dataset, Services services, User user) {
         DatasetType datasetType = dataset.getDatasetType();
 
         if ((datasetType.getExporterClassName().equals("")) || (datasetType.getExporterClassName() == null)) {
             String message = "The exporter for dataset type '" + datasetType + " is not supported";
             Status status = status(user, message);
-            svcHolder.getStatus().create(status);
+            services.getStatus().create(status);
             return false;
         }
         return true;
@@ -259,12 +256,22 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             log.error("Export of Dataset failed - folder= " + folderPath, e);
             throw new EmfException("Export of Dataset failed: " + e.getMessage());
         }
-
     }
 
-    public void importDatasetForEachFile(User user, String folderPath, String[] fileName, DatasetType datasetType) {
-        // NOTE Auto-generated method stub
+    public void importDatasetForEachFile(User user, String folderPath, String[] filenames, DatasetType datasetType)
+            throws EmfException {
+        for (int i = 0; i < filenames.length; i++) {
+            String importFileName = filenames[i] + "_" + DATE_FORMATTER.format(new Date());
+            EmfDataset dataset = new EmfDataset();
+            dataset.setName(importFileName);
+            dataset.setCreator(user.getUsername());
+            dataset.setDatasetType(datasetType);
+            dataset.setCreatedDateTime(new Date());
+            dataset.setModifiedDateTime(new Date());
+            dataset.setAccessedDateTime(new Date());
 
+            importDatasetUsingSingleFile(user, folderPath, filenames[i], dataset);
+        }
     }
 
 }
