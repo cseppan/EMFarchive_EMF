@@ -234,8 +234,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     private List getSelectedDatasets() {
-        int[] selected = selectModel.getSelectedIndexes();
-        return model.elements(selected);
+        return selectModel.selected();
     }
 
     protected void doDisplayPropertiesViewer() {
@@ -246,7 +245,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
             return;
         }
         for (Iterator iter = datasets.iterator(); iter.hasNext();) {
-            DatasetPropertiesViewer view = new DatasetPropertiesViewer(session, parentConsole, desktopManager);
+            DatasetPropertiesViewer view = new DatasetPropertiesViewer(parentConsole, desktopManager);
             desktop.add(view);
             EmfDataset dataset = (EmfDataset) iter.next();
             presenter.doDisplayPropertiesView(view, dataset);

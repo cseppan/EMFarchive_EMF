@@ -223,7 +223,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
     }
 
     private User[] getSelectedUsers() {
-        List selected = model.elements(selectModel.getSelectedIndexes());
+        List selected = selectModel.selected();
         return (User[]) selected.toArray(new User[0]);
     }
 
