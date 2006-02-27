@@ -3,7 +3,9 @@ package gov.epa.emissions.framework.client.data.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.data.TablePaginator;
@@ -30,11 +32,9 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         Mock view = mock(EditablePageManagerView.class);
         Mock service = mock(DataEditorService.class);
 
-        Mock source = mock(InternalSource.class);
         String[] cols = { "col1", "col2", "col3" };
-        source.stubs().method("getCols").will(returnValue(cols));
 
-        TablePresenter p = new EditableTablePresenterImpl(null, "table", (InternalSource) source.proxy(),
+        TablePresenter p = new EditableTablePresenterImpl(null, "table", tableMetaData(cols),
                 (EditablePageManagerView) view.proxy(), (DataEditorService) service.proxy());
 
         String rowFilter = "rowFilter";
@@ -51,15 +51,22 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         p.doApplyConstraints(rowFilter, sortOrder);
     }
 
+    private TableMetadata tableMetaData(String[] cols) {
+        TableMetadata tableMetadata = new TableMetadata();
+        for (int i = 0; i < cols.length; i++) {
+            ColumnMetaData col = new ColumnMetaData(cols[i],"java.lang.String",20);
+            tableMetadata.addColumnMetaData(col);
+        }
+        return tableMetadata;
+    }
+
     public void testShouldIgnoreWhenSortOrderIsEmptyOnApplyConstraints() throws EmfException {
         Mock view = mock(EditablePageManagerView.class);
         Mock service = mock(DataEditorService.class);
 
-        Mock source = mock(InternalSource.class);
         String[] cols = { "col1", "col2", "col3" };
-        source.stubs().method("getCols").will(returnValue(cols));
 
-        TablePresenter p = new EditableTablePresenterImpl(null, "table", (InternalSource) source.proxy(),
+        TablePresenter p = new EditableTablePresenterImpl(null, "table", tableMetaData(cols),
                 (EditablePageManagerView) view.proxy(), (DataEditorService) service.proxy());
 
         String rowFilter = "rowFilter";
@@ -83,7 +90,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         String[] cols = { "col1", "col2", "col3" };
         source.stubs().method("getCols").will(returnValue(cols));
 
-        TablePresenter p = new EditableTablePresenterImpl(null, "table", (InternalSource) source.proxy(),
+        TablePresenter p = new EditableTablePresenterImpl(null, "table", tableMetaData(cols),
                 (EditablePageManagerView) view.proxy(), (DataEditorService) service.proxy());
 
         String sortOrder = "invalid-row";
@@ -104,7 +111,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         String[] cols = { "col1", "col2", "col3" };
         source.stubs().method("getCols").will(returnValue(cols));
 
-        TablePresenter p = new EditableTablePresenterImpl(null, "table", (InternalSource) source.proxy(),
+        TablePresenter p = new EditableTablePresenterImpl(null, "table", tableMetaData(cols),
                 (EditablePageManagerView) view.proxy(), (DataEditorService) service.proxy());
 
         String sortOrder = "col3, invalid-row";

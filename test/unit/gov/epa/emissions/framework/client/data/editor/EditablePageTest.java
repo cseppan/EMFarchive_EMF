@@ -50,14 +50,21 @@ public class EditablePageTest extends TestCase {
     }
 
     private TableMetadata tableMetadata() {
-        ColumnMetaData col0 = new ColumnMetaData(cols[0],"java.lang.String",10);
-        ColumnMetaData col1 = new ColumnMetaData(cols[1],"java.lang.String",10);
-        ColumnMetaData col2 = new ColumnMetaData(cols[2],"java.lang.String",10);
         TableMetadata tableMetadata = new TableMetadata();
+
+        tableMetadata.addColumnMetaData(new ColumnMetaData("record_id", "java.lang.Integer", 10));
+        tableMetadata.addColumnMetaData(new ColumnMetaData("dataset_id", "java.lang.Long", 10));
+        tableMetadata.addColumnMetaData(new ColumnMetaData("version", "java.lang.Long", 10));
+        tableMetadata.addColumnMetaData(new ColumnMetaData("delete_version", "java.lang.String", 10));
+
+        ColumnMetaData col0 = new ColumnMetaData(cols[0], "java.lang.String", 10);
+        ColumnMetaData col1 = new ColumnMetaData(cols[1], "java.lang.String", 10);
+        ColumnMetaData col2 = new ColumnMetaData(cols[2], "java.lang.String", 10);
+
         tableMetadata.addColumnMetaData(col0);
         tableMetadata.addColumnMetaData(col1);
         tableMetadata.addColumnMetaData(col2);
-        
+
         return tableMetadata;
     }
 
@@ -198,8 +205,8 @@ public class EditablePageTest extends TestCase {
         assertEquals("", blankRecord.getDeleteVersions());
         assertEquals(cols.length, blankRecord.tokens().size());
         for (int i = 0; i < cols.length - 1; i++)
-            assertEquals("", blankRecord.token(i));
-        assertEquals("", blankRecord.token(cols.length - 1));
+            assertNull(blankRecord.token(i));
+        assertNull(blankRecord.token(cols.length - 1));
 
         ChangeSet changeset = data.changeset();
         assertEquals(1, changeset.getNewRecords().length);

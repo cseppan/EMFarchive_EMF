@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -61,18 +60,8 @@ public class DataEditorPresenter {
     }
 
     public void displayTable(EditablePageManagerView tableView) throws EmfException {
-        InternalSource source = source(table, dataset.getInternalSources());
-        tablePresenter = new EditableTablePresenterImpl(version, table, source, tableView, dataEditorService());
+        tablePresenter = new EditableTablePresenterImpl(version, table, tableView.tableMetadata(), tableView, dataEditorService());
         displayTable(tablePresenter);
-    }
-
-    private InternalSource source(String table, InternalSource[] sources) {
-        for (int i = 0; i < sources.length; i++) {
-            if (sources[i].getTable().equals(table))
-                return sources[i];
-        }
-
-        return null;
     }
 
     void displayTable(EditableTablePresenter tablePresenter) throws EmfException {

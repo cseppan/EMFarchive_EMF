@@ -40,10 +40,10 @@ public class EditablePage extends AbstractTableData implements SelectableEmfTabl
         List list = new ArrayList();
         list.add("Select");
         ColumnMetaData[] cols = tableMetadata.getCols();
-        for (int i = 0; i < cols.length; i++) {
+        for (int i = 4; i < cols.length; i++) {// FIXME: have to add record id and verson related columns
             list.add(cols[i].getName());
         }
-        
+
         return (String[]) list.toArray(new String[0]);
     }
 
@@ -146,8 +146,10 @@ public class EditablePage extends AbstractTableData implements SelectableEmfTabl
         record.setVersion(version.getVersion());
         record.setDeleteVersions("");
         List tokens = new ArrayList();
-        for (int i = 0; i < tableMetadata.getCols().length; i++)
-            tokens.add("");
+        for (int i = 4; i < tableMetadata.getCols().length; i++) {
+            // FIXME: have to add record id and verson related columns
+            tokens.add(null);
+        }
         record.setTokens(tokens.toArray());
 
         rows.add(row(record));
@@ -162,7 +164,16 @@ public class EditablePage extends AbstractTableData implements SelectableEmfTabl
     }
 
     public Class getColumnClass(int col) {
-        return col == 0 ? Boolean.class : String.class;
+        return col == 0 ? Boolean.class : classType(col);
+    }
+
+    private Class classType(int col) {
+        String type = tableMetadata.getCols()[col+3].getType(); //FIXME: remove the addition after adding version adn record id columns
+        try {
+            return Class.forName(type);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     public ChangeSet changeset() {

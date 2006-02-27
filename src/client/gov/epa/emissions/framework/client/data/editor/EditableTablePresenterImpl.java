@@ -3,7 +3,8 @@ package gov.epa.emissions.framework.client.data.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.commons.io.ColumnMetaData;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.TablePaginator;
 import gov.epa.emissions.framework.client.data.TablePaginatorImpl;
@@ -22,17 +23,17 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
 
     private DataEditorService service;
 
-    private InternalSource source;
+    private TableMetadata tableMetadata;
 
-    public EditableTablePresenterImpl(Version version, String table, InternalSource source,
+    public EditableTablePresenterImpl(Version version, String table, TableMetadata tableMetadata,
             EditablePageManagerView view, DataEditorService service) {
-        this(new TablePaginatorImpl(version, table, view, service), source, view, service);
+        this(new TablePaginatorImpl(version, table, view, service), tableMetadata, view, service);
     }
 
-    public EditableTablePresenterImpl(TablePaginator paginator, InternalSource source, EditablePageManagerView view,
+    public EditableTablePresenterImpl(TablePaginator paginator, TableMetadata tableMetadata, EditablePageManagerView view,
             DataEditorService service) {
         this.service = service;
-        this.source = source;
+        this.tableMetadata = tableMetadata;
         this.view = view;
 
         this.paginator = paginator;
@@ -107,10 +108,19 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
     }
 
     public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
-        validateColsInSortOrder(sortOrder, source.getCols());
+        validateColsInSortOrder(sortOrder, cols(tableMetadata));
         Page page = service.applyConstraints(token(), rowFilter, sortOrder);
         view.display(page);
         updateFilteredCount();
+    }
+
+    private String[] cols(TableMetadata tableMetadata) {
+        ColumnMetaData [] cols = tableMetadata.getCols();
+        String [] colNames=new String[cols.length];
+        for (int i = 0; i < cols.length; i++) {
+            colNames[i] = cols[i].getName();
+        }
+        return colNames;
     }
 
     private void validateColsInSortOrder(String sortOrder, String[] cols) throws EmfException {
