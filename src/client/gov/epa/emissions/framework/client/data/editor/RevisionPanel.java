@@ -40,13 +40,10 @@ public class RevisionPanel extends JPanel {
 
         super.add(createLayout());
         super.setBorder(new Border("Revision Information"));
-        //javax.swing.border.Border revBorder = BorderFactory.createEmptyBorder(3,3,3,3);
-        //super.setBorder(BorderFactory.createTitledBorder(
-        //        revBorder,"Revision Information",TitledBorder.LEFT,TitledBorder.DEFAULT_POSITION));
     }
 
     private JPanel createLayout() {
-        JPanel panel = new JPanel(new BorderLayout(10,3));
+        JPanel panel = new JPanel(new BorderLayout(10, 3));
 
         panel.add(mainPanel(), BorderLayout.CENTER);
         panel.add(referencesPanel(), BorderLayout.LINE_END);
@@ -69,11 +66,11 @@ public class RevisionPanel extends JPanel {
     }
 
     private JPanel mainPanel() {
-        JPanel panel = new JPanel(new GridLayout(1,2,10,0));
+        JPanel panel = new JPanel(new GridLayout(1, 2, 10, 0));
 
         what = new TextArea("", "", 30, 2);
         panel.add(labelValuePanel("What was changed", ScrollableTextArea.createWithVerticalScrollBar(what)));
- 
+
         why = new TextArea("", "", 30, 2);
         panel.add(labelValuePanel("Why it was changed", ScrollableTextArea.createWithVerticalScrollBar(why)));
 
@@ -81,11 +78,11 @@ public class RevisionPanel extends JPanel {
     }
 
     private JPanel labelValuePanel(String labelText, JComponent widget) {
-        BorderLayout bl = new BorderLayout(3,4);
+        BorderLayout bl = new BorderLayout(3, 4);
         JPanel panel = new JPanel(bl);
-        JLabel label = new JLabel(labelText,JLabel.CENTER);
-        panel.add(label,BorderLayout.NORTH);
-        panel.add(widget,BorderLayout.CENTER);
+        JLabel label = new JLabel(labelText, JLabel.CENTER);
+        panel.add(label, BorderLayout.NORTH);
+        panel.add(widget, BorderLayout.CENTER);
 
         return panel;
     }

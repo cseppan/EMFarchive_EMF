@@ -14,7 +14,7 @@ public class Dialog extends JDialog {
         super.setTitle(title);
         super.setModal(true);
         super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
+        
         applyDecorations();
     }
 
@@ -27,4 +27,11 @@ public class Dialog extends JDialog {
         super.setLocation(ScreenUtils.getPointToCenter(this));
     }
 
+    protected void close() {
+        super.dispose();
+    }
+
+    public void display() {
+        super.setVisible(true);
+    }
 }

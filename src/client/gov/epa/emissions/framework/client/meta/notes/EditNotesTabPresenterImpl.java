@@ -55,6 +55,5 @@ public class EditNotesTabPresenterImpl implements EditNotesTabPresenter {
         newNoteView.display(user, dataset, notes, types, versions);
         if (newNoteView.shouldCreate())
             view.addNote(newNoteView.note());
-
     }
 }

@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
@@ -36,8 +37,6 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
 
     private TextArea details;
 
-    private TextField references;
-
     private DefaultComboBoxModel versionsModel;
 
     private VersionsSet versionsSet;
@@ -52,11 +51,19 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
 
     private String version;
 
+    private EmfConsole parent;
+
+    private Note[] selectedReferences;
+
+    private TextArea referencesListing;
+
     public NewNoteDialog(EmfConsole parent) {
         super("Create new Note", parent);
-        super.setSize(new Dimension(550, 250));
-
+        super.setSize(new Dimension(550, 300));
         super.center();
+
+        this.parent = parent;
+        selectedReferences = new Note[0];
     }
 
     public void display(User user, EmfDataset dataset, Version version, Note[] notes, NoteType[] types,
@@ -64,36 +71,37 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         versionsSet = new VersionsSet(versions);
         this.version = version.getName();
 
-        doDisplay(user, dataset, types);
+        doDisplay(user, dataset, notes, types);
     }
 
     public void display(User user, EmfDataset dataset, Note[] notes, NoteType[] types, Version[] versions) {
         versionsSet = new VersionsSet(versions);
         version = versionsSet.getDefaultVersionName(dataset);
 
-        doDisplay(user, dataset, types);
+        doDisplay(user, dataset, notes, types);
     }
 
-    private void doDisplay(User user, EmfDataset dataset, NoteType[] types) {
+    private void doDisplay(User user, EmfDataset dataset, Note[] notes, NoteType[] types) {
         this.user = user;
         this.dataset = dataset;
         this.types = types;
 
-        super.getContentPane().add(createLayout(types, versionsSet));
-        super.show();
+        JPanel layout = createLayout(notes, types, versionsSet);
+        super.getContentPane().add(layout);
+        super.display();
     }
 
-    private JPanel createLayout(NoteType[] types, VersionsSet versionsSet) {
+    private JPanel createLayout(Note[] notes, NoteType[] types, VersionsSet versionsSet) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        panel.add(inputPanel(types, versionsSet));
+        panel.add(inputPanel(notes, types, versionsSet));
         panel.add(buttonsPanel());
 
         return panel;
     }
 
-    private JPanel inputPanel(NoteType[] types, VersionsSet versionsSet) {
+    private JPanel inputPanel(final Note[] notes, NoteType[] types, VersionsSet versionsSet) {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
@@ -108,8 +116,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         ScrollableTextArea scrollableDetails = ScrollableTextArea.createWithVerticalScrollBar(details);
         layoutGenerator.addLabelWidgetPair("Details", scrollableDetails, panel);
 
-        references = new TextField("", 40);
-        layoutGenerator.addLabelWidgetPair("References", references, panel);
+        layoutReferences(notes, panel, layoutGenerator);
 
         versionsModel = new DefaultComboBoxModel(versionsSet.names());
         JComboBox versionsCombo = createCombo(versionsModel);
@@ -122,6 +129,35 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
                 10, 10);// xPad, yPad
 
         return panel;
+    }
+
+    private void layoutReferences(final Note[] notes, JPanel panel, SpringLayoutGenerator layoutGenerator) {
+        JPanel rightPanel = new JPanel();
+        rightPanel.add(scrollableReferences());
+
+        Button button = new Button("Set", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doAddReferences(notes);
+            }
+        });
+        button.setToolTipText("Set References");
+        rightPanel.add(button);
+
+        layoutGenerator.addWidgetPair(new Label("References"), rightPanel, panel);
+    }
+
+    private ScrollableTextArea scrollableReferences() {
+        referencesListing = new TextArea("", "", 20, 2);
+        referencesListing.setEditable(false);
+
+        return ScrollableTextArea.createWithVerticalScrollBar(referencesListing);
+    }
+
+    protected void doAddReferences(Note[] notes) {
+        AddReferencesDialog dialog = new AddReferencesDialog(parent);
+        dialog.display(notes, selectedReferences);
+        selectedReferences = dialog.selected();
+        referencesListing.setText(references());
     }
 
     private String[] typeNames(NoteType[] types) {
@@ -172,10 +208,6 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         return false;
     }
 
-    protected void close() {
-        super.dispose();
-    }
-
     public boolean shouldCreate() {
         return shouldCreate;
     }
@@ -184,7 +216,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         Note note = new Note();
         note.setName(name.getText());
         note.setDetails(details.getText());
-        note.setReferences(references.getText());
+        note.setReferences(references());
         note.setVersion(version().getVersion());
         note.setNoteType(type());
         note.setDate(new Date());
@@ -192,6 +224,17 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         note.setDatasetId(dataset.getId());
 
         return note;
+    }
+
+    private String references() {
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < selectedReferences.length; i++) {
+            result.append(selectedReferences[i].getName());
+            if ((i + 1) < selectedReferences.length)
+                result.append(", ");
+        }
+
+        return result.toString();
     }
 
     private NoteType type() {
