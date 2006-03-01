@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.ExImService;
@@ -53,51 +52,28 @@ public class ImportPresenterTest extends MockObjectTestCase {
         user.setName("full name");
 
         Mock model = mock(ExImService.class);
-        model.expects(once()).method("importDatasetUsingSingleFile");
+        model.expects(once()).method("importDataset");
 
         ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), user, (ExImService) model.proxy());
 
         prefs.stubs().method("mapLocalInputPathToRemote");
-        presenter.doImportDatasetUsingSingleFile("dir", "filename", "dataset", type);
+        presenter.doImport("dir", new String[] {"filename"}, type, "");
     }
+    
+    public void testSendsImportRequestToEximServiceOnImportMultipleDatasets() throws Exception {
+        DatasetType type = new DatasetType("ORL NonRoad");
 
-    public void testDuringImportRaisesExceptionOnBlankFilename() {
-        ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), null, null);
+        User user = new User();
+        user.setUsername("user");
+        user.setName("full name");
 
-        try {
-            presenter.doImportDatasetUsingSingleFile("dir", "", "dataset name", new DatasetType("ORL NonRoad"));
-        } catch (EmfException e) {
-            assertEquals("Filename should be specified", e.getMessage());
-            return;
-        }
+        Mock model = mock(ExImService.class);
+        model.expects(once()).method("importDatasets");
 
-        fail("should have raised an exception if a blank filename is provided");
-    }
+        ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), user, (ExImService) model.proxy());
 
-    public void testDuringImportRaisesExceptionOnBlankDatasetName() {
-        ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), null, null);
-
-        try {
-            presenter.doImportDatasetUsingSingleFile("dir", "filename", "", new DatasetType("ORL NonRoad"));
-        } catch (EmfException e) {
-            assertEquals("Dataset Name should be specified", e.getMessage());
-            return;
-        }
-
-        fail("should have raised an exception if a blank filename is provided");
-    }
-
-    public void testDuringImportRaisesExceptionOnBlankFolder() {
-        ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), null, null);
-
-        try {
-            presenter.doImportDatasetUsingSingleFile("", "file.txt", "dataset name", new DatasetType("ORL NonRoad"));
-        } catch (EmfException e) {
-            assertEquals("Folder should be specified", e.getMessage());
-            return;
-        }
-
-        fail("should have raised an exception if a blank filename is provided");
+        prefs.stubs().method("mapLocalInputPathToRemote");
+        presenter.doImport("dir", new String[] {"filename"}, type);
     }
 
     public void testClosesViewOnDoneImport() {

@@ -28,8 +28,7 @@ public class ImporterFactory {
         this.sqlDataTypes = sqlDataTypes;
     }
 
-    public Importer createVersioned(EmfDataset dataset, File folder, String filename) throws ImporterException {
-        String[] filePatterns = new String[] { filename };
+    public Importer createVersioned(EmfDataset dataset, File folder, String[] filePatterns) throws ImporterException {
         Importer importer = create(dataset, folder, filePatterns);
         return new VersionedImporter(importer, dataset, dbServer);
     }

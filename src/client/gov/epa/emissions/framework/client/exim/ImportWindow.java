@@ -42,7 +42,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
-        importInputPanel = new ImportInputPanel(service, messagePanel);
+        importInputPanel = new ImportInputPanel(service, messagePanel, this);
         panel.add(messagePanel);
         panel.add(importInputPanel);
         panel.add(createButtonsPanel());
@@ -62,7 +62,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
         JButton importButton = new Button("Import", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                //TODO: doImport();
+                doImport();
             }
         });
         container.add(importButton);
@@ -78,6 +78,10 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         panel.add(container, BorderLayout.EAST);
 
         return panel;
+    }
+    
+    private void doImport() {
+        importInputPanel.doImport(presenter);
     }
 
     public void register(ImportPresenter presenter) {

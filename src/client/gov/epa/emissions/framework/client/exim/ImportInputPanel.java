@@ -5,7 +5,10 @@ import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
+import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.ui.FileChooser;
@@ -42,16 +45,20 @@ public class ImportInputPanel extends JPanel {
     private TextArea filenames;
 
     private JCheckBox isMultipleDatasets;
+    
+    private ImportInputRules importrule;
 
     private static File lastFolder = null;
 
     private File[] fileSelected;
 
-
-    public ImportInputPanel(DataCommonsService service, MessagePanel messagePanel) 
+    private EmfInternalFrame parent;
+    
+    public ImportInputPanel(DataCommonsService service, MessagePanel messagePanel, EmfInternalFrame parent) 
         throws EmfException {
         this.messagePanel = messagePanel;
         this.service = service;
+        this.parent = parent;
         initialize();
     }
 
@@ -93,19 +100,16 @@ public class ImportInputPanel extends JPanel {
         layoutGenerator.addLabelWidgetPair("Dataset Name", name, this);
 
         isMultipleDatasets = new JCheckBox("Create Multiple Datasets");
-        isMultipleDatasets.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                // multipleDatasetsSelected();
-            }
-        });
+
         layoutGenerator.addLabelWidgetPair("", isMultipleDatasets, this);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(this, 6, 2, // rows, cols
                 20, 10, // initialX, initialY
                 10, 10);// xPad, yPad
-
-        //registerForEditEvents(name, folder, filename);// edit-awareness
+        
+        importrule = new ImportInputRules( messagePanel, datasetTypesModel, name,
+            folder, filenames, isMultipleDatasets, parent);
     }
     
     private void copyDatasetTypes(DatasetType[] allDatasetTypes, DatasetType[] allTypesWithMessage) {
@@ -119,6 +123,7 @@ public class ImportInputPanel extends JPanel {
         filenames.setText("");
         name.setText("");
         messagePanel.clear();
+        parent.refreshLayout();
     }
     
     private JButton importFileButton() {
@@ -137,20 +142,43 @@ public class ImportInputPanel extends JPanel {
     private JButton applyPatternButton() {
         Button button = new Button("Apply Pattern", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
-                //TODO: 
+                selectFilesFromPattern();
             }
         });
 
         return button;
     }
     
+    private void selectFilesFromPattern() {
+        clearTextField();
+        try {
+            File inputFilesFolder = new File(folder.getText());
+            FilePatternMatcher fpm = new FilePatternMatcher(inputFilesFolder, pattern.getText());
+            String[] allFilesInFolder = inputFilesFolder.list();
+            String[] fileNamesForImport = fpm.matchingNames(allFilesInFolder);
+            fileSelected = new File[fileNamesForImport.length];
+            for(int i = 0; i < fileNamesForImport.length; i++)
+                fileSelected[i] = new File(inputFilesFolder, fileNamesForImport[i]);
+            populateFilenamesFiled();    
+        } catch (ImporterException e) {
+            messagePanel.setError("Cannot apply pattern.");
+        }
+
+    }
+    
     private void selectFile() {
+        clearTextField();
         FileChooser chooser = new FileChooser("Select File", new File(folder.getText()), ImportInputPanel.this);
         chooser.setTitle("Select a " + datasetTypesModel.getSelectedItem().toString() + " File");
         fileSelected = chooser.choose();
+        populateFilenamesFiled();
+    }
+
+    private void populateFilenamesFiled() {
         if (fileSelected.length == 1)
             singleFile(fileSelected[0]);
-        else
+
+        if (fileSelected.length > 1)
             multipleFiles(fileSelected);
     }
     
@@ -184,6 +212,10 @@ public class ImportInputPanel extends JPanel {
             this.folder.setText(folder);
         else
             this.folder.setText(lastFolder.getAbsolutePath());
+    }
+    
+    public void doImport(ImportPresenter presenter) {
+        importrule.doImport(presenter);
     }
 
 }

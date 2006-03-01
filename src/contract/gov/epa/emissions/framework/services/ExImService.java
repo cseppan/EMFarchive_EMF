@@ -6,17 +6,9 @@ import gov.epa.emissions.framework.EmfException;
 
 public interface ExImService extends EMFService {
 
-    void importDatasetUsingSingleFile(User user, String folderPath, String fileName, EmfDataset dataset)
-            throws EmfException;
+    void importDatasets(User user, String folderPath, String[] fileNames, DatasetType datasetType) throws EmfException;
 
-    void importDatasetUsingMultipleFiles(User user, String folderPath, String[] fileNames, EmfDataset dataset)
-            throws EmfException;
-
-    void importDatasetForEveryFileInPattern(User user, String folderPath, String filePattern, DatasetType datasetType)
-            throws EmfException;
-
-    void importDatasetForEachFile(User user, String folderPath, String[] fileName, DatasetType datasetType)
-            throws EmfException;
+    void importDataset(User user, String folderPath, String[] filenames, DatasetType datasetType, String datasetName) throws EmfException;
 
     void startExport(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException;
 

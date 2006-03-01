@@ -44,59 +44,31 @@ public class ExImServiceTransport implements ExImService {
         call.request(new Object[] { user, datasets, folder, purpose });
     }
 
-    public void importDatasetUsingSingleFile(User user, String folderPath, String filename, EmfDataset dataset)
-            throws EmfException {
+    public void importDataset(User user, String folderPath, String[] fileNames, DatasetType datasetType, String datasetName) throws EmfException {
         EmfCall call = call();
 
-        call.setOperation("importDatasetUsingSingleFile");
-        call.addParam("user", mappings.user());
-        call.addParam("folderpath", mappings.string());
-        call.addParam("filename", mappings.string());
-        call.addParam("dataset", mappings.dataset());
-        call.setVoidReturnType();
-
-        call.request(new Object[] { user, folderPath, filename, dataset });
-    }
-
-    public void importDatasetUsingMultipleFiles(User user, String folderPath, String[] filenames, EmfDataset dataset)
-            throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("importDatasetUsingMultipleFiles");
-        call.addParam("user", mappings.user());
-        call.addParam("folderpath", mappings.string());
-        call.addParam("filenames", mappings.strings());
-        call.addParam("dataset", mappings.dataset());
-        call.setVoidReturnType();
-
-        call.request(new Object[] { user, folderPath, filenames, dataset });
-    }
-
-    public void importDatasetForEveryFileInPattern(User user, String folderPath, String filePattern,
-            DatasetType datasetType) throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("importDatasetForEveryFileInPattern");
-        call.addParam("user", mappings.user());
-        call.addParam("folderpath", mappings.string());
-        call.addParam("filePattern", mappings.string());
-        call.addParam("dataset", mappings.datasetType());
-        call.setVoidReturnType();
-
-        call.request(new Object[] { user, folderPath, filePattern, datasetType });
-    }
-
-    public void importDatasetForEachFile(User user, String folderPath, String[] filenames, DatasetType datasetType)
-            throws EmfException {
-        EmfCall call = call();
-
-        call.setOperation("importDatasetForEachFile");
+        call.setOperation("importDataset");
         call.addParam("user", mappings.user());
         call.addParam("folderPath", mappings.string());
-        call.addParam("filenames", mappings.strings());
+        call.addParam("fileNames", mappings.strings());
+        call.addParam("datasetType", mappings.datasetType());
+        call.addParam("datasetName", mappings.string());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, folderPath, fileNames, datasetType, datasetName });
+    }
+
+    public void importDatasets(User user, String folderPath, String[] fileNames, DatasetType datasetType) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("importDatasets");
+        call.addParam("user", mappings.user());
+        call.addParam("folderPath", mappings.string());
+        call.addParam("fileNames", mappings.strings());
         call.addParam("datasetType", mappings.datasetType());
         call.setVoidReturnType();
 
-        call.request(new Object[] { user, folderPath, filenames, datasetType });
+        call.request(new Object[] { user, folderPath, fileNames, datasetType });
     }
+
 }

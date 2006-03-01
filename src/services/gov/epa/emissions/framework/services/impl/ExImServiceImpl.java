@@ -4,9 +4,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.KeyVal;
-import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
 import gov.epa.emissions.commons.io.importer.Importer;
-import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDao;
@@ -95,33 +93,18 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         }
     }
 
-    public void importDatasetUsingSingleFile(User user, String folderPath, String fileName, EmfDataset dataset)
+    public void importSingleDataset(User user, String folderPath, String[] fileNames, EmfDataset dataset)
             throws EmfException {
         try {
             File path = validatePath(folderPath);
 
             validateDatasetName(dataset);
-            Importer importer = importerFactory.createVersioned(dataset, path, fileName);
-            ImportTask eximTask = new ImportTask(user, new String[] { fileName }, dataset, services(), importer);
+            Importer importer = importerFactory.createVersioned(dataset, path, fileNames);
+            ImportTask eximTask = new ImportTask(user, fileNames, dataset, services(), importer);
 
             threadPool.execute(eximTask);
         } catch (Exception e) {
-            log.error("Exception attempting to start import of file: " + fileName, e);
-            throw new EmfException("Import of file failed: " + e.getMessage());
-        }
-    }
-
-    public void importDatasetUsingMultipleFiles(User user, String folderPath, String[] filenames, EmfDataset dataset)
-            throws EmfException {
-        try {
-            File path = validatePath(folderPath);
-            validateDatasetName(dataset);
-            Importer importer = importerFactory.create(dataset, path, filenames);
-            ImportTask eximTask = new ImportTask(user, filenames, dataset, services(), importer);
-
-            threadPool.execute(eximTask);
-        } catch (Exception e) {
-            log.error("Exception attempting to import multiple files into a single Dataset", e);
+            log.error("Exception attempting to start import of file: " + fileNames[0], e);
             throw new EmfException("Import of file failed: " + e.getMessage());
         }
     }
@@ -220,53 +203,31 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return prefix + name + "_" + date.toLowerCase() + suffix;
     }
 
-    public void importDatasetForEveryFileInPattern(User user, String folderPath, String filePattern,
-            DatasetType datasetType) throws EmfException {
-        String[] fileNamesForImport = null;
-
-        try {
-            File folder = validatePath(folderPath);
-
-            // The fileName is a regular expression that maps to a collection of files.
-            FilePatternMatcher fpm = new FilePatternMatcher(folder, filePattern);
-            String[] allFilesInFolder = folder.list();
-            fileNamesForImport = fpm.matchingNames(allFilesInFolder);
-
-            // Loop through the collection and start import for the file
-            for (int i = 0; i < fileNamesForImport.length; i++) {
-                String fileName = fileNamesForImport[i];
-                String importFileName = fileName + "_" + DATE_FORMATTER.format(new Date());
-                EmfDataset dataset = new EmfDataset();
-                dataset.setName(importFileName);
-                dataset.setCreator(user.getUsername());
-                dataset.setDatasetType(datasetType);
-                dataset.setCreatedDateTime(new Date());
-                dataset.setModifiedDateTime(new Date());
-                dataset.setAccessedDateTime(new Date());
-
-                importDatasetUsingSingleFile(user, folderPath, fileName, dataset);
-            }
-
-        } catch (ImporterException e) {
-            log.error("Export of Dataset failed - folder= " + folderPath, e);
-            throw new EmfException("Export of Dataset failed: " + e.getMessage());
-        }
-    }
-
-    public void importDatasetForEachFile(User user, String folderPath, String[] filenames, DatasetType datasetType)
-            throws EmfException {
+    public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType) throws EmfException {
         for (int i = 0; i < filenames.length; i++) {
-            String importFileName = filenames[i] + "_" + DATE_FORMATTER.format(new Date());
+            String datasetName = filenames[i] + "_" + DATE_FORMATTER.format(new Date());
             EmfDataset dataset = new EmfDataset();
-            dataset.setName(importFileName);
+            dataset.setName(datasetName);
             dataset.setCreator(user.getUsername());
             dataset.setDatasetType(datasetType);
             dataset.setCreatedDateTime(new Date());
             dataset.setModifiedDateTime(new Date());
             dataset.setAccessedDateTime(new Date());
 
-            importDatasetUsingSingleFile(user, folderPath, filenames[i], dataset);
+            importSingleDataset(user, folderPath, new String[]{filenames[i]}, dataset);
         }
+    }
+    
+    public void importDataset(User user, String folderPath, String[] filenames, DatasetType datasetType, String datasetName) throws EmfException {
+            EmfDataset dataset = new EmfDataset();
+            dataset.setName(datasetName);
+            dataset.setCreator(user.getUsername());
+            dataset.setDatasetType(datasetType);
+            dataset.setCreatedDateTime(new Date());
+            dataset.setModifiedDateTime(new Date());
+            dataset.setAccessedDateTime(new Date());
+
+            importSingleDataset(user, folderPath, filenames, dataset);
     }
 
 }

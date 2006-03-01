@@ -27,7 +27,7 @@ public class ImporterFactoryTest extends MockObjectTestCase {
         dataset.setDatasetType(datasetType);
         dataset.setName("name");
 
-        Importer importer = factory.createVersioned(dataset, null, "file");
+        Importer importer = factory.createVersioned(dataset, null, new String[]{"file"});
 
         assertEquals(VersionedImporter.class.getName(), importer.getClass().getName());
     }
@@ -43,7 +43,7 @@ public class ImporterFactoryTest extends MockObjectTestCase {
         EmfDataset dataset = new EmfDataset();
         dataset.setDatasetType(datasetType);
 
-        Importer exporter = factory.createVersioned(dataset, null, "file");
+        Importer exporter = factory.createVersioned(dataset, null, new String[]{"file"});
 
         assertEquals(VersionedImporter.class.getName(), exporter.getClass().getName());
     }
