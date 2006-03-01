@@ -11,14 +11,20 @@ import gov.epa.emissions.framework.ui.TableColumnWidth;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
+
 
 public class EditablePagePanel extends JPanel {
 
@@ -41,12 +47,29 @@ public class EditablePagePanel extends JPanel {
 
     private JPanel doLayout(EditablePage tableData) {
         JPanel container = new JPanel(new BorderLayout());
-
+        JToolBar toolBar = toolBar(tableData);
+        container.add(toolBar, BorderLayout.PAGE_START);
         container.add(table(tableData), BorderLayout.CENTER);
         container.add(bottomPanel(tableData), BorderLayout.PAGE_END);
 
         setBorder();
         return container;
+    }
+
+    private JToolBar toolBar(EditablePage tableData) {
+        JToolBar toolbar = new JToolBar();
+        String insertAbove = "/toolbarButtonGraphics/table/RowInsertBefore" + 24 + ".gif";
+        ImageIcon iconAbove = createImageIcon(insertAbove);
+        String nameAbove = "Insert Above";
+        JButton buttonAbove = toolbar.add(insertRowAction(tableData, true, nameAbove, iconAbove));
+        buttonAbove.setToolTipText(nameAbove);
+        
+        String insertBelow = "/toolbarButtonGraphics/table/RowInsertAfter" + 24 + ".gif";
+        ImageIcon iconBelow = createImageIcon(insertBelow);
+        String nameBelow = "Insert Below";
+        JButton buttonBelow = toolbar.add(insertRowAction(tableData, false, nameBelow, iconBelow));
+        buttonBelow.setToolTipText(nameBelow);
+        return toolbar;
     }
 
     private void setBorder() {
@@ -104,12 +127,18 @@ public class EditablePagePanel extends JPanel {
         return panel;
     }
 
-    private AbstractAction insertRowAction(final EditablePage tableData, final boolean above) {
-        return new AbstractAction() {
+    private Action insertRowAction(final EditablePage tableData, final boolean above, String name,
+            ImageIcon icon) {
+        return new AbstractAction(name, icon) {
             public void actionPerformed(ActionEvent e) {
                 doAdd(tableData, editableTable, above);
             }
         };
+
+    }
+
+    private Action insertRowAction(final EditablePage tableData, final boolean above) {
+        return insertRowAction(tableData, above, null, null);
     }
 
     protected void clearMessagesWithTableRefresh() {
@@ -142,5 +171,14 @@ public class EditablePagePanel extends JPanel {
 
     public void scrollToPageEnd() {
         table.moveToBottom();
+    }
+
+    protected ImageIcon createImageIcon(String path) {
+        URL imgURL = getClass().getResource(path);
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        }
+        messagePanel.setError("Could not find file: " + path);
+        return null;
     }
 }
