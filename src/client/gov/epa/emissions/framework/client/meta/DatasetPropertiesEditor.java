@@ -98,7 +98,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private JPanel createNotesTab(EmfConsole parentConsole) {
         try {
-            EditNotesTab view = new EditNotesTab(parentConsole, this);
+            EditNotesTab view = new EditNotesTab(parentConsole, this, messagePanel);
             presenter.set(view);
             return view;
         } catch (EmfException e) {

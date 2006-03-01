@@ -183,6 +183,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         NoteType[] types = new NoteType[0];
         Version[] versions = new Version[0];
         User user = new User();
+        Note[] notes = {};
 
         Mock service = mock(DataCommonsService.class);
         service.expects(once()).method("addNote").with(same(note));
@@ -193,12 +194,12 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
 
         Mock view = mock(NewNoteView.class);
         EmfDataset dataset = new EmfDataset();
-        Constraint[] constraints = { same(user), same(dataset), same(version), same(types), same(versions) };
+        Constraint[] constraints = { same(user), same(dataset), same(version), same(notes), same(types), same(versions) };
         view.stubs().method("display").with(constraints);
         view.stubs().method("shouldCreate").will(returnValue(Boolean.TRUE));
         view.stubs().method("note").will(returnValue(note));
 
-        presenter.addNote((NewNoteView) view.proxy(), user, dataset, types, versions);
+        presenter.addNote((NewNoteView) view.proxy(), user, dataset, notes, types, versions);
     }
 
     public void testShouldCloseWithChangedSavedOnClose() throws Exception {

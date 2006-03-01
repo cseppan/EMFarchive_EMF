@@ -1,15 +1,13 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
-import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
-import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Note;
-import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
 import java.awt.BorderLayout;
@@ -32,24 +30,27 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
     private ManageChangeables changeables;
 
-    public EditNotesTab(EmfConsole parentConsole, ManageChangeables changeables) {
+    private MessagePanel messagePanel;
+
+    public EditNotesTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel) {
         super.setName("editNotesTab");
         this.parentConsole = parentConsole;
         this.changeables = changeables;
+        this.messagePanel = messagePanel;
+
         super.setLayout(new BorderLayout());
     }
 
-    public void display(User user, EmfDataset dataset, Note[] notes, NoteType[] types, Version[] versions) {
+    public void display(Note[] notes, EditNotesTabPresenter presenter) {
         super.removeAll();
-        super.add(createLayout(user, dataset, notes, types, versions, parentConsole), BorderLayout.CENTER);
+        super.add(createLayout(notes, presenter, parentConsole), BorderLayout.CENTER);
     }
 
-    private JPanel createLayout(User user, EmfDataset dataset, Note[] notes, NoteType[] types, Version[] versions,
-            EmfConsole parentConsole) {
+    private JPanel createLayout(Note[] notes, EditNotesTabPresenter presenter, EmfConsole parentConsole) {
         JPanel layout = new JPanel(new BorderLayout());
 
         layout.add(tablePanel(notes, parentConsole), BorderLayout.CENTER);
-        layout.add(controlPanel(user, dataset, types, versions), BorderLayout.PAGE_END);
+        layout.add(controlPanel(presenter), BorderLayout.PAGE_END);
 
         return layout;
     }
@@ -74,13 +75,12 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         return scrollPane;
     }
 
-    private JPanel controlPanel(final User user, final EmfDataset dataset, final NoteType[] types,
-            final Version[] versions) {
+    private JPanel controlPanel(final EditNotesTabPresenter presenter) {
         JPanel panel = new JPanel(new BorderLayout());
 
         Button add = new Button("Add", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doNewNote(user, dataset, types, versions);
+                doNewNote(presenter);
             }
         });
         panel.add(add, BorderLayout.LINE_START);
@@ -88,15 +88,16 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         return panel;
     }
 
-    protected void doNewNote(User user, EmfDataset dataset, NoteType[] types, Version[] versions) {
-        NewNoteDialog dialog = new NewNoteDialog(parentConsole);
-        dialog.display(user, dataset, types, versions);
-
-        if (dialog.shouldCreate())
-            addNote(dialog.note());
+    protected void doNewNote(EditNotesTabPresenter presenter) {
+        NewNoteDialog view = new NewNoteDialog(parentConsole);
+        try {
+            presenter.doAddNote(view);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
     }
 
-    private void addNote(Note note) {
+    public void addNote(Note note) {
         tableData.add(note);
         selectModel.refresh();
 

@@ -4,39 +4,35 @@ import gov.epa.emissions.commons.security.User;
 
 import java.util.Date;
 
-/**
- * This class keeps track of the date/time a user initiated an export of a particular version of a dataset to a
- * repository (location).
- * 
- * @author Conrad F. D'Cruz
- * 
- */
 public class Note {
 
     private long id;
+
     private long datasetId;
+
     private long version;
+
     private String name;
+
     private User creator;
+
     private Date date;
+
     private NoteType noteType;
+
     private String details;
+
     private String references;
-    
+
     public Note() {// No argument constructor needed for hibernate mapping
     }
 
-    public String toString(){
-       String delim=":";
-       String output = "[" + id + delim + datasetId + delim + version + delim + name + delim 
-                           + creator + delim + date + delim + noteType + delim + details + delim
-                           + references + "]";
-      return output;   
+    public String toString() {
+        return name + "(" + id + ")";
     }
-    
-    public Note(User creator, long datasetId, Date date, String details, String name, NoteType type, String references, long version) {
-        super();
-        // TODO Auto-generated constructor stub
+
+    public Note(User creator, long datasetId, Date date, String details, String name, NoteType type, String references,
+            long version) {
         this.creator = creator;
         this.datasetId = datasetId;
         this.date = date;
@@ -118,7 +114,5 @@ public class Note {
     public void setVersion(long version) {
         this.version = version;
     }
-
-
 
 }

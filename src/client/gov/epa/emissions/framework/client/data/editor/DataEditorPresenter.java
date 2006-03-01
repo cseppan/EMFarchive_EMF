@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
 
 public class DataEditorPresenter {
@@ -60,7 +61,8 @@ public class DataEditorPresenter {
     }
 
     public void displayTable(EditablePageManagerView tableView) throws EmfException {
-        tablePresenter = new EditableTablePresenterImpl(version, table, tableView.tableMetadata(), tableView, dataEditorService());
+        tablePresenter = new EditableTablePresenterImpl(version, table, tableView.tableMetadata(), tableView,
+                dataEditorService());
         displayTable(tablePresenter);
     }
 
@@ -123,17 +125,18 @@ public class DataEditorPresenter {
     public void doAddNote(NewNoteView view) throws EmfException {
         NoteType[] types = commonsService().getNoteTypes();
         Version[] versions = dataEditorService().getVersions(dataset.getId());
+        Note[] notes = commonsService().getNotes(dataset.getId());
 
-        addNote(view, session.user(), dataset, types, versions);
+        addNote(view, session.user(), dataset, notes, types, versions);
     }
 
     private DataCommonsService commonsService() {
         return session.dataCommonsService();
     }
 
-    void addNote(NewNoteView view, User user, EmfDataset dataset, NoteType[] types, Version[] versions)
+    void addNote(NewNoteView view, User user, EmfDataset dataset, Note[] notes, NoteType[] types, Version[] versions)
             throws EmfException {
-        view.display(user, dataset, version, types, versions);
+        view.display(user, dataset, version, notes, types, versions);
         if (view.shouldCreate())
             commonsService().addNote(view.note());
     }

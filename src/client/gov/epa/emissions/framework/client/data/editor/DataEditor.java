@@ -22,9 +22,6 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -126,7 +123,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private JPanel tablePanel(Version version, String table, TableMetadata tableMetadata) {
         pageContainer = new EditablePageContainer(dataset, version, tableMetadata, messagePanel, this);
         displayTable(table);
-        addListener(new DataEditorKeyListener());
 
         return pageContainer;
     }
@@ -211,12 +207,12 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
                 doSave();
             }
         });
-       
+
         save.setToolTipText("Save your changes");
         save.setEnabled(false);
         return save;
     }
-    
+
     public void signalChanges() {
         save.signalChanges();
         discard.signalChanges();
@@ -329,16 +325,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
             doClose();
         } catch (EmfException e) {
             displayError("Could not close. Reason - " + e.getMessage());
-        }
-    }
-
-    private void addListener(KeyListener listener) {
-        pageContainer.addListener(listener);
-    }
-
-    public class DataEditorKeyListener extends KeyAdapter {
-        public void keyTyped(KeyEvent e) {
-            enableButtons();
         }
     }
 

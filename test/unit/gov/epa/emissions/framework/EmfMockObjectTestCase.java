@@ -2,6 +2,7 @@ package gov.epa.emissions.framework;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.core.Constraint;
 import org.jmock.core.matcher.InvokeCountMatcher;
 
 public abstract class EmfMockObjectTestCase extends MockObjectTestCase {
@@ -20,6 +21,10 @@ public abstract class EmfMockObjectTestCase extends MockObjectTestCase {
 
     protected void expects(Mock mock, int count, String method) {
         mock.expects(new InvokeCountMatcher(count)).method(method);
+    }
+
+    protected void expects(Mock mock, int count, String method, Constraint param) {
+        mock.expects(new InvokeCountMatcher(count)).method(method).with(param);
     }
 
     protected void expects(Mock mock, String method) {

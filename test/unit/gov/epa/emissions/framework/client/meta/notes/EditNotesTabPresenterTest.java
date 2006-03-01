@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataCommonsService;
 import gov.epa.emissions.framework.services.DataEditorService;
@@ -10,34 +11,23 @@ import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Constraint;
 
-public class EditNotesTabPresenterTest extends MockObjectTestCase {
+public class EditNotesTabPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldDisplayViewOnDisplay() throws Exception {
-        Note[] notes = new Note[0];
-        NoteType[] noteTypes = new NoteType[0];
-        Version[] versions = new Version[0];
-        EmfDataset dataset = new EmfDataset();
-
         Mock view = mock(EditNotesTabView.class);
-        User user = new User();
-        Constraint[] constraints = { same(user), same(dataset), same(notes), same(noteTypes), same(versions) };
-        view.expects(once()).method("display").with(constraints);
 
-        Mock dataCommons = mock(DataCommonsService.class);
+        EmfDataset dataset = new EmfDataset();
         dataset.setId(2);
+        Note[] notes = new Note[0];
+        Mock dataCommons = mock(DataCommonsService.class);
         dataCommons.stubs().method("getNotes").with(eq(dataset.getId())).will(returnValue(notes));
-        dataCommons.stubs().method("getNoteTypes").will(returnValue(noteTypes));
 
-        Mock dataEditor = mock(DataEditorService.class);
-        dataEditor.stubs().method("getVersions").with(eq(dataset.getId())).will(returnValue(versions));
-
-        EmfSession session = session(user, (DataCommonsService) dataCommons.proxy(), (DataEditorService) dataEditor
-                .proxy());
+        EmfSession session = session(null, (DataCommonsService) dataCommons.proxy(), null);
         EditNotesTabPresenter presenter = new EditNotesTabPresenterImpl(dataset, session, (EditNotesTabView) view
                 .proxy());
+        view.expects(once()).method("display").with(same(notes), same(presenter));
 
         presenter.display();
     }
@@ -69,5 +59,31 @@ public class EditNotesTabPresenterTest extends MockObjectTestCase {
 
         EditNotesTabPresenter presenter = new EditNotesTabPresenterImpl(dataset, session, viewProxy);
         presenter.doSave();
+    }
+
+    public void testShouldAddNoteToViewOnAddNote() throws Exception {
+        NoteType[] types = new NoteType[0];
+        Version[] versions = new Version[0];
+        Note note = new Note();
+        Note[] notes = {};
+
+        EmfDataset dataset = new EmfDataset();
+        dataset.setId(2);
+        User user = new User();
+        EmfSession session = session(user, null, null);
+
+        Mock view = mock(EditNotesTabView.class);
+        expects(view, 1, "addNote", same(note));
+
+        EditNotesTabPresenterImpl presenter = new EditNotesTabPresenterImpl(dataset, session, (EditNotesTabView) view
+                .proxy());
+
+        Mock newNoteView = mock(NewNoteView.class);
+        Constraint[] constraints = { same(user), same(dataset), same(notes), same(types), same(versions) };
+        newNoteView.stubs().method("display").with(constraints);
+        newNoteView.stubs().method("shouldCreate").will(returnValue(Boolean.TRUE));
+        newNoteView.stubs().method("note").will(returnValue(note));
+
+        presenter.addNote((NewNoteView) newNoteView.proxy(), user, dataset, notes, types, versions);
     }
 }

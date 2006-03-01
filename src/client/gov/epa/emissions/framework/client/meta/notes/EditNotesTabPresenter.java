@@ -8,4 +8,6 @@ public interface EditNotesTabPresenter {
 
     void doSave() throws EmfException;
 
+    void doAddNote(NewNoteView view) throws EmfException;
+
 }
