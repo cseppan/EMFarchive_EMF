@@ -328,6 +328,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         }
     }
 
+
     public void enableButtons() {
         save.setEnabled(true);
         discard.setEnabled(true);

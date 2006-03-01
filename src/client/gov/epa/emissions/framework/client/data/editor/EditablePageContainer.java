@@ -13,7 +13,6 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.KeyListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -113,10 +112,6 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
         editablePagePanel.scrollToPageEnd();
     }
     
-    public void addListener(KeyListener listener) {
-        editablePagePanel.addListener(listener);
-    }
-
     public TableMetadata tableMetadata() {
         return tableMetadata;
     }

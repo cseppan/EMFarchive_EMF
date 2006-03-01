@@ -81,12 +81,16 @@ public class DataEditableTable extends EditableTable {
 
         public TableHeaderRenderer(JTableHeader tableHeader) {
             this.textArea = new JTextArea();
+            textAreaSettings(tableHeader);
+            setLayout(new BorderLayout());
+            add(textArea);
+        }
+
+        private void textAreaSettings(JTableHeader tableHeader) {
             textArea.setForeground(tableHeader.getForeground());
             textArea.setBackground(tableHeader.getBackground());
             textArea.setFont(tableHeader.getFont());
             textArea.setBorder(UIManager.getBorder("TableHeader.cellBorder"));
-            setLayout(new BorderLayout());
-            add(textArea);
         }
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,

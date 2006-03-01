@@ -11,7 +11,6 @@ import gov.epa.emissions.framework.ui.TableColumnWidth;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -30,6 +29,8 @@ public class EditablePagePanel extends JPanel {
     private MessagePanel messagePanel;
 
     private ManageChangeables listOfChangeables;
+
+    private DataEditableTable editableTable;
 
     public EditablePagePanel(EditablePage page, MessagePanel messagePanel, ManageChangeables listOfChangeables) {
         this.listOfChangeables = listOfChangeables;
@@ -68,8 +69,7 @@ public class EditablePagePanel extends JPanel {
 
     private JScrollPane table(EditablePage tableData) {
         tableModel = new EmfTableModel(tableData);
-        DataEditableTable editableTable = new DataEditableTable(tableModel, tableData.getTableMetadata(), messagePanel);
-
+        editableTable = new DataEditableTable(tableModel, tableData.getTableMetadata(), messagePanel);
         listOfChangeables.addChangeable(editableTable);
 
         table = new ScrollableTable(editableTable);
@@ -82,13 +82,13 @@ public class EditablePagePanel extends JPanel {
     private JPanel buttonsPanel(final EditablePage tableData) {
         JPanel container = new JPanel();
 
-        Button add = new Button("Add Row", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                doAdd(tableData);
-            }
-        });
-        container.add(add);
-        add.setToolTipText("Add a row to this table");
+        Button insertAbove = new Button("Insert Row Above", insertRowAction(tableData, true));
+        container.add(insertAbove);
+        insertAbove.setToolTipText("insert a row above the selection to this table");
+
+        Button insertBelow = new Button("Insert Row Below", insertRowAction(tableData, false));
+        container.add(insertBelow);
+        insertBelow.setToolTipText("insert a row above the selection to this table");
 
         Button remove = new Button("Remove Rows", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -104,7 +104,15 @@ public class EditablePagePanel extends JPanel {
         return panel;
     }
 
-    protected void clearMessages() {
+    private AbstractAction insertRowAction(final EditablePage tableData, final boolean above) {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doAdd(tableData, editableTable, above);
+            }
+        };
+    }
+
+    protected void clearMessagesWithTableRefresh() {
         messagePanel.clear();
         refresh();
     }
@@ -114,15 +122,20 @@ public class EditablePagePanel extends JPanel {
         super.revalidate();
     }
 
-    private void doAdd(final EditablePage tableData) {
-        clearMessages();
-        tableData.addBlankRow();
-        refresh();
-        scrollToPageEnd();
+    private void doAdd(final EditablePage tableData, DataEditableTable editableTable, boolean above) {
+        int selectedRow = editableTable.getSelectedRow();
+        messagePanel.clear();
+        if (selectedRow != -1) {
+            int insertRowNo = tableData.addBlankRow(selectedRow, above);
+            refresh();
+            editableTable.setRowSelectionInterval(insertRowNo, insertRowNo);
+        } else {
+            messagePanel.setError("Please highlight a row before insert a row");
+        }
     }
 
     private void doRemove(final EditablePage tableData) {
-        clearMessages();
+        clearMessagesWithTableRefresh();
         tableData.removeSelected();
         refresh();
     }
@@ -130,9 +143,4 @@ public class EditablePagePanel extends JPanel {
     public void scrollToPageEnd() {
         table.moveToBottom();
     }
-
-    public void addListener(KeyListener keyListener) {
-        table.addListener(keyListener);
-    }
-
 }
