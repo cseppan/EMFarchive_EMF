@@ -180,4 +180,8 @@ public class EditablePage extends AbstractTableData implements SelectableEmfTabl
         return changeset;
     }
 
+    public TableMetadata getTableMetadata() {
+        return tableMetadata;
+    }
+
 }

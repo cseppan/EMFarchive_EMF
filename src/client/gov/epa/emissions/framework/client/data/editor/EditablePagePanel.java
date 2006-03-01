@@ -1,12 +1,12 @@
 package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
-import gov.epa.emissions.framework.ui.TableData;
+import gov.epa.emissions.framework.ui.TableColumnWidth;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -33,10 +33,9 @@ public class EditablePagePanel extends JPanel {
 
     public EditablePagePanel(EditablePage page, MessagePanel messagePanel, ManageChangeables listOfChangeables) {
         this.listOfChangeables = listOfChangeables;
+        this.messagePanel = messagePanel;
         super.setLayout(new BorderLayout());
         super.add(doLayout(page), BorderLayout.CENTER);
-
-        this.messagePanel = messagePanel;
     }
 
     private JPanel doLayout(EditablePage tableData) {
@@ -67,13 +66,16 @@ public class EditablePagePanel extends JPanel {
         return panel;
     }
 
-    private JScrollPane table(TableData tableData) {
+    private JScrollPane table(EditablePage tableData) {
         tableModel = new EmfTableModel(tableData);
-        EditableTable editableTable = new EditableTable(tableModel);
+        DataEditableTable editableTable = new DataEditableTable(tableModel, tableData.getTableMetadata(), messagePanel);
+
         listOfChangeables.addChangeable(editableTable);
-        
+
         table = new ScrollableTable(editableTable);
-        
+
+        TableMetadata metadata = tableData.getTableMetadata();
+        new TableColumnWidth(editableTable, metadata).columnWidths();
         return table;
     }
 
@@ -128,7 +130,7 @@ public class EditablePagePanel extends JPanel {
     public void scrollToPageEnd() {
         table.moveToBottom();
     }
-    
+
     public void addListener(KeyListener keyListener) {
         table.addListener(keyListener);
     }

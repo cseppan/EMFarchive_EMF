@@ -23,24 +23,28 @@ public class ScrollableTable extends JScrollPane {
     public ScrollableTable(JTable table) {
         super(VERTICAL_SCROLLBAR_AS_NEEDED, HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.table = table;
+        table(table);
         super.setViewportView(table);
     }
 
-    private JTable table(EmfTableModel tableModel) {
-        JTable table = new JTable(tableModel);
+    private void table(JTable table) {
         table.setRowHeight(18);
 
         enableScrolling(table);
         setColWidthsBasedOnColNames(table);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setRowSelectionAllowed(true);
+    }
+
+    private JTable table(EmfTableModel tableModel) {
+        JTable table = new JTable(tableModel);
         if (tableModel.getRowCount() == 1) {
             if ((tableModel.getColumnClass(0).isInstance(Boolean.TRUE))
                     && tableModel.getColumnName(0).equalsIgnoreCase("Select")) {
                 tableModel.setValueAt(Boolean.TRUE, 0, 0);
             }
         }
-
+        table(table);
         return table;
     }
 
