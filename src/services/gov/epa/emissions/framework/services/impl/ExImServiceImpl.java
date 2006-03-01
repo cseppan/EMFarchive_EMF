@@ -101,12 +101,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             File path = validatePath(folderPath);
 
             validateDatasetName(dataset);
-            Services services = new Services();
-            services.setDataService(new DataServiceImpl(sessionFactory));
-            services.setStatusService(new StatusServiceImpl(sessionFactory));
-
             Importer importer = importerFactory.createVersioned(dataset, path, fileName);
-            ImportTask eximTask = new ImportTask(user, new String[] { fileName }, dataset, services, importer);
+            ImportTask eximTask = new ImportTask(user, new String[] { fileName }, dataset, services(), importer);
 
             threadPool.execute(eximTask);
         } catch (Exception e) {
@@ -120,9 +116,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         try {
             File path = validatePath(folderPath);
             validateDatasetName(dataset);
-            Services services = services();
             Importer importer = importerFactory.create(dataset, path, filenames);
-            ImportTask eximTask = new ImportTask(user, filenames, dataset, services, importer);
+            ImportTask eximTask = new ImportTask(user, filenames, dataset, services(), importer);
 
             threadPool.execute(eximTask);
         } catch (Exception e) {
