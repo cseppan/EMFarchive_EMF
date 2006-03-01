@@ -4,9 +4,9 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.editor.DataEditorPresenter;
-import gov.epa.emissions.framework.client.data.editor.DataEditorView;
 import gov.epa.emissions.framework.client.data.viewer.DataView;
 import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
 import gov.epa.emissions.framework.services.DataAccessToken;
@@ -14,13 +14,10 @@ import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
-import java.util.Date;
-
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.constraint.IsInstanceOf;
 
-public class EditVersionsPresenterTest extends MockObjectTestCase {
+public class EditVersionsPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldDisplayTableViewOnView() throws Exception {
         Version version = new Version();
@@ -65,33 +62,13 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayEditableTableViewOnEdit() throws Exception {
         Version version = new Version();
-        String table = "table";
-        User user = new User();
 
-        Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("openSession").withAnyArguments().will(returnValue(token()));
-        DataEditorService serviceProxy = (DataEditorService) service.proxy();
+        EditVersionsPresenter presenter = new EditVersionsPresenter(null, null);
 
-        Mock dataView = mock(DataEditorView.class);
-        dataView.expects(once()).method("display").with(same(version), eq(table), same(user), same(serviceProxy));
-        dataView.expects(once()).method("observe").with(new IsInstanceOf(DataEditorPresenter.class));
-        dataView.expects(once()).method("updateLockPeriod").with(new IsInstanceOf(Date.class),
-                new IsInstanceOf(Date.class));
+        Mock editorPresenter = mock(DataEditorPresenter.class);
+        expects(editorPresenter, 1, "display");
 
-        Mock session = mock(EmfSession.class);
-        session.stubs().method("user").withNoArguments().will(returnValue(user));
-
-        EditVersionsPresenter presenter = new EditVersionsPresenter(null, session(user, serviceProxy, null));
-        presenter.doEdit(version, table, (DataEditorView) dataView.proxy());
-    }
-
-    private DataAccessToken token() {
-        Mock mock = mock(DataAccessToken.class);
-        mock.stubs().method("isLocked").will(returnValue(Boolean.TRUE));
-        mock.stubs().method("lockStart").will(returnValue(new Date()));
-        mock.stubs().method("lockEnd").will(returnValue(new Date()));
-
-        return (DataAccessToken) mock.proxy();
+        presenter.edit(version, null, (DataEditorPresenter) editorPresenter.proxy());
     }
 
     public void testShouldRaiseErrorOnEditWhenVersionIsFinal() throws Exception {
@@ -101,7 +78,7 @@ public class EditVersionsPresenterTest extends MockObjectTestCase {
         EditVersionsPresenter presenter = new EditVersionsPresenter(null, null);
 
         try {
-            presenter.doEdit(version, null, null);
+            presenter.edit(version, null, null);
         } catch (EmfException e) {
             assertEquals("Cannot edit a Version(" + version.getVersion() + ") that is Final. Please choose 'View'.", e
                     .getMessage());

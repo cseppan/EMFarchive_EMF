@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
@@ -31,16 +32,23 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         DataAccessToken token = successToken();
         User user = new User();
         service.expects(once()).method("openSession").with(same(user), constraint).will(returnValue(token));
+        TableMetadata tableMetaData = new TableMetadata();
+        service.stubs().method("getTableMetadata").will(returnValue(tableMetaData));
 
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
+        Mock commonsService = mock(DataCommonsService.class);
+        Note[] notes = new Note[0];
+        stub(commonsService, "getNotes", notes);
+
         Mock view = mock(DataEditorView.class);
-        view.expects(once()).method("display").with(eq(version), eq(table), same(user), same(serviceProxy));
+        Constraint[] constraints = { eq(version), eq(table), same(user), same(tableMetaData), same(notes) };
+        view.expects(once()).method("display").with(constraints);
         view.expects(once()).method("updateLockPeriod")
                 .with(new IsInstanceOf(Date.class), new IsInstanceOf(Date.class));
 
-        EmfSession session = session(user, serviceProxy, null);
-        DataEditorPresenter p = new DataEditorPresenter(null, version, table, session);
+        EmfSession session = session(user, serviceProxy, (DataCommonsService) commonsService.proxy());
+        DataEditorPresenter p = new DataEditorPresenterImpl(new EmfDataset(), version, table, session);
         view.expects(once()).method("observe").with(same(p));
 
         p.display((DataEditorView) view.proxy());
@@ -71,7 +79,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         view.expects(once()).method("notifyLockFailure");
 
         EmfSession session = session(user, serviceProxy, null);
-        DataEditorPresenter p = new DataEditorPresenter(null, version, table, session);
+        DataEditorPresenter p = new DataEditorPresenterImpl(null, version, table, session);
 
         p.display((DataEditorView) view.proxy());
     }
@@ -97,14 +105,14 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         DataAccessToken token = new DataAccessToken();
         service.expects(once()).method("discard").with(same(token));
 
-        DataEditorPresenter p = new DataEditorPresenter(null, null, null, null);
+        DataEditorPresenterImpl p = new DataEditorPresenterImpl(null, null, null, null);
         Mock tablePresenter = setupTablePresenterToDisplay();
 
         p.discard((DataEditorService) service.proxy(), token, (EditableTablePresenter) tablePresenter.proxy());
     }
 
     public void testShouldDisplayTableViewOnDisplayTableView() throws Exception {
-        DataEditorPresenter p = new DataEditorPresenter(null, null, null, null);
+        DataEditorPresenterImpl p = new DataEditorPresenterImpl(null, null, null, null);
         Mock tablePresenter = setupTablePresenterToDisplay();
 
         p.displayTable((EditableTablePresenter) tablePresenter.proxy());
@@ -128,7 +136,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
 
         EditableTablePresenter tablePresenterProxy = (EditableTablePresenter) tablePresenter.proxy();
 
-        DataEditorPresenter p = new DataEditorPresenter(null, version, null, null);
+        DataEditorPresenterImpl p = new DataEditorPresenterImpl(null, version, null, null);
         p.save(viewProxy, token, tablePresenterProxy, serviceProxy, null);
 
         assertTrue("Changes should be saved on save", p.areChangesSaved());
@@ -157,7 +165,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         closingRule.expects(once()).method("proceedWithClose");
         ClosingRule closingRuleProxy = (ClosingRule) closingRule.proxy();
 
-        DataEditorPresenter p = new DataEditorPresenter(null, null, null, null);
+        DataEditorPresenterImpl p = new DataEditorPresenterImpl(null, null, null, null);
         p.save(viewProxy, token, tablePresenterProxy, serviceProxy, closingRuleProxy);
 
         assertFalse("Changes should not be saved on discard", p.areChangesSaved());
@@ -190,7 +198,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
 
         EmfSession session = session(user, null, (DataCommonsService) service.proxy());
         Version version = new Version();
-        DataEditorPresenter presenter = new DataEditorPresenter(null, version, null, session);
+        DataEditorPresenterImpl presenter = new DataEditorPresenterImpl(null, version, null, session);
 
         Mock view = mock(NewNoteView.class);
         EmfDataset dataset = new EmfDataset();
@@ -207,7 +215,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
 
         DataCommonsService serviceProxy = (DataCommonsService) service.proxy();
         EmfSession session = session(null, null, serviceProxy);
-        DataEditorPresenter presenter = new DataEditorPresenter(null, null, null, session);
+        DataEditorPresenterImpl presenter = new DataEditorPresenterImpl(null, null, null, session);
 
         Mock closingRule = mock(ClosingRule.class);
         closingRule.expects(once()).method("close").with(eq(Boolean.TRUE));

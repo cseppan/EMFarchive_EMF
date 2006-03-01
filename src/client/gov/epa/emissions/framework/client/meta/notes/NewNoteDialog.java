@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.SetReferencesDialog;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Note;
@@ -154,10 +155,10 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
     }
 
     protected void doAddReferences(Note[] notes) {
-        AddReferencesDialog dialog = new AddReferencesDialog(parent);
+        SetReferencesDialog dialog = new SetReferencesDialog(parent);
         dialog.display(notes, selectedReferences);
         selectedReferences = dialog.selected();
-        referencesListing.setText(references());
+        referencesListing.setText(dialog.referencesList());
     }
 
     private String[] typeNames(NoteType[] types) {
@@ -216,7 +217,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         Note note = new Note();
         note.setName(name.getText());
         note.setDetails(details.getText());
-        note.setReferences(references());
+        note.setReferences(referencesListing.getText());
         note.setVersion(version().getVersion());
         note.setNoteType(type());
         note.setDate(new Date());
@@ -224,17 +225,6 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         note.setDatasetId(dataset.getId());
 
         return note;
-    }
-
-    private String references() {
-        StringBuffer result = new StringBuffer();
-        for (int i = 0; i < selectedReferences.length; i++) {
-            result.append(selectedReferences[i].getName());
-            if ((i + 1) < selectedReferences.length)
-                result.append(", ");
-        }
-
-        return result.toString();
     }
 
     private NoteType type() {

@@ -5,7 +5,10 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.SetReferencesDialog;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.Revision;
 import gov.epa.emissions.framework.ui.Border;
 
@@ -33,10 +36,19 @@ public class RevisionPanel extends JPanel {
 
     private Version version;
 
-    public RevisionPanel(User user, EmfDataset dataset, Version version) {
+    private Note[] selectedReferences;
+
+    private Note[] notes;
+
+    private SetReferencesDialog setReferencesDialog;
+
+    public RevisionPanel(User user, EmfDataset dataset, Version version, Note[] notes, EmfConsole parent) {
         this.user = user;
         this.dataset = dataset;
         this.version = version;
+        selectedReferences = new Note[0];
+        this.notes = notes;
+        setReferencesDialog = new SetReferencesDialog(parent);
 
         super.add(createLayout());
         super.setBorder(new Border("Revision Information"));
@@ -56,13 +68,18 @@ public class RevisionPanel extends JPanel {
 
         Button references = new Button("References", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // NOTE lookup references
+                setReferences();
             }
         });
 
         panel.add(references);
 
         return panel;
+    }
+
+    protected void setReferences() {
+        setReferencesDialog.display(notes, selectedReferences);
+        selectedReferences = setReferencesDialog.selected();
     }
 
     private JPanel mainPanel() {
@@ -94,7 +111,7 @@ public class RevisionPanel extends JPanel {
         revision.setVersion(version.getVersion());
         revision.setWhat(what.getText());
         revision.setWhy(why.getText());
-        // revision.setReferences(references.get());
+        revision.setReferences(setReferencesDialog.referencesList());
         revision.setDate(new Date());
 
         return revision;

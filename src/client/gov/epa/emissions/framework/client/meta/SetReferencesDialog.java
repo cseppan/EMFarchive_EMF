@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta.notes;
+package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -17,14 +17,14 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class AddReferencesDialog extends Dialog {
+public class SetReferencesDialog extends Dialog {
 
     private ListWidget list;
 
     protected Note[] selected;
 
-    public AddReferencesDialog(EmfConsole parent) {
-        super("Add References", parent);
+    public SetReferencesDialog(EmfConsole parent) {
+        super("Set References", parent);
         super.setSize(new Dimension(250, 275));
 
         super.center();
@@ -84,4 +84,14 @@ public class AddReferencesDialog extends Dialog {
         return selected;
     }
 
+    public String referencesList() {
+        StringBuffer result = new StringBuffer();
+        for (int i = 0; i < selected.length; i++) {
+            result.append(selected[i].getName());
+            if ((i + 1) < selected.length)
+                result.append(", ");
+        }
+
+        return result.toString();
+    }
 }

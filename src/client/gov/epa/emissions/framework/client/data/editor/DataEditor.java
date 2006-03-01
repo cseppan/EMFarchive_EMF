@@ -11,8 +11,8 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteDialog;
 import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.DataEditorService;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.Revision;
 import gov.epa.emissions.framework.ui.Dimensions;
 import gov.epa.emissions.framework.ui.EmfDialog;
@@ -93,17 +93,16 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         this.presenter = presenter;
     }
 
-    public void display(Version version, String table, User user, DataEditorService service) throws EmfException {
+    public void display(Version version, String table, User user, TableMetadata tableMetadata, Note[] notes) {
         this.version = version;
         this.user = user;
-        TableMetadata tableMetadata = service.getTableMetadata(table);
 
         updateTitle(version, table);
         super.setName("dataEditor:" + version.getDatasetId() + ":" + version.getId());
 
         JPanel container = new JPanel(new BorderLayout());
         container.add(tablePanel(version, table, tableMetadata), BorderLayout.CENTER);
-        container.add(bottomPanel(), BorderLayout.PAGE_END);
+        container.add(bottomPanel(notes), BorderLayout.PAGE_END);
         layout.add(container, BorderLayout.CENTER);
 
         super.display();
@@ -135,18 +134,18 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         }
     }
 
-    private JPanel bottomPanel() {
+    private JPanel bottomPanel(Note[] notes) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        panel.add(revisionPanel());
+        panel.add(revisionPanel(notes));
         panel.add(controlPanel());
 
         return panel;
     }
 
-    private JPanel revisionPanel() {
-        revisionPanel = new RevisionPanel(user, dataset, version);
+    private JPanel revisionPanel(Note[] notes) {
+        revisionPanel = new RevisionPanel(user, dataset, version, notes, parent);
         return revisionPanel;
     }
 
@@ -327,7 +326,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
             displayError("Could not close. Reason - " + e.getMessage());
         }
     }
-
 
     public void enableButtons() {
         save.setEnabled(true);
