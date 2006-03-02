@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.data.editor;
 
-import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -14,7 +13,6 @@ import java.net.URL;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -47,7 +45,6 @@ public class EditablePagePanel extends JPanel {
         JToolBar toolBar = toolBar(tableData);
         container.add(toolBar, BorderLayout.PAGE_START);
         container.add(table(tableData), BorderLayout.CENTER);
-        container.add(bottomPanel(tableData), BorderLayout.PAGE_END);
 
         setBorder();
         return container;
@@ -66,6 +63,12 @@ public class EditablePagePanel extends JPanel {
         String nameBelow = "Insert Below";
         JButton buttonBelow = toolbar.add(insertRowAction(tableData, false, nameBelow, iconBelow));
         buttonBelow.setToolTipText(nameBelow);
+        
+        String delete = "/toolbarButtonGraphics/table/RowDelete"+24+".gif";
+        ImageIcon iconDelete = createImageIcon(delete);
+        String nameDelete= "Delete";
+        JButton buttonDelete = toolbar.add(deleteAction(tableData, nameDelete,iconDelete));
+        buttonDelete.setToolTipText(nameDelete);
         return toolbar;
     }
 
@@ -77,16 +80,6 @@ public class EditablePagePanel extends JPanel {
         super.setBorder(border);
     }
 
-    private JPanel bottomPanel(EditablePage tableData) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        JPanel buttonsPanel = buttonsPanel(tableData);
-        panel.add(buttonsPanel);
-
-        return panel;
-    }
-
     private JScrollPane table(EditablePage tableData) {
         tableModel = new EditableEmfTableModel(tableData);
         editableTable = new DataEditorTable(tableModel, tableData.getTableMetadata(), messagePanel);
@@ -96,29 +89,12 @@ public class EditablePagePanel extends JPanel {
         return table;
     }
 
-    private JPanel buttonsPanel(final EditablePage tableData) {
-        JPanel container = new JPanel();
-
-        Button insertAbove = new Button("Insert Row Above", insertRowAction(tableData, true));
-        container.add(insertAbove);
-        insertAbove.setToolTipText("insert a row above the selection to this table");
-
-        Button insertBelow = new Button("Insert Row Below", insertRowAction(tableData, false));
-        container.add(insertBelow);
-        insertBelow.setToolTipText("insert a row above the selection to this table");
-
-        Button remove = new Button("Remove Rows", new AbstractAction() {
+    private AbstractAction deleteAction(final EditablePage tableData, String nameDelete, ImageIcon iconDelete) {
+        return new AbstractAction(nameDelete,iconDelete) {
             public void actionPerformed(ActionEvent e) {
                 doRemove(tableData);
             }
-        });
-        container.add(remove);
-        remove.setToolTipText("Remove the selected rows from this table");
-
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(container, BorderLayout.WEST);
-
-        return panel;
+        };
     }
 
     private Action insertRowAction(final EditablePage tableData, final boolean above, String name, ImageIcon icon) {
@@ -128,10 +104,6 @@ public class EditablePagePanel extends JPanel {
             }
         };
 
-    }
-
-    private Action insertRowAction(final EditablePage tableData, final boolean above) {
-        return insertRowAction(tableData, above, null, null);
     }
 
     protected void clearMessagesWithTableRefresh() {
@@ -152,14 +124,18 @@ public class EditablePagePanel extends JPanel {
             refresh();
             editableTable.setRowSelectionInterval(insertRowNo, insertRowNo);
         } else {
-            messagePanel.setError("Please highlight a row before insert a row");
+            messagePanel.setError("Please highlight a row before insert");
         }
     }
 
     private void doRemove(final EditablePage tableData) {
         clearMessagesWithTableRefresh();
-        tableData.removeSelected();
-        refresh();
+        if (tableData.getSelected().length == 0) {
+            messagePanel.setError("Please select one more rows for removing data");
+        } else {
+            tableData.removeSelected();
+            refresh();
+        }
     }
 
     public void scrollToPageEnd() {

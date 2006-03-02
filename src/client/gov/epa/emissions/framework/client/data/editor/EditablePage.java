@@ -137,7 +137,7 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
         }
     }
 
-    private VersionedRecord[] getSelected() {
+    public VersionedRecord[] getSelected() {
         List selected = new ArrayList();
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
