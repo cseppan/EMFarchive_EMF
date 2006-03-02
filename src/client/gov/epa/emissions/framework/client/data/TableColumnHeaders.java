@@ -1,17 +1,22 @@
 package gov.epa.emissions.framework.client.data;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-
 import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.TableMetadata;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Font;
+
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 public class TableColumnHeaders {
     
@@ -33,28 +38,36 @@ public class TableColumnHeaders {
     
     public class TableHeaderRenderer extends JPanel implements TableCellRenderer {
 
-        private JTextArea textArea;
+        private JTextPane textPane;
 
         private TableMetadata metadata;
 
         public TableHeaderRenderer(JTableHeader tableHeader, TableMetadata tableMetadata) {
-            this.textArea = new JTextArea();
+            this.textPane = new JTextPane();
             this.metadata = tableMetadata;
-            textAreaSettings(tableHeader);
+            textPaneSettings(tableHeader);
             setLayout(new BorderLayout());
-            add(textArea);
+            add(textPane);
         }
 
-        private void textAreaSettings(JTableHeader tableHeader) {
-            textArea.setForeground(tableHeader.getForeground());
-            textArea.setBackground(tableHeader.getBackground());
-            textArea.setFont(tableHeader.getFont());
-            textArea.setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+        private void textPaneSettings(JTableHeader tableHeader) {
+            textPane.setForeground(tableHeader.getForeground());
+            textPane.setBackground(tableHeader.getBackground());
+            textPane.setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+            StyledDocument doc = textPane.getStyledDocument();
+            MutableAttributeSet standard = new SimpleAttributeSet();
+            Font font = tableHeader.getFont();
+            StyleConstants.setAlignment(standard, StyleConstants.ALIGN_CENTER);
+            StyleConstants.setFontFamily(standard, font.getFamily());
+            StyleConstants.setFontSize(standard,font.getSize());
+            doc.setParagraphAttributes(0, 0, standard, true);
+            
+            textPane.setFont(font);
         }
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                 boolean hasFocus, int row, int column) {
-            textArea.setText(headerText(value));
+            textPane.setText(headerText(value));
             return this;
         }
 
