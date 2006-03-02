@@ -212,18 +212,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         return save;
     }
 
-    public void signalChanges() {
-        save.signalChanges();
-        discard.signalChanges();
-        super.signalChanges();
-    }
-
-    public void signalSaved() {
-        save.signalSaved();
-        discard.signalSaved();
-        super.signalSaved();
-    }
-
     private Button discardButton() {
         // TODO: prompts for Discard and Close (if changes exist)
         discard = new ChangeAwareButton("Discard", new AbstractAction() {
@@ -252,12 +240,11 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
             presenter.doSave();
             resetChanges();
             displayMessage("Saved changes.");
+            disableSaveDiscard();
         } catch (EmfException e) {
             displayError("Could not Save. Reason: " + e.getMessage());
             return;
         }
-
-        disableButtons();
     }
 
     private void clearMessages() {
@@ -282,12 +269,13 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         clearMessages();
         try {
             presenter.doDiscard();
+            resetChanges();
+            disableSaveDiscard();
             displayMessage("Discarded changes.");
         } catch (EmfException e) {
             displayError("Could not Discard. Reason: " + e.getMessage());
         }
 
-        enableButtons();
     }
 
     public void windowClosing() {
@@ -327,14 +315,24 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         }
     }
 
-    public void enableButtons() {
-        save.setEnabled(true);
-        discard.setEnabled(true);
+    public void signalChanges() {
+        enableSaveDiscard();
+        super.signalChanges();
     }
 
-    public void disableButtons() {
-        save.setEnabled(false);
-        discard.setEnabled(false);
+    public void signalSaved() {
+        disableSaveDiscard();
+        super.signalSaved();
+    }
+
+    private void enableSaveDiscard() {
+        save.signalChanges();
+        discard.signalChanges();
+    }
+
+    private void disableSaveDiscard() {
+        save.signalSaved();
+        discard.signalSaved();
     }
 
 }

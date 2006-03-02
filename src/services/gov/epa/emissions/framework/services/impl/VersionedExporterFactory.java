@@ -39,7 +39,7 @@ public class VersionedExporterFactory {
             return (Exporter) exporterConstructor.newInstance(params);
         } catch (Exception e) {
             log.error("Could not create Exporter", e);
-            throw new EmfException("EMF server error: Could not create exporter");
+            throw new EmfException("Could not create Exporter for Dataset Type: " + dataset.getDatasetTypeName());
         }
     }
 

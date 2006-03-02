@@ -120,7 +120,7 @@ public class NewVersionDialog extends Dialog {
     }
 
     public void run() {
-        show();
+        super.display();
     }
 
     public boolean shouldCreate() {

@@ -141,6 +141,7 @@ public class EditablePagePanel extends JPanel {
         return insertRowAction(tableData, above, null, null);
     }
 
+    
     protected void clearMessagesWithTableRefresh() {
         messagePanel.clear();
         refresh();
