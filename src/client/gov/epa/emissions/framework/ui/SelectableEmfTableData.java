@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.ui;
 
-public interface SelectableEmfTableData extends TableData {
+public interface SelectableEmfTableData extends EditableTableData {
 
     void addBlankRow();
 

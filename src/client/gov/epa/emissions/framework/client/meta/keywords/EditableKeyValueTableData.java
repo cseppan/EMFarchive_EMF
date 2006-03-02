@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.ui.AbstractTableData;
+import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
 import gov.epa.emissions.framework.ui.SelectableEmfTableData;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class EditableKeyValueTableData extends AbstractTableData implements SelectableEmfTableData {
+public class EditableKeyValueTableData extends AbstractEditableTableData implements SelectableEmfTableData {
     private List rows;
 
     private Keywords masterKeywords;
@@ -165,4 +165,5 @@ public class EditableKeyValueTableData extends AbstractTableData implements Sele
 
         return String.class;
     }
+
 }

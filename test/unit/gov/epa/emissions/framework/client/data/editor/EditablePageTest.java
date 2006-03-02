@@ -224,4 +224,11 @@ public class EditablePageTest extends TestCase {
         assertEquals(record2, sources[1]);
         assertEquals(datasetId, sources[2].getDatasetId());
     }
+
+    public void testShouldConfirmTrackChangesForAllExceptSelectColumn() {
+        assertFalse(data.shouldTrackChange(0));
+        assertTrue(data.shouldTrackChange(1));
+        assertTrue(data.shouldTrackChange(2));
+        assertTrue(data.shouldTrackChange(3));
+    }
 }

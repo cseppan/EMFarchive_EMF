@@ -48,11 +48,11 @@ public class EditableKeyValueTableDataTest extends TestCase {
     }
 
     public void testShouldReturnBooleanAsColumnClassForSelectColumnAndStringForAllOtherColumns() {
-       assertEquals(Boolean.class, data.getColumnClass(0)); 
-       assertEquals(String.class, data.getColumnClass(1)); 
-       assertEquals(String.class, data.getColumnClass(2)); 
+        assertEquals(Boolean.class, data.getColumnClass(0));
+        assertEquals(String.class, data.getColumnClass(1));
+        assertEquals(String.class, data.getColumnClass(2));
     }
-    
+
     public void testAllColumnsShouldBeEditable() {
         assertTrue("All cells should be editable", data.isEditable(0));
         assertTrue("All cells should be editable", data.isEditable(1));
@@ -115,29 +115,34 @@ public class EditableKeyValueTableDataTest extends TestCase {
 
     public void testShouldReturnCurrentlyHeldKeyVal() throws EmfException {
         data.addBlankRow();
-        
+
         String key = "key";
         String value = "value";
-        data.setValueAt(new Boolean(true),2,0);
-        data.setValueAt(key,2,1);
-        data.setValueAt(value,2,2);
-        
+        data.setValueAt(new Boolean(true), 2, 0);
+        data.setValueAt(key, 2, 1);
+        data.setValueAt(value, 2, 2);
+
         KeyVal[] sources = data.sources();
         assertEquals(3, sources.length);
         assertEquals(val1, sources[0]);
         assertEquals(val2, sources[1]);
         assertEquals(new Keyword(key), sources[2].getKeyword());
     }
-    
+
     public void testShouldGiveErrorForEmptyValues() {
         data.addBlankRow();
         try {
             data.sources();
         } catch (EmfException e) {
-            assertEquals("empty keyword at row 3",e.getMessage());
+            assertEquals("empty keyword at row 3", e.getMessage());
             return;
         }
-        assertFalse("blank key values are not allowed",true);
+        assertFalse("blank key values are not allowed", true);
     }
 
+    public void testShouldConfirmTrackChangesForAllExceptSelectColumn() {
+        assertFalse(data.shouldTrackChange(0));
+        assertTrue(data.shouldTrackChange(1));
+        assertTrue(data.shouldTrackChange(2));
+    }
 }

@@ -21,8 +21,7 @@ public class KeywordsTableDataTest extends TestCase {
     protected void setUp() {
         keyword1 = new Keyword("keyword1");
         keyword2 = new Keyword("keyword2");
-        data = new KeywordsTableData(new Keyword[] { keyword1, keyword2 },
-                new Keywords(new Keyword[0]));
+        data = new KeywordsTableData(new Keyword[] { keyword1, keyword2 }, new Keywords(new Keyword[0]));
     }
 
     public void testShouldHaveTwoColumn() {
@@ -83,6 +82,11 @@ public class KeywordsTableDataTest extends TestCase {
         assertEquals("keyword1", sources[0].getName());
         assertEquals("keyword2", sources[1].getName());
         assertEquals("keyword3", sources[2].getName());
+    }
+
+    public void testShouldConfirmTrackChangesForAllExceptSelectColumn() {
+        assertFalse(data.shouldTrackChange(0));
+        assertTrue(data.shouldTrackChange(1));
     }
 
 }

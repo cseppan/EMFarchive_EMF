@@ -6,7 +6,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.TableMetadata;
-import gov.epa.emissions.framework.ui.AbstractTableData;
+import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
 import gov.epa.emissions.framework.ui.SelectableEmfTableData;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class EditablePage extends AbstractTableData implements SelectableEmfTableData {
+public class EditablePage extends AbstractEditableTableData implements SelectableEmfTableData {
     private List rows;
 
     private int datasetId;
@@ -172,7 +172,7 @@ public class EditablePage extends AbstractTableData implements SelectableEmfTabl
         int insertRow = insertRow(rows.size(), selectedRow, above);
         rows.add(insertRow, row(record));
         changeset.addNew(record);
-        
+
         return insertRow;
     }
 
