@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.admin;
 
-import gov.epa.emissions.commons.gui.ChangeObserver;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextFieldWidget;
 import gov.epa.emissions.commons.gui.Widget;
@@ -33,14 +32,14 @@ public class RegisterUserPanel extends JPanel {
     private User user;
 
     private ManageChangeables changeablesList;
-    
+
     public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, RegisterCancelStrategy cancelStrategy,
-            EmfView parent, ChangeObserver changeObserver, ManageChangeables changeablesList) {
-        this(postRegisterStrategy, cancelStrategy, parent, new NoAdminOption(), changeObserver, changeablesList);
+            EmfView parent, ManageChangeables changeablesList) {
+        this(postRegisterStrategy, cancelStrategy, parent, new NoAdminOption(), changeablesList);
     }
 
     public RegisterUserPanel(PostRegisterStrategy postRegisterStrategy, RegisterCancelStrategy cancelStrategy,
-            EmfView parent, AdminOption adminOption, ChangeObserver changeObserver, ManageChangeables changeablesList) {
+            EmfView parent, AdminOption adminOption, ManageChangeables changeablesList) {
         this.postRegisterStrategy = postRegisterStrategy;
         this.cancelStrategy = cancelStrategy;
         this.container = parent;
@@ -49,7 +48,7 @@ public class RegisterUserPanel extends JPanel {
 
         this.setSize(new Dimension(375, 425));
     }
-    
+
     private void createLayout(AdminOption adminOption) {
         Action okAction = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -68,12 +67,12 @@ public class RegisterUserPanel extends JPanel {
                 new PopulateUserOnRegisterStrategy(user), changeablesList);
         this.add(panel);
     }
-    
+
     private void registerUser() {
         try {
             panel.populateUser();
-            
-            //FIXME: monitor.resetChanges();
+
+            // FIXME: monitor.resetChanges();
             presenter.doRegister(user);
             postRegisterStrategy.execute(user);
         } catch (EmfException e) {
@@ -98,14 +97,14 @@ public class RegisterUserPanel extends JPanel {
     }
 
     public boolean confirmDiscardChanges() {
-        if(changeablesList instanceof EmfInternalFrame)
-            return ((EmfInternalFrame)changeablesList).checkChanges();
-        
+        if (changeablesList instanceof EmfInternalFrame)
+            return ((EmfInternalFrame) changeablesList).checkChanges();
+
         return true;
     }
 
     public void closeWindow() {
-        if(confirmDiscardChanges())
+        if (confirmDiscardChanges())
             cancelStrategy.execute(presenter);
     }
 

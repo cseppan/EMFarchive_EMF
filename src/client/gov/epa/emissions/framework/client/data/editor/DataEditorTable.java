@@ -1,18 +1,17 @@
 package gov.epa.emissions.framework.client.data.editor;
 
+import gov.epa.emissions.commons.gui.EditableTableModel;
 import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.client.data.DataTableWidget;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
-import javax.swing.table.TableModel;
-
 public class DataEditorTable extends DataTableWidget {
 
     private MessagePanel messagePanel;
 
-    public DataEditorTable(TableModel tableModel, TableMetadata tableMetadata, MessagePanel messagePanel) {
-        super(tableModel,tableMetadata);
+    public DataEditorTable(EditableTableModel tableModel, TableMetadata tableMetadata, MessagePanel messagePanel) {
+        super(tableModel, tableMetadata);
         this.messagePanel = messagePanel;
     }
 

@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 
@@ -23,10 +23,9 @@ import javax.swing.JToolBar;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
-
 public class EditablePagePanel extends JPanel {
 
-    private EmfTableModel tableModel;
+    private EditableEmfTableModel tableModel;
 
     private ScrollableTable table;
 
@@ -61,7 +60,7 @@ public class EditablePagePanel extends JPanel {
         String nameAbove = "Insert Above";
         JButton buttonAbove = toolbar.add(insertRowAction(tableData, true, nameAbove, iconAbove));
         buttonAbove.setToolTipText(nameAbove);
-        
+
         String insertBelow = "/toolbarButtonGraphics/table/RowInsertAfter" + 24 + ".gif";
         ImageIcon iconBelow = createImageIcon(insertBelow);
         String nameBelow = "Insert Below";
@@ -89,7 +88,7 @@ public class EditablePagePanel extends JPanel {
     }
 
     private JScrollPane table(EditablePage tableData) {
-        tableModel = new EmfTableModel(tableData);
+        tableModel = new EditableEmfTableModel(tableData);
         editableTable = new DataEditorTable(tableModel, tableData.getTableMetadata(), messagePanel);
         listOfChangeables.addChangeable(editableTable);
 
@@ -122,8 +121,7 @@ public class EditablePagePanel extends JPanel {
         return panel;
     }
 
-    private Action insertRowAction(final EditablePage tableData, final boolean above, String name,
-            ImageIcon icon) {
+    private Action insertRowAction(final EditablePage tableData, final boolean above, String name, ImageIcon icon) {
         return new AbstractAction(name, icon) {
             public void actionPerformed(ActionEvent e) {
                 doAdd(tableData, editableTable, above);

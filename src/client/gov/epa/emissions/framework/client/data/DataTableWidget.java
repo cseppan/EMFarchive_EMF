@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.EditableTable;
+import gov.epa.emissions.commons.gui.EditableTableModel;
 import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.ui.TableColumnWidth;
@@ -14,13 +15,12 @@ import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
 
 public class DataTableWidget extends EditableTable {
 
     protected TableMetadata tableMetadata;
 
-    public DataTableWidget(TableModel tableModel, TableMetadata tableMetadata) {
+    public DataTableWidget(EditableTableModel tableModel, TableMetadata tableMetadata) {
         super(tableModel);
         this.tableMetadata = tableMetadata;
         new TableColumnWidth(this, tableMetadata).columnWidths();
@@ -34,16 +34,15 @@ public class DataTableWidget extends EditableTable {
         setTableHeader(tableHeader);
     }
 
-
     public class TableHeaderRenderer extends JPanel implements TableCellRenderer {
 
         private JTextArea textArea;
-        
+
         private TableMetadata metadata;
 
         public TableHeaderRenderer(JTableHeader tableHeader, TableMetadata tableMetadata) {
             this.textArea = new JTextArea();
-            this.metadata= tableMetadata;
+            this.metadata = tableMetadata;
             textAreaSettings(tableHeader);
             setLayout(new BorderLayout());
             add(textArea);
@@ -69,12 +68,12 @@ public class DataTableWidget extends EditableTable {
 
         private String type(String header) {
             ColumnMetaData data = metadata.columnMetadata(header);
-            return data == null? "":"\n"+parse(data.getType())+"("+data.getSize()+")";
+            return data == null ? "" : "\n" + parse(data.getType()) + "(" + data.getSize() + ")";
         }
 
         private String parse(String type) {
             int index = type.lastIndexOf('.');
-            return type.substring(index+1);
+            return type.substring(index + 1);
         }
     }
 

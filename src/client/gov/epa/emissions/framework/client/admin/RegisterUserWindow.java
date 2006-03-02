@@ -17,7 +17,7 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView, Ch
     private LaunchLoginOnCancelStrategy onCancelStrategy;
 
     private ChangeObserver changeObserver;
-    
+
     private ChangeablesList changeablesList;
 
     public RegisterUserWindow(ServiceLocator serviceLocator, PostRegisterStrategy postRegisterStrategy) {
@@ -25,7 +25,7 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView, Ch
         onCancelStrategy = new LaunchLoginOnCancelStrategy(serviceLocator);
         changeablesList = new ChangeablesList(this);
         changeObserver = new DefaultChangeObserver(this);
-        view = new RegisterUserPanel(postRegisterStrategy, onCancelStrategy, this, changeObserver, this);
+        view = new RegisterUserPanel(postRegisterStrategy, onCancelStrategy, this, this);
         this.getContentPane().add(view);
 
         this.setSize(view.getSize());
@@ -37,7 +37,7 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView, Ch
         RegisterUserPresenter presenter = view.getPresenter();
         onCancelStrategy.execute(presenter);
     }
-    
+
     public void windowClosing() {
         view.closeWindow();
     }

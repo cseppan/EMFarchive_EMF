@@ -21,7 +21,7 @@ import javax.swing.table.TableColumnModel;
 
 public class EditableTablePanel extends JPanel implements Editor {
 
-    protected EmfTableModel tableModel;
+    protected EditableEmfTableModel tableModel;
 
     protected EditableTable table;
 
@@ -53,7 +53,7 @@ public class EditableTablePanel extends JPanel implements Editor {
     }
 
     protected JScrollPane table(TableData tableData) {
-        tableModel = new EmfTableModel(tableData);
+        tableModel = new EditableEmfTableModel(tableData);
         table = new EditableTable(tableModel);
         changeablesList.addChangeable(table);
 
