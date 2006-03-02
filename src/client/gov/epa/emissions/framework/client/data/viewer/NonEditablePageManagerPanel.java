@@ -4,16 +4,19 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.client.data.DataSortFilterPanel;
 import gov.epa.emissions.framework.client.data.PaginationPanel;
+import gov.epa.emissions.framework.client.data.TableColumnHeaders;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
+import gov.epa.emissions.framework.ui.TableColumnWidth;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
@@ -91,7 +94,10 @@ public class NonEditablePageManagerPanel extends JPanel implements PageManagerVi
 
     private ScrollableTable table(Page page) {
         tableModel = new EmfTableModel(new ViewablePage(tableMetadata, page));
-        table = new ScrollableTable(tableModel);
+        JTable viewTable = new JTable(tableModel);
+        new TableColumnHeaders(viewTable,tableMetadata).renderHeader();
+        new TableColumnWidth(viewTable, tableMetadata).columnWidths();
+        table = new ScrollableTable(viewTable);
         return table;
     }
 

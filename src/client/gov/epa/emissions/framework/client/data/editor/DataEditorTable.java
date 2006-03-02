@@ -1,18 +1,25 @@
 package gov.epa.emissions.framework.client.data.editor;
 
+import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.EditableTableModel;
 import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.TableMetadata;
-import gov.epa.emissions.framework.client.data.DataTableWidget;
+import gov.epa.emissions.framework.client.data.TableColumnHeaders;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.TableColumnWidth;
 
-public class DataEditorTable extends DataTableWidget {
+public class DataEditorTable extends EditableTable {
 
     private MessagePanel messagePanel;
+    
+    private TableMetadata tableMetadata;
 
     public DataEditorTable(EditableTableModel tableModel, TableMetadata tableMetadata, MessagePanel messagePanel) {
-        super(tableModel, tableMetadata);
+        super(tableModel);
+        this.tableMetadata = tableMetadata;
         this.messagePanel = messagePanel;
+        new TableColumnHeaders(this,tableMetadata).renderHeader();
+        new TableColumnWidth(this, tableMetadata).columnWidths();
     }
 
     public void setValueAt(Object value, int row, int column) {

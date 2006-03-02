@@ -22,11 +22,15 @@ public class NonEditablePageDataTest extends TestCase {
     }
 
     private TableMetadata tableMetadata(String[] cols) {
-        TableMetadata table = new TableMetadata();
+        TableMetadata tableMetadata = new TableMetadata();
+        tableMetadata.addColumnMetaData(new ColumnMetaData("record_id", "java.lang.Integer", 10));
+        tableMetadata.addColumnMetaData(new ColumnMetaData("dataset_id", "java.lang.Long", 10));
+        tableMetadata.addColumnMetaData(new ColumnMetaData("version", "java.lang.Long", 10));
+        tableMetadata.addColumnMetaData(new ColumnMetaData("delete_version", "java.lang.String", 10));
         for (int i = 0; i < cols.length; i++) {
-            table.addColumnMetaData(new ColumnMetaData(cols[i],"java.lang.String", 10));
+            tableMetadata.addColumnMetaData(new ColumnMetaData(cols[i],"java.lang.String", 10));
         }
-        return table;
+        return tableMetadata;
     }
 
     public void testShouldDisplayAllColumns() {
@@ -35,10 +39,12 @@ public class NonEditablePageDataTest extends TestCase {
         ViewablePage data = new ViewablePage(tableMetadata(cols), new Page());
 
         String[] columns = data.columns();
-        assertEquals(3, columns.length);
+        assertEquals(5, columns.length);
         assertEquals(cols[0], columns[0]);
         assertEquals(cols[1], columns[1]);
         assertEquals(cols[2], columns[2]);
+        assertEquals("record_id", columns[3]);
+        assertEquals("version", columns[4]);
     }
 
     public void testShouldMarkAllColumnsAsNotEditable() {
@@ -87,11 +93,11 @@ public class NonEditablePageDataTest extends TestCase {
         List rows = data.rows();
 
         Row row1 = (Row) rows.get(0);
-        assertEquals(record1.token(0), row1.getValueAt(4));// <4 version data
-        assertEquals(record1.token(1), row1.getValueAt(5));// <4 version data
+        assertEquals(record1.token(0), row1.getValueAt(0));
+        assertEquals(record1.token(1), row1.getValueAt(1));
 
         Row row2 = (Row) rows.get(1);
-        assertEquals(record2.token(0), row2.getValueAt(4));// <4 version data
-        assertEquals(record2.token(1), row2.getValueAt(5));// <4 version data
+        assertEquals(record2.token(0), row2.getValueAt(0));
+        assertEquals(record2.token(1), row2.getValueAt(1));
     }
 }

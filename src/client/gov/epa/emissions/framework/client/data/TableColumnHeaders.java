@@ -1,13 +1,10 @@
 package gov.epa.emissions.framework.client.data;
 
-import gov.epa.emissions.commons.gui.EditableTable;
-import gov.epa.emissions.commons.gui.EditableTableModel;
-import gov.epa.emissions.commons.io.ColumnMetaData;
-import gov.epa.emissions.commons.io.TableMetadata;
-import gov.epa.emissions.framework.ui.TableColumnWidth;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
+
+import gov.epa.emissions.commons.io.ColumnMetaData;
+import gov.epa.emissions.commons.io.TableMetadata;
 
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -16,24 +13,24 @@ import javax.swing.UIManager;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
-public class DataTableWidget extends EditableTable {
+public class TableColumnHeaders {
+    
+    private JTable table;
+    private TableMetadata tableMetadata;
 
-    protected TableMetadata tableMetadata;
-
-    public DataTableWidget(EditableTableModel tableModel, TableMetadata tableMetadata) {
-        super(tableModel);
+    public TableColumnHeaders(JTable table, TableMetadata tableMetadata){
+        this.table = table;
         this.tableMetadata = tableMetadata;
-        new TableColumnWidth(this, tableMetadata).columnWidths();
-        headerRender();
     }
-
-    private void headerRender() {
-        JTableHeader tableHeader = new JTableHeader(getColumnModel());
+    
+    public void  renderHeader() {
+        JTableHeader tableHeader = new JTableHeader(table.getColumnModel());
         tableHeader.setBackground(UIManager.getDefaults().getColor("TableHeader.background"));
         tableHeader.setDefaultRenderer(new TableHeaderRenderer(tableHeader, tableMetadata));
-        setTableHeader(tableHeader);
+        table.setTableHeader(tableHeader);
     }
 
+    
     public class TableHeaderRenderer extends JPanel implements TableCellRenderer {
 
         private JTextArea textArea;
@@ -68,7 +65,7 @@ public class DataTableWidget extends EditableTable {
 
         private String type(String header) {
             ColumnMetaData data = metadata.columnMetadata(header);
-            return data == null ? "" : "\n" + parse(data.getType()) + "(" + data.getSize() + ")";
+            return data == null ? "\n" : "\n" + parse(data.getType()) + "(" + data.getSize() + ")";
         }
 
         private String parse(String type) {
@@ -76,5 +73,6 @@ public class DataTableWidget extends EditableTable {
             return type.substring(index + 1);
         }
     }
+
 
 }

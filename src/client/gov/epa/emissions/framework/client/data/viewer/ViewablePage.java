@@ -18,14 +18,28 @@ public class ViewablePage extends AbstractTableData {
 
     private TableMetadata tableMetadata;
 
+    private String[] columnNames;
+    
+    private Class[] columnClasses;
+
     public ViewablePage(TableMetadata tableMetadata, Page page) {
         this.tableMetadata = tableMetadata;
         this.rows = createRows(page);
+        this.columnNames = createColumns();
+        this.columnClasses = columnClasses();
+    }
+    
+    public Class getColumnClass(int col) {
+        return columnClasses[col];
     }
 
-    public Class getColumnClass(int col) {
-        ColumnMetaData[] cols = tableMetadata.getCols();
-        return classType(cols[col].getType());
+    private Class[] columnClasses() {
+        Class[] classes = new Class[columnNames.length];
+        for (int i = 0; i < columnNames.length; i++) {
+            ColumnMetaData data = tableMetadata.columnMetadata(columnNames[i]);
+            classes[i]= classType(data.getType());
+        }
+        return classes;
     }
 
     private Class classType(String type) {
@@ -37,11 +51,18 @@ public class ViewablePage extends AbstractTableData {
     }
 
     public String[] columns() {
+        return columnNames;
+    }
+
+    private String[] createColumns() {
         List result = new ArrayList();
         ColumnMetaData[] cols = tableMetadata.getCols();
-        for (int i = 0; i < cols.length; i++)
+        for (int i = 4; i < cols.length; i++){
             result.add(cols[i].getName());
-
+        }
+        result.add(cols[0].getName());//record_id
+        result.add(cols[2].getName());//version
+        
         return (String[]) result.toArray(new String[0]);
     }
 
@@ -68,13 +89,12 @@ public class ViewablePage extends AbstractTableData {
 
     private Object[] values(VersionedRecord record) {
         List allTokens = new ArrayList();
-        allTokens.add(new Integer("" + record.getRecordId()));
-        allTokens.add(new Long("" + record.getDatasetId()));
-        allTokens.add(new Long("" + record.getVersion()));
-        allTokens.add(record.getDeleteVersions());
-
         Object[] tokens = record.getTokens();
         allTokens.addAll(Arrays.asList(tokens));
+        
+        allTokens.add(new Integer(record.getRecordId()));
+        allTokens.add(new Long(record.getVersion()));
+        
         return allTokens.toArray();
     }
 }
