@@ -2,11 +2,9 @@ package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
-import gov.epa.emissions.framework.ui.TableColumnWidth;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,7 +34,7 @@ public class EditablePagePanel extends JPanel {
 
     private ManageChangeables listOfChangeables;
 
-    private DataEditableTable editableTable;
+    private DataEditorTable editableTable;
 
     public EditablePagePanel(EditablePage page, MessagePanel messagePanel, ManageChangeables listOfChangeables) {
         this.listOfChangeables = listOfChangeables;
@@ -92,13 +90,10 @@ public class EditablePagePanel extends JPanel {
 
     private JScrollPane table(EditablePage tableData) {
         tableModel = new EmfTableModel(tableData);
-        editableTable = new DataEditableTable(tableModel, tableData.getTableMetadata(), messagePanel);
+        editableTable = new DataEditorTable(tableModel, tableData.getTableMetadata(), messagePanel);
         listOfChangeables.addChangeable(editableTable);
 
         table = new ScrollableTable(editableTable);
-
-        TableMetadata metadata = tableData.getTableMetadata();
-        new TableColumnWidth(editableTable, metadata).columnWidths();
         return table;
     }
 
@@ -141,7 +136,6 @@ public class EditablePagePanel extends JPanel {
         return insertRowAction(tableData, above, null, null);
     }
 
-    
     protected void clearMessagesWithTableRefresh() {
         messagePanel.clear();
         refresh();
@@ -152,7 +146,7 @@ public class EditablePagePanel extends JPanel {
         super.revalidate();
     }
 
-    private void doAdd(final EditablePage tableData, DataEditableTable editableTable, boolean above) {
+    private void doAdd(final EditablePage tableData, DataEditorTable editableTable, boolean above) {
         int selectedRow = editableTable.getSelectedRow();
         messagePanel.clear();
         if (selectedRow != -1) {
