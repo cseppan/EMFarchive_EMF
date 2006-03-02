@@ -143,7 +143,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
                         presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), sortOrder.getText());
                     }
                 } catch (EmfException e) {
-                    messagePanel.setError("Could not save. Reason: " + e.getMessage());
+                    messagePanel.setError("Could not save." + e.getMessage());
                 }
             }
         };
@@ -170,7 +170,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
             if (checkChanges())
                 presenter.doClose();
         } catch (EmfException e) {
-            messagePanel.setError("Could not close. Reason: " + e.getMessage());
+            messagePanel.setError("Could not close." + e.getMessage());
         }
     }
 

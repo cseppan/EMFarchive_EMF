@@ -57,7 +57,7 @@ public class ExportTask implements Runnable {
             setStatus("Completed export for " + dataset.getName() + ":" + file.getName());
         } catch (Exception e) {
             log.error("Problem on attempting to run Export on file : " + file, e);
-            setStatus("Export failure. Reason: " + e.getMessage());
+            setStatus("Export failure." + e.getMessage());
         }
     }
 

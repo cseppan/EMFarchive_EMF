@@ -86,7 +86,7 @@ public class PaginationPanel extends JPanel {
         try {
             doLayout(presenter.totalRecords());
         } catch (EmfException e) {
-            messagePanel.setError("Could not obtain Total Records. Reason: " + e.getMessage());
+            messagePanel.setError("Could not obtain Total Records." + e.getMessage());
         }
     }
 
@@ -233,7 +233,7 @@ public class PaginationPanel extends JPanel {
         try {
             presenter.doDisplayPrevious();
         } catch (EmfException e) {
-            setErrorMessage("Could not display Previous Page. Reason: " + e.getMessage());
+            setErrorMessage("Could not display Previous Page." + e.getMessage());
         }
     }
 
@@ -242,7 +242,7 @@ public class PaginationPanel extends JPanel {
         try {
             presenter.doDisplayNext();
         } catch (EmfException e) {
-            setErrorMessage("Could not display Next Page. Reason: " + e.getMessage());
+            setErrorMessage("Could not display Next Page." + e.getMessage());
         }
     }
 
@@ -259,7 +259,7 @@ public class PaginationPanel extends JPanel {
         try {
             presenter.doDisplayPageWithRecord(record);
         } catch (EmfException e) {
-            messagePanel.setError("Could not display Page with record: " + record + ". Reason: " + e.getMessage());
+            messagePanel.setError("Could not display Page with record: " + record + "." + e.getMessage());
         }
     }
 
@@ -268,7 +268,7 @@ public class PaginationPanel extends JPanel {
         try {
             presenter.doDisplayLast();
         } catch (EmfException e) {
-            setErrorMessage("Could not display Last Page. Reason: " + e.getMessage());
+            setErrorMessage("Could not display Last Page." + e.getMessage());
         }
     }
 
@@ -277,7 +277,7 @@ public class PaginationPanel extends JPanel {
         try {
             presenter.doDisplayFirst();
         } catch (EmfException e) {
-            messagePanel.setError("Could not display First Page. Reason: " + e.getMessage());
+            messagePanel.setError("Could not display First Page." + e.getMessage());
         }
     }
 

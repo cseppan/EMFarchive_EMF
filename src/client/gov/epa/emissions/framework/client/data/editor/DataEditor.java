@@ -42,7 +42,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private EmfDataset dataset;
 
-    private EditablePageContainer pageContainer;
+    private EditorPanel pageContainer;
 
     private JLabel lockInfo;
 
@@ -120,7 +120,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     private JPanel tablePanel(Version version, String table, TableMetadata tableMetadata) {
-        pageContainer = new EditablePageContainer(dataset, version, tableMetadata, messagePanel, this);
+        pageContainer = new EditorPanel(dataset, version, tableMetadata, messagePanel, this);
         displayTable(table);
 
         return pageContainer;
@@ -130,7 +130,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         try {
             presenter.displayTable(pageContainer);
         } catch (EmfException e) {
-            displayError("Could not display table: " + table + ". Reason: " + e.getMessage());
+            displayError("Could not display table: " + table + "." + e.getMessage());
         }
     }
 
@@ -192,7 +192,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
                 try {
                     doClose();
                 } catch (EmfException e) {
-                    displayError("Could not Close. Reason: " + e.getMessage());
+                    displayError("Could not Close." + e.getMessage());
                 }
             }
         });
@@ -242,7 +242,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
             displayMessage("Saved changes.");
             disableSaveDiscard();
         } catch (EmfException e) {
-            displayError("Could not Save. Reason: " + e.getMessage());
+            displayError("Could not Save." + e.getMessage());
             return;
         }
     }
@@ -273,7 +273,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
             disableSaveDiscard();
             displayMessage("Discarded changes.");
         } catch (EmfException e) {
-            displayError("Could not Discard. Reason: " + e.getMessage());
+            displayError("Could not Discard." + e.getMessage());
         }
 
     }

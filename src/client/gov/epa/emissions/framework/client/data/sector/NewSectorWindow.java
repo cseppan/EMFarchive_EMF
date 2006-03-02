@@ -139,7 +139,7 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
                     } else
                         messagePanel.setError("Name field should be a non-empty string.");
                 } catch (EmfException e) {
-                    messagePanel.setError("Could not save. Reason: " + e.getMessage());
+                    messagePanel.setError("Could not save." + e.getMessage());
                 }
             }
         };

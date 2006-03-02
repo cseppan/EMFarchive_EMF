@@ -162,7 +162,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
             try {
                 presenter.doView(type, viewableView());
             } catch (EmfException e) {
-                messagePanel.setError("Could not display: " + type.getName() + ". Reason: " + e.getMessage());
+                messagePanel.setError("Could not display: " + type.getName() + ". " + e.getMessage());
                 break;
             }
         }
@@ -175,7 +175,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
             try {
                 presenter.doEdit(type, editableView(), viewableView());
             } catch (EmfException e) {
-                messagePanel.setError("Could not display: " + type.getName() + ". Reason: " + e.getMessage());
+                messagePanel.setError("Could not display: " + type.getName() + "." + e.getMessage());
                 break;
             }
         }

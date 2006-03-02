@@ -216,7 +216,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             try {
                 presenter.doNew(dialog.version(), dialog.name());
             } catch (EmfException e) {
-                displayError("Could not create new version: " + dialog.name() + ". Reason: " + e.getMessage());
+                displayError("Could not create new version: " + dialog.name() + "." + e.getMessage());
             }
         }
     }
@@ -227,7 +227,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         try {
             presenter.doMarkFinal(versions);
         } catch (EmfException e) {
-            displayError("Could not mark as final. Reason: " + e.getMessage());
+            displayError("Could not mark as final." + e.getMessage());
         }
     }
 
@@ -301,7 +301,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             if (dataset.getInternalSources().length > 0)
                 presenter.doView(version, table, view);
             else
-                displayError("Could not open viewer. Reason: This is an external file.");
+                displayError("Could not open viewer.This is an external file.");
         } catch (EmfException e) {
             displayError(e.getMessage());
         }
@@ -335,9 +335,9 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             if (dataset.getInternalSources().length > 0)
                 presenter.doEdit(version, table, view);
             else
-                displayError("Could not open editor. Reason: This is an external file.");
+                displayError("Could not open editor.This is an external file.");
         } catch (EmfException e) {
-            displayError("Could not open editor. Reason: " + e.getMessage());
+            displayError("Could not open editor." + e.getMessage());
         }
     }
 

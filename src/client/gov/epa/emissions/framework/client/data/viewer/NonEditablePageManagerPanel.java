@@ -73,7 +73,7 @@ public class NonEditablePageManagerPanel extends JPanel implements PageManagerVi
     }
 
     private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
-        sortFilterPanel = new DataSortFilterPanel(messagePanel, null, dataset);
+        sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset);
         return sortFilterPanel;
     }
 

@@ -179,7 +179,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
             try {
                 presenter.doEdit(sector, editSectorView(), displaySectorView());
             } catch (EmfException e) {
-                setError("Could not edit Sector: " + sector.getName() + ". Reason: " + e.getMessage());
+                setError("Could not edit Sector: " + sector.getName() + "." + e.getMessage());
             }
         }
     }

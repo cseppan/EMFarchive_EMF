@@ -17,7 +17,7 @@ import java.awt.Color;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-public class EditablePageContainer extends JPanel implements EditablePageManagerView {
+public class EditorPanel extends JPanel implements EditablePageManagerView {
 
     private JPanel pageContainer;
 
@@ -39,7 +39,7 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
 
     private TableMetadata tableMetadata;
 
-    public EditablePageContainer(EmfDataset dataset, Version version, TableMetadata tableMetadata, 
+    public EditorPanel(EmfDataset dataset, Version version, TableMetadata tableMetadata, 
             MessagePanel messagePanel, ManageChangeables changeablesList) {
         super(new BorderLayout());
         super.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -72,7 +72,7 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
     }
 
     private DataSortFilterPanel sortFilterPanel(MessagePanel messagePanel) {
-        sortFilterPanel = new DataSortFilterPanel(messagePanel, changeablesList, dataset);
+        sortFilterPanel = new DataSortFilterPanel(messagePanel, dataset);
         return sortFilterPanel;
     }
 
