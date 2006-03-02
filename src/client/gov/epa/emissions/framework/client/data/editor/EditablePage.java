@@ -26,6 +26,10 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
 
     private TableMetadata tableMetadata;
 
+    private String[] columnNames;
+
+    private Class []columnClasses;
+
     public EditablePage(int datasetId, Version version, Page page, TableMetadata tableMetadata) {
         this.datasetId = datasetId;
         this.version = version;
@@ -34,17 +38,43 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
 
         changeset = new ChangeSet();
         changeset.setVersion(version);
+        columnNames = setupColumns();
+        columnClasses = columnClasses();
     }
 
     public String[] columns() {
+        return columnNames;
+    }
+
+    private String[] setupColumns() {
         List list = new ArrayList();
         list.add("Select");
         ColumnMetaData[] cols = tableMetadata.getCols();
-        for (int i = 4; i < cols.length; i++) {// FIXME: have to add record id and verson related columns
+        for (int i = 4; i < cols.length; i++) {
             list.add(cols[i].getName());
         }
+        list.add(cols[0].getName());
+        list.add(cols[2].getName());
 
         return (String[]) list.toArray(new String[0]);
+    }
+    
+    private Class[] columnClasses(){
+        List classes = new ArrayList();
+        classes.add(Boolean.class);
+        for (int i = 1; i < columnNames.length; i++) {//first column is 'Select'
+            ColumnMetaData data = tableMetadata.columnMetadata(columnNames[i]);
+            classes.add(classType(data.getType()));
+        }
+        return (Class[]) classes.toArray(new Class[0]);
+    }
+
+    private Class classType(String type) {
+        try {
+            return Class.forName(type);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     public List rows() {
@@ -52,7 +82,8 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
     }
 
     public boolean isEditable(int col) {
-        return true;
+        int size = columnNames.length;
+        return (col < size - 2) ? true : false;
     }
 
     private List createRows(Page page) {
@@ -62,8 +93,8 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
         for (int i = 0; i < records.length; i++) {
             EditableRow row = row(records[i]);
             rows.add(row);
-        }
 
+        }
         return rows;
     }
 
@@ -191,19 +222,9 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
     }
 
     public Class getColumnClass(int col) {
-        return col == 0 ? Boolean.class : classType(col);
+        return columnClasses[col];
     }
-
-    private Class classType(int col) {
-        String type = tableMetadata.getCols()[col + 3].getType(); // FIXME: remove the addition after adding version
-        // adn record id columns
-        try {
-            return Class.forName(type);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
+    
     public ChangeSet changeset() {
         return changeset;
     }

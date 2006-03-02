@@ -33,7 +33,7 @@ public class TableColumnWidth {
 
     private void width(ColumnMetaData metaData, TableColumn tableColumn) {
         String header = (String) tableColumn.getHeaderValue();
-        int width = header.length() * 10;
+        int width = header.length() * 12;
         int dbColumnSize = metaData.getSize() + 10;
         tableColumn.setWidth((width > dbColumnSize) ? width : dbColumnSize);
     }

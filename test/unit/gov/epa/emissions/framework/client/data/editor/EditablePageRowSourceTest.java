@@ -35,7 +35,7 @@ public class EditablePageRowSourceTest extends MockObjectTestCase {
     public void testShouldReturnSelectedAlongWithTokensAsValues() {
         Object[] results = row.values();
 
-        assertEquals(4, results.length);
+        assertEquals(6, results.length);
         assertEquals(Boolean.FALSE, results[0]);
         assertEquals(record.token(0), results[1]);
         assertEquals(record.token(1), results[2]);

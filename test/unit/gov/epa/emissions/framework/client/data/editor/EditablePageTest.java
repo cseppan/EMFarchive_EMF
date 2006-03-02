@@ -34,11 +34,11 @@ public class EditablePageTest extends TestCase {
         page = new Page();
 
         record1 = new VersionedRecord();
-        record1.setTokens(new String[] { "1", "2", "3" });
+        record1.setTokens(new Object[] { "1", new Double(2.0), new Integer(3)});
         page.add(record1);
 
         record2 = new VersionedRecord();
-        record2.setTokens(new String[] { "11", "12", "13" });
+        record2.setTokens(new Object[] { "11", new Double(4.0), new Integer(6)});
         page.add(record2);
 
         cols = new String[] { "col1", "col2", "col3" };
@@ -58,8 +58,8 @@ public class EditablePageTest extends TestCase {
         tableMetadata.addColumnMetaData(new ColumnMetaData("delete_version", "java.lang.String", 10));
 
         ColumnMetaData col0 = new ColumnMetaData(cols[0], "java.lang.String", 10);
-        ColumnMetaData col1 = new ColumnMetaData(cols[1], "java.lang.String", 10);
-        ColumnMetaData col2 = new ColumnMetaData(cols[2], "java.lang.String", 10);
+        ColumnMetaData col1 = new ColumnMetaData(cols[1], "java.lang.Double", 10);
+        ColumnMetaData col2 = new ColumnMetaData(cols[2], "java.lang.Integer", 10);
 
         tableMetadata.addColumnMetaData(col0);
         tableMetadata.addColumnMetaData(col1);
@@ -70,22 +70,33 @@ public class EditablePageTest extends TestCase {
 
     public void testShouldHaveThreeColumns() {
         String[] columns = data.columns();
-        assertEquals(4, columns.length);
+        assertEquals(6, columns.length);
         assertEquals("Select", columns[0]);
         assertEquals("col1", columns[1]);
         assertEquals("col2", columns[2]);
         assertEquals("col3", columns[3]);
+        assertEquals("record_id", columns[4]);
+        assertEquals("version", columns[5]);
     }
 
-    public void testShouldHaveStringColumnClassForAllColumns() {
+    public void testShouldCheckColumnClasses() {
+        String[] columns = data.columns();
+        assertEquals(6, columns.length);
         assertEquals(Boolean.class, data.getColumnClass(0));
-        for (int i = 1; i < data.columns().length; i++)
-            assertEquals(String.class, data.getColumnClass(i));
+        assertEquals(String.class, data.getColumnClass(1));
+        assertEquals(Double.class, data.getColumnClass(2));
+        assertEquals(Integer.class, data.getColumnClass(3));
+        assertEquals(Integer.class, data.getColumnClass(4));
+        assertEquals(Long.class, data.getColumnClass(5));
     }
 
-    public void testAllColumnsShouldBeEditable() {
-        for (int i = 0; i < data.columns().length; i++)
+    public void testAllColumnsShouldBeEditableExceptLastTwo() {
+        int length = data.columns().length;
+        for (int i = 0; i < length-2; i++){
             assertTrue("All cells should be editable", data.isEditable(i));
+        }
+        assertFalse("not editable", data.isEditable(length-2));
+        assertFalse("not editable", data.isEditable(length-1));
     }
 
     public void testRowsShouldContainDataValuesOfRecord() {
