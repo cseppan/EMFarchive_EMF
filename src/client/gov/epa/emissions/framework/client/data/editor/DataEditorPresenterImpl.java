@@ -70,7 +70,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
         view.display(version, table, session.user(), tableMetadata, notes);
     }
 
-    public void displayTable(EditablePageManagerView tableView) throws EmfException {
+    public void displayTable(EditorPanelView tableView) throws EmfException {
         tablePresenter = new EditableTablePresenterImpl(dataset.getDatasetType(), version, table, tableView
                 .tableMetadata(), tableView, dataEditorService());
         displayTable(tablePresenter);

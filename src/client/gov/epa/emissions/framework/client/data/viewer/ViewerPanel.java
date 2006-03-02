@@ -20,7 +20,7 @@ import javax.swing.JTable;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 
-public class NonEditablePageManagerPanel extends JPanel implements PageManagerView {
+public class ViewerPanel extends JPanel implements ViewerPanelView {
 
     private EmfTableModel tableModel;
 
@@ -36,7 +36,7 @@ public class NonEditablePageManagerPanel extends JPanel implements PageManagerVi
 
     private TableMetadata tableMetadata;
 
-    public NonEditablePageManagerPanel(MessagePanel messagePanel, EmfDataset dataset, TableMetadata tableMetadata) {
+    public ViewerPanel(MessagePanel messagePanel, EmfDataset dataset, TableMetadata tableMetadata) {
         super(new BorderLayout());
         this.tableMetadata = tableMetadata;
         this.dataset = dataset;
@@ -95,7 +95,7 @@ public class NonEditablePageManagerPanel extends JPanel implements PageManagerVi
     private ScrollableTable table(Page page) {
         tableModel = new EmfTableModel(new ViewablePage(tableMetadata, page));
         JTable viewTable = new JTable(tableModel);
-        new TableColumnHeaders(viewTable,tableMetadata).renderHeader();
+        new TableColumnHeaders(viewTable, tableMetadata).renderHeader();
         new TableColumnWidth(viewTable, tableMetadata).columnWidths();
         table = new ScrollableTable(viewTable);
         return table;

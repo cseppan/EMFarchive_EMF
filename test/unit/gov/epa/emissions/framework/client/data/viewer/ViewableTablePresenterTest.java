@@ -17,22 +17,22 @@ import org.jmock.core.constraint.IsInstanceOf;
 public class ViewableTablePresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldObserveViewOnObserve() {
-        Mock view = mock(PageManagerView.class);
+        Mock view = mock(ViewerPanelView.class);
 
-        TablePresenter p = new ViewableTablePresenter(null, "table", null, (PageManagerView) view.proxy(), null);
+        TablePresenter p = new ViewableTablePresenter(null, "table", null, (ViewerPanelView) view.proxy(), null);
         view.expects(once()).method("observe").with(same(p));
 
         p.observe();
     }
 
     public void testShouldDisplayPageOneAfterApplyingConstraintsOnApplyConstraints() throws EmfException {
-        Mock view = mock(PageManagerView.class);
+        Mock view = mock(ViewerPanelView.class);
         Mock service = mock(DataEditorService.class);
 
         String[] cols = { "col1", "col2", "col3" };
         TableMetadata tableMetadata = tableMetadata(cols);
 
-        TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata, (PageManagerView) view.proxy(),
+        TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata, (ViewerPanelView) view.proxy(),
                 (DataAccessService) service.proxy());
 
         String rowFilter = "rowFilter";
@@ -50,13 +50,13 @@ public class ViewableTablePresenterTest extends EmfMockObjectTestCase {
     }
 
     public void testShouldRaiseExceptionIfInvalidColsAreSpecifiedInSortOrderOnApplyConstraints() {
-        Mock view = mock(PageManagerView.class);
+        Mock view = mock(ViewerPanelView.class);
         Mock service = mock(DataEditorService.class);
 
         String[] cols = { "col1", "col2", "col3" };
         TableMetadata tableMetadata = tableMetadata(cols);
 
-        TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata, (PageManagerView) view.proxy(),
+        TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata, (ViewerPanelView) view.proxy(),
                 (DataAccessService) service.proxy());
 
         String sortOrder = "invalid-row";
@@ -70,13 +70,13 @@ public class ViewableTablePresenterTest extends EmfMockObjectTestCase {
     }
 
     public void testShouldRaiseExceptionIfOneOfColsInSortOrderIsInvalidOnApplyConstraints() {
-        Mock view = mock(PageManagerView.class);
+        Mock view = mock(ViewerPanelView.class);
         Mock service = mock(DataEditorService.class);
 
         String[] cols = { "col1", "col2", "col3" };
         TableMetadata tableMetadata = tableMetadata(cols);
 
-        TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata, (PageManagerView) view.proxy(),
+        TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata, (ViewerPanelView) view.proxy(),
                 (DataAccessService) service.proxy());
 
         String sortOrder = "col3, invalid-row";
@@ -91,13 +91,13 @@ public class ViewableTablePresenterTest extends EmfMockObjectTestCase {
     }
 
     public void testShouldIgnoreWhenSortOrderIsEmptyOnApplyConstraints() throws EmfException {
-        Mock view = mock(PageManagerView.class);
+        Mock view = mock(ViewerPanelView.class);
         Mock service = mock(DataEditorService.class);
 
         String[] cols = { "col1", "col2", "col3" };
         TableMetadata tableMetadata = tableMetadata(cols);
 
-        TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata, (PageManagerView) view.proxy(),
+        TablePresenter p = new ViewableTablePresenter(null, "table", tableMetadata, (ViewerPanelView) view.proxy(),
                 (DataAccessService) service.proxy());
 
         String rowFilter = "rowFilter";

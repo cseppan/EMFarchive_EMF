@@ -89,7 +89,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
-        NonEditablePageManagerPanel tableView = new NonEditablePageManagerPanel(messagePanel, dataset, tableMetadata);
+        ViewerPanel tableView = new ViewerPanel(messagePanel, dataset, tableMetadata);
         TablePresenter tablePresenter = new ViewableTablePresenter(version, table, tableMetadata, tableView, service);
         tablePresenter.observe();
 

@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 
 public class ViewableTablePresenter implements TablePresenter {
 
-    private PageManagerView view;
+    private ViewerPanelView view;
 
     private TablePaginator delegate;
 
@@ -23,12 +23,12 @@ public class ViewableTablePresenter implements TablePresenter {
 
     private TableMetadata tableMetadata;
 
-    public ViewableTablePresenter(Version version, String table, TableMetadata tableMetadata, PageManagerView view,
+    public ViewableTablePresenter(Version version, String table, TableMetadata tableMetadata, ViewerPanelView view,
             DataAccessService service) {
         this(new TablePaginatorImpl(version, table, view, service), tableMetadata, view, service);
     }
 
-    public ViewableTablePresenter(TablePaginator paginator, TableMetadata tableMetadata, PageManagerView view,
+    public ViewableTablePresenter(TablePaginator paginator, TableMetadata tableMetadata, ViewerPanelView view,
             DataAccessService service) {
         delegate = paginator;
         this.tableMetadata = tableMetadata;

@@ -18,7 +18,7 @@ import java.util.StringTokenizer;
 
 public class EditableTablePresenterImpl implements EditableTablePresenter {
 
-    private EditablePageManagerView view;
+    private EditorPanelView view;
 
     private TablePaginator paginator;
 
@@ -29,12 +29,12 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
     private DatasetType datasetType;
 
     public EditableTablePresenterImpl(DatasetType datasetType, Version version, String table,
-            TableMetadata tableMetadata, EditablePageManagerView view, DataEditorService service) {
+            TableMetadata tableMetadata, EditorPanelView view, DataEditorService service) {
         this(datasetType, new TablePaginatorImpl(version, table, view, service), tableMetadata, view, service);
     }
 
     public EditableTablePresenterImpl(DatasetType datasetType, TablePaginator paginator, TableMetadata tableMetadata,
-            EditablePageManagerView view, DataEditorService service) {
+            EditorPanelView view, DataEditorService service) {
         this.datasetType = datasetType;
         this.service = service;
         this.tableMetadata = tableMetadata;

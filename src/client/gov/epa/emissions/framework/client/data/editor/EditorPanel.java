@@ -17,7 +17,7 @@ import java.awt.Color;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
-public class EditorPanel extends JPanel implements EditablePageManagerView {
+public class EditorPanel extends JPanel implements EditorPanelView {
 
     private JPanel pageContainer;
 
