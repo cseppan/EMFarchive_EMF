@@ -330,4 +330,52 @@ public class EmfDataset implements Dataset, Lockable {
         this.intendedUse = intendedUse;
     }
 
+    public boolean getInlineCommentSetting() {
+        KeyVal[] keyvals = getKeyVals();
+        for(int i = 0; i < keyvals.length; i++) {
+            String keyword = keyvals[i].getKeyword().getName();
+            String value = keyvals[i].getValue();
+            if(keyword.equalsIgnoreCase(inline_comment_key))
+                return value.equals("true") ? true:false; 
+        }
+        
+        return true;
+    }
+
+    public boolean getHeaderCommentsSetting() {
+        KeyVal[] keyvals = getKeyVals();
+        for(int i = 0; i < keyvals.length; i++) {
+            String keyword = keyvals[i].getKeyword().getName();
+            String value = keyvals[i].getValue();
+            if(keyword.equalsIgnoreCase(header_comment_key))
+                return value.equals("true") ? true:false; 
+        }
+        
+        return true;
+    }
+
+    public char getInlineCommentChar() {
+        KeyVal[] keyvals = getKeyVals();
+        for(int i = 0; i < keyvals.length; i++) {
+            String keyword = keyvals[i].getKeyword().getName();
+            String value = keyvals[i].getValue();
+            if(keyword.equalsIgnoreCase(inline_comment_char))
+                return (value.length() == 1) ? value.charAt(0):'!'; 
+        }
+        
+        return '!';
+    }
+
+    public char getHeaderCommentChar() {
+        KeyVal[] keyvals = getKeyVals();
+        for(int i = 0; i < keyvals.length; i++) {
+            String keyword = keyvals[i].getKeyword().getName();
+            String value = keyvals[i].getValue();
+            if(keyword.equalsIgnoreCase(header_comment_char))
+                return (value.length() == 1) ? value.charAt(0):'#'; 
+        }
+        
+        return '#';
+    }
+
 }
