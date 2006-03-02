@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.ColumnMetaData;
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
@@ -21,8 +22,8 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
     public void testShouldObserveViewOnObserve() {
         Mock view = mock(EditablePageManagerView.class);
 
-        TablePresenter p = new EditableTablePresenterImpl(null, "table", null, (EditablePageManagerView) view.proxy(),
-                null);
+        TablePresenter p = new EditableTablePresenterImpl(null, null, "table", null, (EditablePageManagerView) view
+                .proxy(), null);
         view.expects(once()).method("observe").with(same(p));
 
         p.observe();
@@ -34,7 +35,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
 
         String[] cols = { "col1", "col2", "col3" };
 
-        TablePresenter p = new EditableTablePresenterImpl(null, "table", tableMetaData(cols),
+        TablePresenter p = new EditableTablePresenterImpl(null, null, "table", tableMetaData(cols),
                 (EditablePageManagerView) view.proxy(), (DataEditorService) service.proxy());
 
         String rowFilter = "rowFilter";
@@ -54,7 +55,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
     private TableMetadata tableMetaData(String[] cols) {
         TableMetadata tableMetadata = new TableMetadata();
         for (int i = 0; i < cols.length; i++) {
-            ColumnMetaData col = new ColumnMetaData(cols[i],"java.lang.String",20);
+            ColumnMetaData col = new ColumnMetaData(cols[i], "java.lang.String", 20);
             tableMetadata.addColumnMetaData(col);
         }
         return tableMetadata;
@@ -66,7 +67,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
 
         String[] cols = { "col1", "col2", "col3" };
 
-        TablePresenter p = new EditableTablePresenterImpl(null, "table", tableMetaData(cols),
+        TablePresenter p = new EditableTablePresenterImpl(null, null, "table", tableMetaData(cols),
                 (EditablePageManagerView) view.proxy(), (DataEditorService) service.proxy());
 
         String rowFilter = "rowFilter";
@@ -90,7 +91,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         String[] cols = { "col1", "col2", "col3" };
         source.stubs().method("getCols").will(returnValue(cols));
 
-        TablePresenter p = new EditableTablePresenterImpl(null, "table", tableMetaData(cols),
+        TablePresenter p = new EditableTablePresenterImpl(null, null, "table", tableMetaData(cols),
                 (EditablePageManagerView) view.proxy(), (DataEditorService) service.proxy());
 
         String sortOrder = "invalid-row";
@@ -111,7 +112,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         String[] cols = { "col1", "col2", "col3" };
         source.stubs().method("getCols").will(returnValue(cols));
 
-        TablePresenter p = new EditableTablePresenterImpl(null, "table", tableMetaData(cols),
+        TablePresenter p = new EditableTablePresenterImpl(null, null, "table", tableMetaData(cols),
                 (EditablePageManagerView) view.proxy(), (DataEditorService) service.proxy());
 
         String sortOrder = "col3, invalid-row";
@@ -130,8 +131,8 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         Version version = new Version();
         services.stubs().method("getTotalRecords").with(isA(DataAccessToken.class)).will(returnValue(new Integer(28)));
 
-        TablePresenter p = new EditableTablePresenterImpl(version, "table", null, null, (DataEditorService) services
-                .proxy());
+        TablePresenter p = new EditableTablePresenterImpl(null, version, "table", null, null,
+                (DataEditorService) services.proxy());
 
         assertEquals(28, p.totalRecords());
     }
@@ -143,7 +144,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         expects(paginator, "doDisplayNext");
         stub(paginator, "totalRecords", new Integer(20));
 
-        TablePresenter p = new EditableTablePresenterImpl((TablePaginator) paginator.proxy(), null,
+        TablePresenter p = new EditableTablePresenterImpl(null, (TablePaginator) paginator.proxy(), null,
                 (EditablePageManagerView) view.proxy(), null);
 
         p.doDisplayNext();
@@ -156,7 +157,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         expects(paginator, "doDisplay");
         stub(paginator, "totalRecords", new Integer(20));
 
-        TablePresenter p = new EditableTablePresenterImpl((TablePaginator) paginator.proxy(), null,
+        TablePresenter p = new EditableTablePresenterImpl(null, (TablePaginator) paginator.proxy(), null,
                 (EditablePageManagerView) view.proxy(), null);
 
         p.doDisplay(21);
@@ -178,7 +179,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         stub(paginator, "totalRecords", new Integer(20));
         stub(paginator, "isCurrent", Boolean.FALSE);
 
-        TablePresenter p = new EditableTablePresenterImpl((TablePaginator) paginator.proxy(), null,
+        TablePresenter p = new EditableTablePresenterImpl(null, (TablePaginator) paginator.proxy(), null,
                 (EditablePageManagerView) view.proxy(), null);
 
         p.doDisplayPageWithRecord(21);
@@ -191,10 +192,37 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         expects(paginator, "doDisplayFirst");
         stub(paginator, "totalRecords", new Integer(20));
 
-        TablePresenter p = new EditableTablePresenterImpl((TablePaginator) paginator.proxy(), null,
+        TablePresenter p = new EditableTablePresenterImpl(null, (TablePaginator) paginator.proxy(), null,
                 (EditablePageManagerView) view.proxy(), null);
 
         p.doDisplayFirst();
+    }
+
+    public void testShouldApplyDefaultSortOrderOnDisplay() throws Exception {
+        Mock view = mockViewWithChanges(20);
+
+        Mock paginator = mock(TablePaginator.class);
+        expects(paginator, "token");
+        stub(paginator, "totalRecords", new Integer(20));
+        expects(paginator, "doDisplayFirst");
+
+        Mock datasetType = mock(DatasetType.class);
+        String sortOrder = "sort-order";
+        stub(datasetType, "getDefaultSortOrder", sortOrder);
+
+        Mock service = mock(DataEditorService.class);
+        TableMetadata tableMetaData = tableMetaData(new String[] { sortOrder });
+
+        EditableTablePresenter p = new EditableTablePresenterImpl((DatasetType) datasetType.proxy(),
+                (TablePaginator) paginator.proxy(), tableMetaData, (EditablePageManagerView) view.proxy(),
+                (DataEditorService) service.proxy());
+
+        Page page = new Page();
+        service.expects(once()).method("applyConstraints").with(ANYTHING, eq(""), eq(sortOrder))
+                .will(returnValue(page));
+        view.expects(once()).method("display").with(same(page));
+
+        p.doDisplay();
     }
 
     public void testShouldDisplayLastPage() throws Exception {
@@ -205,7 +233,7 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         expects(paginator, "doDisplayLast");
         stub(paginator, "totalRecords", new Integer(20));
 
-        TablePresenter p = new EditableTablePresenterImpl((TablePaginator) paginator.proxy(), null,
+        TablePresenter p = new EditableTablePresenterImpl(null, (TablePaginator) paginator.proxy(), null,
                 (EditablePageManagerView) view.proxy(), null);
 
         p.doDisplayLast();
@@ -213,14 +241,14 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldReloadCurrentPage() throws Exception {
         Mock view = mockViewWithChanges(20);
-        
+
         Mock paginator = mock(TablePaginator.class);
         expects(paginator, "reloadCurrent");
         stub(paginator, "totalRecords", new Integer(20));
-        
-        EditableTablePresenter p = new EditableTablePresenterImpl((TablePaginator) paginator.proxy(), null,
+
+        EditableTablePresenter p = new EditableTablePresenterImpl(null, (TablePaginator) paginator.proxy(), null,
                 (EditablePageManagerView) view.proxy(), null);
-        
+
         p.reloadCurrent();
     }
 

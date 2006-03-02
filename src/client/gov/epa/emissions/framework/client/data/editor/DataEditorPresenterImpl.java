@@ -71,18 +71,14 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
     }
 
     public void displayTable(EditablePageManagerView tableView) throws EmfException {
-        tablePresenter = new EditableTablePresenterImpl(version, table, tableView.tableMetadata(), tableView,
-                dataEditorService());
+        tablePresenter = new EditableTablePresenterImpl(dataset.getDatasetType(), version, table, tableView
+                .tableMetadata(), tableView, dataEditorService());
         displayTable(tablePresenter);
     }
 
     void displayTable(EditableTablePresenter tablePresenter) throws EmfException {
         tablePresenter.observe();
-        tablePresenter.doDisplayFirst();
-    }
-
-    private void reloadTable(EditableTablePresenter tablePresenter) throws EmfException {
-        tablePresenter.reloadCurrent();
+        tablePresenter.doDisplay();
     }
 
     public void doClose() throws EmfException {
@@ -108,7 +104,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
     void discard(DataEditorService service, DataAccessToken token, EditableTablePresenter tablePresenter)
             throws EmfException {
         service.discard(token);
-        reloadTable(tablePresenter);
+        tablePresenter.reloadCurrent();
         clearChangesSaved();
     }
 
@@ -121,7 +117,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
         tablePresenter.submitChanges();
         try {
             token = service.save(token);
-            reloadTable(tablePresenter);
+            tablePresenter.reloadCurrent();
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
             changesSaved = true;
         } catch (EmfException e) {

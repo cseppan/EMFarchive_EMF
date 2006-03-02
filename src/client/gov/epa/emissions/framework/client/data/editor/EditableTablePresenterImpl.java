@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.ColumnMetaData;
+import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.TablePaginator;
@@ -25,13 +26,16 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
 
     private TableMetadata tableMetadata;
 
-    public EditableTablePresenterImpl(Version version, String table, TableMetadata tableMetadata,
-            EditablePageManagerView view, DataEditorService service) {
-        this(new TablePaginatorImpl(version, table, view, service), tableMetadata, view, service);
+    private DatasetType datasetType;
+
+    public EditableTablePresenterImpl(DatasetType datasetType, Version version, String table,
+            TableMetadata tableMetadata, EditablePageManagerView view, DataEditorService service) {
+        this(datasetType, new TablePaginatorImpl(version, table, view, service), tableMetadata, view, service);
     }
 
-    public EditableTablePresenterImpl(TablePaginator paginator, TableMetadata tableMetadata, EditablePageManagerView view,
-            DataEditorService service) {
+    public EditableTablePresenterImpl(DatasetType datasetType, TablePaginator paginator, TableMetadata tableMetadata,
+            EditablePageManagerView view, DataEditorService service) {
+        this.datasetType = datasetType;
         this.service = service;
         this.tableMetadata = tableMetadata;
         this.view = view;
@@ -43,8 +47,12 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
         view.observe(this);
     }
 
+    public void doDisplay() throws EmfException {
+        paginator.doDisplayFirst();
+        doApplyConstraints("", datasetType.getDefaultSortOrder());
+    }
+
     public void reloadCurrent() throws EmfException {
-        submitChanges();
         paginator.reloadCurrent();
     }
 
@@ -115,8 +123,8 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
     }
 
     private String[] cols(TableMetadata tableMetadata) {
-        ColumnMetaData [] cols = tableMetadata.getCols();
-        String [] colNames=new String[cols.length];
+        ColumnMetaData[] cols = tableMetadata.getCols();
+        String[] colNames = new String[cols.length];
         for (int i = 0; i < cols.length; i++) {
             colNames[i] = cols[i].getName();
         }

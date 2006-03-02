@@ -109,7 +109,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
             session.close();
         } catch (Exception e) {
             LOG.error("Could not submit changes for Dataset: " + token.datasetId() + ". Version: " + token.getVersion()
-                    + ". Reason: " + e.getMessage(), e);
+                    + "." + e.getMessage(), e);
             throw new EmfException("Could not submit changes for Dataset: " + token.datasetId() + ". Version: "
                     + token.getVersion());
         }
@@ -163,7 +163,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
 
             return version;
         } catch (HibernateException e) {
-            LOG.error("Could not mark a derived Version: " + derived.getDatasetId() + " as Final" + ". Reason: " + e);
+            LOG.error("Could not mark a derived Version: " + derived.getDatasetId() + " as Final" + "." + e);
             throw new EmfException("Could not mark a derived Version: " + derived.getDatasetId() + " as Final");
         }
     }
@@ -195,7 +195,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
             return accessor.openEditSession(user, token, pageSize);
         } catch (Exception e) {
             LOG.error("Could not open Session for Dataset: " + token.datasetId() + ", Version: "
-                    + token.getVersion().getVersion() + ". Reason: " + e.getMessage(), e);
+                    + token.getVersion().getVersion() + "." + e.getMessage(), e);
             throw new EmfException("Could not open Session for Dataset: " + token.datasetId() + ", Version: "
                     + token.getVersion().getVersion());
         }
@@ -222,7 +222,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
             return result;
         } catch (Exception e) {
             Version version = token.getVersion();
-            LOG.error("Could not confirm changes for Version: " + version.getDatasetId() + ". Reason: " + e);
+            LOG.error("Could not confirm changes for Version: " + version.getDatasetId() + "." + e);
             throw new EmfException("Could not confirm changes for Version: " + version.getDatasetId());
         }
     }

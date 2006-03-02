@@ -175,7 +175,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
     private Mock setupTablePresenterToDisplay() {
         Mock tablePresenter = mock(EditableTablePresenter.class);
         tablePresenter.expects(once()).method("observe");
-        tablePresenter.expects(once()).method("doDisplayFirst");
+        tablePresenter.expects(once()).method("doDisplay");
 
         return tablePresenter;
     }
