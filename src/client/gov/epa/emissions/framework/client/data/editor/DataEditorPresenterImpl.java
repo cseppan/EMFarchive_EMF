@@ -81,6 +81,10 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
         tablePresenter.doDisplayFirst();
     }
 
+    private void reloadTable(EditableTablePresenter tablePresenter) throws EmfException {
+        tablePresenter.reloadCurrent();
+    }
+
     public void doClose() throws EmfException {
         close(closingRule(), areChangesSaved());
     }
@@ -104,7 +108,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
     void discard(DataEditorService service, DataAccessToken token, EditableTablePresenter tablePresenter)
             throws EmfException {
         service.discard(token);
-        displayTable(tablePresenter);
+        reloadTable(tablePresenter);
         clearChangesSaved();
     }
 
@@ -117,7 +121,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
         tablePresenter.submitChanges();
         try {
             token = service.save(token);
-            tablePresenter.reloadCurrent();
+            reloadTable(tablePresenter);
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
             changesSaved = true;
         } catch (EmfException e) {

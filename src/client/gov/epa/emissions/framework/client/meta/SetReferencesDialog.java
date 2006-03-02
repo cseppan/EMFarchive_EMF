@@ -28,6 +28,7 @@ public class SetReferencesDialog extends Dialog {
         super.setSize(new Dimension(250, 275));
 
         super.center();
+        selected = new Note[0];
     }
 
     public void display(Note[] all, Note[] selected) {

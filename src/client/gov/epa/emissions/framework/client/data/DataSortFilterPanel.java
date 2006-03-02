@@ -15,8 +15,8 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -38,16 +38,16 @@ public class DataSortFilterPanel extends JPanel {
         this.listOfChangeables = listOfChangeables;
         this.messagePanel = messagePanel;
         this.dataset = dataset;
-        super.setLayout(new BorderLayout(5,5));
-        super.add(sortFilterPanel(),BorderLayout.CENTER);
-        super.add(controlPanel(),BorderLayout.EAST);
-        super.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+
+        super.setLayout(new BorderLayout(5, 5));
+        super.add(sortFilterPanel(), BorderLayout.CENTER);
+        super.add(controlPanel(), BorderLayout.EAST);
+        super.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
     private JPanel sortFilterPanel() {
         JPanel panel = new JPanel();
-        GridLayout yLayout = new GridLayout(2,1,5,5);
-        panel.setLayout(yLayout);
+        panel.setLayout(new GridLayout(2, 1, 5, 5));
 
         panel.add(sortOrderPanel());
         panel.add(rowFilterPanel());
@@ -59,7 +59,7 @@ public class DataSortFilterPanel extends JPanel {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        actionPanel = new JPanel(new GridLayout(3,1));
+        actionPanel = new JPanel(new GridLayout(3, 1));
         panel.add(actionPanel);
 
         return panel;
@@ -68,15 +68,14 @@ public class DataSortFilterPanel extends JPanel {
     private JPanel sortOrderPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
-        panel.add(new Label("Sort Order "),BorderLayout.WEST);
+        panel.add(new Label("Sort Order "), BorderLayout.WEST);
         sortOrder = new TextArea("sortOrder", dataset.getDatasetType().getDefaultSortOrder(), 25, 2);
         sortOrder.setToolTipText(sortOrder.getText());
         if (listOfChangeables != null) {
             listOfChangeables.addChangeable(sortOrder);
             sortOrder.addTextListener();
         }
-        panel.add(ScrollableTextArea.createWithVerticalScrollBar(sortOrder),
-                BorderLayout.CENTER);
+        panel.add(ScrollableTextArea.createWithVerticalScrollBar(sortOrder), BorderLayout.CENTER);
 
         return panel;
     }
@@ -84,14 +83,14 @@ public class DataSortFilterPanel extends JPanel {
     private JPanel rowFilterPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
-        panel.add(new Label("Row Filter  "),BorderLayout.WEST);
+        panel.add(new Label("Row Filter  "), BorderLayout.WEST);
         rowFilter = new TextArea("rowFilter", "", 25, 2);
         rowFilter.setToolTipText(rowFilter.getText());
         if (listOfChangeables != null) {
             listOfChangeables.addChangeable(rowFilter);
             rowFilter.addTextListener();
         }
-        panel.add(ScrollableTextArea.createWithVerticalScrollBar(rowFilter),BorderLayout.CENTER);
+        panel.add(ScrollableTextArea.createWithVerticalScrollBar(rowFilter), BorderLayout.CENTER);
 
         return panel;
     }
@@ -99,23 +98,31 @@ public class DataSortFilterPanel extends JPanel {
     public void init(final TablePresenter presenter) {
         Button apply = new Button("Apply", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    presenter.doApplyConstraints(rowFilter.getText().trim(), sortOrder.getText().trim());
-                    String rowMessage = rowFilter.getText().trim();
-                    if (rowMessage.length() == 0) rowMessage = "No filter";
-                    String sortMessage = sortOrder.getText().trim();
-                    if (sortMessage.length() == 0) sortMessage = "No sort";
-                    messagePanel.setMessage("Applied Sort '"+sortMessage+"' and Filter '" + rowMessage +
-                            "'");
-                } catch (EmfException ex) {
-                    messagePanel.setError(ex.getMessage());
-                }
+                doApplyConstraints(presenter);
             }
         });
         apply.setToolTipText("Apply the Row Filter & Sort Order constraints to the table");
         actionPanel.add(new JLabel(""));
         actionPanel.add(apply);
         actionPanel.add(new JLabel(""));
+    }
+
+    private void doApplyConstraints(final TablePresenter presenter) {
+        try {
+            String rowFilterValue = rowFilter.getText().trim();
+            String sortOrderValue = sortOrder.getText().trim();
+            presenter.doApplyConstraints(rowFilterValue, sortOrderValue);
+
+            if (rowFilterValue.length() == 0)
+                rowFilterValue = "No filter";
+            String sortMessage = sortOrderValue;
+            if (sortMessage.length() == 0)
+                sortMessage = "No sort";
+
+            messagePanel.setMessage("Applied Sort '" + sortMessage + "' and Filter '" + rowFilterValue + "'");
+        } catch (EmfException ex) {
+            messagePanel.setError(ex.getMessage());
+        }
     }
 
 }

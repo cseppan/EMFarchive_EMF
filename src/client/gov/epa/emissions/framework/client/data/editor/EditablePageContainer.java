@@ -82,12 +82,8 @@ public class EditablePageContainer extends JPanel implements EditablePageManager
     }
 
     public void display(Page page) {
-        // TODO: refresh table w/ new data? or remove and add back the table?
         pageContainer.removeAll();
-
         paginationPanel.updateStatus(page);
-
-        // FIXME: why is Dataset Id 'int', and not long?
         pageContainer.add(createEditablePage(page), BorderLayout.CENTER);
     }
 
