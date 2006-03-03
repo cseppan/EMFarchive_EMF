@@ -63,11 +63,11 @@ public class EditablePagePanel extends JPanel {
         String nameBelow = "Insert Below";
         JButton buttonBelow = toolbar.add(insertRowAction(tableData, false, nameBelow, iconBelow));
         buttonBelow.setToolTipText(nameBelow);
-        
-        String delete = "/toolbarButtonGraphics/table/RowDelete"+24+".gif";
+
+        String delete = "/toolbarButtonGraphics/table/RowDelete" + 24 + ".gif";
         ImageIcon iconDelete = createImageIcon(delete);
-        String nameDelete= "Delete";
-        JButton buttonDelete = toolbar.add(deleteAction(tableData, nameDelete,iconDelete));
+        String nameDelete = "Delete";
+        JButton buttonDelete = toolbar.add(deleteAction(tableData, nameDelete, iconDelete));
         buttonDelete.setToolTipText(nameDelete);
         return toolbar;
     }
@@ -90,7 +90,7 @@ public class EditablePagePanel extends JPanel {
     }
 
     private AbstractAction deleteAction(final EditablePage tableData, String nameDelete, ImageIcon iconDelete) {
-        return new AbstractAction(nameDelete,iconDelete) {
+        return new AbstractAction(nameDelete, iconDelete) {
             public void actionPerformed(ActionEvent e) {
                 doRemove(tableData);
             }
@@ -120,7 +120,8 @@ public class EditablePagePanel extends JPanel {
         int selectedRow = editableTable.getSelectedRow();
         messagePanel.clear();
         if (selectedRow != -1) {
-            int insertRowNo = tableData.addBlankRow(selectedRow, above);
+            int insertRowNo = (above) ? selectedRow : selectedRow + 1;
+            tableData.addBlankRow(selectedRow);
             refresh();
             editableTable.setRowSelectionInterval(insertRowNo, insertRowNo);
         } else {

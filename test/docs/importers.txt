@@ -1,0 +1,49 @@
+,2/17/2006 - RP,
+Name,Success,Note
+,,
+ORL Nonpoint Inventory (ARINV),Yes,
+ORL Nonroad Inventory (ARINV),Yes,
+ORL Onroad Inventory (MBINV),Yes,
+ORL Point Inventory (PTINV),Yes,
+Shapefile (External),No,"Pattern is workig, but it fails when a single file specified and wrong error message"
+External File (External),Yes,
+Temporal Cross Reference (A/M/PTREF),Yes,
+Temporal Profile (A/M/PTPRO),No,
+Comma Separated Values (CSV),Yes,
+Text file (Line-based),Yes,
+CEM Hour-Specific Point Inventory (PTHOUR),Yes,
+"Country, state, and county names and data (COSTCY)",Yes,
+Day-Specific Point Inventory (PTDAY),No,
+Inventory Table Data (INVTABLE),Yes,
+Point-Source Stack Replacements (PSTK),Yes,"In Multiple file import, if pattern denotes single file => fails"
+SMOKE Report,Yes,
+Surrogate Descriptions (SRGDESC),Yes,
+Gridding Cross Reference (A/MGREF),No,
+Spatial Surrogates (A/MGPRO),Yes,
+Chemical Speciation Cross-Reference (GSREF),Yes,
+Chemical Speciation Profiles (GSPRO),Yes,
+NIF3.0 Point Inventory,Yes,
+NIF3.0 Onroad Inventory,-,
+NIF3.0 Nonpoint Inventory,-,
+NIF3.0 Nonroad Inventory,-,
+IDA Mobile,-,
+IDA Nonpoint/Nonroad,Yes,
+IDA Point,Yes,
+Shapefile Catalog (CSV),Yes,
+Surrogate Tool Control Variables (CSV),Yes
+Surrogate Specifications (CSV),Yes
+Surrogate Tool Generation Controls (CSV),Yes
+Surrogate Code Mapping (CSV),Yes
+
+Area-to-point Conversions (Line-based),
+Grid Descriptions (Line-based),
+Report Configurations (Line-based),
+Growth and Controls Configurations (Line-based),
+Holiday Identifications (Line-based),
+BEIS3 Emission Factors (Line-based),
+Mobile Source Codes (Line-based),
+NonHAP VOC Calculation Exclusions (Line-based),
+SIC Descriptions (Line-based),
+SCC Descriptions (Line-based),
+Meteorology File (External),
+Model Ready Emissions File (External)

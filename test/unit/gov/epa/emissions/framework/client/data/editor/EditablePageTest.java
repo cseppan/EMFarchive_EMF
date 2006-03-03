@@ -164,7 +164,7 @@ public class EditablePageTest extends TestCase {
     }
 
     public void testModificationsToBlankRowShouldNotImpactChangeSet() {
-        data.addBlankRow();
+        data.addBlankRow(2);
         assertEquals(3, data.rows().size());
 
         // modify newly added (blank) row
@@ -182,8 +182,8 @@ public class EditablePageTest extends TestCase {
     }
 
     public void testChangeSetShouldIgnoreChangesToSelectCol() {
-        data.addBlankRow();
-        data.addBlankRow();
+        data.addBlankRow(2);
+        data.addBlankRow(3);
 
         data.setValueAt(Boolean.TRUE, 1, 0);
         data.setValueAt(Boolean.TRUE, 3, 0);
@@ -198,13 +198,13 @@ public class EditablePageTest extends TestCase {
     }
 
     public void testShouldAddEntryOnAdd() {
-        data.addBlankRow();
+        data.addBlankRow(2);
 
         assertEquals(3, data.rows().size());
     }
 
     public void testShouldAddBlankEntry() {
-        data.addBlankRow();
+        data.addBlankRow(2);
 
         List rows = data.rows();
         assertEquals(3, rows.size());
@@ -227,7 +227,7 @@ public class EditablePageTest extends TestCase {
     }
 
     public void testShouldReturnCurrentlyHeldRecords() {
-        data.addBlankRow();
+        data.addBlankRow(2);
 
         VersionedRecord[] sources = data.sources();
         assertEquals(3, sources.length);

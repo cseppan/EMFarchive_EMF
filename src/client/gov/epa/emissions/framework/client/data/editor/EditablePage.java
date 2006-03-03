@@ -9,13 +9,13 @@ import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
-import gov.epa.emissions.framework.ui.SelectableEmfTableData;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class EditablePage extends AbstractEditableTableData implements SelectableEmfTableData {
+public class EditablePage extends AbstractEditableTableData implements SelectableTableData {
+    
     private List rows;
 
     private int datasetId;
@@ -127,7 +127,6 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
     private void addUpdated(int row) {
         EditableRow editableRow = (EditableRow) rows.get(row);
         VersionedRecord record = (VersionedRecord) editableRow.source();
-
         if (changeset.containsNew(record)) {// ignore changes to new records
             return;
         }
@@ -139,7 +138,6 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
 
     public VersionedRecord[] getSelected() {
         List selected = new ArrayList();
-
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
             EditablePageRowSource rowSource = (EditablePageRowSource) row.rowSource();
@@ -171,48 +169,22 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
         return sources;
     }
 
-    // FIXME: Remove this after finishing insert abover and below
-    public void addBlankRow() {
+    public void addBlankRow(int row) {
         VersionedRecord record = new VersionedRecord();
         record.setDatasetId(datasetId);
         record.setVersion(version.getVersion());
         record.setDeleteVersions("");
         List tokens = new ArrayList();
+        //0-3 are record id and version related columns 
         for (int i = 4; i < tableMetadata.getCols().length; i++) {
-            // FIXME: have to add record id and verson related columns
             tokens.add(null);
         }
         record.setTokens(tokens.toArray());
 
-        rows.add(row(record));
+        rows.add(row, row(record));
         changeset.addNew(record);
     }
 
-    public int addBlankRow(int selectedRow, boolean above) {
-        VersionedRecord record = new VersionedRecord();
-        record.setDatasetId(datasetId);
-        record.setVersion(version.getVersion());
-        record.setDeleteVersions("");
-        List tokens = new ArrayList();
-        for (int i = 4; i < tableMetadata.getCols().length; i++) {
-            // FIXME: have to add record id and verson related columns
-            tokens.add(null);
-        }
-        record.setTokens(tokens.toArray());
-
-        int insertRow = insertRow(rows.size(), selectedRow, above);
-        rows.add(insertRow, row(record));
-        changeset.addNew(record);
-
-        return insertRow;
-    }
-
-    private int insertRow(int rowCount, int selectedRow, boolean above) {
-        if (rowCount == 0)
-            return 0;
-
-        return (above) ? selectedRow : selectedRow + 1;
-    }
 
     public void removeSelected() {
         VersionedRecord[] record = getSelected();
