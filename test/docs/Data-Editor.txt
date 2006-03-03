@@ -4,6 +4,9 @@ Test Cases - Data Editor
 2. Add a Note
 3. Specify a Revision
 4. Save Changes
-5. Concurrency
-6. Discard Changes
-7. Mark a Version Final
+   -Add a row(above, below)
+   -Delete row/rows
+5. Apply Sort and Filter   
+6. Concurrency
+7. Discard Changes
+8. Mark a Version Final
