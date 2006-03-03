@@ -47,6 +47,10 @@ Test Cases - Importers
 44. Meteorology File (External),
 45. Model Ready Emissions File (External)
 
-46. Apply Patten to filter files
+46. Apply Pattern to filter files
 47. Select multiple files using File Chooser
 48. Create Multiple Datasets by choosing multiple files of same Dataset Type
+49. Import multiple files (of different types) as a single type. Should indicate error.
+50. Select one file, but choose Multiple Datasets.
+51. Select a single file for a dataset type that requires muliple data files(NIF, ShapeFile)
+
