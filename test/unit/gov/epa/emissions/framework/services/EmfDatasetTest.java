@@ -65,8 +65,8 @@ public class EmfDatasetTest extends TestCase {
         
         assertFalse(dataset.getHeaderCommentsSetting());
         assertFalse(dataset.getInlineCommentSetting());
-        assertTrue(dataset.getHeaderCommentChar() == '%');
-        assertTrue(dataset.getInlineCommentChar() == '$');
+        assertTrue(dataset.getHeaderCommentChar().equals("%"));
+        assertTrue(dataset.getInlineCommentChar().equals("$"));
     }
     
     public void testShouldGiveCorrectCommentSettingsWithBlankKeyValues() {
@@ -93,7 +93,7 @@ public class EmfDatasetTest extends TestCase {
         
         assertFalse(dataset.getHeaderCommentsSetting());
         assertFalse(dataset.getInlineCommentSetting());
-        assertTrue(dataset.getHeaderCommentChar() == '#');
-        assertTrue(dataset.getInlineCommentChar() == '!');
+        assertTrue(dataset.getHeaderCommentChar().equals("#"));
+        assertTrue(dataset.getInlineCommentChar().equals("!"));
     }
 }

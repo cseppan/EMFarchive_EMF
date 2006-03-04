@@ -31,10 +31,10 @@ public class EmfDataset implements Dataset, Lockable {
     private String status;
 
     private Region region;
-    
+
     private IntendedUse intendedUse;
 
-    private Country country ;
+    private Country country;
 
     private String units;
 
@@ -63,7 +63,7 @@ public class EmfDataset implements Dataset, Lockable {
     private List keyValsList;
 
     private List sectorsList;
-    
+
     private int defaultVersion;
 
     private Mutex lock;
@@ -265,7 +265,7 @@ public class EmfDataset implements Dataset, Lockable {
     }
 
     public Sector[] getSectors() {
-        return (Sector[])sectorsList.toArray(new Sector[0]);
+        return (Sector[]) sectorsList.toArray(new Sector[0]);
     }
 
     public void setSectors(Sector[] sectors) {
@@ -332,50 +332,50 @@ public class EmfDataset implements Dataset, Lockable {
 
     public boolean getInlineCommentSetting() {
         KeyVal[] keyvals = getKeyVals();
-        for(int i = 0; i < keyvals.length; i++) {
+        for (int i = 0; i < keyvals.length; i++) {
             String keyword = keyvals[i].getKeyword().getName();
             String value = keyvals[i].getValue();
-            if(keyword.equalsIgnoreCase(inline_comment_key))
-                return value.equals("true") ? true:false; 
+            if (keyword.equalsIgnoreCase(inline_comment_key))
+                return value.equals("true") ? true : false;
         }
-        
+
         return true;
     }
 
     public boolean getHeaderCommentsSetting() {
         KeyVal[] keyvals = getKeyVals();
-        for(int i = 0; i < keyvals.length; i++) {
+        for (int i = 0; i < keyvals.length; i++) {
             String keyword = keyvals[i].getKeyword().getName();
             String value = keyvals[i].getValue();
-            if(keyword.equalsIgnoreCase(header_comment_key))
-                return value.equals("true") ? true:false; 
+            if (keyword.equalsIgnoreCase(header_comment_key))
+                return value.equals("true") ? true : false;
         }
-        
+
         return true;
     }
 
-    public char getInlineCommentChar() {
+    public String getInlineCommentChar() {
         KeyVal[] keyvals = getKeyVals();
-        for(int i = 0; i < keyvals.length; i++) {
+        for (int i = 0; i < keyvals.length; i++) {
             String keyword = keyvals[i].getKeyword().getName();
             String value = keyvals[i].getValue();
-            if(keyword.equalsIgnoreCase(inline_comment_char))
-                return (value.length() == 1) ? value.charAt(0):'!'; 
+            if (keyword.equalsIgnoreCase(inline_comment_char))
+                return (value.length() == 1) ? value : "!";
         }
-        
-        return '!';
+
+        return "!";
     }
 
-    public char getHeaderCommentChar() {
+    public String getHeaderCommentChar() {
         KeyVal[] keyvals = getKeyVals();
-        for(int i = 0; i < keyvals.length; i++) {
+        for (int i = 0; i < keyvals.length; i++) {
             String keyword = keyvals[i].getKeyword().getName();
             String value = keyvals[i].getValue();
-            if(keyword.equalsIgnoreCase(header_comment_char))
-                return (value.length() == 1) ? value.charAt(0):'#'; 
+            if (keyword.equalsIgnoreCase(header_comment_char))
+                return (value.length() == 1) ? value : "#";
         }
-        
-        return '#';
+
+        return "#";
     }
 
 }
