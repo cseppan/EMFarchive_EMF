@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.impl;
 
+import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.KeyVal;
@@ -15,6 +17,7 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
@@ -136,11 +139,21 @@ public class ExportService {
             throws Exception {
         Services services = services();
         File file = validateExportFile(path, getCleanDatasetName(dataset), overwrite);
-        Exporter exporter = exporterFactory.create(dataset, dataset.getDefaultVersion());
+        Exporter exporter = exporterFactory.create(dataset, version(dataset));
         AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset.getAccessedDateTime(),
                 "Version " + dataset.getDefaultVersion(), purpose, dirName);
 
         ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, exporter);
         threadPool.execute(eximTask);
+    }
+
+    private Version version(EmfDataset dataset) {
+        Session session = sessionFactory.getSession();
+        try {
+            Versions versions = new Versions();
+            return versions.get(dataset.getId(), dataset.getDefaultVersion(), session);
+        } finally {
+            session.close();
+        }
     }
 }

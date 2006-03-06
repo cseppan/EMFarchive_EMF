@@ -52,8 +52,11 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
     }
 
     private void doImport() throws ImporterException {
+        Version version = new Version();
+        version.setVersion(0);
+
         File file = new File("test/data/orl/nc", "very-small-nonpoint.txt");
-        DataFormatFactory formatFactory = new VersionedDataFormatFactory(0);
+        DataFormatFactory formatFactory = new VersionedDataFormatFactory(version);
         ORLNonPointImporter importer = new ORLNonPointImporter(file.getParentFile(), new String[] { file.getName() },
                 dataset, dbServer(), sqlDataTypes(), formatFactory);
         new VersionedImporter(importer, dataset, dbServer()).run();

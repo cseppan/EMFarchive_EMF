@@ -33,7 +33,7 @@ public class ImporterFactory {
         return new VersionedImporter(importer, dataset, dbServer);
     }
 
-    public Importer create(EmfDataset dataset, File folder, String[] filePatterns) throws ImporterException {
+    private Importer create(EmfDataset dataset, File folder, String[] filePatterns) throws ImporterException {
         try {
             return doCreate(dataset, folder, filePatterns);
         } catch (Exception e) {
@@ -49,7 +49,7 @@ public class ImporterFactory {
         Class[] classParams = new Class[] { File.class, String[].class, Dataset.class, DbServer.class,
                 SqlDataTypes.class, DataFormatFactory.class };
         Object[] params = new Object[] { folder, filePatterns, dataset, dbServer, sqlDataTypes,
-                new VersionedDataFormatFactory(0) };
+                new VersionedDataFormatFactory(null) };
 
         Constructor importerConstructor = importerClass.getDeclaredConstructor(classParams);
         return (Importer) importerConstructor.newInstance(params);

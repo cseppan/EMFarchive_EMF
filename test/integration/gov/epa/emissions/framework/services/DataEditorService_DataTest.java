@@ -63,8 +63,11 @@ public class DataEditorService_DataTest extends ServiceTestCase {
     }
 
     private void doImport(EmfDataset dataset) throws ImporterException {
+        Version version = new Version();
+        version.setVersion(0);
+
         File file = new File("test/data/orl/nc", "onroad-15records.txt");
-        DataFormatFactory formatFactory = new VersionedDataFormatFactory(0);
+        DataFormatFactory formatFactory = new VersionedDataFormatFactory(version);
         Importer importer = new ORLOnRoadImporter(file.getParentFile(), new String[] { file.getName() }, dataset,
                 dbServer(), sqlDataTypes(), formatFactory);
         new VersionedImporter(importer, dataset, dbServer()).run();

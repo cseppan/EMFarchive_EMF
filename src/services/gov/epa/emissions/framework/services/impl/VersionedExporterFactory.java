@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DataFormatFactory;
 import gov.epa.emissions.commons.io.Dataset;
 import gov.epa.emissions.commons.io.Exporter;
@@ -25,7 +26,7 @@ public class VersionedExporterFactory {
         this.sqlDataTypes = sqlDataTypes;
     }
 
-    public Exporter create(Dataset dataset, int version) throws EmfException {
+    public Exporter create(Dataset dataset, Version version) throws EmfException {
         try {
             String exporterName = dataset.getDatasetType().getExporterClassName();
 

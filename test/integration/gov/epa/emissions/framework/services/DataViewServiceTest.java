@@ -46,8 +46,11 @@ public class DataViewServiceTest extends ServiceTestCase {
     }
 
     private void doImport() throws ImporterException {
+        Version version = new Version();
+        version.setVersion(0);
+
         File file = new File("test/data/orl/nc", "midsize-onroad.txt");
-        DataFormatFactory formatFactory = new VersionedDataFormatFactory(0);
+        DataFormatFactory formatFactory = new VersionedDataFormatFactory(version);
         ORLOnRoadImporter importer = new ORLOnRoadImporter(file.getParentFile(), new String[] { file.getName() },
                 dataset, dbServer(), sqlDataTypes(), formatFactory);
         new VersionedImporter(importer, dataset, dbServer()).run();
