@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.TablePaginator;
 import gov.epa.emissions.framework.client.data.TablePaginatorImpl;
 import gov.epa.emissions.framework.client.data.TablePresenterDelegate;
+import gov.epa.emissions.framework.client.data.TablePresenterDelegateImpl;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataEditorService;
 
@@ -26,7 +27,7 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
 
     public EditableTablePresenterImpl(DatasetType datasetType, TablePaginator paginator, TableMetadata tableMetadata,
             EditorPanelView view, DataEditorService service) {
-        this(new TablePresenterDelegate(datasetType, paginator, tableMetadata, view, service), view, service);
+        this(new TablePresenterDelegateImpl(datasetType, paginator, tableMetadata, view, service), view, service);
     }
 
     public EditableTablePresenterImpl(TablePresenterDelegate delegate, EditorPanelView view, DataEditorService service) {

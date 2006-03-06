@@ -1,101 +1,34 @@
 package gov.epa.emissions.framework.client.data;
 
-import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.data.editor.EditorPanelView;
 import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.DataEditorService;
 
-import java.util.StringTokenizer;
+public interface TablePresenterDelegate {
 
-public class TablePresenterDelegate {
+    void display() throws EmfException;
 
-    private DatasetType datasetType;
+    void reloadCurrent() throws EmfException;
 
-    private DataEditorService service;
+    void doDisplayNext() throws EmfException;
 
-    private TableMetadata tableMetadata;
+    void doDisplayPrevious() throws EmfException;
 
-    private EditorPanelView view;
+    void doDisplay(int pageNumber) throws EmfException;
 
-    private TablePaginator paginator;
+    void doDisplayFirst() throws EmfException;
 
-    public TablePresenterDelegate(DatasetType datasetType, TablePaginator paginator, TableMetadata tableMetadata,
-            EditorPanelView view, DataEditorService service) {
-        this.datasetType = datasetType;
-        this.service = service;
-        this.tableMetadata = tableMetadata;
-        this.view = view;
+    void doDisplayLast() throws EmfException;
 
-        this.paginator = paginator;
-    }
+    void doDisplayPageWithRecord(int record) throws EmfException;
 
-    public void display() throws EmfException {
-        paginator.doDisplayFirst();
-        doApplyConstraints("", datasetType.getDefaultSortOrder());
-    }
+    int totalRecords() throws EmfException;
 
-    public void reloadCurrent() throws EmfException {
-        paginator.reloadCurrent();
-    }
+    void updateFilteredCount() throws EmfException;
 
-    public void doDisplayNext() throws EmfException {
-        paginator.doDisplayNext();
-    }
+    DataAccessToken token();
 
-    public void doDisplayPrevious() throws EmfException {
-        paginator.doDisplayPrevious();
-    }
+    void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException;
 
-    public void doDisplay(int pageNumber) throws EmfException {
-        paginator.doDisplay(pageNumber);
-    }
-
-    public void doDisplayFirst() throws EmfException {
-        paginator.doDisplayFirst();
-    }
-
-    public void doDisplayLast() throws EmfException {
-        paginator.doDisplayLast();
-    }
-
-    public void doDisplayPageWithRecord(int record) throws EmfException {
-        if (paginator.isCurrent(record))
-            return;
-        paginator.doDisplayPageWithRecord(record);
-    }
-
-    public int totalRecords() throws EmfException {
-        return paginator.totalRecords();
-    }
-
-    public void updateFilteredCount() throws EmfException {
-        view.updateFilteredRecordsCount(paginator.totalRecords());
-    }
-
-    public DataAccessToken token() {
-        return paginator.token();
-    }
-
-    public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
-        validateColsInSortOrder(sortOrder);
-        Page page = service.applyConstraints(token(), rowFilter, sortOrder);
-        view.display(page);
-        updateFilteredCount();
-    }
-
-    private void validateColsInSortOrder(String sortOrder) throws EmfException {
-        for (StringTokenizer tokenizer = new StringTokenizer(sortOrder.trim(), ","); tokenizer.hasMoreTokens();) {
-            String col = tokenizer.nextToken().trim().toLowerCase();
-            if (!tableMetadata.containsCol(col))
-                throw new EmfException("Sort Order contains an invalid column: " + col);
-        }
-    }
-
-    public int pageNumber() {
-        return paginator.pageNumber();
-    }
+    int pageNumber();
 
 }
