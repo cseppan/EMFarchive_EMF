@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.EmfException;
 
 public interface TablePresenter {
 
-    void observe();
+    void display() throws EmfException;
 
     void doDisplayNext() throws EmfException;
 

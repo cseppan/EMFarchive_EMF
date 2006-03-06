@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.data.viewer;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.data.viewer.DataView;
-import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteView;
 import gov.epa.emissions.framework.services.DataAccessToken;
 import gov.epa.emissions.framework.services.DataCommonsService;
@@ -14,12 +14,11 @@ import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Constraint;
 import org.jmock.core.constraint.HasPropertyWithValue;
 import org.jmock.core.constraint.IsInstanceOf;
 
-public class DataViewPresenterTest extends MockObjectTestCase {
+public class DataViewPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldLoadTablesOfDatasetOnDisplay() throws Exception {
         Version version = new Version();
@@ -29,17 +28,28 @@ public class DataViewPresenterTest extends MockObjectTestCase {
         Mock service = mock(DataViewService.class);
         Constraint constraint = tokenConstraint(version, table);
         service.expects(once()).method("openSession").with(constraint);
+        TableMetadata tableMetadata = new TableMetadata();
+        stub(service, "getTableMetadata", tableMetadata);
 
         DataViewService serviceProxy = (DataViewService) service.proxy();
 
         Mock view = mock(DataView.class);
-        view.expects(once()).method("display").with(eq(version), eq(table), same(serviceProxy));
+        view.expects(once()).method("display").with(eq(version), eq(table), same(tableMetadata));
 
         EmfSession session = session(serviceProxy, null);
         DataViewPresenter p = new DataViewPresenter(null, version, table, (DataView) view.proxy(), session);
         view.expects(once()).method("observe").with(same(p));
 
         p.display();
+    }
+
+    public void testShouldDisplayTablePresenterOnDisplayTable() throws Exception {
+        DataViewPresenter p = new DataViewPresenter(null, null, null, null, null);
+
+        Mock tablePresenter = mock(TablePresenter.class);
+        expects(tablePresenter, 1, "display");
+        
+        p.displayTable((TablePresenter) tablePresenter.proxy());
     }
 
     private EmfSession session(DataViewService viewService, DataCommonsService commons) {

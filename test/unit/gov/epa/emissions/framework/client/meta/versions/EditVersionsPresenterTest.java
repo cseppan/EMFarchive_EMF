@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
@@ -26,10 +27,12 @@ public class EditVersionsPresenterTest extends EmfMockObjectTestCase {
 
         Mock service = mock(DataViewService.class);
         service.expects(once()).method("openSession").withAnyArguments();
+        TableMetadata tableMetadata = new TableMetadata();
+        stub(service, "getTableMetadata", tableMetadata);
         DataViewService serviceProxy = (DataViewService) service.proxy();
 
         Mock dataView = mock(DataView.class);
-        dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
+        dataView.expects(once()).method("display").with(same(version), eq(table), same(tableMetadata));
         dataView.expects(once()).method("observe").with(new IsInstanceOf(DataViewPresenter.class));
 
         EmfSession session = session(null, null, serviceProxy);

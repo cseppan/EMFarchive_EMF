@@ -1,46 +1,44 @@
-package gov.epa.emissions.framework.client.data.viewer;
+package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.client.data.TablePaginator;
-import gov.epa.emissions.framework.client.data.TablePaginatorImpl;
-import gov.epa.emissions.framework.services.DataAccessService;
+import gov.epa.emissions.framework.client.data.editor.EditorPanelView;
+import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.DataEditorService;
 
 import java.util.StringTokenizer;
 
-public class ViewableTablePresenter implements TablePresenter {
-
-    private ViewerPanelView view;
-
-    private TablePaginator paginator;
-
-    private DataAccessService service;
-
-    private TableMetadata tableMetadata;
+public class TablePresenterDelegate {
 
     private DatasetType datasetType;
 
-    public ViewableTablePresenter(DatasetType datasetType, Version version, String table, TableMetadata tableMetadata,
-            ViewerPanelView view, DataAccessService service) {
-        this(datasetType, new TablePaginatorImpl(version, table, view, service), tableMetadata, view, service);
-    }
+    private DataEditorService service;
 
-    public ViewableTablePresenter(DatasetType datasetType, TablePaginator paginator, TableMetadata tableMetadata,
-            ViewerPanelView view, DataAccessService service) {
+    private TableMetadata tableMetadata;
+
+    private EditorPanelView view;
+
+    private TablePaginator paginator;
+
+    public TablePresenterDelegate(DatasetType datasetType, TablePaginator paginator, TableMetadata tableMetadata,
+            EditorPanelView view, DataEditorService service) {
         this.datasetType = datasetType;
-        this.paginator = paginator;
+        this.service = service;
         this.tableMetadata = tableMetadata;
         this.view = view;
-        this.service = service;
+
+        this.paginator = paginator;
     }
 
     public void display() throws EmfException {
-        view.observe(this);
         paginator.doDisplayFirst();
         doApplyConstraints("", datasetType.getDefaultSortOrder());
+    }
+
+    public void reloadCurrent() throws EmfException {
+        paginator.reloadCurrent();
     }
 
     public void doDisplayNext() throws EmfException {
@@ -64,6 +62,8 @@ public class ViewableTablePresenter implements TablePresenter {
     }
 
     public void doDisplayPageWithRecord(int record) throws EmfException {
+        if (paginator.isCurrent(record))
+            return;
         paginator.doDisplayPageWithRecord(record);
     }
 
@@ -71,11 +71,19 @@ public class ViewableTablePresenter implements TablePresenter {
         return paginator.totalRecords();
     }
 
+    public void updateFilteredCount() throws EmfException {
+        view.updateFilteredRecordsCount(paginator.totalRecords());
+    }
+
+    public DataAccessToken token() {
+        return paginator.token();
+    }
+
     public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
         validateColsInSortOrder(sortOrder);
-        Page page = service.applyConstraints(paginator.token(), rowFilter, sortOrder);
+        Page page = service.applyConstraints(token(), rowFilter, sortOrder);
         view.display(page);
-        view.updateFilteredRecordsCount(paginator.totalRecords());
+        updateFilteredCount();
     }
 
     private void validateColsInSortOrder(String sortOrder) throws EmfException {
@@ -84,6 +92,10 @@ public class ViewableTablePresenter implements TablePresenter {
             if (!tableMetadata.containsCol(col))
                 throw new EmfException("Sort Order contains an invalid column: " + col);
         }
+    }
+
+    public int pageNumber() {
+        return paginator.pageNumber();
     }
 
 }

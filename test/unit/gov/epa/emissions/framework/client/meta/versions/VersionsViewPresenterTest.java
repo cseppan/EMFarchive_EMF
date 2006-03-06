@@ -2,7 +2,9 @@ package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.InternalSource;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.viewer.DataView;
 import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
@@ -10,10 +12,9 @@ import gov.epa.emissions.framework.services.DataViewService;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.constraint.IsInstanceOf;
 
-public class VersionsViewPresenterTest extends MockObjectTestCase {
+public class VersionsViewPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldDisplayTableViewOnView() throws Exception {
         Version version = new Version();
@@ -22,10 +23,12 @@ public class VersionsViewPresenterTest extends MockObjectTestCase {
 
         Mock service = mock(DataViewService.class);
         service.expects(once()).method("openSession").withAnyArguments();
+        TableMetadata tableMetadata = new TableMetadata();
+        stub(service, "getTableMetadata", tableMetadata);
         DataViewService serviceProxy = (DataViewService) service.proxy();
 
         Mock dataView = mock(DataView.class);
-        dataView.expects(once()).method("display").with(same(version), eq(table), same(serviceProxy));
+        dataView.expects(once()).method("display").with(same(version), eq(table), same(tableMetadata));
         dataView.expects(once()).method("observe").with(new IsInstanceOf(DataViewPresenter.class));
 
         VersionsViewPresenter presenter = new VersionsViewPresenter(null, session(serviceProxy));

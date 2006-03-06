@@ -77,8 +77,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
     }
 
     void displayTable(EditableTablePresenter tablePresenter) throws EmfException {
-        tablePresenter.observe();
-        tablePresenter.doDisplay();
+        tablePresenter.display();
     }
 
     public void doClose() throws EmfException {

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data.viewer;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -47,7 +48,20 @@ public class DataViewPresenter {
     public void display() throws EmfException {
         token = viewService().openSession(token);
         view.observe(this);
-        view.display(version, table, viewService());
+
+        TableMetadata tableMetadata = viewService().getTableMetadata(table);
+        view.display(version, table, tableMetadata);
+    }
+
+    public void displayTable(ViewerPanel tableView) throws EmfException {
+        TableMetadata tableMetadata = viewService().getTableMetadata(table);
+        TablePresenter tablePresenter = new ViewableTablePresenter(dataset.getDatasetType(), version, table,
+                tableMetadata, tableView, viewService());
+        displayTable(tablePresenter);
+    }
+
+    void displayTable(TablePresenter tablePresenter) throws EmfException {
+        tablePresenter.display();
     }
 
     public void doClose() throws EmfException {

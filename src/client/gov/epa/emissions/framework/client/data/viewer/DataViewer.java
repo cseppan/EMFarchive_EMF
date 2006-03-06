@@ -8,7 +8,6 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteDialog;
-import gov.epa.emissions.framework.services.DataAccessService;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Dimensions;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -63,12 +62,12 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         this.presenter = presenter;
     }
 
-    public void display(Version version, String table, DataAccessService service) {
+    public void display(Version version, String table, TableMetadata tableMetadata) {
         updateTitle(version, table);
         super.setName("dataViewer:" + version.getDatasetId() + ":" + version.getId());
 
         JPanel container = new JPanel(new BorderLayout());
-        container.add(tablePanel(version, table, service), BorderLayout.CENTER);
+        container.add(tablePanel(tableMetadata), BorderLayout.CENTER);
         container.add(controlsPanel(), BorderLayout.PAGE_END);
         layout.add(container, BorderLayout.CENTER);
 
@@ -82,24 +81,15 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         super.setTitle(label);
     }
 
-    private JPanel tablePanel(Version version, String table, DataAccessService service) {
-        TableMetadata tableMetadata = null;
+    private JPanel tablePanel(TableMetadata tableMetadata) {
+        ViewerPanel viewerPanel = new ViewerPanel(messagePanel, dataset, tableMetadata);
         try {
-            tableMetadata = service.getTableMetadata(table);
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
-        ViewerPanel tableView = new ViewerPanel(messagePanel, dataset, tableMetadata);
-        TablePresenter tablePresenter = new ViewableTablePresenter(version, table, tableMetadata, tableView, service);
-        tablePresenter.observe();
-
-        try {
-            tablePresenter.doDisplayFirst();
+            presenter.displayTable(viewerPanel);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
 
-        return tableView;
+        return viewerPanel;
     }
 
     private JPanel controlsPanel() {

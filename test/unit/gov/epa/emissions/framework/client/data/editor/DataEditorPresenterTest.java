@@ -114,7 +114,8 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldDisplayTableViewOnDisplayTableView() throws Exception {
         DataEditorPresenterImpl p = new DataEditorPresenterImpl(null, null, null, null);
-        Mock tablePresenter = setupTablePresenterToDisplay();
+        Mock tablePresenter = mock(EditableTablePresenter.class);
+        tablePresenter.expects(once()).method("display");
 
         p.displayTable((EditableTablePresenter) tablePresenter.proxy());
     }
@@ -170,14 +171,6 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         p.save(viewProxy, token, tablePresenterProxy, serviceProxy, closingRuleProxy);
 
         assertFalse("Changes should not be saved on discard", p.areChangesSaved());
-    }
-
-    private Mock setupTablePresenterToDisplay() {
-        Mock tablePresenter = mock(EditableTablePresenter.class);
-        tablePresenter.expects(once()).method("observe");
-        tablePresenter.expects(once()).method("doDisplay");
-
-        return tablePresenter;
     }
 
     private Constraint tokenConstraint(Version version, String table) {

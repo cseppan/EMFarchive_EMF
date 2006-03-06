@@ -11,5 +11,4 @@ public interface EditableTablePresenter extends TablePresenter {
 
     void reloadCurrent() throws EmfException;
 
-    void doDisplay() throws EmfException;
 }

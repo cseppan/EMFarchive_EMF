@@ -19,31 +19,23 @@ import org.jmock.core.constraint.IsInstanceOf;
 
 public class EditableTablePresenterTest extends EmfMockObjectTestCase {
 
-    public void testShouldObserveViewOnObserve() {
-        Mock view = mock(EditorPanelView.class);
-
-        TablePresenter p = new EditableTablePresenterImpl(null, null, "table", null, (EditorPanelView) view
-                .proxy(), null);
-        view.expects(once()).method("observe").with(same(p));
-
-        p.observe();
-    }
-
     public void testShouldDisplayPageOneAfterApplyingConstraintsOnApplyConstraints() throws EmfException {
         Mock view = mock(EditorPanelView.class);
         Mock service = mock(DataEditorService.class);
 
-        String[] cols = { "col1", "col2", "col3" };
+        Mock tableMetadata = mock(TableMetadata.class);
+        TableMetadata tableMetadataProxy = (TableMetadata) tableMetadata.proxy();
 
-        TablePresenter p = new EditableTablePresenterImpl(null, null, "table", tableMetaData(cols),
+        TablePresenter p = new EditableTablePresenterImpl(null, null, "table", tableMetadataProxy,
                 (EditorPanelView) view.proxy(), (DataEditorService) service.proxy());
 
         String rowFilter = "rowFilter";
-        String sortOrder = "COL2";
+        String sortOrder = "col2";
         Page page = new Page();
         service.expects(once()).method("applyConstraints").with(new IsInstanceOf(DataAccessToken.class), eq(rowFilter),
                 eq(sortOrder)).will(returnValue(page));
         view.expects(once()).method("display").with(same(page));
+        stub(tableMetadata, "containsCol", sortOrder, Boolean.TRUE);
 
         Integer filtered = new Integer(10);
         service.stubs().method("getTotalRecords").will(returnValue(filtered));
@@ -108,14 +100,15 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         Mock view = mock(EditorPanelView.class);
         Mock service = mock(DataEditorService.class);
 
-        Mock source = mock(InternalSource.class);
-        String[] cols = { "col1", "col2", "col3" };
-        source.stubs().method("getCols").will(returnValue(cols));
+        Mock tableMetadata = mock(TableMetadata.class);
+        TableMetadata tableMetadataProxy = (TableMetadata) tableMetadata.proxy();
 
-        TablePresenter p = new EditableTablePresenterImpl(null, null, "table", tableMetaData(cols),
+        TablePresenter p = new EditableTablePresenterImpl(null, null, "table", tableMetadataProxy,
                 (EditorPanelView) view.proxy(), (DataEditorService) service.proxy());
 
         String sortOrder = "col3, invalid-row";
+        stub(tableMetadata, "containsCol", "col3", Boolean.TRUE);
+        stub(tableMetadata, "containsCol", "invalid-row", Boolean.FALSE);
         try {
             p.doApplyConstraints(null, sortOrder);
         } catch (EmfException e) {
@@ -211,18 +204,22 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         stub(datasetType, "getDefaultSortOrder", sortOrder);
 
         Mock service = mock(DataEditorService.class);
-        TableMetadata tableMetaData = tableMetaData(new String[] { sortOrder });
+
+        Mock tableMetadata = mock(TableMetadata.class);
+        stub(tableMetadata, "containsCol", sortOrder, Boolean.TRUE);
+        TableMetadata tableMetadataProxy = (TableMetadata) tableMetadata.proxy();
 
         EditableTablePresenter p = new EditableTablePresenterImpl((DatasetType) datasetType.proxy(),
-                (TablePaginator) paginator.proxy(), tableMetaData, (EditorPanelView) view.proxy(),
+                (TablePaginator) paginator.proxy(), tableMetadataProxy, (EditorPanelView) view.proxy(),
                 (DataEditorService) service.proxy());
 
         Page page = new Page();
         service.expects(once()).method("applyConstraints").with(ANYTHING, eq(""), eq(sortOrder))
                 .will(returnValue(page));
-        view.expects(once()).method("display").with(same(page));
+        expects(view, 1, "display", same(page));
+        expects(view, 1, "observe", same(p));
 
-        p.doDisplay();
+        p.display();
     }
 
     public void testShouldDisplayLastPage() throws Exception {
