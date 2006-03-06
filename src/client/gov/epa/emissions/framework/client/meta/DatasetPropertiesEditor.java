@@ -72,8 +72,8 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
             presenter.set(view);
             return view;
         } catch (EmfException e) {
-            showError("Could not load Summary Tab. Reason - " + e.getMessage());
-            return createErrorTab("Could not load Summary Tab. Reason - " + e.getMessage());
+            showError("Could not load Summary Tab." + e.getMessage());
+            return createErrorTab("Could not load Summary Tab." + e.getMessage());
         }
     }
 
@@ -91,8 +91,8 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
             presenter.set(keywordsTab);
             return keywordsTab;
         } catch (EmfException e) {
-            showError("Could not load Keyword Tab. Reason - " + e.getMessage());
-            return createErrorTab("Could not load Keyword Tab. Reason - " + e.getMessage());
+            showError("Could not load Keyword Tab." + e.getMessage());
+            return createErrorTab("Could not load Keyword Tab." + e.getMessage());
         }
     }
 
@@ -212,7 +212,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
             if (checkChanges())
                 presenter.doClose();
         } catch (EmfException e) {
-            showError("Could not close. Reason - " + e.getMessage());
+            showError("Could not close." + e.getMessage());
         }
     }
 

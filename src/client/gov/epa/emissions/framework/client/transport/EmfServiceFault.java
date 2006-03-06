@@ -17,7 +17,14 @@ public class EmfServiceFault {
         if ((cause != null) && (CONNECTION_REFUSED.equals(cause.getMessage())))
             return "EMF server not responding";
 
-        return fault.getFaultReason();
+        String faultReason = reason();
+
+        return faultReason;
+    }
+
+    private String reason() {// Fault Reason format - [exception class:reason]
+        String faultReason = fault.getFaultReason();
+        return faultReason.substring(faultReason.indexOf(':') + 1);
     }
 
 }

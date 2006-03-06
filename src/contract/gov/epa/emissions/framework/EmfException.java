@@ -1,21 +1,25 @@
 package gov.epa.emissions.framework;
 
-public class EmfException extends Exception {
+import java.rmi.RemoteException;
+
+public class EmfException extends RemoteException {
 
     String details;
 
-    public EmfException(String message, String details, Throwable cause) {
-        super(message, cause);
-        this.details = details;
-    }
-
-    public EmfException(String message, String details) {
-        super(message);
-        this.details = details;
+    public EmfException() {//
     }
 
     public EmfException(String message) {
         super(message);
+        this.details = message;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    public String getDetails() {
+        return details;
     }
 
 }

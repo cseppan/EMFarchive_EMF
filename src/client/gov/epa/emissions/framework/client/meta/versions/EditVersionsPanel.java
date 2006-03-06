@@ -227,7 +227,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         try {
             presenter.doMarkFinal(versions);
         } catch (EmfException e) {
-            displayError("Could not mark as final." + e.getMessage());
+            displayError(e.getMessage());
         }
     }
 

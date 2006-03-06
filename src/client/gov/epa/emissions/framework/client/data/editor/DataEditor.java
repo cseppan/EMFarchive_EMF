@@ -311,7 +311,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         try {
             doClose();
         } catch (EmfException e) {
-            displayError("Could not close. Reason - " + e.getMessage());
+            displayError("Could not close." + e.getMessage());
         }
     }
 

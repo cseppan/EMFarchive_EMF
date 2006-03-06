@@ -105,7 +105,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
             threadPool.execute(eximTask);
         } catch (Exception e) {
             log.error("Exception attempting to start import of file: " + fileNames[0], e);
-            throw new EmfException("Import of file failed: " + e.getMessage());
+            throw new EmfException("Import failed: " + e.getMessage());
         }
     }
 

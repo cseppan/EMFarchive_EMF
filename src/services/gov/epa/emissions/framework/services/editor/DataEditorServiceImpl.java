@@ -172,7 +172,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         Version derived = token.getVersion();
         Version current = accessor.currentVersion(derived);
         if (current.isLocked())
-            throw new EmfException("Cannot mark Version: " + derived.getName() + " Final as it is locked by "
+            throw new EmfException("Cannot mark Version " + derived.getName() + " Final as it is locked by "
                     + current.getLockOwner());
 
         return doMarkFinal(derived);
