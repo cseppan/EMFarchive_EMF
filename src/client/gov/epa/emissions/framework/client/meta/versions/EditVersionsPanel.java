@@ -332,12 +332,13 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     private void showEditor(String table, Version version) {
         DataEditor view = new DataEditor(dataset, parentConsole, desktopManager);
         try {
-            if (dataset.getInternalSources().length > 0)
-                presenter.doEdit(version, table, view);
-            else
+            if (dataset.isExternal()) {
                 displayError("Could not open editor.This is an external file.");
+                return;
+            }
+            presenter.doEdit(version, table, view);
         } catch (EmfException e) {
-            displayError("Could not open editor." + e.getMessage());
+            displayError(e.getMessage());
         }
     }
 
