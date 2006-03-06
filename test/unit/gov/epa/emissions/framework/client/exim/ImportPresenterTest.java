@@ -46,34 +46,44 @@ public class ImportPresenterTest extends MockObjectTestCase {
 
     public void testSendsImportRequestToEximServiceOnImport() throws Exception {
         DatasetType type = new DatasetType("ORL NonRoad");
-
+        type.setMinFiles(1);
+        type.setMaxFiles(1);
+        
         User user = new User();
         user.setUsername("user");
         user.setName("full name");
 
         Mock model = mock(ExImService.class);
         model.expects(once()).method("importDataset");
+        
+        Mock view = mock(ImportView.class);
+        view.expects(once()).method("setMessage");
 
         ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), user, (ExImService) model.proxy());
-
+        
         prefs.stubs().method("mapLocalInputPathToRemote");
-        presenter.doImport("dir", new String[] {"filename"}, type, "");
+        presenter.importDataset("dir", new String[] {"filename"}, type, "test",(ImportView)view.proxy());
     }
     
     public void testSendsImportRequestToEximServiceOnImportMultipleDatasets() throws Exception {
         DatasetType type = new DatasetType("ORL NonRoad");
-
+        type.setMinFiles(1);
+        type.setMaxFiles(1);
+        
         User user = new User();
         user.setUsername("user");
         user.setName("full name");
 
         Mock model = mock(ExImService.class);
         model.expects(once()).method("importDatasets");
+        
+        Mock view = mock(ImportView.class);
+        view.expects(once()).method("setMessage");
 
         ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), user, (ExImService) model.proxy());
 
         prefs.stubs().method("mapLocalInputPathToRemote");
-        presenter.doImport("dir", new String[] {"filename"}, type);
+        presenter.importDatasets("dir", new String[] {"filename"}, type,(ImportView) view.proxy());
     }
 
     public void testClosesViewOnDoneImport() {

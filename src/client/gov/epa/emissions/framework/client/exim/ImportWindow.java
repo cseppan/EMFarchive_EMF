@@ -25,11 +25,11 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private MessagePanel messagePanel;
 
     private DataCommonsService service;
-    
+
     private ImportInputPanel importInputPanel;
 
     public ImportWindow(DataCommonsService service, DesktopManager desktopManager) throws EmfException {
-        super("Import Dataset", new Dimension(650, 400), desktopManager);
+        super("Import Dataset", new Dimension(650, 450), desktopManager);
         super.setName("importDatasets");
 
         this.service = service;
@@ -42,14 +42,13 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
-        importInputPanel = new ImportInputPanel(service, messagePanel, this);
+        importInputPanel = new ImportInputPanel(service, messagePanel);
         panel.add(messagePanel);
         panel.add(importInputPanel);
         panel.add(createButtonsPanel());
 
         return panel;
     }
-
 
     private JPanel createButtonsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -79,9 +78,18 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
         return panel;
     }
-    
+
     private void doImport() {
-        importInputPanel.doImport(presenter);
+        try {
+            if (!importInputPanel.isCreateMutlipleDatasets()) {
+                presenter.doImport(importInputPanel.folder(), importInputPanel.files(), importInputPanel.datasetType(),
+                        importInputPanel.datasetName());
+            } else {
+                presenter.doImport(importInputPanel.folder(), importInputPanel.files(), importInputPanel.datasetType());
+            }
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
     }
 
     public void register(ImportPresenter presenter) {
@@ -95,5 +103,10 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     public void setDefaultBaseFolder(String folder) {
         importInputPanel.setDefaultBaseFolder(folder);
+    }
+
+    public void setMessage(String message) {
+        importInputPanel.setMessage(message);
+
     }
 }

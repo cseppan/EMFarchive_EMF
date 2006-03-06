@@ -18,20 +18,32 @@ public class ImportPresenter {
 
     private EmfSession session;
 
+    private NewImportInputRules importRules;
+
     public ImportPresenter(EmfSession session, User user, ExImService service) {
         this.user = user;
         this.service = service;
         this.session = session;
+        this.importRules = new NewImportInputRules();
     }
 
-    public void doImport(String directory, String[] filePattern, DatasetType type)
-            throws EmfException {
-        service.importDatasets(user, mapToRemote(directory), filePattern, type);
+    public void doImport(String directory, String[] files, DatasetType type) throws EmfException {
+        importDatasets(directory, files, type, view);
     }
-    
-    public void doImport(String directory, String[] filePattern, DatasetType type, String datasetName)
-            throws EmfException {
-        service.importDataset(user, mapToRemote(directory), filePattern, type, datasetName);
+
+    void importDatasets(String directory, String[] files, DatasetType type, ImportView view) throws EmfException {
+        importRules.validate(directory, files, type);
+        startImportMessage(view);
+        service.importDatasets(user, mapToRemote(directory), files, type);
+    }
+
+    private void startImportMessage(ImportView view) {
+        String message = "Started import. Please monitor the Status window to track your Import request.";
+        view.setMessage(message);
+    }
+
+    public void doImport(String directory, String[] files, DatasetType type, String datasetName) throws EmfException {
+       importDataset(directory,files,type,datasetName,view);
     }
 
     public void doDone() {
@@ -60,6 +72,13 @@ public class ImportPresenter {
 
     private String mapToRemote(String dir) {
         return session.preferences().mapLocalInputPathToRemote(dir);
+    }
+
+    public void importDataset(String directory, String[] files, DatasetType type, String datasetName, ImportView view) throws EmfException {
+        importRules.validate(directory, files, type, datasetName);
+        startImportMessage(view);
+        service.importDataset(user, mapToRemote(directory), files, type, datasetName);
+        
     }
 
 }

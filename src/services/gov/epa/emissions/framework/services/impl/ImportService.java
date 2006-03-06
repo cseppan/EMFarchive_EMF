@@ -26,7 +26,7 @@ public class ImportService {
 
     private ImporterFactory importerFactory;
 
-    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MMddyy_HHmm");
+    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MMddyy_HHmmss");
 
     public ImportService(ImporterFactory importerFactory, HibernateSessionFactory sessionFactory,
             PooledExecutor threadPool) {
