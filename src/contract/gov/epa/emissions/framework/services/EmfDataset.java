@@ -378,4 +378,8 @@ public class EmfDataset implements Dataset, Lockable {
         return "#";
     }
 
+    public boolean isExternal() {
+        return getInternalSources().length == 0;
+    }
+
 }
