@@ -49,13 +49,13 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         EmfDataset[] datasets = new EmfDataset[] { (EmfDataset) dataset.proxy() };
 
         Mock model = mock(ExImService.class);
-        model.expects(once()).method("startExportWithOverwrite");
+        model.expects(once()).method("exportDatasetsWithOverwrite");
 
         session.stubs().method("user").withNoArguments().will(returnValue(user));
         session.stubs().method("eximService").withNoArguments().will(returnValue(model.proxy()));
         session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
 
-        ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
+        ExportPresenter presenter = new ExportPresenterImpl((EmfSession) session.proxy());
 
         presenter.doExportWithOverwrite(datasets, folder, "mock export");
     }
@@ -71,14 +71,14 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         EmfDataset[] datasets = new EmfDataset[] { dataset };
 
         Mock model = mock(ExImService.class);
-        model.expects(once()).method("startExport").with(
+        model.expects(once()).method("exportDatasets").with(
                 new Constraint[] { eq(user), eq(datasets), eq(folder), eq(description) });
 
         session.stubs().method("user").withNoArguments().will(returnValue(user));
         session.stubs().method("eximService").withNoArguments().will(returnValue(model.proxy()));
         session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
 
-        ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
+        ExportPresenter presenter = new ExportPresenterImpl((EmfSession) session.proxy());
 
         presenter.doExport(datasets, folder, description);
     }
@@ -87,7 +87,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         Mock view = mock(ExportView.class);
         view.expects(once()).method("close");
 
-        ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
+        ExportPresenter presenter = new ExportPresenterImpl((EmfSession) session.proxy());
 
         ExportView viewProxy = (ExportView) view.proxy();
         view.expects(once()).method("observe").with(eq(presenter));
@@ -103,7 +103,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         session.stubs().method("user").withNoArguments().will(returnValue(null));
         session.stubs().method("eximService").withNoArguments().will(returnValue(null));
 
-        ExportPresenter presenter = new DefaultExportPresenter((EmfSession) session.proxy());
+        ExportPresenter presenter = new ExportPresenterImpl((EmfSession) session.proxy());
 
         Mock view = mock(ExportView.class);
         ExportView viewProxy = (ExportView) view.proxy();

@@ -13,7 +13,7 @@ import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.exim.DatasetsBrowserAwareImportPresenter;
-import gov.epa.emissions.framework.client.exim.DefaultExportPresenter;
+import gov.epa.emissions.framework.client.exim.ExportPresenterImpl;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
@@ -217,7 +217,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager);
         getDesktopPane().add(exportView);
 
-        ExportPresenter exportPresenter = new DefaultExportPresenter(session);
+        ExportPresenter exportPresenter = new ExportPresenterImpl(session);
         presenter.doExport(exportView, exportPresenter, emfDatasets);
     }
 

@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.services.ExImService;
 import java.io.File;
 import java.util.Date;
 
-public class DefaultExportPresenter implements ExportPresenter {
+public class ExportPresenterImpl implements ExportPresenter {
 
     private ExportView view;
 
@@ -16,7 +16,7 @@ public class DefaultExportPresenter implements ExportPresenter {
 
     private static String lastFolder = null;
 
-    public DefaultExportPresenter(EmfSession session) {
+    public ExportPresenterImpl(EmfSession session) {
         this.session = session;
     }
 
@@ -55,9 +55,9 @@ public class DefaultExportPresenter implements ExportPresenter {
 
         ExImService services = session.eximService();
         if (overwrite)
-            services.startExportWithOverwrite(session.user(), datasets, mapToRemote(folder), purpose);
+            services.exportDatasetsWithOverwrite(session.user(), datasets, mapToRemote(folder), purpose);
         else
-            services.startExport(session.user(), datasets, mapToRemote(folder), purpose);
+            services.exportDatasets(session.user(), datasets, mapToRemote(folder), purpose);
     }
 
     private String mapToRemote(String dir) {

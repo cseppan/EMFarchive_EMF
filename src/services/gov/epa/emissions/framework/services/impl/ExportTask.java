@@ -35,14 +35,14 @@ public class ExportTask implements Runnable {
 
     private AccessLog accesslog;
 
-    protected ExportTask(User user, File file, EmfDataset dataset, Services svcHolder, AccessLog accesslog,
+    protected ExportTask(User user, File file, EmfDataset dataset, Services services, AccessLog accesslog,
             Exporter exporter) {
         this.user = user;
         this.file = file;
         this.dataset = dataset;
-        this.statusServices = svcHolder.getStatus();
-        this.loggingService = svcHolder.getLoggingService();
-        this.dataService = svcHolder.getData();
+        this.statusServices = services.getStatus();
+        this.loggingService = services.getLoggingService();
+        this.dataService = services.getData();
         this.exporter = exporter;
         this.accesslog = accesslog;
     }

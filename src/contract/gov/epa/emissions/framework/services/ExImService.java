@@ -10,8 +10,8 @@ public interface ExImService extends EMFService {
 
     void importDataset(User user, String folderPath, String[] filenames, DatasetType datasetType, String datasetName) throws EmfException;
 
-    void startExport(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException;
+    void exportDatasets(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException;
 
-    void startExportWithOverwrite(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException;
+    void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException;
 
 }

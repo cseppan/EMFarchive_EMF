@@ -21,13 +21,13 @@ public class ExImServiceTransport implements ExImService {
         return callFactory.createCall("Export-Import Service");
     }
 
-    public void startExport(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException {
-        doExport("startExport", user, datasets, folder, purpose);
+    public void exportDatasets(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException {
+        doExport("exportDatasets", user, datasets, folder, purpose);
     }
 
-    public void startExportWithOverwrite(User user, EmfDataset[] datasets, String folder, String purpose)
+    public void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, String folder, String purpose)
             throws EmfException {
-        doExport("startExportWithOverwrite", user, datasets, folder, purpose);
+        doExport("exportDatasetsWithOverwrite", user, datasets, folder, purpose);
     }
 
     private void doExport(String operationName, User user, EmfDataset[] datasets, String folder, String purpose)
