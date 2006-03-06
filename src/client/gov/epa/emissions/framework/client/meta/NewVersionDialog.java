@@ -20,7 +20,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-
 public class NewVersionDialog extends Dialog {
 
     private TextField name;
@@ -71,7 +70,7 @@ public class NewVersionDialog extends Dialog {
 
     private String[] versionNames(Version[] versions) {
         VersionsSet set = new VersionsSet(versions);
-        return set.names();
+        return set.namesOfFinalVersions();
     }
 
     private JComboBox createVersionsCombo(DefaultComboBoxModel model) {
