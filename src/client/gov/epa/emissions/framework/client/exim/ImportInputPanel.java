@@ -49,8 +49,7 @@ public class ImportInputPanel extends JPanel {
 
     private static File lastFolder = null;
 
-    public ImportInputPanel(DataCommonsService service, MessagePanel messagePanel)
-            throws EmfException {
+    public ImportInputPanel(DataCommonsService service, MessagePanel messagePanel) throws EmfException {
         this.messagePanel = messagePanel;
         this.service = service;
         initialize();
@@ -60,12 +59,7 @@ public class ImportInputPanel extends JPanel {
         setLayout(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        DatasetType[] allDatasetTypes = service.getDatasetTypes();
-        DatasetType[] allTypesWithMessage = new DatasetType[allDatasetTypes.length + 1];
-        copyDatasetTypes(allDatasetTypes, allTypesWithMessage);
-        datasetTypesModel = new DefaultComboBoxModel(allTypesWithMessage);
-        JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
-        datasetTypesComboBox.setName("datasetTypes");
+        JComboBox datasetTypesComboBox = typesComboBox();
         layoutGenerator.addLabelWidgetPair("Dataset Type", datasetTypesComboBox, this);
 
         JPanel chooser = new JPanel(new BorderLayout());
@@ -89,7 +83,7 @@ public class ImportInputPanel extends JPanel {
         layoutGenerator.addLabelWidgetPair("Dataset Name", name, this);
 
         isMultipleDatasets = new JCheckBox("Create Multiple Datasets");
-        isMultipleDatasets.addActionListener(actionListener());
+        isMultipleDatasets.addActionListener(multipleDatasetsActionListener());
 
         layoutGenerator.addLabelWidgetPair("", isMultipleDatasets, this);
 
@@ -100,9 +94,26 @@ public class ImportInputPanel extends JPanel {
 
     }
 
-    private ActionListener actionListener() {
+    private JComboBox typesComboBox() throws EmfException {
+        DatasetType[] allDatasetTypes = service.getDatasetTypes();
+        DatasetType[] allTypesWithMessage = new DatasetType[allDatasetTypes.length + 1];
+        copyDatasetTypes(allDatasetTypes, allTypesWithMessage);
+        datasetTypesModel = new DefaultComboBoxModel(allTypesWithMessage);
+        JComboBox datasetTypesComboBox = new JComboBox(datasetTypesModel);
+        datasetTypesComboBox.setName("datasetTypes");
+        
+        datasetTypesComboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                clear();
+            }
+        });
+        return datasetTypesComboBox;
+    }
+
+    private ActionListener multipleDatasetsActionListener() {
         return new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                clear();
                 makeVisibleDatasetNameField(!isMultipleDatasets.isSelected());
             }
         };
@@ -124,6 +135,7 @@ public class ImportInputPanel extends JPanel {
     private JButton importFileButton() {
         Button button = new Button("Choose File", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
+                clear();
                 selectFile();
             }
         });
@@ -137,6 +149,7 @@ public class ImportInputPanel extends JPanel {
     private JButton applyPatternButton() {
         Button button = new Button("Apply Pattern", new AbstractAction() {
             public void actionPerformed(ActionEvent arg0) {
+                clear();
                 selectFilesFromPattern();
             }
         });
@@ -172,18 +185,21 @@ public class ImportInputPanel extends JPanel {
         FileChooser chooser = new FileChooser("Select File", new File(folder.getText()), ImportInputPanel.this);
         chooser.setTitle("Select a " + datasetTypesModel.getSelectedItem().toString() + " File");
         File[] files = chooser.choose();
-        if(files.length>1){
-        setFolder(files);
-        String [] fileNames = new String[files.length];
-        for (int i = 0; i < fileNames.length; i++) {
-            fileNames[i] = files[i].getName();
-        }
-        populateFilenamesFiled(fileNames);
-        }else{
+        if (files.length == 0)
+            return;
+
+        if (files.length > 1) {
+            setFolder(files);
+            String[] fileNames = new String[files.length];
+            for (int i = 0; i < fileNames.length; i++) {
+                fileNames[i] = files[i].getName();
+            }
+            populateFilenamesFiled(fileNames);
+        } else {
             singleFile(files[0]);
         }
     }
-    
+
     private void singleFile(File file) {
         if (file.isDirectory()) {
             folder.setText(file.getAbsolutePath());
@@ -199,7 +215,7 @@ public class ImportInputPanel extends JPanel {
     }
 
     private void setFolder(File[] files) {
-        if(files.length>0){
+        if (files.length > 0) {
             folder.setText(files[0].getParentFile().toString());
             lastFolder = files[0].getParentFile();
         }
@@ -259,6 +275,10 @@ public class ImportInputPanel extends JPanel {
 
     public void setMessage(String message) {
         messagePanel.setMessage(message);
+    }
+
+    private void clear() {
+        messagePanel.clear();
     }
 
 }
