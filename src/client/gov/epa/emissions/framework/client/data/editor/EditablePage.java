@@ -186,10 +186,10 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
 
 
     public void removeSelected() {
-        VersionedRecord[] record = getSelected();
+        VersionedRecord[] records = getSelected();
 
-        remove(record);
-        changeset.addDeleted(record);
+        remove(records);
+        changeset.addDeleted(records);
     }
 
     public Class getColumnClass(int col) {

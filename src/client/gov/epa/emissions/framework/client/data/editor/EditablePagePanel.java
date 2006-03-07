@@ -133,10 +133,11 @@ public class EditablePagePanel extends JPanel {
         clearMessagesWithTableRefresh();
         if (tableData.getSelected().length == 0) {
             messagePanel.setError("Please select one more rows for removing data");
-        } else {
-            tableData.removeSelected();
-            refresh();
+            return;
         }
+
+        tableData.removeSelected();
+        refresh();
     }
 
     public void scrollToPageEnd() {
