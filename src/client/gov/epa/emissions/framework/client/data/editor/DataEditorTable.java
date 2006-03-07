@@ -36,7 +36,7 @@ public class DataEditorTable extends EditableTable {
             return value;
         }
         if (!sizeCheck(value, metadata)) {
-            messagePanel.setError("The column size is " + metadata.getSize());
+            messagePanel.setError("Enter a value no longer than " + metadata.getSize()+" characters");
             return getValueAt(row, column); // return the current value;
         }
 
@@ -47,7 +47,7 @@ public class DataEditorTable extends EditableTable {
     private boolean sizeCheck(String value, ColumnMetaData metadata) {
         int dbColumnSize = metadata.getSize();
         // -1=> no size constraints
-        return (dbColumnSize == -1 || value == null || dbColumnSize > value.length());
+        return (dbColumnSize == -1 || value == null || dbColumnSize >= value.length());
     }
 
 }
