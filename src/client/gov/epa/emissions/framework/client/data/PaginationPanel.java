@@ -9,8 +9,8 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -42,10 +42,18 @@ public class PaginationPanel extends JPanel {
 
     private JLabel filteredRecords;
 
+    private IconButton lastButton;
+
+    private IconButton firstButton;
+
+    private IconButton prevButton;
+
+    private IconButton nextButton;
+
     public PaginationPanel(MessagePanel messagePanel) {
         super(new BorderLayout());
         this.messagePanel = messagePanel;
-        this.setMinimumSize(new Dimension(300,300));
+        this.setMinimumSize(new Dimension(300, 300));
     }
 
     private void doLayout(int totalRecordsCount) {
@@ -84,7 +92,11 @@ public class PaginationPanel extends JPanel {
     public void init(TablePresenter presenter) {
         this.presenter = presenter;
         try {
-            doLayout(presenter.totalRecords());
+            int totalRecords = presenter.totalRecords();
+            doLayout(totalRecords);
+
+            if (totalRecords == 0)
+                disableControlPanel();
         } catch (EmfException e) {
             messagePanel.setError("Could not obtain Total Records." + e.getMessage());
         }
@@ -137,7 +149,10 @@ public class PaginationPanel extends JPanel {
     }
 
     private JSlider slider(int max) {
-        slider = new JSlider(JSlider.HORIZONTAL, 1, max, 1);
+        if (max == 0)
+            slider = new JSlider(JSlider.HORIZONTAL, 0, max, 0);
+        else
+            slider = new JSlider(JSlider.HORIZONTAL, 1, max, 1);
 
         slider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
@@ -155,14 +170,45 @@ public class PaginationPanel extends JPanel {
     }
 
     public void updateStatus(Page page) {
+        if (page.getMax() == 0) {
+            current.setText("0");
+            return;
+        }
+
         current.setText(page.getMin() + " - " + page.getMax());
         slider.setValue(page.getMin());
     }
 
     public void updateFilteredRecordsCount(int filtered) {
         filteredRecords.setText("" + filtered);
+        if (filtered == 0) {
+            recordInput.setText("0");
+            recordInput.setRange(0, 0);
+            disableControlPanel();
+            return;
+        }
+
+        enableControlPanel();
         slider.setMaximum(filtered);
         recordInput.setRange(1, filtered);
+    }
+
+    private void enableControlPanel() {
+        slider.setEnabled(true);
+        recordInput.setEnabled(true);
+        firstButton.setEnabled(true);
+        lastButton.setEnabled(true);
+        prevButton.setEnabled(true);
+        nextButton.setEnabled(true);
+    }
+
+    private void disableControlPanel() {
+        slider.setEnabled(false);
+        recordInput.setEnabled(false);
+        firstButton.setEnabled(false);
+        lastButton.setEnabled(false);
+        prevButton.setEnabled(false);
+        nextButton.setEnabled(false);
     }
 
     private boolean verifyInput(JSlider slider) {
@@ -190,14 +236,14 @@ public class PaginationPanel extends JPanel {
         }
     }
 
-    // FIXME: change messages about 'page' to 'range' ??
     private IconButton lastButton(ImageResources res) {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doDisplayLast();
             }
         };
-        return new IconButton("Last", "Go to Last Page", res.last("Go to Last Page"), action);
+        lastButton = new IconButton("Last", "Go to Last Page", res.last("Go to Last Page"), action);
+        return lastButton;
     }
 
     private IconButton nextButton(ImageResources res) {
@@ -206,7 +252,8 @@ public class PaginationPanel extends JPanel {
                 doDisplayNext();
             }
         };
-        return new IconButton("Next", "Go to Next Page", res.next("Go to Next Page"), action);
+        nextButton = new IconButton("Next", "Go to Next Page", res.next("Go to Next Page"), action);
+        return nextButton;
     }
 
     private IconButton prevButton(ImageResources res) {
@@ -216,7 +263,8 @@ public class PaginationPanel extends JPanel {
             }
 
         };
-        return new IconButton("Prev", "Go to Previous Page", res.prev("Go to Previous Page"), action);
+        prevButton = new IconButton("Prev", "Go to Previous Page", res.prev("Go to Previous Page"), action);
+        return prevButton;
     }
 
     private IconButton firstButton(ImageResources res) {
@@ -225,7 +273,8 @@ public class PaginationPanel extends JPanel {
                 doDisplayFirst();
             }
         };
-        return new IconButton("First", "Go to First Page", res.first("Go to First Page"), action);
+        firstButton = new IconButton("First", "Go to First Page", res.first("Go to First Page"), action);
+        return firstButton;
     }
 
     private void doDisplayPrevious() {
