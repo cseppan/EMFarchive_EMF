@@ -28,7 +28,7 @@ public class Note {
     }
 
     public String toString() {
-        return name + "(" + id + ")";
+        return name + " (" + id + ")";
     }
 
     public Note(User creator, long datasetId, Date date, String details, String name, NoteType type, String references,
