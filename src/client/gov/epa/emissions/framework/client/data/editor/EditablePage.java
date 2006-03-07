@@ -53,8 +53,8 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
         for (int i = 4; i < cols.length; i++) {
             list.add(cols[i].getName());
         }
-        list.add(cols[0].getName());
-        list.add(cols[2].getName());
+        list.add(cols[0].getName());  //record_id
+        list.add(cols[2].getName());  //version
 
         return (String[]) list.toArray(new String[0]);
     }
