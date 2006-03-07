@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.NoteType;
 
 import org.jmock.Mock;
 import org.jmock.core.Constraint;
+import org.jmock.core.constraint.IsInstanceOf;
 
 public class EditNotesTabPresenterTest extends EmfMockObjectTestCase {
 
@@ -74,12 +75,14 @@ public class EditNotesTabPresenterTest extends EmfMockObjectTestCase {
 
         Mock view = mock(EditNotesTabView.class);
         expects(view, 1, "addNote", same(note));
+        stub(view, "additions", new Note[0]);
 
         EditNotesTabPresenterImpl presenter = new EditNotesTabPresenterImpl(dataset, session, (EditNotesTabView) view
                 .proxy());
 
         Mock newNoteView = mock(NewNoteView.class);
-        Constraint[] constraints = { same(user), same(dataset), same(notes), same(types), same(versions) };
+        Constraint[] constraints = { same(user), same(dataset), new IsInstanceOf(new Note[0].getClass()), same(types),
+                same(versions) };
         newNoteView.stubs().method("display").with(constraints);
         newNoteView.stubs().method("shouldCreate").will(returnValue(Boolean.TRUE));
         newNoteView.stubs().method("note").will(returnValue(note));

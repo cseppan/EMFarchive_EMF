@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
 import gov.epa.emissions.framework.ui.Dialog;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -97,7 +98,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         panel.add(inputPanel(notes, types, versionsSet));
-        panel.add(buttonsPanel());
+        panel.add(buttonsPanel(notes));
 
         return panel;
     }
@@ -133,8 +134,10 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
     }
 
     private void layoutReferences(final Note[] notes, JPanel panel, SpringLayoutGenerator layoutGenerator) {
-        JPanel rightPanel = new JPanel();
-        rightPanel.add(scrollableReferences());
+        JPanel rightPanel = new JPanel(new BorderLayout());
+
+        JPanel container = new JPanel();
+        container.add(scrollableReferences());
 
         Button button = new Button("Set", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -142,7 +145,9 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
             }
         });
         button.setToolTipText("Set References");
-        rightPanel.add(button);
+        container.add(button);
+
+        rightPanel.add(container, BorderLayout.LINE_START);
 
         layoutGenerator.addWidgetPair(new Label("References"), rightPanel, panel);
     }
@@ -177,14 +182,11 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         return combo;
     }
 
-    private JPanel buttonsPanel() {
+    private JPanel buttonsPanel(final Note[] notes) {
         JPanel panel = new JPanel();
         Button ok = new Button("OK", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if (verifyInput()) {
-                    shouldCreate = true;
-                    close();
-                }
+                doNew(notes);
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -201,11 +203,35 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         return panel;
     }
 
-    protected boolean verifyInput() {
-        if (name.getText().trim().length() != 0)
-            return true;
+    private void doNew(Note[] notes) {
+        if (verifyInput(notes)) {
+            shouldCreate = true;
+            close();
+        }
+    }
 
-        JOptionPane.showMessageDialog(super.getParent(), "Please enter Name", "Error", JOptionPane.ERROR_MESSAGE);
+    protected boolean verifyInput(Note[] notes) {
+        String noteName = name.getText().trim();
+        if (noteName.length() == 0) {
+            JOptionPane.showMessageDialog(super.getParent(), "Please enter Name", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        if (duplicate(noteName, notes)) {
+            JOptionPane.showMessageDialog(super.getParent(), "Name is duplicate. Please enter a different name.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean duplicate(String noteName, Note[] notes) {
+        for (int i = 0; i < notes.length; i++) {
+            if (notes[i].getName().equals(noteName))
+                return true;
+        }
+
         return false;
     }
 

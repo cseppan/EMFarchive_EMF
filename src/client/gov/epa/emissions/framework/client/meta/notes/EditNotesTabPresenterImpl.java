@@ -9,6 +9,10 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Note;
 import gov.epa.emissions.framework.services.NoteType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class EditNotesTabPresenterImpl implements EditNotesTabPresenter {
 
     private EmfDataset dataset;
@@ -52,8 +56,17 @@ public class EditNotesTabPresenterImpl implements EditNotesTabPresenter {
 
     void addNote(NewNoteView newNoteView, User user, EmfDataset dataset, Note[] notes, NoteType[] types,
             Version[] versions) {
-        newNoteView.display(user, dataset, notes, types, versions);
+        Note[] combinedNotesList = combinedNotesList(notes, view.additions());
+        newNoteView.display(user, dataset, combinedNotesList, types, versions);
         if (newNoteView.shouldCreate())
             view.addNote(newNoteView.note());
+    }
+
+    private Note[] combinedNotesList(Note[] a, Note[] b) {
+        List list = new ArrayList();
+        list.addAll(Arrays.asList(a));
+        list.addAll(Arrays.asList(b));
+
+        return (Note[]) list.toArray(new Note[0]);
     }
 }
