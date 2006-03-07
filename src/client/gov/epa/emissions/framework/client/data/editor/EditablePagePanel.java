@@ -121,11 +121,11 @@ public class EditablePagePanel extends JPanel {
         messagePanel.clear();
         if (selectedRow != -1) {
             int insertRowNo = (above) ? selectedRow : selectedRow + 1;
-            tableData.addBlankRow(selectedRow);
+            tableData.addBlankRow(insertRowNo);
             refresh();
             editableTable.setRowSelectionInterval(insertRowNo, insertRowNo);
         } else {
-            messagePanel.setError("Please highlight a row before insert");
+            messagePanel.setError("Please highlight a row before clicking the insert button");
         }
     }
 
