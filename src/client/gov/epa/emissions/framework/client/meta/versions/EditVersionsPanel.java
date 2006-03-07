@@ -333,7 +333,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         DataEditor view = new DataEditor(dataset, parentConsole, desktopManager);
         try {
             if (dataset.isExternal()) {
-                displayError("Could not open editor.This is an external file.");
+                displayError("Could not open data editor: the Dataset references external files.");
                 return;
             }
             presenter.doEdit(version, table, view);
