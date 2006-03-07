@@ -89,7 +89,6 @@ public class EditablePage extends AbstractEditableTableData implements Selectabl
     private List createRows(Page page) {
         List rows = new ArrayList();
         VersionedRecord[] records = page.getRecords();
-
         for (int i = 0; i < records.length; i++) {
             EditableRow row = row(records[i]);
             rows.add(row);

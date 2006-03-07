@@ -66,7 +66,7 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
     }
 
     public void doDisplayPageWithRecord(int record) throws EmfException {
-        if (paginator.isCurrent(record))
+        if ((record == 0) || paginator.isCurrent(record))
             return;
         paginator.doDisplayPageWithRecord(record);
     }

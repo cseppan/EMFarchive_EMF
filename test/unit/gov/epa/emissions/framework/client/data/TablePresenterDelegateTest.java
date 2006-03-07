@@ -177,6 +177,23 @@ public class TablePresenterDelegateTest extends EmfMockObjectTestCase {
         p.doDisplayPageWithRecord(21);
     }
 
+    public void testShouldAbortIfRecordIsOnCurrentPageOnDisplayPageWithRecord() throws Exception {
+        Mock paginator = mock(TablePaginator.class);
+        stub(paginator, "isCurrent", Boolean.TRUE);
+        
+        TablePresenterDelegate p = new TablePresenterDelegateImpl(null, (TablePaginator) paginator.proxy(), null, null,
+                null);
+        p.doDisplayPageWithRecord(21);
+    }
+
+    public void testShouldAbortIfRecordIsZeroOnDisplayPageWithRecord() throws Exception {
+        Mock paginator = mock(TablePaginator.class);
+        
+        TablePresenterDelegate p = new TablePresenterDelegateImpl(null, (TablePaginator) paginator.proxy(), null, null,
+                null);
+        p.doDisplayPageWithRecord(0);
+    }
+
     public void testShouldDisplayFirstPage() throws Exception {
         Mock paginator = mock(TablePaginator.class);
         expects(paginator, "doDisplayFirst");
