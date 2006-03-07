@@ -11,8 +11,6 @@ import java.util.StringTokenizer;
 
 public class TablePresenterDelegateImpl implements TablePresenterDelegate {
 
-    private DatasetType datasetType;
-
     private DataAccessService service;
 
     private TableMetadata tableMetadata;
@@ -20,6 +18,12 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
     private TableView view;
 
     private TablePaginator paginator;
+
+    private String rowFilter;
+
+    private String sortOrder;
+
+    private DatasetType datasetType;
 
     public TablePresenterDelegateImpl(DatasetType datasetType, TablePaginator paginator, TableMetadata tableMetadata,
             TableView view, DataAccessService service) {
@@ -32,11 +36,12 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
     }
 
     public void display() throws EmfException {
+        applyConstraints("", datasetType.getDefaultSortOrder());
         paginator.doDisplayFirst();
-        doApplyConstraints("", datasetType.getDefaultSortOrder());
     }
 
     public void reloadCurrent() throws EmfException {
+        applyConstraints(rowFilter, sortOrder);
         paginator.reloadCurrent();
     }
 
@@ -79,10 +84,17 @@ public class TablePresenterDelegateImpl implements TablePresenterDelegate {
     }
 
     public void doApplyConstraints(String rowFilter, String sortOrder) throws EmfException {
-        validateColsInSortOrder(sortOrder);
-        Page page = service.applyConstraints(token(), rowFilter, sortOrder);
+        Page page = applyConstraints(rowFilter, sortOrder);
         view.display(page);
         updateFilteredCount();
+    }
+
+    Page applyConstraints(String rowFilter, String sortOrder) throws EmfException {
+        validateColsInSortOrder(sortOrder);
+        this.rowFilter = rowFilter;
+        this.sortOrder = sortOrder;
+
+        return service.applyConstraints(token(), rowFilter, sortOrder);
     }
 
     private void validateColsInSortOrder(String sortOrder) throws EmfException {

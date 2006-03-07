@@ -42,7 +42,6 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
     }
 
     public void reloadCurrent() throws EmfException {
-        submitChanges();
         delegate.reloadCurrent();
     }
 

@@ -123,7 +123,6 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
         Page page = new Page();
         service.expects(once()).method("applyConstraints").with(ANYTHING, eq(""), eq(sortOrder))
                 .will(returnValue(page));
-        expects(view, 1, "display", same(page));
         expects(view, 1, "observe", same(p));
 
         p.display();
@@ -144,14 +143,11 @@ public class EditableTablePresenterTest extends EmfMockObjectTestCase {
     }
 
     public void testShouldReloadCurrentPage() throws Exception {
-        Mock view = mockViewWithChanges(20);
+        Mock delegate = mock(TablePresenterDelegate.class);
+        expects(delegate, 1, "reloadCurrent");
 
-        Mock paginator = mock(TablePaginator.class);
-        expects(paginator, "reloadCurrent");
-        stub(paginator, "totalRecords", new Integer(20));
-
-        EditableTablePresenter p = new EditableTablePresenterImpl(null, (TablePaginator) paginator.proxy(), null,
-                (EditorPanelView) view.proxy(), null);
+        EditableTablePresenterImpl p = new EditableTablePresenterImpl((TablePresenterDelegate) delegate.proxy(), null,
+                null);
 
         p.reloadCurrent();
     }

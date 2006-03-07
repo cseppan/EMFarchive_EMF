@@ -80,17 +80,12 @@ public class TablePresenterDelegateTest extends EmfMockObjectTestCase {
 
         TableMetadata tableMetadataProxy = (TableMetadata) tableMetadata.proxy();
 
-        Mock view = mock(TableView.class);
-        expects(view, 1, "updateFilteredRecordsCount");
-
         TablePresenterDelegate p = new TablePresenterDelegateImpl((DatasetType) datasetType.proxy(),
-                (TablePaginator) paginator.proxy(), tableMetadataProxy, (TableView) view.proxy(),
-                (DataAccessService) service.proxy());
+                (TablePaginator) paginator.proxy(), tableMetadataProxy, null, (DataAccessService) service.proxy());
 
         Page page = new Page();
         service.expects(once()).method("applyConstraints").with(ANYTHING, eq(""), eq(sortOrder))
                 .will(returnValue(page));
-        expects(view, 1, "display", same(page));
 
         p.display();
     }
@@ -102,8 +97,8 @@ public class TablePresenterDelegateTest extends EmfMockObjectTestCase {
         Mock tableMetadata = mock(TableMetadata.class);
         TableMetadata tableMetadataProxy = (TableMetadata) tableMetadata.proxy();
 
-        TablePresenterDelegate p = new TablePresenterDelegateImpl(null, null, tableMetadataProxy, (TableView) view.proxy(),
-                (DataAccessService) service.proxy());
+        TablePresenterDelegate p = new TablePresenterDelegateImpl(null, null, tableMetadataProxy, (TableView) view
+                .proxy(), (DataAccessService) service.proxy());
 
         String sortOrder = "col3, invalid-row";
         stub(tableMetadata, "containsCol", "col3", Boolean.TRUE);
@@ -130,8 +125,8 @@ public class TablePresenterDelegateTest extends EmfMockObjectTestCase {
         Integer filtered = new Integer(10);
         stub(paginator, "totalRecords", filtered);
 
-        TablePresenterDelegate p = new TablePresenterDelegateImpl(null, (TablePaginator) paginator.proxy(), tableMetadata,
-                (TableView) view.proxy(), (DataAccessService) service.proxy());
+        TablePresenterDelegate p = new TablePresenterDelegateImpl(null, (TablePaginator) paginator.proxy(),
+                tableMetadata, (TableView) view.proxy(), (DataAccessService) service.proxy());
 
         String rowFilter = "rowFilter";
         String sortOrder = "   ";

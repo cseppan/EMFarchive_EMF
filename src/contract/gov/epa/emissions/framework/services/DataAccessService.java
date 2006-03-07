@@ -7,6 +7,9 @@ import gov.epa.emissions.framework.EmfException;
 
 public interface DataAccessService {
     // read
+    /**
+     * Applie's constraints and returns Page 1
+     */
     Page applyConstraints(DataAccessToken token, String rowFilter, String sortOrder) throws EmfException;
 
     Page getPage(DataAccessToken token, int pageNumber) throws EmfException;
