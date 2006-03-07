@@ -179,7 +179,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = new Button("Ok", new AbstractAction() {
+        Button ok = new Button("OK", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 if (verifyInput()) {
                     shouldCreate = true;

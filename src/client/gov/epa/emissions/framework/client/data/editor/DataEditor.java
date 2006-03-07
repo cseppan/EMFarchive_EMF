@@ -192,7 +192,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
                 try {
                     doClose();
                 } catch (EmfException e) {
-                    displayError("Could not Close." + e.getMessage());
+                    displayError("Could not close: " + e.getMessage());
                 }
             }
         });
@@ -242,7 +242,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
             displayMessage("Saved changes.");
             disableSaveDiscard();
         } catch (EmfException e) {
-            displayError("Could not Save." + e.getMessage());
+            displayError("Could not save: " + e.getMessage());
             return;
         }
     }
@@ -273,7 +273,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
             disableSaveDiscard();
             displayMessage("Discarded changes.");
         } catch (EmfException e) {
-            displayError("Could not Discard." + e.getMessage());
+            displayError("Could not discard: " + e.getMessage());
         }
 
     }
@@ -311,7 +311,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         try {
             doClose();
         } catch (EmfException e) {
-            displayError("Could not close." + e.getMessage());
+            displayError("Could not close: " + e.getMessage());
         }
     }
 

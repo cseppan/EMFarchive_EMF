@@ -170,7 +170,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
             if (checkChanges())
                 presenter.doClose();
         } catch (EmfException e) {
-            messagePanel.setError("Could not close." + e.getMessage());
+            messagePanel.setError("Could not close: " + e.getMessage());
         }
     }
 

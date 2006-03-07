@@ -118,7 +118,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
                 try {
                     presenter.doClose();
                 } catch (EmfException e) {
-                    messagePanel.setError("Could not close." + e.getMessage());
+                    messagePanel.setError("Could not close: " + e.getMessage());
                 }
             }
         });

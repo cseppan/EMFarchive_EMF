@@ -135,7 +135,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
                     } else
                         messagePanel.setError("Name field should be a non-empty string.");
                 } catch (EmfException e) {
-                    messagePanel.setError("Could not save." + e.getMessage());
+                    messagePanel.setError("Could not save: " + e.getMessage());
                 }
             }
         };
@@ -162,7 +162,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
             try {
                 presenter.doClose();
             } catch (EmfException e) {
-                messagePanel.setError("Could not close." + e.getMessage());
+                messagePanel.setError("Could not close: " + e.getMessage());
             }
     }
 
