@@ -29,7 +29,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
     private ImportInputPanel importInputPanel;
 
     public ImportWindow(DataCommonsService service, DesktopManager desktopManager) throws EmfException {
-        super("Import Dataset", new Dimension(650, 450), desktopManager);
+        super("Import Dataset", new Dimension(650, 400), desktopManager);
         super.setName("importDatasets");
 
         this.service = service;
