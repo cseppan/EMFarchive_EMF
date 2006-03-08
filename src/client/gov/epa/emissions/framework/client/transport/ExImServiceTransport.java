@@ -70,5 +70,16 @@ public class ExImServiceTransport implements ExImService {
 
         call.request(new Object[] { user, folderPath, fileNames, datasetType });
     }
+    
+    public String[] getFilenamesFromPattern (String folder, String pattern) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getFilenamesFromPattern");
+        call.addParam("folder", mappings.string());
+        call.addParam("pattern", mappings.string());
+        call.setReturnType(mappings.strings());
+
+        return (String[])call.requestResponse(new Object[] { folder, pattern });
+    }
 
 }

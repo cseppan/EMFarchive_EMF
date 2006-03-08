@@ -94,6 +94,7 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
 
     public void register(ImportPresenter presenter) {
         this.presenter = presenter;
+        importInputPanel.register(presenter);
     }
 
     public void clearMessagePanel() {

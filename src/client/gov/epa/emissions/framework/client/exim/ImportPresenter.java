@@ -80,5 +80,9 @@ public class ImportPresenter {
         service.importDataset(user, mapToRemote(directory), files, type, datasetName);
         
     }
+    
+    public String[] getFilesFromPatten(String folder, String pattern) throws EmfException {
+        return service.getFilenamesFromPattern(mapToRemote(folder), pattern);
+    }
 
 }

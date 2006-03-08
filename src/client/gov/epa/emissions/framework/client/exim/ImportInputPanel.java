@@ -5,8 +5,6 @@ import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
-import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.services.DataCommonsService;
@@ -34,6 +32,8 @@ import javax.swing.SpringLayout;
 public class ImportInputPanel extends JPanel {
 
     private MessagePanel messagePanel;
+    
+    private ImportPresenter presenter;
 
     private DataCommonsService service;
 
@@ -52,6 +52,7 @@ public class ImportInputPanel extends JPanel {
     public ImportInputPanel(DataCommonsService service, MessagePanel messagePanel) throws EmfException {
         this.messagePanel = messagePanel;
         this.service = service;
+        
         initialize();
     }
 
@@ -156,20 +157,16 @@ public class ImportInputPanel extends JPanel {
 
         return button;
     }
+    
+    public void register(ImportPresenter presenter) {
+        this.presenter = presenter;
+    }
 
     private void selectFilesFromPattern() {
         try {
-            File inputFilesFolder = new File(folder.getText());
-            FilePatternMatcher fpm = new FilePatternMatcher(inputFilesFolder, pattern.getText());
-            String[] allFilesInFolder = inputFilesFolder.list();
-            String[] fileNamesForImport = fpm.matchingNames(allFilesInFolder);
-            if (fileNamesForImport.length > 0) {
-                populateFilenamesFiled(fileNamesForImport);
-            } else {
-                messagePanel.setError("No files found for pattern '" + pattern.getText() + "'");
-            }
-        } catch (ImporterException e) {
-            messagePanel.setError("Cannot apply pattern.");
+            populateFilenamesFiled(presenter.getFilesFromPatten(folder.getText(), pattern.getText()));
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
         }
     }
 

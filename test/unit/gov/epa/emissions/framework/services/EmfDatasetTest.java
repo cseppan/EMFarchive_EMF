@@ -50,11 +50,13 @@ public class EmfDatasetTest extends TestCase {
         
         keyval1.setKeyword(new Keyword(Dataset.header_comment_key));
         keyval1.setValue("false");
+        keyval1.setValue("YES");
         keyval2.setKeyword(new Keyword(Dataset.header_comment_char));
         keyval2.setValue("%");
         
         keyval3.setKeyword(new Keyword(Dataset.inline_comment_key));
         keyval3.setValue("false");
+        keyval3.setValue("TRuE");
         keyval4.setKeyword(new Keyword(Dataset.inline_comment_char));
         keyval4.setValue("$");
         
@@ -63,8 +65,8 @@ public class EmfDatasetTest extends TestCase {
         ((EmfDataset)dataset).addKeyVal(keyval3);
         ((EmfDataset)dataset).addKeyVal(keyval4);
         
-        assertFalse(dataset.getHeaderCommentsSetting());
-        assertFalse(dataset.getInlineCommentSetting());
+        assertTrue(dataset.getHeaderCommentsSetting());
+        assertTrue(dataset.getInlineCommentSetting());
         assertTrue(dataset.getHeaderCommentChar().equals("%"));
         assertTrue(dataset.getInlineCommentChar().equals("$"));
     }
@@ -83,6 +85,7 @@ public class EmfDatasetTest extends TestCase {
         
         keyval3.setKeyword(new Keyword(Dataset.inline_comment_key));
         keyval3.setValue("false");
+        keyval3.setValue("yes");
         keyval4.setKeyword(new Keyword(Dataset.inline_comment_char));
         keyval4.setValue("");
         
@@ -92,7 +95,7 @@ public class EmfDatasetTest extends TestCase {
         ((EmfDataset)dataset).addKeyVal(keyval4);
         
         assertFalse(dataset.getHeaderCommentsSetting());
-        assertFalse(dataset.getInlineCommentSetting());
+        assertTrue(dataset.getInlineCommentSetting());
         assertTrue(dataset.getHeaderCommentChar().equals("#"));
         assertTrue(dataset.getInlineCommentChar().equals("!"));
     }

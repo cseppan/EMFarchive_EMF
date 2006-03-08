@@ -1,11 +1,14 @@
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
 import gov.epa.emissions.commons.io.importer.Importer;
+import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.dao.DatasetDao;
 import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.Status;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -84,6 +87,8 @@ public class ImportService {
 
     public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType)
             throws EmfException {
+        showMultipleDatasets(user, filenames);
+        
         for (int i = 0; i < filenames.length; i++) {
             String datasetName = filenames[i] + "_" + DATE_FORMATTER.format(new Date());
             EmfDataset dataset = new EmfDataset();
@@ -109,6 +114,44 @@ public class ImportService {
         dataset.setAccessedDateTime(new Date());
 
         importSingleDataset(user, folderPath, filenames, dataset);
+    }
+    
+    public String[] getFilenamesFromPattern(String folder, String pattern) throws EmfException {
+        try {
+            File directory = new File(folder);
+            FilePatternMatcher fpm = new FilePatternMatcher(directory, pattern);
+            String[] allFilesInFolder = directory.list();
+            String[] fileNamesForImport = fpm.matchingNames(allFilesInFolder);
+            if (fileNamesForImport.length > 0) 
+                return fileNamesForImport;
+            
+            throw new EmfException("No files found for pattern '" + pattern + "'");
+        } catch (ImporterException e) {
+            throw new EmfException("Cannot apply pattern.");
+        }
+    }
+    
+    private void showMultipleDatasets(User user, String[] filenames) {
+        StatusServiceImpl status = services().getStatus();
+        int filecount = filenames.length;
+        String message = "***IMPORT MULTIPLE DATASETS (" + filecount + " in total): ";
+        for (int i = 0; i < filecount; i++) {
+            if(i == filecount - 1)
+                message += filenames[i];
+            else
+                message += filenames[i] + ", ";
+        }
+        setStatus(message, user, status);
+    }
+    
+    private void setStatus(String message, User user, StatusServiceImpl statusServices) {
+        Status endStatus = new Status();
+        endStatus.setUsername(user.getUsername());
+        endStatus.setType("Import");
+        endStatus.setMessage(message);
+        endStatus.setTimestamp(new Date());
+
+        statusServices.create(endStatus);
     }
 
 }

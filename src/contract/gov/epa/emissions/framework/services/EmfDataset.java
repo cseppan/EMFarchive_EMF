@@ -336,7 +336,7 @@ public class EmfDataset implements Dataset, Lockable {
             String keyword = keyvals[i].getKeyword().getName();
             String value = keyvals[i].getValue();
             if (keyword.equalsIgnoreCase(inline_comment_key))
-                return value.equals("true") ? true : false;
+                return (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes")) ? true : false;
         }
 
         return true;
@@ -348,7 +348,7 @@ public class EmfDataset implements Dataset, Lockable {
             String keyword = keyvals[i].getKeyword().getName();
             String value = keyvals[i].getValue();
             if (keyword.equalsIgnoreCase(header_comment_key))
-                return value.equals("true") ? true : false;
+                return (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes")) ? true : false;
         }
 
         return true;

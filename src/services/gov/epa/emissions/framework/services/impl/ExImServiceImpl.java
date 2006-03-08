@@ -62,4 +62,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         importService.importDataset(user, folderPath, filenames, datasetType, datasetName);
     }
 
+    public String[] getFilenamesFromPattern(String folder, String pattern) throws EmfException {
+        return importService.getFilenamesFromPattern(folder, pattern);
+    }
+
 }
