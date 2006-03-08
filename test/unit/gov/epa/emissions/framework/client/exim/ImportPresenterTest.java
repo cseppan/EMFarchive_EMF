@@ -48,58 +48,58 @@ public class ImportPresenterTest extends MockObjectTestCase {
         DatasetType type = new DatasetType("ORL NonRoad");
         type.setMinFiles(1);
         type.setMaxFiles(1);
-        
+
         User user = new User();
         user.setUsername("user");
         user.setName("full name");
 
         Mock model = mock(ExImService.class);
         model.expects(once()).method("importDataset");
-        
+
         Mock view = mock(ImportView.class);
         view.expects(once()).method("setMessage");
 
         ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), user, (ExImService) model.proxy());
-        
+
         prefs.stubs().method("mapLocalInputPathToRemote");
-        presenter.importDataset("dir", new String[] {"filename"}, type, "test",(ImportView)view.proxy());
+        presenter.importDataset("dir", new String[] { "filename" }, type, "test", (ImportView) view.proxy());
     }
-    
+
     public void testSendsImportRequestToEximServiceOnImportMultipleDatasets() throws Exception {
         DatasetType type = new DatasetType("ORL NonRoad");
         type.setMinFiles(1);
         type.setMaxFiles(1);
-        
+
         User user = new User();
         user.setUsername("user");
         user.setName("full name");
 
         Mock model = mock(ExImService.class);
         model.expects(once()).method("importDatasets");
-        
+
         Mock view = mock(ImportView.class);
         view.expects(once()).method("setMessage");
 
         ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), user, (ExImService) model.proxy());
 
         prefs.stubs().method("mapLocalInputPathToRemote");
-        presenter.importDatasets("dir", new String[] {"filename"}, type,(ImportView) view.proxy());
+        presenter.importDatasets("dir", new String[] { "filename" }, type, (ImportView) view.proxy());
     }
-    
+
     public void testSendsImportRequestToEximServiceOnPatternMatching() throws Exception {
         DatasetType type = new DatasetType("ORL NonRoad");
         type.setMinFiles(1);
         type.setMaxFiles(1);
-        
+
         User user = new User();
         user.setUsername("user");
         user.setName("full name");
 
         Mock model = mock(ExImService.class);
         model.expects(once()).method("getFilenamesFromPattern");
-        
+
         ImportPresenter presenter = new ImportPresenter((EmfSession) session.proxy(), user, (ExImService) model.proxy());
-        
+
         prefs.stubs().method("mapLocalInputPathToRemote");
         presenter.getFilesFromPatten("C:\\", "*.csv");
     }
@@ -110,9 +110,4 @@ public class ImportPresenterTest extends MockObjectTestCase {
         presenter.doDone();
     }
 
-    public void testShouldClearMessagePanelOnEdit() {
-        view.expects(once()).method("clearMessagePanel").withNoArguments();
-
-        presenter.notifyBeginInput();
-    }
 }

@@ -97,11 +97,6 @@ public class ImportWindow extends ReusableInteralFrame implements ImportView {
         importInputPanel.register(presenter);
     }
 
-    public void clearMessagePanel() {
-        messagePanel.clear();
-        super.refreshLayout();
-    }
-
     public void setDefaultBaseFolder(String folder) {
         importInputPanel.setDefaultBaseFolder(folder);
     }

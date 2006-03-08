@@ -7,8 +7,6 @@ public interface ImportView extends ManagedView {
 
     void setDefaultBaseFolder(String folder);
 
-    void clearMessagePanel();
-
     void setMessage(String message);
-    
+
 }

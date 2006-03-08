@@ -18,13 +18,13 @@ public class ImportPresenter {
 
     private EmfSession session;
 
-    private NewImportInputRules importRules;
+    private ImportInputRules importRules;
 
     public ImportPresenter(EmfSession session, User user, ExImService service) {
         this.user = user;
         this.service = service;
         this.session = session;
-        this.importRules = new NewImportInputRules();
+        this.importRules = new ImportInputRules();
     }
 
     public void doImport(String directory, String[] files, DatasetType type) throws EmfException {
@@ -43,7 +43,7 @@ public class ImportPresenter {
     }
 
     public void doImport(String directory, String[] files, DatasetType type, String datasetName) throws EmfException {
-       importDataset(directory,files,type,datasetName,view);
+        importDataset(directory, files, type, datasetName, view);
     }
 
     public void doDone() {
@@ -58,10 +58,6 @@ public class ImportPresenter {
         view.display();
     }
 
-    public void notifyBeginInput() {
-        view.clearMessagePanel();
-    }
-
     private String getDefaultBaseFolder() {
         String folder = session.preferences().inputFolder();
         if (!new File(folder).isDirectory())
@@ -74,13 +70,14 @@ public class ImportPresenter {
         return session.preferences().mapLocalInputPathToRemote(dir);
     }
 
-    public void importDataset(String directory, String[] files, DatasetType type, String datasetName, ImportView view) throws EmfException {
+    public void importDataset(String directory, String[] files, DatasetType type, String datasetName, ImportView view)
+            throws EmfException {
         importRules.validate(directory, files, type, datasetName);
         startImportMessage(view);
         service.importDataset(user, mapToRemote(directory), files, type, datasetName);
-        
+
     }
-    
+
     public String[] getFilesFromPatten(String folder, String pattern) throws EmfException {
         return service.getFilenamesFromPattern(mapToRemote(folder), pattern);
     }
