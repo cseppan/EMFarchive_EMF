@@ -1,15 +1,17 @@
 package gov.epa.emissions.framework.ui;
 
+import gov.epa.emissions.commons.io.ColumnMetaData;
+import gov.epa.emissions.commons.io.TableMetadata;
+
 import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import gov.epa.emissions.commons.io.ColumnMetaData;
-import gov.epa.emissions.commons.io.TableMetadata;
-
 public class TableColumnWidth {
 
     private JTable table;
+
+    private static final int MAX_WIDTH = 300;
 
     private TableMetadata tableMetadata;
 
@@ -29,13 +31,18 @@ public class TableColumnWidth {
                 width(metaData, tableColumn);
             }
         }
+        table.repaint();
     }
 
     private void width(ColumnMetaData metaData, TableColumn tableColumn) {
         String header = (String) tableColumn.getHeaderValue();
-        int width = header.length() * 12;
-        int dbColumnSize = metaData.getSize() + 10;
-        tableColumn.setWidth((width > dbColumnSize) ? width : dbColumnSize);
+        // factor(10) is selected by trial and error
+        int width = header.length() * 10;
+        int dbColumnSize = metaData.getSize() * 10;
+        dbColumnSize = (dbColumnSize < MAX_WIDTH) ? dbColumnSize : MAX_WIDTH;
+        int preferedWidth = (width > dbColumnSize) ? width : dbColumnSize;
+
+        tableColumn.setPreferredWidth(preferedWidth);
     }
 
     private ColumnMetaData exist(String columnName, TableMetadata tableMetadata) {

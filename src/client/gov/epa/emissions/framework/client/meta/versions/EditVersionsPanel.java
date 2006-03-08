@@ -166,6 +166,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         tableModel = new EmfTableModel(tableData);
 
         ScrollableTable table = new ScrollableTable(tableModel);
+        table.setColWidthsBasedOnColNames();
         table.disableScrolling();
         return table;
     }

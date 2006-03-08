@@ -135,6 +135,7 @@ public class VersionsPanel extends JPanel implements VersionsView {
         tableModel = new EmfTableModel(tableData);
 
         ScrollableTable table = new ScrollableTable(tableModel);
+        table.setColWidthsBasedOnColNames();
         table.disableScrolling();
         return table;
     }
