@@ -73,12 +73,21 @@ public class TableColumnHeaders {
 
         private String headerText(Object value) {
             String header = ((value == null) ? "" : value.toString());
-            return header + type(header);
+            return header.toUpperCase() + type(header);
         }
 
         private String type(String header) {
             ColumnMetaData data = metadata.columnMetadata(header);
-            return data == null ? "\n" : "\n" + parse(data.getType()) + "(" + data.getSize() + ")";
+            if(data==null){
+                return "\n";
+            }
+            String type = parse(data.getType());
+            if(!type.equalsIgnoreCase("String")){
+                return "\n"+type;
+            }
+            int length = data.getSize();
+            String size = (length==-1)?"*":""+length;
+            return "\n" + type + "(" + size + ")";
         }
 
         private String parse(String type) {
