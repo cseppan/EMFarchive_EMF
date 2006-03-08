@@ -97,8 +97,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         } catch (HibernateException e) {
             LOG.error("Could not derive a new Version from the base Version: " + base.getVersion() + " of Dataset: "
                     + base.getDatasetId(), e);
-            throw new EmfException("Could not derive a new Version from the base Version: " + base.getVersion()
-                    + " of Dataset: " + base.getDatasetId());
+            throw new EmfException("Could not create a new Version using " + base.getVersion() + "as the base");
         }
     }
 
@@ -227,15 +226,15 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
     }
 
-    public TableMetadata getTableMetadata(String table) throws EmfException{
+    public TableMetadata getTableMetadata(String table) throws EmfException {
         try {
             TableDefinition definition = dbServer.getEmissionsDatasource().tableDefinition();
             return definition.getTableMetaData(table);
         } catch (SQLException e) {
-            LOG.error("Database error. Failed to get table metadata for table: ",e);
+            LOG.error("Database error. Failed to get table metadata for table: ", e);
             throw new EmfException("Database error");
         }
-        
+
     }
 
 }

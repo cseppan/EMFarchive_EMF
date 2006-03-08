@@ -216,7 +216,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
             try {
                 presenter.doNew(dialog.version(), dialog.name());
             } catch (EmfException e) {
-                displayError("Could not create new version: " + dialog.name() + "." + e.getMessage());
+                displayError(e.getMessage());
             }
         }
     }
