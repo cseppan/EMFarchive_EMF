@@ -31,9 +31,9 @@ public class NewVersionDialog extends Dialog {
     private Version[] versions;
 
     public NewVersionDialog(EmfDataset dataset, Version[] versions, EmfConsole parent) {
-        super("Create new Version for Dataset: " + dataset.getName(), parent);
+        super("Create a new Version of " + dataset.getName(), parent);
         this.versions = versions;
-        super.setSize(new Dimension(500, 150));
+        super.setSize(new Dimension(450, 150));
 
         super.getContentPane().add(createLayout(versions));
         super.center();
@@ -53,7 +53,7 @@ public class NewVersionDialog extends Dialog {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        name = new TextField("", 40);
+        name = new TextField("", 30);
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
         versionsModel = new DefaultComboBoxModel(versionNames(versions));
