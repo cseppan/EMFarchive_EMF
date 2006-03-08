@@ -17,10 +17,7 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +26,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.CompoundBorder;
 
@@ -77,59 +73,10 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     public void display(Version[] versions, InternalSource[] sources) {
         add(topRightPanel(sources), BorderLayout.PAGE_START);
         add(tablePanel(versions), BorderLayout.CENTER);
-        add(bottomPanel(versions), BorderLayout.PAGE_END);
+        add(bottomPanel(), BorderLayout.PAGE_END);
         if (dataset.getInternalSources().length == 0) {
             displayError("Versions cannot be edited for external files.");
         }
-    }
-
-    private JPanel bottomRightPanel(final EmfDataset dataset, Version[] versions) {
-        VersionsSet versionsSet = new VersionsSet(versions);
-
-        JPanel panel = new JPanel();
-        panel.add(new JLabel("Default Version"));
-
-        String[] versionNames = getVersionNames(versionsSet);
-        ComboBoxModel model = new DefaultComboBoxModel(versionNames);
-        defaultVersionsCombo = new JComboBox(model);
-        String defaultVersion = getDefaultVersion(versionsSet);
-        defaultVersionsCombo.setSelectedItem(defaultVersion);
-        defaultVersionsCombo.setName("defaultVersions");
-        defaultVersionsCombo.setEditable(false);
-        defaultVersionsCombo.setPreferredSize(new Dimension(175, 20));
-        panel.add(defaultVersionsCombo);
-
-        defaultVersionsCombo.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                String version = e.getItem().toString();
-                int versionnum = Integer.parseInt(version.split("-")[0].trim());
-                dataset.setDefaultVersion(versionnum);
-            }
-        });
-
-        return panel;
-    }
-
-    private String getDefaultVersion(VersionsSet versionsSet) {
-        String name = versionsSet.getVersionName(dataset.getDefaultVersion());
-        return displayableVersion(name, dataset.getDefaultVersion());
-    }
-
-    private String[] getVersionNames(VersionsSet versionsSet) {
-        String[] versionNames = versionsSet.names();
-        Integer[] versionNums = versionsSet.versions();
-
-        List versions = new ArrayList();
-        for (int i = 0; i < versionNames.length; i++) {
-            String version = displayableVersion(versionNames[i], versionNums[i].intValue());
-            versions.add(version);
-        }
-
-        return (String[]) versions.toArray(new String[0]);
-    }
-
-    private String displayableVersion(String name, int version) {
-        return version + " - " + name;
     }
 
     public void reload(Version[] versions) {
@@ -171,11 +118,9 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         return table;
     }
 
-    private JPanel bottomPanel(Version[] versions) {
+    private JPanel bottomPanel() {
         JPanel container = new JPanel(new BorderLayout());
-
         container.add(leftControlPanel(), BorderLayout.LINE_START);
-        container.add(bottomRightPanel(dataset, versions), BorderLayout.LINE_END);
 
         return container;
     }

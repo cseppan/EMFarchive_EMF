@@ -1,8 +1,10 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenter;
@@ -16,9 +18,8 @@ import gov.epa.emissions.framework.services.EmfDataset;
 import java.util.Date;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 
-public class PropertiesEditorPresenterTest extends MockObjectTestCase {
+public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
 
     private Mock view;
 
@@ -70,12 +71,17 @@ public class PropertiesEditorPresenterTest extends MockObjectTestCase {
                 returnValue(dataset));
 
         session.stubs().method("user").withNoArguments().will(returnValue(owner));
-
+        
+        Mock editorService = mock(DataEditorService.class);
+        Version[] versions = new Version[0];
+        stub(editorService, "getVersions", versions);
+        session.stubs().method("dataEditorService").will(returnValue(editorService.proxy()));
+        
         DatasetPropertiesEditorView viewProxy = (DatasetPropertiesEditorView) view.proxy();
         presenter = new PropertiesEditorPresenterImpl(dataset, viewProxy, (EmfSession) session.proxy());
 
         view.expects(once()).method("observe").with(eq(presenter));
-        view.expects(once()).method("display").with(eq(dataset));
+        view.expects(once()).method("display").with(eq(dataset), same(versions));
 
         presenter.doDisplay();
     }

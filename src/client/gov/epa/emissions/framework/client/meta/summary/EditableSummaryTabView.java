@@ -5,6 +5,6 @@ import gov.epa.emissions.framework.services.EmfDataset;
 
 public interface EditableSummaryTabView {
     // update dataset with the view contents
-    void updateDataset(EmfDataset dataset) throws EmfException;
+    void save(EmfDataset dataset) throws EmfException;
 
 }

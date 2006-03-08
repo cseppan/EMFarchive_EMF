@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
@@ -23,8 +24,6 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
 
     private EditableSummaryTabPresenter summaryPresenter;
 
-    private boolean alert;
-
     private EditableKeywordsTabPresenter keywordsPresenter;
 
     private EmfSession session;
@@ -35,20 +34,23 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
         this.dataset = dataset;
         this.session = session;
         this.view = view;
-        this.alert = false;
     }
 
     public void doDisplay() throws EmfException {
         view.observe(this);
 
-        dataset = session.dataService().obtainLockedDataset(session.user(), dataset);
-
+        dataset = dataService().obtainLockedDataset(session.user(), dataset);
         if (!dataset.isLocked(session.user())) {// view mode, locked by another user
             view.notifyLockFailure(dataset);
             return;
         }
 
-        view.display(dataset);
+        display();
+    }
+
+    void display() throws EmfException {
+        Version[] versions = session.dataEditorService().getVersions(dataset.getId());
+        view.display(dataset, versions);
     }
 
     public void doClose() throws EmfException {
@@ -63,9 +65,7 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
     void save(DataService service, EditableSummaryTabPresenter summary, EditableKeywordsTabPresenter keywords,
             EditNotesTabPresenter notes) throws EmfException {
         updateDataset(service, summary, keywords, notes);
-
-        if (!alert)
-            view.close();
+        view.close();
     }
 
     private DataService dataService() {
@@ -77,8 +77,7 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
         summary.doSave();
         keywords.doSave();
         notes.doSave();
-        if (!alert)
-            service.updateDataset(dataset);
+        service.updateDataset(dataset);
     }
 
     public void set(EditableSummaryTabView summary) {
@@ -95,10 +94,6 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
     public void set(EditNotesTabView view) throws EmfException {
         notesPresenter = new EditNotesTabPresenterImpl(dataset, session, view);
         notesPresenter.display();
-    }
-
-    public void alert(boolean alert) {
-        this.alert = alert;
     }
 
 }

@@ -19,7 +19,7 @@ public class EditableSummaryTabPresenterTest extends MockObjectTestCase {
 
         Mock view = mock(EditableSummaryTabView.class);
         Object datasetProxy = dataset.proxy();
-        view.expects(once()).method("updateDataset").with(eq(datasetProxy));
+        view.expects(once()).method("save").with(eq(datasetProxy));
 
         EditableSummaryTabPresenter presenter = new EditableSummaryTabPresenterImpl((EmfDataset) datasetProxy, (EditableSummaryTabView) view
                 .proxy());

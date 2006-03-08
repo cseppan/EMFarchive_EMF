@@ -42,7 +42,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         JPanel container = new JPanel();
         container.add(createTimeSpaceSection());
         container.add(createStatusSection());
-        
+
         panel.add(container, BorderLayout.LINE_START);
 
         return panel;
@@ -72,8 +72,12 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         IntendedUse intendedUse = dataset.getIntendedUse();
         String intendedUseName = (intendedUse != null) ? intendedUse.getName() : "";
         layoutGenerator.addLabelWidgetPair("Intended Use:", new Label("intendedUse", intendedUseName), panel);
+
+        layoutGenerator.addLabelWidgetPair("Default Version:", new Label("defaultVersion", ""
+                + dataset.getDefaultVersion()), panel);
+
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -88,10 +92,9 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         // time period
         layoutGenerator.addLabelWidgetPair("Time Period Start:", new JLabel(formatDate(dataset.getStartDateTime())),
                 panel);
-        layoutGenerator.addLabelWidgetPair("Time Period End:", new JLabel(formatDate(dataset.getStopDateTime())),
-                panel);
-        layoutGenerator.addLabelWidgetPair("Temporal Resolution:", new JLabel(dataset.getTemporalResolution()),
-                panel);
+        layoutGenerator
+                .addLabelWidgetPair("Time Period End:", new JLabel(formatDate(dataset.getStopDateTime())), panel);
+        layoutGenerator.addLabelWidgetPair("Temporal Resolution:", new JLabel(dataset.getTemporalResolution()), panel);
         Sector[] sectors = dataset.getSectors();
         String sectorLabel = "";
         if (sectors != null && sectors.length > 0) {

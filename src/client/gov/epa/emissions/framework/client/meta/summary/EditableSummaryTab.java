@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.summary;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.FormattedTextField;
@@ -29,14 +30,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-//FIXME: super long class..break it up
 public class EditableSummaryTab extends JPanel implements EditableSummaryTabView {
 
     private EmfDataset dataset;
@@ -75,8 +72,10 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private ManageChangeables changeablesList;
 
-    public EditableSummaryTab(EmfDataset dataset, DataCommonsService service, MessagePanel messagePanel,
-            ManageChangeables changeablesList) throws EmfException {
+    private DefaultVersionPanel defaultVersionPanel;
+
+    public EditableSummaryTab(EmfDataset dataset, Version[] versions, DataCommonsService service,
+            MessagePanel messagePanel, ManageChangeables changeablesList) throws EmfException {
         super.setName("summary");
         this.dataset = dataset;
         this.service = service;
@@ -85,45 +84,34 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
         super.setLayout(new BorderLayout());
         super.add(createOverviewSection(), BorderLayout.PAGE_START);
-        super.add(createLowerSection(), BorderLayout.CENTER);
+        super.add(createLowerSection(versions), BorderLayout.CENTER);
     }
 
-    private JPanel createLowerSection() throws EmfException {
+    private JPanel createLowerSection(Version[] versions) throws EmfException {
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel container = new JPanel();
         container.add(createTimeSpaceSection());
-        container.add(createStatusSection());
+        container.add(createLowerRightSection(versions));
 
         panel.add(container, BorderLayout.LINE_START);
 
         return panel;
     }
 
-    private JPanel createStatusSection() throws EmfException {
+    private JPanel createLowerRightSection(Version[] versions) throws EmfException {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
         panel.add(createStatusDatesAndIntendedUsePanel(), BorderLayout.PAGE_START);
-        panel.add(createSubscriptionPanel(), BorderLayout.CENTER);
+        panel.add(createDefaultVersionPanel(versions), BorderLayout.CENTER);
 
         return panel;
     }
 
-    private JPanel createSubscriptionPanel() {
-        JPanel panel = new JPanel();
-        JCheckBox subscribed = new JCheckBox("Subscribed?", true);
-        subscribed.setToolTipText("TBD");
-        // panel.add(subscribed);
-
-        // panel.add(new JLabel("Subscribed Users"));
-        DefaultComboBoxModel subscribedUsersModel = new DefaultComboBoxModel(new String[0]);
-        JComboBox subscribedUsers = new JComboBox(subscribedUsersModel);
-        subscribedUsers.setName("subscribedUser");
-        subscribedUsers.setPreferredSize(new Dimension(100, 20));
-        // panel.add(subscribedUsers);
-
-        return panel;
+    private JPanel createDefaultVersionPanel(Version[] versions) {
+        defaultVersionPanel = new DefaultVersionPanel(dataset, versions, changeablesList);
+        return defaultVersionPanel;
     }
 
     private JPanel createStatusDatesAndIntendedUsePanel() throws EmfException {
@@ -174,14 +162,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         layoutGenerator.addLabelWidgetPair("Time Period End:", endDateTime, panel);
 
         // temporal resolution
-        String[] temporalResolutionNames = (String[]) TemporalResolution.NAMES.toArray(new String[0]);
-        temporalResolutionsCombo = new ComboBox("Choose a resolution", temporalResolutionNames);
-        temporalResolutionsCombo.setSelectedItem(dataset.getTemporalResolution());
-        temporalResolutionsCombo.setName("temporalResolutions");
-        temporalResolutionsCombo.setPreferredSize(new Dimension(170, 20));
-        String temporalResolution = dataset.getTemporalResolution();
-        temporalResolutionsCombo.setSelectedItem(temporalResolution);
-        changeablesList.addChangeable(temporalResolutionsCombo);
+        temporalResolutionsCombo = temporalResolutionCombo();
         layoutGenerator.addLabelWidgetPair("Temporal Resolution:", temporalResolutionsCombo, panel);
 
         sectorsCombo = new ComboBox("Choose a sector", service.getSectors());
@@ -222,6 +203,19 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
                 10, 10);// xPad, yPad
 
         return panel;
+    }
+
+    private ComboBox temporalResolutionCombo() {
+        ComboBox combo = new ComboBox("Choose a resolution", TemporalResolution.NAMES.toArray());
+        combo.setName("temporalResolutions");
+        combo.setPreferredSize(new Dimension(170, 20));
+
+        String temporalResolution = dataset.getTemporalResolution();
+        combo.setSelectedItem(temporalResolution);
+
+        changeablesList.addChangeable(combo);
+
+        return combo;
     }
 
     private JPanel createOverviewSection() throws EmfException {
@@ -277,14 +271,15 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         return datasetTypeLabel;
     }
 
-    public void updateDataset(EmfDataset dataset) {
-        if (!name.getText().equals("")) {
-            messagePanel.clear();
-            dataset.setName(name.getText());
-        } else {
+    public void save(EmfDataset dataset) {
+        messagePanel.clear();
+
+        if (name.getText().equals("")) {
             messagePanel.setError("Name field should be a non-empty string.");
             return;
         }
+
+        dataset.setName(name.getText());
         dataset.setDescription(description.getText());
         updateProject();
         dataset.setStartDateTime(toDate(startDateTime.getText()));
@@ -294,6 +289,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         dataset.setCountry((Country) countriesCombo.getSelectedItem());
         dataset.setSectors(new Sector[] { (Sector) sectorsCombo.getSelectedItem() });
         updateIntendedUse();
+        defaultVersionPanel.updateDataset();
     }
 
     private void updateProject() {

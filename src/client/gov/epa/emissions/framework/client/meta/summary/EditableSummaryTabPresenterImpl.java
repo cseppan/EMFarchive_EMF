@@ -18,7 +18,7 @@ public class EditableSummaryTabPresenterImpl implements EditableSummaryTabPresen
 
     public void doSave() throws EmfException {
         dataset.setModifiedDateTime(new Date());
-        view.updateDataset(dataset);
+        view.save(dataset);
     }
 
 }

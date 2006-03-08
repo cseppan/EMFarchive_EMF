@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -51,11 +52,11 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         this.parentConsole = parentConsole;
     }
 
-    private JTabbedPane createTabbedPane(EmfDataset dataset, MessagePanel messagePanel) {
+    private JTabbedPane createTabbedPane(EmfDataset dataset, Version[] versions, MessagePanel messagePanel) {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
 
-        tabbedPane.addTab("Summary", createSummaryTab(dataset, messagePanel));
+        tabbedPane.addTab("Summary", createSummaryTab(dataset, versions, messagePanel));
         tabbedPane.addTab("Keywords", createKeywordsTab());
         tabbedPane.addTab("Notes", createNotesTab(parentConsole));
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
@@ -66,9 +67,10 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         return tabbedPane;
     }
 
-    private JPanel createSummaryTab(EmfDataset dataset, MessagePanel messagePanel) {
+    private JPanel createSummaryTab(EmfDataset dataset, Version[] versions, MessagePanel messagePanel) {
         try {
-            EditableSummaryTab view = new EditableSummaryTab(dataset, session.dataCommonsService(), messagePanel, this);
+            EditableSummaryTab view = new EditableSummaryTab(dataset, versions, session.dataCommonsService(),
+                    messagePanel, this);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
@@ -129,7 +131,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         return panel;
     }
 
-    public void display(EmfDataset dataset) {
+    public void display(EmfDataset dataset, Version[] versions) {
         super.setTitle("Dataset Properties Editor: " + dataset.getName());
         super.setName("datasetPropertiesEditor:" + dataset.getId());
         Container contentPane = super.getContentPane();
@@ -138,7 +140,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
-        panel.add(createTabbedPane(dataset, messagePanel), BorderLayout.CENTER);
+        panel.add(createTabbedPane(dataset, versions, messagePanel), BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         contentPane.add(panel);
