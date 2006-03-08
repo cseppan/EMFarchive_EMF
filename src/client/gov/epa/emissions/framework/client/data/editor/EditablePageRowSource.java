@@ -23,7 +23,7 @@ public class EditablePageRowSource implements RowSource {
 
         list.addAll(source.tokens());
         list.add(new Integer(source.getRecordId()));
-        list.add(new Long(source.getVersion()));
+        list.add(new Integer(source.getVersion()));
         
 
         return list.toArray();

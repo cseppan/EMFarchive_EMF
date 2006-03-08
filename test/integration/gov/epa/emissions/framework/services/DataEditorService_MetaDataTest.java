@@ -97,28 +97,26 @@ public class DataEditorService_MetaDataTest extends ServiceTestCase {
         return versions.get(dataset.getId(), 0, session);
     }
 
+    public void testShouldGetTheMetaDataForTable() throws Exception {
+        TableMetadata tmd = service.getTableMetadata(table);
+        assertEquals("Should have 14 columns", tmd.getCols().length, 14);
+        ColumnMetaData[] cmd = tmd.getCols();
+        assertEquals("column name should match", cmd[0].getName(), "record_id");
+        assertEquals("column name should match", cmd[0].getType(), "java.lang.Integer");
+        assertEquals("column name should match", cmd[0].getSize(), 11);
 
-     public void testShouldGetTheMetaDataForTable() throws Exception {
-      TableMetadata tmd = service.getTableMetadata(table);
-      assertEquals("Should have 14 columns",tmd.getCols().length,14);
-      ColumnMetaData[] cmd = tmd.getCols();
-      assertEquals("column name should match",cmd[0].getName(),"record_id");
-      assertEquals("column name should match",cmd[0].getType(),"java.lang.Integer");
-      assertEquals("column name should match",cmd[0].getSize(),11);
+        assertEquals("column name should match", cmd[1].getName(), "dataset_id");
+        assertEquals("column name should match", cmd[1].getType(), "java.lang.Long");
+        assertEquals("column name should match", cmd[1].getSize(), 20);
 
-      assertEquals("column name should match",cmd[1].getName(),"dataset_id");
-      assertEquals("column name should match",cmd[1].getType(),"java.lang.Long");
-      assertEquals("column name should match",cmd[1].getSize(),20);
+        assertEquals("column name should match", cmd[2].getName(), "version");
+        assertEquals("column name should match", cmd[2].getType(), "java.lang.Integer");
+        assertEquals("column name should match", cmd[2].getSize(), 11);
 
-      assertEquals("column name should match",cmd[2].getName(),"version");
-      assertEquals("column name should match",cmd[2].getType(),"java.lang.Long");
-      assertEquals("column name should match",cmd[2].getSize(),20);
-
-      assertEquals("column name should match",cmd[3].getName(),"delete_versions");
-      assertEquals("column name should match",cmd[3].getType(),"java.lang.String");
-      assertEquals("column name should match",cmd[3].getSize(),-1);
+        assertEquals("column name should match", cmd[3].getName(), "delete_versions");
+        assertEquals("column name should match", cmd[3].getType(), "java.lang.String");
+        assertEquals("column name should match", cmd[3].getSize(), -1);
 
     }
-    
 
 }
