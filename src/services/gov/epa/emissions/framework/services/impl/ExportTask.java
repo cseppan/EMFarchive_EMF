@@ -68,10 +68,6 @@ public class ExportTask implements Runnable {
         DatasetDao dao = new DatasetDao();
         try {
             Session session = sessionFactory.getSession();
-
-            if (!dao.canUpdate(dataset, session))
-                throw new EmfException("Dataset name already in use");
-
             dao.updateWithoutLocking(dataset, session);
             session.close();
         } catch (RuntimeException e) {

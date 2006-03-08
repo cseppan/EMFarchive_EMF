@@ -47,15 +47,9 @@ public class ImportTask implements Runnable {
             complete();
         } catch (Exception e) {
             logError("Failed to import file(s) : " + filesList(), e);
-            addStatus("Import failure: " + e.getMessage());
+            setStatus("Failed to import dataset " + dataset.getName() + ".Reason: " + e.getMessage());
             removeDataset(dataset);
         }
-    }
-
-    private void complete() throws EmfException {
-        dataset.setStatus("Imported");
-        updateDataset(dataset);
-        addCompletedStatus();
     }
 
     private void prepare() throws EmfException {
@@ -64,8 +58,10 @@ public class ImportTask implements Runnable {
         dataset.setStatus("Started import");
     }
 
-    private void addCompletedStatus() {
-        addStatus("Completed import of :" + filesList() + " of type " + dataset.getDatasetTypeName());
+    private void complete() {
+        dataset.setStatus("Imported");
+        updateDataset(dataset);
+        addCompletedStatus();
     }
 
     private String filesList() {
@@ -78,23 +74,26 @@ public class ImportTask implements Runnable {
         return fileList.toString();
     }
 
-    private void addStartStatus() {
-        addStatus("Started import for " + dataset.getDatasetTypeName());
-    }
-
     void addDataset(EmfDataset dataset) throws EmfException {
         DatasetDao dao = new DatasetDao();
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
-
             if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))
                 throw new EmfException("Dataset name already in use");
 
             dao.add(dataset, session);
+        } finally {
             session.close();
-        } catch (RuntimeException e) {
-            logError("Could not add Dataset - " + dataset.getName(), e);
-            throw new EmfException("Could not add Dataset - " + dataset.getName());
+        }
+    }
+
+    void updateDataset(EmfDataset dataset) {
+        DatasetDao dao = new DatasetDao();
+        Session session = sessionFactory.getSession();
+        try {
+            dao.updateWithoutLocking(dataset, session);
+        } finally {
+            session.close();
         }
     }
 
@@ -109,27 +108,15 @@ public class ImportTask implements Runnable {
         }
     }
 
-    void updateDataset(EmfDataset dataset) throws EmfException {
-        DatasetDao dao = new DatasetDao();
-        try {
-            Session session = sessionFactory.getSession();
-
-            if (!dao.canUpdate(dataset, session))
-                throw new EmfException("Dataset name already in use");
-
-            dao.updateWithoutLocking(dataset, session);
-            session.close();
-        } catch (RuntimeException e) {
-            logError("Could not update Dataset - " + dataset.getName(), e);
-            throw new EmfException("Could not update Dataset - " + dataset.getName());
-        }
+    private void addStartStatus() {
+        setStatus("Started import of " + dataset.getName() + "[" + dataset.getDatasetTypeName() + "]");
     }
 
-    private void logError(String messge, Exception e) {
-        log.error(messge, e);
+    private void addCompletedStatus() {
+        setStatus("Completed import of " + dataset.getName() + "[" + dataset.getDatasetTypeName() + "]");
     }
 
-    private void addStatus(String message) {
+    private void setStatus(String message) {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
         endStatus.setType("Import");
@@ -137,6 +124,10 @@ public class ImportTask implements Runnable {
         endStatus.setTimestamp(new Date());
 
         services.getStatus().create(endStatus);
+    }
+
+    private void logError(String messge, Exception e) {
+        log.error(messge, e);
     }
 
 }

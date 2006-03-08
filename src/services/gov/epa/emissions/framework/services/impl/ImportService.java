@@ -149,7 +149,7 @@ public class ImportService {
     private void showMultipleDatasets(User user, String[] filenames) {
         StatusServiceImpl status = services().getStatus();
         int filecount = filenames.length;
-        String message = "***IMPORT MULTIPLE DATASETS (" + filecount + " in total): ";
+        String message = "Starting to import multiple datasets (" + filecount + " in total): ";
         for (int i = 0; i < filecount; i++) {
             if (i == filecount - 1)
                 message += filenames[i];
