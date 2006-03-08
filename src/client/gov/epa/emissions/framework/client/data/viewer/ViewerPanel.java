@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.data.viewer;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.client.data.DataSortFilterPanel;
+import gov.epa.emissions.framework.client.data.DoubleRenderer;
 import gov.epa.emissions.framework.client.data.PaginationPanel;
 import gov.epa.emissions.framework.client.data.TableColumnHeaders;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -95,10 +96,17 @@ public class ViewerPanel extends JPanel implements ViewerPanelView {
     private ScrollableTable table(Page page) {
         tableModel = new EmfTableModel(new ViewablePage(tableMetadata, page));
         JTable viewTable = new JTable(tableModel);
-        new TableColumnHeaders(viewTable, tableMetadata).renderHeader();
-        new TableColumnWidth(viewTable, tableMetadata).columnWidths();
+        viewTableConfig(viewTable);
         table = new ScrollableTable(viewTable);
         return table;
+    }
+
+    private void viewTableConfig(JTable viewTable) {
+        new TableColumnHeaders(viewTable, tableMetadata).renderHeader();
+        new TableColumnWidth(viewTable, tableMetadata).columnWidths();
+        viewTable.setDefaultRenderer(Double.class,new DoubleRenderer());
+        viewTable.setDefaultRenderer(Float.class,new DoubleRenderer());
+        viewTable.repaint();
     }
 
     public void updateFilteredRecordsCount(int filtered) {
