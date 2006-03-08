@@ -206,7 +206,7 @@ public class DataServiceTest extends ServiceTestCase {
             remove(region);
         }
     }
-    
+
     public void testShouldUpdateDatsetName() throws EmfException {
         User owner = userService.getUser("emf");
         EmfDataset dataset = newDataset();
@@ -219,23 +219,6 @@ public class DataServiceTest extends ServiceTestCase {
             assertEquals("TEST dataset", released.getName());
         } finally {
             remove(dataset);
-        }
-    }
-
-    public void testShouldFailOnAttemptToAddDatasetWithDuplicateName() throws EmfException {
-        EmfDataset dataset1 = newDataset();
-
-        EmfDataset dataset2 = new EmfDataset();
-        dataset2.setName(dataset1.getName());
-        dataset2.setCreator(dataset1.getCreator());
-
-        try {
-            service.addDataset(dataset2);
-        } catch (EmfException e) {
-            assertEquals("Dataset name already in use", e.getMessage());
-            return;
-        } finally {
-            remove(dataset1);
         }
     }
 

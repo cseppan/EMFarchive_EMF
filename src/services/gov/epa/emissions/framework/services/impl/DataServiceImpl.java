@@ -41,47 +41,6 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    public void addDataset(EmfDataset dataset) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-
-            if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))
-                throw new EmfException("Dataset name already in use");
-
-            dao.add(dataset, session);
-            session.close();
-        } catch (RuntimeException e) {
-            LOG.error("Could not add Dataset - " + dataset.getName(), e);
-            throw new EmfException("Could not add Dataset - " + dataset.getName());
-        }
-    }
-
-    public void updateDatasetWithoutLock(EmfDataset dataset) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-
-            if (!dao.canUpdate(dataset, session))
-                throw new EmfException("Dataset name already in use");
-
-            dao.updateWithoutLocking(dataset, session);
-            session.close();
-        } catch (RuntimeException e) {
-            LOG.error("Could not update Dataset - " + dataset.getName(), e);
-            throw new EmfException("Could not update Dataset - " + dataset.getName());
-        }
-    }
-
-    public void removeDataset(EmfDataset dataset) throws EmfException {
-        try {
-            Session session = sessionFactory.getSession();
-            dao.remove(dataset, session);
-            session.close();
-        } catch (RuntimeException e) {
-            LOG.error("Could not get remove Dataset - " + dataset.getName(), e);
-            throw new EmfException("Could not get remove Dataset - " + dataset.getName());
-        }
-    }
-
     public EmfDataset obtainLockedDataset(User owner, EmfDataset dataset) throws EmfException {
         try {
             Session session = sessionFactory.getSession();

@@ -143,7 +143,7 @@ public class ExportService {
         AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset.getAccessedDateTime(),
                 "Version " + dataset.getDefaultVersion(), purpose, dirName);
 
-        ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, exporter);
+        ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, exporter, sessionFactory);
         threadPool.execute(eximTask);
     }
 

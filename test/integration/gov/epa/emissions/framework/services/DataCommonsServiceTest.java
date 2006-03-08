@@ -7,7 +7,6 @@ import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.impl.DataCommonsServiceImpl;
-import gov.epa.emissions.framework.services.impl.DataServiceImpl;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
@@ -24,15 +23,12 @@ public class DataCommonsServiceTest extends ServiceTestCase {
 
     private DataCommonsService service;
 
-    private DataServiceImpl dataService;
-
     private UserService userService;
 
     protected void doSetUp() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory();
         service = new DataCommonsServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
-        dataService = new DataServiceImpl(sessionFactory);
         super.deleteAllDatasets();
     }
 
@@ -344,19 +340,7 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         status.setUsername(username);
         status.setTimestamp(new Date());
 
-        save(status);
-    }
-
-    private void save(Status status) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            session.save(status);
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        add(status);
     }
 
     public void testShouldGetAllNoteTypes() throws EmfException {
@@ -386,7 +370,7 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         User user = userService.getUser("emf");
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
-        dataService.addDataset(dataset);
+        add(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
         rev = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT" + id,
@@ -414,7 +398,7 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         User user = userService.getUser("emf");
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
-        dataService.addDataset(dataset);
+        add(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
         int revisionsBeforeAdd = service.getRevisions(datasetFromDB.getId()).length;
@@ -446,7 +430,7 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         User user = userService.getUser("emf");
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
-        dataService.addDataset(dataset);
+        super.add(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
         Note note = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
@@ -470,7 +454,7 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         User user = userService.getUser("emf");
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
-        dataService.addDataset(dataset);
+        super.add(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
         int notesBeforeAdd = service.getNotes(datasetFromDB.getId()).length;
@@ -498,7 +482,7 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         User user = userService.getUser("emf");
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
-        dataService.addDataset(dataset);
+        super.add(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
         int notesBeforeAdd = service.getNotes(datasetFromDB.getId()).length;

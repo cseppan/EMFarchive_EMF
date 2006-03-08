@@ -66,7 +66,7 @@ public class LoggingServiceTest extends ServiceTestCase {
             dataset.setTemporalResolution("t1");
             dataset.setStopDateTime(new Date());
 
-            dataService.addDataset(dataset);
+            super.add(dataset);
 
             datasetFromDB = getDataset(dataset);
 

@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.services.impl.DataCommonsServiceImpl;
-import gov.epa.emissions.framework.services.impl.DataServiceImpl;
 import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 import gov.epa.emissions.framework.services.impl.UserServiceImpl;
 
@@ -23,15 +22,12 @@ public class DataCommonsTransportServiceTestCase extends ServiceTestCase {
 
     private DataCommonsService service;
 
-    private DataServiceImpl dataService;
-
     private UserService userService;
 
     protected void doSetUp() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory();
         service = new DataCommonsServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
-        dataService = new DataServiceImpl(sessionFactory);
 
         RemoteServiceLocator rl = new RemoteServiceLocator(DEFAULT_URL);
         dcs = rl.dataCommonsService();
@@ -47,7 +43,7 @@ public class DataCommonsTransportServiceTestCase extends ServiceTestCase {
         User user = userService.getUser("emf");
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
-        dataService.addDataset(dataset);
+        add(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
         Note note = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME" + id,
                 loadNoteType("Observation"), "abcd", dataset.getDefaultVersion());
@@ -67,7 +63,7 @@ public class DataCommonsTransportServiceTestCase extends ServiceTestCase {
         User user = userService.getUser("emf");
         EmfDataset dataset = newDataset();
         dataset.setCreator(user.getUsername());
-        dataService.addDataset(dataset);
+        add(dataset);
         EmfDataset datasetFromDB = loadDataset(dataset.getName());
 
         Note note1 = new Note(user, datasetFromDB.getId(), new Date(), "NOTE DETAILS", "NOTE NAME1" + id,

@@ -31,11 +31,14 @@ public class ImportService {
 
     public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MMddyy_HHmmss");
 
+    private Services services;
+
     public ImportService(ImporterFactory importerFactory, HibernateSessionFactory sessionFactory,
             PooledExecutor threadPool) {
         this.importerFactory = importerFactory;
         this.sessionFactory = sessionFactory;
         this.threadPool = threadPool;
+        this.services = services();
     }
 
     private Services services() {
@@ -76,7 +79,7 @@ public class ImportService {
 
             isUnique(dataset);
             Importer importer = importerFactory.createVersioned(dataset, path, fileNames);
-            ImportTask eximTask = new ImportTask(user, fileNames, dataset, services(), importer);
+            ImportTask eximTask = new ImportTask(dataset, fileNames, importer, user, services, sessionFactory);
 
             threadPool.execute(eximTask);
         } catch (Exception e) {
@@ -85,27 +88,33 @@ public class ImportService {
         }
     }
 
-    public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType)
-            throws EmfException {
+    public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType) {
         showMultipleDatasets(user, filenames);
-        
+
         for (int i = 0; i < filenames.length; i++) {
             String datasetName = filenames[i] + "_" + DATE_FORMATTER.format(new Date());
-            EmfDataset dataset = new EmfDataset();
-            dataset.setName(datasetName);
-            dataset.setCreator(user.getUsername());
-            dataset.setDatasetType(datasetType);
-            dataset.setCreatedDateTime(new Date());
-            dataset.setModifiedDateTime(new Date());
-            dataset.setAccessedDateTime(new Date());
-
-            importSingleDataset(user, folderPath, new String[] { filenames[i] }, dataset);
+            EmfDataset dataset = createDataset(datasetName, user, datasetType);
+            try {
+                importSingleDataset(user, folderPath, new String[] { filenames[i] }, dataset);
+            } catch (EmfException e) {
+                addFailureStatus(dataset, e.getMessage(), user);
+            }
         }
     }
 
-    public void importDataset(User user, String folderPath, String[] filenames, DatasetType datasetType,
-            String datasetName) throws EmfException {
+    private void addFailureStatus(EmfDataset dataset, String errorMessage, User user) {
+        Status endStatus = new Status();
+        endStatus.setUsername(user.getUsername());
+        endStatus.setType("Import");
+        endStatus.setMessage("Import of Dataset " + dataset.getName() + " failed. Reason: " + errorMessage);
+        endStatus.setTimestamp(new Date());
+
+        services.getStatus().create(endStatus);
+    }
+
+    private EmfDataset createDataset(String datasetName, User user, DatasetType datasetType) {
         EmfDataset dataset = new EmfDataset();
+
         dataset.setName(datasetName);
         dataset.setCreator(user.getUsername());
         dataset.setDatasetType(datasetType);
@@ -113,37 +122,43 @@ public class ImportService {
         dataset.setModifiedDateTime(new Date());
         dataset.setAccessedDateTime(new Date());
 
+        return dataset;
+    }
+
+    public void importDataset(User user, String folderPath, String[] filenames, DatasetType datasetType,
+            String datasetName) throws EmfException {
+        EmfDataset dataset = createDataset(datasetName, user, datasetType);
         importSingleDataset(user, folderPath, filenames, dataset);
     }
-    
+
     public String[] getFilenamesFromPattern(String folder, String pattern) throws EmfException {
         try {
             File directory = new File(folder);
             FilePatternMatcher fpm = new FilePatternMatcher(directory, pattern);
             String[] allFilesInFolder = directory.list();
             String[] fileNamesForImport = fpm.matchingNames(allFilesInFolder);
-            if (fileNamesForImport.length > 0) 
+            if (fileNamesForImport.length > 0)
                 return fileNamesForImport;
-            
+
             throw new EmfException("No files found for pattern '" + pattern + "'");
         } catch (ImporterException e) {
             throw new EmfException("Cannot apply pattern.");
         }
     }
-    
+
     private void showMultipleDatasets(User user, String[] filenames) {
         StatusServiceImpl status = services().getStatus();
         int filecount = filenames.length;
         String message = "***IMPORT MULTIPLE DATASETS (" + filecount + " in total): ";
         for (int i = 0; i < filecount; i++) {
-            if(i == filecount - 1)
+            if (i == filecount - 1)
                 message += filenames[i];
             else
                 message += filenames[i] + ", ";
         }
         setStatus(message, user, status);
     }
-    
+
     private void setStatus(String message, User user, StatusServiceImpl statusServices) {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());

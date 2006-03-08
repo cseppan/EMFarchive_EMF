@@ -52,8 +52,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         exportService.export(user, datasets, dirName, purpose, true);
     }
 
-    public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType)
-            throws EmfException {
+    public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType) {
         importService.importDatasets(user, folderPath, filenames, datasetType);
     }
 

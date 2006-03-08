@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.services.impl;
 
 import gov.epa.emissions.commons.io.importer.Importer;
-import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.dao.DatasetDao;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.services.Status;
 
@@ -11,6 +11,7 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 
 public class ImportTask implements Runnable {
 
@@ -18,72 +19,124 @@ public class ImportTask implements Runnable {
 
     private User user;
 
-    private StatusServiceImpl statusServices = null;
-
-    private DataServiceImpl dataService = null;
-
     private Importer importer;
 
     private EmfDataset dataset;
 
-    private String[] fileNames;
+    private String[] files;
 
-    public ImportTask(User user, String[] fileNames, EmfDataset dataset, Services services, Importer importer) {
+    private HibernateSessionFactory sessionFactory;
+
+    private Services services;
+
+    public ImportTask(EmfDataset dataset, String[] files, Importer importer, User user, Services services,
+            HibernateSessionFactory sessionFactory) {
         this.user = user;
-        this.fileNames = fileNames;
+        this.files = files;
         this.dataset = dataset;
-        this.dataService = services.getData();
-        this.statusServices = services.getStatus();
+        this.services = services;
+        this.sessionFactory = sessionFactory;
 
         this.importer = importer;
     }
 
     public void run() {
-        String fileName = fileNames[0];
-        
-        if(fileNames.length > 1)
-            for(int i = 1; i < fileNames.length; i++)
-                fileName += ", " + fileNames[i];
-        
         try {
-            setStartStatus();
-            dataService.addDataset(dataset);
-            dataset.setCreator(user.getUsername());
-            dataset.setStatus("Start Import");
+            prepare();
             importer.run();
-
-            // if no errors then insert the dataset into the database
-            dataset.setStatus("Imported");
-            dataService.updateDatasetWithoutLock(dataset);
-            
-            setStatus("Completed import for " + dataset.getDatasetTypeName() + ":" + fileName);
-        } catch (ImporterException e) {
-            log.error("Problem attempting to run ExIm on file : " + fileName, e);
-            setStatus("Import failure: " + e.getMessage());
-            try {
-                dataService.removeDataset(dataset);
-            } catch (RuntimeException e1) {
-                log.error("Problem removing inserted dataset for failed import : " + dataset.getName(), e);
-            } catch (EmfException ex) {
-                log.error("Problem attempting to run ExIm on file : " + fileName, ex);
-            }
-        } catch (EmfException e) {
-            log.error("Problem attempting to run Import on file : " + fileName, e);
+            complete();
+        } catch (Exception e) {
+            logError("Failed to import file(s) : " + filesList(), e);
+            addStatus("Import failure: " + e.getMessage());
+            removeDataset(dataset);
         }
     }
 
-    private void setStartStatus() {
-        setStatus("Started import for " + dataset.getDatasetTypeName());
+    private void complete() throws EmfException {
+        dataset.setStatus("Imported");
+        updateDataset(dataset);
+        addCompletedStatus();
     }
 
-    private void setStatus(String message) {
+    private void prepare() throws EmfException {
+        addStartStatus();
+        addDataset(dataset);
+        dataset.setStatus("Started import");
+    }
+
+    private void addCompletedStatus() {
+        addStatus("Completed import of :" + filesList() + " of type " + dataset.getDatasetTypeName());
+    }
+
+    private String filesList() {
+        StringBuffer fileList = new StringBuffer(files[0]);
+
+        if (files.length > 1)
+            for (int i = 1; i < files.length; i++)
+                fileList.append(", " + files[i]);
+
+        return fileList.toString();
+    }
+
+    private void addStartStatus() {
+        addStatus("Started import for " + dataset.getDatasetTypeName());
+    }
+
+    void addDataset(EmfDataset dataset) throws EmfException {
+        DatasetDao dao = new DatasetDao();
+        try {
+            Session session = sessionFactory.getSession();
+
+            if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))
+                throw new EmfException("Dataset name already in use");
+
+            dao.add(dataset, session);
+            session.close();
+        } catch (RuntimeException e) {
+            logError("Could not add Dataset - " + dataset.getName(), e);
+            throw new EmfException("Could not add Dataset - " + dataset.getName());
+        }
+    }
+
+    void removeDataset(EmfDataset dataset) {
+        DatasetDao dao = new DatasetDao();
+        try {
+            Session session = sessionFactory.getSession();
+            dao.remove(dataset, session);
+            session.close();
+        } catch (Exception e) {
+            logError("Could not get remove Dataset - " + dataset.getName(), e);
+        }
+    }
+
+    void updateDataset(EmfDataset dataset) throws EmfException {
+        DatasetDao dao = new DatasetDao();
+        try {
+            Session session = sessionFactory.getSession();
+
+            if (!dao.canUpdate(dataset, session))
+                throw new EmfException("Dataset name already in use");
+
+            dao.updateWithoutLocking(dataset, session);
+            session.close();
+        } catch (RuntimeException e) {
+            logError("Could not update Dataset - " + dataset.getName(), e);
+            throw new EmfException("Could not update Dataset - " + dataset.getName());
+        }
+    }
+
+    private void logError(String messge, Exception e) {
+        log.error(messge, e);
+    }
+
+    private void addStatus(String message) {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
         endStatus.setType("Import");
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 
-        statusServices.create(endStatus);
+        services.getStatus().create(endStatus);
     }
 
 }
