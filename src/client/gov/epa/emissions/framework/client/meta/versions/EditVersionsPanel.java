@@ -9,7 +9,6 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.editor.DataEditor;
 import gov.epa.emissions.framework.client.data.viewer.DataViewer;
-import gov.epa.emissions.framework.client.meta.NewVersionDialog;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EmfTableModel;
@@ -23,7 +22,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -44,8 +42,6 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
     private EmfTableModel tableModel;
 
     private JPanel tablePanel;
-
-    private JComboBox defaultVersionsCombo;
 
     private DesktopManager desktopManager;
 
@@ -85,11 +81,6 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         // reload table
         ScrollableTable table = createTable(versions);
         tablePanel.add(table, BorderLayout.CENTER);
-
-        // reload default version list
-        VersionsSet versionsSet = new VersionsSet(versions);
-        ComboBoxModel model = new DefaultComboBoxModel(versionsSet.finalVersions());
-        defaultVersionsCombo.setModel(model);
 
         refreshLayout();
     }

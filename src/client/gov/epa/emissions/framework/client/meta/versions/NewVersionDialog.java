@@ -1,11 +1,10 @@
-package gov.epa.emissions.framework.client.meta;
+package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.Dialog;
 
@@ -28,11 +27,11 @@ public class NewVersionDialog extends Dialog {
 
     protected boolean shouldCreate;
 
-    private Version[] versions;
+    private VersionsSet versionsSet;
 
     public NewVersionDialog(EmfDataset dataset, Version[] versions, EmfConsole parent) {
         super("Create a new Version of " + dataset.getName(), parent);
-        this.versions = versions;
+        versionsSet = new VersionsSet(versions);
         super.setSize(new Dimension(450, 150));
 
         super.getContentPane().add(createLayout(versions));
@@ -107,11 +106,23 @@ public class NewVersionDialog extends Dialog {
     }
 
     protected boolean verifyInput() {
-        if (name().trim().length() != 0)
-            return true;
+        String newName = name().trim();
+        if (newName.length() == 0) {
+            JOptionPane.showMessageDialog(super.getParent(), "Please enter Name", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
 
-        JOptionPane.showMessageDialog(super.getParent(), "Please enter Name", "Error", JOptionPane.ERROR_MESSAGE);
-        return false;
+        if (isDuplicate(newName)) {
+            JOptionPane.showMessageDialog(super.getParent(), "Please enter a unique 'name'", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isDuplicate(String value) {
+        return versionsSet.contains(value);
     }
 
     protected void close() {
@@ -127,16 +138,7 @@ public class NewVersionDialog extends Dialog {
     }
 
     public Version version() {
-        return lookupVersion((String) versionsModel.getSelectedItem());
-    }
-
-    private Version lookupVersion(String name) {
-        for (int i = 0; i < versions.length; i++) {
-            if (versions[i].getName().equals(name))
-                return versions[i];
-        }
-
-        return null;
+        return versionsSet.version(((String) versionsModel.getSelectedItem()));
     }
 
     public String name() {

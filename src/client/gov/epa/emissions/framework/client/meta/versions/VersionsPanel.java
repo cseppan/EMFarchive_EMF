@@ -21,10 +21,8 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.CompoundBorder;
 
@@ -43,8 +41,6 @@ public class VersionsPanel extends JPanel implements VersionsView {
     private EmfTableModel tableModel;
 
     private JPanel tablePanel;
-
-    private JComboBox defaultVersionsCombo;
 
     private DesktopManager desktopManager;
 
@@ -70,35 +66,9 @@ public class VersionsPanel extends JPanel implements VersionsView {
     }
 
     public void display(Version[] versions, InternalSource[] sources) {
-        VersionsSet versionsSet = new VersionsSet(versions);
-
         if (sources.length != 0)
             add(topPanel(sources), BorderLayout.PAGE_START);
         add(tablePanel(versions), BorderLayout.CENTER);
-        add(bottomPanel(versionsSet), BorderLayout.SOUTH);
-    }
-
-    private JPanel bottomPanel(VersionsSet versionsSet) {
-        JPanel container = new JPanel(new BorderLayout());
-
-        JPanel right = new JPanel();
-        right.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 5));
-        right.add(new JLabel("Default Version: "));
-
-        String name = versionsSet.getVersionName(dataset.getDefaultVersion());
-        if (name == null)
-        {
-            name = "N/A";
-        }
-        right.add(new JLabel(displayableVersion(name, dataset)));
-
-        container.add(right, BorderLayout.CENTER);
-
-        return container;
-    }
-
-    private String displayableVersion(String name, EmfDataset dataset) {
-        return dataset.getDefaultVersion() + " - " + name;
     }
 
     public void reload(Version[] versions) {
@@ -107,11 +77,6 @@ public class VersionsPanel extends JPanel implements VersionsView {
         // reload table
         ScrollableTable table = createTable(versions);
         tablePanel.add(table, BorderLayout.CENTER);
-
-        // reload default version list
-        VersionsSet versionsSet = new VersionsSet(versions);
-        ComboBoxModel model = new DefaultComboBoxModel(versionsSet.finalVersions());
-        defaultVersionsCombo.setModel(model);
 
         refreshLayout();
     }

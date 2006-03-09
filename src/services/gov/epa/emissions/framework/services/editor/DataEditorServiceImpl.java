@@ -97,7 +97,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         } catch (HibernateException e) {
             LOG.error("Could not derive a new Version from the base Version: " + base.getVersion() + " of Dataset: "
                     + base.getDatasetId(), e);
-            throw new EmfException("Could not create a new Version using " + base.getVersion() + "as the base");
+            throw new EmfException("Could not create a new Version using " + base.getVersion() + " as the base");
         }
     }
 

@@ -23,6 +23,22 @@ public class VersionsSetTest extends TestCase {
         assertTrue(vset.getVersionName(10).equals("" + 10));
     }
 
+    public void testShouldContainListedVersion() {
+        Version v1 = new Version();
+        v1.setName("final2");
+
+        Version v2 = new Version();
+        v2.setName("final2");
+
+        Version[] versions = { v1, v2 };
+
+        VersionsSet set = new VersionsSet(versions);
+
+        assertTrue(set.contains(v1.getName()));
+        assertTrue(set.contains(v2.getName()));
+        assertFalse(set.contains("non-existent"));
+    }
+
     public void testShouldFetchNamesOfFinalVersions() {
         Version nonFinal = new Version();
         Version final1 = new Version();

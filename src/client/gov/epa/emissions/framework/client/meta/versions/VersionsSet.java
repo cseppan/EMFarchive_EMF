@@ -86,4 +86,8 @@ public class VersionsSet {
         return getVersionName(dataset.getDefaultVersion());
     }
 
+    public boolean contains(String name) {
+        return version(name) != null;
+    }
+
 }

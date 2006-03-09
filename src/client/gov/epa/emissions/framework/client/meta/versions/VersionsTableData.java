@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,10 +14,10 @@ public class VersionsTableData extends AbstractTableData {
 
     private List rows;
 
-    private Version[] values;
+    private List values;
 
     public VersionsTableData(Version[] values) {
-        this.values = values;
+        this.values = new ArrayList(Arrays.asList(values));
         this.rows = createRows(values);
     }
 
@@ -35,6 +36,7 @@ public class VersionsTableData extends AbstractTableData {
     }
 
     public void add(Version version) {
+        values.add(version);
         rows.add(row(version));
     }
 
@@ -69,7 +71,7 @@ public class VersionsTableData extends AbstractTableData {
     }
 
     public Version[] getValues() {
-        return values;
+        return (Version[]) values.toArray(new Version[0]);
     }
 
 }
