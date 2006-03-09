@@ -77,7 +77,7 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
         dbUpdate.dropTable(datasource.getName(), dataset.getName());
 
         DataModifier modifier = datasource.dataModifier();
-        modifier.dropAll("versions");
+        modifier.dropAllData("versions");
     }
 
     private DataAccessToken token(Version version) {

@@ -36,12 +36,7 @@ public class SpringLayoutGenerator {
      */
     public void makeGrid(Container parent, int rows, int cols, int initialX, int initialY, int xPad, int yPad) {
         SpringLayout layout;
-        try {
-            layout = (SpringLayout) parent.getLayout();
-        } catch (ClassCastException exc) {
-            System.err.println("The first argument to makeGrid must use SpringLayout.");
-            return;
-        }
+        layout = (SpringLayout) parent.getLayout();
 
         Spring xPadSpring = Spring.constant(xPad);
         Spring yPadSpring = Spring.constant(yPad);
@@ -125,12 +120,7 @@ public class SpringLayoutGenerator {
      */
     public void makeCompactGrid(Container parent, int rows, int cols, int initialX, int initialY, int xPad, int yPad) {
         SpringLayout layout;
-        try {
-            layout = (SpringLayout) parent.getLayout();
-        } catch (ClassCastException exc) {
-            System.err.println("The first argument to makeCompactGrid must use SpringLayout.");
-            return;
-        }
+        layout = (SpringLayout) parent.getLayout();
 
         // Align all cells in each column and make them the same width.
         Spring x = Spring.constant(initialX);

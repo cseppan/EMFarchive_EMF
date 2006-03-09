@@ -88,7 +88,7 @@ public abstract class ServiceTestCase extends TestCase {
 
     protected void dropData(String table, Datasource datasource) throws Exception, SQLException {
         DataModifier modifier = datasource.dataModifier();
-        modifier.dropAll(table);
+        modifier.dropAllData(table);
     }
 
     protected HibernateSessionFactory sessionFactory() throws Exception {
