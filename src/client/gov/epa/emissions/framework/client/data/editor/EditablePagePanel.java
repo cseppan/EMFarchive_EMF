@@ -103,7 +103,6 @@ public class EditablePagePanel extends JPanel {
                 doAdd(tableData, editableTable, above);
             }
         };
-
     }
 
     protected void clearMessagesWithTableRefresh() {
@@ -119,14 +118,21 @@ public class EditablePagePanel extends JPanel {
     private void doAdd(final EditablePage tableData, DataEditorTable editableTable, boolean above) {
         int selectedRow = editableTable.getSelectedRow();
         messagePanel.clear();
-        if (selectedRow != -1) {
-            int insertRowNo = (above) ? selectedRow : selectedRow + 1;
+        if (selectedRow != -1 || editableTable.getRowCount() == 0) {
+            int insertRowNo = insertRowNumber(above, selectedRow, editableTable);
             tableData.addBlankRow(insertRowNo);
             refresh();
             editableTable.setRowSelectionInterval(insertRowNo, insertRowNo);
         } else {
             messagePanel.setError("Please highlight a row before clicking the insert button");
         }
+    }
+
+    private int insertRowNumber(boolean above, int selectedRow, DataEditorTable editableTable) {
+        if (editableTable.getRowCount() == 0) {
+            return 0;
+        }
+        return (above) ? selectedRow : selectedRow + 1;
     }
 
     private void doRemove(final EditablePage tableData) {
