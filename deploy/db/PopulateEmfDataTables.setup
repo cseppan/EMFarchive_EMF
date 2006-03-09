@@ -80,6 +80,9 @@ insert into emf.dataset_types values(DEFAULT,'SCC Descriptions (Line-based)','SC
  
 -- emf.dataset_types
 --
+-- emf.dataset_types_keywords
+
+--
 -- emf.intended_uses
 insert into emf.intended_uses values (DEFAULT, 'public');
 insert into emf.intended_uses values (DEFAULT, 'private');
@@ -97,6 +100,7 @@ insert INTO emf.note_types VALUES (DEFAULT, 'Replaced by dataset');
 insert INTO emf.note_types VALUES (DEFAULT, 'Replaces dataset ');
 -- emf.note_types
 --
+
 
 
 
