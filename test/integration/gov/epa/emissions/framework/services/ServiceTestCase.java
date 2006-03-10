@@ -13,7 +13,6 @@ import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -81,12 +80,12 @@ public abstract class ServiceTestCase extends TestCase {
         return dbServer().getSqlDataTypes();
     }
 
-    protected void dropTable(String table, Datasource datasource) throws Exception, SQLException {
+    protected void dropTable(String table, Datasource datasource) throws Exception {
         PostgresDbUpdate dbUpdate = new PostgresDbUpdate();
         dbUpdate.dropTable(datasource.getName(), table);
     }
 
-    protected void dropData(String table, Datasource datasource) throws Exception, SQLException {
+    protected void dropData(String table, Datasource datasource) throws Exception {
         DataModifier modifier = datasource.dataModifier();
         modifier.dropAllData(table);
     }

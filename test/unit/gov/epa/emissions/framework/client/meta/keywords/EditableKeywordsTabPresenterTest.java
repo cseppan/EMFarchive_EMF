@@ -22,7 +22,6 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("display").with(eq(dataset.proxy()), same(keywords));
 
         Mock type = mock(DatasetType.class);
-        type.stubs().method("getKeywords").withNoArguments().will(returnValue(new Keyword[0]));
         dataset.stubs().method("getDatasetType").withNoArguments().will(returnValue(type.proxy()));
 
         EditableKeywordsTabPresenter presenter = new EditableKeywordsTabPresenterImpl((EditableKeywordsTabView) view.proxy(), (EmfDataset) dataset
@@ -43,7 +42,6 @@ public class EditableKeywordsTabPresenterTest extends MockObjectTestCase {
         dataset.stubs().method("getKeyVals").will(returnValue(values));
 
         Mock type = mock(DatasetType.class);
-        type.stubs().method("getKeywords").withNoArguments().will(returnValue(keywordsList));
         dataset.stubs().method("getDatasetType").withNoArguments().will(returnValue(type.proxy()));
 
         Mock view = mock(EditableKeywordsTabView.class);

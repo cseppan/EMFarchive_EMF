@@ -18,14 +18,14 @@ public class EditableKeyValueTableData extends AbstractEditableTableData impleme
     private List rows;
 
     private Keywords masterKeywords;
-    
+
     private DatasetType datasetType;
 
     public EditableKeyValueTableData(KeyVal[] keyVals, Keywords masterKeywords) {
         this.masterKeywords = masterKeywords;
         this.rows = createRows(keyVals, masterKeywords);
     }
-    
+
     public EditableKeyValueTableData(KeyVal[] datasetKeyVals, KeyVal[] datasetTypeKeyVals, Keywords masterKeywords) {
         this(mergeKeyVals(datasetKeyVals, datasetTypeKeyVals), masterKeywords);
     }
@@ -41,15 +41,16 @@ public class EditableKeyValueTableData extends AbstractEditableTableData impleme
     public boolean isEditable(int row, int col) {
         EditableRow editableRow = (EditableRow) rows.get(row);
         KeyVal keyVal = (KeyVal) editableRow.source();
-        if (contains(datasetType.getKeywords(), keyVal.getKeyword()) && (col == 0 || col == 1)) {
+        if (contains(keyVal.getKeyword()) && (col == 0 || col == 1)) {
             return false;
         }
         return true;
     }
 
-    private boolean contains(Keyword[] keywords, Keyword keyword) {
-        for (int i = 0; i < keywords.length; i++) {
-            if (keyword.equals(keywords[i])) {
+    private boolean contains(Keyword keyword) {
+        KeyVal[] keyvals = datasetType.getKeyVals();
+        for (int i = 0; i < keyvals.length; i++) {
+            if (keyword.equals(keyvals[i].getKeyword())) {
                 return true;
             }
         }

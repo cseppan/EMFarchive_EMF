@@ -5,16 +5,14 @@ import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
-import gov.epa.emissions.commons.io.KeyVal;
-import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.exim.DatasetsBrowserAwareImportPresenter;
-import gov.epa.emissions.framework.client.exim.ExportPresenterImpl;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
+import gov.epa.emissions.framework.client.exim.ExportPresenterImpl;
 import gov.epa.emissions.framework.client.exim.ExportWindow;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
@@ -189,11 +187,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
         JButton exportButton = new Button("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    exportSelectedDatasets();
-                } catch (EmfException e) {
-                    showError(e.getMessage());
-                }
+                exportSelectedDatasets();
             }
         });
         exportButton.setToolTipText("Export existing Dataset(s)");
@@ -210,9 +204,9 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         return panel;
     }
 
-    protected void exportSelectedDatasets() throws EmfException {
+    protected void exportSelectedDatasets() {
         EmfDataset[] emfDatasets = getNonExternalDatasets(getSelectedDatasets());
-        checkKeyVals(emfDatasets);
+        verifyKeyVals(emfDatasets);
 
         ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager);
         getDesktopPane().add(exportView);
@@ -335,34 +329,8 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         super.refreshLayout();
     }
 
-    // COMPLEX: is this readable?
-    private void checkKeyVals(EmfDataset[] datasets) throws EmfException {
-        for (int i = 0; i < datasets.length; i++) {
-            KeyVal[] keyVals = datasets[i].getKeyVals();
-            Keyword[] keyWords = datasets[i].getDatasetType().getKeywords();
-            int k;
-            boolean found = true; // need to do this to handle no keywords case
-            // verify that each keyword defined for the dataset type is in the
-            // dataset
-            for (k = 0; (k < keyWords.length) && !found; k++) {
-                found = false;
-                for (int l = 0; l < keyVals.length; l++) {
-                    if (keyVals[l].getKeyword().getName().equals(keyWords[k].getName())) {
-                        found = true;
-                    }
-                }
-                if (!found)
-                    break;
-            }
-            if (!found)
-                throw new EmfException("Cannot export: Keyword " + keyWords[k].getName() + " is missing for dataset "
-                        + datasets[i].getName());
-
-            for (int j = 0; j < keyVals.length; j++)
-                if (keyVals[j].getValue().equals(""))
-                    throw new EmfException("Cannot export: Keyword " + keyVals[j].getKeyword()
-                            + "does not have a value for dataset " + datasets[i].getName());
-        }
+    private void verifyKeyVals(EmfDataset[] datasets) {
+        // FIXME: what should be verified/validated?
     }
 
     public void doRefresh() throws EmfException {

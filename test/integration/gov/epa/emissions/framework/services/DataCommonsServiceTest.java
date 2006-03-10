@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.io.Project;
 import gov.epa.emissions.commons.io.Sector;
@@ -113,7 +114,8 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         String newname = "MyDatasetType" + Math.abs(new Random().nextInt());
         DatasetType newtype = new DatasetType(newname);
         newtype.setDescription("MyDatasetType, newly added type.");
-        newtype.setKeywords(new Keyword[0]);
+        Keyword keyword = new Keyword("key");
+        newtype.setKeyVals(new KeyVal[] { new KeyVal(keyword, "val") });
         newtype.setDefaultSortOrder("default sort order string goes here");
         int existingTypes = service.getDatasetTypes().length;
 
@@ -124,6 +126,7 @@ public class DataCommonsServiceTest extends ServiceTestCase {
             assertTrue(currentDatasetType(newtype).getName().equalsIgnoreCase(newname));
         } finally {
             remove(newtype);
+            remove(keyword);
         }
     }
 
@@ -156,13 +159,11 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         type1.setDescription("MyDatasetType, newly added type.");
         type1.setDefaultSortOrder("default sort order string goes here");
 
-        type1.setKeywords(new Keyword[0]);
         service.addDatasetType(type1);
 
         try {
             DatasetType type2 = new DatasetType(newname);
             type2.setDescription("duplicate type");
-            type2.setKeywords(new Keyword[0]);
 
             service.addDatasetType(type2);
         } catch (EmfException e) {
@@ -177,13 +178,11 @@ public class DataCommonsServiceTest extends ServiceTestCase {
         String newname = "MyDatasetType" + Math.abs(new Random().nextInt());
         DatasetType type1 = new DatasetType(newname);
         type1.setDescription("MyDatasetType, newly added type.");
-        type1.setKeywords(new Keyword[0]);
         type1.setDefaultSortOrder("default sort order string goes here");
         service.addDatasetType(type1);
 
         DatasetType type2 = new DatasetType(newname + "foobar");
         type2.setDescription("duplicate type");
-        type2.setKeywords(new Keyword[0]);
         type2.setDefaultSortOrder("default sort order string goes here");
         service.addDatasetType(type2);
 

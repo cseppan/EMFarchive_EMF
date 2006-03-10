@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.commons.io.Country;
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.io.Project;
 import gov.epa.emissions.commons.io.Region;
@@ -40,7 +41,7 @@ public class DataCommonsDAOTest extends ServiceTestCase {
         datasetDAO = new DatasetDao();
     }
 
-    protected void doTearDown() throws Exception {// no op
+    protected void doTearDown() {// no op
     }
 
     public void testShouldGetAllKeywords() {
@@ -51,7 +52,7 @@ public class DataCommonsDAOTest extends ServiceTestCase {
         try {
             List keywords = dao.getKeywords(session);
             assertEquals(totalBeforeAdd + 1, keywords.size());
-            assertSame(keyword, keywords.get(0));
+            assertEquals(keyword, keywords.get(0));
         } finally {
             remove(keyword);
         }
@@ -167,6 +168,29 @@ public class DataCommonsDAOTest extends ServiceTestCase {
 
         DatasetType loadedFromDb = currentDatasetType(type);
         assertEquals(loadedFromDb.getLockOwner(), owner.getUsername());
+    }
+
+    public void testShouldGetLockOnDatasetTypeContainingKeyVals() {
+        User owner = userDao.get("emf", session);
+        
+        DatasetType newType = new DatasetType("name" + Math.random());
+        newType.setDescription("MyDatasetType, newly added type.");
+        Keyword keyword = new Keyword("test");
+        KeyVal keyVal = new KeyVal(keyword, "val");
+        newType.setKeyVals(new KeyVal[] { keyVal });
+
+        try {
+            dao.add(newType, session);
+
+            DatasetType locked = dao.obtainLockedDatasetType(owner, newType, session);
+            assertEquals(locked.getLockOwner(), owner.getUsername());
+
+            DatasetType loadedFromDb = currentDatasetType(newType);
+            assertEquals(loadedFromDb.getLockOwner(), owner.getUsername());
+        } finally {
+            remove(newType);
+            remove(keyword);
+        }
     }
 
     public void testShouldFailToGetLockWhenAlreadyLockedByAnotherUser() {

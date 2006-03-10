@@ -19,12 +19,6 @@
         <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
         <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
         
-        <array name="keywords" table="dataset_types_keywords" cascade="save-update">
-            <key column="dataset_type_id" not-null="true"/>
-            <list-index column="list_index"/>
-            <many-to-many class="gov.epa.emissions.commons.io.Keyword" column="keyword_id"/>
-        </array>
-        
        	<array name="keyVals" table="dataset_types_keywords" cascade="save-update">
       		<key column="dataset_type_id"/>
       		<list-index column="list_index"/>
