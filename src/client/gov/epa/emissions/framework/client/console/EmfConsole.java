@@ -98,12 +98,13 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
     private JMenuBar createMenuBar(WindowMenu windowMenu, EmfSession session) {
         JMenuBar menubar = new JMenuBar();
 
-        menubar.add(createFileMenu(session));
-        menubar.add(createManageMenu(session));
+        messagePanel = new SingleLineMessagePanel();
+
+        menubar.add(createFileMenu(session, messagePanel));
+        menubar.add(createManageMenu(session, messagePanel));
         menubar.add(windowMenu);
         menubar.add(createHelpMenu());
 
-        messagePanel = new SingleLineMessagePanel();
         menubar.add(messagePanel);
 
         return menubar;
@@ -117,7 +118,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         return windowMenu;
     }
 
-    private JMenu createFileMenu(EmfSession session) {
+    private JMenu createFileMenu(EmfSession session, MessagePanel messagePanel) {
         return new FileMenu(session, this, messagePanel, desktopManager);
     }
 
@@ -133,7 +134,7 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         return menuItem;
     }
 
-    private JMenu createManageMenu(EmfSession session) {
+    private JMenu createManageMenu(EmfSession session, MessagePanel messagePanel) {
         manageMenu = new ManageMenu(session, this, messagePanel, desktopManager);
 
         return manageMenu;
