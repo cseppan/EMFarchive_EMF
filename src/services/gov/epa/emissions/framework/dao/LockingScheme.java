@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.dao;
 
-import gov.epa.emissions.commons.io.Lockable;
+import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.impl.EmfProperty;

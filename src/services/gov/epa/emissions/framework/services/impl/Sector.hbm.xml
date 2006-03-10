@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false"> 
-    <class name="gov.epa.emissions.commons.io.Sector" table="sectors" schema="emf">
+    <class name="gov.epa.emissions.commons.data.Sector" table="sectors" schema="emf">
         <id name="id" type="long" column="id">
             <generator class="identity"/>
         </id>
@@ -16,7 +16,7 @@
         <array name="sectorCriteria" table="sector_criteria">
             <key column="sector_id"/>
             <list-index column="list_index"/>
-            <composite-element class="gov.epa.emissions.commons.io.SectorCriteria">
+            <composite-element class="gov.epa.emissions.commons.data.SectorCriteria">
                 <property name="type" column="type" not-null="true"/>
                 <property name="criteria" column="criteria" not-null="true"/>
             </composite-element>

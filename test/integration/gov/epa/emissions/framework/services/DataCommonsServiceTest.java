@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.KeyVal;
-import gov.epa.emissions.commons.io.Keyword;
-import gov.epa.emissions.commons.io.Project;
-import gov.epa.emissions.commons.io.Sector;
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.services.impl.DataCommonsServiceImpl;

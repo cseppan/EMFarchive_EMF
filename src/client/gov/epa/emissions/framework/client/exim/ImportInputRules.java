@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 
 public class ImportInputRules {

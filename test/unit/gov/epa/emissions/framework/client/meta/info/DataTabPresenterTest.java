@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.meta.info;
 
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.DataTabPresenter;
 import gov.epa.emissions.framework.client.meta.DataTabView;

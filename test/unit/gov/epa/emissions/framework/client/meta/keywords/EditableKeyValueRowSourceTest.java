@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.keywords;
 
-import gov.epa.emissions.commons.io.KeyVal;
-import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueRowSource;
 
 import org.jmock.cglib.MockObjectTestCase;

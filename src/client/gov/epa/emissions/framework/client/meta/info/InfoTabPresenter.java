@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta.info;
 
-import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 public class InfoTabPresenter {

@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
-import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.data.DatasetType;
 
 public class ViewableDatasetTypePresenterImpl implements ViewableDatasetTypePresenter {
 

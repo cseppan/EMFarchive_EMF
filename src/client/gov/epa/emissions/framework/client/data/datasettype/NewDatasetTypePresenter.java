@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
-import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.DataCommonsService;

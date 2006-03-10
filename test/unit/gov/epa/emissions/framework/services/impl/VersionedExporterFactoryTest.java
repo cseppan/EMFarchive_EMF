@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.services.impl;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.io.orl.ORLOnRoadExporter;
 import gov.epa.emissions.commons.io.temporal.TemporalProfileExporter;

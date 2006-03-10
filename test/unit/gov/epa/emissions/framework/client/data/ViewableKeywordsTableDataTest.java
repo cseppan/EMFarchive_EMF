@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.data;
 
-import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.framework.client.data.datasettype.ViewableKeywordsTableData;
 import gov.epa.emissions.framework.ui.Row;
 

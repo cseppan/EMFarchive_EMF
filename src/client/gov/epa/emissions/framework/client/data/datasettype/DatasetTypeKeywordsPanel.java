@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueTableData;
 import gov.epa.emissions.framework.ui.EditableTablePanel;
 

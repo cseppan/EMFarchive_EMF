@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.meta.info;
 
+import gov.epa.emissions.commons.data.ExternalSource;
+import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.gui.SimpleTableModel;
-import gov.epa.emissions.commons.io.ExternalSource;
-import gov.epa.emissions.commons.io.InternalSource;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EmfTableModel;

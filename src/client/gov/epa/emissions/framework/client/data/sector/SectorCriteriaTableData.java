@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.data.sector;
 
-import gov.epa.emissions.commons.io.SectorCriteria;
+import gov.epa.emissions.commons.data.SectorCriteria;
 import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;

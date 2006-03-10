@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.keywords;
 
-import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.KeyVal;
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import org.jmock.Mock;

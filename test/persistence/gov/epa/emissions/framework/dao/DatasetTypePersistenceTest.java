@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.dao;
 
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.db.HibernateTestCase;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
-import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.KeyVal;
-import gov.epa.emissions.commons.io.Keyword;
 
 import java.util.List;
 

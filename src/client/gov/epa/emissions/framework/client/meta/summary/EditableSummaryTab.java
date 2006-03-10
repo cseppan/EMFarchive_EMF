@@ -1,5 +1,9 @@
 package gov.epa.emissions.framework.client.meta.summary;
 
+import gov.epa.emissions.commons.data.Country;
+import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.Region;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
@@ -8,10 +12,6 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
-import gov.epa.emissions.commons.io.Country;
-import gov.epa.emissions.commons.io.Project;
-import gov.epa.emissions.commons.io.Region;
-import gov.epa.emissions.commons.io.Sector;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.Label;

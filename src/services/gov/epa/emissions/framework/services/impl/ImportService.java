@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.services.impl;
 
-import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;

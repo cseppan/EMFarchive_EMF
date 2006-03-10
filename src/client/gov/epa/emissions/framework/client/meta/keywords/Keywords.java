@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.commons.data.Keyword;
 
 public class Keywords {
 

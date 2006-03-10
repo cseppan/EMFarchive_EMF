@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.services.exportfile;
 
-import gov.epa.emissions.commons.io.KeyVal;
-import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.framework.services.EmfDataset;
 
 import java.text.SimpleDateFormat;

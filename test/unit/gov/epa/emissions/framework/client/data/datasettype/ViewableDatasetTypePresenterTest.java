@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
-import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.framework.client.data.datasettype.ViewableDatasetTypePresenter;
 import gov.epa.emissions.framework.client.data.datasettype.ViewableDatasetTypePresenterImpl;
 import gov.epa.emissions.framework.client.data.datasettype.ViewableDatasetTypeView;

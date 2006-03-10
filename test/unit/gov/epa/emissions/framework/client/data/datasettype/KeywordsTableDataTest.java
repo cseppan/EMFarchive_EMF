@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
-import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.datasettype.KeywordsTableData;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;

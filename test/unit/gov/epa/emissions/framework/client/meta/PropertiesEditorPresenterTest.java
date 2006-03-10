@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.meta;
 
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;

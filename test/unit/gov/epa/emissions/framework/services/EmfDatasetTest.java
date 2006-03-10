@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.commons.io.Dataset;
-import gov.epa.emissions.commons.io.KeyVal;
-import gov.epa.emissions.commons.io.Keyword;
-import gov.epa.emissions.commons.io.Lockable;
-import gov.epa.emissions.commons.io.Sector;
+import gov.epa.emissions.commons.data.Dataset;
+import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.data.Lockable;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 
 import java.util.Date;
