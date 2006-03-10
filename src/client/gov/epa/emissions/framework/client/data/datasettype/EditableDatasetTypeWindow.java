@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueTableData;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -40,7 +41,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private TextArea description;
 
-    private KeywordsTableData keywordsTableData;
+    private EditableKeyValueTableData keywordsTableData;
 
     private DatasetTypeKeywordsPanel keywordsPanel;
 
@@ -105,7 +106,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     }
 
     private JPanel createKeywordsPanel(DatasetType type, Keyword[] keywords) {
-        keywordsTableData = new KeywordsTableData(type.getKeywords(), new Keywords(keywords));
+        keywordsTableData = new EditableKeyValueTableData(type.getKeyVals(), new Keywords(keywords));
         keywordsPanel = new DatasetTypeKeywordsPanel(keywordsTableData, keywords, this);
         keywordsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 

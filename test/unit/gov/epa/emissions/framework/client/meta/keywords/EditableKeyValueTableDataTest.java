@@ -19,6 +19,8 @@ public class EditableKeyValueTableDataTest extends TestCase {
     private KeyVal val1;
 
     private KeyVal val2;
+    
+    private KeyVal val3;
 
     protected void setUp() {
         val1 = new KeyVal();
@@ -30,13 +32,21 @@ public class EditableKeyValueTableDataTest extends TestCase {
         val2.setId(2);
         val2.setKeyword(new Keyword("key2"));
         val2.setValue("val2");
+        
+        val3 = new KeyVal();
+        val3.setId(3);
+        val3.setKeyword(new Keyword("key3"));
+        val3.setValue("val3");
 
         Keyword[] keywords = { new Keyword("1"), new Keyword("2") };
         KeyVal[] keyVals = new KeyVal[] { val1, val2 };
+        KeyVal[] datasetTypeKeyVals = new KeyVal[] { val1, val2, val3 };
         EmfDataset dataset = new EmfDataset();
+        DatasetType datasetType = new DatasetType();
+        datasetType.setKeyVals(datasetTypeKeyVals);
         dataset.setKeyVals(keyVals);
-        dataset.setDatasetType(new DatasetType());
-        data = new EditableKeyValueTableData(dataset, new Keywords(keywords));
+        dataset.setDatasetType(datasetType);
+        data = new EditableKeyValueTableData(dataset.getKeyVals(), datasetTypeKeyVals, new Keywords(keywords));
     }
 
     public void testShouldHaveThreeColumns() {
@@ -61,8 +71,8 @@ public class EditableKeyValueTableDataTest extends TestCase {
 
     public void testShouldReturnTheRowsCorrespondingToTotalCount() {
         List rows = data.rows();
-        assertNotNull("Should have 2 rows", rows);
-        assertEquals(2, rows.size());
+        assertNotNull("Should have 3 rows", rows);
+        assertEquals(3, rows.size());
     }
 
     public void testShouldFillTheColumnsCorrectly() {
@@ -81,33 +91,33 @@ public class EditableKeyValueTableDataTest extends TestCase {
 
     public void testShouldRemoveRowOnRemove() {
         data.remove(val1);
-        assertEquals(1, data.rows().size());
+        assertEquals(2, data.rows().size());
 
         data.remove(new KeyVal());
-        assertEquals(1, data.rows().size());
+        assertEquals(2, data.rows().size());
     }
 
     public void testShouldRemoveSelectedOnRemove() {
-        assertEquals(2, data.rows().size());
+        assertEquals(3, data.rows().size());
 
         data.setValueAt(Boolean.TRUE, 0, 0);
         data.removeSelected();
 
-        assertEquals(1, data.rows().size());
+        assertEquals(2, data.rows().size());
     }
 
     public void testShouldAddEntryOnAdd() {
         data.addBlankRow();
 
-        assertEquals(3, data.rows().size());
+        assertEquals(4, data.rows().size());
     }
 
     public void testShouldAddBlankEntry() {
         data.addBlankRow();
 
         List rows = data.rows();
-        assertEquals(3, rows.size());
-        Row blankRow = (Row) rows.get(2);
+        assertEquals(4, rows.size());
+        Row blankRow = (Row) rows.get(3);
         KeyVal blankSource = ((KeyVal) blankRow.source());
         assertEquals(new Keyword(""), blankSource.getKeyword());
         assertEquals("", blankSource.getValue());
@@ -118,15 +128,15 @@ public class EditableKeyValueTableDataTest extends TestCase {
 
         String key = "key";
         String value = "value";
-        data.setValueAt(new Boolean(true), 2, 0);
-        data.setValueAt(key, 2, 1);
-        data.setValueAt(value, 2, 2);
+        data.setValueAt(new Boolean(true), 3, 0);
+        data.setValueAt(key, 3, 1);
+        data.setValueAt(value, 3, 2);
 
         KeyVal[] sources = data.sources();
-        assertEquals(3, sources.length);
+        assertEquals(4, sources.length);
         assertEquals(val1, sources[0]);
         assertEquals(val2, sources[1]);
-        assertEquals(new Keyword(key), sources[2].getKeyword());
+        assertEquals(new Keyword(key), sources[3].getKeyword());
     }
 
     public void testShouldGiveErrorForEmptyValues() {
@@ -134,7 +144,7 @@ public class EditableKeyValueTableDataTest extends TestCase {
         try {
             data.sources();
         } catch (EmfException e) {
-            assertEquals("empty keyword at row 3", e.getMessage());
+            assertEquals("empty keyword at row 4", e.getMessage());
             return;
         }
         assertFalse("blank key values are not allowed", true);

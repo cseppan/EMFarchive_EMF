@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.data.datasettype;
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueTableData;
 import gov.epa.emissions.framework.ui.EditableTablePanel;
 
 import java.awt.BorderLayout;
@@ -16,7 +17,7 @@ public class DatasetTypeKeywordsPanel extends JPanel implements Editor {
 
     private EditableTablePanel editableTablePanel;
 
-    public DatasetTypeKeywordsPanel(KeywordsTableData tableData, Keyword[] keywords, ManageChangeables changeablesList) {
+    public DatasetTypeKeywordsPanel(EditableKeyValueTableData tableData, Keyword[] keywords, ManageChangeables changeablesList) {
         editableTablePanel = new EditableTablePanel("Keywords", tableData, changeablesList);
         editableTablePanel.setColumnEditor(cellEditor(keywords), 1, "Select from the list");
 

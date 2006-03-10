@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -57,25 +58,25 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
         editable.close();
     }
 
-    public void doSave(String name, String description, Keyword[] keywords, String sortOrder) throws EmfException {
-        update(name, description, keywords, sortOrder);
+    public void doSave(String name, String description, KeyVal[] keyVals, String sortOrder) throws EmfException {
+        update(name, description, keyVals, sortOrder);
         type = service().updateDatasetType(type);
         closeView();
     }
 
-    private void update(String name, String description, Keyword[] keywords, String sortOrder) throws EmfException {
+    private void update(String name, String description, KeyVal[] keyVals, String sortOrder) throws EmfException {
         type.setName(name);
         type.setDescription(description);
         type.setDefaultSortOrder(sortOrder);
 
-        verifyDuplicates(keywords);
-        type.setKeywords(keywords);
+        verifyDuplicates(keyVals);
+        type.setKeyVals(keyVals);
     }
 
-    private void verifyDuplicates(Keyword[] keywords) throws EmfException {
+    private void verifyDuplicates(KeyVal[] keyVals) throws EmfException {
         Set set = new TreeSet();
-        for (int i = 0; i < keywords.length; i++) {
-            String name = keywords[i].getName();
+        for (int i = 0; i < keyVals.length; i++) {
+            String name = keyVals[i].getKeyword().getName();
             if (!set.add(name))
                 throw new EmfException("duplicate keyword: '" + name + "'");
         }

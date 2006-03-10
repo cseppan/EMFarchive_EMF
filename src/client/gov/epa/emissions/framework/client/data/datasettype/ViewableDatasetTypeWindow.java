@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.DatasetType;
-import gov.epa.emissions.commons.io.Keyword;
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -50,8 +50,8 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
 
     public void display(DatasetType type) {
         super.setTitle("View Dataset Type: " + type.getName());
-        super.setName("datasetTypeView:"+type.getId());
-        
+        super.setName("datasetTypeView:" + type.getId());
+
         layout.removeAll();
         doLayout(layout, type);
 
@@ -63,7 +63,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         messagePanel = new SingleLineMessagePanel();
         layout.add(messagePanel);
         layout.add(createBasicDataPanel(type));
-        layout.add(createKeywordsPanel(type.getKeywords()));
+        layout.add(createKeywordsPanel(type.getKeyVals()));
         layout.add(createButtonsPanel());
 
         messagePanel.setMessage(lockStatus(type));
@@ -90,7 +90,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         ScrollableTextArea descScrollableTextArea = new ScrollableTextArea(description);
         descScrollableTextArea.setMinimumSize(new Dimension(80, 80));
         layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, panel);
-        
+
         TextField sortOrder = new TextField("sortOrder", type.getDefaultSortOrder(), 40);
         sortOrder.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Default Sort Order:", sortOrder, panel);
@@ -103,11 +103,11 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         return panel;
     }
 
-    private JPanel createKeywordsPanel(Keyword[] keywords) {
+    private JPanel createKeywordsPanel(KeyVal[] vals) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Keywords"));
 
-        TableData tableData = new ViewableKeywordsTableData(keywords);
+        TableData tableData = new DatasetTypeKeyValueTableData(vals);
         JTable table = new JTable(new EmfTableModel(tableData));
         table.setRowHeight(20);
 

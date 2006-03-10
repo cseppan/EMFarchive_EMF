@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.io.DatasetType;
 import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.EmfDataset;
 import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
@@ -19,14 +18,16 @@ public class EditableKeyValueTableData extends AbstractEditableTableData impleme
     private List rows;
 
     private Keywords masterKeywords;
-
+    
     private DatasetType datasetType;
 
-    public EditableKeyValueTableData(EmfDataset dataset, Keywords masterKeywords) {
-        this.datasetType = dataset.getDatasetType();
+    public EditableKeyValueTableData(KeyVal[] keyVals, Keywords masterKeywords) {
         this.masterKeywords = masterKeywords;
-
-        this.rows = createRows(dataset, masterKeywords);
+        this.rows = createRows(keyVals, masterKeywords);
+    }
+    
+    public EditableKeyValueTableData(KeyVal[] datasetKeyVals, KeyVal[] datasetTypeKeyVals, Keywords masterKeywords) {
+        this(mergeKeyVals(datasetKeyVals, datasetTypeKeyVals), masterKeywords);
     }
 
     public String[] columns() {
@@ -59,36 +60,30 @@ public class EditableKeyValueTableData extends AbstractEditableTableData impleme
         return true;
     }
 
-    private List createRows(EmfDataset dataset, Keywords masterKeywords) {
-        KeyVal[] values = vals(dataset);
+    private List createRows(KeyVal[] keyVals, Keywords masterKeywords) {
         List rows = new ArrayList();
-        for (int i = 0; i < values.length; i++)
-            rows.add(row(values[i], masterKeywords));
+        for (int i = 0; i < keyVals.length; i++)
+            rows.add(row(keyVals[i], masterKeywords));
 
         return rows;
     }
 
-    private KeyVal[] vals(EmfDataset dataset) {
-        Keyword[] datasetTypesKeywords = dataset.getDatasetType().getKeywords();
+    private static KeyVal[] mergeKeyVals(KeyVal[] datasetKeyVals, KeyVal[] datasetTypeKeyVals) {
         List result = new ArrayList();
-        KeyVal[] keyVals = dataset.getKeyVals();
-        result.addAll(Arrays.asList(keyVals));
+        result.addAll(Arrays.asList(datasetKeyVals));
 
-        for (int i = 0; i < datasetTypesKeywords.length; i++) {
-            if (!contains(result, datasetTypesKeywords[i])) {
-                KeyVal keyVal = new KeyVal();
-                keyVal.setKeyword(datasetTypesKeywords[i]);
-                keyVal.setValue("");
-                result.add(keyVal);
+        for (int i = 0; i < datasetTypeKeyVals.length; i++) {
+            if (!contains(result, datasetTypeKeyVals[i])) {
+                result.add(datasetTypeKeyVals[i]);
             }
         }
         return (KeyVal[]) result.toArray(new KeyVal[0]);
     }
 
-    private boolean contains(List keyVals, Keyword keyword) {
+    private static boolean contains(List keyVals, KeyVal newKeyVal) {
         for (Iterator iter = keyVals.iterator(); iter.hasNext();) {
             KeyVal element = (KeyVal) iter.next();
-            if (element.getKeyword().equals(keyword))
+            if (element.getKeyword().equals(newKeyVal.getKeyword()))
                 return true;
         }
 

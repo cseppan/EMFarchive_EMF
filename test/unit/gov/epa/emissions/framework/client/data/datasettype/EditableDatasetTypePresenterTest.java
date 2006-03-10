@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
 import gov.epa.emissions.commons.io.DatasetType;
+import gov.epa.emissions.commons.io.KeyVal;
 import gov.epa.emissions.commons.io.Keyword;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfException;
@@ -95,12 +96,23 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         String name = "name";
         String desc = "desc";
         String sortOrder = "default sortOrder";
-        Keyword[] keywords = {};
+        
+        KeyVal val1 = new KeyVal();
+        val1.setId(1);
+        val1.setKeyword(new Keyword("key1"));
+        val1.setValue("val1");
+
+        KeyVal val2 = new KeyVal();
+        val2.setId(2);
+        val2.setKeyword(new Keyword("key2"));
+        val2.setValue("val2");
+        
+        KeyVal[] keyVals = {val1, val2};
 
         Mock type = mock(DatasetType.class);
         type.expects(once()).method("setName").with(same(name));
         type.expects(once()).method("setDescription").with(same(desc));
-        type.expects(once()).method("setKeywords").with(same(keywords));
+        type.expects(once()).method("setKeyVals").with(same(keyVals));
         type.expects(once()).method("setDefaultSortOrder").with(same(sortOrder));
         DatasetType typeProxy = (DatasetType) type.proxy();
 
@@ -117,13 +129,20 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenterImpl((EmfSession) session.proxy(),
                 (EditableDatasetTypeView) view.proxy(), null, typeProxy);
 
-        presenter.doSave(name, desc, keywords, sortOrder);
+        presenter.doSave(name, desc, keyVals, sortOrder);
     }
 
     public void testShouldFailWithErrorIfDuplicateKeywordsInKeyValsOnSave() {
         String name = "name";
         String desc = "desc";
         String sortOrder = "default sortOrder";
+        
+        KeyVal val1 = new KeyVal();
+        val1.setId(1);
+        val1.setKeyword(new Keyword("key1"));
+        val1.setValue("val1");
+
+        KeyVal[] keyVals = {val1, val1};
         
         Mock type = mock(DatasetType.class);
         type.expects(once()).method("setName").with(same(name));
@@ -133,11 +152,10 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         EditableDatasetTypePresenter presenter = new EditableDatasetTypePresenterImpl(null, null, null,
                 ((DatasetType) type.proxy()));
 
-        Keyword key1 = new Keyword("1");
         try {
-            presenter.doSave(name, desc, new Keyword[] { key1, key1 }, sortOrder);
+            presenter.doSave(name, desc, keyVals, sortOrder);
         } catch (EmfException e) {
-            assertEquals("duplicate keyword: '1'", e.getMessage());
+            assertEquals("duplicate keyword: 'key1'", e.getMessage());
             return;
         }
 

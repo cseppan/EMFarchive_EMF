@@ -38,7 +38,7 @@ public class EditableKeywordsTab extends JPanel implements EditableKeywordsTabVi
     }
 
     private JPanel createLayout(EmfDataset dataset, Keywords masterKeywords) {
-        tableData = new EditableKeyValueTableData(dataset, masterKeywords);
+        tableData = new EditableKeyValueTableData(dataset.getKeyVals(), dataset.getDatasetType().getKeyVals(), masterKeywords);
         editableKeywordsPanel = new EditableKeywordsPanel("", tableData, masterKeywords, changeablesList);
         return editableKeywordsPanel;
     }

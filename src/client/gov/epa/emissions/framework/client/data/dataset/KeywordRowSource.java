@@ -46,7 +46,7 @@ public class KeywordRowSource implements RowSource {
 
     public void validate(int rowNumber) throws EmfException {
         if (keyword == null || keyword.getName().trim().length() == 0) {
-            throw new EmfException("empty keyword at row "+rowNumber);
+            throw new EmfException("empty keyword at row " + rowNumber);
         }
     }
 }
