@@ -20,3 +20,6 @@ delete from emf.regions;
 delete from emf.notes;
 delete from emf.note_types;
 delete from emf.revisions;
+
+
+delete from emf.dataset_types_qa_step_templates;

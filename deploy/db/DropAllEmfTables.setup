@@ -1,7 +1,6 @@
 --emissions.versions
 DROP TABLE emissions.versions CASCADE;
 --emissions.versions
---
 -- emf.users
 DROP TABLE emf.users CASCADE;
 --emf.users
@@ -16,6 +15,10 @@ DROP TABLE emf.sectors CASCADE;
 --
 DROP TABLE emf.sector_criteria CASCADE;
 --emf. status, countries, properties, sectors,sector criteria
+--
+--emf.dataset_types_qa_step_templates
+DROP TABLE emf.dataset_types_qa_step_templates CASCADE;
+--emf.dataset_types_qa_step_templates
 --
 -- emf ... KEYWORDS framework
 DROP TABLE emf.datasets_keywords CASCADE;

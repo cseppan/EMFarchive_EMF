@@ -25,19 +25,19 @@ import org.hibernate.criterion.Restrictions;
 
 public class DataCommonsDAO {
 
-    private LockingScheme lockingScheme;
-
     private SectorsDAO sectorsDao;
 
     private HibernateFacade hibernateFacade;
 
     private KeywordsDAO keywordsDAO;
 
+    private DatasetTypesDAO datasetTypesDAO;
+
     public DataCommonsDAO() {
-        lockingScheme = new LockingScheme();
         sectorsDao = new SectorsDAO();
         hibernateFacade = new HibernateFacade();
         keywordsDAO = new KeywordsDAO();
+        datasetTypesDAO = new DatasetTypesDAO();
     }
 
     public List getKeywords(Session session) {
@@ -69,7 +69,7 @@ public class DataCommonsDAO {
     }
 
     public List getDatasetTypes(Session session) {
-        return session.createCriteria(DatasetType.class).addOrder(Order.asc("name").ignoreCase()).list();
+        return datasetTypesDAO.getAll(session);
     }
 
     public Sector obtainLockedSector(User user, Sector sector, Session session) {
@@ -77,7 +77,7 @@ public class DataCommonsDAO {
     }
 
     public DatasetType obtainLockedDatasetType(User user, DatasetType type, Session session) {
-        return (DatasetType) lockingScheme.getLocked(user, type, session, getDatasetTypes(session));
+        return datasetTypesDAO.obtainLocked(user, type, session);
     }
 
     public Sector updateSector(Sector sector, Session session) throws EmfException {
@@ -85,7 +85,7 @@ public class DataCommonsDAO {
     }
 
     public DatasetType updateDatasetType(DatasetType type, Session session) throws EmfException {
-        return (DatasetType) lockingScheme.releaseLockOnUpdate(type, session, getDatasetTypes(session));
+        return datasetTypesDAO.update(type, session);
     }
 
     public Sector releaseLockedSector(Sector locked, Session session) throws EmfException {
@@ -93,7 +93,7 @@ public class DataCommonsDAO {
     }
 
     public DatasetType releaseLockedDatasetType(DatasetType locked, Session session) throws EmfException {
-        return (DatasetType) lockingScheme.releaseLock(locked, session, getDatasetTypes(session));
+        return datasetTypesDAO.releaseLocked(locked, session);
     }
 
     public List getStatuses(String username, Session session) {
@@ -158,7 +158,7 @@ public class DataCommonsDAO {
     }
 
     public void add(DatasetType datasetType, Session session) {
-        addObject(datasetType, session);
+        datasetTypesDAO.add(datasetType, session);
     }
 
     public void add(Sector sector, Session session) {
@@ -209,18 +209,7 @@ public class DataCommonsDAO {
     }
 
     public boolean canUpdate(DatasetType datasetType, Session session) {
-        if (!exists(datasetType.getId(), DatasetType.class, session)) {
-            return false;
-        }
-
-        DatasetType current = (DatasetType) current(datasetType.getId(), DatasetType.class, session);
-        // The current object is saved in the session. Hibernate cannot persist our
-        // object with the same id.
-        session.clear();
-        if (current.getName().equals(datasetType.getName()))
-            return true;
-
-        return !nameUsed(datasetType.getName(), DatasetType.class, session);
+        return datasetTypesDAO.canUpdate(datasetType, session);
     }
 
 }
