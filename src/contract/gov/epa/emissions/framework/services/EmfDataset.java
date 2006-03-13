@@ -16,6 +16,7 @@ import gov.epa.emissions.commons.security.User;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 public class EmfDataset implements Dataset, Lockable {
@@ -278,7 +279,7 @@ public class EmfDataset implements Dataset, Lockable {
     }
 
     public KeyVal[] getKeyVals() {
-        return (KeyVal[]) keyValsList.toArray(new KeyVal[0]);
+        return mergeKeyVals();
     }
 
     public void setKeyVals(KeyVal[] keyvals) {
@@ -380,6 +381,33 @@ public class EmfDataset implements Dataset, Lockable {
 
     public boolean isExternal() {
         return getInternalSources().length == 0;
+    }
+    
+    public KeyVal[] mergeKeyVals() {
+        List result = new ArrayList();
+        result.addAll(keyValsList);
+        
+        if(datasetType == null)
+            return (KeyVal[]) result.toArray(new KeyVal[0]);
+        
+        KeyVal[] datasetTypeKeyVals = datasetType.getKeyVals();
+
+        for (int i = 0; i < datasetTypeKeyVals.length; i++) {
+            if (!contains(result, datasetTypeKeyVals[i])) {
+                result.add(datasetTypeKeyVals[i]);
+            }
+        }
+        return (KeyVal[]) result.toArray(new KeyVal[0]);
+    }
+
+    public boolean contains(List keyVals, KeyVal newKeyVal) {
+        for (Iterator iter = keyVals.iterator(); iter.hasNext();) {
+            KeyVal element = (KeyVal) iter.next();
+            if (element.getKeyword().equals(newKeyVal.getKeyword()))
+                return true;
+        }
+
+        return false;
     }
 
 }

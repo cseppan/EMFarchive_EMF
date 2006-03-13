@@ -80,9 +80,6 @@ insert into emf.dataset_types values(DEFAULT,'SCC Descriptions (Line-based)','SC
  
 -- emf.dataset_types
 --
--- emf.dataset_types_keywords
-
---
 -- emf.intended_uses
 insert into emf.intended_uses values (DEFAULT, 'public');
 insert into emf.intended_uses values (DEFAULT, 'private');
@@ -100,7 +97,15 @@ insert INTO emf.note_types VALUES (DEFAULT, 'Replaced by dataset');
 insert INTO emf.note_types VALUES (DEFAULT, 'Replaces dataset ');
 -- emf.note_types
 --
-
+-- emf.keywords
+insert INTO emf.keywords VALUES (DEFAULT, 'EXPORT_HEADER_COMMENTS');
+insert INTO emf.keywords VALUES (DEFAULT, 'EXPORT_INLINE_COMMENTS');
+insert INTO emf.keywords VALUES (DEFAULT, 'HEADER_COMMENT_CHAR');
+insert INTO emf.keywords VALUES (DEFAULT, 'INLINE_COMMENT_CHAR');
+insert INTO emf.keywords VALUES (DEFAULT, 'EXPORT_PREFIX');
+insert INTO emf.keywords VALUES (DEFAULT, 'EXPORT_SUFFIX');
+-- emf.keywords
+--
 
 
 

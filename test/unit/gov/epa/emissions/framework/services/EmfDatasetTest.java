@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.data.Dataset;
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Lockable;
@@ -42,6 +43,7 @@ public class EmfDatasetTest extends TestCase {
     }
     
     public void testShouldGiveCorrectCommentSettings() {
+        DatasetType type = new DatasetType();
         Dataset dataset = new EmfDataset();
         KeyVal keyval1 = new KeyVal();
         KeyVal keyval2 = new KeyVal();
@@ -60,6 +62,7 @@ public class EmfDatasetTest extends TestCase {
         keyval4.setKeyword(new Keyword(Dataset.inline_comment_char));
         keyval4.setValue("$");
         
+        ((EmfDataset)dataset).setDatasetType(type);
         ((EmfDataset)dataset).addKeyVal(keyval1);
         ((EmfDataset)dataset).addKeyVal(keyval2);
         ((EmfDataset)dataset).addKeyVal(keyval3);
@@ -73,6 +76,7 @@ public class EmfDatasetTest extends TestCase {
     
     public void testShouldGiveCorrectCommentSettingsWithBlankKeyValues() {
         Dataset dataset = new EmfDataset();
+        DatasetType type = new DatasetType();
         KeyVal keyval1 = new KeyVal();
         KeyVal keyval2 = new KeyVal();
         KeyVal keyval3 = new KeyVal();
@@ -89,6 +93,7 @@ public class EmfDatasetTest extends TestCase {
         keyval4.setKeyword(new Keyword(Dataset.inline_comment_char));
         keyval4.setValue("");
         
+        ((EmfDataset)dataset).setDatasetType(type);
         ((EmfDataset)dataset).addKeyVal(keyval1);
         ((EmfDataset)dataset).addKeyVal(keyval2);
         ((EmfDataset)dataset).addKeyVal(keyval3);

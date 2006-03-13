@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.exportfile;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.framework.services.EmfDataset;
@@ -11,7 +12,9 @@ import junit.framework.TestCase;
 
 public class ExportFilenameTest extends TestCase {
     public void testShouldGiveCorrectExportFilename() {
+        DatasetType type = new DatasetType();
         EmfDataset dataset = new EmfDataset();
+        dataset.setDatasetType(type);
         KeyVal[] keyvals = {new KeyVal(), new KeyVal(), new KeyVal(), new KeyVal()};
         keyvals[0].setKeyword(new Keyword("none"));
         keyvals[1].setKeyword(new Keyword("EXPORT_PREFIX"));
