@@ -144,7 +144,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
                         presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), sortOrder.getText());
                     }
                 } catch (EmfException e) {
-                    messagePanel.setError("Could not save." + e.getMessage());
+                    messagePanel.setError("Could not save: " + e.getMessage());
                 }
             }
         };
