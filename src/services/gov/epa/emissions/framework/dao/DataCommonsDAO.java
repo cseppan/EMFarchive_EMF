@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.dao;
 
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
@@ -28,12 +27,21 @@ public class DataCommonsDAO {
 
     private LockingScheme lockingScheme;
 
+    private SectorsDAO sectorsDao;
+
+    private HibernateFacade hibernateFacade;
+
+    private KeywordsDAO keywordsDAO;
+
     public DataCommonsDAO() {
         lockingScheme = new LockingScheme();
+        sectorsDao = new SectorsDAO();
+        hibernateFacade = new HibernateFacade();
+        keywordsDAO = new KeywordsDAO();
     }
 
     public List getKeywords(Session session) {
-        return session.createCriteria(Keyword.class).addOrder(Order.asc("name")).list();
+        return keywordsDAO.getKeywords(session);
     }
 
     public void add(Region region, Session session) {
@@ -57,7 +65,7 @@ public class DataCommonsDAO {
     }
 
     public List getSectors(Session session) {
-        return session.createCriteria(Sector.class).addOrder(Order.asc("name")).list();
+        return sectorsDao.getAll(session);
     }
 
     public List getDatasetTypes(Session session) {
@@ -65,7 +73,7 @@ public class DataCommonsDAO {
     }
 
     public Sector obtainLockedSector(User user, Sector sector, Session session) {
-        return (Sector) lockingScheme.getLocked(user, sector, session, getSectors(session));
+        return sectorsDao.obtainLocked(user, sector, session);
     }
 
     public DatasetType obtainLockedDatasetType(User user, DatasetType type, Session session) {
@@ -73,7 +81,7 @@ public class DataCommonsDAO {
     }
 
     public Sector updateSector(Sector sector, Session session) throws EmfException {
-        return (Sector) lockingScheme.releaseLockOnUpdate(sector, session, getSectors(session));
+        return sectorsDao.update(sector, session);
     }
 
     public DatasetType updateDatasetType(DatasetType type, Session session) throws EmfException {
@@ -81,7 +89,7 @@ public class DataCommonsDAO {
     }
 
     public Sector releaseLockedSector(Sector locked, Session session) throws EmfException {
-        return (Sector) lockingScheme.releaseLock(locked, session, getSectors(session));
+        return sectorsDao.releaseLocked(locked, session);
     }
 
     public DatasetType releaseLockedDatasetType(DatasetType locked, Session session) throws EmfException {
@@ -158,15 +166,7 @@ public class DataCommonsDAO {
     }
 
     private void addObject(Object obj, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            session.save(obj);
-            tx.commit();
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        hibernateFacade.add(obj, session);
     }
 
     public List getNoteTypes(Session session) {
@@ -193,48 +193,19 @@ public class DataCommonsDAO {
      * Return true if the name is already used
      */
     public boolean nameUsed(String name, Class clazz, Session session) {
-        Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("name", name));
-        return crit.uniqueResult() != null;
+        return hibernateFacade.nameUsed(name, clazz, session);
     }
 
     public Object current(long id, Class clazz, Session session) {
-        Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("id", new Long(id)));
-        return crit.uniqueResult();
+        return hibernateFacade.current(id, clazz, session);
     }
 
     public boolean exists(long id, Class clazz, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("id", new Long(id)));
-            tx.commit();
-
-            return crit.uniqueResult() != null;
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        return hibernateFacade.exists(id, clazz, session);
     }
 
-    /*
-     * True if sector exists in database
-     * 
-     * 1. Should Exist 2. Your id matches existing Id 3. Your name should not match another object's name
-     * 
-     */
     public boolean canUpdate(Sector sector, Session session) {
-        if (!exists(sector.getId(), Sector.class, session)) {
-            return false;
-        }
-
-        Sector current = (Sector) current(sector.getId(), Sector.class, session);
-        // The current object is saved in the session. Hibernate cannot persist our
-        // object with the same id.
-        session.clear();
-        if (current.getName().equals(sector.getName()))
-            return true;
-
-        return !nameUsed(sector.getName(), Sector.class, session);
+        return sectorsDao.canUpdate(sector, session);
     }
 
     public boolean canUpdate(DatasetType datasetType, Session session) {

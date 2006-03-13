@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false"> 
+    <class name="gov.epa.emissions.commons.data.Sector" table="sectors" schema="emf">
+        <id name="id" type="long" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="name" column="name" type="java.lang.String" not-null="true"/>
+        <property name="program" column="program" type="java.lang.String" not-null="false"/>
+        <property name="programArguments" column="program_arguments" type="java.lang.String" not-null="false"/>
+        <property name="required" column="required" type="boolean" not-null="false"/>               
+        <property name="order" column="order" type="java.lang.String" not-null="false"/>
+    </class>
+</hibernate-mapping>  
+
