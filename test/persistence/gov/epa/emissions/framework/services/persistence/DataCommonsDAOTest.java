@@ -51,7 +51,7 @@ public class DataCommonsDAOTest extends ServiceTestCase {
         try {
             List keywords = dao.getKeywords(session);
             assertEquals(totalBeforeAdd + 1, keywords.size());
-            assertEquals(keyword, keywords.get(0));
+            assertEquals(keyword, keywords.get(totalBeforeAdd + 0));
         } finally {
             remove(keyword);
         }
