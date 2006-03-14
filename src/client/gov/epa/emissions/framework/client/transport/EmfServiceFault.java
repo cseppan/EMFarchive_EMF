@@ -15,7 +15,7 @@ public class EmfServiceFault {
     public String message() {
         Throwable cause = fault.getCause();
         if ((cause != null) && (CONNECTION_REFUSED.equals(cause.getMessage())))
-            return "EMF server not responding";
+            return "EMF Services are unavailable";
 
         String faultReason = reason();
 
