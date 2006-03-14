@@ -20,28 +20,28 @@ public class RemoteServiceLocator implements ServiceLocator {
     public RemoteServiceLocator(String baseUrl) throws Exception {
         this.baseUrl = baseUrl;
         editCall = this.createSessionEnabledCall("DataEditor Service", baseUrl
-                + "/gov.epa.emf.services.DataEditorService");
-        viewCall = this.createSessionEnabledCall("DataView Service", baseUrl + "/gov.epa.emf.services.DataViewService");
+                + "/gov.epa.emf.services.editor.DataEditorService");
+        viewCall = this.createSessionEnabledCall("DataView Service", baseUrl + "/gov.epa.emf.services.editor.DataViewService");
     }
 
     public UserService userService() {
-        return new UserServiceTransport(baseUrl + "/gov.epa.emf.services.UserService");
+        return new UserServiceTransport(baseUrl + "/gov.epa.emf.services.basic.UserService");
     }
 
     public ExImService eximService() {
-        return new ExImServiceTransport(baseUrl + "/gov.epa.emf.services.ExImService");
+        return new ExImServiceTransport(baseUrl + "/gov.epa.emf.services.exim.ExImService");
     }
 
     public DataService dataService() {
-        return new DataServiceTransport(baseUrl + "/gov.epa.emf.services.DataService");
+        return new DataServiceTransport(baseUrl + "/gov.epa.emf.services.data.DataService");
     }
 
     public LoggingService loggingService() {
-        return new LoggingServiceTransport(baseUrl + "/gov.epa.emf.services.LoggingService");
+        return new LoggingServiceTransport(baseUrl + "/gov.epa.emf.services.basic.LoggingService");
     }
 
     public DataCommonsService dataCommonsService() {
-        return new DataCommonsServiceTransport(baseUrl + "/gov.epa.emf.services.DataCommonsService");
+        return new DataCommonsServiceTransport(baseUrl + "/gov.epa.emf.services.data.DataCommonsService");
     }
 
     public DataEditorService dataEditorService() {

@@ -131,7 +131,7 @@
 		qname="ns1:Status" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
-		languageSpecificType="java:gov.epa.emissions.framework.services.AccessLog"
+		languageSpecificType="java:gov.epa.emissions.framework.services.basic.AccessLog"
 		qname="ns1:AccessLog" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 	
 	<beanMapping
