@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.framework.client.meta.logs.LogsTableData;
-import gov.epa.emissions.framework.services.AccessLog;
+import gov.epa.emissions.framework.services.basic.AccessLog;
 
 import java.util.List;
 

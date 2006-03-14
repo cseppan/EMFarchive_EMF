@@ -3,10 +3,9 @@ package gov.epa.emissions.framework.services.editor;
 import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
-import gov.epa.emissions.framework.dao.EmfProperties;
-import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
-import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.impl.EmfProperty;
+import gov.epa.emissions.framework.services.EmfProperties;
+import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 
 import java.sql.SQLException;
 import java.util.Collection;

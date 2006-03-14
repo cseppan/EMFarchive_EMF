@@ -4,9 +4,9 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextFieldWidget;
 import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfView;
+import gov.epa.emissions.framework.services.EmfException;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

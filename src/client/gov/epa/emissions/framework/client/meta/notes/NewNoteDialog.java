@@ -11,9 +11,9 @@ import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.SetReferencesDialog;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.Note;
-import gov.epa.emissions.framework.services.NoteType;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.ui.Dialog;
 
 import java.awt.BorderLayout;

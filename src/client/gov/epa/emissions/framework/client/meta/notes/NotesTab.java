@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.meta.notes;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.Note;
+import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 

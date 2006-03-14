@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.status;
 
 import gov.epa.emissions.commons.gui.TableHeader;
-import gov.epa.emissions.framework.services.Status;
+import gov.epa.emissions.framework.services.basic.Status;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

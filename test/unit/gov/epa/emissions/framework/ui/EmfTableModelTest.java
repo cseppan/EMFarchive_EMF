@@ -3,8 +3,8 @@ package gov.epa.emissions.framework.ui;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.IntendedUse;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.IntendedUse;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

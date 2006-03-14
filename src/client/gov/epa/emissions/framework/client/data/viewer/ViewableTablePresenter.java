@@ -3,12 +3,12 @@ package gov.epa.emissions.framework.client.data.viewer;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.TableMetadata;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.TablePaginator;
 import gov.epa.emissions.framework.client.data.TablePaginatorImpl;
 import gov.epa.emissions.framework.client.data.TablePresenterDelegate;
 import gov.epa.emissions.framework.client.data.TablePresenterDelegateImpl;
-import gov.epa.emissions.framework.services.DataAccessService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.editor.DataAccessService;
 
 public class ViewableTablePresenter implements TablePresenter {
 

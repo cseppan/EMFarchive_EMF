@@ -1,11 +1,11 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabView;
-import gov.epa.emissions.framework.services.AccessLog;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.LoggingService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.AccessLog;
+import gov.epa.emissions.framework.services.basic.LoggingService;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;

@@ -2,10 +2,10 @@ package gov.epa.emissions.framework.client.meta.summary;
 
 import java.util.Date;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;

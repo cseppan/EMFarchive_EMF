@@ -4,12 +4,12 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.io.TableMetadata;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.data.TablePaginator;
 import gov.epa.emissions.framework.client.data.TablePresenterDelegate;
 import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
-import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.editor.DataEditorService;
 
 import org.jmock.Mock;
 

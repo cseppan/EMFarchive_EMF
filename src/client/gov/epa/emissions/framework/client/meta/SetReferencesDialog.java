@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.Note;
+import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.ui.Dialog;
 import gov.epa.emissions.framework.ui.ListWidget;
 

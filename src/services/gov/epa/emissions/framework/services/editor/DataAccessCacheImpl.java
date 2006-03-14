@@ -5,9 +5,8 @@ import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
-import gov.epa.emissions.framework.dao.EmfProperties;
-import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
-import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.EmfProperties;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 
 import org.hibernate.Session;
 

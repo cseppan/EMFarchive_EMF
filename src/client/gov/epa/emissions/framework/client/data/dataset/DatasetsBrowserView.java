@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.data.dataset;
 
 import gov.epa.emissions.framework.client.ManagedView;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public interface DatasetsBrowserView extends ManagedView {
 

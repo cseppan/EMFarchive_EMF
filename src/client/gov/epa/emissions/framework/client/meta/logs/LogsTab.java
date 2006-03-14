@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.meta.logs;
 
 import gov.epa.emissions.commons.gui.SimpleTableModel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.AccessLog;
+import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.mims.analysisengine.table.SortFilterTablePanel;

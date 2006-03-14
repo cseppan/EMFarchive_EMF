@@ -11,12 +11,10 @@ import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.InfrastructureException;
-import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.impl.EmfServiceImpl;
-import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfServiceImpl;
+import gov.epa.emissions.framework.services.InfrastructureException;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.SQLException;
 

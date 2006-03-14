@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Dialog;
 
 import java.awt.Dimension;

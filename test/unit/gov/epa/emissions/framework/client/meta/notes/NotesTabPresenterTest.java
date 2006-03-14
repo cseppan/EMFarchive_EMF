@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
-import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.Note;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.Note;
 
 import org.jmock.Mock;
 

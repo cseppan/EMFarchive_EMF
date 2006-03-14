@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.info.InfoTabPresenter;
 import gov.epa.emissions.framework.client.meta.info.InfoTabView;
@@ -14,7 +13,8 @@ import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabPresenter;
 import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabView;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTabPresenter;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTabView;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public class PropertiesViewPresenter {
 

@@ -1,11 +1,11 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserView;
-import gov.epa.emissions.framework.services.DataService;
-import gov.epa.emissions.framework.services.ExImService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.DataService;
+import gov.epa.emissions.framework.services.exim.ExImService;
 
 /**
  * updates the Datasets Browser once View is closed.

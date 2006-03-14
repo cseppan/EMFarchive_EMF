@@ -4,11 +4,10 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
-import gov.epa.emissions.framework.dao.EmfProperties;
-import gov.epa.emissions.framework.dao.EmfPropertiesDAO;
-import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.EmfProperties;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.editor.ChangeSets.ChangeSetsIterator;
-import gov.epa.emissions.framework.services.impl.EmfProperty;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 
 import java.sql.SQLException;
 import java.util.Collection;

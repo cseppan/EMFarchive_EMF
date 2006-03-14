@@ -2,9 +2,9 @@ package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.ExImService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.exim.ExImService;
 
 public class ExImServiceTransport implements ExImService {
 

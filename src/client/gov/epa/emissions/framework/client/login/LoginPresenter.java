@@ -3,8 +3,8 @@ package gov.epa.emissions.framework.client.login;
 import gov.epa.emissions.commons.CommonsException;
 import gov.epa.emissions.commons.security.PasswordGenerator;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.UserService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.UserService;
 
 public class LoginPresenter {
 

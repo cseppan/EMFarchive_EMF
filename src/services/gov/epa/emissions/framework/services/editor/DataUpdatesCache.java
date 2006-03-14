@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.editor;
 
 import gov.epa.emissions.commons.db.version.ChangeSet;
-import gov.epa.emissions.framework.services.DataAccessToken;
 
 import org.hibernate.Session;
 

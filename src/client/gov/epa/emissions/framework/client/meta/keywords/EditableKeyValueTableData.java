@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.meta.keywords;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
-import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;

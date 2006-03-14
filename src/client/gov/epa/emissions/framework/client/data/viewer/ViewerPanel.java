@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.client.data.DataSortFilterPanel;
 import gov.epa.emissions.framework.client.data.DoubleRenderer;
 import gov.epa.emissions.framework.client.data.PaginationPanel;
 import gov.epa.emissions.framework.client.data.TableColumnHeaders;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ScrollableTable;

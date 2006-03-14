@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;

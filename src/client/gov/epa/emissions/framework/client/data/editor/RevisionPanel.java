@@ -7,9 +7,9 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.SetReferencesDialog;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.Note;
-import gov.epa.emissions.framework.services.Revision;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.ui.Border;
 
 import java.awt.BorderLayout;

@@ -1,12 +1,12 @@
 package gov.epa.emissions.framework.client.console;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.exim.ImportPresenter;
 import gov.epa.emissions.framework.client.exim.ImportWindow;
 import gov.epa.emissions.framework.client.login.LoginPresenter;
 import gov.epa.emissions.framework.client.login.LoginWindow;
-import gov.epa.emissions.framework.services.UserService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.event.ActionEvent;

@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.data.viewer;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.data.TablePresenterDelegate;
+import gov.epa.emissions.framework.services.EmfException;
 
 import org.jmock.Mock;
 

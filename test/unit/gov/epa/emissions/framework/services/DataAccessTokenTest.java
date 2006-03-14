@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.framework.services.editor.DataAccessToken;
 
 import java.util.Date;
 

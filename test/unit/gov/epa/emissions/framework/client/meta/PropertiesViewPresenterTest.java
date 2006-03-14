@@ -6,11 +6,11 @@ import gov.epa.emissions.framework.client.meta.info.InfoTabView;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabView;
 import gov.epa.emissions.framework.client.meta.notes.NotesTabView;
 import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabView;
-import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.LoggingService;
-import gov.epa.emissions.framework.services.Note;
-import gov.epa.emissions.framework.services.Revision;
+import gov.epa.emissions.framework.services.basic.LoggingService;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.editor.Revision;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;

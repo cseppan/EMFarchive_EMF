@@ -3,10 +3,10 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;

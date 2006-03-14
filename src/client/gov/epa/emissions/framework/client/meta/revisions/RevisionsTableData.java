@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta.revisions;
 
-import gov.epa.emissions.framework.services.Revision;
+import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;

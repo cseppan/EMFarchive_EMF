@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.transport;
 
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.AccessLog;
-import gov.epa.emissions.framework.services.LoggingService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.AccessLog;
+import gov.epa.emissions.framework.services.basic.LoggingService;
 
 public class LoggingServiceTransport implements LoggingService {
 

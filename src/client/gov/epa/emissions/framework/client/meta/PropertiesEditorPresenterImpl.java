@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenterImpl;
@@ -13,8 +12,9 @@ import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
-import gov.epa.emissions.framework.services.DataService;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.DataService;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter {
 

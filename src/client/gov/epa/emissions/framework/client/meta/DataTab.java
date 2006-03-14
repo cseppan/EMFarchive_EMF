@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.versions.VersionsPanel;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 

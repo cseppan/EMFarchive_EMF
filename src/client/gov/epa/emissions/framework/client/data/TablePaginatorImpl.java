@@ -2,9 +2,9 @@ package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataAccessService;
-import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.editor.DataAccessService;
+import gov.epa.emissions.framework.services.editor.DataAccessToken;
 
 public class TablePaginatorImpl implements TablePaginator {
 

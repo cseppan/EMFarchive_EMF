@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
 import gov.epa.emissions.commons.data.KeyVal;
-import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EmfException;
 
 public interface EditableDatasetTypePresenter {
 

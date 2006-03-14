@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.versions.VersionsView;
 import gov.epa.emissions.framework.client.meta.versions.VersionsViewPresenter;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public class DataTabPresenter {
 

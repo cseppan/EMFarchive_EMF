@@ -2,11 +2,11 @@ package gov.epa.emissions.framework.client.status;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.commons.security.UserException;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.TaskRunner;
 import gov.epa.emissions.framework.client.status.StatusPresenter.StatusMonitor;
-import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.services.Status;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
 
 import java.util.Date;
 

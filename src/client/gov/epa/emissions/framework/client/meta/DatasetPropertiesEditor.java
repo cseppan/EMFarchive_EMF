@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -14,7 +13,8 @@ import gov.epa.emissions.framework.client.meta.logs.LogsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTab;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;

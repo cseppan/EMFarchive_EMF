@@ -4,8 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.Note;
-import gov.epa.emissions.framework.services.NoteType;
+import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.data.NoteType;
 import junit.framework.TestCase;
 
 public class NotesRowSourceTest extends TestCase {

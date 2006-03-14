@@ -2,11 +2,11 @@ package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.commons.gui.Confirm;
 import gov.epa.emissions.framework.ConcurrentTaskRunner;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.status.StatusPresenter;
 import gov.epa.emissions.framework.client.status.StatusWindow;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.Dimensions;
 import gov.epa.emissions.framework.ui.EmfDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;

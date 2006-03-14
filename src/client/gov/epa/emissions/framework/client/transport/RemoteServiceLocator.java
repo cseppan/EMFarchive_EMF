@@ -1,13 +1,13 @@
 package gov.epa.emissions.framework.client.transport;
 
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.DataService;
-import gov.epa.emissions.framework.services.DataViewService;
-import gov.epa.emissions.framework.services.ExImService;
-import gov.epa.emissions.framework.services.LoggingService;
-import gov.epa.emissions.framework.services.UserService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.LoggingService;
+import gov.epa.emissions.framework.services.basic.UserService;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DataService;
+import gov.epa.emissions.framework.services.editor.DataEditorService;
+import gov.epa.emissions.framework.services.editor.DataViewService;
+import gov.epa.emissions.framework.services.exim.ExImService;
 
 public class RemoteServiceLocator implements ServiceLocator {
     private String baseUrl;

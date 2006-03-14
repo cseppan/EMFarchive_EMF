@@ -1,16 +1,16 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.editor.DataEditorPresenter;
 import gov.epa.emissions.framework.client.data.editor.DataEditorPresenterImpl;
 import gov.epa.emissions.framework.client.data.editor.DataEditorView;
 import gov.epa.emissions.framework.client.data.viewer.DataView;
 import gov.epa.emissions.framework.client.data.viewer.DataViewPresenter;
-import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.editor.DataAccessToken;
+import gov.epa.emissions.framework.services.editor.DataEditorService;
 
 public class EditVersionsPresenter {
 

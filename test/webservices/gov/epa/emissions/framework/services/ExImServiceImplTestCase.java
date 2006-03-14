@@ -1,9 +1,11 @@
 package gov.epa.emissions.framework.services;
 
-import gov.epa.emissions.framework.services.impl.DataCommonsServiceImpl;
-import gov.epa.emissions.framework.services.impl.ExImServiceImpl;
-import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
-import gov.epa.emissions.framework.services.impl.UserServiceImpl;
+import gov.epa.emissions.framework.services.basic.UserService;
+import gov.epa.emissions.framework.services.basic.UserServiceImpl;
+import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
+import gov.epa.emissions.framework.services.exim.ExImService;
+import gov.epa.emissions.framework.services.exim.ExImServiceImpl;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 public class ExImServiceImplTestCase extends ExImServiceTestCase {
 

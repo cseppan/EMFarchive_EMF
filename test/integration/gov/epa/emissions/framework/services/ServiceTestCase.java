@@ -6,10 +6,13 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.io.Column;
-import gov.epa.emissions.framework.db.EmfDatabaseSetup;
-import gov.epa.emissions.framework.db.LocalHibernateConfiguration;
-import gov.epa.emissions.framework.db.VersionedTable;
-import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.editor.Revision;
+import gov.epa.emissions.framework.services.persistence.EmfDatabaseSetup;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+import gov.epa.emissions.framework.services.persistence.LocalHibernateConfiguration;
+import gov.epa.emissions.framework.services.persistence.VersionedTable;
 
 import java.io.File;
 import java.io.FileInputStream;

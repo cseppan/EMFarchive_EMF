@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
-import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EmfException;
 
 import java.net.URL;
 

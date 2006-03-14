@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
-import gov.epa.emissions.framework.services.Note;
+import gov.epa.emissions.framework.services.data.Note;
 
 public interface EditNotesTabView {
 

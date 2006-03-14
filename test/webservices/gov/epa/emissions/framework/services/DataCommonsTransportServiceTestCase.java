@@ -1,11 +1,15 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
-import gov.epa.emissions.framework.services.impl.DataCommonsServiceImpl;
-import gov.epa.emissions.framework.services.impl.HibernateSessionFactory;
-import gov.epa.emissions.framework.services.impl.UserServiceImpl;
+import gov.epa.emissions.framework.services.basic.UserService;
+import gov.epa.emissions.framework.services.basic.UserServiceImpl;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DataCommonsServiceImpl;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.data.NoteType;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Date;
 import java.util.Random;

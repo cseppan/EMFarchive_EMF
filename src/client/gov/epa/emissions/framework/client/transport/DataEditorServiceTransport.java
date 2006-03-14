@@ -5,9 +5,9 @@ import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.editor.DataAccessToken;
+import gov.epa.emissions.framework.services.editor.DataEditorService;
 
 public class DataEditorServiceTransport implements DataEditorService {
     private EmfMappings mappings;

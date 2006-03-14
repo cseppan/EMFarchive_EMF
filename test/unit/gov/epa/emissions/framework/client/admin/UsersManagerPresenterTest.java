@@ -1,10 +1,10 @@
 package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.services.UserService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.UserService;
 
 import java.util.Date;
 

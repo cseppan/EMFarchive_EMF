@@ -6,7 +6,7 @@ import gov.epa.emissions.commons.gui.PasswordField;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;

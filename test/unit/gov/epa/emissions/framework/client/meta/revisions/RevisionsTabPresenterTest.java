@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.meta.revisions;
 
-import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.Revision;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.editor.Revision;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;

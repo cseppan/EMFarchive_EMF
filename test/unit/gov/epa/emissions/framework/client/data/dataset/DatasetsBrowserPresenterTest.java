@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.data.dataset;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserPresenter;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserView;
@@ -17,11 +16,12 @@ import gov.epa.emissions.framework.client.meta.versions.EditVersionsPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataView;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.DataService;
-import gov.epa.emissions.framework.services.DataViewService;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DataService;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.editor.DataEditorService;
+import gov.epa.emissions.framework.services.editor.DataViewService;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;

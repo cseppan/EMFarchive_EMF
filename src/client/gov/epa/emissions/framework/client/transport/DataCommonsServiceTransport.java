@@ -7,13 +7,13 @@ import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.services.IntendedUse;
-import gov.epa.emissions.framework.services.Note;
-import gov.epa.emissions.framework.services.NoteType;
-import gov.epa.emissions.framework.services.Revision;
-import gov.epa.emissions.framework.services.Status;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.IntendedUse;
+import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.data.NoteType;
+import gov.epa.emissions.framework.services.editor.Revision;
 
 public class DataCommonsServiceTransport implements DataCommonsService {
     private EmfMappings mappings;

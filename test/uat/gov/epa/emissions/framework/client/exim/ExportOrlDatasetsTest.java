@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.client.UserAcceptanceTestCase;
 import gov.epa.emissions.framework.client.console.ConsoleActions;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.DatasetsBrowserActions;
-import gov.epa.emissions.framework.db.ExImDbUpdate;
+import gov.epa.emissions.framework.services.persistence.ExImDbUpdate;
 
 import java.util.Random;
 

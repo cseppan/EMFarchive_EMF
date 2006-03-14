@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.transport;
 
 import org.apache.axis.AxisFault;
 
-import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EmfException;
 
 public class EmfServiceException extends EmfException {
 

@@ -3,8 +3,7 @@ package gov.epa.emissions.framework.services.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.DataAccessToken;
+import gov.epa.emissions.framework.services.EmfException;
 
 public interface DataAccessor {
 

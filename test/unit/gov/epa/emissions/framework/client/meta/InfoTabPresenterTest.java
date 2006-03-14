@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.framework.client.meta.info.InfoTabPresenter;
 import gov.epa.emissions.framework.client.meta.info.InfoTabView;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;

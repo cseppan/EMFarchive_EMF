@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.meta;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
+import gov.epa.emissions.framework.services.EmfException;
 
 public interface PropertiesEditorPresenter {
 

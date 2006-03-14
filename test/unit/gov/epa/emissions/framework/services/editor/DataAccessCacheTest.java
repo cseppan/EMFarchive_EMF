@@ -5,9 +5,8 @@ import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
-import gov.epa.emissions.framework.dao.EmfProperties;
-import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.impl.EmfProperty;
+import gov.epa.emissions.framework.services.EmfProperties;
+import gov.epa.emissions.framework.services.EmfProperty;
 
 import org.hibernate.Session;
 import org.jmock.Mock;

@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.IconButton;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.MessagePanel;

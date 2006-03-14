@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.preference.UserPreference;
-import gov.epa.emissions.framework.services.ExImService;
+import gov.epa.emissions.framework.services.exim.ExImService;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;

@@ -6,12 +6,12 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteView;
-import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.services.DataViewService;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.Note;
-import gov.epa.emissions.framework.services.NoteType;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.data.NoteType;
+import gov.epa.emissions.framework.services.editor.DataAccessToken;
+import gov.epa.emissions.framework.services.editor.DataViewService;
 
 import org.jmock.Mock;
 import org.jmock.core.Constraint;

@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.admin.UpdateMyProfileWindow;
 import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
@@ -15,8 +14,9 @@ import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerPr
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerWindow;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerPresenter;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerWindow;
-import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.services.UserService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.UserService;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.event.ActionEvent;

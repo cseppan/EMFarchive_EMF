@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.meta.logs;
 
-import gov.epa.emissions.framework.services.AccessLog;
+import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.ViewableRow;
 import gov.epa.emissions.framework.ui.Row;

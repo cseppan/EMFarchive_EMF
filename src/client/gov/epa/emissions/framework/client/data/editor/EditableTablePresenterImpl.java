@@ -4,13 +4,13 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.TableMetadata;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.data.TablePaginator;
 import gov.epa.emissions.framework.client.data.TablePaginatorImpl;
 import gov.epa.emissions.framework.client.data.TablePresenterDelegate;
 import gov.epa.emissions.framework.client.data.TablePresenterDelegateImpl;
-import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.DataEditorService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.editor.DataAccessToken;
+import gov.epa.emissions.framework.services.editor.DataEditorService;
 
 public class EditableTablePresenterImpl implements EditableTablePresenter {
 

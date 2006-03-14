@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.data.dataset;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.exim.ExportPresenter;
 import gov.epa.emissions.framework.client.exim.ExportView;
@@ -13,8 +12,9 @@ import gov.epa.emissions.framework.client.meta.PropertiesView;
 import gov.epa.emissions.framework.client.meta.PropertiesViewPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataPresenter;
 import gov.epa.emissions.framework.client.meta.versions.VersionedDataView;
-import gov.epa.emissions.framework.services.DataService;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.DataService;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
 public class DatasetsBrowserPresenter implements RefreshObserver {

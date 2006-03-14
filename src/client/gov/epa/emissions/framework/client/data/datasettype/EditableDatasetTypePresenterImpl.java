@@ -3,9 +3,9 @@ package gov.epa.emissions.framework.client.data.datasettype;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.services.DataCommonsService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
 
 import java.util.Set;
 import java.util.TreeSet;

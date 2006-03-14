@@ -17,14 +17,14 @@ import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.commons.io.ColumnMetaData;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.AccessLog;
-import gov.epa.emissions.framework.services.DataAccessToken;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.IntendedUse;
-import gov.epa.emissions.framework.services.Note;
-import gov.epa.emissions.framework.services.NoteType;
-import gov.epa.emissions.framework.services.Revision;
-import gov.epa.emissions.framework.services.Status;
+import gov.epa.emissions.framework.services.basic.AccessLog;
+import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.data.IntendedUse;
+import gov.epa.emissions.framework.services.data.Note;
+import gov.epa.emissions.framework.services.data.NoteType;
+import gov.epa.emissions.framework.services.editor.DataAccessToken;
+import gov.epa.emissions.framework.services.editor.Revision;
 
 import javax.xml.namespace.QName;
 

@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.exim;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.services.EmfDataset;
-import gov.epa.emissions.framework.services.ExImService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.exim.ExImService;
 
 import java.io.File;
 import java.util.Date;

@@ -7,8 +7,8 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.DataTabPresenter;
 import gov.epa.emissions.framework.client.meta.DataTabView;
 import gov.epa.emissions.framework.client.meta.versions.VersionsView;
-import gov.epa.emissions.framework.services.DataViewService;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.editor.DataViewService;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;

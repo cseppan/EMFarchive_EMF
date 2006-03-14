@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.editor;
 
 import gov.epa.emissions.commons.db.Page;
-import gov.epa.emissions.framework.services.DataAccessToken;
 
 import org.hibernate.Session;
 import org.jmock.Mock;

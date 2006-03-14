@@ -1,8 +1,8 @@
 package gov.epa.emissions.framework.client.meta.keywords;
 
 import gov.epa.emissions.commons.data.KeyVal;
-import gov.epa.emissions.framework.EmfException;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.util.Set;
 import java.util.TreeSet;

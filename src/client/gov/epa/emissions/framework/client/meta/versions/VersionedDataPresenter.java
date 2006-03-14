@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public class VersionedDataPresenter {
 

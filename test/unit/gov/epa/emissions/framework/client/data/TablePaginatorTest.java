@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.data;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
-import gov.epa.emissions.framework.services.DataAccessService;
+import gov.epa.emissions.framework.services.editor.DataAccessService;
 
 import org.jmock.Mock;
 import org.jmock.core.matcher.InvokeCountMatcher;

@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.data.editor;
 
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.meta.notes.NewNoteView;
+import gov.epa.emissions.framework.services.EmfException;
 
 public interface DataEditorPresenter {
 

@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.preference;
 
-import gov.epa.emissions.framework.EmfException;
+import gov.epa.emissions.framework.services.EmfException;
 
 import java.io.File;
 import java.io.FileInputStream;

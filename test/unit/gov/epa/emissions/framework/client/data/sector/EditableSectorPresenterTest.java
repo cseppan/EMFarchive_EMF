@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.data.sector;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.services.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
 
 import java.util.Date;
 

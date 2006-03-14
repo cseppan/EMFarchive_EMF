@@ -1,17 +1,17 @@
 package gov.epa.emissions.framework.client;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.EmfException;
 import gov.epa.emissions.framework.client.preference.DefaultUserPreferences;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
-import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.DataService;
-import gov.epa.emissions.framework.services.DataViewService;
-import gov.epa.emissions.framework.services.ExImService;
-import gov.epa.emissions.framework.services.LoggingService;
-import gov.epa.emissions.framework.services.UserService;
+import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.basic.LoggingService;
+import gov.epa.emissions.framework.services.basic.UserService;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DataService;
+import gov.epa.emissions.framework.services.editor.DataEditorService;
+import gov.epa.emissions.framework.services.editor.DataViewService;
+import gov.epa.emissions.framework.services.exim.ExImService;
 
 public class DefaultEmfSession implements EmfSession {
 

@@ -10,10 +10,10 @@ import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPrese
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
-import gov.epa.emissions.framework.services.DataCommonsService;
-import gov.epa.emissions.framework.services.DataEditorService;
-import gov.epa.emissions.framework.services.DataService;
-import gov.epa.emissions.framework.services.EmfDataset;
+import gov.epa.emissions.framework.services.data.DataCommonsService;
+import gov.epa.emissions.framework.services.data.DataService;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.editor.DataEditorService;
 
 import java.util.Date;
 

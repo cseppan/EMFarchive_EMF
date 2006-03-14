@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.revisions;
 
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.Revision;
+import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.ui.Row;
 
 import java.text.SimpleDateFormat;
