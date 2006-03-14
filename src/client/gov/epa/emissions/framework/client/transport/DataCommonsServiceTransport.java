@@ -215,17 +215,17 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         call.request(new Object[] { type });
     }
 
-    public Note[] getNotes(long datasetId) throws EmfException {
+    public Note[] getNotes(int datasetId) throws EmfException {
         EmfCall call = call();
 
-        call.addLongParam("datasetId");
+        call.addIntegerParam("datasetId");
         call.setOperation("getNotes");
         call.setReturnType(mappings.notes());
 
-        return (Note[]) call.requestResponse(new Object[] { new Long(datasetId) });
+        return (Note[]) call.requestResponse(new Object[] { new Integer(datasetId) });
     }
 
-    public void addNote(Note note) throws EmfException{
+    public void addNote(Note note) throws EmfException {
         EmfCall call = call();
 
         call.addParam("note", mappings.note());
@@ -254,17 +254,17 @@ public class DataCommonsServiceTransport implements DataCommonsService {
         return (NoteType[]) call.requestResponse(new Object[] {});
     }
 
-    public Revision[] getRevisions(long datasetId) throws EmfException{
+    public Revision[] getRevisions(int datasetId) throws EmfException {
         EmfCall call = call();
 
-        call.addLongParam("datasetId");
+        call.addIntegerParam("datasetId");
         call.setOperation("getRevisions");
         call.setReturnType(mappings.revisions());
 
-        return (Revision[]) call.requestResponse(new Object[] { new Long(datasetId) });
+        return (Revision[]) call.requestResponse(new Object[] { new Integer(datasetId) });
     }
 
-    public void addRevision(Revision revision) throws EmfException{
+    public void addRevision(Revision revision) throws EmfException {
         EmfCall call = call();
 
         call.addParam("revision", mappings.revision());

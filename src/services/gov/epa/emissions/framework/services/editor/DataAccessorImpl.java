@@ -101,7 +101,7 @@ public class DataAccessorImpl implements DataAccessor {
         return sessionLifecycle.currentVersion(reference);
     }
 
-    public Version[] getVersions(long datasetId) throws EmfException {
+    public Version[] getVersions(int datasetId) throws EmfException {
         return sessionLifecycle.getVersions(datasetId);
     }
 

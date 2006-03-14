@@ -5,10 +5,10 @@
 
 <hibernate-mapping default-lazy="false">
     <class name="gov.epa.emissions.commons.db.version.Version" table="versions" schema="emissions">
-        <id name="id" type="long" column="id">
+        <id name="id" type="integer" column="id">
             <generator class="identity"/>
         </id>
-        <property name="datasetId" column="dataset_id" type="long" not-null="true"/>
+        <property name="datasetId" column="dataset_id" type="integer" not-null="true"/>
         <property name="version" column="version" type="integer" not-null="true"/>
         <property name="name" column="name" type="java.lang.String" not-null="true" length="255"/>
         <property name="path" column="path" type="java.lang.String" not-null="true"/>

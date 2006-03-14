@@ -16,9 +16,10 @@ DROP TABLE emf.sectors CASCADE;
 DROP TABLE emf.sector_criteria CASCADE;
 --emf. status, countries, properties, sectors,sector criteria
 --
---emf.dataset_types_qa_step_templates
+--QA tables
 DROP TABLE emf.dataset_types_qa_step_templates CASCADE;
---emf.dataset_types_qa_step_templates
+DROP TABLE emf.qa_steps CASCADE;
+--QA table
 --
 -- emf ... KEYWORDS framework
 DROP TABLE emf.datasets_keywords CASCADE;
@@ -30,7 +31,7 @@ DROP TABLE emf.dataset_types_keywords CASCADE;
 DROP TABLE emf.dataset_types CASCADE;
 -- emf.dataset_types
 --
--- emf.datasets must
+-- emf.datasets
 DROP TABLE emf.datasets CASCADE;
 DROP TABLE emf.dataset_access_logs CASCADE;
 --emf.datasets

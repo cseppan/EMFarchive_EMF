@@ -175,7 +175,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         return doMarkFinal(derived);
     }
 
-    public Version[] getVersions(long datasetId) throws EmfException {
+    public Version[] getVersions(int datasetId) throws EmfException {
         return accessor.getVersions(datasetId);
     }
 

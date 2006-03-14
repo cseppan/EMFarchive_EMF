@@ -137,7 +137,7 @@ public class DatasetTypesDAOTest extends ServiceTestCase {
             super.remove(type);
         }
     }
-    
+
     public void testShouldUpdateDatasetTypeByRemovingQAStepTemplate() throws Exception {
         DatasetType type = new DatasetType();
         type.setName("test-type");
@@ -148,44 +148,44 @@ public class DatasetTypesDAOTest extends ServiceTestCase {
         type.addQaStepTemplate(template);
 
         super.add(type);
-        
+
         try {
             User owner = userDao.get("emf", session);
             DatasetType modified = dao.obtainLocked(owner, type, session);
-            
-            modified.setQaStepTemplates(new QAStepTemplate[0]);//clear templates
+
+            modified.setQaStepTemplates(new QAStepTemplate[0]);// clear templates
             DatasetType updated = dao.update(modified, session);
-            
+
             QAStepTemplate[] results = updated.getQaStepTemplates();
             assertEquals(0, results.length);
         } finally {
             super.remove(type);
         }
     }
-    
+
     public void testShouldUpdateQAStepTemplate() throws Exception {
         DatasetType type = new DatasetType();
         type.setName("test-type");
         type.setDescription("test-desc");
-        
+
         QAStepTemplate template = new QAStepTemplate();
         template.setName("step1");
         type.addQaStepTemplate(template);
-        
+
         super.add(type);
-        
+
         try {
             User owner = userDao.get("emf", session);
             DatasetType modified = dao.obtainLocked(owner, type, session);
-            
+
             QAStepTemplate[] templates = modified.getQaStepTemplates();
             assertEquals(1, templates.length);
             QAStepTemplate updateTemplate = templates[0];
             updateTemplate.setName("updated-template");
             updateTemplate.setProgram("program-1");
-            
+
             DatasetType updated = dao.update(modified, session);
-            
+
             QAStepTemplate[] results = updated.getQaStepTemplates();
             assertEquals(1, results.length);
             assertEquals("updated-template", results[0].getName());

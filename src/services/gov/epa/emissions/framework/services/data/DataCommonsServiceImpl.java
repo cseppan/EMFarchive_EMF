@@ -92,7 +92,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public Sector updateSector(Sector sector) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            
+
             if (!dao.canUpdate(sector, session))
                 throw new EmfException("Sector name already in use");
 
@@ -207,9 +207,9 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.nameUsed(project.getName(),Project.class, session))
+            if (dao.nameUsed(project.getName(), Project.class, session))
                 throw new EmfException("Project name already in use");
-            
+
             dao.add(project, session);
             session.close();
         } catch (RuntimeException e) {
@@ -235,7 +235,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.nameUsed(region.getName(),Region.class,session))
+            if (dao.nameUsed(region.getName(), Region.class, session))
                 throw new EmfException("Region name already in use");
 
             dao.add(region, session);
@@ -263,7 +263,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.nameUsed(intendedUse.getName(), IntendedUse.class,session))
+            if (dao.nameUsed(intendedUse.getName(), IntendedUse.class, session))
                 throw new EmfException("Intended use name already in use");
 
             dao.add(intendedUse, session);
@@ -308,7 +308,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         try {
             Session session = sessionFactory.getSession();
 
-            if (dao.nameUsed(sector.getName(),Sector.class, session))
+            if (dao.nameUsed(sector.getName(), Sector.class, session))
                 throw new EmfException("Sector name already in use");
 
             dao.add(sector, session);
@@ -319,7 +319,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Note[] getNotes(long datasetId) throws EmfException {
+    public Note[] getNotes(int datasetId) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List notes = dao.getNotes(datasetId, session);
@@ -335,8 +335,8 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addNote(Note note) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            
-            if (dao.nameUsed(note.getName(),Note.class, session))
+
+            if (dao.nameUsed(note.getName(), Note.class, session))
                 throw new EmfException("Note name already in use");
 
             dao.add(note, session);
@@ -349,7 +349,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
 
     public void addNotesB(Note[] notes) throws EmfException {
         for (int i = 0; i < notes.length; i++) {
-          this.addNote(notes[i]);   
+            this.addNote(notes[i]);
         }
     }
 
@@ -358,19 +358,19 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             Session session = sessionFactory.getSession();
 
             for (int i = 0; i < notes.length; i++) {
-               Note note = notes[i];
-               
-               if (dao.nameUsed(note.getName(),Note.class, session))
-                   throw new EmfException("Note name already in use");
+                Note note = notes[i];
 
-               dao.add(note, session);
+                if (dao.nameUsed(note.getName(), Note.class, session))
+                    throw new EmfException("Note name already in use");
+
+                dao.add(note, session);
             }
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add new note", e);
             throw new EmfException("Note name already in use");
         }
-    
+
     }
 
     public NoteType[] getNoteTypes() throws EmfException {
@@ -386,10 +386,10 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         }
     }
 
-    public Revision[] getRevisions(long datasetId) throws EmfException {
+    public Revision[] getRevisions(int datasetId) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            List revisions = dao.getRevisions(datasetId,session);
+            List revisions = dao.getRevisions(datasetId, session);
             session.close();
 
             return (Revision[]) revisions.toArray(new Revision[revisions.size()]);
@@ -402,7 +402,7 @@ public class DataCommonsServiceImpl implements DataCommonsService {
     public void addRevision(Revision revision) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            
+
             dao.add(revision, session);
             session.close();
         } catch (RuntimeException e) {
@@ -410,6 +410,5 @@ public class DataCommonsServiceImpl implements DataCommonsService {
             throw new EmfException("Could not add revision");
         }
     }
-
 
 }

@@ -133,12 +133,12 @@ public class DataEditorServiceTransport implements DataEditorService {
         return (Version) call.requestResponse(new Object[] { token });
     }
 
-    public Version[] getVersions(long datasetId) throws EmfException {
+    public Version[] getVersions(int datasetId) throws EmfException {
         call.addLongParam("datasetId");
         call.setOperation("getVersions");
         call.setReturnType(mappings.versions());
 
-        return (Version[]) call.requestResponse(new Object[] { new Long(datasetId) });
+        return (Version[]) call.requestResponse(new Object[] { new Integer(datasetId) });
     }
 
     public Page applyConstraints(DataAccessToken token, String rowFilter, String sortOrder) throws EmfException {

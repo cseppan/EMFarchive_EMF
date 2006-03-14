@@ -4,20 +4,20 @@ import java.io.Serializable;
 
 public class EmfProperty implements Serializable {
 
-    private long id;
+    private int id;
 
-    private String name = null;
+    private String name;
 
-    private String value = null;
+    private String value;
 
     public EmfProperty() {// needed for persistence
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

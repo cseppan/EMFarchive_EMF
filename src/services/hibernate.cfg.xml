@@ -36,6 +36,7 @@
         <mapping resource="gov/epa/emissions/framework/services/persistence/Note.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/persistence/NoteType.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/persistence/Revision.hbm.xml"/>
+        <mapping resource="gov/epa/emissions/framework/services/persistence/QAStep.hbm.xml"/>
     </session-factory>
     
 </hibernate-configuration>

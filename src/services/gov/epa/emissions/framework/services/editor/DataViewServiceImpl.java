@@ -70,7 +70,7 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
         return accessor.getTotalRecords(token);
     }
 
-    public Version[] getVersions(long datasetId) throws EmfException {
+    public Version[] getVersions(int datasetId) throws EmfException {
         return accessor.getVersions(datasetId);
     }
 

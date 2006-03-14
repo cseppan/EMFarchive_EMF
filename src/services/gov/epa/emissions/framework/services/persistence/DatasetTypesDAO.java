@@ -21,7 +21,7 @@ public class DatasetTypesDAO {
     }
 
     public List getAll(Session session) {
-        return session.createCriteria(DatasetType.class).addOrder(Order.asc("name").ignoreCase()).list();
+        return hibernateFacade.getAll(DatasetType.class, Order.asc("name").ignoreCase(), session);
     }
 
     public DatasetType obtainLocked(User user, DatasetType type, Session session) {
@@ -55,7 +55,7 @@ public class DatasetTypesDAO {
         return !nameUsed(datasetType.getName(), DatasetType.class, session);
     }
 
-    private boolean exists(long id, Class clazz, Session session) {
+    private boolean exists(int id, Class clazz, Session session) {
         return hibernateFacade.exists(id, clazz, session);
     }
 
@@ -63,7 +63,7 @@ public class DatasetTypesDAO {
         return hibernateFacade.nameUsed(name, clazz, session);
     }
 
-    private DatasetType current(long id, Class clazz, Session session) {
+    private DatasetType current(int id, Class clazz, Session session) {
         return (DatasetType) hibernateFacade.current(id, clazz, session);
     }
 

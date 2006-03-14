@@ -31,7 +31,7 @@ public class SessionLifecycle {
         lockableVersions = new LockableVersions(versions);
     }
 
-    public Version[] getVersions(long datasetId) throws EmfException {
+    public Version[] getVersions(int datasetId) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             Version[] results = versions.get(datasetId, session);

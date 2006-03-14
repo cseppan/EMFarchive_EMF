@@ -61,11 +61,11 @@ public class SectorsDAO {
         return hibernateFacade.nameUsed(name, clazz, session);
     }
 
-    private Sector current(long id, Class clazz, Session session) {
+    private Sector current(int id, Class clazz, Session session) {
         return (Sector) hibernateFacade.current(id, clazz, session);
     }
 
-    private boolean exists(long id, Class clazz, Session session) {
+    private boolean exists(int id, Class clazz, Session session) {
         return hibernateFacade.exists(id, clazz, session);
     }
 

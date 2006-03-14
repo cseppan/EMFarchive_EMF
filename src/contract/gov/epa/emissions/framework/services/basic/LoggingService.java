@@ -4,6 +4,6 @@ import gov.epa.emissions.framework.services.EmfException;
 
 public interface LoggingService {
 
-    AccessLog[] getAccessLogs(long datasetid) throws EmfException;
+    AccessLog[] getAccessLogs(int datasetid) throws EmfException;
 
 }

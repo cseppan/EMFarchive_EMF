@@ -39,7 +39,7 @@ public class LoggingServiceImpl implements LoggingService {
 
     }
 
-    public AccessLog[] getAccessLogs(long datasetid) throws EmfException {
+    public AccessLog[] getAccessLogs(int datasetid) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
             List allLogs = dao.getAccessLogs(datasetid, session);

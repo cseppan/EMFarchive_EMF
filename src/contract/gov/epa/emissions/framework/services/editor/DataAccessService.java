@@ -21,7 +21,7 @@ public interface DataAccessService {
     int getTotalRecords(DataAccessToken token) throws EmfException;
 
     // version-related
-    Version[] getVersions(long datasetId) throws EmfException;
+    Version[] getVersions(int datasetId) throws EmfException;
     
     TableMetadata getTableMetadata(String table) throws EmfException;
 

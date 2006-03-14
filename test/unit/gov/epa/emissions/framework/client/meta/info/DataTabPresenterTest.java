@@ -57,7 +57,7 @@ public class DataTabPresenterTest extends MockObjectTestCase {
 
         Mock editorService = mock(DataViewService.class);
         Version[] versions = new Version[0];
-        editorService.stubs().method("getVersions").with(eq(new Long(1))).will(returnValue(versions));
+        editorService.stubs().method("getVersions").with(eq(new Integer(1))).will(returnValue(versions));
 
         DataViewService serviceProxy = (DataViewService) editorService.proxy();
 

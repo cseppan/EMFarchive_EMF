@@ -1,18 +1,14 @@
 package gov.epa.emissions.framework.services.data;
 
-
 /**
  * This class keeps track of the date/time a user initiated an export of a particular version of a dataset to a
  * repository (location).
- * 
- * @author Conrad F. D'Cruz
- * 
  */
 public class NoteType {
 
-    private long id;
+    private int id;
 
-    private String type = null;
+    private String type;
 
     public NoteType() {// No argument constructor needed for hibernate mapping
     }
@@ -22,11 +18,11 @@ public class NoteType {
         setType(type);
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

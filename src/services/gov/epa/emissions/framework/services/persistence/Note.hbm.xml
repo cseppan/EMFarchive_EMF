@@ -5,11 +5,11 @@
 
 <hibernate-mapping default-lazy="false"> 
   <class name="gov.epa.emissions.framework.services.data.Note" table="notes" schema="emf"> 
- 	<id name="id" type="long" column="id">
+ 	<id name="id" type="integer" column="id">
 	  <generator class="identity"/>
  	</id>
-	<property name="datasetId"		column="dataset_id"		type="long"					not-null="true"/>
-	<property name="version" 		column="version"		type="long"					not-null="true" />
+	<property name="datasetId"		column="dataset_id"		type="integer"				not-null="true"/>
+	<property name="version" 		column="version"		type="integer"					not-null="true" />
 	<property name="name"			column="name"			type="java.lang.String"		not-null="true"		length="15"/>
 	<property name="date" 			column="date_time"		type="java.util.Date"		not-null="true" 	length="10"/>
 	<property name="details" 		column="details"		type="java.lang.String"		not-null="true"/>

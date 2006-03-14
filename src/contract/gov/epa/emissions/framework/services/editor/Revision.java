@@ -13,11 +13,11 @@ import java.util.Date;
  */
 public class Revision {
 
-    private long id;
+    private int id;
 
-    private long datasetId;
+    private int datasetId;
 
-    private long version;
+    private int version;
 
     private User creator;
 
@@ -26,22 +26,20 @@ public class Revision {
     private String what;
 
     private String why;
-    
+
     private String references;
 
     public Revision() {// No argument constructor needed for hibernate mapping
     }
 
-    public Revision(User creator, long datasetId, Date date, long version, String what, String why, String references) {
-        super();
-        // TODO Auto-generated constructor stub
+    public Revision(User creator, int datasetId, Date date, int version, String what, String why, String references) {
         this.creator = creator;
         this.datasetId = datasetId;
         this.date = date;
         this.version = version;
         this.what = what;
         this.why = why;
-        this.references=references;
+        this.references = references;
     }
 
     public User getCreator() {
@@ -52,11 +50,11 @@ public class Revision {
         this.creator = creator;
     }
 
-    public long getDatasetId() {
+    public int getDatasetId() {
         return datasetId;
     }
 
-    public void setDatasetId(long datasetId) {
+    public void setDatasetId(int datasetId) {
         this.datasetId = datasetId;
     }
 
@@ -68,19 +66,19 @@ public class Revision {
         this.date = date;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public long getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 

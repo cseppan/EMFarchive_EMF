@@ -210,15 +210,15 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         changeset.setVersion(v1);
 
         VersionedRecord record6 = new VersionedRecord();
-        record6.setDatasetId((int) dataset.getId());
+        record6.setDatasetId(dataset.getId());
         changeset.addNew(record6);
 
         VersionedRecord record7 = new VersionedRecord();
-        record7.setDatasetId((int) dataset.getId());
+        record7.setDatasetId(dataset.getId());
         changeset.addNew(record7);
 
         VersionedRecord record8 = new VersionedRecord();
-        record8.setDatasetId((int) dataset.getId());
+        record8.setDatasetId(dataset.getId());
         changeset.addNew(record8);
 
         service.submit(token, changeset, 1);
@@ -238,7 +238,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         changeset.setVersion(v1);
 
         VersionedRecord record6 = new VersionedRecord();
-        record6.setDatasetId((int) dataset.getId());
+        record6.setDatasetId(dataset.getId());
         changeset.addNew(record6);
 
         service.submit(token, changeset, 1);
@@ -257,14 +257,14 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         ChangeSet changeset1 = new ChangeSet();
         changeset1.setVersion(v1);
         VersionedRecord record6 = new VersionedRecord();
-        record6.setDatasetId((int) dataset.getId());
+        record6.setDatasetId(dataset.getId());
         changeset1.addNew(record6);
         service.submit(token, changeset1, 1);
 
         ChangeSet changeset2 = new ChangeSet();
         changeset2.setVersion(v1);
         VersionedRecord record7 = new VersionedRecord();
-        record7.setDatasetId((int) dataset.getId());
+        record7.setDatasetId(dataset.getId());
         changeset2.addNew(record7);
         service.submit(token, changeset2, 1);
 
@@ -284,7 +284,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         ChangeSet changeset1 = new ChangeSet();
         changeset1.setVersion(v1);
         VersionedRecord record6 = new VersionedRecord();
-        record6.setDatasetId((int) dataset.getId());
+        record6.setDatasetId(dataset.getId());
         changeset1.addNew(record6);
         service.submit(token, changeset1, 1);
 
@@ -307,7 +307,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         ChangeSet changeset = new ChangeSet();
         changeset.setVersion(v1);
         VersionedRecord record6 = new VersionedRecord();
-        record6.setDatasetId((int) dataset.getId());
+        record6.setDatasetId(dataset.getId());
         changeset.addNew(record6);
         service.submit(token, changeset, 1);
 
@@ -330,7 +330,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         changeset.setVersion(v1);
 
         VersionedRecord record6 = new VersionedRecord(10);
-        record6.setDatasetId((int) dataset.getId());
+        record6.setDatasetId(dataset.getId());
         changeset.addNew(record6);
 
         service.submit(token, changeset, 1);
@@ -358,7 +358,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         changeset.setVersion(v1);
 
         VersionedRecord record6 = new VersionedRecord(10);
-        record6.setDatasetId((int) dataset.getId());
+        record6.setDatasetId(dataset.getId());
         changeset.addNew(record6);
 
         int totalPriorToChanges = service.getTotalRecords(token);
@@ -376,7 +376,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         changeset.setVersion(v1);
 
         VersionedRecord record6 = new VersionedRecord(10);
-        record6.setDatasetId((int) dataset.getId());
+        record6.setDatasetId(dataset.getId());
         changeset.addNew(record6);
 
         VersionedRecord[] page1Records = page.getRecords();
@@ -412,7 +412,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         ChangeSet page1ChangeSet = new ChangeSet();
         page1ChangeSet.setVersion(v1);
         VersionedRecord record6 = new VersionedRecord(10);
-        record6.setDatasetId((int) dataset.getId());
+        record6.setDatasetId(dataset.getId());
         page1ChangeSet.addNew(record6);
         Page page1 = service.getPage(token, 1);
         service.submit(token, page1ChangeSet, 1);
@@ -447,7 +447,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         ChangeSet page1ChangeSet = new ChangeSet();
         page1ChangeSet.setVersion(v1);
         VersionedRecord newRecord = new VersionedRecord(10);
-        newRecord.setDatasetId((int) dataset.getId());
+        newRecord.setDatasetId(dataset.getId());
         page1ChangeSet.addNew(newRecord);
         service.submit(token, page1ChangeSet, 1);
 

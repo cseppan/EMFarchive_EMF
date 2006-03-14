@@ -21,7 +21,7 @@ import java.util.List;
 
 public class EmfDataset implements Dataset, Lockable {
 
-    private long id;// unique id needed for hibernate persistence
+    private int id;// unique id needed for hibernate persistence
 
     private String name;
 
@@ -201,11 +201,11 @@ public class EmfDataset implements Dataset, Lockable {
         return endDateTime;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

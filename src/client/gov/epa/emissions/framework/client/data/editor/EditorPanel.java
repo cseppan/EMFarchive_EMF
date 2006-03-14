@@ -88,7 +88,7 @@ public class EditorPanel extends JPanel implements EditorPanelView {
     }
 
     private EditablePagePanel createEditablePage(Page page) {
-        editablePage = new EditablePage((int) dataset.getId(), version, page, tableMetadata);
+        editablePage = new EditablePage(dataset.getId(), version, page, tableMetadata);
         editablePagePanel = new EditablePagePanel(editablePage, messagePanel, changeablesList);
 
         return editablePagePanel;

@@ -19,14 +19,14 @@ public class LoggingServiceTransport implements LoggingService {
         return callFactory.createCall("User Service");
     }
 
-    public AccessLog[] getAccessLogs(long datasetid) throws EmfException {
+    public AccessLog[] getAccessLogs(int datasetid) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("getAccessLogs");
-        call.addLongParam("datasetId");
+        call.addIntegerParam("datasetId");
         call.setReturnType(mappings.logs());
 
-        return (AccessLog[]) call.requestResponse(new Object[] { new Long(datasetid) });
+        return (AccessLog[]) call.requestResponse(new Object[] { new Integer(datasetid) });
     }
 
 }

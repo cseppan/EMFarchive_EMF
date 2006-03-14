@@ -6,11 +6,11 @@ import java.util.Date;
 
 public class Note {
 
-    private long id;
+    private int id;
 
-    private long datasetId;
+    private int datasetId;
 
-    private long version;
+    private int version;
 
     private String name;
 
@@ -31,8 +31,8 @@ public class Note {
         return name + " (" + id + ")";
     }
 
-    public Note(User creator, long datasetId, Date date, String details, String name, NoteType type, String references,
-            long version) {
+    public Note(User creator, int datasetId, Date date, String details, String name, NoteType type, String references,
+            int version) {
         this.creator = creator;
         this.datasetId = datasetId;
         this.date = date;
@@ -51,11 +51,11 @@ public class Note {
         this.creator = creator;
     }
 
-    public long getDatasetId() {
+    public int getDatasetId() {
         return datasetId;
     }
 
-    public void setDatasetId(long datasetId) {
+    public void setDatasetId(int datasetId) {
         this.datasetId = datasetId;
     }
 
@@ -75,11 +75,11 @@ public class Note {
         this.details = details;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -107,11 +107,11 @@ public class Note {
         this.references = references;
     }
 
-    public long getVersion() {
+    public int getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(int version) {
         this.version = version;
     }
 

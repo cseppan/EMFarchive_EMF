@@ -5,9 +5,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.persistence.DataCommonsDAO;
-import gov.epa.emissions.framework.services.persistence.DatasetDao;
-import gov.epa.emissions.framework.services.persistence.UserDAO;
+import gov.epa.emissions.framework.services.data.QAStep;
 
 import java.util.List;
 
@@ -71,6 +69,27 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldGetQASteps() throws Exception {
+        EmfDataset dataset = newDataset();
+
+        QAStep step = new QAStep();
+        step.setDatasetId(dataset.getId());
+        step.setName("name");
+        step.setVersion(2);
+        add(step);
+
+        try {
+            QAStep[] steps = dao.steps(dataset, session);
+
+            assertEquals(1, steps.length);
+            assertEquals("name", steps[0].getName());
+            assertEquals(2, steps[0].getVersion());
+        } finally {
+            remove(step);
+            remove(dataset);
+        }
+    }
+
     public void testShouldRemoveDatasetFromDatabaseOnRemove() throws Exception {
         EmfDataset dataset = newDataset();
 
@@ -85,7 +104,7 @@ public class DatasetDaoTest extends ServiceTestCase {
 
         try {
             assertTrue("Should be able to confirm existence of dataset", dao.exists(dataset.getName(), session));
-            
+
         } finally {
             remove(dataset);
         }

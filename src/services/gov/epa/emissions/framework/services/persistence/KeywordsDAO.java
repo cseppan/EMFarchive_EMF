@@ -9,8 +9,14 @@ import org.hibernate.criterion.Order;
 
 public class KeywordsDAO {
 
+    private HibernateFacade hibernateFacade;
+
+    public KeywordsDAO() {
+        hibernateFacade = new HibernateFacade();
+    }
+
     public List getKeywords(Session session) {
-        return session.createCriteria(Keyword.class).addOrder(Order.asc("name")).list();
+        return hibernateFacade.getAll(Keyword.class, Order.asc("name"), session);
     }
 
 }

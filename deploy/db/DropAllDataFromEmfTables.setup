@@ -22,4 +22,5 @@ delete from emf.note_types;
 delete from emf.revisions;
 
 
+delete from emf.qa_steps;
 delete from emf.dataset_types_qa_step_templates;

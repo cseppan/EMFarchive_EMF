@@ -181,12 +181,12 @@ public class DataCommonsDAO {
         addObject(note, session);
     }
 
-    public List getRevisions(long datasetId, Session session) {
-        return session.createCriteria(Revision.class).add(Restrictions.eq("datasetId", new Long(datasetId))).list();
+    public List getRevisions(int datasetId, Session session) {
+        return session.createCriteria(Revision.class).add(Restrictions.eq("datasetId", new Integer(datasetId))).list();
     }
 
-    public List getNotes(long datasetId, Session session) {
-        return session.createCriteria(Note.class).add(Restrictions.eq("datasetId", new Long(datasetId))).list();
+    public List getNotes(int datasetId, Session session) {
+        return session.createCriteria(Note.class).add(Restrictions.eq("datasetId", new Integer(datasetId))).list();
     }
 
     /*
@@ -196,11 +196,11 @@ public class DataCommonsDAO {
         return hibernateFacade.nameUsed(name, clazz, session);
     }
 
-    public Object current(long id, Class clazz, Session session) {
+    public Object current(int id, Class clazz, Session session) {
         return hibernateFacade.current(id, clazz, session);
     }
 
-    public boolean exists(long id, Class clazz, Session session) {
+    public boolean exists(int id, Class clazz, Session session) {
         return hibernateFacade.exists(id, clazz, session);
     }
 

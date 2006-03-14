@@ -19,7 +19,7 @@ public interface DataAccessor {
 
     Version currentVersion(Version reference) throws EmfException;
 
-    Version[] getVersions(long datasetId) throws EmfException;
+    Version[] getVersions(int datasetId) throws EmfException;
 
     void shutdown() throws EmfException;
 

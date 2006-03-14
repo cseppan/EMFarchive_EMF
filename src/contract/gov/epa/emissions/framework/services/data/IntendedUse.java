@@ -1,29 +1,23 @@
 package gov.epa.emissions.framework.services.data;
 
-import java.io.Serializable;
+public class IntendedUse implements Comparable {
 
-public class IntendedUse implements Serializable, Comparable {
-
-    private long id;
+    private int id;
 
     private String name;
 
-    /*
-     * Default constructor needed for hibernate and axis serialization
-     */
-    public IntendedUse() {
-        super();
+    public IntendedUse() {// bean-style
     }
 
     public IntendedUse(String name) {
         this.name = name;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -34,8 +28,8 @@ public class IntendedUse implements Serializable, Comparable {
     public void setName(String name) {
         this.name = name;
     }
-    
-    public String toString(){
+
+    public String toString() {
         return getName();
     }
 
@@ -58,7 +52,7 @@ public class IntendedUse implements Serializable, Comparable {
     }
 
     public int compareTo(Object o) {
-        return name.compareTo(((IntendedUse)o).getName());
+        return name.compareTo(((IntendedUse) o).getName());
     }
 
 }

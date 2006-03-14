@@ -5,25 +5,22 @@ import java.util.Date;
 /**
  * This class keeps track of the date/time a user initiated an export of a particular version of a dataset to a
  * repository (location).
- * 
- * @author Conrad F. D'Cruz
- * 
  */
 public class AccessLog {
 
-    private long id;
+    private int id;
 
-    private long datasetId;
+    private int datasetId;
 
-    private String username = null;
+    private String username;
 
-    private Date timestamp = null;
+    private Date timestamp;
 
     private String version = "v1";
 
-    private String description = null;
+    private String description;
 
-    private String folderPath = null;
+    private String folderPath;
 
     public AccessLog() {// No argument constructor needed for hibernate mapping
     }
@@ -32,7 +29,7 @@ public class AccessLog {
         return "[ " + id + " " + datasetId + " " + username + " " + version + " ]";
     }
 
-    public AccessLog(String username, long datasetid, Date date, String version, String description, String folderPath) {
+    public AccessLog(String username, int datasetid, Date date, String version, String description, String folderPath) {
         super();
         setUsername(username);
         setDatasetId(datasetid);
@@ -82,19 +79,19 @@ public class AccessLog {
         this.version = version;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public long getDatasetId() {
+    public int getDatasetId() {
         return datasetId;
     }
 
-    public void setDatasetId(long datasetid) {
+    public void setDatasetId(int datasetid) {
         this.datasetId = datasetid;
     }
 

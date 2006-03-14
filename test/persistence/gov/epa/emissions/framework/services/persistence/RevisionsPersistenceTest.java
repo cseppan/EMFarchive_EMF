@@ -70,7 +70,8 @@ public class RevisionsPersistenceTest extends HibernateTestCase {
             save(dataset);
 
             EmfDataset datasetFromDB = loadDataset(user.getUsername() + "_" + id);
-            rev = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT ONE", "WHY ONE", "NOTE ONE");
+            rev = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT ONE",
+                    "WHY ONE", "NOTE ONE");
 
             save(rev);
             Revision revFromDB = loadRevision("WHAT ONE");
@@ -86,7 +87,7 @@ public class RevisionsPersistenceTest extends HibernateTestCase {
     public void testShouldAddAndGetThreeRevisions() throws Exception {
         Random rando = new Random();
         long id = Math.abs(rando.nextInt());
-        Revision rev1=null,rev2=null,rev3=null;
+        Revision rev1 = null, rev2 = null, rev3 = null;
 
         User user = null;
         EmfDataset dataset = null;
@@ -113,17 +114,20 @@ public class RevisionsPersistenceTest extends HibernateTestCase {
             save(dataset);
 
             EmfDataset datasetFromDB = loadDataset(user.getUsername() + "_" + id);
-            rev1 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT ONE", "WHY ONE", "NOTE ONE");
+            rev1 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT ONE",
+                    "WHY ONE", "NOTE ONE");
             save(rev1);
-            
-            rev2 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT TWO", "WHY TWO", "NOTE TWO");
+
+            rev2 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT TWO",
+                    "WHY TWO", "NOTE TWO");
             save(rev2);
 
-            rev3 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT THREE", "WHY THREE", "NOTE THREE");
+            rev3 = new Revision(user, datasetFromDB.getId(), new Date(), dataset.getDefaultVersion(), "WHAT THREE",
+                    "WHY THREE", "NOTE THREE");
             save(rev3);
 
             List allRevisionsFromDB = loadAllRevisions();
-            assertEquals("Should return 3 revisions",allRevisionsFromDB.size(),3);
+            assertEquals("Should return 3 revisions", allRevisionsFromDB.size(), 3);
 
         } finally {
             remove(rev1);

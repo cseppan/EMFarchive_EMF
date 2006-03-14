@@ -5,7 +5,7 @@
 
 <hibernate-mapping default-lazy="false"> 
   <class name="gov.epa.emissions.framework.services.EmfProperty" table="properties" schema="emf"> 
- 	<id name="id" type="long" column="id">
+ 	<id name="id" type="integer" column="id">
 	  <generator class="identity"/>
  	</id>
 	<property name="name"		column="name"		type="java.lang.String"		not-null="true"/>
