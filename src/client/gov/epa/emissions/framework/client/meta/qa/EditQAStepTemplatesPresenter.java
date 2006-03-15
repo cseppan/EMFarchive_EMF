@@ -18,12 +18,6 @@ public class EditQAStepTemplatesPresenter {
         view.observe(this);
     }
 
-    public void doNew(NewQAStepTemplateView qaStepTemplateview, DatasetType type, int row) {
-        qaStepTemplateview.display(type);
-        if (qaStepTemplateview.shouldCreate())
-            view.setTableData(qaStepTemplateview.template(), row);
-    }
-
     public void doAdd(NewQAStepTemplateView dialog) {
         dialog.display(type);
         if (dialog.shouldCreate())

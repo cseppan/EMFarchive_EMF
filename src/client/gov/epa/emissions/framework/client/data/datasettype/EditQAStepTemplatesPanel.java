@@ -14,7 +14,6 @@ import gov.epa.emissions.framework.client.meta.qa.EditableQAStepTemplateTableDat
 import gov.epa.emissions.framework.client.meta.qa.NewQAStepTemplateDialog;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
-import gov.epa.emissions.framework.ui.InlineEditableTableData;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -28,7 +27,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-public class QAStepTemplatesPanel extends JPanel implements EditQAStepTemplatesView, Editor {
+public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTemplatesView, Editor {
 
     protected EditableEmfTableModel tableModel;
 
@@ -44,7 +43,7 @@ public class QAStepTemplatesPanel extends JPanel implements EditQAStepTemplatesV
 
     private EmfConsole parent;
 
-    public QAStepTemplatesPanel(DatasetType type, EditableQAStepTemplateTableData tableData,
+    public EditQAStepTemplatesPanel(DatasetType type, EditableQAStepTemplateTableData tableData,
             ManageChangeables changeablesList, EmfConsole parent, DesktopManager desktopManager) {
         this.changeablesList = changeablesList;
         this.type = type;
@@ -57,19 +56,19 @@ public class QAStepTemplatesPanel extends JPanel implements EditQAStepTemplatesV
     private void createLayout() {
         setBorder(new Border("QAStepTemplates"));
         super.setLayout(new BorderLayout());
-        super.add(centerPanel(tableData), BorderLayout.CENTER);
+        super.add(centerPanel(), BorderLayout.CENTER);
     }
 
-    private JPanel centerPanel(InlineEditableTableData tableData) {
+    private JPanel centerPanel() {
         JPanel container = new JPanel(new BorderLayout());
 
-        container.add(table(tableData), BorderLayout.CENTER);
+        container.add(table(), BorderLayout.CENTER);
         container.add(buttonsPanel(), BorderLayout.PAGE_END);
 
         return container;
     }
 
-    protected JScrollPane table(InlineEditableTableData tableData) {
+    protected JScrollPane table() {
         tableModel = new EditableEmfTableModel(tableData);
         table = new EditableTable(tableModel);
         changeablesList.addChangeable(table);
@@ -142,7 +141,7 @@ public class QAStepTemplatesPanel extends JPanel implements EditQAStepTemplatesV
     }
 
     public void commit() {
-        table.commit();
+        type.setQaStepTemplates(tableData.sources());
     }
 
     public void addListener(KeyListener keyListener) {

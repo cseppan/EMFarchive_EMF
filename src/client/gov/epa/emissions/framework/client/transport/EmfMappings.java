@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SectorCriteria;
@@ -69,6 +70,8 @@ public class EmfMappings extends Mappings {
         bean(call, Note.class, note());
         bean(call, NoteType.class, notetype());
         bean(call, Revision.class, revision());
+        
+        bean(call, QAStepTemplate.class, qaStepTemplate());
 
         bean(call, TableMetadata.class, tablemetadata());
         bean(call, ColumnMetaData.class, columnmetadata());
@@ -107,6 +110,7 @@ public class EmfMappings extends Mappings {
         array(call, Revision[].class, revisions());
         array(call, ColumnMetaData[].class, columnmetadatas());
 
+        array(call, QAStepTemplate[].class, qaStepTemplates());
     }
 
     public QName logs() {
@@ -251,6 +255,14 @@ public class EmfMappings extends Mappings {
 
     public QName revisions() {
         return qname("Revisions");
+    }
+
+    public QName qaStepTemplate() {
+        return qname("QAStepTemplate");
+    }
+
+    public QName qaStepTemplates() {
+        return qname("QAStepTemplates");
     }
 
     public QName tablemetadata() {

@@ -111,6 +111,10 @@
 		qname="ns1:TableMetadata" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.commons.data.QAStepTemplate"
+		qname="ns1:QAStepTemplate" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.editor.Revision"
 		qname="ns1:Revision" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
@@ -205,6 +209,11 @@
 		innerType="ns1:ColumnMetaData"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
+	<arrayMapping qname="ns1:QAStepTemplates" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.commons.data.QAStepTemplate[]"
+		innerType="ns1:QAStepTemplate"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
 	<arrayMapping qname="ns1:Revisions" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.editor.Revision[]"
 		innerType="ns1:Revision"

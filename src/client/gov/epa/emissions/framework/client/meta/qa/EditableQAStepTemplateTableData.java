@@ -3,30 +3,19 @@ package gov.epa.emissions.framework.client.meta.qa;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
-import gov.epa.emissions.framework.ui.InlineEditableTableData;
+import gov.epa.emissions.framework.ui.EditableTableData;
 import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class EditableQAStepTemplateTableData extends AbstractEditableTableData implements InlineEditableTableData {
+public class EditableQAStepTemplateTableData extends AbstractEditableTableData implements EditableTableData {
 
     private List rows;
 
     public EditableQAStepTemplateTableData(QAStepTemplate[] templates) {
         this.rows = createRows(templates);
-    }
-
-    public void addBlankRow() {
-        QAStepTemplate template = new QAStepTemplate();
-        template.setName("");
-        template.setProgram("");
-        template.setProgramArguments("");
-        template.setRequired(false);
-        template.setOrder("");
-
-        rows.add(row(template));
     }
 
     public void add(QAStepTemplate template) {

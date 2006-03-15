@@ -52,6 +52,8 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private EmfConsole parent;
 
+    private EditQAStepTemplatesPanel qaStepTemplatesPanel;
+
     public EditableDatasetTypeWindow(EmfConsole parent, DesktopManager desktopManager) {
         super("Edit Dataset Type", new Dimension(600, 500), desktopManager);
 
@@ -124,12 +126,12 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private JPanel createQAStepTemplatesPanel(DatasetType type) {
         EditableQAStepTemplateTableData tableData = new EditableQAStepTemplateTableData(type.getQaStepTemplates());
-        QAStepTemplatesPanel panel = new QAStepTemplatesPanel(type, tableData, this, parent, desktopManager);
+        qaStepTemplatesPanel = new EditQAStepTemplatesPanel(type, tableData, this, parent, desktopManager);
 
-        EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenter(type, panel);
+        EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenter(type, qaStepTemplatesPanel);
         presenter.display();
 
-        return panel;
+        return qaStepTemplatesPanel;
     }
 
     private JPanel createButtonsPanel() {
@@ -154,15 +156,17 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     private Action saveAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
+                if (name.getText().equals("")) {
+                    messagePanel.setError("Name field should be a non-empty string.");
+                    return;
+                }
+
+                resetChanges();
                 try {
-                    if (name.getText().equals(""))
-                        messagePanel.setError("Name field should be a non-empty string.");
-                    else {
-                        keywordsPanel.commit();
-                        resetChanges();
-                        presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), sortOrder
-                                .getText());
-                    }
+                    keywordsPanel.commit();
+                    qaStepTemplatesPanel.commit();
+                    presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), sortOrder
+                            .getText());
                 } catch (EmfException e) {
                     messagePanel.setError("Could not save: " + e.getMessage());
                 }
