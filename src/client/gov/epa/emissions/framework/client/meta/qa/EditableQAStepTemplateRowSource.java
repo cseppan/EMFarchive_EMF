@@ -1,7 +1,6 @@
-package gov.epa.emissions.framework.client.meta.QA;
+package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.QAStepTemplate;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.RowSource;
 
 public class EditableQAStepTemplateRowSource implements RowSource {
@@ -53,8 +52,9 @@ public class EditableQAStepTemplateRowSource implements RowSource {
         return selected.booleanValue();
     }
 
-    public void validate(int rowNumber) throws EmfException {
-        if (source.getName() == null || source.getName().trim().length() == 0)
-            throw new EmfException("empty QAStepTemplate name at row " + rowNumber);
+    public void validate(int rowNumber) {
+        // NOTE no validation needed
+        
     }
+
 }

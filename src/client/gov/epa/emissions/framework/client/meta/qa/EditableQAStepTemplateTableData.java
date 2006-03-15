@@ -1,11 +1,10 @@
-package gov.epa.emissions.framework.client.meta.QA;
+package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.QAStepTemplate;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
-import gov.epa.emissions.framework.ui.RowSource;
 import gov.epa.emissions.framework.ui.InlineEditableTableData;
+import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,7 +33,7 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
         remove(getSelected());
     }
     
-    public void remove(QAStepTemplate template) {
+    private void remove(QAStepTemplate template) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
             QAStepTemplate source = (QAStepTemplate) row.source();
@@ -45,7 +44,7 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
         }
     }
     
-    public void remove(QAStepTemplate[] templates) {
+    private void remove(QAStepTemplate[] templates) {
         for(int i = 0; i < templates.length; i++)
             remove(templates[i]);
     }
@@ -58,18 +57,8 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
         return this.rows;
     }
 
-    public boolean isEditable(int col, int row) {
-        EditableRow editableRow = (EditableRow) rows.get(row);
-        QAStepTemplate template = (QAStepTemplate) editableRow.source();
-        if (template != null && (col == 0 || col == 1)) {
-            return false;
-        }
-        
-        return true;
-    }
-
     public boolean isEditable(int col) {
-        return true;
+        return (col == 0) ? true : false;
     }
     
     private List createRows(QAStepTemplate[] templates) {
@@ -105,19 +94,16 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
         return (QAStepTemplate[]) selected.toArray(new QAStepTemplate[0]);
     }
     
-    public QAStepTemplate[] sources() throws EmfException {
+    public QAStepTemplate[] sources() {
         List sources = sourcesList();
         return (QAStepTemplate[]) sources.toArray(new QAStepTemplate[0]);
     }
 
-    private List sourcesList() throws EmfException {
+    private List sourcesList() {
         List sources = new ArrayList();
-        int rowNumber = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            rowNumber++;
             EditableRow row = (EditableRow) iter.next();
             EditableQAStepTemplateRowSource rowSource = (EditableQAStepTemplateRowSource) row.rowSource();
-            rowSource.validate(rowNumber);
             sources.add(rowSource.source());
         }
         return sources;

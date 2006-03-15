@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta.QA;
+package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.framework.ui.AbstractTableData;
@@ -40,7 +40,7 @@ public class QAStepTemplateTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        return String.class;
+        return (col == 3) ? Boolean.class : String.class;
     }
 
 }

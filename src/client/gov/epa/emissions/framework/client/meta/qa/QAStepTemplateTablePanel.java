@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta.QA;
+package gov.epa.emissions.framework.client.meta.qa;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;

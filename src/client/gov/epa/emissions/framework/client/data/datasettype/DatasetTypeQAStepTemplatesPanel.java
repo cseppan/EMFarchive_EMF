@@ -7,9 +7,9 @@ import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.console.DesktopManager;
-import gov.epa.emissions.framework.client.meta.QA.EditableQAStepTemplateTableData;
-import gov.epa.emissions.framework.client.meta.QA.NewQAStepTemplateDialog;
-import gov.epa.emissions.framework.client.meta.QA.QAStepTemplatePanelPresenter;
+import gov.epa.emissions.framework.client.meta.qa.EditableQAStepTemplateTableData;
+import gov.epa.emissions.framework.client.meta.qa.NewQAStepTemplateDialog;
+import gov.epa.emissions.framework.client.meta.qa.QAStepTemplatePanelPresenter;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.InlineEditableTableData;
 
