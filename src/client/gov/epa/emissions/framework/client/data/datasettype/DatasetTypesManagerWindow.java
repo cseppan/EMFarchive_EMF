@@ -20,13 +20,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -104,8 +102,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         JPanel crudPanel = createCrudPanel();
 
         JPanel closePanel = new JPanel();
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(new ActionListener() {
+        Button closeButton = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }
@@ -195,7 +192,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private EditableDatasetTypeView editableView() {
-        EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(desktopManager);
+        EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(parentConsole, desktopManager);
         return view;
     }
 

@@ -39,7 +39,6 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -173,7 +172,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     private JPanel createRightControlPanel() {
         JPanel panel = new JPanel();
 
-        JButton importButton = new Button("Import", new AbstractAction() {
+        Button importButton = new Button("Import", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
                     importDataset();
@@ -185,7 +184,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         importButton.setToolTipText("Import a new Dataset");
         panel.add(importButton);
 
-        JButton exportButton = new Button("Export", new AbstractAction() {
+        Button exportButton = new Button("Export", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 exportSelectedDatasets();
             }
@@ -193,7 +192,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         exportButton.setToolTipText("Export existing Dataset(s)");
         panel.add(exportButton);
 
-        JButton closeButton = new Button("Close", new AbstractAction() {
+        Button closeButton = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }

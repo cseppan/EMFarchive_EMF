@@ -13,7 +13,7 @@ import java.util.List;
 public class EditableQAStepTemplateTableData extends AbstractEditableTableData implements InlineEditableTableData {
 
     private List rows;
-    
+
     public EditableQAStepTemplateTableData(QAStepTemplate[] templates) {
         this.rows = createRows(templates);
     }
@@ -25,14 +25,18 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
         template.setProgramArguments("");
         template.setRequired(false);
         template.setOrder("");
-        
+
+        rows.add(row(template));
+    }
+
+    public void add(QAStepTemplate template) {
         rows.add(row(template));
     }
 
     public void removeSelected() {
         remove(getSelected());
     }
-    
+
     private void remove(QAStepTemplate template) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
@@ -43,9 +47,9 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
             }
         }
     }
-    
+
     private void remove(QAStepTemplate[] templates) {
-        for(int i = 0; i < templates.length; i++)
+        for (int i = 0; i < templates.length; i++)
             remove(templates[i]);
     }
 
@@ -60,7 +64,7 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
     public boolean isEditable(int col) {
         return (col == 0) ? true : false;
     }
-    
+
     private List createRows(QAStepTemplate[] templates) {
         List rows = new ArrayList();
         for (int i = 0; i < templates.length; i++)
@@ -80,7 +84,7 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
 
         return String.class;
     }
-    
+
     private QAStepTemplate[] getSelected() {
         List selected = new ArrayList();
 
@@ -93,7 +97,7 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
 
         return (QAStepTemplate[]) selected.toArray(new QAStepTemplate[0]);
     }
-    
+
     public QAStepTemplate[] sources() {
         List sources = sourcesList();
         return (QAStepTemplate[]) sources.toArray(new QAStepTemplate[0]);

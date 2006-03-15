@@ -6,9 +6,9 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
-import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.ui.Dialog;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -20,29 +20,33 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class NewQAStepTemplateDialog extends DisposableInteralFrame implements NewQAStepTemplateView {
+public class NewQAStepTemplateDialog extends Dialog implements NewQAStepTemplateView {
     private TextField name;
-    
+
     private TextField program;
-    
+
     private TextArea programParameters;
-    
+
     private JCheckBox required;
-    
+
     private TextField order;
-    
+
     private boolean shouldCreate;
-    
-    public NewQAStepTemplateDialog(String title, DesktopManager desktopManager) {
-        super(title, new Dimension(550, 300), desktopManager);
+
+    public NewQAStepTemplateDialog(EmfConsole parent) {
+        super("New QA Step Template", parent);
+        super.setSize(new Dimension(550, 300));
+        super.center();
     }
-    
+
     public void display(DatasetType type) {
+        super.setTitle(super.getTitle() + ": " + type.getName());
+
         JPanel layout = createLayout(type);
         super.getContentPane().add(layout);
         super.display();
     }
-    
+
     private JPanel createLayout(DatasetType type) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -62,17 +66,16 @@ public class NewQAStepTemplateDialog extends DisposableInteralFrame implements N
 
         program = new TextField("", 40);
         layoutGenerator.addLabelWidgetPair("Program", program, panel);
-        
+
         programParameters = new TextArea("", "", 40, 3);
         ScrollableTextArea scrollableDetails = ScrollableTextArea.createWithVerticalScrollBar(programParameters);
         layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
-        
+
         order = new TextField("", 40);
         layoutGenerator.addLabelWidgetPair("Order", order, panel);
-        
+
         required = new JCheckBox();
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
-        
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
@@ -81,7 +84,7 @@ public class NewQAStepTemplateDialog extends DisposableInteralFrame implements N
 
         return panel;
     }
-    
+
     protected boolean verifyInput(DatasetType type) {
         String templatename = name.getText().trim();
         if (templatename.length() == 0) {
@@ -97,7 +100,7 @@ public class NewQAStepTemplateDialog extends DisposableInteralFrame implements N
 
         return true;
     }
-    
+
     private boolean duplicate(String name, DatasetType type) {
         QAStepTemplate[] templates = type.getQaStepTemplates();
         for (int i = 0; i < templates.length; i++) {
@@ -107,7 +110,7 @@ public class NewQAStepTemplateDialog extends DisposableInteralFrame implements N
 
         return false;
     }
-    
+
     private JPanel buttonsPanel(final DatasetType type) {
         JPanel panel = new JPanel();
         Button ok = new Button("OK", new AbstractAction() {
@@ -136,7 +139,6 @@ public class NewQAStepTemplateDialog extends DisposableInteralFrame implements N
         }
     }
 
-
     public boolean shouldCreate() {
         return shouldCreate;
     }
@@ -148,8 +150,8 @@ public class NewQAStepTemplateDialog extends DisposableInteralFrame implements N
         template.setProgramArguments(programParameters.getText());
         template.setRequired(required.isSelected());
         template.setOrder(order.getText().trim());
-        
+
         return template;
     }
-    
+
 }

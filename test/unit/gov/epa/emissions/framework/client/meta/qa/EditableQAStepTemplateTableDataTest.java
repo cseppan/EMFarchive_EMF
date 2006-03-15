@@ -100,5 +100,22 @@ public class EditableQAStepTemplateTableDataTest extends TestCase {
         assertEquals(template1, sources[0]);
         assertEquals(template2, sources[1]);
     }
+    
+    public void testShouldAddNewQAStepTemplateOnAddMethod() {
+        QAStepTemplate template3 = new QAStepTemplate();
+        template3.setName("name3");
+        template3.setProgram("program3");
+        template3.setProgramArguments("program-args3");
+        template3.setRequired(false);
+        template3.setOrder("3");
+        
+        data.add(template3);
+        
+        List rows = data.rows();
+        Row row = (Row) rows.get(2);
+        
+        assertEquals("Rows number is now 3", 3, rows.size());
+        assertEquals(template3.getName(), row.getValueAt(1));
+    }
 
 }
