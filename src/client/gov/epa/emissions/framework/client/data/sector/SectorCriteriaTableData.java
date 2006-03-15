@@ -4,13 +4,13 @@ import gov.epa.emissions.commons.data.SectorCriteria;
 import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
-import gov.epa.emissions.framework.ui.SelectableEmfTableData;
+import gov.epa.emissions.framework.ui.InlineEditableTableData;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SectorCriteriaTableData extends AbstractEditableTableData implements SelectableEmfTableData {
+public class SectorCriteriaTableData extends AbstractEditableTableData implements InlineEditableTableData {
     private List rows;
 
     public SectorCriteriaTableData(SectorCriteria[] criteria) {

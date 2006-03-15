@@ -7,14 +7,14 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.RowSource;
-import gov.epa.emissions.framework.ui.SelectableEmfTableData;
+import gov.epa.emissions.framework.ui.InlineEditableTableData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class EditableKeyValueTableData extends AbstractEditableTableData implements SelectableEmfTableData {
+public class EditableKeyValueTableData extends AbstractEditableTableData implements InlineEditableTableData {
     private List rows;
 
     private Keywords masterKeywords;

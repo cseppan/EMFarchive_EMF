@@ -9,6 +9,8 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.meta.QA.EditableQAStepTemplateTableData;
+import gov.epa.emissions.framework.client.meta.QA.QAStepTemplatePanelPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueTableData;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.services.EmfException;
@@ -42,12 +44,19 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     private TextArea description;
 
     private EditableKeyValueTableData keywordsTableData;
+    
+    private EditableQAStepTemplateTableData qaStepTemplatesTableData;
 
     private DatasetTypeKeywordsPanel keywordsPanel;
-
+    
+    private DatasetTypeQAStepTemplatesPanel qaStepTemplatesPanel;
+    
+    private DesktopManager desktopManager;
+    
     public EditableDatasetTypeWindow(DesktopManager desktopManager) {
         super("Edit Dataset Type", new Dimension(600, 500), desktopManager);
 
+        this.desktopManager = desktopManager;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -56,7 +65,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     public void observe(EditableDatasetTypePresenter presenter) {
         this.presenter = presenter;
     }
-
+    
     public void display(DatasetType type, Keyword[] keywords) {
         super.setTitle("Edit Dataset Type: " + type.getName());
         super.setName("datasetTypeEditor:" + type.getId());
@@ -73,6 +82,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         layout.add(messagePanel);
         layout.add(createInputPanel(type));
         layout.add(createKeywordsPanel(type, keywords));
+        layout.add(createQAStepTemplatesPanel(type));
         layout.add(createButtonsPanel());
     }
 
@@ -111,6 +121,15 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         keywordsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 
         return keywordsPanel;
+    }
+    
+    private JPanel createQAStepTemplatesPanel(DatasetType type) {
+        qaStepTemplatesTableData = new EditableQAStepTemplateTableData(type.getQaStepTemplates());
+        qaStepTemplatesPanel = new DatasetTypeQAStepTemplatesPanel(type, qaStepTemplatesTableData, this, desktopManager);
+        qaStepTemplatesPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        new QAStepTemplatePanelPresenter(qaStepTemplatesPanel);
+        
+        return qaStepTemplatesPanel;
     }
 
     private JPanel createButtonsPanel() {

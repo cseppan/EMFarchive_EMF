@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.data.datasettype;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
+import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
@@ -9,6 +10,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.meta.QA.QAStepTemplateTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.TableData;
@@ -64,6 +66,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         layout.add(messagePanel);
         layout.add(createBasicDataPanel(type));
         layout.add(createKeywordsPanel(type.getKeyVals()));
+        layout.add(createQAStepTemplatesPanel(type.getQaStepTemplates()));
         layout.add(createButtonsPanel());
 
         messagePanel.setMessage(lockStatus(type));
@@ -115,7 +118,20 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
 
         return panel;
     }
+    
+    private JPanel createQAStepTemplatesPanel(QAStepTemplate[] templates) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("QAStepTemplates"));
 
+        TableData tableData = new QAStepTemplateTableData(templates);
+        JTable table = new JTable(new EmfTableModel(tableData));
+        table.setRowHeight(20);
+
+        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        return panel;
+    }
+    
     private JPanel createButtonsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

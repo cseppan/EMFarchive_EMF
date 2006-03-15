@@ -1,9 +1,17 @@
-package gov.epa.emissions.framework.ui;
+package gov.epa.emissions.framework.client.data.datasettype;
 
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.Label;
+import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.meta.QA.EditableQAStepTemplateTableData;
+import gov.epa.emissions.framework.client.meta.QA.NewQAStepTemplateDialog;
+import gov.epa.emissions.framework.client.meta.QA.QAStepTemplatePanelPresenter;
+import gov.epa.emissions.framework.ui.EditableEmfTableModel;
+import gov.epa.emissions.framework.ui.InlineEditableTableData;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
@@ -19,18 +27,27 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-public class EditableTablePanel extends JPanel implements Editor {
+public class DatasetTypeQAStepTemplatesPanel extends JPanel implements QAStepTemplatesPanelView,Editor {
 
     protected EditableEmfTableModel tableModel;
 
     protected EditableTable table;
 
     protected ManageChangeables changeablesList;
-
-    public EditableTablePanel(String label, InlineEditableTableData tableData, ManageChangeables changeablesList) {
+    
+    protected DatasetType type;
+    
+    protected QAStepTemplatePanelPresenter presenter;
+    
+    private DesktopManager desktopManager;
+    
+    public DatasetTypeQAStepTemplatesPanel(DatasetType type, EditableQAStepTemplateTableData tableData, 
+            ManageChangeables changeablesList, DesktopManager desktopManager) {
         this.changeablesList = changeablesList;
+        this.type = type;
+        this.desktopManager = desktopManager;
         super.setLayout(new BorderLayout());
-        super.add(doLayout(label, tableData), BorderLayout.CENTER);
+        super.add(doLayout("QAStepTemplates", tableData), BorderLayout.CENTER);
     }
 
     private JPanel doLayout(String label, InlineEditableTableData tableData) {
@@ -87,6 +104,15 @@ public class EditableTablePanel extends JPanel implements Editor {
             }
         });
         container.add(remove);
+        
+        JButton update = new JButton("Update");
+        update.setMargin(new Insets(2, 2, 2, 2));
+        update.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent event) {
+                update();
+            }
+        });
+        container.add(update);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
@@ -94,11 +120,21 @@ public class EditableTablePanel extends JPanel implements Editor {
         return panel;
     }
 
+    protected void update() {
+        int[] selectedRows = table.getSelectedRows();
+        String title = "Create New QAStepTemplate: row(";
+        for(int i = 0; i < selectedRows.length; i++) {
+            title += selectedRows[i] + ")";
+            NewQAStepTemplateDialog dialog = new NewQAStepTemplateDialog(title, desktopManager);
+            presenter.doNewQAStepTemplate(dialog, type, selectedRows[i]);
+        }
+    }
+
     private void refresh() {
         tableModel.refresh();
         super.revalidate();
     }
-
+    
     public void setColumnEditor(TableCellEditor editor, int columnIndex, String toolTip) {
         TableColumnModel colModel = table.getColumnModel();
         TableColumn col = colModel.getColumn(columnIndex);
@@ -120,6 +156,18 @@ public class EditableTablePanel extends JPanel implements Editor {
 
     public void addListener(KeyListener keyListener) {
         table.addKeyListener(keyListener);
+    }
+
+    public void setTableData(QAStepTemplate template, int row) {
+        tableModel.setValueAt(template.getName(), row, 1);
+        tableModel.setValueAt(template.getProgram(), row, 2);
+        tableModel.setValueAt(template.getProgramArguments(), row, 3);
+        tableModel.setValueAt(Boolean.valueOf(template.isRequired()), row, 4);
+        tableModel.setValueAt(template.getOrder(), row, 5);
+    }
+
+    public void observe(QAStepTemplatePanelPresenter presenter) {
+        this.presenter = presenter;
     }
 
 }
