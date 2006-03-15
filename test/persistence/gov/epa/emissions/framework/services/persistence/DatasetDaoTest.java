@@ -90,6 +90,58 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldUpdateQASteps() throws Exception {
+        EmfDataset dataset = newDataset();
+
+        QAStep step = new QAStep();
+        step.setDatasetId(dataset.getId());
+        step.setName("name");
+        step.setVersion(2);
+        add(step);
+
+        try {
+            QAStep[] read = dao.steps(dataset, session);
+            assertEquals(1, read.length);
+
+            read[0].setName("updated-name");
+            read[0].setProgram("updated-program");
+
+            dao.update(read, session);
+            session.clear();// to ensure Hibernate does not return cached objects
+
+            QAStep[] updated = dao.steps(dataset, session);
+            assertEquals(1, updated.length);
+            assertEquals("updated-name", updated[0].getName());
+            assertEquals("updated-program", updated[0].getProgram());
+        } finally {
+            remove(step);
+            remove(dataset);
+        }
+    }
+
+    public void testShouldSaveNewQASteps() throws Exception {
+        EmfDataset dataset = newDataset();
+
+        QAStep step = new QAStep();
+        step.setDatasetId(dataset.getId());
+        step.setName("name");
+        step.setVersion(2);
+
+        try {
+            dao.add(new QAStep[] { step }, session);
+            session.clear();
+
+            QAStep[] read = dao.steps(dataset, session);
+            assertEquals(1, read.length);
+            assertEquals("name", read[0].getName());
+            assertEquals(2, read[0].getVersion());
+            assertEquals(dataset.getId(), read[0].getDatasetId());
+        } finally {
+            remove(step);
+            remove(dataset);
+        }
+    }
+
     public void testShouldRemoveDatasetFromDatabaseOnRemove() throws Exception {
         EmfDataset dataset = newDataset();
 

@@ -112,4 +112,13 @@ public class DatasetDao {
         return (QAStep[]) steps.toArray(new QAStep[0]);
     }
 
+    
+    public void update(QAStep[] steps, Session session) {
+        hibernateFacade.update(steps, session);
+    }
+
+    public void add(QAStep[] steps, Session session) {
+        hibernateFacade.add(steps, session);
+    }
+
 }

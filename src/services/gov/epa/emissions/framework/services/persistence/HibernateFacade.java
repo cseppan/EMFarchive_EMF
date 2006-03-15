@@ -23,6 +23,11 @@ public class HibernateFacade {
         }
     }
 
+    public void add(Object[] objects, Session session) {
+        for (int i = 0; i < objects.length; i++)
+            add(objects[i], session);
+    }
+
     public boolean exists(int id, Class clazz, Session session) {
         Transaction tx = null;
         try {
@@ -57,6 +62,11 @@ public class HibernateFacade {
             tx.rollback();
             throw e;
         }
+    }
+
+    public void update(Object[] objects, Session session) {
+        for (int i = 0; i < objects.length; i++)
+            update(objects[i], session);
     }
 
     public void remove(Object obj, Session session) {
