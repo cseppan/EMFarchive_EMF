@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.persistence.DatasetDao;
+import gov.epa.emissions.framework.services.persistence.DatasetDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Date;
@@ -77,7 +77,7 @@ public class ImportTask implements Runnable {
     }
 
     void addDataset(EmfDataset dataset) throws EmfException {
-        DatasetDao dao = new DatasetDao();
+        DatasetDAO dao = new DatasetDAO();
         Session session = sessionFactory.getSession();
         try {
             if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))
@@ -90,7 +90,7 @@ public class ImportTask implements Runnable {
     }
 
     void updateDataset(EmfDataset dataset) {
-        DatasetDao dao = new DatasetDao();
+        DatasetDAO dao = new DatasetDAO();
         Session session = sessionFactory.getSession();
         try {
             dao.updateWithoutLocking(dataset, session);
@@ -100,7 +100,7 @@ public class ImportTask implements Runnable {
     }
 
     void removeDataset(EmfDataset dataset) {
-        DatasetDao dao = new DatasetDao();
+        DatasetDAO dao = new DatasetDAO();
         try {
             Session session = sessionFactory.getSession();
             dao.remove(dataset, session);

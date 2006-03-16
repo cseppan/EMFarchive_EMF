@@ -16,7 +16,7 @@ import org.hibernate.criterion.Restrictions;
 
 public class DatasetDaoTest extends ServiceTestCase {
 
-    private DatasetDao dao;
+    private DatasetDAO dao;
 
     private DataCommonsDAO dcDao;
 
@@ -24,7 +24,7 @@ public class DatasetDaoTest extends ServiceTestCase {
 
     protected void doSetUp() throws Exception {
         deleteAllDatasets();
-        dao = new DatasetDao();
+        dao = new DatasetDAO();
         dcDao = new DataCommonsDAO();
         userDAO = new UserDAO();
     }

@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.persistence.DatasetDao;
+import gov.epa.emissions.framework.services.persistence.DatasetDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public class DataServiceImpl implements DataService {
 
     private HibernateSessionFactory sessionFactory;
 
-    private DatasetDao dao;
+    private DatasetDAO dao;
 
     public DataServiceImpl() {
         this(HibernateSessionFactory.get());
@@ -24,7 +24,7 @@ public class DataServiceImpl implements DataService {
 
     public DataServiceImpl(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-        dao = new DatasetDao();
+        dao = new DatasetDAO();
     }
 
     public EmfDataset[] getDatasets() throws EmfException {

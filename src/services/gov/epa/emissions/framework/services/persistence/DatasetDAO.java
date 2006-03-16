@@ -15,13 +15,13 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-public class DatasetDao {
+public class DatasetDAO {
 
     private LockingScheme lockingScheme;
 
     private HibernateFacade hibernateFacade;
 
-    public DatasetDao() {
+    public DatasetDAO() {
         lockingScheme = new LockingScheme();
         hibernateFacade = new HibernateFacade();
     }

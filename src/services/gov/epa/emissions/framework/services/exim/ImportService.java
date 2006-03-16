@@ -12,7 +12,7 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusServiceImpl;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.persistence.DatasetDao;
+import gov.epa.emissions.framework.services.persistence.DatasetDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
@@ -67,7 +67,7 @@ public class ImportService {
 
     private void isUnique(EmfDataset dataset) throws EmfException {
         Session session = sessionFactory.getSession();
-        DatasetDao dao = new DatasetDao();
+        DatasetDAO dao = new DatasetDAO();
         boolean nameUsed = dao.nameUsed(dataset.getName(), EmfDataset.class, session);
         session.flush();
         session.close();

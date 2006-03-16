@@ -13,7 +13,7 @@ import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.DataCommonsDAO;
-import gov.epa.emissions.framework.services.persistence.DatasetDao;
+import gov.epa.emissions.framework.services.persistence.DatasetDAO;
 import gov.epa.emissions.framework.services.persistence.UserDAO;
 
 import java.util.Date;
@@ -30,14 +30,14 @@ public class DataCommonsDAOTest extends ServiceTestCase {
 
     private DataCommonsDAO dao;
 
-    private DatasetDao datasetDAO;
+    private DatasetDAO datasetDAO;
 
     private UserDAO userDao;
 
     protected void doSetUp() throws Exception {
         dao = new DataCommonsDAO();
         userDao = new UserDAO();
-        datasetDAO = new DatasetDao();
+        datasetDAO = new DatasetDAO();
     }
 
     protected void doTearDown() {// no op

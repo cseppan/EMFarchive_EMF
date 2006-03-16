@@ -24,6 +24,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
+import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.Revision;
 
@@ -72,6 +73,7 @@ public class EmfMappings extends Mappings {
         bean(call, Revision.class, revision());
         
         bean(call, QAStepTemplate.class, qaStepTemplate());
+        bean(call, QAStep.class, qaStep());
 
         bean(call, TableMetadata.class, tablemetadata());
         bean(call, ColumnMetaData.class, columnmetadata());
@@ -111,6 +113,7 @@ public class EmfMappings extends Mappings {
         array(call, ColumnMetaData[].class, columnmetadatas());
 
         array(call, QAStepTemplate[].class, qaStepTemplates());
+        array(call, QAStep[].class, qaSteps());
     }
 
     public QName logs() {
@@ -263,6 +266,14 @@ public class EmfMappings extends Mappings {
 
     public QName qaStepTemplates() {
         return qname("QAStepTemplates");
+    }
+
+    public QName qaStep() {
+        return qname("QAStep");
+    }
+    
+    public QName qaSteps() {
+        return qname("QASteps");
     }
 
     public QName tablemetadata() {

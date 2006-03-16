@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 import gov.epa.emissions.framework.services.editor.DataViewService;
 import gov.epa.emissions.framework.services.exim.ExImService;
+import gov.epa.emissions.framework.services.qa.QAService;
 
 public class RemoteServiceLocator implements ServiceLocator {
     private String baseUrl;
@@ -21,7 +22,8 @@ public class RemoteServiceLocator implements ServiceLocator {
         this.baseUrl = baseUrl;
         editCall = this.createSessionEnabledCall("DataEditor Service", baseUrl
                 + "/gov.epa.emf.services.editor.DataEditorService");
-        viewCall = this.createSessionEnabledCall("DataView Service", baseUrl + "/gov.epa.emf.services.editor.DataViewService");
+        viewCall = this.createSessionEnabledCall("DataView Service", baseUrl
+                + "/gov.epa.emf.services.editor.DataViewService");
     }
 
     public UserService userService() {
@@ -38,6 +40,10 @@ public class RemoteServiceLocator implements ServiceLocator {
 
     public LoggingService loggingService() {
         return new LoggingServiceTransport(baseUrl + "/gov.epa.emf.services.basic.LoggingService");
+    }
+
+    public QAService qaService() {
+        return new QAServiceTransport(baseUrl + "/gov.epa.emf.services.qa.QAService");
     }
 
     public DataCommonsService dataCommonsService() {

@@ -9,7 +9,7 @@ import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.persistence.DatasetDao;
+import gov.epa.emissions.framework.services.persistence.DatasetDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
@@ -69,7 +69,7 @@ public class ExportTask implements Runnable {
     }
 
     void updateDataset(EmfDataset dataset) throws EmfException {
-        DatasetDao dao = new DatasetDao();
+        DatasetDAO dao = new DatasetDAO();
         try {
             Session session = sessionFactory.getSession();
             dao.updateWithoutLocking(dataset, session);
