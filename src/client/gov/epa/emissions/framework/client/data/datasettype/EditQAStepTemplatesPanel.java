@@ -9,6 +9,7 @@ import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.meta.qa.EditQAStepTemplateWindow;
 import gov.epa.emissions.framework.client.meta.qa.EditQAStepTemplatesPresenter;
 import gov.epa.emissions.framework.client.meta.qa.EditableQAStepTemplateTableData;
 import gov.epa.emissions.framework.client.meta.qa.NewQAStepTemplateDialog;
@@ -42,6 +43,8 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
     private EditableQAStepTemplateTableData tableData;
 
     private EmfConsole parent;
+    
+    private DesktopManager desktopManager;
 
     public EditQAStepTemplatesPanel(DatasetType type, EditableQAStepTemplateTableData tableData,
             ManageChangeables changeablesList, EmfConsole parent, DesktopManager desktopManager) {
@@ -49,6 +52,7 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
         this.type = type;
         this.tableData = tableData;
         this.parent = parent;
+        this.desktopManager = desktopManager;
 
         createLayout();
     }
@@ -112,15 +116,15 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
     }
 
     protected void update() {
-        int[] selectedRows = table.getSelectedRows();
-        String title = "Create New QAStepTemplate: row(";
+        QAStepTemplate[] selectedRows = tableData.getSelected();
         for (int i = 0; i < selectedRows.length; i++) {
-            title += selectedRows[i] + ")";
-            // TODO: display the UpdateWindows
+            String titleSuffix = "(" + selectedRows[i].getName() + ")";
+            EditQAStepTemplateWindow view = new EditQAStepTemplateWindow(titleSuffix, desktopManager);
+            presenter.showEditView(view, selectedRows[i]);
         }
     }
 
-    private void refresh() {
+    public void refresh() {
         tableModel.refresh();
         super.revalidate();
     }
@@ -146,14 +150,6 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
 
     public void addListener(KeyListener keyListener) {
         table.addKeyListener(keyListener);
-    }
-
-    public void setTableData(QAStepTemplate template, int row) {
-        tableModel.setValueAt(template.getName(), row, 1);
-        tableModel.setValueAt(template.getProgram(), row, 2);
-        tableModel.setValueAt(template.getProgramArguments(), row, 3);
-        tableModel.setValueAt(Boolean.valueOf(template.isRequired()), row, 4);
-        tableModel.setValueAt(template.getOrder(), row, 5);
     }
 
     public void observe(EditQAStepTemplatesPresenter presenter) {

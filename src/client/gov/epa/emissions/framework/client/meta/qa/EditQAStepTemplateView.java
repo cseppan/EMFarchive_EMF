@@ -3,11 +3,12 @@ package gov.epa.emissions.framework.client.meta.qa;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 
-public interface NewQAStepTemplateView {
+public interface EditQAStepTemplateView {
     void display(DatasetType type);
     
-    boolean shouldCreate();
+    void observe(EditQAStepTemplatesPresenter presenter);
+
+    void setTemplate();
     
-    QAStepTemplate template();
-    
+    void setEditTemplate(QAStepTemplate template);
 }

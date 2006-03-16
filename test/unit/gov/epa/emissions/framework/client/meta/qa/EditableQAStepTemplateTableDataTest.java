@@ -117,5 +117,24 @@ public class EditableQAStepTemplateTableDataTest extends TestCase {
         assertEquals("Rows number is now 3", 3, rows.size());
         assertEquals(template3.getName(), row.getValueAt(1));
     }
+    
+    public void testShouldReturnCorrectSelectedRows() {
+        QAStepTemplate template3 = new QAStepTemplate();
+        template3.setName("name3");
+        template3.setProgram("program3");
+        template3.setProgramArguments("program-args3");
+        template3.setRequired(false);
+        template3.setOrder("3");
+        
+        data.add(template3);
+        data.setValueAt(Boolean.TRUE, 0, 0);
+        data.setValueAt(Boolean.TRUE, 2, 0);
+        
+        QAStepTemplate[] rows = data.getSelected();
+        
+        assertEquals("Only two rows selected", 2, rows.length);
+        assertEquals(template1.getName(), rows[0].getName());
+        assertEquals(template3.getName(), rows[1].getName());
+    }
 
 }

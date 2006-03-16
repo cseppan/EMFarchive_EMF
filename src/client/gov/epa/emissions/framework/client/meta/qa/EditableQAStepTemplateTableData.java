@@ -74,7 +74,7 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
         return String.class;
     }
 
-    private QAStepTemplate[] getSelected() {
+    public QAStepTemplate[] getSelected() {
         List selected = new ArrayList();
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {

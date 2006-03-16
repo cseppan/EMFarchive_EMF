@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.framework.client.data.datasettype.EditQAStepTemplatesView;
 
 public class EditQAStepTemplatesPresenter {
@@ -8,7 +9,7 @@ public class EditQAStepTemplatesPresenter {
     private EditQAStepTemplatesView view;
 
     private DatasetType type;
-
+    
     public EditQAStepTemplatesPresenter(DatasetType type, EditQAStepTemplatesView view) {
         this.type = type;
         this.view = view;
@@ -22,6 +23,17 @@ public class EditQAStepTemplatesPresenter {
         dialog.display(type);
         if (dialog.shouldCreate())
             view.add(dialog.template());
+    }
+    
+    public void showEditView(EditQAStepTemplateView view, QAStepTemplate template) {
+        view.observe(this);
+        view.display(type);
+        view.setEditTemplate(template);
+    }
+
+    public void doEdit(EditQAStepTemplateView view) {
+        view.setTemplate();
+        this.view.refresh();
     }
 
 }

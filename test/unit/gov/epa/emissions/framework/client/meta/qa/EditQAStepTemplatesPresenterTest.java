@@ -50,5 +50,35 @@ public class EditQAStepTemplatesPresenterTest extends EmfMockObjectTestCase {
         
         presenter.doAdd((NewQAStepTemplateView) dialog.proxy());
     }
+    
+    public void testShouldRunEditQAStepTemplateWindow() {
+        Mock view = mock(EditQAStepTemplatesView.class);
+        
+        DatasetType type = new DatasetType();
+        EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenter(type, (EditQAStepTemplatesView) view
+                .proxy());
+        
+        Mock editor = mock(EditQAStepTemplateView.class);
+        expects(editor, "setTemplate");
+        expects(view, "refresh");
+        
+        presenter.doEdit((EditQAStepTemplateView) editor.proxy());
+    }
+
+    public void testShouldDisplayEditQAStepTemplateWindow() {
+        Mock view = mock(EditQAStepTemplatesView.class);
+        
+        DatasetType type = new DatasetType();
+        EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenter(type, (EditQAStepTemplatesView) view
+                .proxy());
+        
+        QAStepTemplate template = new QAStepTemplate();
+        Mock editor = mock(EditQAStepTemplateView.class);
+        expects(editor, "display");
+        expects(editor, 1, "observe", same(presenter));
+        expects(editor, 1, "setEditTemplate", same(template));
+        
+        presenter.showEditView((EditQAStepTemplateView) editor.proxy(), template);
+    }
 
 }
