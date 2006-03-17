@@ -8,7 +8,7 @@ public interface EditQAStepTemplateView {
     
     void observe(EditQAStepTemplatesPresenter presenter);
 
-    void setTemplate();
+    void loadTemplate();
     
-    void setEditTemplate(QAStepTemplate template);
+    void display(QAStepTemplate template);
 }

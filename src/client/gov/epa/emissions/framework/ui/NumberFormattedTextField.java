@@ -12,11 +12,22 @@ import javax.swing.text.NumberFormatter;
 public class NumberFormattedTextField extends JFormattedTextField {
 
     public NumberFormattedTextField(int min, int max, int size, Action action) {
-        super.setFormatterFactory(new DefaultFormatterFactory(formatter(min, max)));
+        super.setFormatterFactory(new DefaultFormatterFactory(integerFormatter(min, max)));
         super.setValue(new Integer(min));
         super.setColumns(size);
 
         addActionForEnterKeyPress(action);
+    }
+
+    public NumberFormattedTextField(double min, double max, int size, Action action) {
+        super.setFormatterFactory(new DefaultFormatterFactory(doubleFormatter(min, max)));
+        super.setColumns(size);
+
+        addActionForEnterKeyPress(action);
+    }
+
+    public NumberFormattedTextField(int size, Action action) {
+        this(Double.MIN_VALUE, Double.MAX_VALUE, size, action);
     }
 
     private void addActionForEnterKeyPress(Action action) {
@@ -24,7 +35,7 @@ public class NumberFormattedTextField extends JFormattedTextField {
         super.getActionMap().put("check", action);
     }
 
-    private NumberFormatter formatter(int min, int max) {
+    private NumberFormatter integerFormatter(int min, int max) {
         NumberFormatter formatter = new NumberFormatter(NumberFormat.getIntegerInstance());
         formatter.setMinimum(new Integer(min));
         formatter.setMaximum(new Integer(max));
@@ -32,8 +43,20 @@ public class NumberFormattedTextField extends JFormattedTextField {
         return formatter;
     }
 
+    private NumberFormatter doubleFormatter(double min, double max) {
+        NumberFormatter formatter = new NumberFormatter(NumberFormat.getNumberInstance());
+        formatter.setMinimum(new Double(min));
+        formatter.setMaximum(new Double(max));
+
+        return formatter;
+    }
+
     public void setRange(int min, int max) {
-        super.setFormatterFactory(new DefaultFormatterFactory(formatter(min, max)));
+        super.setFormatterFactory(new DefaultFormatterFactory(integerFormatter(min, max)));
+    }
+
+    public boolean isEmpty() {
+        return getText().trim().length() == 0;
     }
 
 }

@@ -59,7 +59,7 @@ public class EditQAStepTemplatesPresenterTest extends EmfMockObjectTestCase {
                 .proxy());
         
         Mock editor = mock(EditQAStepTemplateView.class);
-        expects(editor, "setTemplate");
+        expects(editor, "loadTemplate");
         expects(view, "refresh");
         
         presenter.doEdit((EditQAStepTemplateView) editor.proxy());
@@ -76,7 +76,7 @@ public class EditQAStepTemplatesPresenterTest extends EmfMockObjectTestCase {
         Mock editor = mock(EditQAStepTemplateView.class);
         expects(editor, "display");
         expects(editor, 1, "observe", same(presenter));
-        expects(editor, 1, "setEditTemplate", same(template));
+        expects(editor, 1, "display", same(template));
         
         presenter.showEditView((EditQAStepTemplateView) editor.proxy(), template);
     }

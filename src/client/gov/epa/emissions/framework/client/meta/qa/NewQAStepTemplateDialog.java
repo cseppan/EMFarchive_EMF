@@ -9,6 +9,8 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.ui.Dialog;
+import gov.epa.emissions.framework.ui.NumberFormattedTextField;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -29,9 +31,13 @@ public class NewQAStepTemplateDialog extends Dialog implements NewQAStepTemplate
 
     private JCheckBox required;
 
-    private TextField order;
+    private NumberFormattedTextField order;
+
+    private TextArea description;
 
     private boolean shouldCreate;
+
+    private SingleLineMessagePanel messagePanel;
 
     public NewQAStepTemplateDialog(EmfConsole parent) {
         super("New QA Step Template", parent);
@@ -51,6 +57,8 @@ public class NewQAStepTemplateDialog extends Dialog implements NewQAStepTemplate
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
+        messagePanel = new SingleLineMessagePanel();
+        panel.add(messagePanel);
         panel.add(inputPanel());
         panel.add(buttonsPanel(type));
 
@@ -71,14 +79,26 @@ public class NewQAStepTemplateDialog extends Dialog implements NewQAStepTemplate
         ScrollableTextArea scrollableDetails = ScrollableTextArea.createWithVerticalScrollBar(programParameters);
         layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
 
-        order = new TextField("", 40);
+        order = new NumberFormattedTextField(5, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Float.parseFloat(order.getText());
+                } catch (NumberFormatException ex) {
+                    messagePanel.setError("Order should be a floating point number");
+                }
+            }
+        });
         layoutGenerator.addLabelWidgetPair("Order", order, panel);
 
         required = new JCheckBox();
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
+        description = new TextArea("", "", 40, 3);
+        ScrollableTextArea scrollableDesc = ScrollableTextArea.createWithVerticalScrollBar(description);
+        layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
+
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -149,7 +169,11 @@ public class NewQAStepTemplateDialog extends Dialog implements NewQAStepTemplate
         template.setProgram(program.getText().trim());
         template.setProgramArguments(programParameters.getText());
         template.setRequired(required.isSelected());
-        template.setOrder(Float.parseFloat(order.getText()));
+
+        if (!order.isEmpty())
+            template.setOrder(Float.parseFloat(order.getText()));
+
+        template.setDescription(description.getText().trim());
 
         return template;
     }

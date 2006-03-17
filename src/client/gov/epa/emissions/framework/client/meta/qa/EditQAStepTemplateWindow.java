@@ -9,6 +9,8 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.ui.NumberFormattedTextField;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -29,7 +31,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
     private JCheckBox required;
 
-    private TextField order;
+    private NumberFormattedTextField order;
 
     private boolean shouldCreate;
 
@@ -40,6 +42,10 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     private EditQAStepTemplatesPresenter presenter;
 
     private QAStepTemplate template;
+
+    private TextArea description;
+
+    private SingleLineMessagePanel messagePanel;
 
     public EditQAStepTemplateWindow(String title, DesktopManager desktopManager) {
         super("Edit QA Step Template", new Dimension(550, 300), desktopManager);
@@ -58,6 +64,8 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
+        messagePanel = new SingleLineMessagePanel();
+        panel.add(messagePanel);
         panel.add(inputPanel());
         panel.add(buttonsPanel(type));
 
@@ -78,14 +86,26 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         ScrollableTextArea scrollableDetails = ScrollableTextArea.createWithVerticalScrollBar(programParameters);
         layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
 
-        order = new TextField("", 40);
+        order = new NumberFormattedTextField(5, new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Float.parseFloat(order.getText());
+                } catch (NumberFormatException ex) {
+                    messagePanel.setError("Order should be a floating point number");
+                }
+            }
+        });
         layoutGenerator.addLabelWidgetPair("Order", order, panel);
 
         required = new JCheckBox();
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
+        description = new TextArea("", "", 40, 3);
+        ScrollableTextArea scrollableDesc = ScrollableTextArea.createWithVerticalScrollBar(description);
+        layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
+
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -156,23 +176,24 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         this.presenter = presenter;
     }
 
-    public void setTemplate() {
-        if (template != null) {
-            template.setName(name.getText().trim());
-            template.setProgram(program.getText().trim());
-            template.setProgramArguments(programParameters.getText());
-            template.setRequired(required.isSelected());
+    public void loadTemplate() {
+        template.setName(name.getText().trim());
+        template.setProgram(program.getText().trim());
+        template.setProgramArguments(programParameters.getText());
+        template.setRequired(required.isSelected());
+        if (!order.isEmpty())
             template.setOrder(Float.parseFloat(order.getText()));
-        }
+        template.setDescription(description.getText().trim());
     }
 
-    public void setEditTemplate(QAStepTemplate template) {
+    public void display(QAStepTemplate template) {
         this.template = template;
         name.setText(template.getName());
         program.setText(template.getProgram());
         programParameters.setText(template.getProgramArguments());
         required.setSelected(template.isRequired());
         order.setText(template.getOrder() + "");
+        description.setText(template.getDescription());
     }
 
 }

@@ -296,6 +296,7 @@ CREATE TABLE emf.dataset_types_qa_step_templates
   program_arguments text,
   required bool,
   order_no real,
+  description text,
   UNIQUE (dataset_type_id, name)
 ) 
 WITHOUT OIDS;

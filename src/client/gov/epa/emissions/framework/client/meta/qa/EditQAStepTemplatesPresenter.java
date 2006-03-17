@@ -28,11 +28,11 @@ public class EditQAStepTemplatesPresenter {
     public void showEditView(EditQAStepTemplateView view, QAStepTemplate template) {
         view.observe(this);
         view.display(type);
-        view.setEditTemplate(template);
+        view.display(template);
     }
 
     public void doEdit(EditQAStepTemplateView view) {
-        view.setTemplate();
+        view.loadTemplate();
         this.view.refresh();
     }
 
