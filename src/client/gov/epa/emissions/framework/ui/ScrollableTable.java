@@ -29,7 +29,7 @@ public class ScrollableTable extends JScrollPane {
         table.setRowHeight(18);
 
         enableScrolling(table);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         table.setRowSelectionAllowed(true);
     }
 
