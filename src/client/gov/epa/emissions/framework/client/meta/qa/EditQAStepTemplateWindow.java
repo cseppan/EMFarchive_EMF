@@ -34,13 +34,13 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     private boolean shouldCreate;
 
     private JPanel layout;
-    
+
     private String title;
 
     private EditQAStepTemplatesPresenter presenter;
 
     private QAStepTemplate template;
-    
+
     public EditQAStepTemplateWindow(String title, DesktopManager desktopManager) {
         super("Edit QA Step Template", new Dimension(550, 300), desktopManager);
         this.title = title;
@@ -138,7 +138,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
         return panel;
     }
-    
+
     private void doEdit(DatasetType type) {
         verifyInput(type);
         presenter.doEdit(this);
@@ -157,12 +157,12 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     }
 
     public void setTemplate() {
-        if(template != null) {
+        if (template != null) {
             template.setName(name.getText().trim());
             template.setProgram(program.getText().trim());
             template.setProgramArguments(programParameters.getText());
             template.setRequired(required.isSelected());
-            template.setOrder(order.getText().trim());
+            template.setOrder(Float.parseFloat(order.getText()));
         }
     }
 
@@ -172,7 +172,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         program.setText(template.getProgram());
         programParameters.setText(template.getProgramArguments());
         required.setSelected(template.isRequired());
-        order.setText(template.getOrder());
+        order.setText(template.getOrder() + "");
     }
 
 }

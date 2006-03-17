@@ -15,8 +15,8 @@ public class EditableQAStepTemplateRowSource implements RowSource {
     }
 
     public Object[] values() {
-        return new Object[] { selected, source.getName(), source.getProgram(), 
-                source.getProgramArguments(), Boolean.valueOf(source.isRequired()), source.getOrder() };
+        return new Object[] { selected, source.getName(), source.getProgram(), source.getProgramArguments(),
+                Boolean.valueOf(source.isRequired()), new Float(source.getOrder()) };
     }
 
     public void setValueAt(int column, Object val) {
@@ -25,19 +25,19 @@ public class EditableQAStepTemplateRowSource implements RowSource {
             selected = (Boolean) val;
             break;
         case 1:
-            source.setName((String)val);
+            source.setName((String) val);
             break;
         case 2:
-            source.setProgram((String)val);
+            source.setProgram((String) val);
             break;
         case 3:
-            source.setProgramArguments((String)val);
+            source.setProgramArguments((String) val);
             break;
         case 4:
-            source.setRequired(((Boolean)val).booleanValue());
+            source.setRequired(((Boolean) val).booleanValue());
             break;
         case 5:
-            source.setOrder((String)val);
+            source.setOrder(((Float) val).floatValue());
             break;
         default:
             throw new RuntimeException("invalid column - " + column);
@@ -54,7 +54,7 @@ public class EditableQAStepTemplateRowSource implements RowSource {
 
     public void validate(int rowNumber) {
         // NOTE no validation needed
-        
+
     }
 
 }

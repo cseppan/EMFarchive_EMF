@@ -20,7 +20,7 @@ public class QAStepRowSourceTest extends TestCase {
         step.setWhen(new Date());
         step.setProgram("program");
         step.setRequired(true);
-        step.setOrder("order");
+        step.setOrder((float)823.2);
         step.setResult("result");
         step.setStatus("status");
 
@@ -37,7 +37,7 @@ public class QAStepRowSourceTest extends TestCase {
 
         assertEquals(step.getProgram(), values[4]);
         assertEquals(step.isRequired(), ((Boolean) values[5]).booleanValue());
-        assertEquals(step.getOrder(), values[6]);
+        assertEquals(step.getOrder(), 0.0, ((Float) values[6]).floatValue());
         assertEquals(step.getResult(), values[7]);
         assertEquals(step.getStatus(), values[8]);
     }

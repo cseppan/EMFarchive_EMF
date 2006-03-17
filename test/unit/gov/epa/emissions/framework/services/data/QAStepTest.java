@@ -15,7 +15,7 @@ public class QAStepTest extends TestCase {
         template.setProgram("program");
         template.setProgramArguments("args");
         template.setRequired(true);
-        template.setOrder("order");
+        template.setOrder((float)1.2);
         
         QAStep step = new QAStep(template, 2);
         

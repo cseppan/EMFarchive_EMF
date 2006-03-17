@@ -21,21 +21,21 @@ public class QAStepTemplateTableDataTest extends TestCase {
         template1.setProgram("program1");
         template1.setProgramArguments("program-args1");
         template1.setRequired(true);
-        template1.setOrder("1");
+        template1.setOrder(1);
 
         template2 = new QAStepTemplate();
         template2.setName("name2");
         template2.setProgram("program2");
         template2.setProgramArguments("program-args2");
         template2.setRequired(false);
-        template2.setOrder("2");
+        template2.setOrder(2);
 
         data = new QAStepTemplateTableData(new QAStepTemplate[] { template1, template2 });
     }
 
     public void testShouldHaveFiveColumns() {
         String[] columns = data.columns();
-        
+
         assertEquals(5, columns.length);
         assertEquals("Name", columns[0]);
         assertEquals("Program", columns[1]);
@@ -72,7 +72,7 @@ public class QAStepTemplateTableDataTest extends TestCase {
         assertEquals(template1.getProgram(), row.getValueAt(1));
         assertEquals(template1.getProgramArguments(), row.getValueAt(2));
         assertEquals(template1.isRequired(), ((Boolean) row.getValueAt(3)).booleanValue());
-        assertEquals(template1.getOrder(), row.getValueAt(4));
+        assertEquals(template1.getOrder(), 0.0, ((Float) row.getValueAt(4)).floatValue());
     }
 
     public void testShouldReturnARowRepresentingATemplateEntry() {

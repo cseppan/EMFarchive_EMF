@@ -36,7 +36,7 @@
 		        <property name="program" column="program" type="java.lang.String" not-null="false"/>
         		<property name="programArguments" column="program_arguments" type="java.lang.String" not-null="false"/>
 		        <property name="required" column="required" type="boolean" not-null="false"/>               
-        		<property name="order" column="order_no" type="java.lang.String" not-null="false"/>
+        		<property name="order" column="order_no" type="float" not-null="false"/>
       		</composite-element>
  		</array>
  	

@@ -295,7 +295,7 @@ CREATE TABLE emf.dataset_types_qa_step_templates
   program text,
   program_arguments text,
   required bool,
-  order_no text,
+  order_no real,
   UNIQUE (dataset_type_id, name)
 ) 
 WITHOUT OIDS;
@@ -311,7 +311,7 @@ CREATE TABLE emf.qa_steps
   program text,
   program_arguments text,
   required bool,
-  order_no text,
+  order_no real,
   who int4 REFERENCES emf.users(username),
   "when" timestamp,
   result text,

@@ -23,14 +23,14 @@ public class EditableQAStepTableDataTest extends TestCase {
         step1.setProgram("program1");
         step1.setProgramArguments("program-args1");
         step1.setRequired(true);
-        step1.setOrder("1");
+        step1.setOrder(1);
 
         step2 = new QAStep();
         step2.setName("name2");
         step2.setProgram("program2");
         step2.setProgramArguments("program-args2");
         step2.setRequired(false);
-        step2.setOrder("2");
+        step2.setOrder(2);
 
         data = new EditableQAStepTableData(new QAStep[] { step1, step2 });
     }
@@ -72,7 +72,7 @@ public class EditableQAStepTableDataTest extends TestCase {
 
     public void testAllColumnsShouldBeUneditableExceptSelect() {
         assertTrue("Select column should be editable", data.isEditable(0));
-        
+
         for (int i = 1; i < 13; i++) {
             assertFalse("Cell index " + i + " should be uneditable", data.isEditable(i));
         }
@@ -89,14 +89,14 @@ public class EditableQAStepTableDataTest extends TestCase {
 
         Row row = (Row) rows.get(0);
         assertEquals(Boolean.FALSE, row.getValueAt(0));
-        assertEquals(step1.getId(), Integer.parseInt((String)row.getValueAt(1)));
-        assertEquals(step1.getDatasetId(), Integer.parseInt((String)row.getValueAt(2)));
-        assertEquals(step1.getVersion(), Integer.parseInt((String)row.getValueAt(3)));
+        assertEquals(step1.getId(), Integer.parseInt((String) row.getValueAt(1)));
+        assertEquals(step1.getDatasetId(), Integer.parseInt((String) row.getValueAt(2)));
+        assertEquals(step1.getVersion(), Integer.parseInt((String) row.getValueAt(3)));
         assertEquals(step1.getName(), row.getValueAt(4));
         assertEquals(step1.getProgram(), row.getValueAt(5));
         assertEquals(step1.getProgramArguments(), row.getValueAt(6));
         assertEquals(step1.isRequired(), ((Boolean) row.getValueAt(7)).booleanValue());
-        assertEquals(step1.getOrder(), row.getValueAt(8));
+        assertEquals(step1.getOrder(), 0.0, ((Float) row.getValueAt(8)).floatValue());
         assertEquals(step1.getWhen(), row.getValueAt(9));
         assertEquals(step1.getWho(), row.getValueAt(10));
         assertEquals(step1.getResult(), row.getValueAt(11));
@@ -107,45 +107,45 @@ public class EditableQAStepTableDataTest extends TestCase {
         assertEquals(step1, data.element(0));
         assertEquals(step2, data.element(1));
     }
-    
+
     public void testShouldReturnCorrectSources() {
         QAStep[] sources = data.sources();
-        
+
         assertEquals(step1, sources[0]);
         assertEquals(step2, sources[1]);
     }
-    
+
     public void testShouldAddNewQAStepTemplateOnAddMethod() {
         QAStep step3 = new QAStep();
         step3.setName("name3");
         step3.setProgram("program3");
         step3.setProgramArguments("program-args3");
         step3.setRequired(false);
-        step3.setOrder("3");
-        
+        step3.setOrder(3);
+
         data.add(step3);
-        
+
         List rows = data.rows();
         Row row = (Row) rows.get(2);
-        
+
         assertEquals("Rows number is now 3", 3, rows.size());
         assertEquals(step3.getName(), row.getValueAt(4));
     }
-    
+
     public void testShouldReturnCorrectSelectedRows() {
         QAStep step3 = new QAStep();
         step3.setName("name3");
         step3.setProgram("program3");
         step3.setProgramArguments("program-args3");
         step3.setRequired(false);
-        step3.setOrder("3");
-        
+        step3.setOrder(3);
+
         data.add(step3);
         data.setValueAt(Boolean.TRUE, 0, 0);
         data.setValueAt(Boolean.TRUE, 2, 0);
-        
+
         QAStep[] rows = data.getSelected();
-        
+
         assertEquals("Only two rows selected", 2, rows.length);
         assertEquals(step1.getName(), rows[0].getName());
         assertEquals(step3.getName(), rows[1].getName());

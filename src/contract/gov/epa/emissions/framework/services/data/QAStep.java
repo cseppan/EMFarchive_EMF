@@ -17,7 +17,7 @@ public class QAStep {
 
     private boolean required;
 
-    private String order;
+    private float order;
 
     private String status;
 
@@ -75,11 +75,11 @@ public class QAStep {
         this.version = version;
     }
 
-    public String getOrder() {
+    public float getOrder() {
         return order;
     }
 
-    public void setOrder(String order) {
+    public void setOrder(float order) {
         this.order = order;
     }
 

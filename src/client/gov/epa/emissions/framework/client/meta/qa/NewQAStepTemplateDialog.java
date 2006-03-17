@@ -149,7 +149,7 @@ public class NewQAStepTemplateDialog extends Dialog implements NewQAStepTemplate
         template.setProgram(program.getText().trim());
         template.setProgramArguments(programParameters.getText());
         template.setRequired(required.isSelected());
-        template.setOrder(order.getText().trim());
+        template.setOrder(Float.parseFloat(order.getText()));
 
         return template;
     }

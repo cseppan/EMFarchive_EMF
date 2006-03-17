@@ -27,7 +27,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         step1.setWhen(new Date());
         step1.setProgram("program1");
         step1.setRequired(true);
-        step1.setOrder("order1");
+        step1.setOrder(1);
         step1.setResult("result1");
         step1.setStatus("status1");
 
@@ -40,7 +40,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         step2.setWhen(new Date());
         step2.setProgram("program2");
         step2.setRequired(false);
-        step2.setOrder("order2");
+        step2.setOrder(2);
         step2.setResult("result2");
         step2.setStatus("status2");
 
@@ -97,7 +97,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
 
         assertEquals(step1.getProgram(), row.getValueAt(4));
         assertEquals(step1.isRequired(), ((Boolean) row.getValueAt(5)).booleanValue());
-        assertEquals(step1.getOrder(), row.getValueAt(6));
+        assertEquals(step1.getOrder(), 0, (((Float) row.getValueAt(6)).floatValue()));
         assertEquals(step1.getResult(), row.getValueAt(7));
         assertEquals(step1.getStatus(), row.getValueAt(8));
     }
