@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 import gov.epa.emissions.framework.services.editor.DataViewService;
 import gov.epa.emissions.framework.services.exim.ExImService;
+import gov.epa.emissions.framework.services.qa.QAService;
 
 public interface EmfSession {
 
@@ -36,4 +37,6 @@ public interface EmfSession {
     DataEditorService dataEditorService();
 
     UserPreference preferences();
+
+    QAService qaService();
 }

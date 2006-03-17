@@ -9,9 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class QAStepTableDataTest extends EmfMockObjectTestCase {
+public class QAStepsTableDataTest extends EmfMockObjectTestCase {
 
-    private QAStepTableData data;
+    private QAStepsTableData data;
 
     private QAStep step1;
 
@@ -44,7 +44,7 @@ public class QAStepTableDataTest extends EmfMockObjectTestCase {
         step2.setResult("result2");
         step2.setStatus("status2");
 
-        data = new QAStepTableData(new QAStep[] { step1, step2 });
+        data = new QAStepsTableData(new QAStep[] { step1, step2 });
     }
 
     public void testShouldHaveNineColumns() {

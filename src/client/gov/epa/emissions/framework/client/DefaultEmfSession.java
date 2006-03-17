@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 import gov.epa.emissions.framework.services.editor.DataViewService;
 import gov.epa.emissions.framework.services.exim.ExImService;
+import gov.epa.emissions.framework.services.qa.QAService;
 
 public class DefaultEmfSession implements EmfSession {
 
@@ -75,5 +76,9 @@ public class DefaultEmfSession implements EmfSession {
 
     public DataEditorService dataEditorService() {
         return serviceLocator.dataEditorService();
+    }
+
+    public QAService qaService() {
+        return serviceLocator.qaService();
     }
 }

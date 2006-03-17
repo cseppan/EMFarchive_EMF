@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class QAStepTableData extends AbstractTableData {
+public class QAStepsTableData extends AbstractTableData {
 
     private List rows;
 
     private QAStep[] values;
 
-    public QAStepTableData(QAStep[] values) {
+    public QAStepsTableData(QAStep[] values) {
         this.values = values;
         this.rows = createRows(values);
     }

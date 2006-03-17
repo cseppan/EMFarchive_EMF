@@ -5,12 +5,14 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.info.InfoTabView;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabView;
 import gov.epa.emissions.framework.client.meta.notes.NotesTabView;
+import gov.epa.emissions.framework.client.meta.qa.QATabView;
 import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabView;
 import gov.epa.emissions.framework.services.basic.LoggingService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.editor.Revision;
+import gov.epa.emissions.framework.services.qa.QAService;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -94,6 +96,24 @@ public class PropertiesViewPresenterTest extends MockObjectTestCase {
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, (EmfSession) session.proxy());
 
         presenter.set((LogsTabView) view.proxy());
+    }
+
+    public void testShouldDisplayQATabOnSetQATab() throws Exception {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("test");
+        dataset.setDatasetType(new DatasetType());
+        
+        Mock view = mock(QATabView.class);
+        view.expects(once()).method("display");
+        
+        Mock session = mock(EmfSession.class);
+        Mock service = mock(QAService.class);
+        service.stubs().method("getQASteps");
+        session.stubs().method("qaService").will(returnValue(service.proxy()));
+        
+        PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, (EmfSession) session.proxy());
+        
+        presenter.set((QATabView) view.proxy());
     }
 
     public void testShouldDisplayNotesTabOnSetNotesTab() throws Exception {
