@@ -45,13 +45,13 @@ public class DefaultVersionPanel extends JPanel {
 
     private ComboBox comboBox(ManageChangeables changeables) {
         VersionsSet versionsSet = new VersionsSet(versions);
-        String defaultValue = getDefaultVersion(versionsSet);
+        selected = getDefaultVersion(versionsSet);
 
-        ComboBox combo = new ComboBox(defaultValue, labels(versionsSet));
+        ComboBox combo = new ComboBox(selected, labels(versionsSet));
         combo.setName("defaultVersions");
         combo.setPreferredSize(new Dimension(175, 20));
 
-        combo.setSelectedItem(defaultValue);
+        combo.setSelectedItem(selected);
         changeables.addChangeable(combo);
 
         return combo;

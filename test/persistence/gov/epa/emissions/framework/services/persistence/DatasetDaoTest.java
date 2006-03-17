@@ -237,7 +237,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         try {
             dao.releaseLocked(dataset, session);
         } catch (EmfException e) {
-            assertEquals("Cannot release without owning lock", e.getMessage());
+            assertEquals("Cannot release the lock without owning it", e.getMessage());
             return;
         } finally {
             remove(dataset);

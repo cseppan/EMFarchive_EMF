@@ -8,7 +8,6 @@ import gov.epa.emissions.framework.client.meta.info.InfoTab;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTab;
 import gov.epa.emissions.framework.client.meta.notes.NotesTab;
-import gov.epa.emissions.framework.client.meta.qa.QATab;
 import gov.epa.emissions.framework.client.meta.revisions.RevisionsTab;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTab;
 import gov.epa.emissions.framework.services.EmfException;
@@ -64,7 +63,6 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         tabbedPane.addTab("Revisions", createRevisionsTab(parentConsole));
         tabbedPane.addTab("Logs", createLogsTab(parentConsole));
         tabbedPane.addTab("Tables", createInfoTab(parentConsole));
-        tabbedPane.addTab("QA", createQATab(parentConsole));
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -125,18 +123,6 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         } catch (EmfException e) {
             messagePanel.setError("Could not load Logs tab. Failed communication with remote Logging Services.");
             return createErrorTab("Could not load Logs tab. Failed communication with remote Logging Services.");
-        }
-    }
-
-    private JPanel createQATab(EmfConsole parentConsole) {
-        try {
-            QATab view = new QATab(null, null, null, null, null, parentConsole);
-            presenter.set(view);
-
-            return view;
-        } catch (EmfException e) {
-            messagePanel.setError("Could not load QA tab. Failed communication with remote QA Services.");
-            return createErrorTab("Could not load QA tab. Failed communication with remote QA Services.");
         }
     }
 

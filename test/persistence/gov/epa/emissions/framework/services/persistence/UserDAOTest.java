@@ -132,7 +132,7 @@ public class UserDAOTest extends HibernateTestCase {
         try {
             dao.releaseLocked(user, session);
         } catch (EmfException e) {
-            assertEquals("Cannot release without owning lock", e.getMessage());
+            assertEquals("Cannot release the lock without owning it", e.getMessage());
             return;
         }
 

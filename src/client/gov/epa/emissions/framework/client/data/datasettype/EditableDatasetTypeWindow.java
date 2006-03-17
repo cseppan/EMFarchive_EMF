@@ -156,20 +156,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     private Action saveAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                if (name.getText().equals("")) {
-                    messagePanel.setError("Name field should be a non-empty string.");
-                    return;
-                }
-
-                resetChanges();
-                try {
-                    keywordsPanel.commit();
-                    qaStepTemplatesPanel.commit();
-                    presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), sortOrder
-                            .getText());
-                } catch (EmfException e) {
-                    messagePanel.setError("Could not save: " + e.getMessage());
-                }
+                doSave();
             }
         };
 
@@ -196,6 +183,22 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
                 presenter.doClose();
         } catch (EmfException e) {
             messagePanel.setError("Could not close: " + e.getMessage());
+        }
+    }
+
+    private void doSave() {
+        if (name.getText().equals("")) {
+            messagePanel.setError("Name should be specified.");
+            return;
+        }
+
+        resetChanges();
+        try {
+            keywordsPanel.commit();
+            qaStepTemplatesPanel.commit();
+            presenter.doSave(name.getText(), description.getText(), keywordsTableData.sources(), sortOrder.getText());
+        } catch (EmfException e) {
+            messagePanel.setError("Could not save: " + e.getMessage());
         }
     }
 

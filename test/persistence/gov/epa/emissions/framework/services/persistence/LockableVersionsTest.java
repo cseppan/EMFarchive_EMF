@@ -93,7 +93,7 @@ public class LockableVersionsTest extends HibernateTestCase {
         try {
             lockableVersions.releaseLocked(version, session);
         } catch (EmfException e) {
-            assertEquals("Cannot release without owning lock", e.getMessage());
+            assertEquals("Cannot release the lock without owning it", e.getMessage());
             return;
         }
 

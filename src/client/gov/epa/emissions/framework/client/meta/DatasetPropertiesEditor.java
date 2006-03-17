@@ -62,7 +62,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         tabbedPane.addTab("Notes", createNotesTab(parentConsole));
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
         tabbedPane.addTab("Tables", createInfoTab(dataset, parentConsole));
-        tabbedPane.addTab("QA Steps", createQAStepTab(dataset, versions, messagePanel));
+        tabbedPane.addTab("QA", createQAStepTab(dataset, versions, messagePanel));
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 

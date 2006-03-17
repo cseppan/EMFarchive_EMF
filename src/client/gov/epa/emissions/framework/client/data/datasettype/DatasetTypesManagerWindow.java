@@ -28,7 +28,6 @@ import javax.swing.Action;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-//FIXME: very similar to SectorsManager. Refactor ?
 public class DatasetTypesManagerWindow extends ReusableInteralFrame implements DatasetTypesManagerView, RefreshObserver {
 
     private DatasetTypesManagerPresenter presenter;
@@ -153,8 +152,8 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private void viewDatasetTypes() {
-        List sectors = selected();
-        for (Iterator iter = sectors.iterator(); iter.hasNext();) {
+        List selected = selected();
+        for (Iterator iter = selected.iterator(); iter.hasNext();) {
             DatasetType type = (DatasetType) iter.next();
             try {
                 presenter.doView(type, viewableView());
@@ -166,8 +165,8 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private void editDatasetTypes() {
-        List sectors = selected();
-        for (Iterator iter = sectors.iterator(); iter.hasNext();) {
+        List selected = selected();
+        for (Iterator iter = selected.iterator(); iter.hasNext();) {
             DatasetType type = (DatasetType) iter.next();
             try {
                 presenter.doEdit(type, editableView(), viewableView());

@@ -43,7 +43,7 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
     private EditableQAStepTemplateTableData tableData;
 
     private EmfConsole parent;
-    
+
     private DesktopManager desktopManager;
 
     public EditQAStepTemplatesPanel(DatasetType type, EditableQAStepTemplateTableData tableData,
@@ -77,7 +77,7 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
         table = new EditableTable(tableModel);
         changeablesList.addChangeable(table);
         table.setRowHeight(16);
-        
+
         return new JScrollPane(table);
     }
 
