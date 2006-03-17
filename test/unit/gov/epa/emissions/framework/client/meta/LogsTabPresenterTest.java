@@ -26,7 +26,7 @@ public class LogsTabPresenterTest extends MockObjectTestCase {
 
         view.expects(once()).method("display").with(eq(accessLogs));
 
-        presenter.doDisplay();
+        presenter.display();
     }
 
     public void testShouldDoNothingOnSave() {

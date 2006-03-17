@@ -62,7 +62,7 @@ public class PropertiesViewPresenter {
 
     public void set(LogsTabView view) throws EmfException {
         LogsTabPresenter presenter = new LogsTabPresenter(view, dataset, session.loggingService());
-        presenter.doDisplay();
+        presenter.display();
     }
 
     public void set(NotesTabView view) throws EmfException {

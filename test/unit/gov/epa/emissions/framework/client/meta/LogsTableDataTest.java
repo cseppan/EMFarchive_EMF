@@ -7,7 +7,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-public class AccessLogTableDataTest extends TestCase {
+public class LogsTableDataTest extends TestCase {
 
     private LogsTableData data;
 

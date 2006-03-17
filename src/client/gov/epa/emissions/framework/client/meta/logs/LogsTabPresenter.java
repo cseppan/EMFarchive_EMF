@@ -18,7 +18,7 @@ public class LogsTabPresenter {
         this.service = services;
     }
 
-    public void doDisplay() throws EmfException {
+    public void display() throws EmfException {
         view.display(service.getAccessLogs(dataset.getId()));
     }
 

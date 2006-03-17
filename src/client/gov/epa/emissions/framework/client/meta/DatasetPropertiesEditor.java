@@ -113,7 +113,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         try {
             LogsTab view = new LogsTab(parentConsole);
             LogsTabPresenter presenter = new LogsTabPresenter(view, dataset, session.loggingService());
-            presenter.doDisplay();
+            presenter.display();
 
             return view;
         } catch (EmfException e) {
