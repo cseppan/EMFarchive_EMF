@@ -259,7 +259,7 @@ public class EditVersionsPanel extends JPanel implements EditVersionsView {
         String table = (String) tableCombo.getSelectedItem();
         Version[] versions = tableData.selected();
         if (versions.length != 1) {
-            displayError("Please select one version");
+            displayError("Please select a single version");
             return;
         }
 

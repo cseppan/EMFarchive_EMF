@@ -22,7 +22,7 @@ public class ImportInputRules {
 
     private void checkMultipleFilesRequired(DatasetType type) throws EmfException {
         if(type.getMinFiles()>1){
-            throw new EmfException("Sorry. You cannot create multiple datasets for this dataset type.");
+            throw new EmfException("Multiple datasets cannot be created for this dataset type.");
         }
         
     }
@@ -30,40 +30,40 @@ public class ImportInputRules {
     private void checkForMinAndMaxFiles(DatasetType type, String[] files) throws EmfException {
         int size = files.length;
         if (type.getMinFiles() > size) {
-            throw new EmfException("The " + type.getName() + " requires atleast " + type.getMinFiles() + " files");
+            throw new EmfException("The " + type.getName() + " importer requires at least " + type.getMinFiles() + " files");
         }
 
         int maxFiles = type.getMaxFiles();
         if (maxFiles != -1 && maxFiles < size) {
-            throw new EmfException("The " + type.getName() + " only takes atmost " + maxFiles + " files");
+            throw new EmfException("The " + type.getName() + " importer can use at most " + maxFiles + " files");
         }
 
     }
 
     private void validateFiles(String[] files) throws EmfException {
         if (files == null || files.length == 0) {
-            throw new EmfException("Filename should be specified");
+            throw new EmfException("A Filename should be specified");
         }
 
     }
 
     private void validateDatasetName(String datasetName) throws EmfException {
         if (datasetName == null || datasetName.trim().length() == 0) {
-            throw new EmfException("Dataset Name should be specified");
+            throw new EmfException("A Dataset Name should be specified");
         }
 
     }
 
     private void validateDirectory(String directory) throws EmfException {
         if (directory == null || directory.trim().length() == 0) {
-            throw new EmfException("Folder should be specified");
+            throw new EmfException("A Folder should be specified");
         }
 
     }
 
     private void validateDatasetType(DatasetType type) throws EmfException {
         if (type == null || type.getName().startsWith("Choose a type ...")) {
-            throw new EmfException("Dataset Type should be selected");
+            throw new EmfException("A Dataset Type should be selected");
         }
 
     }

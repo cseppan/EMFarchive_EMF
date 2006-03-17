@@ -34,8 +34,8 @@ public class QAServiceImpl implements QAService {
 
             return results;
         } catch (RuntimeException e) {
-            LOG.error("could not fetch QA Steps for dataset: " + dataset.getName(), e);
-            throw new EmfException("could not fetch QA Steps for dataset: " + dataset.getName());
+            LOG.error("could not retrieve QA Steps for dataset: " + dataset.getName(), e);
+            throw new EmfException("could not retrieve QA Steps for dataset: " + dataset.getName());
         }
     }
 

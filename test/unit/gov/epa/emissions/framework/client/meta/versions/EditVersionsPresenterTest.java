@@ -83,8 +83,8 @@ public class EditVersionsPresenterTest extends EmfMockObjectTestCase {
         try {
             presenter.edit(version, null, null);
         } catch (EmfException e) {
-            assertEquals("Cannot edit a Version(" + version.getVersion() + ") that is Final. Please choose 'View'.", e
-                    .getMessage());
+            assertEquals("Cannot edit a Version that is Final. Please choose View for Version "+
+                    version.getName(), e.getMessage());
             return;
         }
 
@@ -159,8 +159,9 @@ public class EditVersionsPresenterTest extends EmfMockObjectTestCase {
         try {
             p.doMarkFinal(new Version[] { version });
         } catch (EmfException e) {
-            assertEquals("Version: " + version.getVersion() + " is already Final. It should be non-final.", e
-                    .getMessage());
+            assertEquals("Version: " + version.getName()+
+                    " is already Final. It cannot be marked as final again.", 
+                    e.getMessage());
             return;
         }
 

@@ -44,8 +44,8 @@ public class EditVersionsPresenter {
 
     public void doView(Version version, String table, DataView view) throws EmfException {
         if (!version.isFinalVersion())
-            throw new EmfException("Cannot view a Version(" + version.getVersion()
-                    + ") that is not Final. Please choose edit.");
+            throw new EmfException("Cannot view a Version that is not Final. Please choose edit for Version "+
+                    version.getName());
 
         DataViewPresenter presenter = new DataViewPresenter(dataset, version, table, view, session);
         presenter.display();
@@ -58,16 +58,16 @@ public class EditVersionsPresenter {
 
     void edit(Version version, DataEditorView view, DataEditorPresenter presenter) throws EmfException {
         if (version.isFinalVersion())
-            throw new EmfException("Cannot edit a Version(" + version.getVersion()
-                    + ") that is Final. Please choose 'View'.");
+            throw new EmfException("Cannot edit a Version that is Final. Please choose View for Version "+
+                    version.getName());
         presenter.display(view);
     }
 
     public void doMarkFinal(Version[] versions) throws EmfException {
         for (int i = 0; i < versions.length; i++) {
             if (versions[i].isFinalVersion())
-                throw new EmfException("Version: " + versions[i].getVersion()
-                        + " is already Final. It should be non-final.");
+                throw new EmfException("Version: " + versions[i].getName()
+                        + " is already Final. It cannot be marked as final again.");
             editorService().markFinal(token(versions[i]));
         }
 

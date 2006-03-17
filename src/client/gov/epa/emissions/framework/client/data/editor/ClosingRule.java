@@ -60,7 +60,7 @@ public class ClosingRule {
 
     private void saveRevision() throws EmfException {
         if (!view.verifyRevisionInput())
-            throw new EmfException("Please enter 'revision' information before closing");
+            throw new EmfException("Please enter revision information before closing");
 
         DataCommonsService service = dataCommonsService();
         service.addRevision(view.revision());

@@ -36,7 +36,7 @@ public class DefaultUserPreferences implements UserPreference {
             props.load(inStream);
         } catch (Exception e) {
             log.error("Cannot load user preferences file " + getFile().getAbsolutePath(), e);
-            throw new EmfException("Cannot load user preferences file");
+            throw new EmfException("Cannot load user preferences file "+getFile().getAbsolutePath());
         }
     }
 

@@ -81,7 +81,7 @@ public class ImportTask implements Runnable {
         Session session = sessionFactory.getSession();
         try {
             if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))
-                throw new EmfException("Dataset name already in use");
+                throw new EmfException("The selected dataset name is already in use");
 
             dao.add(dataset, session);
         } finally {

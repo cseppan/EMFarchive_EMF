@@ -138,7 +138,7 @@ public class EditablePagePanel extends JPanel {
     private void doRemove(final EditablePage tableData) {
         clearMessagesWithTableRefresh();
         if (tableData.getSelected().length == 0) {
-            messagePanel.setError("Please select one more rows for removing data");
+            messagePanel.setError("Please check the Select column for one or more rows to delete them");
             return;
         }
 
