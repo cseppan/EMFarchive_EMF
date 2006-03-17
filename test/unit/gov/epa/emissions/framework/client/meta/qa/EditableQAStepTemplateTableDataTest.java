@@ -51,7 +51,7 @@ public class EditableQAStepTemplateTableDataTest extends TestCase {
         assertEquals(String.class, data.getColumnClass(2));
         assertEquals(String.class, data.getColumnClass(3));
         assertEquals(Boolean.class, data.getColumnClass(4));
-        assertEquals(String.class, data.getColumnClass(5));
+        assertEquals(Float.class, data.getColumnClass(5));
     }
 
     public void testAllColumnsShouldBeUneditableExceptSelect() {

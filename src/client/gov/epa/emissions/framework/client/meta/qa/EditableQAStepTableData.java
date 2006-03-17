@@ -60,6 +60,9 @@ public class EditableQAStepTableData extends AbstractEditableTableData implement
         if(col == 10)
             return User.class;
 
+        if(col == 8)
+            return Float.class;
+
         return String.class;
     }
 

@@ -70,7 +70,8 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
     public Class getColumnClass(int col) {
         if (col == 0 || col == 4)
             return Boolean.class;
-
+        if(col == 5)
+            return Float.class;
         return String.class;
     }
 

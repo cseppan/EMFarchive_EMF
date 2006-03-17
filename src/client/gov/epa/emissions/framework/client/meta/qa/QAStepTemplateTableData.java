@@ -41,7 +41,11 @@ public class QAStepTemplateTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        return (col == 3) ? Boolean.class : String.class;
+        if (col == 3) 
+            return Boolean.class;
+        if(col == 4)
+            return Float.class;
+        return String.class;
     }
 
 }

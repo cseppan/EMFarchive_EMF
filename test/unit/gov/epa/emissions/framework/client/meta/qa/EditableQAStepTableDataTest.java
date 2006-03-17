@@ -63,7 +63,7 @@ public class EditableQAStepTableDataTest extends TestCase {
         assertEquals(String.class, data.getColumnClass(5));
         assertEquals(String.class, data.getColumnClass(6));
         assertEquals(Boolean.class, data.getColumnClass(7));
-        assertEquals(String.class, data.getColumnClass(8));
+        assertEquals(Float.class, data.getColumnClass(8));
         assertEquals(Date.class, data.getColumnClass(9));
         assertEquals(User.class, data.getColumnClass(10));
         assertEquals(String.class, data.getColumnClass(11));
