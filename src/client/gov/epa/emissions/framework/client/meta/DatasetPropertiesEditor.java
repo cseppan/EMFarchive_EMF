@@ -48,7 +48,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private EditableKeywordsTab keywordsTab;
 
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Dataset Properties Editor", new Dimension(700, 580), desktopManager);
+        super("Dataset Properties Editor", new Dimension(700, 510), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
     }
