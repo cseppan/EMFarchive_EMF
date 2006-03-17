@@ -71,6 +71,7 @@ public class RevisionPanel extends JPanel {
                 setReferences();
             }
         });
+        references.setToolTipText("Select notes for the dataset that your changes are in reference to");
 
         panel.add(references);
 
