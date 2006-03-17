@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.qa;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
@@ -17,7 +18,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -29,7 +29,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
     private TextArea programParameters;
 
-    private JCheckBox required;
+    private CheckBox required;
 
     private NumberFormattedTextField order;
 
@@ -77,12 +77,18 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         name = new TextField("", 40);
+        addChangeable(name);
+        name.addKeyListener();
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
         program = new TextField("", 40);
+        addChangeable(program);
+        program.addKeyListener();
         layoutGenerator.addLabelWidgetPair("Program", program, panel);
 
         programParameters = new TextArea("", "", 40, 3);
+        addChangeable(programParameters);
+        programParameters.addKeyListener();
         ScrollableTextArea scrollableDetails = ScrollableTextArea.createWithVerticalScrollBar(programParameters);
         layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
 
@@ -95,12 +101,17 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
                 }
             }
         });
+        addChangeable(order);
+        order.addKeyListener();
         layoutGenerator.addLabelWidgetPair("Order", order, panel);
 
-        required = new JCheckBox();
+        required = new CheckBox("required");
+        addChangeable(required);
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
         description = new TextArea("", "", 40, 3);
+        addChangeable(description);
+        description.addKeyListener();
         ScrollableTextArea scrollableDesc = ScrollableTextArea.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
 
@@ -151,7 +162,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
         Button cancel = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                close();
+                checkChangesAndCloseWindow();
             }
         });
         panel.add(cancel);
@@ -165,7 +176,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     }
 
     public void windowClosing() {
-        super.close();
+        checkChangesAndCloseWindow();
     }
 
     public boolean shouldCreate() {
@@ -194,6 +205,11 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         required.setSelected(template.isRequired());
         order.setText(template.getOrder() + "");
         description.setText(template.getDescription());
+    }
+    
+    private void checkChangesAndCloseWindow() {
+        if (checkChanges())
+            super.close();
     }
 
 }

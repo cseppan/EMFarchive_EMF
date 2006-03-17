@@ -1,5 +1,9 @@
 package gov.epa.emissions.framework.ui;
 
+import gov.epa.emissions.commons.gui.Changeable;
+import gov.epa.emissions.commons.gui.ChangeablesList;
+
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.NumberFormat;
 
@@ -9,8 +13,12 @@ import javax.swing.KeyStroke;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
 
-public class NumberFormattedTextField extends JFormattedTextField {
+public class NumberFormattedTextField extends JFormattedTextField implements Changeable {
 
+    private ChangeablesList listOfChangeables;
+
+    private boolean changed = false;
+    
     public NumberFormattedTextField(int min, int max, int size, Action action) {
         super.setFormatterFactory(new DefaultFormatterFactory(integerFormatter(min, max)));
         super.setValue(new Integer(min));
@@ -57,6 +65,31 @@ public class NumberFormattedTextField extends JFormattedTextField {
 
     public boolean isEmpty() {
         return getText().trim().length() == 0;
+    }
+    
+    public void addKeyListener() {
+        this.addKeyListener(new KeyAdapter() {
+            public void keyTyped(KeyEvent e) {
+                notifyChanges();
+            }
+        });
+    }
+
+    public void clear() {
+        this.changed = false;
+    }
+
+    private void notifyChanges() {
+        this.changed = true;
+        this.listOfChangeables.onChanges();
+    }
+
+    public boolean hasChanges() {
+        return this.changed;
+    }
+
+    public void observe(ChangeablesList list) {
+        this.listOfChangeables = list;
     }
 
 }

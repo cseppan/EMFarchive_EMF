@@ -112,7 +112,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
 
         TableData tableData = new DatasetTypeKeyValueTableData(vals);
         JTable table = new JTable(new EmfTableModel(tableData));
-        table.setRowHeight(20);
+        table.setRowHeight(16);
 
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -125,7 +125,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
 
         TableData tableData = new QAStepTemplateTableData(templates);
         JTable table = new JTable(new EmfTableModel(tableData));
-        table.setRowHeight(20);
+        table.setRowHeight(16);
 
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
