@@ -130,7 +130,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
 
     private JPanel createQATab(EmfConsole parentConsole) {
         try {
-            QATab view = new QATab(parentConsole);
+            QATab view = new QATab(null, null, null, null, null, parentConsole);
             presenter.set(view);
 
             return view;

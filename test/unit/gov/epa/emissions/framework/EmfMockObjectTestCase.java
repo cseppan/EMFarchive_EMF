@@ -30,5 +30,10 @@ public abstract class EmfMockObjectTestCase extends MockObjectTestCase {
     protected void expects(Mock mock, String method) {
         expects(mock, 1, method);
     }
+    
+    //No argument & return value
+    protected void expects(Mock mock, int count, String method, Object returnVal) {
+        mock.expects(new InvokeCountMatcher(count)).method(method).will(returnValue(returnVal));
+    }
 
 }

@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTab;
+import gov.epa.emissions.framework.client.meta.qa.QATab;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -47,7 +48,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     private EditableKeywordsTab keywordsTab;
 
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Dataset Properties Editor", new Dimension(700, 550), desktopManager);
+        super("Dataset Properties Editor", new Dimension(700, 580), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
     }
@@ -61,6 +62,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         tabbedPane.addTab("Notes", createNotesTab(parentConsole));
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
         tabbedPane.addTab("Tables", createInfoTab(dataset, parentConsole));
+        tabbedPane.addTab("QA Steps", createQAStepTab(dataset, versions, messagePanel));
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -77,6 +79,12 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
             showError("Could not load Summary Tab." + e.getMessage());
             return createErrorTab("Could not load Summary Tab." + e.getMessage());
         }
+    }
+    
+    private JPanel createQAStepTab(EmfDataset dataset, Version[] versions, MessagePanel messagePanel) {
+        QATab view = new QATab(dataset, versions, session.qaService(), messagePanel, this, parentConsole);
+        presenter.set(view);
+        return view;
     }
 
     private JPanel createInfoTab(EmfDataset dataset, EmfConsole parentConsole) {

@@ -55,7 +55,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     private EditQAStepTemplatesPanel qaStepTemplatesPanel;
 
     public EditableDatasetTypeWindow(EmfConsole parent, DesktopManager desktopManager) {
-        super("Edit Dataset Type", new Dimension(600, 500), desktopManager);
+        super("Edit Dataset Type", new Dimension(600, 550), desktopManager);
 
         this.desktopManager = desktopManager;
         this.parent = parent;
@@ -140,7 +140,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         JPanel container = new JPanel();
         FlowLayout layout = new FlowLayout();
         layout.setHgap(20);
-        layout.setVgap(25);
+        layout.setVgap(10);
         container.setLayout(layout);
 
         Button saveButton = new Button("Save", saveAction());

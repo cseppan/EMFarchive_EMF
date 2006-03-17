@@ -76,7 +76,8 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
         tableModel = new EditableEmfTableModel(tableData);
         table = new EditableTable(tableModel);
         changeablesList.addChangeable(table);
-
+        table.setRowHeight(16);
+        
         return new JScrollPane(table);
     }
 
@@ -102,7 +103,7 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
         });
         container.add(remove);
 
-        Button update = new BorderlessButton("Update", new AbstractAction() {
+        Button update = new BorderlessButton("Edit", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 update();
             }

@@ -9,6 +9,8 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
+import gov.epa.emissions.framework.client.meta.qa.QAStepsPresenter;
+import gov.epa.emissions.framework.client.meta.qa.QATabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
@@ -18,6 +20,7 @@ import gov.epa.emissions.framework.services.editor.DataEditorService;
 import java.util.Date;
 
 import org.jmock.Mock;
+import org.jmock.core.constraint.IsInstanceOf;
 
 public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
 
@@ -180,5 +183,28 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
                 .proxy());
 
         presenter.set((EditNotesTabView) view.proxy());
+    }
+    
+    public void testShouldDisplayQATabOnSetQATab() throws Exception {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("test");
+        dataset.setDatasetType(new DatasetType());
+        
+        Mock dataCommons = mock(DataCommonsService.class);
+        dataCommons.stubs().method(ANYTHING);
+        session.stubs().method("dataCommonsService").will(returnValue(dataCommons.proxy()));
+        
+        Mock dataEditor = mock(DataEditorService.class);
+        dataEditor.stubs().method(ANYTHING);
+        session.stubs().method("dataEditorService").will(returnValue(dataEditor.proxy()));
+        session.stubs().method("user");
+        
+        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, null, (EmfSession) session
+                .proxy());
+        
+        Mock view = mock(QATabView.class);
+        view.expects(atLeastOnce()).method("observe").with(new IsInstanceOf(QAStepsPresenter.class));
+        
+        presenter.set((QATabView) view.proxy());
     }
 }

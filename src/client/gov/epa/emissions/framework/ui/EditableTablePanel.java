@@ -56,7 +56,8 @@ public class EditableTablePanel extends JPanel implements Editor {
         tableModel = new EditableEmfTableModel(tableData);
         table = new EditableTable(tableModel);
         changeablesList.addChangeable(table);
-
+        table.setRowHeight(16);
+        
         return new JScrollPane(table);
     }
 
