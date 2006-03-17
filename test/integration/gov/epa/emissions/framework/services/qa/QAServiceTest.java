@@ -45,6 +45,34 @@ public class QAServiceTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldUpdateQASteps() throws Exception {
+        EmfDataset dataset = newDataset();
+
+        QAStep step = new QAStep();
+        step.setDatasetId(dataset.getId());
+        step.setName("name");
+        step.setVersion(2);
+        add(step);
+
+        try {
+            QAStep[] read = service.getQASteps(dataset);
+            assertEquals(1, read.length);
+
+            read[0].setName("updated-name");
+            read[0].setProgram("updated-program");
+
+            service.update(read);
+
+            QAStep[] updated = service.getQASteps(dataset);
+            assertEquals(1, updated.length);
+            assertEquals("updated-name", updated[0].getName());
+            assertEquals("updated-program", updated[0].getProgram());
+        } finally {
+            remove(step);
+            remove(dataset);
+        }
+    }
+
     private EmfDataset newDataset() {
         User owner = userDAO.get("emf", session);
 

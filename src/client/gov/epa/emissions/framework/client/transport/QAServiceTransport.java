@@ -16,6 +16,10 @@ public class QAServiceTransport implements QAService {
         mappings = new EmfMappings();
     }
 
+    private EmfCall call() throws EmfException {
+        return callFactory.createCall("QA Service");
+    }
+
     public QAStep[] getQASteps(EmfDataset dataset) throws EmfException {
         EmfCall call = call();
 
@@ -27,7 +31,13 @@ public class QAServiceTransport implements QAService {
         return (QAStep[]) call.requestResponse(params);
     }
 
-    private EmfCall call() throws EmfException {
-        return callFactory.createCall("QA Service");
+    public void update(QAStep[] steps) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("update");
+        call.addParam("steps", mappings.qaSteps());
+        call.setVoidReturnType();
+
+        call.request(steps);
     }
 }

@@ -38,4 +38,15 @@ public class QAServiceImpl implements QAService {
             throw new EmfException("could not fetch QA Steps for dataset: " + dataset.getName());
         }
     }
+
+    public void update(QAStep[] steps) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.update(steps, session);
+            session.close();
+        } catch (RuntimeException e) {
+            LOG.error("could not update QA Steps", e);
+            throw new EmfException("could not update QA Steps");
+        }
+    }
 }
