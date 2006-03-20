@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.meta.qa;
+package gov.epa.emissions.framework.client.qa;
 
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.framework.ui.AbstractEditableTableData;

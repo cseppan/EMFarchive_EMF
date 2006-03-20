@@ -12,8 +12,8 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueTableData;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
-import gov.epa.emissions.framework.client.meta.qa.EditableQAStepTemplateTableData;
-import gov.epa.emissions.framework.client.meta.qa.EditQAStepTemplatesPresenter;
+import gov.epa.emissions.framework.client.qa.EditQAStepTemplatesPresenter;
+import gov.epa.emissions.framework.client.qa.EditableQAStepTemplateTableData;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 

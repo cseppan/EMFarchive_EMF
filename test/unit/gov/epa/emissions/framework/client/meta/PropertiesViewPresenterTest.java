@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.info.InfoTabView;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabView;
 import gov.epa.emissions.framework.client.meta.notes.NotesTabView;
-import gov.epa.emissions.framework.client.meta.qa.QATabView;
+import gov.epa.emissions.framework.client.meta.qa.EditableQATabView;
 import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabView;
 import gov.epa.emissions.framework.services.basic.LoggingService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -103,7 +103,7 @@ public class PropertiesViewPresenterTest extends MockObjectTestCase {
         dataset.setName("test");
         dataset.setDatasetType(new DatasetType());
         
-        Mock view = mock(QATabView.class);
+        Mock view = mock(EditableQATabView.class);
         view.expects(once()).method("display");
         
         Mock session = mock(EmfSession.class);
@@ -113,7 +113,7 @@ public class PropertiesViewPresenterTest extends MockObjectTestCase {
         
         PropertiesViewPresenter presenter = new PropertiesViewPresenter(dataset, (EmfSession) session.proxy());
         
-        presenter.set((QATabView) view.proxy());
+        presenter.set((EditableQATabView) view.proxy());
     }
 
     public void testShouldDisplayNotesTabOnSetNotesTab() throws Exception {

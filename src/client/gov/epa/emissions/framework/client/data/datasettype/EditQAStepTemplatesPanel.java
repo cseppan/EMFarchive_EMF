@@ -9,10 +9,10 @@ import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.client.meta.qa.EditQAStepTemplateWindow;
-import gov.epa.emissions.framework.client.meta.qa.EditQAStepTemplatesPresenter;
-import gov.epa.emissions.framework.client.meta.qa.EditableQAStepTemplateTableData;
-import gov.epa.emissions.framework.client.meta.qa.NewQAStepTemplateDialog;
+import gov.epa.emissions.framework.client.qa.EditQAStepTemplateWindow;
+import gov.epa.emissions.framework.client.qa.EditQAStepTemplatesPresenter;
+import gov.epa.emissions.framework.client.qa.EditableQAStepTemplateTableData;
+import gov.epa.emissions.framework.client.qa.NewQAStepTemplateDialog;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 

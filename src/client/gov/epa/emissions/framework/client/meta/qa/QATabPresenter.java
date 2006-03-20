@@ -6,13 +6,13 @@ import gov.epa.emissions.framework.services.qa.QAService;
 
 public class QATabPresenter {
 
-    private QATabView view;
+    private EditableQATabView view;
 
     private QAService service;
 
     private EmfDataset dataset;
 
-    public QATabPresenter(QATabView view, EmfDataset dataset, QAService service) {
+    public QATabPresenter(EditableQATabView view, EmfDataset dataset, QAService service) {
         this.view = view;
         this.dataset = dataset;
         this.service = service;

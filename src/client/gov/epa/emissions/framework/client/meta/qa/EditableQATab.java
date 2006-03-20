@@ -21,9 +21,9 @@ import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class QATab extends JPanel implements QATabView {
+public class EditableQATab extends JPanel implements EditableQATabView {
 
-    private QAStepsPresenter presenter;
+    private EditableQAStepsPresenter presenter;
     
     private QAService service;
     
@@ -41,7 +41,7 @@ public class QATab extends JPanel implements QATabView {
     
     private Version[] versions;
     
-    public QATab(EmfDataset dataset, Version[] versions, QAService service,
+    public EditableQATab(EmfDataset dataset, Version[] versions, QAService service,
             MessagePanel messagePanel, ManageChangeables changeablesList, EmfConsole parent) {
         super.setName("aqsteps");
         this.dataset = dataset;
@@ -106,7 +106,7 @@ public class QATab extends JPanel implements QATabView {
         return panel;
     }
 
-    public void observe(QAStepsPresenter presenter) {
+    public void observe(EditableQAStepsPresenter presenter) {
         this.presenter = presenter;
     }
 

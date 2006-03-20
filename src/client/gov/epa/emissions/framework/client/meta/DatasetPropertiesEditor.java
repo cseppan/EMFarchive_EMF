@@ -12,7 +12,7 @@ import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTab;
-import gov.epa.emissions.framework.client.meta.qa.QATab;
+import gov.epa.emissions.framework.client.meta.qa.EditableQATab;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -82,7 +82,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
     
     private JPanel createQAStepTab(EmfDataset dataset, Version[] versions, MessagePanel messagePanel) {
-        QATab view = new QATab(dataset, versions, session.qaService(), messagePanel, this, parentConsole);
+        EditableQATab view = new EditableQATab(dataset, versions, session.qaService(), messagePanel, this, parentConsole);
         presenter.set(view);
         return view;
     }

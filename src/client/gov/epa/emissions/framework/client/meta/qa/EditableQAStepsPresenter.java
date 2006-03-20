@@ -2,11 +2,11 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
-public class QAStepsPresenter {
+public class EditableQAStepsPresenter {
 
-    private QATabView view;
+    private EditableQATabView view;
     
-    public QAStepsPresenter(EmfDataset dataset, QATabView view) {
+    public EditableQAStepsPresenter(EditableQATabView view) {
         this.view = view;
     }
     
@@ -18,8 +18,8 @@ public class QAStepsPresenter {
         view.save();
     }
     
-    public void doAdd(NewQAStepView stepview, EmfDataset dataset2) {
-        stepview.display(dataset2.getDatasetType());
+    public void doAdd(NewQAStepView stepview, EmfDataset dataset) {
+        stepview.display(dataset.getDatasetType());
         if(stepview.shouldCreate()){
             view.add(stepview.qaSteps());
         }

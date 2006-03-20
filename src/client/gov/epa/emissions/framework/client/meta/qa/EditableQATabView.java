@@ -2,9 +2,9 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.framework.services.data.QAStep;
 
-public interface QATabView {
+public interface EditableQATabView {
 
-    void observe(QAStepsPresenter presenter);
+    void observe(EditableQAStepsPresenter presenter);
 
     void save();
 

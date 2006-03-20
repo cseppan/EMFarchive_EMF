@@ -9,8 +9,8 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
-import gov.epa.emissions.framework.client.meta.qa.QAStepsPresenter;
-import gov.epa.emissions.framework.client.meta.qa.QATabView;
+import gov.epa.emissions.framework.client.meta.qa.EditableQAStepsPresenter;
+import gov.epa.emissions.framework.client.meta.qa.EditableQATabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
@@ -202,9 +202,9 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
         PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, null, (EmfSession) session
                 .proxy());
         
-        Mock view = mock(QATabView.class);
-        view.expects(atLeastOnce()).method("observe").with(new IsInstanceOf(QAStepsPresenter.class));
+        Mock view = mock(EditableQATabView.class);
+        view.expects(atLeastOnce()).method("observe").with(new IsInstanceOf(EditableQAStepsPresenter.class));
         
-        presenter.set((QATabView) view.proxy());
+        presenter.set((EditableQATabView) view.proxy());
     }
 }
