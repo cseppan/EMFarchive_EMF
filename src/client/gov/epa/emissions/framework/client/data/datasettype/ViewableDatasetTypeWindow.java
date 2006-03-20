@@ -10,7 +10,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
-import gov.epa.emissions.framework.client.qa.QAStepTemplateTableData;
+import gov.epa.emissions.framework.client.qa.EditableQAStepTemplateTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.TableData;
@@ -37,10 +37,13 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
     private JPanel layout;
 
     private SingleLineMessagePanel messagePanel;
+    
+    private DesktopManager desktopManager;
 
     public ViewableDatasetTypeWindow(DesktopManager desktopManager) {
         super("View Dataset Type", new Dimension(600, 500), desktopManager);
 
+        this.desktopManager = desktopManager;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -66,7 +69,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         layout.add(messagePanel);
         layout.add(createBasicDataPanel(type));
         layout.add(createKeywordsPanel(type.getKeyVals()));
-        layout.add(createQAStepTemplatesPanel(type.getQaStepTemplates()));
+        layout.add(createQAStepTemplatesPanel(type));
         layout.add(createButtonsPanel());
 
         messagePanel.setMessage(lockStatus(type));
@@ -119,19 +122,44 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         return panel;
     }
     
-    private JPanel createQAStepTemplatesPanel(QAStepTemplate[] templates) {
+    private JPanel createQAStepTemplatesPanel(DatasetType type) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createTitledBorder("QAStepTemplates"));
 
-        TableData tableData = new QAStepTemplateTableData(templates);
+        EditableQAStepTemplateTableData tableData = new EditableQAStepTemplateTableData(type.getQaStepTemplates());
         JTable table = new JTable(new EmfTableModel(tableData));
         table.setRowHeight(16);
 
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
+        panel.add(createViewButton(tableData, type), BorderLayout.SOUTH);
 
         return panel;
     }
     
+    private JPanel createViewButton(final EditableQAStepTemplateTableData data, final DatasetType type) {
+        JPanel panel = new JPanel(new BorderLayout());
+        
+        Button view = new Button("View", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                showTemplateWindows(data, type);
+            }
+        });
+        
+        panel.add(view, BorderLayout.LINE_START);
+        
+        return panel;
+    }
+
+    private void showTemplateWindows(EditableQAStepTemplateTableData data, DatasetType type) {
+        QAStepTemplate[] selected = data.getSelected();
+        
+        for(int i = 0; i < selected.length; i++) {
+            ViewableQAStepTemplateView view = new ViewableQAStepTemplateWindow(selected[i].getName(), desktopManager);
+            ViewableQAStepTemplatePresenter presenter = new ViewableQAStepTemplatePresenter(view, selected[i], type);
+            presenter.display();
+        }
+    }
+
     private JPanel createButtonsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
