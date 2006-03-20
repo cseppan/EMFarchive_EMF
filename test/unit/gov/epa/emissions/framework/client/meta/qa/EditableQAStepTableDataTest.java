@@ -38,20 +38,18 @@ public class EditableQAStepTableDataTest extends TestCase {
     public void testShouldHaveSixColumns() {
         String[] columns = data.columns();
 
-        assertEquals(13, columns.length);
+        assertEquals(11, columns.length);
         assertEquals("Select", columns[0]);
-        assertEquals("QA Step ID", columns[1]);
-        assertEquals("Dataset ID", columns[2]);
-        assertEquals("Version", columns[3]);
-        assertEquals("Name", columns[4]);
-        assertEquals("Program", columns[5]);
-        assertEquals("Arguments", columns[6]);
-        assertEquals("Required", columns[7]);
-        assertEquals("Order", columns[8]);
-        assertEquals("When", columns[9]);
-        assertEquals("Who", columns[10]);
-        assertEquals("Result", columns[11]);
-        assertEquals("Status", columns[12]);
+        assertEquals("Version", columns[1]);
+        assertEquals("Name", columns[2]);
+        assertEquals("Program", columns[3]);
+        assertEquals("Arguments", columns[4]);
+        assertEquals("Required", columns[5]);
+        assertEquals("Order", columns[6]);
+        assertEquals("When", columns[7]);
+        assertEquals("Who", columns[8]);
+        assertEquals("Result", columns[9]);
+        assertEquals("Status", columns[10]);
     }
 
     public void testShouldReturnCorrectTypesAsColumnClassForAllCols() {
@@ -60,14 +58,12 @@ public class EditableQAStepTableDataTest extends TestCase {
         assertEquals(String.class, data.getColumnClass(2));
         assertEquals(String.class, data.getColumnClass(3));
         assertEquals(String.class, data.getColumnClass(4));
-        assertEquals(String.class, data.getColumnClass(5));
-        assertEquals(String.class, data.getColumnClass(6));
-        assertEquals(Boolean.class, data.getColumnClass(7));
-        assertEquals(Float.class, data.getColumnClass(8));
-        assertEquals(Date.class, data.getColumnClass(9));
-        assertEquals(User.class, data.getColumnClass(10));
-        assertEquals(String.class, data.getColumnClass(11));
-        assertEquals(String.class, data.getColumnClass(12));
+        assertEquals(Boolean.class, data.getColumnClass(5));
+        assertEquals(Float.class, data.getColumnClass(6));
+        assertEquals(Date.class, data.getColumnClass(7));
+        assertEquals(User.class, data.getColumnClass(8));
+        assertEquals(String.class, data.getColumnClass(9));
+        assertEquals(String.class, data.getColumnClass(10));
     }
 
     public void testAllColumnsShouldBeUneditableExceptSelect() {
@@ -89,18 +85,16 @@ public class EditableQAStepTableDataTest extends TestCase {
 
         Row row = (Row) rows.get(0);
         assertEquals(Boolean.FALSE, row.getValueAt(0));
-        assertEquals(step1.getId(), Integer.parseInt((String) row.getValueAt(1)));
-        assertEquals(step1.getDatasetId(), Integer.parseInt((String) row.getValueAt(2)));
-        assertEquals(step1.getVersion(), Integer.parseInt((String) row.getValueAt(3)));
-        assertEquals(step1.getName(), row.getValueAt(4));
-        assertEquals(step1.getProgram(), row.getValueAt(5));
-        assertEquals(step1.getProgramArguments(), row.getValueAt(6));
-        assertEquals(step1.isRequired(), ((Boolean) row.getValueAt(7)).booleanValue());
-        assertEquals(step1.getOrder(), 0.0, ((Float) row.getValueAt(8)).floatValue());
-        assertEquals(step1.getWhen(), row.getValueAt(9));
-        assertEquals(step1.getWho(), row.getValueAt(10));
-        assertEquals(step1.getResult(), row.getValueAt(11));
-        assertEquals(step1.getStatus(), row.getValueAt(12));
+        assertEquals(step1.getVersion(), Integer.parseInt((String) row.getValueAt(1)));
+        assertEquals(step1.getName(), row.getValueAt(2));
+        assertEquals(step1.getProgram(), row.getValueAt(3));
+        assertEquals(step1.getProgramArguments(), row.getValueAt(4));
+        assertEquals(step1.isRequired(), ((Boolean) row.getValueAt(5)).booleanValue());
+        assertEquals(step1.getOrder(), 0.0, ((Float) row.getValueAt(6)).floatValue());
+        assertEquals(step1.getWhen(), row.getValueAt(7));
+        assertEquals(step1.getWho(), row.getValueAt(8));
+        assertEquals(step1.getResult(), row.getValueAt(9));
+        assertEquals(step1.getStatus(), row.getValueAt(10));
     }
 
     public void testShouldReturnARowRepresentingAQAStep() {
@@ -129,7 +123,7 @@ public class EditableQAStepTableDataTest extends TestCase {
         Row row = (Row) rows.get(2);
 
         assertEquals("Rows number is now 3", 3, rows.size());
-        assertEquals(step3.getName(), row.getValueAt(4));
+        assertEquals(step3.getName(), row.getValueAt(2));
     }
 
     public void testShouldReturnCorrectSelectedRows() {

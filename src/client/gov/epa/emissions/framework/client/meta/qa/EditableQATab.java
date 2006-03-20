@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 public class EditableQATab extends JPanel implements EditableQATabView {
 
@@ -71,12 +72,15 @@ public class EditableQATab extends JPanel implements EditableQATabView {
             tableModel = new EditableEmfTableModel(tableData);
             table = new EditableTable(tableModel);
             table.setRowHeight(16);
+            table.setPreferredScrollableViewportSize(new Dimension(500,320));
             changeablesList.addChangeable(table);
         } catch (EmfException e) {
             messagePanel.setError("Failed to create QAStep table data.");
         }
 
-        return new JScrollPane(table);
+        return new JScrollPane(table,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
     }
 
     private JPanel createButtonsSection() {

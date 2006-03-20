@@ -7,8 +7,11 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.Dialog;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -47,6 +50,8 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
     private QAStepTemplate[] selectedOptionalTemplates;
     
     private HashMap optionalTemplatesMap;
+    
+    private MessagePanel messagePanel;
 
     public NewQAStepDialog(EmfConsole parent, Version[] versions) {
         super("New QA Step", parent);
@@ -67,8 +72,10 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
 
     private JPanel createLayout(DatasetType type) {
         JPanel panel = new JPanel();
+        messagePanel = new SingleLineMessagePanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
+        panel.add(messagePanel);
         panel.add(inputPanel(type));
         panel.add(buttonsPanel());
 
@@ -189,18 +196,27 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
 
     public QAStep[] qaSteps() {
         List qasteps = new ArrayList();
-        
-        for(int i = 0; i < requiredTemplates.length; i++) {
-            QAStep qastep = new QAStep(requiredTemplates[i], 
-                    ((Version)versionsBox.getSelectedItem()).getVersion());
-            qasteps.add(qastep);
+        try {
+            int versionNumber = getVersionNumber();
+            
+            for(int i = 0; i < requiredTemplates.length; i++) 
+                qasteps.add(new QAStep(requiredTemplates[i], versionNumber));
+            
+            for(int j = 0; j < selectedOptionalTemplates.length; j++)
+                qasteps.add(new QAStep(selectedOptionalTemplates[j], versionNumber));
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
         }
         
-        for(int j = 0; j < selectedOptionalTemplates.length; j++)
-            qasteps.add(new QAStep(selectedOptionalTemplates[j],
-                    ((Version)versionsBox.getSelectedItem()).getVersion()));
-        
         return (QAStep[])qasteps.toArray(new QAStep[0]);
+    }
+    
+    private int getVersionNumber() throws EmfException {
+        Version version = (Version)versionsBox.getSelectedItem();
+        if(version.getName().equalsIgnoreCase("version"))
+            throw new EmfException("Please select a valid dataset version.");
+        
+        return version.getVersion();
     }
 
 }
