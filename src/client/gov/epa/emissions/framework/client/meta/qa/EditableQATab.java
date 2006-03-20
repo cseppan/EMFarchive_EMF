@@ -41,6 +41,8 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     
     private Version[] versions;
     
+    ManageChangeables changeablesList;
+    
     public EditableQATab(EmfDataset dataset, Version[] versions, QAService service,
             MessagePanel messagePanel, ManageChangeables changeablesList, EmfConsole parent) {
         super.setName("aqsteps");
@@ -49,7 +51,8 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         this.messagePanel = messagePanel;
         this.parent = parent;
         this.versions = versions;
-
+        this.changeablesList = changeablesList;
+        
         super.setLayout(new BorderLayout());
         super.add(createQAStepsTableSection(), BorderLayout.PAGE_START);
         super.add(createButtonsSection(), BorderLayout.CENTER);
@@ -68,6 +71,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
             tableModel = new EditableEmfTableModel(tableData);
             table = new EditableTable(tableModel);
             table.setRowHeight(16);
+            changeablesList.addChangeable(table);
         } catch (EmfException e) {
             messagePanel.setError("Failed to create QAStep table data.");
         }
