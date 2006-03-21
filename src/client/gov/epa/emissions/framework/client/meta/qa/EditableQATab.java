@@ -16,6 +16,8 @@ import gov.epa.emissions.framework.ui.MessagePanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
@@ -80,7 +82,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
         return new JScrollPane(table,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     }
 
     private JPanel createButtonsSection() {
@@ -128,10 +130,36 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     }
 
     public void add(QAStep[] steps) {
-        for(int i = 0; i < steps.length; i++)
-            tableData.add(steps[i]);
+        QAStep[] nonexistingSteps = removeDuplicate(steps);
+        for(int i = 0; i < nonexistingSteps.length; i++)
+            tableData.add(nonexistingSteps[i]);
         
         refresh();
+    }
+    
+    private QAStep[] removeDuplicate(QAStep[] steps) {
+        List stepsList = new ArrayList();
+        QAStep[] existed = tableData.sources();
+        
+        for(int i =  0; i < steps.length; i++) {
+            if(!contains(existed, steps[i]))
+                stepsList.add(steps[i]);
+        }
+        
+        return (QAStep[])stepsList.toArray(new QAStep[0]);
+    }
+    
+    private boolean contains(QAStep[] step1, QAStep step2) {
+        boolean contains = false;
+        for(int i = 0; i < step1.length; i++) {
+            if(step1[i].getName().equals(step2.getName()) 
+                    && step1[i].getVersion() == step2.getVersion()) {
+                contains = true;
+                break;
+            }
+        }
+        
+        return contains;
     }
     
     public void refresh() {

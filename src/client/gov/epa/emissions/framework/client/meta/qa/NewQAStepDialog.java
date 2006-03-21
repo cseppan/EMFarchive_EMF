@@ -4,15 +4,12 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.Dialog;
-import gov.epa.emissions.framework.ui.MessagePanel;
-import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -21,6 +18,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -37,7 +35,7 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
 
     private boolean shouldCreate;
     
-    private ComboBox versionsBox;
+    private JComboBox versionsBox;
     
     private JList optionalList;
 
@@ -51,11 +49,9 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
     
     private HashMap optionalTemplatesMap;
     
-    private MessagePanel messagePanel;
-
     public NewQAStepDialog(EmfConsole parent, Version[] versions) {
         super("New QA Step", parent);
-        super.setSize(new Dimension(550, 300));
+        super.setSize(new Dimension(550, 350));
         super.center();
         
         optionalTemplatesMap = new HashMap();
@@ -72,10 +68,8 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
 
     private JPanel createLayout(DatasetType type) {
         JPanel panel = new JPanel();
-        messagePanel = new SingleLineMessagePanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        panel.add(messagePanel);
         panel.add(inputPanel(type));
         panel.add(buttonsPanel());
 
@@ -86,14 +80,17 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        versionsBox = new ComboBox("version", versions);
-        versionsBox.setSize(new Dimension(50, 50));
+        setQAStepTemplates(type);
+        setOptionalList();
+        
+        versionsBox = new JComboBox(getVersions());
         layoutGenerator.addLabelWidgetPair("Version", versionsBox, panel);
         
-        required = new JLabel(getRequiredSteps(type));
-        layoutGenerator.addLabelWidgetPair("Required: ", required, panel);
+        required = new JLabel(getRequiredSteps());
+        JScrollPane requiredPane = createScrollPane(required);
+        layoutGenerator.addLabelWidgetPair("Required", requiredPane, panel);
         
-        JScrollPane optionPane = createOptionPane();
+        JScrollPane optionPane = createScrollPane(optionalList);
         layoutGenerator.addLabelWidgetPair("Optional", optionPane, panel);
 
         // Lay out the panel.
@@ -103,45 +100,14 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
 
         return panel;
     }
-
-    private JScrollPane createOptionPane() {
-        setOptionalList();
-        JScrollPane optionPane = new JScrollPane(optionalList,
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        optionPane.getViewport().add(optionalList, null);
-        
-        return optionPane;
-    }
-
-    private void setOptionalList() {
-        optionalList = new JList(getOptionalTemplateNames());
-        optionalList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        optionalList.setPreferredSize(new Dimension(100, 80));
-        optionalList.addListSelectionListener(new ListSelectionListener(){
-            public void valueChanged(ListSelectionEvent e) {
-                getSelectedItems(e);
-            }
-        });
-    }
-
-    protected void getSelectedItems(ListSelectionEvent e) {
-        Object[] selected = optionalList.getSelectedValues();
-        selectedOptionalTemplates = new QAStepTemplate[selected.length];
-        
-        for(int i = 0; i < selected.length; i++)
-            selectedOptionalTemplates[i] = (QAStepTemplate) optionalTemplatesMap.get(selected[i]);
-    }
-
-    private String getRequiredSteps(DatasetType type) {
-        String requiredSteps = "";
+    
+    private void setQAStepTemplates(DatasetType type) {
         List requiredList = new ArrayList();
         List optionalList = new ArrayList();
         QAStepTemplate[] templates = type.getQaStepTemplates();
         
         for(int i = 0; i < templates.length; i++) {
             if(templates[i].isRequired()) {
-                requiredSteps += templates[i].getName() + "; ";
                 requiredList.add(templates[i]);
             } else
                 optionalList.add(templates[i]);
@@ -149,10 +115,44 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
         
         requiredTemplates = (QAStepTemplate[])requiredList.toArray(new QAStepTemplate[0]);
         optionalTemplates = (QAStepTemplate[])optionalList.toArray(new QAStepTemplate[0]);
+    }
 
-        return requiredSteps;
+    private void setOptionalList() {
+        optionalList = new JList(getOptionalTemplateNames());
+        optionalList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        optionalList.addListSelectionListener(new ListSelectionListener(){
+            public void valueChanged(ListSelectionEvent e) {
+                getSelectedItems();
+            }
+        });
     }
     
+    private JScrollPane createScrollPane(Component component) {
+        JScrollPane optionPane = new JScrollPane(optionalList,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        optionPane.getViewport().add(component, null);
+        optionPane.setPreferredSize(new Dimension(300, 100));
+        
+        return optionPane;
+    }
+
+    protected void getSelectedItems() {
+        Object[] selected = optionalList.getSelectedValues();
+        selectedOptionalTemplates = new QAStepTemplate[selected.length];
+        
+        for(int i = 0; i < selected.length; i++)
+            selectedOptionalTemplates[i] = (QAStepTemplate) optionalTemplatesMap.get(selected[i]);
+    }
+
+    private String getRequiredSteps() {
+        String requiredSteps = "<html>";
+        for(int i = 0; i < requiredTemplates.length; i++)
+            requiredSteps += requiredTemplates[i].getName() + "<br>";
+
+        return requiredSteps + "</html>";
+    }
+
     private String[] getOptionalTemplateNames() {
         String[] names = new String[optionalTemplates.length];
         
@@ -186,8 +186,8 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
     }
 
     private void doNew() {
-            shouldCreate = true;
-            close();
+        shouldCreate = true;
+        close();
     }
 
     public boolean shouldCreate() {
@@ -196,27 +196,29 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
 
     public QAStep[] qaSteps() {
         List qasteps = new ArrayList();
-        try {
-            int versionNumber = getVersionNumber();
-            
-            for(int i = 0; i < requiredTemplates.length; i++) 
-                qasteps.add(new QAStep(requiredTemplates[i], versionNumber));
-            
+        int versionNumber = getVersionNumber();
+        
+        for(int i = 0; i < requiredTemplates.length; i++) 
+            qasteps.add(new QAStep(requiredTemplates[i], versionNumber));
+        
+        if(selectedOptionalTemplates != null)
             for(int j = 0; j < selectedOptionalTemplates.length; j++)
                 qasteps.add(new QAStep(selectedOptionalTemplates[j], versionNumber));
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
         
         return (QAStep[])qasteps.toArray(new QAStep[0]);
     }
     
-    private int getVersionNumber() throws EmfException {
-        Version version = (Version)versionsBox.getSelectedItem();
-        if(version.getName().equalsIgnoreCase("version"))
-            throw new EmfException("Please select a valid dataset version.");
+    private String[] getVersions() {
+        List versionsList = new ArrayList();
+        for(int i = 0; i < versions.length; i++)
+            versionsList.add(versions[i].getVersion() + " - " + versions[i].getName());
         
-        return version.getVersion();
+        return (String[])versionsList.toArray(new String[0]);
+    }
+    
+    private int getVersionNumber() {
+        String version = (String)versionsBox.getSelectedItem();
+        return Integer.parseInt(version.substring(0, version.indexOf(" - ")));
     }
 
 }
