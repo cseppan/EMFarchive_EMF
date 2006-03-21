@@ -11,7 +11,7 @@ import org.jmock.MockObjectTestCase;
 public class QATabPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayViewOnDisplay() throws EmfException {
-        Mock view = mock(EditableQATabView.class);
+        Mock view = mock(ViewableQATabView.class);
         EmfDataset dataset = new EmfDataset();
         dataset.setId(6);
 
@@ -19,7 +19,7 @@ public class QATabPresenterTest extends MockObjectTestCase {
         QAStep[] steps = new QAStep[0];
         service.expects(once()).method("getQASteps").with(same(dataset)).will(returnValue(steps));
 
-        QATabPresenter presenter = new QATabPresenter((EditableQATabView) view.proxy(), dataset, (QAService) service.proxy());
+        QATabPresenter presenter = new QATabPresenter((ViewableQATabView) view.proxy(), dataset, (QAService) service.proxy());
 
         view.expects(once()).method("display").with(eq(steps));
 

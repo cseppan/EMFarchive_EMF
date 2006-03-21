@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.meta.info.InfoTab;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTab;
 import gov.epa.emissions.framework.client.meta.notes.NotesTab;
+import gov.epa.emissions.framework.client.meta.qa.ViewableQATab;
 import gov.epa.emissions.framework.client.meta.revisions.RevisionsTab;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTab;
 import gov.epa.emissions.framework.services.EmfException;
@@ -17,6 +18,7 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
@@ -32,10 +34,13 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     private MessagePanel messagePanel;
 
     private EmfConsole parentConsole;
+    
+    private DesktopManager desktopManager;
 
     public DatasetPropertiesViewer(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties View", new Dimension(700, 500), desktopManager);
         this.parentConsole = parentConsole;
+        this.desktopManager = desktopManager;
     }
 
     public void display(EmfDataset dataset) {
@@ -63,7 +68,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
         tabbedPane.addTab("Revisions", createRevisionsTab(parentConsole));
         tabbedPane.addTab("Logs", createLogsTab(parentConsole));
         tabbedPane.addTab("Tables", createInfoTab(parentConsole));
-
+        tabbedPane.addTab("QA", createQAStepsTab(desktopManager));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         return tabbedPane;
@@ -125,6 +130,18 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
             return createErrorTab("Could not load Logs tab. Failed communication with remote Logging Services.");
         }
     }
+    
+    private Component createQAStepsTab(DesktopManager desktopManager) {
+        try {
+            ViewableQATab view = new ViewableQATab(desktopManager);
+            presenter.set(view);
+            return view;
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+            return createErrorTab("Could not load QASteps from QA Service.");
+        }
+    }
+
 
     private JPanel createErrorTab(String message) {
         JPanel panel = new JPanel(false);
