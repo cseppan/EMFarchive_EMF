@@ -25,8 +25,8 @@ public class EditableQAStepTableData extends AbstractEditableTableData implement
     }
 
     public String[] columns() {
-        return new String[] { "Select", "Version", "Name", "Program", "Arguments",
-                "Required", "Order", "When", "Who", "Result", "Status"};
+        return new String[] { "Select", "Version", "Name", "Required", "Order", 
+                "Status", "When", "Who", "Result", "Program", "Arguments" }; 
     }
 
     public List rows() {
@@ -51,16 +51,16 @@ public class EditableQAStepTableData extends AbstractEditableTableData implement
     }
 
     public Class getColumnClass(int col) {
-        if (col == 0 || col == 5)
+        if (col == 0 || col == 3)
             return Boolean.class;
         
-        if(col == 6)
+        if(col == 4)
             return Float.class;
 
-        if(col == 7)
+        if(col == 6)
             return Date.class;
         
-        if(col == 8)
+        if(col == 7)
             return User.class;
 
         return String.class;

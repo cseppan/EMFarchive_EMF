@@ -49,7 +49,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     private SingleLineMessagePanel messagePanel;
 
     public EditQAStepTemplateWindow(String title, DesktopManager desktopManager) {
-        super("Edit QA Step Template", new Dimension(550, 320), desktopManager);
+        super("Edit QA Step Template", new Dimension(550, 350), desktopManager);
         this.title = title;
     }
 
