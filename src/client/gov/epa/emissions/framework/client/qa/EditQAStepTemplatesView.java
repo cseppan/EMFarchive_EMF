@@ -1,7 +1,6 @@
-package gov.epa.emissions.framework.client.data.datasettype;
+package gov.epa.emissions.framework.client.qa;
 
 import gov.epa.emissions.commons.data.QAStepTemplate;
-import gov.epa.emissions.framework.client.qa.EditQAStepTemplatesPresenter;
 
 public interface EditQAStepTemplatesView {
     void observe(EditQAStepTemplatesPresenter presenter);

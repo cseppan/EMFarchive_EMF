@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.qa.EditQAStepTemplateWindow;
 import gov.epa.emissions.framework.client.qa.EditQAStepTemplatesPresenter;
+import gov.epa.emissions.framework.client.qa.EditQAStepTemplatesView;
 import gov.epa.emissions.framework.client.qa.EditableQAStepTemplateTableData;
 import gov.epa.emissions.framework.client.qa.NewQAStepTemplateDialog;
 import gov.epa.emissions.framework.ui.Border;
