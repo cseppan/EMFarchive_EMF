@@ -63,12 +63,12 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
     }
 
     public void doSave() throws EmfException {
-        save(dataService(), summaryPresenter, keywordsPresenter, notesPresenter);
+        save(dataService(), summaryPresenter, keywordsPresenter, notesPresenter, qaPresenter);
     }
 
     void save(DataService service, EditableSummaryTabPresenter summary, EditableKeywordsTabPresenter keywords,
-            EditNotesTabPresenter notes) throws EmfException {
-        updateDataset(service, summary, keywords, notes);
+            EditNotesTabPresenter notes, EditableQAStepsPresenter qaPresenter) throws EmfException {
+        updateDataset(service, summary, keywords, notes, qaPresenter);
         view.close();
     }
 
@@ -77,10 +77,11 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
     }
 
     void updateDataset(DataService service, EditableSummaryTabPresenter summary, EditableKeywordsTabPresenter keywords,
-            EditNotesTabPresenter notes) throws EmfException {
+            EditNotesTabPresenter notes, EditableQAStepsPresenter qaStep) throws EmfException {
         summary.doSave();
         keywords.doSave();
         notes.doSave();
+        qaStep.doSave();
         service.updateDataset(dataset);
     }
 
@@ -100,8 +101,8 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
         notesPresenter.display();
     }
     
-    public void set(EditableQATabView qatab) {
-        qaPresenter = new EditableQAStepsPresenter(qatab);
+    public void set(EditableQATabView qaTab) {
+        qaPresenter = new EditableQAStepsPresenter(dataset, qaTab);
         qaPresenter.register();
     }
 

@@ -38,6 +38,6 @@ public class QAServiceTransport implements QAService {
         call.addParam("steps", mappings.qaSteps());
         call.setVoidReturnType();
 
-        call.request(steps);
+        call.request(new Object[] { steps });
     }
 }

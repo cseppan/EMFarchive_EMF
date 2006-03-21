@@ -119,6 +119,28 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldAddNewStepsOnUpdateQASteps() throws Exception {
+        EmfDataset dataset = newDataset();
+
+        QAStep step = new QAStep();
+        step.setDatasetId(dataset.getId());
+        step.setName("name");
+        step.setVersion(2);
+
+        try {
+            dao.update(new QAStep[] { step }, session);
+            session.clear();// to ensure Hibernate does not return cached objects
+
+            QAStep[] updated = dao.steps(dataset, session);
+            assertEquals(1, updated.length);
+            assertEquals("name", updated[0].getName());
+            assertEquals(2, updated[0].getVersion());
+        } finally {
+            remove(step);
+            remove(dataset);
+        }
+    }
+
     public void testShouldSaveNewQASteps() throws Exception {
         EmfDataset dataset = newDataset();
 

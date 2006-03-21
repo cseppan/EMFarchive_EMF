@@ -27,27 +27,27 @@ import javax.swing.ScrollPaneConstants;
 public class EditableQATab extends JPanel implements EditableQATabView {
 
     private EditableQAStepsPresenter presenter;
-    
+
     private QAService service;
-    
+
     private EmfDataset dataset;
-    
+
     private MessagePanel messagePanel;
-    
+
     private EditableQAStepTableData tableData;
-    
+
     private EditableEmfTableModel tableModel;
 
     private EditableTable table;
-    
+
     private EmfConsole parent;
-    
+
     private Version[] versions;
-    
+
     ManageChangeables changeablesList;
-    
-    public EditableQATab(EmfDataset dataset, Version[] versions, QAService service,
-            MessagePanel messagePanel, ManageChangeables changeablesList, EmfConsole parent) {
+
+    public EditableQATab(EmfDataset dataset, Version[] versions, QAService service, MessagePanel messagePanel,
+            ManageChangeables changeablesList, EmfConsole parent) {
         super.setName("aqsteps");
         this.dataset = dataset;
         this.service = service;
@@ -55,7 +55,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         this.parent = parent;
         this.versions = versions;
         this.changeablesList = changeablesList;
-        
+
         super.setLayout(new BorderLayout());
         super.add(createQAStepsTableSection(), BorderLayout.PAGE_START);
         super.add(createButtonsSection(), BorderLayout.CENTER);
@@ -67,21 +67,20 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         container.add(table(), BorderLayout.CENTER);
         return container;
     }
-    
+
     protected JScrollPane table() {
         try {
             tableData = new EditableQAStepTableData(service.getQASteps(dataset));
             tableModel = new EditableEmfTableModel(tableData);
             table = new EditableTable(tableModel);
             table.setRowHeight(16);
-            table.setPreferredScrollableViewportSize(new Dimension(500,320));
+            table.setPreferredScrollableViewportSize(new Dimension(500, 320));
             changeablesList.addChangeable(table);
         } catch (EmfException e) {
             messagePanel.setError("Failed to create QAStep table data.");
         }
 
-        return new JScrollPane(table,
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+        return new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     }
 
@@ -90,7 +89,6 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
         Button add = new BorderlessButton("Add Existing", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                //FIXME: this is only a place holder, remove when ready
                 addExisting();
             }
         });
@@ -98,14 +96,14 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
         Button remove = new BorderlessButton("Add New", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                //TODO
+                // TODO
             }
         });
         container.add(remove);
 
         Button update = new BorderlessButton("Perform", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                //TODO
+                // TODO
             }
         });
         container.add(update);
@@ -120,48 +118,47 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         this.presenter = presenter;
     }
 
-    public void save() {
-        // NOTE Auto-generated method stub
-        
+    public void save() throws EmfException {
+        QAStep[] sources = tableData.sources();
+        service.update(sources);
     }
-    
+
     private void addExisting() {
-        presenter.doAdd(new NewQAStepDialog(parent, versions), dataset);
+        presenter.doAdd(new NewQAStepDialog(parent, versions));
     }
 
     public void add(QAStep[] steps) {
         QAStep[] nonexistingSteps = removeDuplicate(steps);
-        for(int i = 0; i < nonexistingSteps.length; i++)
+        for (int i = 0; i < nonexistingSteps.length; i++)
             tableData.add(nonexistingSteps[i]);
-        
+
         refresh();
     }
-    
+
     private QAStep[] removeDuplicate(QAStep[] steps) {
         List stepsList = new ArrayList();
         QAStep[] existed = tableData.sources();
-        
-        for(int i =  0; i < steps.length; i++) {
-            if(!contains(existed, steps[i]))
+
+        for (int i = 0; i < steps.length; i++) {
+            if (!contains(existed, steps[i]))
                 stepsList.add(steps[i]);
         }
-        
-        return (QAStep[])stepsList.toArray(new QAStep[0]);
+
+        return (QAStep[]) stepsList.toArray(new QAStep[0]);
     }
-    
+
     private boolean contains(QAStep[] step1, QAStep step2) {
         boolean contains = false;
-        for(int i = 0; i < step1.length; i++) {
-            if(step1[i].getName().equals(step2.getName()) 
-                    && step1[i].getVersion() == step2.getVersion()) {
+        for (int i = 0; i < step1.length; i++) {
+            if (step1[i].getName().equals(step2.getName()) && step1[i].getVersion() == step2.getVersion()) {
                 contains = true;
                 break;
             }
         }
-        
+
         return contains;
     }
-    
+
     public void refresh() {
         tableModel.refresh();
         super.revalidate();
@@ -169,7 +166,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     public void display(QAStep[] steps) {
         // NOTE Auto-generated method stub
-        
+
     }
-    
+
 }

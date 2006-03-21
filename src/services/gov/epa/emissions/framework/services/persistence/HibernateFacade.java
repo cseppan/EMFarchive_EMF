@@ -56,7 +56,7 @@ public class HibernateFacade {
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            session.update(object);
+            session.saveOrUpdate(object);
             tx.commit();
         } catch (HibernateException e) {
             tx.rollback();
