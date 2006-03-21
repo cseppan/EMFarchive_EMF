@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.ChangeSet;
-import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.client.data.TablePaginator;
 import gov.epa.emissions.framework.client.data.TablePaginatorImpl;
@@ -20,9 +19,9 @@ public class EditableTablePresenterImpl implements EditableTablePresenter {
 
     private TablePresenterDelegate delegate;
 
-    public EditableTablePresenterImpl(DatasetType datasetType, Version version, String table,
-            TableMetadata tableMetadata, EditorPanelView view, DataEditorService service) {
-        this(datasetType, new TablePaginatorImpl(version, table, view, service), tableMetadata, view, service);
+    public EditableTablePresenterImpl(DatasetType datasetType, DataAccessToken token, TableMetadata tableMetadata,
+            EditorPanelView view, DataEditorService service) {
+        this(datasetType, new TablePaginatorImpl(token, view, service), tableMetadata, view, service);
     }
 
     public EditableTablePresenterImpl(DatasetType datasetType, TablePaginator paginator, TableMetadata tableMetadata,

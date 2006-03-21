@@ -10,20 +10,20 @@ public class TablePaginatorImpl implements TablePaginator {
 
     private DataAccessService service;
 
-    private String table;
-
     private Page page;
-
-    private Version version;
 
     private TableView view;
 
-    public TablePaginatorImpl(Version version, String table, TableView view, DataAccessService service) {
+    private DataAccessToken token;
+
+    TablePaginatorImpl(Version version, String table, TableView view, DataAccessService service) {
+        this(new DataAccessToken(version, table), view, service);
+    }
+
+    public TablePaginatorImpl(DataAccessToken token, TableView view, DataAccessService service) {
         page = new Page();// page 0, uninitialized
 
-        this.version = version;
-        this.table = table;
-
+        this.token = token;
         this.view = view;
         this.service = service;
     }
@@ -94,7 +94,7 @@ public class TablePaginatorImpl implements TablePaginator {
     }
 
     public DataAccessToken token() {
-        return new DataAccessToken(version, table);
+        return token;
     }
 
     public boolean isCurrent(int record) {

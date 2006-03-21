@@ -55,8 +55,8 @@ public class DataViewPresenter {
 
     public void displayTable(ViewerPanel tableView) throws EmfException {
         TableMetadata tableMetadata = viewService().getTableMetadata(table);
-        TablePresenter tablePresenter = new ViewableTablePresenter(dataset.getDatasetType(), version, table,
-                tableMetadata, tableView, viewService());
+        TablePresenter tablePresenter = new ViewableTablePresenter(dataset.getDatasetType(), token, tableMetadata,
+                tableView, viewService());
         displayTable(tablePresenter);
     }
 

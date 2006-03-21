@@ -224,10 +224,10 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         service.submit(token, changeset, 1);
         service.save(token);
 
-        VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
-        int v0RecordsCount = reader.fetchAll(versionZero(), dataset.getName(), session).length;
+        DefaultVersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
+        int v0RecordsCount = reader.fetch(versionZero(), dataset.getName(), session).all().length;
 
-        VersionedRecord[] records = reader.fetchAll(v1, dataset.getName(), session);
+        VersionedRecord[] records = reader.fetch(v1, dataset.getName(), session).all();
         assertEquals(v0RecordsCount + 3, records.length);
     }
 
@@ -271,9 +271,9 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         service.save(token);
 
         VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
-        int v0RecordsCount = reader.fetchAll(versionZero(), dataset.getName(), session).length;
+        int v0RecordsCount = reader.fetch(versionZero(), dataset.getName(), session).all().length;
 
-        VersionedRecord[] records = reader.fetchAll(v1, dataset.getName(), session);
+        VersionedRecord[] records = reader.fetch(v1, dataset.getName(), session).all();
         assertEquals(v0RecordsCount + 2, records.length);
     }
 
@@ -292,8 +292,8 @@ public class DataEditorService_DataTest extends ServiceTestCase {
 
         VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
 
-        VersionedRecord[] v1Records = reader.fetchAll(v1, dataset.getName(), session);
-        VersionedRecord[] v2Records = reader.fetchAll(v1, dataset.getName(), session);
+        VersionedRecord[] v1Records = reader.fetch(v1, dataset.getName(), session).all();
+        VersionedRecord[] v2Records = reader.fetch(v1, dataset.getName(), session).all();
 
         assertEquals(v1Records.length, v2Records.length);
         for (int i = 0; i < v2Records.length; i++)

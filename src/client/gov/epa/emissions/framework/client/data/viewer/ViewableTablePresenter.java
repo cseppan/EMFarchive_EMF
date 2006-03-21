@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.data.viewer;
 
 import gov.epa.emissions.commons.data.DatasetType;
-import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.client.data.TablePaginator;
 import gov.epa.emissions.framework.client.data.TablePaginatorImpl;
@@ -9,6 +8,7 @@ import gov.epa.emissions.framework.client.data.TablePresenterDelegate;
 import gov.epa.emissions.framework.client.data.TablePresenterDelegateImpl;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.editor.DataAccessService;
+import gov.epa.emissions.framework.services.editor.DataAccessToken;
 
 public class ViewableTablePresenter implements TablePresenter {
 
@@ -16,9 +16,9 @@ public class ViewableTablePresenter implements TablePresenter {
 
     private TablePresenterDelegate delegate;
 
-    public ViewableTablePresenter(DatasetType datasetType, Version version, String table, TableMetadata tableMetadata,
+    public ViewableTablePresenter(DatasetType datasetType, DataAccessToken token, TableMetadata tableMetadata,
             ViewerPanelView view, DataAccessService service) {
-        this(datasetType, new TablePaginatorImpl(version, table, view, service), tableMetadata, view, service);
+        this(datasetType, new TablePaginatorImpl(token, view, service), tableMetadata, view, service);
     }
 
     public ViewableTablePresenter(DatasetType datasetType, TablePaginator paginator, TableMetadata tableMetadata,
