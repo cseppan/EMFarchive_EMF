@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -13,7 +12,6 @@ import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -27,6 +25,8 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SpringLayout;
 
 public class ImportInputPanel extends JPanel {
@@ -76,8 +76,9 @@ public class ImportInputPanel extends JPanel {
         layoutGenerator.addLabelWidgetPair("Pattern", apply, this);
 
         filenames = new TextArea("filenames", "", 35, 6);
-        ScrollableTextArea fileTextArea = new ScrollableTextArea(filenames);
-        fileTextArea.setMinimumSize(new Dimension(80, 20));
+        JScrollPane fileTextArea = new JScrollPane(filenames,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         layoutGenerator.addLabelWidgetPair("Filenames", fileTextArea, this);
 
         name = new TextField("name", 35);
