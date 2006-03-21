@@ -42,7 +42,7 @@
 	<property name="war-path" value="file:///${tomcat.webapps}/${app.name}.war" />
 
 	<property name="tomcat.manager.url" value="http://${tomcat.server}:8080/manager" />
-	<property name="tomcat.start.prefix" value="-jar -Duser.dir=${tomcat.home} -Djava.endorsed.dirs=${tomcat.home}/common/endorsed ${tomcat.home}/bin/bootstrap.jar" />
+	<property name="tomcat.start.prefix" value="-jar -Duser.dir=${tomcat.home} -Djava.endorsed.dirs=${tomcat.home}/common/endorsed -Xms128M -Xmx512M ${tomcat.home}/bin/bootstrap.jar" />
 	<property name="tomcat.start" value="${tomcat.start.prefix} start" />
 
 	<property name="tomcat.stop.prefix" value="-jar -Duser.dir=${tomcat.home} ${tomcat.home}/bin/bootstrap.jar" />
@@ -347,6 +347,7 @@
 	<target name="tomcat-restart" depends="tomcat-stop, tomcat-start" />
 
 	<target name="tomcat-start">
+        <echo message="Starting with: ${tomcat.start}"/>
 		<exec executable="${jdk.home}/bin/java.exe" dir="${build.home}" output="${build.home}/tomcat-start.txt" error="${build.home}/tomcat-start-error.txt" failonerror="yes">
 			<arg line="${tomcat.start}" />
 		</exec>
