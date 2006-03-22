@@ -9,9 +9,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-public class EditableQAStepTableDataTest extends TestCase {
+public class EditableQAStepsTableDataTest extends TestCase {
 
-    private EditableQAStepTableData data;
+    private EditableQAStepsTableData data;
 
     private QAStep step1;
 
@@ -32,7 +32,7 @@ public class EditableQAStepTableDataTest extends TestCase {
         step2.setRequired(false);
         step2.setOrder(2);
 
-        data = new EditableQAStepTableData(new QAStep[] { step1, step2 });
+        data = new EditableQAStepsTableData(new QAStep[] { step1, step2 });
     }
 
     public void testShouldHaveElevenColumns() {

@@ -12,11 +12,11 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-public class EditableQAStepTableData extends AbstractEditableTableData implements EditableTableData {
+public class EditableQAStepsTableData extends AbstractEditableTableData implements EditableTableData {
 
     private List rows;
 
-    public EditableQAStepTableData(QAStep[] steps) {
+    public EditableQAStepsTableData(QAStep[] steps) {
         this.rows = createRows(steps);
     }
 

@@ -34,7 +34,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     private MessagePanel messagePanel;
 
-    private EditableQAStepTableData tableData;
+    private EditableQAStepsTableData tableData;
 
     private EditableEmfTableModel tableModel;
 
@@ -70,7 +70,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     protected JScrollPane table() {
         try {
-            tableData = new EditableQAStepTableData(service.getQASteps(dataset));
+            tableData = new EditableQAStepsTableData(service.getQASteps(dataset));
             tableModel = new EditableEmfTableModel(tableData);
             table = new EditableTable(tableModel);
             table.setRowHeight(16);

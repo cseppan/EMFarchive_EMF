@@ -17,7 +17,7 @@ import javax.swing.ScrollPaneConstants;
 
 public class ViewableQATab extends JPanel implements ViewableQATabView {
 
-    private EditableQAStepTableData tableData;
+    private EditableQAStepsTableData tableData;
 
     private EditableEmfTableModel tableModel;
 
@@ -44,7 +44,7 @@ public class ViewableQATab extends JPanel implements ViewableQATabView {
     }
 
     protected JScrollPane table(QAStep[] steps) {
-        tableData = new EditableQAStepTableData(steps);
+        tableData = new EditableQAStepsTableData(steps);
         tableModel = new EditableEmfTableModel(tableData);
         table = new EditableTable(tableModel);
         table.setRowHeight(16);

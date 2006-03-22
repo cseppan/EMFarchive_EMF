@@ -10,7 +10,7 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import org.jmock.Mock;
 import org.jmock.core.Constraint;
 
-public class QAStepsPresenterTest extends EmfMockObjectTestCase {
+public class EditableQAStepsPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldObserveViewOnDisplay() {
         Mock view = mock(EditableQATabView.class);
