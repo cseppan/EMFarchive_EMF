@@ -20,7 +20,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class ViewQAStepWindow extends DisposableInteralFrame implements ViewQAStepView {
+public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepView {
     private TextField name;
 
     private TextField program;

@@ -4,9 +4,9 @@ import gov.epa.emissions.framework.services.data.QAStep;
 
 public class ViewQAStepPresenter {
 
-    ViewQAStepView view;
+    QAStepView view;
     
-    public ViewQAStepPresenter(ViewQAStepView view) {
+    public ViewQAStepPresenter(QAStepView view) {
         this.view = view;
     }
     

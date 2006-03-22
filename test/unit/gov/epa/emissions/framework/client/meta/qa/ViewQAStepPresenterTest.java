@@ -9,11 +9,11 @@ import org.jmock.MockObjectTestCase;
 public class ViewQAStepPresenterTest extends MockObjectTestCase {
 
     public void testShouldDisplayViewOnDisplay() {
-        Mock view = mock(ViewQAStepView.class);
+        Mock view = mock(QAStepView.class);
         
         QAStep step = new QAStep(new QAStepTemplate(), 1);
 
-        ViewQAStepPresenter presenter = new ViewQAStepPresenter((ViewQAStepView) view.proxy());
+        ViewQAStepPresenter presenter = new ViewQAStepPresenter((QAStepView) view.proxy());
 
         view.expects(once()).method("display").with(eq(step));
 

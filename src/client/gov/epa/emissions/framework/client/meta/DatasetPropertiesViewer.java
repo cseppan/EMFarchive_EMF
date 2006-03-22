@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.client.meta.info.InfoTab;
 import gov.epa.emissions.framework.client.meta.keywords.KeywordsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTab;
 import gov.epa.emissions.framework.client.meta.notes.NotesTab;
-import gov.epa.emissions.framework.client.meta.qa.ViewableQATab;
+import gov.epa.emissions.framework.client.meta.qa.QATab;
 import gov.epa.emissions.framework.client.meta.revisions.RevisionsTab;
 import gov.epa.emissions.framework.client.meta.summary.SummaryTab;
 import gov.epa.emissions.framework.services.EmfException;
@@ -34,7 +34,7 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
     private MessagePanel messagePanel;
 
     private EmfConsole parentConsole;
-    
+
     private DesktopManager desktopManager;
 
     public DatasetPropertiesViewer(EmfConsole parentConsole, DesktopManager desktopManager) {
@@ -130,10 +130,10 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
             return createErrorTab("Could not load Logs tab. Failed communication with remote Logging Services.");
         }
     }
-    
+
     private Component createQAStepsTab(DesktopManager desktopManager) {
         try {
-            ViewableQATab view = new ViewableQATab(desktopManager);
+            QATab view = new QATab(parentConsole, desktopManager);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
@@ -141,7 +141,6 @@ public class DatasetPropertiesViewer extends DisposableInteralFrame implements P
             return createErrorTab("Could not load QASteps from QA Service.");
         }
     }
-
 
     private JPanel createErrorTab(String message) {
         JPanel panel = new JPanel(false);

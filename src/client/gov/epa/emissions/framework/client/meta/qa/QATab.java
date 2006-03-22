@@ -1,32 +1,38 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
-import gov.epa.emissions.commons.gui.EditableTable;
+import gov.epa.emissions.commons.gui.SortFilterSelectModel;
+import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.data.QAStep;
-import gov.epa.emissions.framework.ui.EditableEmfTableModel;
+import gov.epa.emissions.framework.ui.EmfTableModel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 
-public class ViewableQATab extends JPanel implements ViewableQATabView {
+public class QATab extends JPanel implements QATabView {
 
-    private EditableQAStepsTableData tableData;
+    private QAStepsTableData tableData;
 
-    private EditableEmfTableModel tableModel;
-
-    private EditableTable table;
-    
     private DesktopManager desktopManager;
 
-    public ViewableQATab(DesktopManager desktopManager) {
+    private QATabPresenter presenter;
+
+    private SortFilterSelectModel selectModel;
+
+    private EmfConsole parentConsole;
+
+    public QATab(EmfConsole parentConsole, DesktopManager desktopManager) {
         super.setName("aqsteps");
+        this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
     }
 
@@ -36,7 +42,11 @@ public class ViewableQATab extends JPanel implements ViewableQATabView {
         super.add(createButtonsSection(), BorderLayout.CENTER);
         super.setSize(new Dimension(700, 300));
     }
-    
+
+    public void observe(QATabPresenter presenter) {
+        this.presenter = presenter;
+    }
+
     private JPanel createQAStepsTableSection(QAStep[] steps) {
         JPanel container = new JPanel(new BorderLayout());
         container.add(table(steps), BorderLayout.CENTER);
@@ -44,14 +54,14 @@ public class ViewableQATab extends JPanel implements ViewableQATabView {
     }
 
     protected JScrollPane table(QAStep[] steps) {
-        tableData = new EditableQAStepsTableData(steps);
-        tableModel = new EditableEmfTableModel(tableData);
-        table = new EditableTable(tableModel);
-        table.setRowHeight(16);
-        table.setPreferredScrollableViewportSize(new Dimension(500, 320));
+        tableData = new QAStepsTableData(steps);
+        EmfTableModel tableModel = new EmfTableModel(tableData);
+        selectModel = new SortFilterSelectModel(tableModel);
+        
+        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
+        panel.setPreferredSize(new Dimension(450, 60));
 
-        return new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        return new JScrollPane(panel);
     }
 
     private JPanel createButtonsSection() {
@@ -60,7 +70,7 @@ public class ViewableQATab extends JPanel implements ViewableQATabView {
         JButton view = new JButton("View");
         view.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                viewQASteps();
+                doView();
             }
         });
         container.add(view);
@@ -71,13 +81,12 @@ public class ViewableQATab extends JPanel implements ViewableQATabView {
         return panel;
     }
 
-    private void viewQASteps() {
-        QAStep[] steps = tableData.getSelected();
-        
-        for(int i = 0; i < steps.length; i++) {
-            ViewQAStepWindow view = new ViewQAStepWindow(steps[i].getName(), desktopManager);
-            ViewQAStepPresenter presenter = new ViewQAStepPresenter(view);
-            presenter.display(steps[i]);
+    private void doView() {
+        List steps = selectModel.selected();
+        for (Iterator iter = steps.iterator(); iter.hasNext();) {
+            QAStep step = (QAStep) iter.next();
+            ViewQAStepWindow view = new ViewQAStepWindow(step.getName(), desktopManager);
+            presenter.doView(step, view);
         }
     }
 
