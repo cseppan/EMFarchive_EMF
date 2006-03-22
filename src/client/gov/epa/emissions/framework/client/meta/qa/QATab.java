@@ -20,8 +20,6 @@ import javax.swing.JScrollPane;
 
 public class QATab extends JPanel implements QATabView {
 
-    private QAStepsTableData tableData;
-
     private DesktopManager desktopManager;
 
     private QATabPresenter presenter;
@@ -38,9 +36,8 @@ public class QATab extends JPanel implements QATabView {
 
     public void display(QAStep[] steps) {
         super.setLayout(new BorderLayout());
-        super.add(createQAStepsTableSection(steps), BorderLayout.PAGE_START);
-        super.add(createButtonsSection(), BorderLayout.CENTER);
-        super.setSize(new Dimension(700, 300));
+        super.add(createQAStepsTableSection(steps), BorderLayout.CENTER);
+        super.add(createButtonsSection(), BorderLayout.PAGE_END);
     }
 
     public void observe(QATabPresenter presenter) {
@@ -54,10 +51,9 @@ public class QATab extends JPanel implements QATabView {
     }
 
     protected JScrollPane table(QAStep[] steps) {
-        tableData = new QAStepsTableData(steps);
-        EmfTableModel tableModel = new EmfTableModel(tableData);
+        EmfTableModel tableModel = new EmfTableModel(new QAStepsTableData(steps));
         selectModel = new SortFilterSelectModel(tableModel);
-        
+
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
         panel.setPreferredSize(new Dimension(450, 60));
 
@@ -85,7 +81,7 @@ public class QATab extends JPanel implements QATabView {
         List steps = selectModel.selected();
         for (Iterator iter = steps.iterator(); iter.hasNext();) {
             QAStep step = (QAStep) iter.next();
-            ViewQAStepWindow view = new ViewQAStepWindow(step.getName(), desktopManager);
+            ViewQAStepWindow view = new ViewQAStepWindow(desktopManager);
             presenter.doView(step, view);
         }
     }

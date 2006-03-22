@@ -58,11 +58,9 @@ public class NotesTab extends JPanel implements NotesTabView {
 
         SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, selectModel);
         panel.getTable().setName("notesTable");
-
-        JScrollPane scrollPane = new JScrollPane(panel);
         panel.setPreferredSize(new Dimension(450, 60));
 
-        return scrollPane;
+        return new JScrollPane(panel);
     }
 
     private JPanel createControlPanel() {

@@ -31,6 +31,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
                 true, // closable
                 true, // maximizable
                 true);// iconifiable
+        setLabel(title);
         this.desktopManager = desktopManager;
         changeablesList = new ChangeablesList(this);
         monitor = new WidgetChangesMonitor(changeablesList, this);
@@ -39,9 +40,18 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
         addWindowClosingTrap();
     }
 
+    public boolean isAlive() {
+        return false;
+    }
+
+    public void setLabel(String name) {
+        super.setTitle(name);
+        super.setName(name);
+    }
+
     private void addWindowClosingTrap() {
         super.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        
+
         this.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosing(InternalFrameEvent event) {
                 windowClosing();

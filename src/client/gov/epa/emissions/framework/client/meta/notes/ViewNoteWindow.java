@@ -30,9 +30,7 @@ public class ViewNoteWindow extends DisposableInteralFrame implements NoteView {
     }
 
     public void display(Note note) {
-        String name = "View Note: " + note.getName();
-        super.setTitle(name);
-        super.setName(name);
+        super.setLabel(super.getTitle() + " : " + note.getName());
 
         doLayout(note);
         super.display();
