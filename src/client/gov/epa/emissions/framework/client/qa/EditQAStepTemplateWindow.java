@@ -107,7 +107,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         order.addKeyListener();
         layoutGenerator.addLabelWidgetPair("Order", order, panel);
 
-        required = new CheckBox("required");
+        required = new CheckBox("");
         addChangeable(required);
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 

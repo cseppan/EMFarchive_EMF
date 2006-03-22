@@ -59,7 +59,7 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
     }
 
     private void createLayout() {
-        setBorder(new Border("QAStepTemplates"));
+        setBorder(new Border("QA Step Templates"));
         super.setLayout(new BorderLayout());
         super.add(centerPanel(), BorderLayout.CENTER);
     }

@@ -87,7 +87,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     private JPanel createButtonsSection() {
         JPanel container = new JPanel();
 
-        Button add = new BorderlessButton("Add Existing", new AbstractAction() {
+        Button add = new BorderlessButton("Add From Template", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 addExisting();
             }

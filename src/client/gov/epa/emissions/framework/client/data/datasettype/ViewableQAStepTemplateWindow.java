@@ -44,18 +44,18 @@ public class ViewableQAStepTemplateWindow extends DisposableInteralFrame impleme
     public void display(DatasetType type, QAStepTemplate template) {
         super.setTitle(super.getTitle() + ": " + type.getName() + " " + title);
         super.setName(super.getTitle() + ": " + type.getName() + " " + title);
-        layout = createLayout(type);
+        layout = createLayout();
         display(template);
         super.getContentPane().add(layout);
         super.display();
     }
 
-    private JPanel createLayout(DatasetType type) {
+    private JPanel createLayout() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         panel.add(inputPanel());
-        panel.add(buttonsPanel(type));
+        panel.add(buttonsPanel());
 
         return panel;
     }
@@ -81,7 +81,7 @@ public class ViewableQAStepTemplateWindow extends DisposableInteralFrame impleme
         order.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Order", order, panel);
 
-        required = new CheckBox("required");
+        required = new CheckBox("");
         required.setEnabled(false);
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
@@ -98,9 +98,9 @@ public class ViewableQAStepTemplateWindow extends DisposableInteralFrame impleme
         return panel;
     }
 
-    private JPanel buttonsPanel(final DatasetType type) {
+    private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = new Button("OK", new AbstractAction() {
+        Button ok = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 close();
             }

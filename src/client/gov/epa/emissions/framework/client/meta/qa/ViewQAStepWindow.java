@@ -91,7 +91,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements ViewQASt
         order.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Order", order, panel);
 
-        required = new CheckBox("required");
+        required = new CheckBox("");
         required.setEnabled(false);
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
@@ -110,7 +110,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements ViewQASt
         result = new TextArea("", "", 40, 8);
         result.setEditable(false);
         ScrollableTextArea scrollableDesc = ScrollableTextArea.createWithVerticalScrollBar(result);
-        layoutGenerator.addLabelWidgetPair("Result", scrollableDesc, panel);
+        layoutGenerator.addLabelWidgetPair("Comment", scrollableDesc, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 10, 2, // rows, cols
@@ -122,7 +122,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements ViewQASt
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = new Button("OK", new AbstractAction() {
+        Button ok = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 close();
             }

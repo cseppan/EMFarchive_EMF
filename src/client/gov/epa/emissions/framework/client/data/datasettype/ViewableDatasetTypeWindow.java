@@ -124,7 +124,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
     
     private JPanel createQAStepTemplatesPanel(DatasetType type) {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("QAStepTemplates"));
+        panel.setBorder(BorderFactory.createTitledBorder("QA Step Templates"));
 
         EditableQAStepTemplateTableData tableData = new EditableQAStepTemplateTableData(type.getQaStepTemplates());
         JTable table = new JTable(new EmfTableModel(tableData));

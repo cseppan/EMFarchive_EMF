@@ -21,7 +21,7 @@ public class QAStepsTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Version", "Name", "User", "Date", "Program", "Required?", "Order", "Result", "Status" };
+        return new String[] { "Version", "Name", "User", "Date", "Program", "Required?", "Order", "Comment", "Status" };
     }
 
     public Class getColumnClass(int col) {

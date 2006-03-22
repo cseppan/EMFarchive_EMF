@@ -57,7 +57,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         assertEquals("Program", columns[4]);
         assertEquals("Required?", columns[5]);
         assertEquals("Order", columns[6]);
-        assertEquals("Result", columns[7]);
+        assertEquals("Comment", columns[7]);
         assertEquals("Status", columns[8]);
     }
 
