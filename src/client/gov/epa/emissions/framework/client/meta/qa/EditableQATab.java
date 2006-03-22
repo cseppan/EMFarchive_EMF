@@ -7,11 +7,9 @@ import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.qa.QAService;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
-import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -30,10 +28,6 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     private QAService service;
 
-    private EmfDataset dataset;
-
-    private MessagePanel messagePanel;
-
     private EditableQAStepsTableData tableData;
 
     private EditableEmfTableModel tableModel;
@@ -46,39 +40,27 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     ManageChangeables changeablesList;
 
-    public EditableQATab(EmfDataset dataset, Version[] versions, QAService service, MessagePanel messagePanel,
-            ManageChangeables changeablesList, EmfConsole parent) {
-        super.setName("aqsteps");
-        this.dataset = dataset;
+    public EditableQATab(Version[] versions, QAService service, ManageChangeables changeablesList, EmfConsole parent) {
         this.service = service;
-        this.messagePanel = messagePanel;
-        this.parent = parent;
         this.versions = versions;
-        this.changeablesList = changeablesList;
 
-        super.setLayout(new BorderLayout());
-        super.add(createQAStepsTableSection(), BorderLayout.PAGE_START);
-        super.add(createButtonsSection(), BorderLayout.CENTER);
-        super.setSize(new Dimension(700, 300));
+        this.parent = parent;
+        this.changeablesList = changeablesList;
     }
 
-    private JPanel createQAStepsTableSection() {
+    private JPanel createTableSection(QAStep[] steps) {
         JPanel container = new JPanel(new BorderLayout());
-        container.add(table(), BorderLayout.CENTER);
+        container.add(table(steps), BorderLayout.CENTER);
         return container;
     }
 
-    protected JScrollPane table() {
-        try {
-            tableData = new EditableQAStepsTableData(service.getQASteps(dataset));
-            tableModel = new EditableEmfTableModel(tableData);
-            table = new EditableTable(tableModel);
-            table.setRowHeight(16);
-            table.setPreferredScrollableViewportSize(new Dimension(500, 320));
-            changeablesList.addChangeable(table);
-        } catch (EmfException e) {
-            messagePanel.setError("Failed to create QAStep table data.");
-        }
+    protected JScrollPane table(QAStep[] steps) {
+        tableData = new EditableQAStepsTableData(steps);
+        tableModel = new EditableEmfTableModel(tableData);
+        table = new EditableTable(tableModel);
+        table.setRowHeight(16);
+        table.setPreferredScrollableViewportSize(new Dimension(500, 320));
+        changeablesList.addChangeable(table);
 
         return new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -165,8 +147,10 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     }
 
     public void display(QAStep[] steps) {
-        // NOTE Auto-generated method stub
-
+        super.setLayout(new BorderLayout());
+        super.add(createTableSection(steps), BorderLayout.PAGE_START);
+        super.add(createButtonsSection(), BorderLayout.CENTER);
+        super.setSize(new Dimension(700, 300));
     }
 
 }

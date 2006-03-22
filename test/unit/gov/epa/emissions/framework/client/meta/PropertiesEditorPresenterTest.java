@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPrese
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.qa.EditableQAStepsPresenter;
+import gov.epa.emissions.framework.client.meta.qa.EditableQAStepsPresenterImpl;
 import gov.epa.emissions.framework.client.meta.qa.EditableQATabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -20,7 +21,6 @@ import gov.epa.emissions.framework.services.editor.DataEditorService;
 import java.util.Date;
 
 import org.jmock.Mock;
-import org.jmock.core.constraint.IsInstanceOf;
 
 public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
 
@@ -74,12 +74,12 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
                 returnValue(dataset));
 
         session.stubs().method("user").withNoArguments().will(returnValue(owner));
-        
+
         Mock editorService = mock(DataEditorService.class);
         Version[] versions = new Version[0];
         stub(editorService, "getVersions", versions);
         session.stubs().method("dataEditorService").will(returnValue(editorService.proxy()));
-        
+
         DatasetPropertiesEditorView viewProxy = (DatasetPropertiesEditorView) view.proxy();
         presenter = new PropertiesEditorPresenterImpl(dataset, viewProxy, (EmfSession) session.proxy());
 
@@ -121,7 +121,8 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
         EditNotesTabPresenter notesTabProxy = notesMockForSave();
         EditableQAStepsPresenter qaStepProxy = qaStepMockForSave();
 
-        presenter.save((DataService) dataService.proxy(), summaryTabProxy, keywordsTabProxy, notesTabProxy, qaStepProxy);
+        presenter
+                .save((DataService) dataService.proxy(), summaryTabProxy, keywordsTabProxy, notesTabProxy, qaStepProxy);
     }
 
     public void testShouldUpdateDatasetWithChangesFromTabsAndSaveDatasetOnUpdate() throws Exception {
@@ -131,14 +132,15 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
         EditableKeywordsTabPresenter keywordsTabProxy = keywordsMockForSave();
         EditNotesTabPresenter notesTabProxy = notesMockForSave();
         EditableQAStepsPresenter qaStepProxy = qaStepMockForSave();
-        
-        presenter.updateDataset((DataService) dataService.proxy(), summaryTabProxy, keywordsTabProxy, notesTabProxy, qaStepProxy);
+
+        presenter.updateDataset((DataService) dataService.proxy(), summaryTabProxy, keywordsTabProxy, notesTabProxy,
+                qaStepProxy);
     }
-    
+
     private EditableQAStepsPresenter qaStepMockForSave() {
         Mock view = mock(EditableQATabView.class);
         view.expects(once()).method("save");
-        return new EditableQAStepsPresenter(null, (EditableQATabView)view.proxy());
+        return new EditableQAStepsPresenterImpl(null, null, (EditableQATabView) view.proxy());
     }
 
     private EditNotesTabPresenter notesMockForSave() {
@@ -167,8 +169,9 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
         EditableKeywordsTabPresenter keywordsTabProxy = keywordsMockForSave();
         EditNotesTabPresenter notesTabProxy = notesMockForSave();
         EditableQAStepsPresenter qaStepProxy = qaStepMockForSave();
-        
-        presenter.save((DataService) dataService.proxy(), summaryTabProxy, keywordsTabProxy, notesTabProxy, qaStepProxy);
+
+        presenter
+                .save((DataService) dataService.proxy(), summaryTabProxy, keywordsTabProxy, notesTabProxy, qaStepProxy);
     }
 
     public void testShouldDisplayNotesTabOnSetNotesTab() throws Exception {
@@ -193,27 +196,13 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
 
         presenter.set((EditNotesTabView) view.proxy());
     }
-    
+
     public void testShouldDisplayQATabOnSetQATab() throws Exception {
-        EmfDataset dataset = new EmfDataset();
-        dataset.setName("test");
-        dataset.setDatasetType(new DatasetType());
+        PropertiesEditorPresenterImpl presenter = new PropertiesEditorPresenterImpl(null, null, null);
+
+        Mock qaPresenter = mock(EditableQAStepsPresenter.class);
+        qaPresenter.expects(once()).method("display");
         
-        Mock dataCommons = mock(DataCommonsService.class);
-        dataCommons.stubs().method(ANYTHING);
-        session.stubs().method("dataCommonsService").will(returnValue(dataCommons.proxy()));
-        
-        Mock dataEditor = mock(DataEditorService.class);
-        dataEditor.stubs().method(ANYTHING);
-        session.stubs().method("dataEditorService").will(returnValue(dataEditor.proxy()));
-        session.stubs().method("user");
-        
-        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, null, (EmfSession) session
-                .proxy());
-        
-        Mock view = mock(EditableQATabView.class);
-        view.expects(atLeastOnce()).method("observe").with(new IsInstanceOf(EditableQAStepsPresenter.class));
-        
-        presenter.set((EditableQATabView) view.proxy());
+        presenter.set((EditableQAStepsPresenter) qaPresenter.proxy());
     }
 }

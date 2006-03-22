@@ -20,6 +20,6 @@ public interface PropertiesEditorPresenter {
 
     void set(EditNotesTabView view) throws EmfException;
     
-    void set(EditableQATabView qatab);
+    void set(EditableQATabView qatab) throws EmfException;
 
 }

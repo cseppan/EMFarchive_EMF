@@ -5,8 +5,8 @@ import gov.epa.emissions.framework.services.data.QAStep;
 
 public interface QATabPresenter {
 
-    public abstract void display() throws EmfException;
+    void display() throws EmfException;
 
-    public abstract void doView(QAStep step, QAStepView view);
+    void doView(QAStep step, QAStepView view);
 
 }

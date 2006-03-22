@@ -1,32 +1,13 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 
-public class EditableQAStepsPresenter {
+public interface EditableQAStepsPresenter {
 
-    private EditableQATabView view;
+    public abstract void display() throws EmfException;
 
-    private EmfDataset dataset;
+    public abstract void doSave() throws EmfException;
 
-    public EditableQAStepsPresenter(EmfDataset dataset, EditableQATabView view) {
-        this.dataset = dataset;
-        this.view = view;
-    }
-
-    public void register() {
-        view.observe(this);
-    }
-
-    public void doSave() throws EmfException {
-        view.save();
-    }
-
-    public void doAdd(NewQAStepView stepview) {
-        stepview.display(dataset, dataset.getDatasetType());
-        if (stepview.shouldCreate()) {
-            view.add(stepview.qaSteps());
-        }
-    }
+    public abstract void doAdd(NewQAStepView stepview);
 
 }

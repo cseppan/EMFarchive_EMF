@@ -62,7 +62,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         tabbedPane.addTab("Notes", createNotesTab(parentConsole));
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
         tabbedPane.addTab("Tables", createInfoTab(dataset, parentConsole));
-        tabbedPane.addTab("QA", createQAStepTab(dataset, versions, messagePanel));
+        tabbedPane.addTab("QA", createQATab(versions));
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -80,10 +80,15 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
             return createErrorTab("Could not load Summary Tab." + e.getMessage());
         }
     }
-    
-    private JPanel createQAStepTab(EmfDataset dataset, Version[] versions, MessagePanel messagePanel) {
-        EditableQATab view = new EditableQATab(dataset, versions, session.qaService(), messagePanel, this, parentConsole);
-        presenter.set(view);
+
+    private JPanel createQATab(Version[] versions) {
+        EditableQATab view = new EditableQATab(versions, session.qaService(), this, parentConsole);
+        try {
+            presenter.set(view);
+        } catch (EmfException e) {
+            showError("Could not load QA Tab." + e.getMessage());
+            return createErrorTab("Could not load QA Tab." + e.getMessage());
+        }
         return view;
     }
 
