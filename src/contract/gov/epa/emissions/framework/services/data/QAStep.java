@@ -30,6 +30,8 @@ public class QAStep {
     private int datasetId;
 
     private int id;
+    
+    private String description;
 
     public int getId() {
         return id;
@@ -49,6 +51,7 @@ public class QAStep {
         this.programArguments = template.getProgramArguments();
         this.required = template.isRequired();
         this.order = template.getOrder();
+        this.description = template.getDescription();
     }
 
     public String getProgram() {
@@ -137,6 +140,14 @@ public class QAStep {
 
     public int getDatasetId() {
         return datasetId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 }

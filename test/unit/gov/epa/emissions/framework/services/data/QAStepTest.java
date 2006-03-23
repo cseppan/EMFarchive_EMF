@@ -14,6 +14,7 @@ public class QAStepTest extends TestCase {
         template.setName("template");
         template.setProgram("program");
         template.setProgramArguments("args");
+        template.setDescription("description");
         template.setRequired(true);
         template.setOrder((float)1.2);
         
@@ -24,6 +25,7 @@ public class QAStepTest extends TestCase {
         assertEquals(template.getProgramArguments(), step.getProgramArguments());
         assertEquals(template.isRequired(), step.isRequired());
         assertEquals(2, step.getVersion());
+        assertEquals(template.getDescription(), step.getDescription());
     }
 
     public void testShouldHaveWhenWhoResultAndStatusAsAttributes() {
@@ -37,10 +39,12 @@ public class QAStepTest extends TestCase {
         step.setWho(user);
         step.setResult("result");
         step.setStatus("status");
+        step.setDescription("description");
         
         assertEquals(date, step.getWhen());
         assertEquals(user, step.getWho());
         assertEquals("result", step.getResult());
         assertEquals("status", step.getStatus());
+        assertEquals("description", step.getDescription());
     }
 }

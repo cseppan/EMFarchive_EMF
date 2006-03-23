@@ -84,10 +84,17 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         status.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Status", status, panel);
 
-        TextArea result = new TextArea("", step.getResult(), 40, 8);
+        TextArea result = new TextArea("", step.getResult(), 40, 10);
+        result.setEditable(false);
+        ScrollableTextArea scrollableComment = ScrollableTextArea.createWithVerticalScrollBar(result);
+        layoutGenerator.addLabelWidgetPair("Comment", scrollableComment, panel);
+
+        TextArea description = new TextArea("", step.getDescription(), 40, 10);
+        description.setLineWrap(true);
+        description.setWrapStyleWord(true);
         result.setEditable(false);
         ScrollableTextArea scrollableDesc = ScrollableTextArea.createWithVerticalScrollBar(result);
-        layoutGenerator.addLabelWidgetPair("Comment", scrollableDesc, panel);
+        layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 10, 2, // rows, cols

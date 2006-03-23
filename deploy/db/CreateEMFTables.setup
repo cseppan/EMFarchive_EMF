@@ -317,6 +317,7 @@ CREATE TABLE emf.qa_steps
   "when" timestamp,
   result text,
   status varchar(15),
+  description text,
   UNIQUE (dataset_id, version, name)
 ) 
 WITHOUT OIDS;

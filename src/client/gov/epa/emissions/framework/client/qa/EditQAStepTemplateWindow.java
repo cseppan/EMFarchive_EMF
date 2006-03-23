@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
+import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ScrollableTextArea;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
@@ -28,7 +29,7 @@ import javax.swing.SpringLayout;
 public class EditQAStepTemplateWindow extends DisposableInteralFrame implements EditQAStepTemplateView {
     private TextField name;
 
-    private TextField program;
+    private EditableComboBox program;
 
     private TextArea programParameters;
 
@@ -53,7 +54,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     private Button ok;
 
     public EditQAStepTemplateWindow(String title, DesktopManager desktopManager) {
-        super("Edit QA Step Template", new Dimension(550, 350), desktopManager);
+        super("Edit QA Step Template", new Dimension(550, 380), desktopManager);
         this.title = title;
     }
 
@@ -80,15 +81,15 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     private JPanel inputPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        String[] defaultProgram = { "EmisView", "Smkreport", "Smkinven" };
 
         name = new TextField("", 40);
         addChangeable(name);
         name.addKeyListener();
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
-        program = new TextField("", 40);
+        program = new EditableComboBox(defaultProgram);
         addChangeable(program);
-        program.addKeyListener();
         layoutGenerator.addLabelWidgetPair("Program", program, panel);
 
         programParameters = new TextArea("", "", 40, 3);
@@ -235,7 +236,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
             messagePanel.setError(e.getMessage());
         }
         template.setName(name.getText().trim());
-        template.setProgram(program.getText().trim());
+        template.setProgram((String)program.getSelectedItem());
         template.setProgramArguments(programParameters.getText());
         template.setRequired(required.isSelected());
         template.setOrder(Float.parseFloat(order.getText()));
@@ -245,7 +246,6 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     public void display(QAStepTemplate template) {
         this.template = template;
         name.setText(template.getName());
-        program.setText(template.getProgram());
         programParameters.setText(template.getProgramArguments());
         required.setSelected(template.isRequired());
         order.setText(template.getOrder() + "");
