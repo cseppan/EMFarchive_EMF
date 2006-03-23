@@ -35,35 +35,33 @@ public class EditableQAStepsTableDataTest extends TestCase {
         data = new EditableQAStepsTableData(new QAStep[] { step1, step2 });
     }
 
-    public void testShouldHaveElevenColumns() {
+    public void testShouldHaveTenColumns() {
         String[] columns = data.columns();
 
-        assertEquals(11, columns.length);
-        assertEquals("Select", columns[0]);
-        assertEquals("Version", columns[1]);
-        assertEquals("Name", columns[2]);
-        assertEquals("Required", columns[3]);
-        assertEquals("Order", columns[4]);
-        assertEquals("Status", columns[5]);
-        assertEquals("When", columns[6]);
-        assertEquals("Who", columns[7]);
-        assertEquals("Result", columns[8]);
-        assertEquals("Program", columns[9]);
-        assertEquals("Arguments", columns[10]);
+        assertEquals(10, columns.length);
+        assertEquals("Version", columns[0]);
+        assertEquals("Name", columns[1]);
+        assertEquals("Required", columns[2]);
+        assertEquals("Order", columns[3]);
+        assertEquals("Status", columns[4]);
+        assertEquals("When", columns[5]);
+        assertEquals("Who", columns[6]);
+        assertEquals("Result", columns[7]);
+        assertEquals("Program", columns[8]);
+        assertEquals("Arguments", columns[9]);
     }
 
     public void testShouldReturnCorrectTypesAsColumnClassForAllCols() {
-        assertEquals(Boolean.class, data.getColumnClass(0));
+        assertEquals(String.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
-        assertEquals(String.class, data.getColumnClass(2));
-        assertEquals(Boolean.class, data.getColumnClass(3));
-        assertEquals(Float.class, data.getColumnClass(4));
-        assertEquals(String.class, data.getColumnClass(5));
-        assertEquals(Date.class, data.getColumnClass(6));
-        assertEquals(User.class, data.getColumnClass(7));
+        assertEquals(Boolean.class, data.getColumnClass(2));
+        assertEquals(String.class, data.getColumnClass(3));
+        assertEquals(String.class, data.getColumnClass(4));
+        assertEquals(Date.class, data.getColumnClass(5));
+        assertEquals(User.class, data.getColumnClass(6));
+        assertEquals(String.class, data.getColumnClass(7));
         assertEquals(String.class, data.getColumnClass(8));
         assertEquals(String.class, data.getColumnClass(9));
-        assertEquals(String.class, data.getColumnClass(10));
     }
 
     public void testAllColumnsShouldBeUneditableExceptSelect() {

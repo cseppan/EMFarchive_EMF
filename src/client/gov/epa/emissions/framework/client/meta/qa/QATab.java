@@ -36,7 +36,7 @@ public class QATab extends JPanel implements QATabView {
 
     public void display(QAStep[] steps) {
         super.setLayout(new BorderLayout());
-        super.add(createQAStepsTableSection(steps), BorderLayout.CENTER);
+        super.add(tablePanel(steps), BorderLayout.CENTER);
         super.add(createButtonsSection(), BorderLayout.PAGE_END);
     }
 
@@ -44,7 +44,7 @@ public class QATab extends JPanel implements QATabView {
         this.presenter = presenter;
     }
 
-    private JPanel createQAStepsTableSection(QAStep[] steps) {
+    private JPanel tablePanel(QAStep[] steps) {
         JPanel container = new JPanel(new BorderLayout());
         container.add(table(steps), BorderLayout.CENTER);
         return container;

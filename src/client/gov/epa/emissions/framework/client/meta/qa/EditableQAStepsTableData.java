@@ -2,9 +2,8 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.data.QAStep;
-import gov.epa.emissions.framework.ui.AbstractEditableTableData;
+import gov.epa.emissions.framework.ui.ChangeableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
-import gov.epa.emissions.framework.ui.EditableTableData;
 import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-public class EditableQAStepsTableData extends AbstractEditableTableData implements EditableTableData {
+public class EditableQAStepsTableData extends ChangeableTableData {
 
     private List rows;
 
@@ -25,8 +24,8 @@ public class EditableQAStepsTableData extends AbstractEditableTableData implemen
     }
 
     public String[] columns() {
-        return new String[] { "Select", "Version", "Name", "Required", "Order", 
-                "Status", "When", "Who", "Result", "Program", "Arguments" }; 
+        return new String[] { "Version", "Name", "Required", "Order", "Status", "When", "Who", "Result", "Program",
+                "Arguments" };
     }
 
     public List rows() {
@@ -51,16 +50,13 @@ public class EditableQAStepsTableData extends AbstractEditableTableData implemen
     }
 
     public Class getColumnClass(int col) {
-        if (col == 0 || col == 3)
+        if (col == 2)
             return Boolean.class;
-        
-        if(col == 4)
-            return Float.class;
 
-        if(col == 6)
+        if (col == 5)
             return Date.class;
-        
-        if(col == 7)
+
+        if (col == 6)
             return User.class;
 
         return String.class;

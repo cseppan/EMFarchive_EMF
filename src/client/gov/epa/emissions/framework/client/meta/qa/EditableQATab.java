@@ -3,12 +3,12 @@ package gov.epa.emissions.framework.client.meta.qa;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.data.QAStep;
-import gov.epa.emissions.framework.ui.EditableEmfTableModel;
-import gov.epa.emissions.framework.ui.ScrollableTable;
+import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -26,45 +26,47 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     private EditableQAStepsTableData tableData;
 
-    private EditableEmfTableModel tableModel;
+    private SortFilterSelectModel selectModel;
 
-    private EditableTable table;
+    private JPanel tablePanel;
 
-    private EmfConsole parent;
+    private EmfConsole parentConsole;
 
-    ManageChangeables changeablesList;
+    private ManageChangeables changeables;
 
     private Version[] versions;
 
-    public EditableQATab(ManageChangeables changeablesList, EmfConsole parent) {
-        this.parent = parent;
-        this.changeablesList = changeablesList;
+    public EditableQATab(EmfConsole parent, ManageChangeables changeables) {
+        this.parentConsole = parent;
+        this.changeables = changeables;
     }
 
     public void display(QAStep[] steps, Version[] versions) {
         this.versions = versions;
         super.setLayout(new BorderLayout());
-        super.add(createTableSection(steps), BorderLayout.PAGE_START);
-        super.add(createButtonsSection(), BorderLayout.CENTER);
+        super.add(tablePanel(steps), BorderLayout.CENTER);
+        super.add(createButtonsSection(), BorderLayout.PAGE_END);
 
         super.setSize(new Dimension(700, 300));
     }
 
-    private JPanel createTableSection(QAStep[] steps) {
-        JPanel container = new JPanel(new BorderLayout());
-        container.add(table(steps), BorderLayout.CENTER);
-        return container;
+    protected JPanel tablePanel(QAStep[] steps) {
+        tableData = new EditableQAStepsTableData(steps);
+        changeables.addChangeable(tableData);
+        selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
+
+        tablePanel = new JPanel(new BorderLayout());
+        tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
+
+        return tablePanel;
     }
 
-    protected JScrollPane table(QAStep[] steps) {
-        tableData = new EditableQAStepsTableData(steps);
-        tableModel = new EditableEmfTableModel(tableData);
-        table = new EditableTable(tableModel);
-        table.setRowHeight(16);
-        table.setPreferredScrollableViewportSize(new Dimension(500, 320));
-        changeablesList.addChangeable(table);
+    private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
+        SortFilterTablePanel sortFilterPanel = new SortFilterTablePanel(parentConsole, selectModel);
 
-        return new ScrollableTable(table);
+        JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
+        sortFilterPanel.setPreferredSize(new Dimension(450, 60));
+        return scrollPane;
     }
 
     private JPanel createButtonsSection() {
@@ -106,7 +108,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     }
 
     private void addExisting() {
-        presenter.doAdd(new NewQAStepDialog(parent, versions));
+        presenter.doAdd(new NewQAStepDialog(parentConsole, versions));
     }
 
     public void add(QAStep[] steps) {
@@ -142,8 +144,10 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     }
 
     public void refresh() {
-        tableModel.refresh();
-        super.revalidate();
+        selectModel.refresh();
+
+        tablePanel.removeAll();
+        tablePanel.add(createSortFilterPanel(parentConsole));
     }
 
 }

@@ -61,14 +61,13 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
         selectModel = new SortFilterSelectModel(new EmfTableModel(tableData));
 
         tablePanel = new JPanel(new BorderLayout());
-        tablePanel.add(createSortFilterPanel(parentConsole));
+        tablePanel.add(createSortFilterPanel(parentConsole), BorderLayout.CENTER);
 
         return tablePanel;
     }
 
     private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
         SortFilterTablePanel sortFilterPanel = new SortFilterTablePanel(parentConsole, selectModel);
-        sortFilterPanel.getTable().setName("notesTable");
 
         JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
         sortFilterPanel.setPreferredSize(new Dimension(450, 60));
