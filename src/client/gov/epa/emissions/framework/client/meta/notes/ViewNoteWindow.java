@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
@@ -50,7 +50,7 @@ public class ViewNoteWindow extends DisposableInteralFrame implements NoteView {
 
         TextArea details = new TextArea("", note.getDetails(), 40, 3);
         details.setEditable(false);
-        ScrollableTextArea scrollableDetails = ScrollableTextArea.createWithVerticalScrollBar(details);
+        ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(details);
         layoutGenerator.addLabelWidgetPair("Details", scrollableDetails, panel);
 
         layoutGenerator.addLabelWidgetPair("References", new Label(note.getReferences()), panel);

@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.qa;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -76,7 +76,7 @@ public class NewQAStepTemplateDialog extends Dialog implements NewQAStepTemplate
         layoutGenerator.addLabelWidgetPair("Program", program, panel);
 
         programParameters = new TextArea("", "", 40, 3);
-        ScrollableTextArea scrollableDetails = ScrollableTextArea.createWithVerticalScrollBar(programParameters);
+        ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programParameters);
         layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
 
         order = new NumberFormattedTextField(5, new AbstractAction() {
@@ -94,7 +94,7 @@ public class NewQAStepTemplateDialog extends Dialog implements NewQAStepTemplate
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
         description = new TextArea("", "", 40, 3);
-        ScrollableTextArea scrollableDesc = ScrollableTextArea.createWithVerticalScrollBar(description);
+        ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
 
         // Lay out the panel.

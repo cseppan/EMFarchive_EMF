@@ -9,7 +9,7 @@ import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.FormattedTextField;
 import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
@@ -236,7 +236,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         description = new TextArea("description", dataset.getDescription());
         changeablesList.addChangeable(description);
         description.addTextListener();
-        layoutGenerator.addLabelWidgetPair("Description:", new ScrollableTextArea(description), panel);
+        layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description), panel);
 
         allProjects = service.getProjects();
         projectsCombo = new EditableComboBox(allProjects);

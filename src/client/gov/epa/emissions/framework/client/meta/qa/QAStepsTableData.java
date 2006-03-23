@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
@@ -21,16 +22,20 @@ public class QAStepsTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Version", "Name", "User", "Date", "Program", "Required?", "Order", "Comment", "Status" };
+        return new String[] { "Version", "Name", "Required", "Order", "Status", "When", "Who", "Comment", "Program",
+                "Arguments" };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 0)
-            return Long.class;
-        if (col == 3)
-            return Date.class;
-        if (col == 5)
+        if (col == 2)
             return Boolean.class;
+
+        if (col == 5)
+            return Date.class;
+
+        if (col == 6)
+            return User.class;
+
         return String.class;
     }
 

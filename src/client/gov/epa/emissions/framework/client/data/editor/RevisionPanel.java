@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.data.editor;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -87,10 +87,10 @@ public class RevisionPanel extends JPanel {
         JPanel panel = new JPanel(new GridLayout(1, 2, 10, 0));
 
         what = new TextArea("", "", 30, 2);
-        panel.add(labelValuePanel("What was changed", ScrollableTextArea.createWithVerticalScrollBar(what)));
+        panel.add(labelValuePanel("What was changed", ScrollableComponent.createWithVerticalScrollBar(what)));
 
         why = new TextArea("", "", 30, 2);
-        panel.add(labelValuePanel("Why it was changed", ScrollableTextArea.createWithVerticalScrollBar(why)));
+        panel.add(labelValuePanel("Why it was changed", ScrollableComponent.createWithVerticalScrollBar(why)));
 
         return panel;
     }

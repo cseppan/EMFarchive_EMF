@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.meta.revisions;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
@@ -54,7 +54,7 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
 
         TextArea details = new TextArea("Why", revision.getWhy(), 40, 3);
         details.setEditable(false);
-        ScrollableTextArea scrollableDetails = ScrollableTextArea.createWithVerticalScrollBar(details);
+        ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(details);
         layoutGenerator.addLabelWidgetPair("Why", scrollableDetails, panel);
 
         layoutGenerator.addLabelWidgetPair("Dataset", new Label(dataset.getName()), panel);

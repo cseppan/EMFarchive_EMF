@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -95,7 +95,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         programParameters = new TextArea("", "", 40, 3);
         addChangeable(programParameters);
         programParameters.addKeyListener();
-        ScrollableTextArea scrollableDetails = ScrollableTextArea.createWithVerticalScrollBar(programParameters);
+        ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programParameters);
         layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
 
         order = new NumberFormattedTextField(5, getFormatAction());
@@ -114,7 +114,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         description.addKeyListener();
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
-        ScrollableTextArea scrollableDesc = ScrollableTextArea.createWithVerticalScrollBar(description);
+        ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
 
         // Lay out the panel.

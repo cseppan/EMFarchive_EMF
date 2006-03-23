@@ -90,4 +90,9 @@ public class VersionsSet {
         return version(name) != null;
     }
 
+    
+    public Version[] all() {
+        return versions;
+    }
+
 }

@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -93,7 +93,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
 
         TextArea description = new TextArea("description", type.getDescription(), 40);
         description.setEditable(false);
-        ScrollableTextArea descScrollableTextArea = new ScrollableTextArea(description);
+        ScrollableComponent descScrollableTextArea = new ScrollableComponent(description);
         descScrollableTextArea.setMinimumSize(new Dimension(80, 80));
         layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, panel);
 

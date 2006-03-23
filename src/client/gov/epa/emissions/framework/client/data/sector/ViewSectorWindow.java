@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.data.sector;
 
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
@@ -86,7 +86,7 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
 
         TextArea description = new TextArea("description", sector.getDescription(), 40);
         description.setEditable(false);
-        ScrollableTextArea descTextArea = new ScrollableTextArea(description);
+        ScrollableComponent descTextArea = new ScrollableComponent(description);
         descTextArea.setMinimumSize(new Dimension(80, 80));
         layoutGenerator.addLabelWidgetPair("Description:", descTextArea, panel);
 

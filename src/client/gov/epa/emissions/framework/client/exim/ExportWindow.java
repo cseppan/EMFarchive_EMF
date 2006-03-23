@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.exim;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -83,7 +83,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         // datasets
         TextArea datasetNames = new TextArea("datasets", getDatasetsLabel(datasets));
         datasetNames.setEditable(false);
-        ScrollableTextArea dsArea = new ScrollableTextArea(datasetNames);
+        ScrollableComponent dsArea = new ScrollableComponent(datasetNames);
         datasetNames.setWrapStyleWord(true);
         datasetNames.setLineWrap(true);
         dsArea.setMinimumSize(new Dimension(75, 75));
@@ -106,7 +106,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         purpose = new TextArea("purpose", "");
         purpose.setSize(2, 45);
         purpose.setLineWrap(false);
-        layoutGenerator.addLabelWidgetPair("Purpose", new ScrollableTextArea(purpose), panel);
+        layoutGenerator.addLabelWidgetPair("Purpose", new ScrollableComponent(purpose), panel);
 
         // overwrite
         JPanel overwritePanel = new JPanel(new BorderLayout());

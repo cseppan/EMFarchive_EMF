@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.data;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.data.viewer.TablePresenter;
@@ -67,7 +67,7 @@ public class DataSortFilterPanel extends JPanel {
         panel.add(new Label("Sort Order "), BorderLayout.WEST);
         sortOrder = new TextArea("sortOrder", dataset.getDatasetType().getDefaultSortOrder(), 25, 2);
         sortOrder.setToolTipText(sortOrder.getText());
-        panel.add(ScrollableTextArea.createWithVerticalScrollBar(sortOrder), BorderLayout.CENTER);
+        panel.add(ScrollableComponent.createWithVerticalScrollBar(sortOrder), BorderLayout.CENTER);
 
         return panel;
     }
@@ -78,7 +78,7 @@ public class DataSortFilterPanel extends JPanel {
         panel.add(new Label("Row Filter  "), BorderLayout.WEST);
         rowFilter = new TextArea("rowFilter", "", 25, 2);
         rowFilter.setToolTipText(rowFilter.getText());
-        panel.add(ScrollableTextArea.createWithVerticalScrollBar(rowFilter), BorderLayout.CENTER);
+        panel.add(ScrollableComponent.createWithVerticalScrollBar(rowFilter), BorderLayout.CENTER);
 
         return panel;
     }

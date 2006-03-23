@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -132,7 +132,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
         // description
         TextArea description = new TextArea("description", dataset.getDescription());
         description.setEditable(false);
-        layoutGenerator.addLabelWidgetPair("Description:", new ScrollableTextArea(description), panel);
+        layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description), panel);
 
         Project project = dataset.getProject();
         String projectName = (project != null) ? project.getName() : "";

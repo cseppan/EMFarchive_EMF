@@ -24,7 +24,7 @@ public class EditableQAStepsTableData extends ChangeableTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Version", "Name", "Required", "Order", "Status", "When", "Who", "Result", "Program",
+        return new String[] { "Version", "Name", "Required", "Order", "Status", "When", "Who", "Comment", "Program",
                 "Arguments" };
     }
 
@@ -45,7 +45,7 @@ public class EditableQAStepsTableData extends ChangeableTableData {
     }
 
     private EditableRow row(QAStep step) {
-        RowSource source = new EditableQAStepRowSource(step);
+        RowSource source = new QAStepRowSource(step);
         return new EditableRow(source);
     }
 
@@ -62,19 +62,6 @@ public class EditableQAStepsTableData extends ChangeableTableData {
         return String.class;
     }
 
-    public QAStep[] getSelected() {
-        List selected = new ArrayList();
-
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            EditableRow row = (EditableRow) iter.next();
-            EditableQAStepRowSource rowSource = (EditableQAStepRowSource) row.rowSource();
-            if (rowSource.isSelected())
-                selected.add(rowSource.source());
-        }
-
-        return (QAStep[]) selected.toArray(new QAStep[0]);
-    }
-
     public QAStep[] sources() {
         List sources = sourcesList();
         return (QAStep[]) sources.toArray(new QAStep[0]);
@@ -84,7 +71,7 @@ public class EditableQAStepsTableData extends ChangeableTableData {
         List sources = new ArrayList();
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             EditableRow row = (EditableRow) iter.next();
-            EditableQAStepRowSource rowSource = (EditableQAStepRowSource) row.rowSource();
+            QAStepRowSource rowSource = (QAStepRowSource) row.rowSource();
             sources.add(rowSource.source());
         }
         return sources;

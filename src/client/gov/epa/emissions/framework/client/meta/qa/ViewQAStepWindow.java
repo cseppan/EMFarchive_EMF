@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -57,7 +57,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
         TextArea programParameters = new TextArea("", step.getProgramArguments(), 40, 3);
         programParameters.setEditable(false);
-        ScrollableTextArea scrollableDetails = ScrollableTextArea.createWithVerticalScrollBar(programParameters);
+        ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programParameters);
         layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
 
         TextField order = new TextField("", step.getOrder() + "", 40);
@@ -86,18 +86,18 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
         TextArea result = new TextArea("", step.getResult(), 40, 10);
         result.setEditable(false);
-        ScrollableTextArea scrollableComment = ScrollableTextArea.createWithVerticalScrollBar(result);
+        ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(result);
         layoutGenerator.addLabelWidgetPair("Comment", scrollableComment, panel);
 
         TextArea description = new TextArea("", step.getDescription(), 40, 10);
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
         result.setEditable(false);
-        ScrollableTextArea scrollableDesc = ScrollableTextArea.createWithVerticalScrollBar(result);
+        ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(result);
         layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 10, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 11, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 

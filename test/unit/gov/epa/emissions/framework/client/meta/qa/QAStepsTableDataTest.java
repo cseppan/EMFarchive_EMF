@@ -49,26 +49,27 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
 
     public void testShouldHaveNineColumns() {
         String[] columns = data.columns();
-        assertEquals(9, columns.length);
+        assertEquals(10, columns.length);
         assertEquals("Version", columns[0]);
         assertEquals("Name", columns[1]);
-        assertEquals("User", columns[2]);
-        assertEquals("Date", columns[3]);
-        assertEquals("Program", columns[4]);
-        assertEquals("Required?", columns[5]);
-        assertEquals("Order", columns[6]);
+        assertEquals("Required", columns[2]);
+        assertEquals("Order", columns[3]);
+        assertEquals("Status", columns[4]);
+        assertEquals("When", columns[5]);
+        assertEquals("Who", columns[6]);
         assertEquals("Comment", columns[7]);
-        assertEquals("Status", columns[8]);
+        assertEquals("Program", columns[8]);
+        assertEquals("Arguments", columns[9]);
     }
 
     public void testShouldReturnAppropriateColumnClassForEachCol() {
-        assertEquals(Long.class, data.getColumnClass(0));
+        assertEquals(String.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
-        assertEquals(String.class, data.getColumnClass(2));
-        assertEquals(Date.class, data.getColumnClass(3));
+        assertEquals(Boolean.class, data.getColumnClass(2));
+        assertEquals(String.class, data.getColumnClass(3));
         assertEquals(String.class, data.getColumnClass(4));
-        assertEquals(Boolean.class, data.getColumnClass(5));
-        assertEquals(String.class, data.getColumnClass(6));
+        assertEquals(Date.class, data.getColumnClass(5));
+        assertEquals(User.class, data.getColumnClass(6));
         assertEquals(String.class, data.getColumnClass(7));
         assertEquals(String.class, data.getColumnClass(8));
     }
@@ -88,18 +89,19 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         List rows = data.rows();
 
         Row row = (Row) rows.get(0);
-        assertEquals(new Long(step1.getVersion()), row.getValueAt(0));
+        assertEquals(new Integer(step1.getVersion()), row.getValueAt(0));
         assertEquals(step1.getName(), row.getValueAt(1));
-        assertEquals(step1.getWho(), row.getValueAt(2));
+        assertEquals(step1.isRequired(), ((Boolean) row.getValueAt(2)).booleanValue());
+        assertEquals(step1.getOrder() + "", row.getValueAt(3));
+        assertEquals(step1.getStatus(), row.getValueAt(4));
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        assertEquals(dateFormat.format(step1.getWhen()), row.getValueAt(3));
+        assertEquals(dateFormat.format(step1.getWhen()), row.getValueAt(5));
 
-        assertEquals(step1.getProgram(), row.getValueAt(4));
-        assertEquals(step1.isRequired(), ((Boolean) row.getValueAt(5)).booleanValue());
-        assertEquals(step1.getOrder(), 0, (((Float) row.getValueAt(6)).floatValue()));
+        assertEquals(step1.getWho(), row.getValueAt(6));
         assertEquals(step1.getResult(), row.getValueAt(7));
-        assertEquals(step1.getStatus(), row.getValueAt(8));
+        assertEquals(step1.getProgram(), row.getValueAt(8));
+        assertEquals(step1.getProgramArguments(), row.getValueAt(9));
     }
 
     public void testShouldReturnARowRepresentingANoteEntry() {

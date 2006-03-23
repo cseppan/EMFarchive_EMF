@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableTextArea;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.security.User;
@@ -115,7 +115,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         layoutGenerator.addLabelWidgetPair("Type", typesCombo, panel);
 
         details = new TextArea("", "", 40, 3);
-        ScrollableTextArea scrollableDetails = ScrollableTextArea.createWithVerticalScrollBar(details);
+        ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(details);
         layoutGenerator.addLabelWidgetPair("Details", scrollableDetails, panel);
 
         layoutReferences(notes, panel, layoutGenerator);
@@ -152,11 +152,11 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
         layoutGenerator.addWidgetPair(new Label("References"), rightPanel, panel);
     }
 
-    private ScrollableTextArea scrollableReferences() {
+    private ScrollableComponent scrollableReferences() {
         referencesListing = new TextArea("", "", 20, 2);
         referencesListing.setEditable(false);
 
-        return ScrollableTextArea.createWithVerticalScrollBar(referencesListing);
+        return ScrollableComponent.createWithVerticalScrollBar(referencesListing);
     }
 
     protected void doAddReferences(Note[] notes) {

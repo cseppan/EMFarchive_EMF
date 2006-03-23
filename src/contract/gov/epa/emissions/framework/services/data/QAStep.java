@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.data;
 import java.util.Date;
 
 import gov.epa.emissions.commons.data.QAStepTemplate;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 
 public class QAStep {
@@ -52,6 +53,16 @@ public class QAStep {
         this.required = template.isRequired();
         this.order = template.getOrder();
         this.description = template.getDescription();
+    }
+
+    public QAStep(EmfDataset dataset, Version version, QAStepTemplate template) {
+        this.name = template.getName();
+        this.datasetId = dataset.getId();
+        this.version = version.getVersion();
+        this.program = template.getProgram();
+        this.programArguments = template.getProgramArguments();
+        this.required = template.isRequired();
+        this.order = template.getOrder();
     }
 
     public String getProgram() {

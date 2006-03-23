@@ -19,27 +19,29 @@ public class QAStepRowSourceTest extends TestCase {
         step.setWho(user);
         step.setWhen(new Date());
         step.setProgram("program");
+        step.setProgramArguments("args");
         step.setRequired(true);
-        step.setOrder((float)823.2);
+        step.setOrder((float) 823.2);
         step.setResult("result");
         step.setStatus("status");
 
         QAStepRowSource source = new QAStepRowSource(step);
 
         Object[] values = source.values();
-        assertEquals(9, values.length);
-        assertEquals(new Long(step.getVersion()), values[0]);
+        assertEquals(10, values.length);
+        assertEquals(new Integer(step.getVersion()), values[0]);
         assertEquals(step.getName(), values[1]);
-        assertEquals(step.getWho(), values[2]);
+        assertEquals(step.isRequired(), ((Boolean) values[2]).booleanValue());
+        assertEquals(step.getOrder() + "", values[3]);
+        assertEquals(step.getStatus(), values[4]);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        assertEquals(dateFormat.format(step.getWhen()), values[3]);
+        assertEquals(dateFormat.format(step.getWhen()), values[5]);
 
-        assertEquals(step.getProgram(), values[4]);
-        assertEquals(step.isRequired(), ((Boolean) values[5]).booleanValue());
-        assertEquals(step.getOrder(), 0.0, ((Float) values[6]).floatValue());
+        assertEquals(step.getWho(), values[6]);
         assertEquals(step.getResult(), values[7]);
-        assertEquals(step.getStatus(), values[8]);
+        assertEquals(step.getProgram(), values[8]);
+        assertEquals(step.getProgramArguments(), values[9]);
     }
 
     public void testShouldTrackOriginalSource() {

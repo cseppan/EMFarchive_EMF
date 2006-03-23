@@ -13,8 +13,6 @@ import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
@@ -112,35 +110,12 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     }
 
     public void add(QAStep[] steps) {
-        QAStep[] nonexistingSteps = removeDuplicate(steps);
-        for (int i = 0; i < nonexistingSteps.length; i++)
-            tableData.add(nonexistingSteps[i]);
+        QASteps qaSteps = new QASteps(tableData.sources());
+        QAStep[] newSteps = qaSteps.filterDuplicates(steps);
+        for (int i = 0; i < newSteps.length; i++)
+            tableData.add(newSteps[i]);
 
         refresh();
-    }
-
-    private QAStep[] removeDuplicate(QAStep[] steps) {
-        List stepsList = new ArrayList();
-        QAStep[] existed = tableData.sources();
-
-        for (int i = 0; i < steps.length; i++) {
-            if (!contains(existed, steps[i]))
-                stepsList.add(steps[i]);
-        }
-
-        return (QAStep[]) stepsList.toArray(new QAStep[0]);
-    }
-
-    private boolean contains(QAStep[] step1, QAStep step2) {
-        boolean contains = false;
-        for (int i = 0; i < step1.length; i++) {
-            if (step1[i].getName().equals(step2.getName()) && step1[i].getVersion() == step2.getVersion()) {
-                contains = true;
-                break;
-            }
-        }
-
-        return contains;
     }
 
     public void refresh() {
