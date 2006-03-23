@@ -2,22 +2,23 @@ package gov.epa.emissions.framework.client.meta;
 
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
-import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.qa.EditableQAStepsPresenter;
 import gov.epa.emissions.framework.client.meta.qa.EditableQAStepsPresenterImpl;
 import gov.epa.emissions.framework.client.meta.qa.EditableQATabView;
-import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter {
 
@@ -25,20 +26,15 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
 
     private DatasetPropertiesEditorView view;
 
-    private EditableSummaryTabPresenter summaryPresenter;
-
-    private EditableKeywordsTabPresenter keywordsPresenter;
-
-    private EditableQAStepsPresenter qaPresenter;
-
     private EmfSession session;
 
-    private EditNotesTabPresenter notesPresenter;
+    private List presenters;
 
     public PropertiesEditorPresenterImpl(EmfDataset dataset, DatasetPropertiesEditorView view, EmfSession session) {
         this.dataset = dataset;
         this.session = session;
         this.view = view;
+        presenters = new ArrayList();
     }
 
     public void doDisplay() throws EmfException {
@@ -64,51 +60,53 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
     }
 
     public void doSave() throws EmfException {
-        save(dataService(), summaryPresenter, keywordsPresenter, notesPresenter, qaPresenter);
+        save(dataset, dataService(), presenters, view);
     }
 
-    void save(DataService service, EditableSummaryTabPresenter summary, EditableKeywordsTabPresenter keywords,
-            EditNotesTabPresenter notes, EditableQAStepsPresenter qaPresenter) throws EmfException {
-        updateDataset(service, summary, keywords, notes, qaPresenter);
+    void save(EmfDataset dataset, DataService service, List presenters, DatasetPropertiesEditorView view)
+            throws EmfException {
+        for (Iterator iter = presenters.iterator(); iter.hasNext();) {
+            PropertiesEditorTabPresenter element = (PropertiesEditorTabPresenter) iter.next();
+            element.doSave();
+        }
+        service.updateDataset(dataset);
+
         view.close();
     }
 
-    private DataService dataService() {
-        return session.dataService();
-    }
-
-    void updateDataset(DataService service, EditableSummaryTabPresenter summary, EditableKeywordsTabPresenter keywords,
-            EditNotesTabPresenter notes, EditableQAStepsPresenter qaStep) throws EmfException {
-        summary.doSave();
-        keywords.doSave();
-        notes.doSave();
-        qaStep.doSave();
-        service.updateDataset(dataset);
-    }
-
     public void set(EditableSummaryTabView summary) {
-        summaryPresenter = new EditableSummaryTabPresenterImpl(dataset, summary);
+        EditableSummaryTabPresenterImpl summaryPresenter = new EditableSummaryTabPresenterImpl(dataset, summary);
+        presenters.add(summaryPresenter);
     }
 
     public void set(EditableKeywordsTabView keywordsView) throws EmfException {
-        keywordsPresenter = new EditableKeywordsTabPresenterImpl(keywordsView, dataset);
+        EditableKeywordsTabPresenterImpl keywordsPresenter = new EditableKeywordsTabPresenterImpl(keywordsView, dataset);
 
         Keywords keywords = new Keywords(session.dataCommonsService().getKeywords());
         keywordsPresenter.display(keywords);
+
+        presenters.add(keywordsPresenter);
     }
 
     public void set(EditNotesTabView view) throws EmfException {
-        notesPresenter = new EditNotesTabPresenterImpl(dataset, session, view);
+        EditNotesTabPresenterImpl notesPresenter = new EditNotesTabPresenterImpl(dataset, session, view);
         notesPresenter.display();
+
+        presenters.add(notesPresenter);
     }
 
     public void set(EditableQATabView qaTab) throws EmfException {
-        qaPresenter = new EditableQAStepsPresenterImpl(dataset, session.qaService(), qaTab);
+        EditableQAStepsPresenterImpl qaPresenter = new EditableQAStepsPresenterImpl(dataset, session, qaTab);
         set(qaPresenter);
+
+        presenters.add(qaPresenter);
     }
 
     void set(EditableQAStepsPresenter presenter) throws EmfException {
         presenter.display();
     }
 
+    private DataService dataService() {
+        return session.dataService();
+    }
 }

@@ -1,11 +1,9 @@
 package gov.epa.emissions.framework.client.meta.keywords;
 
-import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.client.meta.PropertiesEditorTabPresenter;
 
-public interface EditableKeywordsTabPresenter {
+public interface EditableKeywordsTabPresenter extends PropertiesEditorTabPresenter {
 
     void display(Keywords masterKeywords);
-
-    void doSave() throws EmfException;
 
 }

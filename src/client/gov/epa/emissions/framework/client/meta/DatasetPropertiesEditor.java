@@ -62,7 +62,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         tabbedPane.addTab("Notes", createNotesTab(parentConsole));
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
         tabbedPane.addTab("Tables", createInfoTab(dataset, parentConsole));
-        tabbedPane.addTab("QA", createQATab(versions));
+        tabbedPane.addTab("QA", createQATab());
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -81,8 +81,8 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         }
     }
 
-    private JPanel createQATab(Version[] versions) {
-        EditableQATab view = new EditableQATab(versions, session.qaService(), this, parentConsole);
+    private JPanel createQATab() {
+        EditableQATab view = new EditableQATab(this, parentConsole);
         try {
             presenter.set(view);
         } catch (EmfException e) {

@@ -6,10 +6,9 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.console.EmfConsole;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
-import gov.epa.emissions.framework.services.qa.QAService;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
+import gov.epa.emissions.framework.ui.ScrollableTable;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -20,13 +19,10 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 
 public class EditableQATab extends JPanel implements EditableQATabView {
 
     private EditableQAStepsPresenter presenter;
-
-    private QAService service;
 
     private EditableQAStepsTableData tableData;
 
@@ -36,16 +32,22 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     private EmfConsole parent;
 
-    private Version[] versions;
-
     ManageChangeables changeablesList;
 
-    public EditableQATab(Version[] versions, QAService service, ManageChangeables changeablesList, EmfConsole parent) {
-        this.service = service;
-        this.versions = versions;
+    private Version[] versions;
 
+    public EditableQATab(ManageChangeables changeablesList, EmfConsole parent) {
         this.parent = parent;
         this.changeablesList = changeablesList;
+    }
+
+    public void display(QAStep[] steps, Version[] versions) {
+        this.versions = versions;
+        super.setLayout(new BorderLayout());
+        super.add(createTableSection(steps), BorderLayout.PAGE_START);
+        super.add(createButtonsSection(), BorderLayout.CENTER);
+
+        super.setSize(new Dimension(700, 300));
     }
 
     private JPanel createTableSection(QAStep[] steps) {
@@ -62,8 +64,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         table.setPreferredScrollableViewportSize(new Dimension(500, 320));
         changeablesList.addChangeable(table);
 
-        return new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        return new ScrollableTable(table);
     }
 
     private JPanel createButtonsSection() {
@@ -100,9 +101,8 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         this.presenter = presenter;
     }
 
-    public void save() throws EmfException {
-        QAStep[] sources = tableData.sources();
-        service.update(sources);
+    public QAStep[] steps() {
+        return tableData.sources();
     }
 
     private void addExisting() {
@@ -144,13 +144,6 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     public void refresh() {
         tableModel.refresh();
         super.revalidate();
-    }
-
-    public void display(QAStep[] steps) {
-        super.setLayout(new BorderLayout());
-        super.add(createTableSection(steps), BorderLayout.PAGE_START);
-        super.add(createButtonsSection(), BorderLayout.CENTER);
-        super.setSize(new Dimension(700, 300));
     }
 
 }
