@@ -37,7 +37,7 @@ public class ViewableQAStepTemplateWindow extends DisposableInteralFrame impleme
     private TextArea description;
 
     public ViewableQAStepTemplateWindow(String title, DesktopManager desktopManager) {
-        super("QA Step Template", new Dimension(550, 300), desktopManager);
+        super("QA Step Template", new Dimension(550, 350), desktopManager);
         this.title = title;
     }
 
@@ -85,7 +85,9 @@ public class ViewableQAStepTemplateWindow extends DisposableInteralFrame impleme
         required.setEnabled(false);
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
-        description = new TextArea("", "", 40, 3);
+        description = new TextArea("", "", 40, 10);
+        description.setLineWrap(true);
+        description.setWrapStyleWord(true);
         description.setEditable(false);
         ScrollableTextArea scrollableDesc = ScrollableTextArea.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);

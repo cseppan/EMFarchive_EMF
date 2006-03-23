@@ -112,6 +112,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         addChangeable(description);
         description.addKeyListener();
         description.setLineWrap(true);
+        description.setWrapStyleWord(true);
         ScrollableTextArea scrollableDesc = ScrollableTextArea.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
 
