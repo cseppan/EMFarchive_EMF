@@ -141,7 +141,7 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
         List selectedValues = Arrays.asList(optional.getSelectedValues());
         QAStepTemplate[] optionalTemplates = (QAStepTemplate[]) selectedValues.toArray(new QAStepTemplate[0]);
 
-        QAStep[] all = templates.instantiate(optionalTemplates, dataset, version);
+        QAStep[] all = templates.createSteps(optionalTemplates, dataset, version);
 
         steps.addAll(Arrays.asList(all));
 

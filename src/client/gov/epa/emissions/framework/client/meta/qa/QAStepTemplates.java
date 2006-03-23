@@ -36,7 +36,7 @@ public class QAStepTemplates {
         return (QAStepTemplate[]) results.toArray(new QAStepTemplate[0]);
     }
 
-    public QAStep[] instantiateRequired(EmfDataset dataset, Version version) {
+    public QAStep[] createRequiredSteps(EmfDataset dataset, Version version) {
         List steps = new ArrayList();
 
         QAStepTemplate[] required = required();
@@ -48,7 +48,7 @@ public class QAStepTemplates {
         return (QAStep[]) steps.toArray(new QAStep[0]);
     }
 
-    QAStepTemplate[] required() {
+    public QAStepTemplate[] required() {
         List required = new ArrayList();
         for (int i = 0; i < templates.length; i++) {
             if (templates[i].isRequired())
@@ -58,7 +58,7 @@ public class QAStepTemplates {
         return (QAStepTemplate[]) required.toArray(new QAStepTemplate[0]);
     }
 
-    public QAStep[] instantiateOptional(QAStepTemplate[] optionals, EmfDataset dataset, Version version) {
+    public QAStep[] createOptionalSteps(QAStepTemplate[] optionals, EmfDataset dataset, Version version) {
         List steps = new ArrayList();
 
         for (int i = 0; i < optionals.length; i++) {
@@ -70,13 +70,13 @@ public class QAStepTemplates {
     }
 
     
-    public QAStep[] instantiate(QAStepTemplate[] optional, EmfDataset dataset, Version version) {
+    public QAStep[] createSteps(QAStepTemplate[] optional, EmfDataset dataset, Version version) {
         List all = new ArrayList();
         
-        QAStep[] requiredSteps = instantiateRequired(dataset, version);
+        QAStep[] requiredSteps = createRequiredSteps(dataset, version);
         all.addAll(Arrays.asList(requiredSteps));
         
-        QAStep[] optionalSteps = instantiateOptional(optional, dataset, version);
+        QAStep[] optionalSteps = createOptionalSteps(optional, dataset, version);
         all.addAll(Arrays.asList(optionalSteps));
         
         return (QAStep[]) all.toArray(new QAStep[0]);
