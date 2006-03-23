@@ -16,6 +16,8 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -47,6 +49,8 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     private TextArea description;
 
     private SingleLineMessagePanel messagePanel;
+    
+    private Button ok;
 
     public EditQAStepTemplateWindow(String title, DesktopManager desktopManager) {
         super("Edit QA Step Template", new Dimension(550, 350), desktopManager);
@@ -93,27 +97,21 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         ScrollableTextArea scrollableDetails = ScrollableTextArea.createWithVerticalScrollBar(programParameters);
         layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
 
-        order = new NumberFormattedTextField(5, new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    Float.parseFloat(order.getText());
-                } catch (NumberFormatException ex) {
-                    messagePanel.setError("Order should be a floating point number");
-                }
-            }
-        });
+        order = new NumberFormattedTextField(5, getFormatAction());
         
         addChangeable(order);
-        order.addKeyListener();
+        order.addEditTrackingListener();
+        order.addKeyListener(getKeyVerifyListener());
         layoutGenerator.addLabelWidgetPair("Order", order, panel);
 
         required = new CheckBox("");
         addChangeable(required);
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
-        description = new TextArea("", "", 40, 8);
+        description = new TextArea("", "", 40, 10);
         addChangeable(description);
         description.addKeyListener();
+        description.setLineWrap(true);
         ScrollableTextArea scrollableDesc = ScrollableTextArea.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
 
@@ -123,6 +121,45 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
                 10, 10);// xPad, yPad
 
         return panel;
+    }
+
+    private AbstractAction getFormatAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Float.parseFloat(order.getText());
+                } catch (NumberFormatException ex) {
+                    messagePanel.setError("Order should be a floating point number");
+                }
+            }
+        };
+    }
+
+    private KeyListener getKeyVerifyListener() {
+        return new KeyListener() {
+            public void keyTyped(KeyEvent e) {
+                keyActions();
+            }
+
+            public void keyReleased(KeyEvent e) {
+                keyActions();
+            }
+
+            public void keyPressed(KeyEvent e) {
+                keyActions();
+            }
+        };
+    }
+    
+    private void keyActions() {
+        try {
+            messagePanel.clear();
+            Float.parseFloat(order.getText());
+            ok.setEnabled(true);
+        } catch (NumberFormatException ex) {
+            ok.setEnabled(false);
+            messagePanel.setError("Order should be a floating point number");
+        }
     }
 
     private boolean verifyInput(DatasetType type) {
@@ -153,7 +190,8 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
     private JPanel buttonsPanel(final DatasetType type) {
         JPanel panel = new JPanel();
-        Button ok = new Button("OK", new AbstractAction() {
+
+        ok = new Button("OK", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit(type);
                 close();

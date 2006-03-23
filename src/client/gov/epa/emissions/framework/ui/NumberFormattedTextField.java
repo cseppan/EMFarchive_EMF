@@ -67,7 +67,7 @@ public class NumberFormattedTextField extends JFormattedTextField implements Cha
         return getText().trim().length() == 0;
     }
     
-    public void addKeyListener() {
+    public void addEditTrackingListener() {
         this.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 notifyChanges();
