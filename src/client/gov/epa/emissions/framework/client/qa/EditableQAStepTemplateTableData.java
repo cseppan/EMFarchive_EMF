@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.qa;
 
 import gov.epa.emissions.commons.data.QAStepTemplate;
+import gov.epa.emissions.framework.client.meta.qa.QAStepTemplates;
 import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.EditableTableData;
@@ -101,6 +102,11 @@ public class EditableQAStepTemplateTableData extends AbstractEditableTableData i
             sources.add(rowSource.source());
         }
         return sources;
+    }
+    
+    public void sortByOrder() {
+        QAStepTemplates templates = new QAStepTemplates(sources());
+        this.rows = createRows(templates.sortByOrder());
     }
 
 }

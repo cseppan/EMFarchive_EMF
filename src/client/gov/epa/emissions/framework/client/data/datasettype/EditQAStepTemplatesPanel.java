@@ -18,8 +18,10 @@ import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 
 import java.awt.BorderLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
@@ -75,11 +77,22 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
 
     protected JScrollPane table() {
         tableModel = new EditableEmfTableModel(tableData);
-        table = new EditableTable(tableModel);
+        table = new EditableTable(tableModel){
+            public String getToolTipText(MouseEvent e) { return getCellTip(e, this); }
+        };
         changeablesList.addChangeable(table);
         table.setRowHeight(16);
 
         return new JScrollPane(table);
+    }
+    
+
+    private String getCellTip(MouseEvent e, EditableTable table) {
+        Point p = e.getPoint();
+        int rowIndex = table.rowAtPoint(p);
+        int colIndex = table.columnAtPoint(p);
+        
+        return table.getValueAt(rowIndex, colIndex).toString();
     }
 
     private void setColumnWidths(TableColumnModel model) {
@@ -127,6 +140,7 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
     }
 
     public void refresh() {
+        tableData.sortByOrder();
         tableModel.refresh();
         super.revalidate();
     }

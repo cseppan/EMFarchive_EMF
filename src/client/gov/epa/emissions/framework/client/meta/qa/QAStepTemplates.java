@@ -81,5 +81,10 @@ public class QAStepTemplates {
         
         return (QAStep[]) all.toArray(new QAStep[0]);
     }
+    
+    public QAStepTemplate[] sortByOrder() {
+        Arrays.sort(templates, new QAStepOrderComparator());
+        return templates;
+    }
 
 }

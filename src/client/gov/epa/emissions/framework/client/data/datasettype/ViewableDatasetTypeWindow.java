@@ -17,7 +17,9 @@ import gov.epa.emissions.framework.ui.TableData;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -127,7 +129,9 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         panel.setBorder(BorderFactory.createTitledBorder("QA Step Templates"));
 
         EditableQAStepTemplateTableData tableData = new EditableQAStepTemplateTableData(type.getQaStepTemplates());
-        JTable table = new JTable(new EmfTableModel(tableData));
+        JTable table = new JTable(new EmfTableModel(tableData)){
+            public String getToolTipText(MouseEvent e) { return getCellTip(e, this); }
+        };
         table.setRowHeight(16);
 
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
@@ -148,6 +152,14 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         panel.add(view, BorderLayout.LINE_START);
         
         return panel;
+    }
+    
+    private String getCellTip(MouseEvent e, JTable table) {
+        Point p = e.getPoint();
+        int rowIndex = table.rowAtPoint(p);
+        int colIndex = table.columnAtPoint(p);
+        
+        return table.getValueAt(rowIndex, colIndex).toString();
     }
 
     private void showTemplateWindows(EditableQAStepTemplateTableData data, DatasetType type) {

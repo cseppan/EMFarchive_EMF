@@ -18,8 +18,11 @@ public class QAStepTemplatesTest extends TestCase {
 
     protected void setUp() throws Exception {
         req1 = required("req1");
+        req1.setOrder(0.001f);
         req2 = required("req2");
+        req2.setOrder(0.002f);
         optional = optional("opt");
+        optional.setOrder(123.123f);
         
         QAStepTemplate[] list = { optional, req1, req2 };
         templates = new QAStepTemplates(list);
@@ -113,5 +116,17 @@ public class QAStepTemplatesTest extends TestCase {
         assertEquals(req1.getName(), results[0].getName());
         assertEquals(req2.getName(), results[1].getName());
         assertEquals(optional.getName(), results[2].getName());
+    }
+    
+    public void testShouldSortByOrder() {
+        QAStepTemplate[] localTemplates = templates.sortByOrder();
+        
+        assertEquals(req1.getName(), localTemplates[0].getName());
+        assertEquals(req1.getOrder() + "", localTemplates[0].getOrder() + "");
+        assertEquals(req2.getName(), localTemplates[1].getName());
+        assertEquals(req2.getOrder() + "", localTemplates[1].getOrder() + "");
+        assertEquals(optional.getName(), localTemplates[2].getName());
+        assertEquals(optional.getOrder() + "", localTemplates[2].getOrder() + "");
+        
     }
 }
