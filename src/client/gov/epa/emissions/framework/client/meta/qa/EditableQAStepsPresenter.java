@@ -7,5 +7,7 @@ public interface EditableQAStepsPresenter extends PropertiesEditorTabPresenter {
     void display() throws EmfException;
 
     void doAdd(NewQAStepView stepview);
+    
+    void doSetStatus(QAStatusView statusview);
 
 }

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.commons.gui.Confirm;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.ConcurrentTaskRunner;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -176,6 +177,10 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         Confirm emfConfirmDialog = new EmfDialog(this, "Unsaved Changes Exist", JOptionPane.QUESTION_MESSAGE, msg,
                 JOptionPane.YES_NO_OPTION);
         return emfConfirmDialog;
+    }
+    
+    public User getUser() {
+        return session.user();
     }
 
 }

@@ -43,5 +43,12 @@ public class EditableQAStepsPresenterImpl implements EditableQAStepsPresenter {
             view.add(stepview.qaSteps());
         }
     }
+    
+    public void doSetStatus(QAStatusView statusview) {
+        statusview.display();
+        if (statusview.shouldSetStatus()) {
+            view.setStatus(statusview.qaStepStub());
+        }
+    }
 
 }

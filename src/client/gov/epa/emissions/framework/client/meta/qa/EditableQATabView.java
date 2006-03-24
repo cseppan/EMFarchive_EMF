@@ -13,4 +13,6 @@ public interface EditableQATabView {
 
     QAStep[] steps();
 
+    void setStatus(QAStep step);
+
 }

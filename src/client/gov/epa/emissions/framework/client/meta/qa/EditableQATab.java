@@ -13,6 +13,8 @@ import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
@@ -91,6 +93,13 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         });
         container.add(update);
 
+        Button status = new BorderlessButton("Set Status", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                showStatusDialog();
+            }
+        });
+        container.add(status);
+
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
 
@@ -124,5 +133,23 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         tablePanel.removeAll();
         tablePanel.add(createSortFilterPanel(parentConsole));
     }
+    
+    public void showStatusDialog() {
+        presenter.doSetStatus(new QAStatusDialog(parentConsole));
+    }
 
+    public void setStatus(QAStep step) {
+        List selected = selectModel.selected();
+        
+        for(Iterator iter = selected.iterator(); iter.hasNext();) {
+            QAStep selectedStep = (QAStep) iter.next();
+            selectedStep.setStatus(step.getStatus());
+            selectedStep.setWhen(step.getWhen());
+            selectedStep.setWho(step.getWho());
+            selectedStep.setResult(selectedStep.getResult() +
+                    System.getProperty("line.separator") + step.getResult());
+        }
+        
+        refresh();
+    }
 }
