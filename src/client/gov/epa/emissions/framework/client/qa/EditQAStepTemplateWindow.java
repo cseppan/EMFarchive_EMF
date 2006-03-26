@@ -85,7 +85,6 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
         name = new TextField("", 40);
         addChangeable(name);
-        name.addKeyListener();
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
         program = new EditableComboBox(defaultProgram);
@@ -94,15 +93,14 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
         programParameters = new TextArea("", "", 40, 3);
         addChangeable(programParameters);
-        programParameters.addKeyListener();
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programParameters);
         layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
 
-        order = new NumberFormattedTextField(5, getFormatAction());
+        order = new NumberFormattedTextField(5, orderAction());
         
         addChangeable(order);
         order.addEditTrackingListener();
-        order.addKeyListener(getKeyVerifyListener());
+        order.addKeyListener(keyListener());
         layoutGenerator.addLabelWidgetPair("Order", order, panel);
 
         required = new CheckBox("");
@@ -111,7 +109,6 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
         description = new TextArea("", "", 40, 10);
         addChangeable(description);
-        description.addKeyListener();
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
@@ -125,7 +122,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         return panel;
     }
 
-    private AbstractAction getFormatAction() {
+    private AbstractAction orderAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -137,7 +134,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         };
     }
 
-    private KeyListener getKeyVerifyListener() {
+    private KeyListener keyListener() {
         return new KeyListener() {
             public void keyTyped(KeyEvent e) {
                 keyActions();

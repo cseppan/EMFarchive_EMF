@@ -6,8 +6,10 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
 import java.awt.BorderLayout;
@@ -36,9 +38,12 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     private Version[] versions;
 
-    public EditableQATab(EmfConsole parent, ManageChangeables changeables) {
+    private MessagePanel messagePanel;
+
+    public EditableQATab(EmfConsole parent, ManageChangeables changeables, MessagePanel messagePanel) {
         this.parentConsole = parent;
         this.changeables = changeables;
+        this.messagePanel = messagePanel;
     }
 
     public void display(QAStep[] steps, Version[] versions) {
@@ -81,7 +86,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
         Button remove = new BorderlessButton("Add (customized)", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                // TODO
+                addCustom();
             }
         });
         container.add(remove);
@@ -115,7 +120,21 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     }
 
     private void addUsingTemplate() {
+        clearMessage();
         presenter.doAddUsingTemplate(new NewQAStepDialog(parentConsole, versions));
+    }
+
+    private void addCustom() {
+        clearMessage();
+        try {
+            presenter.doAddCustomized(new NewCustomQAStepDialog(parentConsole));
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void clearMessage() {
+        messagePanel.clear();
     }
 
     public void add(QAStep[] steps) {
@@ -139,6 +158,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     }
 
     public void showStatusDialog() {
+        clearMessage();
         presenter.doSetStatus(new QAStatusDialog(parentConsole));
     }
 
