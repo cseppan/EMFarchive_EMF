@@ -9,8 +9,6 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.EmfDialog;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -22,8 +20,6 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
     private UpdateUserPresenter presenter;
 
     private User user;
-
-    private String windowTitle;
 
     private EditableUserProfilePanel panel;
 
@@ -56,7 +52,6 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
 
     private void setEmbellishments(User user) {
         super.setTitle("Update User: " + user.getUsername());
-        this.windowTitle = "Update User: " + user.getUsername();
         super.setName("updateUser" + user.getId());
     }
 
@@ -85,18 +80,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
         EditableUserProfilePanel panel = new EditableUserProfilePanel(user, username, saveAction, closeAction,
                 adminOption, new PopulateUserOnUpdateStrategy(user), this);
 
-        panel.addEditListener(new KeyAdapter() {
-            public void keyTyped(KeyEvent event) {
-                markAsEdited();
-            }
-        });
-
         return panel;
-    }
-
-    private void markAsEdited() {
-        this.setTitle(windowTitle + " *");
-        presenter.onChange();
     }
 
     private void updateUser() {

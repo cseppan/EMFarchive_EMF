@@ -93,19 +93,16 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
         name = new TextField("name", type.getName(), 40);
         addChangeable(name);
-        name.addTextListener();
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         description = new TextArea("description", type.getDescription(), 40);
         addChangeable(description);
-        description.addTextListener();
         ScrollableComponent descScrollableTextArea = new ScrollableComponent(description);
         descScrollableTextArea.setMinimumSize(new Dimension(80, 80));
         layoutGenerator.addLabelWidgetPair("Description:", descScrollableTextArea, panel);
 
         sortOrder = new TextField("sortOrder", type.getDefaultSortOrder(), 40);
         addChangeable(sortOrder);
-        sortOrder.addTextListener();
         layoutGenerator.addLabelWidgetPair("Default Sort Order:", sortOrder, panel);
 
         // Lay out the panel.

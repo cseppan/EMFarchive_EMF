@@ -76,7 +76,6 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
         name = new TextField("name", 40);
         addChangeable(name);
-        name.addTextListener();
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         derivedFrom = new ComboBox("Choose one:", types);
@@ -85,12 +84,10 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         
         minFiles = new TextField("minfiles", 20);
         addChangeable(minFiles);
-        minFiles.addTextListener();
         layoutGenerator.addLabelWidgetPair("Min Files:", minFiles, panel);
 
         maxFiles = new TextField("maxfiles", 20);
         addChangeable(maxFiles);
-        maxFiles.addTextListener();
         layoutGenerator.addLabelWidgetPair("Max Files:", maxFiles, panel);
 
         derivedFrom.addItemListener(new ItemListener() {

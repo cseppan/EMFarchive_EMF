@@ -75,12 +75,10 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
 
         name = new TextField("name", sector.getName(), 20);
         addChangeable(name);
-        name.addTextListener();
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         description = new TextArea("description", sector.getDescription(), 40);
         addChangeable(description);
-        description.addTextListener();
         ScrollableComponent descTextArea = new ScrollableComponent(description);
         descTextArea.setMinimumSize(new Dimension(80, 80));
         // .descTextAredescTextArea.setHorizontalScroll

@@ -15,7 +15,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.event.KeyListener;
 
 import javax.swing.Action;
 import javax.swing.Box;
@@ -109,15 +108,14 @@ public class EditableUserProfilePanel extends JPanel {
         JPanel valuesPanel = new JPanel(valuesLayoutManager);
 
         username = usernameWidget;
-        username.addChangeable(changeablesList);
         valuesPanel.add(usernameWidget.element());
+
         password = new PasswordField("password", 10);
         changeablesList.addChangeable(password);
-        password.addListeners();
         valuesPanel.add(password);
+
         confirmPassword = new PasswordField("confirmPassword", 10);
         changeablesList.addChangeable(confirmPassword);
-        confirmPassword.addListeners();
         valuesPanel.add(confirmPassword);
 
         panel.add(valuesPanel);
@@ -163,25 +161,21 @@ public class EditableUserProfilePanel extends JPanel {
 
         name = new TextField("name", user.getName(), 15);
         changeablesList.addChangeable(name);
-        name.addTextListener();
         valuesPanel.add(name);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
 
         affiliation = new TextField("affiliation", user.getAffiliation(), 15);
         changeablesList.addChangeable(affiliation);
-        affiliation.addTextListener();
         valuesPanel.add(affiliation);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
 
         phone = new TextField("phone", user.getPhone(), 15);
         changeablesList.addChangeable(phone);
-        phone.addTextListener();
         valuesPanel.add(phone);
         valuesPanel.add(Box.createRigidArea(new Dimension(1, 10)));
 
         email = new TextField("email", user.getEmail(), 15);
         changeablesList.addChangeable(email);
-        email.addTextListener();
         valuesPanel.add(email);
 
         panel.add(valuesPanel);
@@ -201,18 +195,6 @@ public class EditableUserProfilePanel extends JPanel {
 
     void setError(String message) {
         messagePanel.setError(message);
-    }
-
-    // TODO: add admin option listener
-    public void addEditListener(KeyListener listener) {
-        name.addKeyListener(listener);
-        affiliation.addKeyListener(listener);
-        phone.addKeyListener(listener);
-        email.addKeyListener(listener);
-
-        username.addKeyListener(listener);
-        password.addKeyListener(listener);
-        confirmPassword.addKeyListener(listener);
     }
 
 }
