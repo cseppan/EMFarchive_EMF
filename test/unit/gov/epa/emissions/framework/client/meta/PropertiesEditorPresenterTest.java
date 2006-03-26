@@ -9,7 +9,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
-import gov.epa.emissions.framework.client.meta.qa.EditableQAStepsPresenter;
+import gov.epa.emissions.framework.client.meta.qa.EditableQATabPresenter;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
@@ -137,10 +137,10 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
                 .proxy());
     }
 
-    private EditableQAStepsPresenter qaStepMockForSave() {
-        Mock mock = mock(EditableQAStepsPresenter.class);
+    private EditableQATabPresenter qaStepMockForSave() {
+        Mock mock = mock(EditableQATabPresenter.class);
         mock.expects(once()).method("doSave");
-        return (EditableQAStepsPresenter) mock.proxy();
+        return (EditableQATabPresenter) mock.proxy();
     }
 
     private EditNotesTabPresenter notesMockForSave() {
@@ -195,9 +195,9 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
     public void testShouldDisplayQATabOnSetQATab() throws Exception {
         PropertiesEditorPresenterImpl presenter = new PropertiesEditorPresenterImpl(null, null, null);
 
-        Mock qaPresenter = mock(EditableQAStepsPresenter.class);
+        Mock qaPresenter = mock(EditableQATabPresenter.class);
         qaPresenter.expects(once()).method("display");
 
-        presenter.set((EditableQAStepsPresenter) qaPresenter.proxy());
+        presenter.set((EditableQATabPresenter) qaPresenter.proxy());
     }
 }

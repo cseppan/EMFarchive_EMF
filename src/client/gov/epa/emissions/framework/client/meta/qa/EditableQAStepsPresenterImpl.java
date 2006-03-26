@@ -5,9 +5,10 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
+import gov.epa.emissions.framework.services.editor.DataEditorService;
 import gov.epa.emissions.framework.services.qa.QAService;
 
-public class EditableQAStepsPresenterImpl implements EditableQAStepsPresenter {
+public class EditableQAStepsPresenterImpl implements EditableQATabPresenter {
 
     private EditableQATabView view;
 
@@ -23,10 +24,13 @@ public class EditableQAStepsPresenterImpl implements EditableQAStepsPresenter {
 
     public void display() throws EmfException {
         QAStep[] steps = qaService().getQASteps(dataset);
-        Version[] versions = session.dataEditorService().getVersions(dataset.getId());
-        
-        view.display(steps, versions);
+        view.display(steps, versions());
         view.observe(this);
+    }
+
+    private Version[] versions() throws EmfException {
+        DataEditorService service = session.dataEditorService();
+        return service.getVersions(dataset.getId());
     }
 
     private QAService qaService() {
@@ -37,17 +41,28 @@ public class EditableQAStepsPresenterImpl implements EditableQAStepsPresenter {
         qaService().update(view.steps());
     }
 
-    public void doAdd(NewQAStepView stepview) {
-        stepview.display(dataset, dataset.getDatasetType());
-        if (stepview.shouldCreate()) {
-            view.add(stepview.qaSteps());
+    public void doAddUsingTemplate(NewQAStepView stepView) {
+        stepView.display(dataset, dataset.getDatasetType());
+        if (stepView.shouldCreate()) {
+            view.add(stepView.qaSteps());
         }
     }
-    
-    public void doSetStatus(QAStatusView statusview) {
-        statusview.display();
-        if (statusview.shouldSetStatus()) {
-            view.setStatus(statusview.qaStepStub());
+
+    public void doAddCustomized(NewCustomQAStepView stepView) throws EmfException {
+        doAddCustomized(stepView, versions());
+    }
+
+    void doAddCustomized(NewCustomQAStepView stepView, Version[] versions) {
+        stepView.display(dataset, versions);
+        if (stepView.shouldCreate()) {
+            view.add(stepView.step());
+        }
+    }
+
+    public void doSetStatus(QAStatusView statusView) {
+        statusView.display();
+        if (statusView.shouldSetStatus()) {
+            view.setStatus(statusView.qaStepStub());
         }
     }
 

@@ -22,7 +22,7 @@ import javax.swing.JScrollPane;
 
 public class EditableQATab extends JPanel implements EditableQATabView {
 
-    private EditableQAStepsPresenter presenter;
+    private EditableQATabPresenter presenter;
 
     private EditableQAStepsTableData tableData;
 
@@ -72,14 +72,14 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     private JPanel createButtonsSection() {
         JPanel container = new JPanel();
 
-        Button add = new BorderlessButton("Add From Template", new AbstractAction() {
+        Button add = new BorderlessButton("Add (using Template)", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                addExisting();
+                addUsingTemplate();
             }
         });
         container.add(add);
 
-        Button remove = new BorderlessButton("Add New", new AbstractAction() {
+        Button remove = new BorderlessButton("Add (customized)", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 // TODO
             }
@@ -106,7 +106,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         return panel;
     }
 
-    public void observe(EditableQAStepsPresenter presenter) {
+    public void observe(EditableQATabPresenter presenter) {
         this.presenter = presenter;
     }
 
@@ -114,8 +114,8 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         return tableData.sources();
     }
 
-    private void addExisting() {
-        presenter.doAdd(new NewQAStepDialog(parentConsole, versions));
+    private void addUsingTemplate() {
+        presenter.doAddUsingTemplate(new NewQAStepDialog(parentConsole, versions));
     }
 
     public void add(QAStep[] steps) {
@@ -127,29 +127,33 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         refresh();
     }
 
+    public void add(QAStep step) {
+        add(new QAStep[] { step });
+    }
+
     public void refresh() {
         selectModel.refresh();
 
         tablePanel.removeAll();
         tablePanel.add(createSortFilterPanel(parentConsole));
     }
-    
+
     public void showStatusDialog() {
         presenter.doSetStatus(new QAStatusDialog(parentConsole));
     }
 
     public void setStatus(QAStep step) {
         List selected = selectModel.selected();
-        
-        for(Iterator iter = selected.iterator(); iter.hasNext();) {
+
+        for (Iterator iter = selected.iterator(); iter.hasNext();) {
             QAStep selectedStep = (QAStep) iter.next();
             selectedStep.setStatus(step.getStatus());
             selectedStep.setWhen(step.getWhen());
             selectedStep.setWho(step.getWho());
-            selectedStep.setResult(selectedStep.getResult() +
-                    System.getProperty("line.separator") + step.getResult());
+            selectedStep.setResult(selectedStep.getResult() + System.getProperty("line.separator") + step.getResult());
         }
-        
+
         refresh();
     }
+
 }

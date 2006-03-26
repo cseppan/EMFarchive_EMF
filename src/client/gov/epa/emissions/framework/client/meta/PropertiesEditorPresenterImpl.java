@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
-import gov.epa.emissions.framework.client.meta.qa.EditableQAStepsPresenter;
+import gov.epa.emissions.framework.client.meta.qa.EditableQATabPresenter;
 import gov.epa.emissions.framework.client.meta.qa.EditableQAStepsPresenterImpl;
 import gov.epa.emissions.framework.client.meta.qa.EditableQATabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenterImpl;
@@ -102,7 +102,7 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
         presenters.add(qaPresenter);
     }
 
-    void set(EditableQAStepsPresenter presenter) throws EmfException {
+    void set(EditableQATabPresenter presenter) throws EmfException {
         presenter.display();
     }
 

@@ -7,9 +7,11 @@ public interface EditableQATabView {
 
     void display(QAStep[] steps, Version[] versions);
 
-    void observe(EditableQAStepsPresenter presenter);
+    void observe(EditableQATabPresenter presenter);
 
     void add(QAStep[] steps);
+
+    void add(QAStep step);
 
     QAStep[] steps();
 
