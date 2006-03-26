@@ -49,11 +49,11 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
 
     private DesktopManager desktopManager;
 
-    public EditQAStepTemplatesPanel(DatasetType type, EditableQAStepTemplateTableData tableData,
-            ManageChangeables changeablesList, EmfConsole parent, DesktopManager desktopManager) {
+    public EditQAStepTemplatesPanel(DatasetType type, ManageChangeables changeablesList, EmfConsole parent,
+            DesktopManager desktopManager) {
         this.changeablesList = changeablesList;
         this.type = type;
-        this.tableData = tableData;
+        tableData = new EditableQAStepTemplateTableData(type.getQaStepTemplates());
         this.parent = parent;
         this.desktopManager = desktopManager;
 
@@ -77,21 +77,22 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
 
     protected JScrollPane table() {
         tableModel = new EditableEmfTableModel(tableData);
-        table = new EditableTable(tableModel){
-            public String getToolTipText(MouseEvent e) { return getCellTip(e, this); }
+        table = new EditableTable(tableModel) {
+            public String getToolTipText(MouseEvent e) {
+                return getCellTip(e, this);
+            }
         };
         changeablesList.addChangeable(table);
         table.setRowHeight(16);
 
         return new JScrollPane(table);
     }
-    
 
     private String getCellTip(MouseEvent e, EditableTable table) {
         Point p = e.getPoint();
         int rowIndex = table.rowAtPoint(p);
         int colIndex = table.columnAtPoint(p);
-        
+
         return table.getValueAt(rowIndex, colIndex).toString();
     }
 

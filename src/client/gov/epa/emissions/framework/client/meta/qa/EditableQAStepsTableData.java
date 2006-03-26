@@ -21,6 +21,7 @@ public class EditableQAStepsTableData extends ChangeableTableData {
 
     public void add(QAStep step) {
         rows.add(row(step));
+        notifyChanges();
     }
 
     public String[] columns() {

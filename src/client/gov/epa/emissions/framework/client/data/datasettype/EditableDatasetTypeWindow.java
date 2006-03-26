@@ -13,7 +13,6 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueTableData;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
 import gov.epa.emissions.framework.client.qa.EditQAStepTemplatesPresenter;
-import gov.epa.emissions.framework.client.qa.EditableQAStepTemplateTableData;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -122,9 +121,7 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
     }
 
     private JPanel createQAStepTemplatesPanel(DatasetType type) {
-        EditableQAStepTemplateTableData tableData = new EditableQAStepTemplateTableData(type.getQaStepTemplates());
-        qaStepTemplatesPanel = new EditQAStepTemplatesPanel(type, tableData, this, parent, desktopManager);
-
+        qaStepTemplatesPanel = new EditQAStepTemplatesPanel(type, this, parent, desktopManager);
         EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenter(type, qaStepTemplatesPanel);
         presenter.display();
 

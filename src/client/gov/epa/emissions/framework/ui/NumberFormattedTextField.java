@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.ui;
 
 import gov.epa.emissions.commons.gui.Changeable;
-import gov.epa.emissions.commons.gui.ChangeablesList;
+import gov.epa.emissions.commons.gui.Changeables;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -15,10 +15,10 @@ import javax.swing.text.NumberFormatter;
 
 public class NumberFormattedTextField extends JFormattedTextField implements Changeable {
 
-    private ChangeablesList listOfChangeables;
+    private Changeables changeables;
 
     private boolean changed = false;
-    
+
     public NumberFormattedTextField(int min, int max, int size, Action action) {
         super.setFormatterFactory(new DefaultFormatterFactory(integerFormatter(min, max)));
         super.setValue(new Integer(min));
@@ -66,8 +66,8 @@ public class NumberFormattedTextField extends JFormattedTextField implements Cha
     public boolean isEmpty() {
         return getText().trim().length() == 0;
     }
-    
-    public void addEditTrackingListener() {
+
+    private void addEditTrackingListener() {
         this.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 notifyChanges();
@@ -81,15 +81,17 @@ public class NumberFormattedTextField extends JFormattedTextField implements Cha
 
     private void notifyChanges() {
         this.changed = true;
-        this.listOfChangeables.onChanges();
+        if (changeables != null)
+            changeables.onChanges();
     }
 
     public boolean hasChanges() {
         return this.changed;
     }
 
-    public void observe(ChangeablesList list) {
-        this.listOfChangeables = list;
+    public void observe(Changeables changeables) {
+        this.changeables = changeables;
+        addEditTrackingListener();
     }
 
 }

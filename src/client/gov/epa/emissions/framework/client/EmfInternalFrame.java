@@ -3,7 +3,8 @@ package gov.epa.emissions.framework.client;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ChangeObserver;
 import gov.epa.emissions.commons.gui.Changeable;
-import gov.epa.emissions.commons.gui.ChangeablesList;
+import gov.epa.emissions.commons.gui.Changeables;
+import gov.epa.emissions.commons.gui.DefaultChangeables;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.ui.Position;
@@ -22,7 +23,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
 
     private ChangeObserver changeObserver;
 
-    private ChangeablesList changeablesList;
+    private Changeables changeables;
 
     private WidgetChangesMonitor monitor;
 
@@ -33,8 +34,8 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
                 true);// iconifiable
         setLabel(title);
         this.desktopManager = desktopManager;
-        changeablesList = new ChangeablesList(this);
-        monitor = new WidgetChangesMonitor(changeablesList, this);
+        changeables = new DefaultChangeables(this);
+        monitor = new WidgetChangesMonitor(changeables, this);
         changeObserver = new DefaultChangeObserver(this);
 
         addWindowClosingTrap();
@@ -125,7 +126,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     }
 
     public boolean hasChanges() {
-        return changeablesList.hasChanges();
+        return changeables.hasChanges();
     }
 
     public void resetChanges() {
@@ -133,7 +134,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
     }
 
     public void addChangeable(Changeable changeable) {
-        changeablesList.add(changeable);
+        changeables.add(changeable);
     }
 
     public boolean checkChanges() {

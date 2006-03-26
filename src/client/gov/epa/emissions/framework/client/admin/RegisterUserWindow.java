@@ -2,7 +2,8 @@ package gov.epa.emissions.framework.client.admin;
 
 import gov.epa.emissions.commons.gui.ChangeObserver;
 import gov.epa.emissions.commons.gui.Changeable;
-import gov.epa.emissions.commons.gui.ChangeablesList;
+import gov.epa.emissions.commons.gui.Changeables;
+import gov.epa.emissions.commons.gui.DefaultChangeables;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.DefaultChangeObserver;
 import gov.epa.emissions.framework.client.EmfFrame;
@@ -18,12 +19,12 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView, Ch
 
     private ChangeObserver changeObserver;
 
-    private ChangeablesList changeablesList;
+    private Changeables changeablesList;
 
     public RegisterUserWindow(ServiceLocator serviceLocator, PostRegisterStrategy postRegisterStrategy) {
         super("RegisterUser", "Register New User");
         onCancelStrategy = new LaunchLoginOnCancelStrategy(serviceLocator);
-        changeablesList = new ChangeablesList(this);
+        changeablesList = new DefaultChangeables(this);
         changeObserver = new DefaultChangeObserver(this);
         view = new RegisterUserPanel(postRegisterStrategy, onCancelStrategy, this, this);
         this.getContentPane().add(view);

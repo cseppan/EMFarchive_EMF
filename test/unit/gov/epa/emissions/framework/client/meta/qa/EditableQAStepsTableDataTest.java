@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.gui.Changeables;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.Row;
 
@@ -8,9 +10,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.jmock.Mock;
 
-public class EditableQAStepsTableDataTest extends TestCase {
+public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
 
     private EditableQAStepsTableData data;
 
@@ -85,15 +87,15 @@ public class EditableQAStepsTableDataTest extends TestCase {
         List rows = data.rows();
 
         Row row = (Row) rows.get(0);
-        assertEquals(step1.getVersion(), ((Integer)row.getValueAt(0)).intValue());
+        assertEquals(step1.getVersion(), ((Integer) row.getValueAt(0)).intValue());
         assertEquals(step1.getName(), row.getValueAt(1));
         assertEquals(step1.isRequired(), ((Boolean) row.getValueAt(2)).booleanValue());
         assertEquals(step1.getOrder() + "", row.getValueAt(3));
         assertEquals(step1.getStatus(), row.getValueAt(4));
-        
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         assertEquals(dateFormat.format(step1.getWhen()), row.getValueAt(5));
-        
+
         assertEquals(step1.getWho(), row.getValueAt(6));
         assertEquals(step1.getResult(), row.getValueAt(7));
         assertEquals(step1.getProgram(), row.getValueAt(8));
@@ -119,6 +121,10 @@ public class EditableQAStepsTableDataTest extends TestCase {
         step3.setProgramArguments("program-args3");
         step3.setRequired(false);
         step3.setOrder(3);
+
+        Mock changeables = mock(Changeables.class);
+        expects(changeables, 1, "onChanges");
+        data.observe((Changeables) changeables.proxy());
 
         data.add(step3);
 

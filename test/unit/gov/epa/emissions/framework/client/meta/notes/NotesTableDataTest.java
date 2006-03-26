@@ -1,7 +1,8 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.commons.gui.ChangeObserver;
-import gov.epa.emissions.commons.gui.ChangeablesList;
+import gov.epa.emissions.commons.gui.Changeables;
+import gov.epa.emissions.commons.gui.DefaultChangeables;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.services.data.Note;
@@ -107,7 +108,7 @@ public class NotesTableDataTest extends EmfMockObjectTestCase {
 
         Mock observer = mock(ChangeObserver.class);
         expects(observer, 2, "signalSaved");
-        ChangeablesList changeablesList = new ChangeablesList((ChangeObserver) observer.proxy());
+        Changeables changeablesList = new DefaultChangeables((ChangeObserver) observer.proxy());
         
         data.observe(changeablesList);
         data.add(note);

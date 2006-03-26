@@ -50,7 +50,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     private TextArea description;
 
     private SingleLineMessagePanel messagePanel;
-    
+
     private Button ok;
 
     public EditQAStepTemplateWindow(String title, DesktopManager desktopManager) {
@@ -97,9 +97,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
 
         order = new NumberFormattedTextField(5, orderAction());
-        
         addChangeable(order);
-        order.addEditTrackingListener();
         order.addKeyListener(keyListener());
         layoutGenerator.addLabelWidgetPair("Order", order, panel);
 
@@ -149,7 +147,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
             }
         };
     }
-    
+
     private void keyActions() {
         try {
             messagePanel.clear();
@@ -210,8 +208,17 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     }
 
     private void doEdit(DatasetType type) {
+        clearMessage();
         verifyInput(type);
-        presenter.doEdit(this);
+        try {
+            presenter.doEdit(this);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void clearMessage() {
+        messagePanel.clear();
     }
 
     public void windowClosing() {
@@ -226,14 +233,11 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         this.presenter = presenter;
     }
 
-    public void loadTemplate() {
-        try {
-            validateOrder();
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
+    public void loadTemplate() throws EmfException {
+        validateOrder();
+
         template.setName(name.getText().trim());
-        template.setProgram((String)program.getSelectedItem());
+        template.setProgram((String) program.getSelectedItem());
         template.setProgramArguments(programParameters.getText());
         template.setRequired(required.isSelected());
         template.setOrder(Float.parseFloat(order.getText()));
@@ -248,12 +252,12 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         order.setText(template.getOrder() + "");
         description.setText(template.getDescription());
     }
-    
+
     private void validateOrder() throws EmfException {
-        if(!order.isValid() || order.isEmpty()) 
+        if (!order.isValid() || order.isEmpty())
             throw new EmfException("Order field can only be a number");
     }
-    
+
     private void checkChangesAndCloseWindow() {
         if (checkChanges())
             super.close();

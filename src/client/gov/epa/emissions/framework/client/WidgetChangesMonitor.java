@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client;
 
-import gov.epa.emissions.commons.gui.ChangeablesList;
+import gov.epa.emissions.commons.gui.Changeables;
 import gov.epa.emissions.framework.ui.EmfDialog;
 
 import java.awt.Component;
@@ -8,11 +8,11 @@ import java.awt.Component;
 import javax.swing.JOptionPane;
 
 public class WidgetChangesMonitor {
-    private ChangeablesList list;
+    private Changeables list;
     
    private Component window;
     
-    public WidgetChangesMonitor(ChangeablesList list, Component componet) {
+    public WidgetChangesMonitor(Changeables list, Component componet) {
         this.list = list;
         this.window = componet;
     }

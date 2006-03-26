@@ -1,11 +1,11 @@
 package gov.epa.emissions.framework.ui;
 
 import gov.epa.emissions.commons.gui.Changeable;
-import gov.epa.emissions.commons.gui.ChangeablesList;
+import gov.epa.emissions.commons.gui.Changeables;
 
 public abstract class ChangeableTableData extends AbstractTableData implements Changeable {
 
-    private ChangeablesList changeables;
+    private Changeables changeables;
 
     private boolean changed;
 
@@ -22,7 +22,7 @@ public abstract class ChangeableTableData extends AbstractTableData implements C
         return this.changed;
     }
 
-    public void observe(ChangeablesList changeables) {
+    public void observe(Changeables changeables) {
         this.changeables = changeables;
     }
 
