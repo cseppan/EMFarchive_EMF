@@ -97,7 +97,7 @@ public class NewCustomQAStepDialog extends Dialog implements NewCustomQAStepView
         layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
 
         order = new NumberFormattedTextField(5, orderAction());
-        order.addEditTrackingListener();
+        order.setText("0");
         order.addKeyListener(keyListener());
         layoutGenerator.addLabelWidgetPair("Order", order, panel);
 
@@ -115,7 +115,7 @@ public class NewCustomQAStepDialog extends Dialog implements NewCustomQAStepView
         layoutGenerator.addLabelWidgetPair("Version", versionsSelection, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -194,6 +194,12 @@ public class NewCustomQAStepDialog extends Dialog implements NewCustomQAStepView
         step.setDatasetId(dataset.getId());
         step.setVersion(selectedVersion().getVersion());
         step.setRequired(false);
+        
+        step.setName(name.getText());
+        step.setProgram((String)program.getSelectedItem());
+        step.setProgramArguments(programParameters.getText());
+        step.setOrder(Float.parseFloat(order.getText()));
+        step.setDescription(description.getText().trim());
 
         return step;
     }
