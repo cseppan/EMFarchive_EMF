@@ -8,12 +8,16 @@ public class DisposableViewUserWindow extends ViewUserWindow {
         super(desktopManager);
     }
 
-    public void windowClosing() {
+    public void close() {
         super.dispose();
+        super.close();
     }
 
     public boolean isAlive() {
         return !super.isClosed();
     }
 
+    public void windowClosing() {
+        close();
+    }
 }

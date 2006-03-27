@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 
 import java.awt.Dimension;
 
+
 public abstract class ReusableInteralFrame extends EmfInternalFrame {
 
     public ReusableInteralFrame(String title, Dimension dimension, DesktopManager desktopManager) {
@@ -14,8 +15,13 @@ public abstract class ReusableInteralFrame extends EmfInternalFrame {
         super(title, desktopManager);
     }
 
-    final public void windowClosing() {
+    public void windowClosing() {
+        close();
+    }
+
+    public void close() {
         super.setVisible(false);
+        super.close();
     }
 
     public void bringToFront() {

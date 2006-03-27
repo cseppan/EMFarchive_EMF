@@ -14,11 +14,17 @@ public abstract class DisposableInteralFrame extends EmfInternalFrame {
         super(title, desktopManager);
     }
 
-    final public void windowClosing() {
+    public void windowClosing() {
+        close();
+    }
+
+    final public void close() {
         super.dispose();
+        super.close();
     }
 
     public boolean isAlive() {
-        return !super.isClosed();
+        // return !super.isClosed();
+        return false;
     }
 }

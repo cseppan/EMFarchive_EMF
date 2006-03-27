@@ -36,7 +36,7 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
     private TextArea description;
 
     private SectorCriteriaTableData criteriaTableData;
-
+    
     private SectorCriteriaPanel criteriaPanel;
 
     private static int counter;
@@ -145,24 +145,23 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
         return action;
     }
 
+    public void windowClosing() {
+        checkChangesAndCloseWindow();
+    }
+
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                doClose();
+                checkChangesAndCloseWindow();
             }
         };
 
         return action;
     }
 
-<<<<<<< NewSectorWindow.java
     private void checkChangesAndCloseWindow() {
-        if (shouldDiscardChanges())
+        if (checkChanges())
             presenter.doClose();
-=======
-    private void doClose() {
-        presenter.doClose();
->>>>>>> 1.9
     }
 
 }

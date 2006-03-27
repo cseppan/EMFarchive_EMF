@@ -81,7 +81,7 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         derivedFrom = new ComboBox("Choose one:", types);
         addChangeable(derivedFrom);
         layoutGenerator.addLabelWidgetPair("Derived From:", derivedFrom, panel);
-
+        
         minFiles = new TextField("minfiles", 20);
         addChangeable(minFiles);
         layoutGenerator.addLabelWidgetPair("Min Files:", minFiles, panel);
@@ -96,14 +96,14 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
                 minFiles.setEditable(false);
                 maxFiles.setText("1");
                 maxFiles.setEditable(false);
-                if (((String) e.getItem()).equalsIgnoreCase(types[0])) {
+                if(((String)e.getItem()).equalsIgnoreCase(types[0])) {
                     maxFiles.setText("-1");
                     maxFiles.setEditable(true);
                     minFiles.setEditable(true);
                 }
             }
         });
-
+        
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
                 5, 0, // initialX, initialY
@@ -113,9 +113,9 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
     }
 
     private boolean isDigit(String text) {
-        if (text.length() == 0)
+        if(text.length() == 0)
             return false;
-
+        
         if (!Character.isDigit(text.charAt(0)) && text.charAt(0) != '-')
             return false;
 
@@ -162,25 +162,24 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
 
         return action;
     }
+    
+    public void windowClosing() {
+        checkChangesAndCloseWindow();
+    }
 
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                doClose();
+                checkChangesAndCloseWindow();
             }
         };
 
         return action;
     }
 
-<<<<<<< NewDatasetTypeWindow.java
     private void checkChangesAndCloseWindow() {
-        if (shouldDiscardChanges())
+        if (checkChanges())
             presenter.doClose();
-=======
-    private void doClose() {
-        presenter.doClose();
->>>>>>> 1.7
     }
 
     private JPanel createButtonsPanel() {

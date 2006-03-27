@@ -82,7 +82,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private JPanel createQATab() {
-        EditableQATab view = new EditableQATab(parentConsole, desktopManager, this, messagePanel);
+        EditableQATab view = new EditableQATab(parentConsole, this, messagePanel);
         try {
             presenter.set(view);
         } catch (EmfException e) {
@@ -185,7 +185,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
         Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                doClose();
+                closeWindow();
             }
         });
         getRootPane().setDefaultButton(close);
@@ -218,14 +218,14 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         return dateFormat.format(lockDate);
     }
 
-    private void doClose() {
+    public void windowClosing() {
+        closeWindow();
+    }
+
+    private void closeWindow() {
         try {
-<<<<<<< DatasetPropertiesEditor.java
-            if (shouldDiscardChanges())
+            if (checkChanges())
                 presenter.doClose();
-=======
-            presenter.doClose();
->>>>>>> 1.38
         } catch (EmfException e) {
             showError("Could not close: " + e.getMessage());
         }
