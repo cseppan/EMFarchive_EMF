@@ -220,7 +220,12 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private void doClose() {
         try {
+<<<<<<< DatasetPropertiesEditor.java
+            if (shouldDiscardChanges())
+                presenter.doClose();
+=======
             presenter.doClose();
+>>>>>>> 1.38
         } catch (EmfException e) {
             showError("Could not close: " + e.getMessage());
         }

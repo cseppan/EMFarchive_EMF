@@ -74,9 +74,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         when.setEditable(false);
         layoutGenerator.addLabelWidgetPair("When", when, panel);
 
-        TextField who = new TextField("", 40);
-        if (step.getWho() != null)
-            who.setText(step.getWho().getName());
+        TextField who = new TextField("", step.getWho(), 40);
         who.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Who", who, panel);
 

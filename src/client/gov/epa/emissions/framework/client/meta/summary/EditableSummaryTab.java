@@ -7,7 +7,7 @@ import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
-import gov.epa.emissions.commons.gui.FormattedTextField;
+import gov.epa.emissions.commons.gui.FormattedDateField;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
@@ -25,7 +25,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -42,9 +41,9 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private TextField name;
 
-    private FormattedTextField startDateTime;
+    private FormattedDateField startDateTime;
 
-    private FormattedTextField endDateTime;
+    private FormattedDateField endDateTime;
 
     private TextArea description;
 
@@ -153,9 +152,9 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         // time period
-        startDateTime = new FormattedTextField("startDateTime", dataset.getStartDateTime(), DATE_FORMATTER,
+        startDateTime = new FormattedDateField("startDateTime", dataset.getStartDateTime(), DATE_FORMATTER,
                 messagePanel);
-        endDateTime = new FormattedTextField("endDateTime", dataset.getStopDateTime(), DATE_FORMATTER, messagePanel);
+        endDateTime = new FormattedDateField("endDateTime", dataset.getStopDateTime(), DATE_FORMATTER, messagePanel);
         changeablesList.addChangeable(startDateTime);
         changeablesList.addChangeable(endDateTime);
         layoutGenerator.addLabelWidgetPair("Time Period Start:", startDateTime, panel);
@@ -280,8 +279,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         dataset.setName(name.getText());
         dataset.setDescription(description.getText());
         updateProject();
-        dataset.setStartDateTime(toDate(startDateTime.getText()));
-        dataset.setStopDateTime(toDate(endDateTime.getText()));
+        dataset.setStartDateTime(startDateTime.value());
+        dataset.setStopDateTime(endDateTime.value());
         dataset.setTemporalResolution((String) temporalResolutionsCombo.getSelectedItem());
         updateRegion();
         dataset.setCountry((Country) countriesCombo.getSelectedItem());
@@ -354,18 +353,6 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
             }
         }
         return new IntendedUse(intendedUseName);
-    }
-
-    private Date toDate(String text) {
-        if (text == null || text.length() == 0)
-            return null;
-
-        try {
-            return DATE_FORMATTER.parse(text);
-        } catch (ParseException e) {
-            throw new RuntimeException("could not parse Date - " + text + ". Expected format - "
-                    + DATE_FORMATTER.toPattern());
-        }
     }
 
 }

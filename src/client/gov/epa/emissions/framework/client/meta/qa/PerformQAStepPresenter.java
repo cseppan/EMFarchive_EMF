@@ -8,7 +8,13 @@ public class PerformQAStepPresenter {
     private PerformQAStepView view;
     private EmfDataset dataset;
 
+<<<<<<< PerformQAStepPresenter.java
+    private EmfDataset dataset;
+
     public PerformQAStepPresenter(PerformQAStepView view, EmfDataset dataset) {
+=======
+    public PerformQAStepPresenter(PerformQAStepView view, EmfDataset dataset) {
+>>>>>>> 1.2
         this.view = view;
         this.dataset = dataset;
     }
@@ -20,6 +26,10 @@ public class PerformQAStepPresenter {
 
     public void doClose() {
         view.close();
+    }
+
+    public void doEdit() {
+        doClose();
     }
 
 }

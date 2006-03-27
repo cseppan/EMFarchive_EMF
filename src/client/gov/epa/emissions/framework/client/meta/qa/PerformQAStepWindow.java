@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.meta.qa;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
-import gov.epa.emissions.commons.gui.FormattedTextField;
+import gov.epa.emissions.commons.gui.FormattedDateField;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
@@ -51,10 +51,17 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
 
     private final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 
-    private FormattedTextField when;
+    private FormattedDateField when;
 
     public PerformQAStepWindow(DesktopManager desktopManager) {
+<<<<<<< PerformQAStepWindow.java
+        super("Perform QA Step", desktopManager);
+        super.setSize(new Dimension(600, 500));
+
+        super.setResizable(false);
+=======
         super("Perform QA Step", new Dimension(550, 500), desktopManager);
+>>>>>>> 1.2
     }
 
     public void display(QAStep step, EmfDataset dataset) {
@@ -97,9 +104,15 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
         addChangeable(program);
         layoutGenerator.addLabelWidgetPair("Program", program, panel);
 
+<<<<<<< PerformQAStepWindow.java
+        programArguments = new TextArea("", step.getProgramArguments(), 40, 3);
+        addChangeable(programArguments);
+        ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
+=======
         programArguments = new TextArea("", step.getProgramArguments(), 40, 2);
         addChangeable(programArguments);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
+>>>>>>> 1.2
         layoutGenerator.addLabelWidgetPair("Arguments", scrollableDetails, panel);
 
         order = new NumberFormattedTextField(5, orderAction());
@@ -110,27 +123,49 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
 
         CheckBox required = new CheckBox("", false);
         required.setEnabled(false);
-        layoutGenerator.addLabelWidgetPair("Required?", required, panel);
+        layoutGenerator.addLabelWidgetPair("Required ?", required, panel);
 
+<<<<<<< PerformQAStepWindow.java
+        description = new TextArea("", step.getDescription(), 40, 3);
+        addChangeable(description);
+=======
         description = new TextArea("", "", 40, 4);
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
         addChangeable(description);
+>>>>>>> 1.2
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
 
+<<<<<<< PerformQAStepWindow.java
+        who = new TextField("who", step.getWho(), 20);
+        addChangeable(who);
+=======
         String username = step.getWho() != null ? step.getWho().getUsername() : "";
         who = new TextField("who", username, 20);
         addChangeable(who);
+>>>>>>> 1.2
         layoutGenerator.addLabelWidgetPair("User", who, panel);
 
+<<<<<<< PerformQAStepWindow.java
+        when = new FormattedDateField("startDateTime", step.getWhen(), DATE_FORMATTER, messagePanel);
+        addChangeable(when);
+=======
         when = new FormattedTextField("startDateTime", step.getWhen(), DATE_FORMATTER, messagePanel);
         addChangeable(when);
+>>>>>>> 1.2
         layoutGenerator.addLabelWidgetPair("Date", when, panel);
 
+<<<<<<< PerformQAStepWindow.java
+        result = new TextArea("Comment", step.getResult(), 40, 3);
+        addChangeable(result);
+        ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(result);
+        layoutGenerator.addLabelWidgetPair("Comment", scrollableComment, panel);
+=======
         result = new TextArea("Comment", step.getResult(), 40, 2);
         addChangeable(result);
         layoutGenerator.addLabelWidgetPair("Comment", result, panel);
+>>>>>>> 1.2
 
         status = new TextField("Status", step.getStatus(), 20);
         addChangeable(status);
@@ -202,7 +237,8 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
     }
 
     protected void doClose() {
-        presenter.doClose();
+        if (super.shouldDiscardChanges())
+            presenter.doClose();
     }
 
     public void doEdit() {
@@ -213,8 +249,15 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
 
         step.setStatus(status.getText());
         step.setResult(result.getText());
+<<<<<<< PerformQAStepWindow.java
+        step.setWho(who.getText());
+        step.setWhen(when.value());
+
+        presenter.doEdit();
+=======
 
         doClose();
+>>>>>>> 1.2
     }
 
 }

@@ -31,7 +31,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         stub(session, "qaService", qaService.proxy());
         stub(session, "dataEditorService", dataEditorService.proxy());
 
-        EditableQATabPresenter presenter = new EditableQAStepsPresenterImpl(dataset, (EmfSession) session.proxy(),
+        EditableQATabPresenter presenter = new EditableQATabPresenterImpl(dataset, (EmfSession) session.proxy(),
                 (EditableQATabView) view.proxy());
         expectsOnce(view, "observe", presenter);
         expectsOnce(view, "display", new Constraint[] { same(steps), same(versions) });
@@ -55,7 +55,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         Mock tabview = mock(EditableQATabView.class);
         expects(tabview, 1, "add", same(steps));
 
-        EditableQATabPresenter presenter = new EditableQAStepsPresenterImpl(dataset, null, (EditableQATabView) tabview
+        EditableQATabPresenter presenter = new EditableQATabPresenterImpl(dataset, null, (EditableQATabView) tabview
                 .proxy());
 
         presenter.doAddUsingTemplate((NewQAStepView) newQAStepview.proxy());
@@ -76,7 +76,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         Mock tabview = mock(EditableQATabView.class);
         expects(tabview, 1, "add", same(step));
 
-        EditableQAStepsPresenterImpl presenter = new EditableQAStepsPresenterImpl(dataset, null,
+        EditableQATabPresenterImpl presenter = new EditableQATabPresenterImpl(dataset, null,
                 (EditableQATabView) tabview.proxy());
 
         presenter.doAddCustomized((NewCustomQAStepView) newQAStepview.proxy(), versions);
@@ -85,12 +85,25 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
     public void testShouldUpdateQAStepOnPerform() {
         EmfDataset dataset = new EmfDataset();
         QAStep step = new QAStep();
+<<<<<<< EditableQATabPresenterTest.java
+        EmfDataset dataset = new EmfDataset();
 
+=======
+
+>>>>>>> 1.3
         Mock view = mock(PerformQAStepView.class);
+<<<<<<< EditableQATabPresenterTest.java
+        expectsOnce(view, "display", new Constraint[] { same(step), same(dataset) });
+=======
         expectsOnce(view, "display", new Constraint[]{same(step), same(dataset)});
+>>>>>>> 1.3
         expects(view, "observe");
 
+<<<<<<< EditableQATabPresenterTest.java
+        EditableQATabPresenterImpl presenter = new EditableQATabPresenterImpl(dataset, null, null);
+=======
         EditableQAStepsPresenterImpl presenter = new EditableQAStepsPresenterImpl(dataset, null, null);
+>>>>>>> 1.3
 
         presenter.doPerform(step, (PerformQAStepView) view.proxy());
     }
@@ -110,7 +123,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         Mock session = mock(EmfSession.class);
         stub(session, "qaService", qaService.proxy());
 
-        EditableQATabPresenter presenter = new EditableQAStepsPresenterImpl(null, (EmfSession) session.proxy(),
+        EditableQATabPresenter presenter = new EditableQATabPresenterImpl(null, (EmfSession) session.proxy(),
                 (EditableQATabView) view.proxy());
 
         presenter.doSave();
@@ -127,7 +140,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         Mock tabview = mock(EditableQATabView.class);
         expects(tabview, 1, "setStatus", same(step1));
 
-        EditableQATabPresenter presenter = new EditableQAStepsPresenterImpl(null, null, (EditableQATabView) tabview
+        EditableQATabPresenter presenter = new EditableQATabPresenterImpl(null, null, (EditableQATabView) tabview
                 .proxy());
 
         presenter.doSetStatus((QAStatusView) qaStatusView.proxy());

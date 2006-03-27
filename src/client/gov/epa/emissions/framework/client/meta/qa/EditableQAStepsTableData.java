@@ -15,8 +15,16 @@ public class EditableQAStepsTableData extends ChangeableTableData {
 
     private List rows;
 
+    private QAStep[] steps;
+
     public EditableQAStepsTableData(QAStep[] steps) {
+        this.steps = steps;
         this.rows = createRows(steps);
+    }
+
+    public void refresh() {
+        this.rows = createRows(steps);
+        notifyChanges();
     }
 
     public void add(QAStep step) {

@@ -21,9 +21,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         step1 = new QAStep();
         step1.setVersion(2);
         step1.setName("step1");
-        User user1 = new User();
-        user1.setUsername("username1");
-        step1.setWho(user1);
+        step1.setWho("username1");
         step1.setWhen(new Date());
         step1.setProgram("program1");
         step1.setRequired(true);
@@ -34,9 +32,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         step2 = new QAStep();
         step2.setVersion(2);
         step2.setName("step2");
-        User user2 = new User();
-        user2.setUsername("username2");
-        step2.setWho(user2);
+        step2.setWho("username2");
         step2.setWhen(new Date());
         step2.setProgram("program2");
         step2.setRequired(false);

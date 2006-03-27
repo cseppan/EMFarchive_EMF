@@ -173,8 +173,14 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
         return action;
     }
 
+<<<<<<< NewDatasetTypeWindow.java
+    private void checkChangesAndCloseWindow() {
+        if (shouldDiscardChanges())
+            presenter.doClose();
+=======
     private void doClose() {
         presenter.doClose();
+>>>>>>> 1.7
     }
 
     private JPanel createButtonsPanel() {

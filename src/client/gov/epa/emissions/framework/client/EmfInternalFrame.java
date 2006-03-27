@@ -144,8 +144,13 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
         changeables.add(changeable);
     }
 
+<<<<<<< EmfInternalFrame.java
+    public boolean shouldDiscardChanges() {
+        return monitor.checkChanges();
+=======
     public boolean shouldDiscardChanges() {
         return monitor.shouldDiscardChanges();
+>>>>>>> 1.22
     }
 
     protected void setDefaultButton(Button button) {

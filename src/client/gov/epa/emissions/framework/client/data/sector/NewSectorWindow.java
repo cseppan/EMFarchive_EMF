@@ -155,8 +155,14 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
         return action;
     }
 
+<<<<<<< NewSectorWindow.java
+    private void checkChangesAndCloseWindow() {
+        if (shouldDiscardChanges())
+            presenter.doClose();
+=======
     private void doClose() {
         presenter.doClose();
+>>>>>>> 1.9
     }
 
 }

@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.FormattedDateField;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
-import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -12,7 +12,6 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -32,22 +31,24 @@ public class QAStatusDialog extends Dialog implements QAStatusView {
     private JComboBox status;
 
     private JTextField who;
-    
-    private JTextField when;
-    
+
+    private FormattedDateField when;
+
     private JTextArea comment;
-    
+
     private EmfConsole parent;
-    
+
     private SingleLineMessagePanel messagePanel;
-    
-    private String[] statusList = {"Start", "Skipped", "In Progress", "Complete", "Failure" };
+
+    private final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+
+    private String[] statusList = { "Start", "Skipped", "In Progress", "Complete", "Failure" };
 
     public QAStatusDialog(EmfConsole parent) {
         super("Status for Selected QA Steps", parent);
         super.setSize(new Dimension(550, 350));
         super.center();
-        
+
         this.parent = parent;
     }
 
@@ -76,12 +77,12 @@ public class QAStatusDialog extends Dialog implements QAStatusView {
         status = new JComboBox(statusList);
         layoutGenerator.addLabelWidgetPair("Status", status, panel);
 
-        when = new JTextField(new Date().toString(), 40);
+        when = new FormattedDateField("When", new Date(), DATE_FORMATTER, messagePanel);
         layoutGenerator.addLabelWidgetPair("When", when, panel);
 
         who = new JTextField(parent.getUser().getName(), 40);
         layoutGenerator.addLabelWidgetPair("Who", who, panel);
-        
+
         comment = new TextArea("", "", 40, 10);
         comment.setLineWrap(true);
         comment.setWrapStyleWord(true);
@@ -125,31 +126,11 @@ public class QAStatusDialog extends Dialog implements QAStatusView {
     public QAStep qaStepStub() {
         QAStep step = new QAStep();
         step.setStatus(status.getSelectedItem().toString());
-        step.setWhen(getDate());
-        step.setWho(getUser());
+        step.setWhen(when.value());
+        step.setWho(who.getText());
         step.setResult(comment.getText());
-        
+
         return step;
-    }
-
-    private User getUser() {
-        User user = new User();
-        user.setName(who.getText());
-        
-        return user;
-    }
-
-    private Date getDate() {
-        String dateformat = "MM/dd/yyyy hh:mm";
-        String time = when.getText();
-        SimpleDateFormat sdf = new SimpleDateFormat(dateformat);
-        try {
-            Date date = sdf.parse(time);
-            return date;
-        } catch (ParseException e) {
-            messagePanel.setError("Date format should be MM/dd/yyyy hh:mm");
-            return null;
-        }
     }
 
     public boolean shouldSetStatus() {

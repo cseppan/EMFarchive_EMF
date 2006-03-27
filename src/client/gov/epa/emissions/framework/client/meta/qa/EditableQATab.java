@@ -138,6 +138,19 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         }
     }
 
+<<<<<<< EditableQATab.java
+    private void doPerform() {
+        clearMessage();
+
+        List selected = selectModel.selected();
+        for (Iterator iter = selected.iterator(); iter.hasNext();) {
+            QAStep step = (QAStep) iter.next();
+            PerformQAStepWindow view = new PerformQAStepWindow(desktop);
+            presenter.doPerform(step, view);
+        }
+    }
+
+=======
     private void doPerform() {
         clearMessage();
 
@@ -149,6 +162,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         }
     }
 
+>>>>>>> 1.15
     private void clearMessage() {
         messagePanel.clear();
     }
@@ -167,6 +181,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     }
 
     public void refresh() {
+        tableData.refresh();
         selectModel.refresh();
 
         tablePanel.removeAll();

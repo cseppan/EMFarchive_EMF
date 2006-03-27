@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.QAStepTemplate;
-import gov.epa.emissions.commons.security.User;
 
 import java.util.Date;
 
@@ -34,15 +33,13 @@ public class QAStepTest extends TestCase {
         Date date = new Date();
         step.setWhen(date);
         
-        User user = new User();
-        user.setUsername("user");
-        step.setWho(user);
+        step.setWho("user");
         step.setResult("result");
         step.setStatus("status");
         step.setDescription("description");
         
         assertEquals(date, step.getWhen());
-        assertEquals(user, step.getWho());
+        assertEquals("user", step.getWho());
         assertEquals("result", step.getResult());
         assertEquals("status", step.getStatus());
         assertEquals("description", step.getDescription());

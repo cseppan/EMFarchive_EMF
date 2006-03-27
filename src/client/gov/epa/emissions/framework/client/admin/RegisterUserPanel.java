@@ -95,8 +95,21 @@ public class RegisterUserPanel extends JPanel {
         return presenter;
     }
 
+<<<<<<< RegisterUserPanel.java
+    public boolean confirmDiscardChanges() {
+        if (changeablesList instanceof EmfInternalFrame)
+            return ((EmfInternalFrame) changeablesList).shouldDiscardChanges();
+
+        return true;
+    }
+
+    public void closeWindow() {
+        if (confirmDiscardChanges())
+            cancelStrategy.execute(presenter);
+=======
     public void doCancel() {
         cancelStrategy.execute(presenter);
+>>>>>>> 1.19
     }
 
 }

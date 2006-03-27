@@ -151,12 +151,22 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
         return action;
     }
 
+<<<<<<< EditSectorWindow.java
+    private void checkChangesAndCloseWindow() {
+        if (shouldDiscardChanges())
+            try {
+                presenter.doClose();
+            } catch (EmfException e) {
+                messagePanel.setError("Could not close: " + e.getMessage());
+            }
+=======
     private void doClose() {
         try {
             presenter.doClose();
         } catch (EmfException e) {
             messagePanel.setError("Could not close: " + e.getMessage());
         }
+>>>>>>> 1.10
     }
 
 }

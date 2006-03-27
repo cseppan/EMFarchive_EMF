@@ -250,8 +250,14 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
             throw new EmfException("Order field can only be a number");
     }
 
+<<<<<<< EditQAStepTemplateWindow.java
+    private void checkChangesAndCloseWindow() {
+        if (shouldDiscardChanges())
+            super.close();
+=======
     private void doCancel() {
         super.close();
+>>>>>>> 1.12
     }
 
 }

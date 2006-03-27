@@ -1,10 +1,9 @@
 package gov.epa.emissions.framework.services.data;
 
-import java.util.Date;
-
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.security.User;
+
+import java.util.Date;
 
 public class QAStep {
 
@@ -24,7 +23,7 @@ public class QAStep {
 
     private String result;
 
-    private User who;
+    private String who;
 
     private Date when;
 
@@ -117,7 +116,7 @@ public class QAStep {
         this.when = when;
     }
 
-    public void setWho(User who) {
+    public void setWho(String who) {
         this.who = who;
     }
 
@@ -141,7 +140,7 @@ public class QAStep {
         return when;
     }
 
-    public User getWho() {
+    public String getWho() {
         return who;
     }
 

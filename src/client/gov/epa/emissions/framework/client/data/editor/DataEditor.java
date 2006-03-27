@@ -304,7 +304,19 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     public boolean confirmDiscardChanges() {
+<<<<<<< DataEditor.java
         return shouldDiscardChanges();
+    }
+
+    private void closeWindow() {
+        try {
+            doClose();
+        } catch (EmfException e) {
+            displayError("Could not close: " + e.getMessage());
+        }
+=======
+        return shouldDiscardChanges();
+>>>>>>> 1.14
     }
 
     public void signalChanges() {

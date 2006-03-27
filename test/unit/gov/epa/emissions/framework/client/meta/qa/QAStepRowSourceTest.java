@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
-import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.data.QAStep;
 
 import java.text.SimpleDateFormat;
@@ -14,9 +13,7 @@ public class QAStepRowSourceTest extends TestCase {
         QAStep step = new QAStep();
         step.setVersion(2);
         step.setName("step");
-        User user = new User();
-        user.setUsername("username");
-        step.setWho(user);
+        step.setWho("username");
         step.setWhen(new Date());
         step.setProgram("program");
         step.setProgramArguments("args");
