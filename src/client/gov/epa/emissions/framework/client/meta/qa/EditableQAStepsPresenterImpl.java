@@ -66,4 +66,9 @@ public class EditableQAStepsPresenterImpl implements EditableQATabPresenter {
         }
     }
 
+    public void doPerform(QAStep step, PerformQAStepView performView) {
+        PerformQAStepPresenter presenter = new PerformQAStepPresenter(performView);
+        presenter.display(step);
+    }
+
 }

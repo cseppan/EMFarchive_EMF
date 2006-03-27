@@ -82,6 +82,17 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         presenter.doAddCustomized((NewCustomQAStepView) newQAStepview.proxy(), versions);
     }
 
+    public void testShouldUpdateQAStepOnPerform() {
+        QAStep step = new QAStep();
+        Mock view = mock(PerformQAStepView.class);
+        expectsOnce(view, "display", step);
+        expects(view, "observe");
+
+        EditableQAStepsPresenterImpl presenter = new EditableQAStepsPresenterImpl(null, null, null);
+
+        presenter.doPerform(step, (PerformQAStepView) view.proxy());
+    }
+
     public void testShouldSaveQAStepOnSave() throws EmfException {
         EmfDataset dataset = new EmfDataset();
         DatasetType type = new DatasetType();
