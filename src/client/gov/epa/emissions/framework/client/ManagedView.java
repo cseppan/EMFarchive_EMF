@@ -13,5 +13,5 @@ public interface ManagedView extends EmfView {
     
     void resetChanges();
     
-    boolean checkChanges(); //FIXME: do we need this method
+    boolean shouldDiscardChanges(); //FIXME: do we need this method
 }

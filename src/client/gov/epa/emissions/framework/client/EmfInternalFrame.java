@@ -55,10 +55,14 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
 
         this.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosing(InternalFrameEvent event) {
-                windowClosing();
+                xClose();
                 super.internalFrameClosing(event);
             }
         });
+    }
+
+    protected void xClose() {
+        close();
     }
 
     public EmfInternalFrame(String title, Dimension dimension, DesktopManager desktopManager) {
@@ -96,8 +100,11 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
         super.validate();
     }
 
-    public void close() {
-        desktopManager.closeWindow(this);
+    final public void close() {
+        if (shouldDiscardChanges()) {
+            windowClosing();
+            desktopManager.closeWindow(this);
+        }
     }
 
     protected void dimensions(Dimension size) {
@@ -137,8 +144,8 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
         changeables.add(changeable);
     }
 
-    public boolean checkChanges() {
-        return monitor.checkChanges();
+    public boolean shouldDiscardChanges() {
+        return monitor.shouldDiscardChanges();
     }
 
     protected void setDefaultButton(Button button) {

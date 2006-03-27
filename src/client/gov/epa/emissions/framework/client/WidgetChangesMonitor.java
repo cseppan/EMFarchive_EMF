@@ -22,7 +22,7 @@ public class WidgetChangesMonitor {
         list.onChanges();
     }
     
-    public boolean checkChanges() {
+    public boolean shouldDiscardChanges() {
         String message = "Would you like to discard the changes " + System.getProperty("line.separator") + 
                 " and close the current window?";
         String title = "Please choose one";

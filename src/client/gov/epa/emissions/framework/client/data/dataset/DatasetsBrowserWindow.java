@@ -205,7 +205,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     protected void exportSelectedDatasets() {
         EmfDataset[] emfDatasets = getNonExternalDatasets(getSelectedDatasets());
-        verifyKeyVals(emfDatasets);
 
         ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager);
         getDesktopPane().add(exportView);
@@ -303,11 +302,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
         this.presenter = presenter;
     }
 
-    public void close() {
-        // super.dispose(); //why dispose -- reusable frames
-        super.close();
-    }
-
     public void refresh(EmfDataset[] datasets) {
         model.refresh(new EmfDatasetTableData(datasets));
         selectModel.refresh();
@@ -326,10 +320,6 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     public void clearMessage() {
         messagePanel.clear();
         super.refreshLayout();
-    }
-
-    private void verifyKeyVals(EmfDataset[] datasets) {
-        // FIXME: what should be verified/validated?
     }
 
     public void doRefresh() throws EmfException {

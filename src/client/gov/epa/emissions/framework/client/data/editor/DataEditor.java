@@ -189,11 +189,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     private Button closeButton() {
         Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    doClose();
-                } catch (EmfException e) {
-                    displayError("Could not close: " + e.getMessage());
-                }
+                close();
             }
         });
         close.setToolTipText("Close without Saving your changes");
@@ -252,6 +248,14 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         refreshLayout();
     }
 
+    protected void xClose() {
+        try {
+            doClose();
+        } catch (EmfException e) {
+            displayError("Could not close: " + e.getMessage());
+        }
+    }
+
     private void doClose() throws EmfException {
         clearMessages();
         presenter.doClose();
@@ -278,10 +282,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     }
 
-    public void windowClosing() {
-        closeWindow();
-    }
-
     public void notifyLockFailure(DataAccessToken token) {
         Version version = token.getVersion();
         String message = "Cannot edit Version: " + version.getName() + "(" + version.getVersion() + ") of Dataset: "
@@ -304,15 +304,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     public boolean confirmDiscardChanges() {
-        return checkChanges();
-    }
-
-    private void closeWindow() {
-        try {
-            doClose();
-        } catch (EmfException e) {
-            displayError("Could not close: " + e.getMessage());
-        }
+        return shouldDiscardChanges();
     }
 
     public void signalChanges() {

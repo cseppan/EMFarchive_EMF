@@ -12,9 +12,8 @@ public class DisposableUpdateUserWindow extends UpdateUserWindow {
         super(desktopManager);
     }
 
-    public void close() {
+    public void windowClosing() {
         super.dispose();
-        super.close();
     }
 
     public boolean isAlive() {

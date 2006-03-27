@@ -83,12 +83,14 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
     }
 
     public void testShouldUpdateQAStepOnPerform() {
+        EmfDataset dataset = new EmfDataset();
         QAStep step = new QAStep();
+
         Mock view = mock(PerformQAStepView.class);
-        expectsOnce(view, "display", step);
+        expectsOnce(view, "display", new Constraint[]{same(step), same(dataset)});
         expects(view, "observe");
 
-        EditableQAStepsPresenterImpl presenter = new EditableQAStepsPresenterImpl(null, null, null);
+        EditableQAStepsPresenterImpl presenter = new EditableQAStepsPresenterImpl(dataset, null, null);
 
         presenter.doPerform(step, (PerformQAStepView) view.proxy());
     }

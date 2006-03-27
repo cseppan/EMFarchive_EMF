@@ -134,11 +134,6 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
         setLocation(x, y);
     }
 
-    public void close() {
-        super.dispose();
-        // don't try to unregister, since we didn't register with the desktopManager
-    }
-
     public void display() {
         setVisible(true);
         // don't register through desktopmanager, since we don't want to close this window

@@ -8,9 +8,8 @@ public class ViewMyProfileWindow extends ViewUserWindow {
         super(desktopManager);
     }
 
-    public void close() {
+    public void windowClosing() {
         super.setVisible(false);
-        super.close();
     }
 
     public void bringToFront() {
@@ -22,7 +21,4 @@ public class ViewMyProfileWindow extends ViewUserWindow {
         return true;// never terminates, similar to ReusableInternalFrame
     }
 
-    public void windowClosing() {
-        close();
-    }
 }

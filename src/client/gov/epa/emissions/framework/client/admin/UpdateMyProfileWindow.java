@@ -9,9 +9,8 @@ public class UpdateMyProfileWindow extends UpdateUserWindow {
         super(desktopManager);
     }
 
-    public void close() {
+    public void windowClosing() {
         super.setVisible(false);
-        super.close();
     }
 
     public void bringToFront() {

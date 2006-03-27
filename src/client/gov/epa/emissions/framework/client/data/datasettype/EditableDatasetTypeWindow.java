@@ -157,24 +157,19 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         return action;
     }
 
-    public void windowClosing() {
-        checkChangesAndCloseWindow();
-    }
-
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                checkChangesAndCloseWindow();
+                doClose();
             }
         };
 
         return action;
     }
 
-    private void checkChangesAndCloseWindow() {
+    private void doClose() {
         try {
-            if (checkChanges())
-                presenter.doClose();
+            presenter.doClose();
         } catch (EmfException e) {
             messagePanel.setError("Could not close: " + e.getMessage());
         }

@@ -21,8 +21,4 @@ public class RegisterUserInternalFrame extends ReusableInteralFrame implements R
         view.observe(presenter);
     }
 
-    public void windowClosing() {
-        view.closeWindow();
-    }
-
 }

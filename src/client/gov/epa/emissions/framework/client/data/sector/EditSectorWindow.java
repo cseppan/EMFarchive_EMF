@@ -36,7 +36,7 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
     private TextArea description;
 
     private SectorCriteriaTableData criteriaTableData;
-    
+
     private SectorCriteriaPanel criteriaPanel;
 
     public EditSectorWindow(DesktopManager desktopManager) {
@@ -141,27 +141,22 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
         return action;
     }
 
-    public void windowClosing() {
-        checkChangesAndCloseWindow();
-    }
-
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                checkChangesAndCloseWindow();
+                doClose();
             }
         };
 
         return action;
     }
 
-    private void checkChangesAndCloseWindow() {
-        if (checkChanges())
-            try {
-                presenter.doClose();
-            } catch (EmfException e) {
-                messagePanel.setError("Could not close: " + e.getMessage());
-            }
+    private void doClose() {
+        try {
+            presenter.doClose();
+        } catch (EmfException e) {
+            messagePanel.setError("Could not close: " + e.getMessage());
+        }
     }
 
 }

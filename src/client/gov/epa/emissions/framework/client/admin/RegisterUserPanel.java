@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextFieldWidget;
 import gov.epa.emissions.commons.gui.Widget;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.client.EmfInternalFrame;
 import gov.epa.emissions.framework.client.EmfView;
 import gov.epa.emissions.framework.services.EmfException;
 
@@ -57,7 +56,7 @@ public class RegisterUserPanel extends JPanel {
         };
         Action cancelAction = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                closeWindow();
+                doCancel();
             }
         };
 
@@ -96,16 +95,8 @@ public class RegisterUserPanel extends JPanel {
         return presenter;
     }
 
-    public boolean confirmDiscardChanges() {
-        if (changeablesList instanceof EmfInternalFrame)
-            return ((EmfInternalFrame) changeablesList).checkChanges();
-
-        return true;
-    }
-
-    public void closeWindow() {
-        if (confirmDiscardChanges())
-            cancelStrategy.execute(presenter);
+    public void doCancel() {
+        cancelStrategy.execute(presenter);
     }
 
 }

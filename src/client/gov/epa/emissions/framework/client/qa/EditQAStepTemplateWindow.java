@@ -195,7 +195,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
         Button cancel = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                checkChangesAndCloseWindow();
+                doCancel();
             }
         });
         panel.add(cancel);
@@ -215,10 +215,6 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
     private void clearMessage() {
         messagePanel.clear();
-    }
-
-    public void windowClosing() {
-        checkChangesAndCloseWindow();
     }
 
     public boolean shouldCreate() {
@@ -254,9 +250,8 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
             throw new EmfException("Order field can only be a number");
     }
 
-    private void checkChangesAndCloseWindow() {
-        if (checkChanges())
-            super.close();
+    private void doCancel() {
+        super.close();
     }
 
 }

@@ -40,7 +40,7 @@ public class RegisterUserWindow extends EmfFrame implements RegisterUserView, Ch
     }
 
     public void windowClosing() {
-        view.closeWindow();
+        view.doCancel();
     }
 
     public void observe(RegisterUserPresenter presenter) {

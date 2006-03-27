@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -40,8 +41,12 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     private MessagePanel messagePanel;
 
-    public EditableQATab(EmfConsole parent, ManageChangeables changeables, MessagePanel messagePanel) {
+    private DesktopManager desktop;
+
+    public EditableQATab(EmfConsole parent, DesktopManager desktop, ManageChangeables changeables,
+            MessagePanel messagePanel) {
         this.parentConsole = parent;
+        this.desktop = desktop;
         this.changeables = changeables;
         this.messagePanel = messagePanel;
     }
@@ -79,28 +84,28 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
         Button add = new BorderlessButton("Add (using Template)", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                addUsingTemplate();
+                doAddUsingTemplate();
             }
         });
         container.add(add);
 
         Button remove = new BorderlessButton("Add (customized)", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                addCustom();
+                doAddCustom();
             }
         });
         container.add(remove);
 
         Button update = new BorderlessButton("Perform", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                // TODO
+                doPerform();
             }
         });
         container.add(update);
 
         Button status = new BorderlessButton("Set Status", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                showStatusDialog();
+                doSetStatus();
             }
         });
         container.add(status);
@@ -119,17 +124,28 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         return tableData.sources();
     }
 
-    private void addUsingTemplate() {
+    private void doAddUsingTemplate() {
         clearMessage();
         presenter.doAddUsingTemplate(new NewQAStepDialog(parentConsole, versions));
     }
 
-    private void addCustom() {
+    private void doAddCustom() {
         clearMessage();
         try {
             presenter.doAddCustomized(new NewCustomQAStepDialog(parentConsole));
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void doPerform() {
+        clearMessage();
+
+        List selected = selectModel.selected();
+        for (Iterator iter = selected.iterator(); iter.hasNext();) {
+            QAStep step = (QAStep) iter.next();
+            PerformQAStepView view = new PerformQAStepWindow(desktop);
+            presenter.doPerform(step, view);
         }
     }
 
@@ -157,7 +173,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         tablePanel.add(createSortFilterPanel(parentConsole));
     }
 
-    public void showStatusDialog() {
+    public void doSetStatus() {
         clearMessage();
         presenter.doSetStatus(new QAStatusDialog(parentConsole));
     }
