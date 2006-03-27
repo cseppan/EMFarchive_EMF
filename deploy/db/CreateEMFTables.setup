@@ -313,7 +313,7 @@ CREATE TABLE emf.qa_steps
   program_arguments text,
   required bool,
   order_no real,
-  who int4 REFERENCES emf.users(username),
+  who varchar(255),
   "when" timestamp,
   result text,
   status varchar(15),
