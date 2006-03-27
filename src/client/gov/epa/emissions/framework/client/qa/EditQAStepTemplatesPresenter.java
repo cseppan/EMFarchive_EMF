@@ -25,13 +25,13 @@ public class EditQAStepTemplatesPresenter {
             view.add(dialog.template());
     }
 
-    public void showEditView(EditQAStepTemplateView view, QAStepTemplate template) {
+    public void doEdit(EditQAStepTemplateView view, QAStepTemplate template) {
         view.observe(this);
         view.display(type);
         view.display(template);
     }
 
-    public void doEdit(EditQAStepTemplateView view) throws EmfException {
+    public void doEdit_WRONG_PRESENTER(EditQAStepTemplateView view) throws EmfException {
         view.loadTemplate();
         this.view.refresh();
     }

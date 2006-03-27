@@ -120,7 +120,7 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
 
         Button update = new BorderlessButton("Edit", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                update();
+                doEdit();
             }
         });
         container.add(update);
@@ -131,12 +131,11 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
         return panel;
     }
 
-    protected void update() {
-        QAStepTemplate[] selectedRows = tableData.getSelected();
-        for (int i = 0; i < selectedRows.length; i++) {
-            String titleSuffix = "(" + selectedRows[i].getName() + ")";
-            EditQAStepTemplateWindow view = new EditQAStepTemplateWindow(titleSuffix, desktopManager);
-            presenter.showEditView(view, selectedRows[i]);
+    protected void doEdit() {
+        QAStepTemplate[] selected = tableData.getSelected();
+        for (int i = 0; i < selected.length; i++) {
+            EditQAStepTemplateWindow view = new EditQAStepTemplateWindow(desktopManager);
+            presenter.doEdit(view, selected[i]);
         }
     }
 

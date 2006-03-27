@@ -41,8 +41,6 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
     private JPanel layout;
 
-    private String title;
-
     private EditQAStepTemplatesPresenter presenter;
 
     private QAStepTemplate template;
@@ -53,14 +51,12 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
     private Button ok;
 
-    public EditQAStepTemplateWindow(String title, DesktopManager desktopManager) {
+    public EditQAStepTemplateWindow(DesktopManager desktopManager) {
         super("Edit QA Step Template", new Dimension(550, 380), desktopManager);
-        this.title = title;
     }
 
     public void display(DatasetType type) {
-        super.setTitle(super.getTitle() + ": " + type.getName() + " " + title);
-        super.setName(super.getTitle() + ": " + type.getName() + " " + title);
+        super.setLabel(super.getTitle() + ": " + type.getName());
         layout = createLayout(type);
         super.getContentPane().add(layout);
         super.display();
@@ -211,7 +207,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         clearMessage();
         verifyInput(type);
         try {
-            presenter.doEdit(this);
+            presenter.doEdit_WRONG_PRESENTER(this);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
