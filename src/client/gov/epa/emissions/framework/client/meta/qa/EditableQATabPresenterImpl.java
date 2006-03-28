@@ -44,11 +44,11 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
 
     public void doAddUsingTemplate(NewQAStepView stepView) {
         DatasetType type = dataset.getDatasetType();
-        if(type.getQaStepTemplates().length == 0) {
+        if (type.getQaStepTemplates().length == 0) {
             view.informLackOfTemplatesForAddingNewSteps(type);
             return;
         }
-        
+
         stepView.display(dataset, type);
         if (stepView.shouldCreate()) {
             view.add(stepView.steps());
@@ -64,14 +64,12 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
     }
 
     public void doSetStatus(SetQAStatusView statusView, QAStep[] steps) {
-        statusView.display(steps);
-        if (statusView.shouldSetStatus()) {
-            view.refresh();
-        }
+        SetQAStatusPresenter presenter = new SetQAStatusPresenter(statusView, steps, view, session);
+        presenter.display();
     }
 
     public void doEdit(QAStep step, EditQAStepView performView) {
-        PerformQAStepPresenter presenter = new PerformQAStepPresenter(performView, dataset);
+        EditQAStepPresenter presenter = new EditQAStepPresenter(performView, dataset, view);
         presenter.display(step);
     }
 

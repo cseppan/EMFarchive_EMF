@@ -3,14 +3,17 @@ package gov.epa.emissions.framework.client.meta.qa;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
 
-public class PerformQAStepPresenter {
+public class EditQAStepPresenter {
 
     private EditQAStepView view;
+
     private EmfDataset dataset;
 
+    private EditableQATabView tabView;
 
-    public PerformQAStepPresenter(EditQAStepView view, EmfDataset dataset) {
+    public EditQAStepPresenter(EditQAStepView view, EmfDataset dataset, EditableQATabView tabView) {
         this.view = view;
+        this.tabView = tabView;
         this.dataset = dataset;
     }
 
@@ -24,6 +27,7 @@ public class PerformQAStepPresenter {
     }
 
     public void doEdit() {
+        tabView.refresh();
         doClose();
     }
 

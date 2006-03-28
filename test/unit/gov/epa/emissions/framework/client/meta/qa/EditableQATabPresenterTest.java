@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.qa;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
@@ -116,13 +117,12 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
     public void testShouldSetQAStepStatusToViewOnDoSetStatus() {
         Mock qaStatusView = mock(SetQAStatusView.class);
         expects(qaStatusView, 1, "display");
-        stub(qaStatusView, "shouldSetStatus", Boolean.TRUE);
+        expects(qaStatusView, "observe");
 
-        Mock tabview = mock(EditableQATabView.class);
-        expects(tabview, "refresh");
+        Mock session = mock(EmfSession.class);
+        stub(session, "user", new User());
 
-        EditableQATabPresenter presenter = new EditableQATabPresenterImpl(null, null, (EditableQATabView) tabview
-                .proxy());
+        EditableQATabPresenter presenter = new EditableQATabPresenterImpl(null, (EmfSession) session.proxy(), null);
 
         QAStep[] steps = {};
         presenter.doSetStatus((SetQAStatusView) qaStatusView.proxy(), steps);

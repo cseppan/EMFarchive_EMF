@@ -181,7 +181,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
         List selected = selectModel.selected();
         QAStep[] steps = (QAStep[]) selected.toArray(new QAStep[0]);
-        presenter.doSetStatus(new SetQAStatusDialog(parentConsole), steps);
+        presenter.doSetStatus(new SetQAStatusWindow(desktop), steps);
     }
 
     public void informLackOfTemplatesForAddingNewSteps(DatasetType type) {

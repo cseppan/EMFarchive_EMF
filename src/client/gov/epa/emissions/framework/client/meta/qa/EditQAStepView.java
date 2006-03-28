@@ -8,6 +8,6 @@ public interface EditQAStepView extends ManagedView {
 
     void display(QAStep step, EmfDataset dataset);
 
-    void observe(PerformQAStepPresenter presenter);
+    void observe(EditQAStepPresenter presenter);
 
 }

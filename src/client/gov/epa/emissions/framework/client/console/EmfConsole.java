@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.client.console;
 
 import gov.epa.emissions.commons.gui.Confirm;
-import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.ConcurrentTaskRunner;
 import gov.epa.emissions.framework.client.EmfFrame;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -9,9 +8,9 @@ import gov.epa.emissions.framework.client.status.StatusPresenter;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.Dimensions;
-import gov.epa.emissions.framework.ui.YesNoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.emissions.framework.ui.YesNoDialog;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -176,10 +175,6 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
         String msg = "Some windows have unsaved changes.\nDo you want to continue closing these windows?";
         Confirm emfConfirmDialog = new YesNoDialog(this, "Unsaved Changes Exist", msg);
         return emfConfirmDialog;
-    }
-
-    public User getUser() {
-        return session.user();
     }
 
 }

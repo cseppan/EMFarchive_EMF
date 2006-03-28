@@ -42,13 +42,13 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private SingleLineMessagePanel messagePanel;
 
-    private PerformQAStepPresenter presenter;
+    private EditQAStepPresenter presenter;
 
     private QAStep step;
 
     private TextField who;
 
-    private TextArea result;
+    private TextArea comments;
 
     private ComboBox status;
 
@@ -59,11 +59,12 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     private CheckBox required;
 
     public EditQAStepWindow(DesktopManager desktopManager) {
-        super("Edit QA Step", new Dimension(600, 700), desktopManager);
+        super("Edit QA Step", new Dimension(600, 625), desktopManager);
     }
 
     public void display(QAStep step, EmfDataset dataset) {
         this.step = step;
+
         super.setLabel(super.getTitle() + ": " + step.getName());
 
         JPanel layout = createLayout(step, dataset);
@@ -75,7 +76,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         doClose();
     }
 
-    public void observe(PerformQAStepPresenter presenter) {
+    public void observe(EditQAStepPresenter presenter) {
         this.presenter = presenter;
     }
 
@@ -118,9 +119,9 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         addChangeable(date);
         layoutGenerator.addLabelWidgetPair("Date:", date, panel);
 
-        result = new TextArea("Comment", step.getComments(), 40, 3);
-        addChangeable(result);
-        ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(result);
+        comments = new TextArea("Comments", step.getComments(), 40, 3);
+        addChangeable(comments);
+        ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(comments);
         layoutGenerator.addLabelWidgetPair("Comments:", scrollableComment, panel);
 
         // Lay out the panel.
@@ -248,7 +249,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         step.setRequired(required.isSelected());
 
         step.setStatus((String) status.getSelectedItem());
-        step.setComments(result.getText());
+        step.setComments(comments.getText());
         step.setWho(who.getText());
         step.setDate(date.value());
 

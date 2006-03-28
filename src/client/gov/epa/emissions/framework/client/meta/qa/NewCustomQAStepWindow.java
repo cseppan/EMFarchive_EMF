@@ -90,6 +90,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         program = new EditableComboBox(new QAProperties().programs());
+        program.setSelectedItem("");
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
         arguments = new TextArea("", "", 40, 2);

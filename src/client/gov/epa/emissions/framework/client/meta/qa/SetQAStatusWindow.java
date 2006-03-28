@@ -1,35 +1,38 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.FormattedDateField;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.data.QAStep;
-import gov.epa.emissions.framework.ui.Dialog;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
+import abbot.editor.widgets.TextField;
 
-    private boolean shouldSetStatus;
+public class SetQAStatusWindow extends DisposableInteralFrame implements SetQAStatusView {
 
-    private JComboBox status;
+    private ComboBox status;
 
     private JTextField who;
 
@@ -37,24 +40,23 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
 
     private JTextArea comment;
 
-    private EmfConsole parent;
-
     private SingleLineMessagePanel messagePanel;
 
     private final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 
     private QASteps steps;
 
-    public SetQAStatusDialog(EmfConsole parent) {
-        super("Status for Selected QA Steps", parent);
-        super.setSize(new Dimension(550, 350));
-        super.center();
+    private User user;
 
-        this.parent = parent;
+    private SetQAStatusPresenter presenter;
+
+    public SetQAStatusWindow(DesktopManager desktop) {
+        super("Status for Selected QA Steps", new Dimension(550, 350), desktop);
     }
 
-    public void display(QAStep[] steps) {
+    public void display(QAStep[] steps, User user) {
         this.steps = new QASteps(steps);
+        this.user = user;
 
         JPanel layout = createLayout();
         super.getContentPane().add(layout);
@@ -79,13 +81,12 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
 
         layoutGenerator.addLabelWidgetPair("Steps", new Label(steps.namesList()), panel);
 
-        status = new JComboBox(new QAProperties().status());
-        layoutGenerator.addLabelWidgetPair("Status", status, panel);
+        layoutGenerator.addLabelWidgetPair("Status", status(), panel);
 
         when = new FormattedDateField("When", new Date(), DATE_FORMATTER, messagePanel);
         layoutGenerator.addLabelWidgetPair("When", when, panel);
 
-        who = new JTextField(parent.getUser().getName(), 40);
+        who = new TextField(user.getName(), 40);
         layoutGenerator.addLabelWidgetPair("Who", who, panel);
 
         comment = new TextArea("", "", 40, 4);
@@ -95,11 +96,24 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
         layoutGenerator.addLabelWidgetPair("Comment", commentPane, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
+    }
+
+    private ComboBox status() {
+        QAProperties qaProperties = new QAProperties();
+        status = new ComboBox(qaProperties.initialStatus(), qaProperties.status());
+
+        status.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                when.setValue(new Date());
+            }
+        });
+
+        return status;
     }
 
     private JPanel buttonsPanel() {
@@ -131,22 +145,19 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
 
             step.setComments(currentComment(step) + comment.getText());
         }
-
-        shouldSetStatus = true;
-        close();
+        presenter.doSave();
     }
 
     private String currentComment(QAStep step) {
         return step.getComments() != null ? step.getComments() + System.getProperty("line.separator") : "";
     }
 
-    public boolean shouldSetStatus() {
-        return shouldSetStatus;
+    private void doClose() {
+        presenter.doClose();
     }
 
-    private void doClose() {
-        shouldSetStatus = false;
-        close();
+    public void observe(SetQAStatusPresenter presenter) {
+        this.presenter = presenter;
     }
 
 }
