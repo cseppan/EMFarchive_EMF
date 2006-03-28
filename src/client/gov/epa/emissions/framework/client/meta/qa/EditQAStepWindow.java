@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.gui.FormattedDateField;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
@@ -20,9 +21,12 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -58,12 +62,15 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private CheckBox required;
 
+    private User user;
+
     public EditQAStepWindow(DesktopManager desktopManager) {
         super("Edit QA Step", new Dimension(600, 625), desktopManager);
     }
 
-    public void display(QAStep step, EmfDataset dataset) {
+    public void display(QAStep step, EmfDataset dataset, User user) {
         this.step = step;
+        this.user = user;
 
         super.setLabel(super.getTitle() + ": " + step.getName());
 
@@ -107,7 +114,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        status = new ComboBox(status(step), new QAProperties().status());
+        status = status(step);
         addChangeable(status);
         layoutGenerator.addLabelWidgetPair("Status:", status, panel);
 
@@ -132,7 +139,19 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return panel;
     }
 
-    private String status(QAStep step) {
+    private ComboBox status(QAStep step) {
+        ComboBox status = new ComboBox(statusValue(step), new QAProperties().status());
+        status.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                date.setValue(new Date());
+                who.setText(user.getName());
+            }
+        });
+
+        return status;
+    }
+
+    private String statusValue(QAStep step) {
         return step.getStatus() != null ? step.getStatus() : new QAProperties().initialStatus();
     }
 

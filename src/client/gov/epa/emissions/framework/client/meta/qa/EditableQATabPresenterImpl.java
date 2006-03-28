@@ -69,7 +69,7 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
     }
 
     public void doEdit(QAStep step, EditQAStepView performView) {
-        EditQAStepPresenter presenter = new EditQAStepPresenter(performView, dataset, view);
+        EditQAStepPresenter presenter = new EditQAStepPresenter(performView, dataset, view, session);
         presenter.display(step);
     }
 

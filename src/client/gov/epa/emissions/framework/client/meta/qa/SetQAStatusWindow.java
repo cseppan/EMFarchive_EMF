@@ -36,7 +36,7 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
 
     private JTextField who;
 
-    private FormattedDateField when;
+    private FormattedDateField date;
 
     private JTextArea comment;
 
@@ -83,8 +83,8 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
 
         layoutGenerator.addLabelWidgetPair("Status", status(), panel);
 
-        when = new FormattedDateField("When", new Date(), DATE_FORMATTER, messagePanel);
-        layoutGenerator.addLabelWidgetPair("When", when, panel);
+        date = new FormattedDateField("When", new Date(), DATE_FORMATTER, messagePanel);
+        layoutGenerator.addLabelWidgetPair("When", date, panel);
 
         who = new TextField(user.getName(), 40);
         layoutGenerator.addLabelWidgetPair("Who", who, panel);
@@ -109,7 +109,7 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
 
         status.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
-                when.setValue(new Date());
+                date.setValue(new Date());
             }
         });
 
@@ -140,7 +140,7 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
         for (int i = 0; i < steps.size(); i++) {
             QAStep step = steps.get(i);
             step.setStatus(status.getSelectedItem().toString());
-            step.setDate(when.value());
+            step.setDate(date.value());
             step.setWho(who.getText());
 
             step.setComments(currentComment(step) + comment.getText());
