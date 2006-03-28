@@ -315,7 +315,7 @@ CREATE TABLE emf.qa_steps
   order_no real,
   who varchar(255),
   date timestamp,
-  result text,
+  comments text,
   status varchar(15),
   description text,
   UNIQUE (dataset_id, version, name)

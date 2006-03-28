@@ -14,12 +14,12 @@ public class QAStepRowSourceTest extends TestCase {
         step.setVersion(2);
         step.setName("step");
         step.setWho("username");
-        step.setWhen(new Date());
+        step.setDate(new Date());
         step.setProgram("program");
         step.setProgramArguments("args");
         step.setRequired(true);
         step.setOrder((float) 823.2);
-        step.setResult("result");
+        step.setComments("result");
         step.setStatus("status");
 
         QAStepRowSource source = new QAStepRowSource(step);
@@ -33,10 +33,10 @@ public class QAStepRowSourceTest extends TestCase {
         assertEquals(step.getStatus(), values[4]);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        assertEquals(dateFormat.format(step.getWhen()), values[5]);
+        assertEquals(dateFormat.format(step.getDate()), values[5]);
 
         assertEquals(step.getWho(), values[6]);
-        assertEquals(step.getResult(), values[7]);
+        assertEquals(step.getComments(), values[7]);
         assertEquals(step.getProgram(), values[8]);
         assertEquals(step.getProgramArguments(), values[9]);
     }

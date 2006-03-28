@@ -18,8 +18,8 @@
         <property name="order" column="order_no" type="float" not-null="false"/> 
         <property name="description" column="description" type="java.lang.String" not-null="false"/> 
         <property name="status" column="status" type="java.lang.String" not-null="false"/> 
-        <property name="result" column="result" type="java.lang.String" not-null="false"/> 
-        <property name="when" column="date" type="java.util.Date" not-null="false"/> 
+        <property name="comments" column="comments" type="java.lang.String" not-null="false"/> 
+        <property name="date" column="date" type="java.util.Date" not-null="false"/> 
         <property name="who" column="who" type="java.lang.String" not-null="false"/> 
     </class>
 </hibernate-mapping>  

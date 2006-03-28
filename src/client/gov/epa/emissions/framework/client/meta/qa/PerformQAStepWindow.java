@@ -127,11 +127,11 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
         addChangeable(who);
         layoutGenerator.addLabelWidgetPair("User", who, panel);
 
-        when = new FormattedDateField("startDateTime", step.getWhen(), DATE_FORMATTER, messagePanel);
+        when = new FormattedDateField("startDateTime", step.getDate(), DATE_FORMATTER, messagePanel);
         addChangeable(when);
         layoutGenerator.addLabelWidgetPair("Date", when, panel);
 
-        result = new TextArea("Comment", step.getResult(), 40, 3);
+        result = new TextArea("Comment", step.getComments(), 40, 3);
         addChangeable(result);
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(result);
         layoutGenerator.addLabelWidgetPair("Comment", scrollableComment, panel);
@@ -217,9 +217,9 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
         step.setDescription(description.getText().trim());
 
         step.setStatus((String) status.getSelectedItem());
-        step.setResult(result.getText());
+        step.setComments(result.getText());
         step.setWho(who.getText());
-        step.setWhen(when.value());
+        step.setDate(when.value());
 
         presenter.doEdit();
     }

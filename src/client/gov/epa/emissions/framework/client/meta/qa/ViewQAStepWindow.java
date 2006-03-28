@@ -69,8 +69,8 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
         TextField when = new TextField("", 10);
-        if (step.getWhen() != null)
-            when.setText(step.getWhen().toString());
+        if (step.getDate() != null)
+            when.setText(step.getDate().toString());
         when.setEditable(false);
         layoutGenerator.addLabelWidgetPair("When", when, panel);
 
@@ -82,7 +82,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         status.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Status", status, panel);
 
-        TextArea result = new TextArea("", step.getResult(), 40, 10);
+        TextArea result = new TextArea("", step.getComments(), 40, 10);
         result.setLineWrap(true);
         result.setWrapStyleWord(true);
         result.setEditable(false);

@@ -26,14 +26,14 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         step1.setProgram("program1");
         step1.setProgramArguments("program-args1");
         step1.setRequired(true);
-        step1.setWhen(new Date());
+        step1.setDate(new Date());
         step1.setOrder(1);
 
         step2 = new QAStep();
         step2.setName("name2");
         step2.setProgram("program2");
         step2.setProgramArguments("program-args2");
-        step2.setWhen(new Date());
+        step2.setDate(new Date());
         step2.setRequired(false);
         step2.setOrder(2);
 
@@ -94,10 +94,10 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         assertEquals(step1.getStatus(), row.getValueAt(4));
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        assertEquals(dateFormat.format(step1.getWhen()), row.getValueAt(5));
+        assertEquals(dateFormat.format(step1.getDate()), row.getValueAt(5));
 
         assertEquals(step1.getWho(), row.getValueAt(6));
-        assertEquals(step1.getResult(), row.getValueAt(7));
+        assertEquals(step1.getComments(), row.getValueAt(7));
         assertEquals(step1.getProgram(), row.getValueAt(8));
         assertEquals(step1.getProgramArguments(), row.getValueAt(9));
     }

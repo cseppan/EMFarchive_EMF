@@ -31,16 +31,16 @@ public class QAStepTest extends TestCase {
         QAStep step = new QAStep();
         
         Date date = new Date();
-        step.setWhen(date);
+        step.setDate(date);
         
         step.setWho("user");
-        step.setResult("result");
+        step.setComments("result");
         step.setStatus("status");
         step.setDescription("description");
         
-        assertEquals(date, step.getWhen());
+        assertEquals(date, step.getDate());
         assertEquals("user", step.getWho());
-        assertEquals("result", step.getResult());
+        assertEquals("result", step.getComments());
         assertEquals("status", step.getStatus());
         assertEquals("description", step.getDescription());
     }

@@ -20,8 +20,8 @@ public class QAStepRowSource implements RowSource {
 
     public Object[] values() {
         return new Object[] { new Integer(source.getVersion()), source.getName(), Boolean.valueOf(source.isRequired()),
-                source.getOrder() + "", source.getStatus(), format(source.getWhen()), source.getWho(),
-                source.getResult(), source.getProgram(), source.getProgramArguments() };
+                source.getOrder() + "", source.getStatus(), format(source.getDate()), source.getWho(),
+                source.getComments(), source.getProgram(), source.getProgramArguments() };
     }
 
     private Object format(Date date) {

@@ -21,11 +21,11 @@ public class QAStep {
 
     private String status;
 
-    private String result;
+    private String comments;
 
     private String who;
 
-    private Date when;
+    private Date date;
 
     private int datasetId;
 
@@ -112,32 +112,32 @@ public class QAStep {
         this.required = required;
     }
 
-    public void setWhen(Date when) {
-        this.when = when;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public void setWho(String who) {
         this.who = who;
     }
 
-    public void setResult(String result) {
-        this.result = result;
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 
     public void setStatus(String status) {
         this.status = status;
     }
 
-    public String getResult() {
-        return result;
+    public String getComments() {
+        return comments;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public Date getWhen() {
-        return when;
+    public Date getDate() {
+        return date;
     }
 
     public String getWho() {

@@ -126,10 +126,10 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
         for (int i = 0; i < steps.size(); i++) {
             QAStep step = steps.get(i);
             step.setStatus(status.getSelectedItem().toString());
-            step.setWhen(when.value());
+            step.setDate(when.value());
             step.setWho(who.getText());
 
-            step.setResult(currentComment(step) + comment.getText());
+            step.setComments(currentComment(step) + comment.getText());
         }
 
         shouldSetStatus = true;
@@ -137,7 +137,7 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
     }
 
     private String currentComment(QAStep step) {
-        return step.getResult() != null ? step.getResult() + System.getProperty("line.separator") : "";
+        return step.getComments() != null ? step.getComments() + System.getProperty("line.separator") : "";
     }
 
     public boolean shouldSetStatus() {

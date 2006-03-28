@@ -22,22 +22,22 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         step1.setVersion(2);
         step1.setName("step1");
         step1.setWho("username1");
-        step1.setWhen(new Date());
+        step1.setDate(new Date());
         step1.setProgram("program1");
         step1.setRequired(true);
         step1.setOrder(1);
-        step1.setResult("result1");
+        step1.setComments("result1");
         step1.setStatus("status1");
 
         step2 = new QAStep();
         step2.setVersion(2);
         step2.setName("step2");
         step2.setWho("username2");
-        step2.setWhen(new Date());
+        step2.setDate(new Date());
         step2.setProgram("program2");
         step2.setRequired(false);
         step2.setOrder(2);
-        step2.setResult("result2");
+        step2.setComments("result2");
         step2.setStatus("status2");
 
         data = new QAStepsTableData(new QAStep[] { step1, step2 });
@@ -92,10 +92,10 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         assertEquals(step1.getStatus(), row.getValueAt(4));
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        assertEquals(dateFormat.format(step1.getWhen()), row.getValueAt(5));
+        assertEquals(dateFormat.format(step1.getDate()), row.getValueAt(5));
 
         assertEquals(step1.getWho(), row.getValueAt(6));
-        assertEquals(step1.getResult(), row.getValueAt(7));
+        assertEquals(step1.getComments(), row.getValueAt(7));
         assertEquals(step1.getProgram(), row.getValueAt(8));
         assertEquals(step1.getProgramArguments(), row.getValueAt(9));
     }
