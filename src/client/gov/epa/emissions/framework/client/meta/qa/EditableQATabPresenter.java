@@ -9,7 +9,7 @@ public interface EditableQATabPresenter extends PropertiesEditorTabPresenter {
 
     void doAddUsingTemplate(NewQAStepView stepview);
 
-    void doSetStatus(QAStatusView statusview);
+    void doSetStatus(SetQAStatusView statusview);
 
     void doAddCustomized(NewCustomQAStepView view) throws EmfException;
 

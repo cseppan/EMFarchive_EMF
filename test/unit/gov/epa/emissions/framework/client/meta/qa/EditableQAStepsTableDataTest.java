@@ -127,11 +127,35 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         data.observe((Changeables) changeables.proxy());
 
         data.add(step3);
-
+        assertEquals(3, data.rows().size());
+        assertEquals(3, data.sources().length);
+        
         List rows = data.rows();
         Row row = (Row) rows.get(2);
 
         assertEquals("Rows number is now 3", 3, rows.size());
+        assertEquals(step3.getName(), row.getValueAt(1));
+    }
+    
+    public void testShouldRecreateRowsOnRefresh() {
+        QAStep step3 = new QAStep();
+        step3.setName("name3");
+        step3.setProgram("program3");
+        step3.setProgramArguments("program-args3");
+        step3.setRequired(false);
+        step3.setOrder(3);
+        
+        Mock changeables = mock(Changeables.class);
+        expects(changeables, 2, "onChanges");
+        data.observe((Changeables) changeables.proxy());
+        
+        data.add(step3);
+        data.refresh();
+        assertEquals(3, data.rows().size());
+        assertEquals(3, data.sources().length);
+        
+        List rows = data.rows();
+        Row row = (Row) rows.get(2);
         assertEquals(step3.getName(), row.getValueAt(1));
     }
 

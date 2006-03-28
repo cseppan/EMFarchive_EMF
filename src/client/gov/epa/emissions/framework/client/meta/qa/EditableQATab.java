@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
@@ -10,6 +11,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
@@ -176,7 +178,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     public void doSetStatus() {
         clearMessage();
-        presenter.doSetStatus(new QAStatusDialog(parentConsole));
+        presenter.doSetStatus(new SetQAStatusDialog(parentConsole));
     }
 
     public void setStatus(QAStep step) {
@@ -191,6 +193,12 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         }
 
         refresh();
+    }
+
+    public void informLackOfTemplatesForAddingNewSteps(DatasetType type) {
+        String message = "Dataset has no templates to choose from. Please add templates to Dataset Type: " + type.getName();
+        InfoDialog dialog = new InfoDialog(this, "Message", message);
+        dialog.confirm();
     }
 
 }

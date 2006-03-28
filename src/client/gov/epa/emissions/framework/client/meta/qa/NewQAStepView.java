@@ -8,7 +8,7 @@ public interface NewQAStepView {
 
     void display(EmfDataset dataset, DatasetType type);
     
-    QAStep[] qaSteps();
+    QAStep[] steps();
     
     boolean shouldCreate();
 }

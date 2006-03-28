@@ -134,7 +134,7 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
         return shouldCreate;
     }
 
-    public QAStep[] qaSteps() {
+    public QAStep[] steps() {
         List steps = new ArrayList();
 
         Version version = selectedVersion();

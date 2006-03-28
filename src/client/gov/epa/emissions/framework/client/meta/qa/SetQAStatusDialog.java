@@ -24,7 +24,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-public class QAStatusDialog extends Dialog implements QAStatusView {
+public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
 
     private boolean shouldSetStatus;
 
@@ -44,7 +44,7 @@ public class QAStatusDialog extends Dialog implements QAStatusView {
 
     private String[] statusList = { "Start", "Skipped", "In Progress", "Complete", "Failure" };
 
-    public QAStatusDialog(EmfConsole parent) {
+    public SetQAStatusDialog(EmfConsole parent) {
         super("Status for Selected QA Steps", parent);
         super.setSize(new Dimension(550, 350));
         super.center();

@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -42,6 +43,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
     public void testShouldAddNewQAStepOnAddUsingTemplate() {
         EmfDataset dataset = new EmfDataset();
         DatasetType type = new DatasetType();
+        type.setQaStepTemplates(new QAStepTemplate[] { new QAStepTemplate() });
         dataset.setName("test");
         dataset.setDatasetType(type);
 
@@ -50,7 +52,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         Mock newQAStepview = mock(NewQAStepView.class);
         expects(newQAStepview, 1, "display", new Constraint[] { same(dataset), same(dataset.getDatasetType()) });
         stub(newQAStepview, "shouldCreate", Boolean.TRUE);
-        expects(newQAStepview, 1, "qaSteps", steps);
+        expects(newQAStepview, 1, "steps", steps);
 
         Mock tabview = mock(EditableQATabView.class);
         expects(tabview, 1, "add", same(steps));
@@ -119,7 +121,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
     public void testShouldSetQAStepStatusToViewOnDoSetStatus() {
         QAStep step1 = new QAStep();
 
-        Mock qaStatusView = mock(QAStatusView.class);
+        Mock qaStatusView = mock(SetQAStatusView.class);
         expects(qaStatusView, 1, "display");
         stub(qaStatusView, "shouldSetStatus", Boolean.TRUE);
         expects(qaStatusView, 1, "qaStepStub", step1);
@@ -130,7 +132,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         EditableQATabPresenter presenter = new EditableQATabPresenterImpl(null, null, (EditableQATabView) tabview
                 .proxy());
 
-        presenter.doSetStatus((QAStatusView) qaStatusView.proxy());
+        presenter.doSetStatus((SetQAStatusView) qaStatusView.proxy());
     }
 
 }

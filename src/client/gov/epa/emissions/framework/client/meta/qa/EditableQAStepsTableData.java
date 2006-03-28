@@ -15,11 +15,11 @@ public class EditableQAStepsTableData extends ChangeableTableData {
 
     private List rows;
 
-    private QAStep[] steps;
+    private QASteps steps;
 
     public EditableQAStepsTableData(QAStep[] steps) {
-        this.steps = steps;
-        this.rows = createRows(steps);
+        this.steps = new QASteps(steps);
+        this.rows = createRows(this.steps);
     }
 
     public void refresh() {
@@ -28,6 +28,7 @@ public class EditableQAStepsTableData extends ChangeableTableData {
     }
 
     public void add(QAStep step) {
+        steps.add(step);
         rows.add(row(step));
         notifyChanges();
     }
@@ -45,10 +46,10 @@ public class EditableQAStepsTableData extends ChangeableTableData {
         return (col == 0) ? true : false;
     }
 
-    private List createRows(QAStep[] steps) {
+    private List createRows(QASteps steps) {
         List rows = new ArrayList();
-        for (int i = 0; i < steps.length; i++)
-            rows.add(row(steps[i]));
+        for (int i = 0; i < steps.size(); i++)
+            rows.add(row(steps.get(i)));
 
         return rows;
     }

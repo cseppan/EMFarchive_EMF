@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
@@ -42,9 +43,15 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
     }
 
     public void doAddUsingTemplate(NewQAStepView stepView) {
-        stepView.display(dataset, dataset.getDatasetType());
+        DatasetType type = dataset.getDatasetType();
+        if(type.getQaStepTemplates().length == 0) {
+            view.informLackOfTemplatesForAddingNewSteps(type);
+            return;
+        }
+        
+        stepView.display(dataset, type);
         if (stepView.shouldCreate()) {
-            view.add(stepView.qaSteps());
+            view.add(stepView.steps());
         }
     }
 
@@ -59,7 +66,7 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         }
     }
 
-    public void doSetStatus(QAStatusView statusView) {
+    public void doSetStatus(SetQAStatusView statusView) {
         statusView.display();
         if (statusView.shouldSetStatus()) {
             view.setStatus(statusView.qaStepStub());
