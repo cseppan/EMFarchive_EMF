@@ -169,12 +169,8 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private void doClose() {
         try {
-<<<<<<< EditableDatasetTypeWindow.java
             if (shouldDiscardChanges())
                 presenter.doClose();
-=======
-            presenter.doClose();
->>>>>>> 1.20
         } catch (EmfException e) {
             messagePanel.setError("Could not close: " + e.getMessage());
         }

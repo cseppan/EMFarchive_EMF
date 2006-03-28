@@ -98,7 +98,7 @@ public class RegisterUserPanel extends JPanel {
 
     public boolean confirmDiscardChanges() {
         if (changeablesList instanceof EmfInternalFrame)
-            return ((EmfInternalFrame) changeablesList).checkChanges();
+            return ((EmfInternalFrame) changeablesList).shouldDiscardChanges();
 
         return true;
     }

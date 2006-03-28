@@ -304,7 +304,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     public boolean confirmDiscardChanges() {
-        return checkChanges();
+        return super.shouldDiscardChanges();
     }
 
     private void closeWindow() {

@@ -142,21 +142,21 @@ public class EditSectorWindow extends DisposableInteralFrame implements Editable
     }
 
     public void windowClosing() {
-        checkChangesAndCloseWindow();
+        doClose();
     }
 
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                checkChangesAndCloseWindow();
+                doClose();
             }
         };
 
         return action;
     }
 
-    private void checkChangesAndCloseWindow() {
-        if (checkChanges())
+    private void doClose() {
+        if (shouldDiscardChanges())
             try {
                 presenter.doClose();
             } catch (EmfException e) {

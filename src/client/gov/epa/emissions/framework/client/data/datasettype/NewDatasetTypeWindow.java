@@ -164,21 +164,21 @@ public class NewDatasetTypeWindow extends DisposableInteralFrame implements NewD
     }
     
     public void windowClosing() {
-        checkChangesAndCloseWindow();
+        doClose();
     }
 
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                checkChangesAndCloseWindow();
+                doClose();
             }
         };
 
         return action;
     }
 
-    private void checkChangesAndCloseWindow() {
-        if (checkChanges())
+    private void doClose() {
+        if (shouldDiscardChanges())
             presenter.doClose();
     }
 

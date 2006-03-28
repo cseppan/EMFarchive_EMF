@@ -54,14 +54,8 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
     private FormattedDateField when;
 
     public PerformQAStepWindow(DesktopManager desktopManager) {
-<<<<<<< PerformQAStepWindow.java
-        super("Perform QA Step", desktopManager);
-        super.setSize(new Dimension(600, 500));
-
+        super("Perform QA Step", new Dimension(600, 500), desktopManager);
         super.setResizable(false);
-=======
-        super("Perform QA Step", new Dimension(550, 500), desktopManager);
->>>>>>> 1.2
     }
 
     public void display(QAStep step, EmfDataset dataset) {
@@ -71,6 +65,10 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
         JPanel layout = createLayout(step, dataset);
         super.getContentPane().add(layout);
         super.display();
+    }
+
+    public void windowClosing() {
+        doClose();
     }
 
     public void observe(PerformQAStepPresenter presenter) {
@@ -104,15 +102,9 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
         addChangeable(program);
         layoutGenerator.addLabelWidgetPair("Program", program, panel);
 
-<<<<<<< PerformQAStepWindow.java
         programArguments = new TextArea("", step.getProgramArguments(), 40, 3);
         addChangeable(programArguments);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
-=======
-        programArguments = new TextArea("", step.getProgramArguments(), 40, 2);
-        addChangeable(programArguments);
-        ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
->>>>>>> 1.2
         layoutGenerator.addLabelWidgetPair("Arguments", scrollableDetails, panel);
 
         order = new NumberFormattedTextField(5, orderAction());
@@ -125,47 +117,23 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
         required.setEnabled(false);
         layoutGenerator.addLabelWidgetPair("Required ?", required, panel);
 
-<<<<<<< PerformQAStepWindow.java
         description = new TextArea("", step.getDescription(), 40, 3);
         addChangeable(description);
-=======
-        description = new TextArea("", "", 40, 4);
-        description.setLineWrap(true);
-        description.setWrapStyleWord(true);
-        addChangeable(description);
->>>>>>> 1.2
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
 
-<<<<<<< PerformQAStepWindow.java
         who = new TextField("who", step.getWho(), 20);
         addChangeable(who);
-=======
-        String username = step.getWho() != null ? step.getWho().getUsername() : "";
-        who = new TextField("who", username, 20);
-        addChangeable(who);
->>>>>>> 1.2
         layoutGenerator.addLabelWidgetPair("User", who, panel);
 
-<<<<<<< PerformQAStepWindow.java
         when = new FormattedDateField("startDateTime", step.getWhen(), DATE_FORMATTER, messagePanel);
         addChangeable(when);
-=======
-        when = new FormattedTextField("startDateTime", step.getWhen(), DATE_FORMATTER, messagePanel);
-        addChangeable(when);
->>>>>>> 1.2
         layoutGenerator.addLabelWidgetPair("Date", when, panel);
 
-<<<<<<< PerformQAStepWindow.java
         result = new TextArea("Comment", step.getResult(), 40, 3);
         addChangeable(result);
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(result);
         layoutGenerator.addLabelWidgetPair("Comment", scrollableComment, panel);
-=======
-        result = new TextArea("Comment", step.getResult(), 40, 2);
-        addChangeable(result);
-        layoutGenerator.addLabelWidgetPair("Comment", result, panel);
->>>>>>> 1.2
 
         status = new TextField("Status", step.getStatus(), 20);
         addChangeable(status);
@@ -249,15 +217,10 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
 
         step.setStatus(status.getText());
         step.setResult(result.getText());
-<<<<<<< PerformQAStepWindow.java
         step.setWho(who.getText());
         step.setWhen(when.value());
 
         presenter.doEdit();
-=======
-
-        doClose();
->>>>>>> 1.2
     }
 
 }

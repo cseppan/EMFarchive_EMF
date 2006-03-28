@@ -314,7 +314,7 @@ CREATE TABLE emf.qa_steps
   required bool,
   order_no real,
   who varchar(255),
-  "when" timestamp,
+  date timestamp,
   result text,
   status varchar(15),
   description text,
