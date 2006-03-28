@@ -60,10 +60,7 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
     }
 
     void doAddCustomized(NewCustomQAStepView stepView, Version[] versions) {
-        stepView.display(dataset, versions);
-        if (stepView.shouldCreate()) {
-            view.add(stepView.step());
-        }
+        stepView.display(dataset, versions, view);
     }
 
     public void doSetStatus(SetQAStatusView statusView, QAStep[] steps) {
@@ -73,7 +70,7 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         }
     }
 
-    public void doPerform(QAStep step, PerformQAStepView performView) {
+    public void doEdit(QAStep step, EditQAStepView performView) {
         PerformQAStepPresenter presenter = new PerformQAStepPresenter(performView, dataset);
         presenter.display(step);
     }

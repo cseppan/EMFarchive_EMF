@@ -17,6 +17,7 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -24,11 +25,12 @@ import java.awt.event.KeyListener;
 import java.text.SimpleDateFormat;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class PerformQAStepWindow extends DisposableInteralFrame implements PerformQAStepView {
+public class EditQAStepWindow extends DisposableInteralFrame implements EditQAStepView {
 
     private EditableComboBox program;
 
@@ -52,11 +54,12 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
 
     private final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 
-    private FormattedDateField when;
+    private FormattedDateField date;
 
-    public PerformQAStepWindow(DesktopManager desktopManager) {
-        super("Perform QA Step", new Dimension(600, 500), desktopManager);
-        super.setResizable(false);
+    private CheckBox required;
+
+    public EditQAStepWindow(DesktopManager desktopManager) {
+        super("Edit QA Step", new Dimension(600, 700), desktopManager);
     }
 
     public void display(QAStep step, EmfDataset dataset) {
@@ -90,58 +93,85 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
     }
 
     private JPanel inputPanel(QAStep step, EmfDataset dataset) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        panel.add(upperPanel(step, dataset));
+        panel.add(lowerPanel(step));
+
+        return panel;
+    }
+
+    private JPanel lowerPanel(QAStep step) {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Name", new Label(step.getName()), panel);
-        layoutGenerator.addLabelWidgetPair("Dataset", new Label(dataset.getName()), panel);
-        layoutGenerator.addLabelWidgetPair("Version", new Label(step.getVersion() + ""), panel);
+        status = new ComboBox(status(step), new QAProperties().status());
+        addChangeable(status);
+        layoutGenerator.addLabelWidgetPair("Status:", status, panel);
 
-        String[] programs = { "EmisView", "Smkreport", "Smkinven" };
-        program = new EditableComboBox(programs);
+        who = new TextField("who", step.getWho(), 20);
+        addChangeable(who);
+        layoutGenerator.addLabelWidgetPair("User:", who, panel);
+
+        date = new FormattedDateField("Date", step.getDate(), DATE_FORMATTER, messagePanel);
+        addChangeable(date);
+        layoutGenerator.addLabelWidgetPair("Date:", date, panel);
+
+        result = new TextArea("Comment", step.getComments(), 40, 3);
+        addChangeable(result);
+        ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(result);
+        layoutGenerator.addLabelWidgetPair("Comments:", scrollableComment, panel);
+
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+                5, 5, // initialX, initialY
+                10, 10);// xPad, yPad
+
+        return panel;
+    }
+
+    private String status(QAStep step) {
+        return step.getStatus() != null ? step.getStatus() : new QAProperties().initialStatus();
+    }
+
+    private JPanel upperPanel(QAStep step, EmfDataset dataset) {
+        JPanel panel = new JPanel(new SpringLayout());
+        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        layoutGenerator.addLabelWidgetPair("Name:", new Label(step.getName()), panel);
+        layoutGenerator.addLabelWidgetPair("Dataset:", new Label(dataset.getName()), panel);
+        layoutGenerator.addLabelWidgetPair("Version:", new Label(step.getVersion() + ""), panel);
+
+        program = new EditableComboBox(new QAProperties().programs());
         program.setSelectedItem(step.getProgram());
         addChangeable(program);
-        layoutGenerator.addLabelWidgetPair("Program", program, panel);
+        layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
-        programArguments = new TextArea("", step.getProgramArguments(), 40, 3);
+        programArguments = new TextArea("", step.getProgramArguments(), 40, 2);
         addChangeable(programArguments);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programArguments);
-        layoutGenerator.addLabelWidgetPair("Arguments", scrollableDetails, panel);
+        layoutGenerator.addLabelWidgetPair("Arguments:", scrollableDetails, panel);
 
         order = new NumberFormattedTextField(5, orderAction());
         order.setText(step.getOrder() + "");
         order.addKeyListener(keyListener());
         addChangeable(order);
-        layoutGenerator.addLabelWidgetPair("Order", order, panel);
+        layoutGenerator.addLabelWidgetPair("Order:", order, panel);
 
-        CheckBox required = new CheckBox("", false);
-        required.setEnabled(false);
-        layoutGenerator.addLabelWidgetPair("Required ?", required, panel);
+        required = new CheckBox("", step.isRequired());
+        if (step.isRequired())
+            required.setEnabled(false);
+        layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
-        description = new TextArea("", step.getDescription(), 40, 3);
+        description = new TextArea("", step.getDescription(), 40, 4);
         addChangeable(description);
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
-        layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
-
-        who = new TextField("who", step.getWho(), 20);
-        addChangeable(who);
-        layoutGenerator.addLabelWidgetPair("User", who, panel);
-
-        when = new FormattedDateField("startDateTime", step.getDate(), DATE_FORMATTER, messagePanel);
-        addChangeable(when);
-        layoutGenerator.addLabelWidgetPair("Date", when, panel);
-
-        result = new TextArea("Comment", step.getComments(), 40, 3);
-        addChangeable(result);
-        ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(result);
-        layoutGenerator.addLabelWidgetPair("Comment", scrollableComment, panel);
-
-        status = new ComboBox(step.getStatus(), new QAStatus().list());
-        addChangeable(status);
-        layoutGenerator.addLabelWidgetPair("Status", status, panel);
+        layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 12, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 8, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -215,11 +245,12 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
         step.setProgramArguments(programArguments.getText());
         step.setOrder(Float.parseFloat(order.getText()));
         step.setDescription(description.getText().trim());
+        step.setRequired(required.isSelected());
 
         step.setStatus((String) status.getSelectedItem());
         step.setComments(result.getText());
         step.setWho(who.getText());
-        step.setDate(when.value());
+        step.setDate(date.value());
 
         presenter.doEdit();
     }

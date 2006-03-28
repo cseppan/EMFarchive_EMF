@@ -13,6 +13,6 @@ public interface EditableQATabPresenter extends PropertiesEditorTabPresenter {
 
     void doAddCustomized(NewCustomQAStepView view) throws EmfException;
 
-    void doPerform(QAStep step, PerformQAStepView performView);
+    void doEdit(QAStep step, EditQAStepView performView);
 
 }

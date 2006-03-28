@@ -84,26 +84,26 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     private JPanel createButtonsSection() {
         JPanel container = new JPanel();
 
-        Button add = new BorderlessButton("Add (using Template)", new AbstractAction() {
+        Button add = new BorderlessButton("Add from Template", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doAddUsingTemplate();
             }
         });
         container.add(add);
 
-        Button remove = new BorderlessButton("Add (customized)", new AbstractAction() {
+        Button remove = new BorderlessButton("Add Custom", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doAddCustom();
             }
         });
         container.add(remove);
 
-        Button update = new BorderlessButton("Perform", new AbstractAction() {
+        Button edit = new BorderlessButton("Edit", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                doPerform();
+                doEdit();
             }
         });
-        container.add(update);
+        container.add(edit);
 
         Button status = new BorderlessButton("Set Status", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -134,20 +134,20 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     private void doAddCustom() {
         clearMessage();
         try {
-            presenter.doAddCustomized(new NewCustomQAStepDialog(parentConsole));
+            presenter.doAddCustomized(new NewCustomQAStepWindow(desktop));
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
     }
 
-    private void doPerform() {
+    private void doEdit() {
         clearMessage();
 
         List selected = selectModel.selected();
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             QAStep step = (QAStep) iter.next();
-            PerformQAStepWindow view = new PerformQAStepWindow(desktop);
-            presenter.doPerform(step, view);
+            EditQAStepWindow view = new EditQAStepWindow(desktop);
+            presenter.doEdit(step, view);
         }
     }
 

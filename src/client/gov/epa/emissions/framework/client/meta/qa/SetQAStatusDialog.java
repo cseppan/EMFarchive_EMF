@@ -79,7 +79,7 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
 
         layoutGenerator.addLabelWidgetPair("Steps", new Label(steps.namesList()), panel);
 
-        status = new JComboBox(new QAStatus().list());
+        status = new JComboBox(new QAProperties().status());
         layoutGenerator.addLabelWidgetPair("Status", status, panel);
 
         when = new FormattedDateField("When", new Date(), DATE_FORMATTER, messagePanel);

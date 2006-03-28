@@ -5,11 +5,11 @@ import gov.epa.emissions.framework.services.data.QAStep;
 
 public class PerformQAStepPresenter {
 
-    private PerformQAStepView view;
+    private EditQAStepView view;
     private EmfDataset dataset;
 
 
-    public PerformQAStepPresenter(PerformQAStepView view, EmfDataset dataset) {
+    public PerformQAStepPresenter(EditQAStepView view, EmfDataset dataset) {
         this.view = view;
         this.dataset = dataset;
     }

@@ -68,18 +68,13 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         dataset.setName("test");
 
         Version[] versions = {};
-
-        QAStep step = new QAStep();
-        Mock newQAStepview = mock(NewCustomQAStepView.class);
-        expects(newQAStepview, 1, "display", new Constraint[] { same(dataset), eq(versions) });
-        stub(newQAStepview, "shouldCreate", Boolean.TRUE);
-        expects(newQAStepview, 1, "step", step);
-
         Mock tabview = mock(EditableQATabView.class);
-        expects(tabview, 1, "add", same(step));
+        EditableQATabView tabViewProxy = (EditableQATabView) tabview.proxy();
 
-        EditableQATabPresenterImpl presenter = new EditableQATabPresenterImpl(dataset, null,
-                (EditableQATabView) tabview.proxy());
+        Mock newQAStepview = mock(NewCustomQAStepView.class);
+        expects(newQAStepview, 1, "display", new Constraint[] { same(dataset), eq(versions), same(tabViewProxy) });
+
+        EditableQATabPresenterImpl presenter = new EditableQATabPresenterImpl(dataset, null, tabViewProxy);
 
         presenter.doAddCustomized((NewCustomQAStepView) newQAStepview.proxy(), versions);
     }
@@ -88,13 +83,13 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         EmfDataset dataset = new EmfDataset();
         QAStep step = new QAStep();
 
-        Mock view = mock(PerformQAStepView.class);
+        Mock view = mock(EditQAStepView.class);
         expectsOnce(view, "display", new Constraint[] { same(step), same(dataset) });
         expects(view, "observe");
 
         EditableQATabPresenterImpl presenter = new EditableQATabPresenterImpl(dataset, null, null);
 
-        presenter.doPerform(step, (PerformQAStepView) view.proxy());
+        presenter.doEdit(step, (EditQAStepView) view.proxy());
     }
 
     public void testShouldSaveQAStepOnSave() throws EmfException {

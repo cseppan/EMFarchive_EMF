@@ -8,12 +8,12 @@ import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
-import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
-import gov.epa.emissions.framework.ui.Dialog;
 import gov.epa.emissions.framework.ui.NumberFormattedTextField;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -28,9 +28,7 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class NewCustomQAStepDialog extends Dialog implements NewCustomQAStepView {
-
-    private boolean shouldCreate;
+public class NewCustomQAStepWindow extends DisposableInteralFrame implements NewCustomQAStepView {
 
     private JComboBox versionsSelection;
 
@@ -42,7 +40,7 @@ public class NewCustomQAStepDialog extends Dialog implements NewCustomQAStepView
 
     private EditableComboBox program;
 
-    private TextArea programParameters;
+    private TextArea arguments;
 
     private NumberFormattedTextField order;
 
@@ -50,17 +48,20 @@ public class NewCustomQAStepDialog extends Dialog implements NewCustomQAStepView
 
     private SingleLineMessagePanel messagePanel;
 
-    public NewCustomQAStepDialog(EmfConsole parent) {
-        super("New (custom) QA Step", parent);
-        super.setSize(new Dimension(550, 350));
-        super.center();
+    private CheckBox required;
+
+    private EditableQATabView tabView;
+
+    public NewCustomQAStepWindow(DesktopManager desktopManager) {
+        super("New Custom QA Step", new Dimension(550, 450), desktopManager);
     }
 
-    public void display(EmfDataset dataset, Version[] versions) {
+    public void display(EmfDataset dataset, Version[] versions, EditableQATabView tabView) {
         DatasetType type = dataset.getDatasetType();
         super.setTitle(super.getTitle() + ": " + type.getName());
 
         this.dataset = dataset;
+        this.tabView = tabView;
         this.versions = new VersionsSet(versions);
 
         JPanel layout = createLayout();
@@ -84,35 +85,33 @@ public class NewCustomQAStepDialog extends Dialog implements NewCustomQAStepView
     private JPanel inputPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        String[] defaultProgram = { "EmisView", "Smkreport", "Smkinven" };
 
         name = new TextField("", 40);
-        layoutGenerator.addLabelWidgetPair("Name", name, panel);
+        layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
-        program = new EditableComboBox(defaultProgram);
-        layoutGenerator.addLabelWidgetPair("Program", program, panel);
+        program = new EditableComboBox(new QAProperties().programs());
+        layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
-        programParameters = new TextArea("", "", 40, 3);
-        ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programParameters);
-        layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
+        arguments = new TextArea("", "", 40, 2);
+        ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(arguments);
+        layoutGenerator.addLabelWidgetPair("Arguments:", scrollableDetails, panel);
 
         order = new NumberFormattedTextField(5, orderAction());
         order.setText("0");
         order.addKeyListener(keyListener());
-        layoutGenerator.addLabelWidgetPair("Order", order, panel);
+        layoutGenerator.addLabelWidgetPair("Order:", order, panel);
 
-        CheckBox required = new CheckBox("", false);
-        required.setEnabled(false);
+        required = new CheckBox("", false);
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
-        description = new TextArea("", "", 40, 10);
+        description = new TextArea("", "", 40, 4);
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
-        layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
+        layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
 
         versionsSelection = new JComboBox(versions.all());
-        layoutGenerator.addLabelWidgetPair("Version", versionsSelection, panel);
+        layoutGenerator.addLabelWidgetPair("Version:", versionsSelection, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
@@ -163,7 +162,7 @@ public class NewCustomQAStepDialog extends Dialog implements NewCustomQAStepView
         JPanel panel = new JPanel();
         Button ok = new Button("OK", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doNew();
+                doOk();
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -171,7 +170,6 @@ public class NewCustomQAStepDialog extends Dialog implements NewCustomQAStepView
 
         Button cancel = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                shouldCreate = false;
                 close();
             }
         });
@@ -180,24 +178,20 @@ public class NewCustomQAStepDialog extends Dialog implements NewCustomQAStepView
         return panel;
     }
 
-    private void doNew() {
-        shouldCreate = true;
+    private void doOk() {
+        tabView.add(step());
         close();
-    }
-
-    public boolean shouldCreate() {
-        return shouldCreate;
     }
 
     public QAStep step() {
         QAStep step = new QAStep();
         step.setDatasetId(dataset.getId());
         step.setVersion(selectedVersion().getVersion());
-        step.setRequired(false);
-        
+        step.setRequired(required.isSelected());
+
         step.setName(name.getText());
-        step.setProgram((String)program.getSelectedItem());
-        step.setProgramArguments(programParameters.getText());
+        step.setProgram((String) program.getSelectedItem());
+        step.setProgramArguments(arguments.getText());
         step.setOrder(Float.parseFloat(order.getText()));
         step.setDescription(description.getText().trim());
 
