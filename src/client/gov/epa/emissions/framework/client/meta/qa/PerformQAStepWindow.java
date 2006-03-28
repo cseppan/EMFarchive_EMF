@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.FormattedDateField;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
@@ -47,7 +48,7 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
 
     private TextArea result;
 
-    private TextField status;
+    private ComboBox status;
 
     private final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 
@@ -135,7 +136,7 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(result);
         layoutGenerator.addLabelWidgetPair("Comment", scrollableComment, panel);
 
-        status = new TextField("Status", step.getStatus(), 20);
+        status = new ComboBox(step.getStatus(), new QAStatus().list());
         addChangeable(status);
         layoutGenerator.addLabelWidgetPair("Status", status, panel);
 
@@ -215,7 +216,7 @@ public class PerformQAStepWindow extends DisposableInteralFrame implements Perfo
         step.setOrder(Float.parseFloat(order.getText()));
         step.setDescription(description.getText().trim());
 
-        step.setStatus(status.getText());
+        step.setStatus((String) status.getSelectedItem());
         step.setResult(result.getText());
         step.setWho(who.getText());
         step.setWhen(when.value());

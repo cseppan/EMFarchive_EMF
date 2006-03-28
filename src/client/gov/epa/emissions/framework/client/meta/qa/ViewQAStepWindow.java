@@ -43,11 +43,11 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        TextField name = new TextField("", step.getName(), 40);
+        TextField name = new TextField("", step.getName(), 20);
         name.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Name", name, panel);
 
-        TextField version = new TextField("", step.getVersion() + "", 40);
+        TextField version = new TextField("", step.getVersion() + "", 10);
         version.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Version", version, panel);
 
@@ -58,9 +58,9 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         TextArea programParameters = new TextArea("", step.getProgramArguments(), 40, 3);
         programParameters.setEditable(false);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(programParameters);
-        layoutGenerator.addLabelWidgetPair("Parameters", scrollableDetails, panel);
+        layoutGenerator.addLabelWidgetPair("Arguments", scrollableDetails, panel);
 
-        TextField order = new TextField("", step.getOrder() + "", 40);
+        TextField order = new TextField("", step.getOrder() + "", 10);
         order.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Order", order, panel);
 
@@ -68,17 +68,17 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         required.setEnabled(false);
         layoutGenerator.addLabelWidgetPair("Required?", required, panel);
 
-        TextField when = new TextField("", 40);
+        TextField when = new TextField("", 10);
         if (step.getWhen() != null)
             when.setText(step.getWhen().toString());
         when.setEditable(false);
         layoutGenerator.addLabelWidgetPair("When", when, panel);
 
-        TextField who = new TextField("", step.getWho(), 40);
+        TextField who = new TextField("", step.getWho(), 20);
         who.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Who", who, panel);
 
-        TextField status = new TextField("", step.getStatus(), 40);
+        TextField status = new TextField("", step.getStatus(), 20);
         status.setEditable(false);
         layoutGenerator.addLabelWidgetPair("Status", status, panel);
 

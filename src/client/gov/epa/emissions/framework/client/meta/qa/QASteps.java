@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.services.data.QAStep;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class QASteps {
@@ -27,7 +28,7 @@ public class QASteps {
     }
 
     private boolean contains(List sources, QAStep step) {
-        return contains((QAStep[])sources.toArray(new QAStep[0]), step);
+        return contains((QAStep[]) sources.toArray(new QAStep[0]), step);
     }
 
     boolean contains(QAStep[] sources, QAStep step) {
@@ -50,5 +51,21 @@ public class QASteps {
 
     public int size() {
         return sources.size();
+    }
+
+    public QAStep[] all() {
+        return (QAStep[]) sources.toArray(new QAStep[0]);
+    }
+
+    public String namesList() {
+        StringBuffer buf = new StringBuffer();
+        for (Iterator iter = sources.iterator(); iter.hasNext();) {
+            QAStep element = (QAStep) iter.next();
+            buf.append(element.getName());
+            if (iter.hasNext())
+                buf.append(", ");
+        }
+
+        return buf.toString();
     }
 }

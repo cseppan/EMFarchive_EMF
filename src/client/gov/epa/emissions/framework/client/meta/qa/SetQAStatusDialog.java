@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.FormattedDateField;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.data.QAStep;
@@ -42,7 +43,7 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
 
     private final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 
-    private String[] statusList = { "Start", "Skipped", "In Progress", "Complete", "Failure" };
+    private QASteps steps;
 
     public SetQAStatusDialog(EmfConsole parent) {
         super("Status for Selected QA Steps", parent);
@@ -52,7 +53,9 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
         this.parent = parent;
     }
 
-    public void display() {
+    public void display(QAStep[] steps) {
+        this.steps = new QASteps(steps);
+
         JPanel layout = createLayout();
         super.getContentPane().add(layout);
         super.display();
@@ -74,7 +77,9 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        status = new JComboBox(statusList);
+        layoutGenerator.addLabelWidgetPair("Steps", new Label(steps.namesList()), panel);
+
+        status = new JComboBox(new QAStatus().list());
         layoutGenerator.addLabelWidgetPair("Status", status, panel);
 
         when = new FormattedDateField("When", new Date(), DATE_FORMATTER, messagePanel);
@@ -83,7 +88,7 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
         who = new JTextField(parent.getUser().getName(), 40);
         layoutGenerator.addLabelWidgetPair("Who", who, panel);
 
-        comment = new TextArea("", "", 40, 10);
+        comment = new TextArea("", "", 40, 4);
         comment.setLineWrap(true);
         comment.setWrapStyleWord(true);
         JScrollPane commentPane = new ScrollableComponent(comment);
@@ -101,7 +106,7 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
         JPanel panel = new JPanel();
         Button ok = new Button("OK", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                setStatus();
+                doOk();
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -109,8 +114,7 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
 
         Button cancel = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                shouldSetStatus = false;
-                close();
+                doClose();
             }
         });
         panel.add(cancel);
@@ -118,23 +122,31 @@ public class SetQAStatusDialog extends Dialog implements SetQAStatusView {
         return panel;
     }
 
-    private void setStatus() {
+    private void doOk() {
+        for (int i = 0; i < steps.size(); i++) {
+            QAStep step = steps.get(i);
+            step.setStatus(status.getSelectedItem().toString());
+            step.setWhen(when.value());
+            step.setWho(who.getText());
+
+            step.setResult(currentComment(step) + comment.getText());
+        }
+
         shouldSetStatus = true;
         close();
     }
 
-    public QAStep qaStepStub() {
-        QAStep step = new QAStep();
-        step.setStatus(status.getSelectedItem().toString());
-        step.setWhen(when.value());
-        step.setWho(who.getText());
-        step.setResult(comment.getText());
-
-        return step;
+    private String currentComment(QAStep step) {
+        return step.getResult() != null ? step.getResult() + System.getProperty("line.separator") : "";
     }
 
     public boolean shouldSetStatus() {
         return shouldSetStatus;
+    }
+
+    private void doClose() {
+        shouldSetStatus = false;
+        close();
     }
 
 }

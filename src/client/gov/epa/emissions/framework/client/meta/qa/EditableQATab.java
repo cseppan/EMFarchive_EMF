@@ -178,25 +178,15 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     public void doSetStatus() {
         clearMessage();
-        presenter.doSetStatus(new SetQAStatusDialog(parentConsole));
-    }
 
-    public void setStatus(QAStep step) {
         List selected = selectModel.selected();
-
-        for (Iterator iter = selected.iterator(); iter.hasNext();) {
-            QAStep selectedStep = (QAStep) iter.next();
-            selectedStep.setStatus(step.getStatus());
-            selectedStep.setWhen(step.getWhen());
-            selectedStep.setWho(step.getWho());
-            selectedStep.setResult(selectedStep.getResult() + System.getProperty("line.separator") + step.getResult());
-        }
-
-        refresh();
+        QAStep[] steps = (QAStep[]) selected.toArray(new QAStep[0]);
+        presenter.doSetStatus(new SetQAStatusDialog(parentConsole), steps);
     }
 
     public void informLackOfTemplatesForAddingNewSteps(DatasetType type) {
-        String message = "Dataset has no templates to choose from. Please add templates to Dataset Type: " + type.getName();
+        String message = "Dataset has no templates to choose from. Please add templates to Dataset Type: "
+                + type.getName();
         InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }

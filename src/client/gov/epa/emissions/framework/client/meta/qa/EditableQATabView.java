@@ -16,8 +16,8 @@ public interface EditableQATabView {
 
     QAStep[] steps();
 
-    void setStatus(QAStep step);
-
     void informLackOfTemplatesForAddingNewSteps(DatasetType type);
+
+    void refresh();
 
 }

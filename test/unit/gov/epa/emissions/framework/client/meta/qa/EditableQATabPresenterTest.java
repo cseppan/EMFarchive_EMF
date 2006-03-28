@@ -119,20 +119,18 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
     }
 
     public void testShouldSetQAStepStatusToViewOnDoSetStatus() {
-        QAStep step1 = new QAStep();
-
         Mock qaStatusView = mock(SetQAStatusView.class);
         expects(qaStatusView, 1, "display");
         stub(qaStatusView, "shouldSetStatus", Boolean.TRUE);
-        expects(qaStatusView, 1, "qaStepStub", step1);
 
         Mock tabview = mock(EditableQATabView.class);
-        expects(tabview, 1, "setStatus", same(step1));
+        expects(tabview, "refresh");
 
         EditableQATabPresenter presenter = new EditableQATabPresenterImpl(null, null, (EditableQATabView) tabview
                 .proxy());
 
-        presenter.doSetStatus((SetQAStatusView) qaStatusView.proxy());
+        QAStep[] steps = {};
+        presenter.doSetStatus((SetQAStatusView) qaStatusView.proxy(), steps);
     }
 
 }

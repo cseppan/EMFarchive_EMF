@@ -66,10 +66,10 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
         }
     }
 
-    public void doSetStatus(SetQAStatusView statusView) {
-        statusView.display();
+    public void doSetStatus(SetQAStatusView statusView, QAStep[] steps) {
+        statusView.display(steps);
         if (statusView.shouldSetStatus()) {
-            view.setStatus(statusView.qaStepStub());
+            view.refresh();
         }
     }
 
