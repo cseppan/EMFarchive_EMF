@@ -9,7 +9,7 @@ import gov.epa.emissions.framework.client.status.StatusPresenter;
 import gov.epa.emissions.framework.client.status.StatusWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.Dimensions;
-import gov.epa.emissions.framework.ui.EmfDialog;
+import gov.epa.emissions.framework.ui.YesNoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -174,11 +174,10 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private Confirm emfConfirmDialog() {
         String msg = "Some windows have unsaved changes.\nDo you want to continue closing these windows?";
-        Confirm emfConfirmDialog = new EmfDialog(this, "Unsaved Changes Exist", JOptionPane.QUESTION_MESSAGE, msg,
-                JOptionPane.YES_NO_OPTION);
+        Confirm emfConfirmDialog = new YesNoDialog(this, "Unsaved Changes Exist", msg);
         return emfConfirmDialog;
     }
-    
+
     public User getUser() {
         return session.user();
     }

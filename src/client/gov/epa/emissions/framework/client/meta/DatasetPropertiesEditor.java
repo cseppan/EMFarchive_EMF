@@ -16,7 +16,7 @@ import gov.epa.emissions.framework.client.meta.qa.EditableQATab;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.ui.EmfDialog;
+import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -31,7 +31,6 @@ import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -208,8 +207,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         String message = "Cannot edit Properties of Dataset: " + dataset.getName()
                 + System.getProperty("line.separator") + " as it was locked by User: " + dataset.getLockOwner()
                 + "(at " + format(dataset.getLockDate()) + ")";
-        EmfDialog dialog = new EmfDialog(this, "Message", JOptionPane.PLAIN_MESSAGE, message,
-                JOptionPane.DEFAULT_OPTION);
+        InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }
 

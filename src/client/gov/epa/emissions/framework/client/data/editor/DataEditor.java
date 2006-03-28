@@ -15,7 +15,7 @@ import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.ui.Dimensions;
-import gov.epa.emissions.framework.ui.EmfDialog;
+import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -29,7 +29,6 @@ import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class DataEditor extends DisposableInteralFrame implements DataEditorView {
@@ -287,8 +286,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
         String message = "Cannot edit Version: " + version.getName() + "(" + version.getVersion() + ") of Dataset: "
                 + dataset.getName() + System.getProperty("line.separator") + " as it was locked by User: "
                 + version.getLockOwner() + "(at " + format(version.getLockDate()) + ")";
-        EmfDialog dialog = new EmfDialog(this, "Message", JOptionPane.PLAIN_MESSAGE, message,
-                JOptionPane.DEFAULT_OPTION);
+        InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }
 
@@ -298,8 +296,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     public void notifySaveFailure(String message) {
-        EmfDialog dialog = new EmfDialog(this, "Message", JOptionPane.PLAIN_MESSAGE, message,
-                JOptionPane.DEFAULT_OPTION);
+        InfoDialog dialog = new InfoDialog(this, "Message", message);
         dialog.confirm();
     }
 

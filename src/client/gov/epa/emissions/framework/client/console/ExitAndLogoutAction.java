@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.client.console;
 
-import gov.epa.emissions.framework.ui.EmfDialog;
-
-import javax.swing.JOptionPane;
+import gov.epa.emissions.framework.ui.YesNoDialog;
 
 public class ExitAndLogoutAction {
 
@@ -38,8 +36,7 @@ public class ExitAndLogoutAction {
     }
 
     private boolean confirm(String message) {
-        EmfDialog emfDialog = new EmfDialog(emfConsole, "Logout/Exit Confirmation", JOptionPane.QUESTION_MESSAGE, message,
-                JOptionPane.OK_CANCEL_OPTION);
+        YesNoDialog emfDialog = new YesNoDialog(emfConsole, "Logout/Exit Confirmation", message);
         return emfDialog.confirm();
     }
 

@@ -167,6 +167,10 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
         return action;
     }
 
+    public void windowClosing() {
+        doClose();
+    }
+
     private void doClose() {
         try {
             if (shouldDiscardChanges())
