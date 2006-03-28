@@ -8,12 +8,13 @@ import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.console.DesktopManager;
-import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.qa.EditQAStepTemplateWindow;
 import gov.epa.emissions.framework.client.qa.EditQAStepTemplatesPresenter;
 import gov.epa.emissions.framework.client.qa.EditQAStepTemplatesView;
 import gov.epa.emissions.framework.client.qa.EditableQAStepTemplateTableData;
-import gov.epa.emissions.framework.client.qa.NewQAStepTemplateDialog;
+import gov.epa.emissions.framework.client.qa.NewQAStepTemplatePresenter;
+import gov.epa.emissions.framework.client.qa.NewQAStepTemplateView;
+import gov.epa.emissions.framework.client.qa.NewQAStepTemplateWindow;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 
@@ -45,16 +46,13 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
 
     private EditableQAStepTemplateTableData tableData;
 
-    private EmfConsole parent;
-
     private DesktopManager desktopManager;
 
-    public EditQAStepTemplatesPanel(DatasetType type, ManageChangeables changeablesList, EmfConsole parent,
+    public EditQAStepTemplatesPanel(DatasetType type, ManageChangeables changeablesList,
             DesktopManager desktopManager) {
         this.changeablesList = changeablesList;
         this.type = type;
         tableData = new EditableQAStepTemplateTableData(type.getQaStepTemplates());
-        this.parent = parent;
         this.desktopManager = desktopManager;
 
         createLayout();
@@ -178,7 +176,9 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
     }
 
     private void doAdd() {
-        presenter.doAdd(new NewQAStepTemplateDialog(parent));
+        NewQAStepTemplateView view = new NewQAStepTemplateWindow(desktopManager);
+        NewQAStepTemplatePresenter newTemplatePresenter = new NewQAStepTemplatePresenter(this, view);
+        newTemplatePresenter.display(type);
     }
 
     public void add(QAStepTemplate template) {

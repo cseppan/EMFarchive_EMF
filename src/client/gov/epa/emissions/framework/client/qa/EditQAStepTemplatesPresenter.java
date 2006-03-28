@@ -19,12 +19,6 @@ public class EditQAStepTemplatesPresenter {
         view.observe(this);
     }
 
-    public void doAdd(NewQAStepTemplateView dialog) {
-        dialog.display(type);
-        if (dialog.shouldCreate())
-            view.add(dialog.template());
-    }
-
     public void doEdit(EditQAStepTemplateView view, QAStepTemplate template) {
         view.observe(this);
         view.display(type);

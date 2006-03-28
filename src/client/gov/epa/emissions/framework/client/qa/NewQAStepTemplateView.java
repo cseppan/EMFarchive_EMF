@@ -6,8 +6,8 @@ import gov.epa.emissions.commons.data.QAStepTemplate;
 public interface NewQAStepTemplateView {
     void display(DatasetType type);
     
-    boolean shouldCreate();
-    
     QAStepTemplate template();
+
+    void observe(NewQAStepTemplatePresenter presenter);
     
 }
