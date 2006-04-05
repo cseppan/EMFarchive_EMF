@@ -97,6 +97,15 @@ public class DataViewCacheImpl implements DataViewCache {
                 .optimizedFetch(token.getVersion(), token.getTable(), session);
         PageReader reader = new PageReader(pageSize, records);
 
+        cacheReader(token, reader);
+    }
+
+    private void cacheReader(DataAccessToken token, PageReader reader) throws SQLException {
+        if (readersMap.containsKey(token.key())) {// close old/stale reader - performance enhancement
+            PageReader oldReader = reader(token);
+            oldReader.close();
+        }
+
         readersMap.put(token.key(), reader);
     }
 
@@ -106,6 +115,6 @@ public class DataViewCacheImpl implements DataViewCache {
                 columnFilter, rowFilter, sortOrder, session);
         PageReader reader = new PageReader(pageSize, records);
 
-        readersMap.put(token.key(), reader);
+        cacheReader(token, reader);
     }
 }
