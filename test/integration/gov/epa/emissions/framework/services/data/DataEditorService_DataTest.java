@@ -225,10 +225,9 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         service.save(token);
 
         DefaultVersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
-        int v0RecordsCount = reader.fetch(versionZero(), dataset.getName(), session).all().length;
+        int v0RecordsCount = reader.fetch(versionZero(), dataset.getName(), session).total();
 
-        VersionedRecord[] records = reader.fetch(v1, dataset.getName(), session).all();
-        assertEquals(v0RecordsCount + 3, records.length);
+        assertEquals(v0RecordsCount + 3, reader.fetch(v1, dataset.getName(), session).total());
     }
 
     public void testLockRenewedOnSave() throws Exception {
@@ -271,14 +270,18 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         service.save(token);
 
         VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
-        int v0RecordsCount = reader.fetch(versionZero(), dataset.getName(), session).all().length;
+        int v0RecordsCount = reader.fetch(versionZero(), dataset.getName(), session).total();
 
-        VersionedRecord[] records = reader.fetch(v1, dataset.getName(), session).all();
-        assertEquals(v0RecordsCount + 2, records.length);
+        int v1Count = reader.fetch(v1, dataset.getName(), session).total();
+        assertEquals(v0RecordsCount + 2, v1Count);
     }
 
     public void testShouldDiscardChangesOnDiscard() throws Exception {
         Version v1 = versionOne();
+
+        VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
+        int v1Count = reader.fetch(v1, dataset.getName(), session).total();
+
         DataAccessToken token = token(v1, table);
 
         ChangeSet changeset1 = new ChangeSet();
@@ -290,14 +293,8 @@ public class DataEditorService_DataTest extends ServiceTestCase {
 
         service.discard(token);
 
-        VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
-
-        VersionedRecord[] v1Records = reader.fetch(v1, dataset.getName(), session).all();
-        VersionedRecord[] v2Records = reader.fetch(v1, dataset.getName(), session).all();
-
-        assertEquals(v1Records.length, v2Records.length);
-        for (int i = 0; i < v2Records.length; i++)
-            assertEquals(v1Records[i].getRecordId(), v2Records[i].getRecordId());
+        int postDiscardCount = reader.fetch(v1, dataset.getName(), session).total();
+        assertEquals(v1Count, postDiscardCount);
     }
 
     public void testShouldConfirmWithYesIfChangesExist() throws Exception {

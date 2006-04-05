@@ -27,9 +27,7 @@ public class DataViewCacheImplTest extends MockObjectTestCase {
                 eq(rowFilter), eq(sortOrder), same(session) };
         
         Mock records = mock(ScrollableVersionedRecords.class);
-        records.expects(once()).method("execute");
-        
-        reader.expects(once()).method("fetch").with(constraints).will(returnValue(records.proxy()));
+        reader.expects(once()).method("optimizedFetch").with(constraints).will(returnValue(records.proxy()));
 
         cache.init(token, 10, columnFilter, rowFilter, sortOrder, session);
     }

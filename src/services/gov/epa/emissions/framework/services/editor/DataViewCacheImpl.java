@@ -51,8 +51,8 @@ public class DataViewCacheImpl implements DataViewCache {
         reinitialize(token, pageSize, columnFilter, rowFilter, sortOrder, session);
     }
 
-    public void applyConstraints(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder, Session session)
-            throws Exception {
+    public void applyConstraints(DataAccessToken token, String columnFilter, String rowFilter, String sortOrder,
+            Session session) throws Exception {
         reinitialize(token, defaultPageSize(session), columnFilter, rowFilter, sortOrder, session);
     }
 
@@ -93,7 +93,8 @@ public class DataViewCacheImpl implements DataViewCache {
         if (readersMap.containsKey(token.key()))
             return;
 
-        ScrollableVersionedRecords records = recordsReader.fetch(token.getVersion(), token.getTable(), session);
+        ScrollableVersionedRecords records = recordsReader
+                .optimizedFetch(token.getVersion(), token.getTable(), session);
         PageReader reader = new PageReader(pageSize, records);
 
         readersMap.put(token.key(), reader);
@@ -101,8 +102,8 @@ public class DataViewCacheImpl implements DataViewCache {
 
     private void reinitialize(DataAccessToken token, int pageSize, String columnFilter, String rowFilter,
             String sortOrder, Session session) throws Exception {
-        ScrollableVersionedRecords records = recordsReader.fetch(token.getVersion(), token.getTable(), columnFilter,
-                rowFilter, sortOrder, session);
+        ScrollableVersionedRecords records = recordsReader.optimizedFetch(token.getVersion(), token.getTable(),
+                columnFilter, rowFilter, sortOrder, session);
         PageReader reader = new PageReader(pageSize, records);
 
         readersMap.put(token.key(), reader);

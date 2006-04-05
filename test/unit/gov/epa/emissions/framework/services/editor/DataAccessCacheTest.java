@@ -22,11 +22,10 @@ public class DataAccessCacheTest extends MockObjectTestCase {
         super.setUp();
 
         Mock records = mock(ScrollableVersionedRecords.class);
-        records.expects(atLeastOnce()).method("execute");
         records.expects(atLeastOnce()).method("close");
 
         Mock reader = mock(VersionedRecordsReader.class);
-        reader.stubs().method("fetch").withAnyArguments().will(returnValue(records.proxy()));
+        reader.stubs().method("optimizedFetch").withAnyArguments().will(returnValue(records.proxy()));
 
         Mock writer = mock(VersionedRecordsWriter.class);
         writer.expects(once()).method("close");
