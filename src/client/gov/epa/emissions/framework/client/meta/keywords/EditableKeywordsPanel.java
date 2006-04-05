@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.keywords;
 import gov.epa.emissions.commons.data.Keyword;
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.ui.EditableTablePanel;
 
 import java.awt.BorderLayout;
@@ -20,8 +21,8 @@ public class EditableKeywordsPanel extends JPanel implements Editor {
     
     private JComboBox comboBox;
     
-    public EditableKeywordsPanel(String label, EditableKeyValueTableData tableData, Keywords masterKeywords, ManageChangeables changeablesList) {
-        editableTablePanel = new EditableKeyValueTablePanel(label, tableData, changeablesList);
+    public EditableKeywordsPanel(String label, EditableKeyValueTableData tableData, Keywords masterKeywords, ManageChangeables changeablesList, EmfConsole parent) {
+        editableTablePanel = new EditableKeyValueTablePanel(label, tableData, changeablesList, parent);
         editableTablePanel.setColumnEditor(keywordColumnEditor(masterKeywords), 1, "Select from the list");
 
         super.setLayout(new BorderLayout());

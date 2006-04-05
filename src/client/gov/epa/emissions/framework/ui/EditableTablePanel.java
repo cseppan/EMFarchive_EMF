@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.Label;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
@@ -12,6 +13,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -27,8 +29,11 @@ public class EditableTablePanel extends JPanel implements Editor {
 
     protected ManageChangeables changeablesList;
 
-    public EditableTablePanel(String label, InlineEditableTableData tableData, ManageChangeables changeablesList) {
+    private EmfConsole parent;
+
+    public EditableTablePanel(String label, InlineEditableTableData tableData, ManageChangeables changeablesList, EmfConsole parent) {
         this.changeablesList = changeablesList;
+        this.parent = parent;
         super.setLayout(new BorderLayout());
         super.add(doLayout(label, tableData), BorderLayout.CENTER);
     }
@@ -83,8 +88,7 @@ public class EditableTablePanel extends JPanel implements Editor {
         remove.setMargin(new Insets(2, 2, 2, 2));
         remove.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent event) {
-                tableData.removeSelected();
-                refresh();
+                doRemove(tableData);
             }
         });
         container.add(remove);
@@ -95,6 +99,23 @@ public class EditableTablePanel extends JPanel implements Editor {
         return panel;
     }
 
+    private void doRemove(final InlineEditableTableData tableData) {
+        int[] rows = table.getSelectedRows();
+
+        if (rows.length == 0)
+            return;
+
+        String title = "Warning";
+        String message = "Are you sure you want to remove the selected row(s)?";
+        int selection = JOptionPane.showConfirmDialog(parent, message, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection == JOptionPane.YES_OPTION) {
+            tableData.removeSelected();
+            refresh();
+        }
+    }
+    
     private void refresh() {
         tableModel.refresh();
         super.revalidate();

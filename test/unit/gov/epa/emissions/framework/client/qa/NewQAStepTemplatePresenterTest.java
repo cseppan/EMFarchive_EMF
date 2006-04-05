@@ -9,25 +9,25 @@ import gov.epa.emissions.framework.EmfMockObjectTestCase;
 public class NewQAStepTemplatePresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldAddQAStepTemplateToViewOnAdd() {
-        Mock view = mock(EditQAStepTemplatesView.class);
+        Mock view = mock(QAStepTemplatesPanelView.class);
         Mock dialog = mock(NewQAStepTemplateView.class);
         QAStepTemplate stepTemplate = new QAStepTemplate();
         expectsOnce(view, "add", stepTemplate);
         
         NewQAStepTemplatePresenter presenter = new NewQAStepTemplatePresenter(
-                (EditQAStepTemplatesView) view.proxy(), (NewQAStepTemplateView)dialog.proxy());
+                (QAStepTemplatesPanelView) view.proxy(), (NewQAStepTemplateView)dialog.proxy());
 
         presenter.addNew(stepTemplate);
     }
     
     public void testShouldDisplayView() {
-        Mock view = mock(EditQAStepTemplatesView.class);
+        Mock view = mock(QAStepTemplatesPanelView.class);
         DatasetType type = new DatasetType();
         Mock dialog = mock(NewQAStepTemplateView.class);
         expects(dialog, 1, "display", same(type));
 
         NewQAStepTemplatePresenter presenter = new NewQAStepTemplatePresenter(
-                (EditQAStepTemplatesView) view.proxy(), (NewQAStepTemplateView)dialog.proxy());
+                (QAStepTemplatesPanelView) view.proxy(), (NewQAStepTemplateView)dialog.proxy());
 
         expects(dialog, 1, "observe", same(presenter));
         

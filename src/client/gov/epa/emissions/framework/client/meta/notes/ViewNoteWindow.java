@@ -22,7 +22,7 @@ public class ViewNoteWindow extends DisposableInteralFrame implements NoteView {
     private JPanel layout;
 
     public ViewNoteWindow(DesktopManager desktopManager) {
-        super("View Note", new Dimension(350, 250), desktopManager);
+        super("View Note", new Dimension(450, 250), desktopManager);
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -45,16 +45,16 @@ public class ViewNoteWindow extends DisposableInteralFrame implements NoteView {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Name", new Label(note.getName()), panel);
-        layoutGenerator.addLabelWidgetPair("Type", new Label(note.getNoteType().getType()), panel);
+        layoutGenerator.addLabelWidgetPair("Name:", new Label(note.getName()), panel);
+        layoutGenerator.addLabelWidgetPair("Type:", new Label(note.getNoteType().getType()), panel);
 
         TextArea details = new TextArea("", note.getDetails(), 40, 3);
         details.setEditable(false);
         ScrollableComponent scrollableDetails = ScrollableComponent.createWithVerticalScrollBar(details);
-        layoutGenerator.addLabelWidgetPair("Details", scrollableDetails, panel);
+        layoutGenerator.addLabelWidgetPair("Details:", scrollableDetails, panel);
 
-        layoutGenerator.addLabelWidgetPair("References", new Label(note.getReferences()), panel);
-        layoutGenerator.addLabelWidgetPair("Version", new Label(note.getVersion() + ""), panel);
+        layoutGenerator.addLabelWidgetPair("References:", new Label(note.getReferences()), panel);
+        layoutGenerator.addLabelWidgetPair("Version:", new Label(note.getVersion() + ""), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols

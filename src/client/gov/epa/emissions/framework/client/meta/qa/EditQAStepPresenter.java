@@ -21,9 +21,9 @@ public class EditQAStepPresenter {
         this.session = session;
     }
 
-    public void display(QAStep step) {
+    public void display(QAStep step, String versionName) {
         view.observe(this);
-        view.display(step, dataset, session.user());
+        view.display(step, dataset, session.user(), versionName);
     }
 
     public void doClose() {

@@ -10,6 +10,8 @@ import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.qa.EditableQATabPresenter;
 import gov.epa.emissions.framework.client.meta.qa.EditableQATabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.qa.EditableQATabView;
+import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabPresenter;
+import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenterImpl;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 import gov.epa.emissions.framework.services.EmfException;
@@ -108,5 +110,15 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
 
     private DataService dataService() {
         return session.dataService();
+    }
+
+    public void set(DataTabView view) {
+        DataTabPresenter presenter = new DataTabPresenter(view, dataset, session);
+        presenter.doDisplay();
+    }
+
+    public void set(RevisionsTabView view) throws EmfException {
+        RevisionsTabPresenter presenter = new RevisionsTabPresenter(dataset, session.dataCommonsService());
+        presenter.display(view);
     }
 }

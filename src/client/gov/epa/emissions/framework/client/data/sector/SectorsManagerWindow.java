@@ -204,11 +204,11 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
     }
 
     private EditableSectorView editSectorView() {
-        return new EditSectorWindow(desktopManager);
+        return new EditSectorWindow(desktopManager, parentConsole);
     }
 
     private NewSectorView newSectorView() {
-        return new NewSectorWindow(desktopManager);
+        return new NewSectorWindow(desktopManager, parentConsole);
     }
 
     public EmfConsole getParentConsole() {

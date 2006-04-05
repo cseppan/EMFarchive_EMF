@@ -21,6 +21,7 @@
         <property name="comments" column="comments" type="java.lang.String" not-null="false"/> 
         <property name="date" column="date" type="java.util.Date" not-null="false"/> 
         <property name="who" column="who" type="java.lang.String" not-null="false"/> 
+        <property name="configuration" column="configuration" type="java.lang.String" not-null="false"/> 
     </class>
 </hibernate-mapping>  
 

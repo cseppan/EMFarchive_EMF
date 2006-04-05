@@ -34,18 +34,22 @@ public class DatasetTypesTableDataTest extends TestCase {
 
     public void testShouldHaveFiveColumns() {
         String[] columns = data.columns();
-        assertEquals(4, columns.length);
+        assertEquals(6, columns.length);
         assertEquals("Name", columns[0]);
-        assertEquals("Description", columns[1]);
-        assertEquals("Min Files", columns[2]);
-        assertEquals("Max Files", columns[3]);
+        assertEquals("# Keywords", columns[1]);
+        assertEquals("# QA Step Templates", columns[2]);
+        assertEquals("Min Files", columns[3]);
+        assertEquals("Max Files", columns[4]);
+        assertEquals("Description", columns[5]);
     }
 
     public void testShouldHaveAppropriateColumnClassDefinedForAllColumns() {
         assertEquals(String.class, data.getColumnClass(0));
-        assertEquals(String.class, data.getColumnClass(1));
+        assertEquals(Integer.class, data.getColumnClass(1));
         assertEquals(Integer.class, data.getColumnClass(2));
         assertEquals(Integer.class, data.getColumnClass(3));
+        assertEquals(Integer.class, data.getColumnClass(4));
+        assertEquals(String.class, data.getColumnClass(5));
     }
 
     public void testAllColumnsShouldBeEditable() {
@@ -54,6 +58,7 @@ public class DatasetTypesTableDataTest extends TestCase {
         assertTrue("All cells should be uneditable", data.isEditable(2));
         assertTrue("All cells should be uneditable", data.isEditable(3));
         assertTrue("All cells should be uneditable", data.isEditable(4));
+        assertTrue("All cells should be uneditable", data.isEditable(5));
     }
 
     public void testShouldReturnTheRowsCorrespondingToDatasetTypesCount() {
@@ -67,9 +72,9 @@ public class DatasetTypesTableDataTest extends TestCase {
 
         Row row = (Row) rows.get(0);
         assertEquals("name1", row.getValueAt(0));
-        assertEquals("desc1", row.getValueAt(1));
-        assertEquals(new Integer(1), row.getValueAt(2));
-        assertEquals(new Integer(3), row.getValueAt(3));
+        assertEquals("desc1", row.getValueAt(5));
+        assertEquals(new Integer(1), row.getValueAt(3));
+        assertEquals(new Integer(3), row.getValueAt(4));
     }
 
     public void testShouldReturnARowRepresentingADatasetTypeEntry() {

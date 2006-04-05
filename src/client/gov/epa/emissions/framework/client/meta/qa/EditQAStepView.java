@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.services.data.QAStep;
 
 public interface EditQAStepView extends ManagedView {
 
-    void display(QAStep step, EmfDataset dataset, User user);
+    void display(QAStep step, EmfDataset dataset, User user, String versionName);
 
     void observe(EditQAStepPresenter presenter);
 

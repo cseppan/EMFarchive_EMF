@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.data.datasettype;
 
-import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
@@ -41,11 +40,11 @@ public class ViewableQAStepTemplateWindow extends DisposableInteralFrame impleme
         this.title = title;
     }
 
-    public void display(DatasetType type, QAStepTemplate template) {
-        super.setTitle(super.getTitle() + ": " + type.getName() + " " + title);
-        super.setName(super.getTitle() + ": " + type.getName() + " " + title);
+    public void display(QAStepTemplate template) {
+        super.setTitle(super.getTitle() + ": " + " " + title);
+        super.setName(super.getTitle() + ": " + " " + title);
         layout = createLayout();
-        display(template);
+        populateFields(template);
         super.getContentPane().add(layout);
         super.display();
     }
@@ -113,7 +112,7 @@ public class ViewableQAStepTemplateWindow extends DisposableInteralFrame impleme
         return panel;
     }
 
-    public void display(QAStepTemplate template) {
+    public void populateFields(QAStepTemplate template) {
         name.setText(template.getName());
         program.setText(template.getProgram());
         programParameters.setText(template.getProgramArguments());

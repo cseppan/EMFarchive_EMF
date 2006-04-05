@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabView;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.qa.EditableQATabView;
+import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabView;
 import gov.epa.emissions.framework.services.EmfException;
 
@@ -21,5 +22,9 @@ public interface PropertiesEditorPresenter {
     void set(EditNotesTabView view) throws EmfException;
     
     void set(EditableQATabView qatab) throws EmfException;
+    
+    void set(DataTabView view);
+    
+    void set(RevisionsTabView view) throws EmfException;
 
 }

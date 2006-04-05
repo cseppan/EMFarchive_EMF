@@ -69,4 +69,8 @@ public class EditNotesTabPresenterImpl implements EditNotesTabPresenter {
 
         return (Note[]) list.toArray(new Note[0]);
     }
+
+    public void doViewNote(Note note, NoteView window) {
+        window.display(note);
+    }
 }

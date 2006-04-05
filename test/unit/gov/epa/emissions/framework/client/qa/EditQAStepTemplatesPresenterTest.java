@@ -6,47 +6,36 @@ import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.services.EmfException;
 
 import org.jmock.Mock;
+import org.jmock.core.constraint.IsInstanceOf;
 
 public class EditQAStepTemplatesPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldObserveViewOnDisplay() {
-        Mock view = mock(EditQAStepTemplatesView.class);
-
-        EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenter(null, (EditQAStepTemplatesView) view
-                .proxy());
-        expectsOnce(view, "observe", presenter);
-
-        presenter.display();
-    }
-
-    public void testShouldRunEditQAStepTemplateWindow() throws EmfException {
-        Mock view = mock(EditQAStepTemplatesView.class);
-
-        DatasetType type = new DatasetType();
-        EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenter(type, (EditQAStepTemplatesView) view
-                .proxy());
-
+        Mock view = mock(QAStepTemplatesPanelView.class);
         Mock editor = mock(EditQAStepTemplateView.class);
-        expects(editor, "loadTemplate");
-        expects(view, "refresh");
-
-        presenter.doEdit_WRONG_PRESENTER((EditQAStepTemplateView) editor.proxy());
-    }
-
-    public void testShouldDisplayEditQAStepTemplateWindow() {
-        Mock view = mock(EditQAStepTemplatesView.class);
-
+        
         DatasetType type = new DatasetType();
-        EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenter(type, (EditQAStepTemplatesView) view
-                .proxy());
-
         QAStepTemplate template = new QAStepTemplate();
-        Mock editor = mock(EditQAStepTemplateView.class);
-        expects(editor, "display");
-        expects(editor, 1, "observe", same(presenter));
-        expects(editor, 1, "display", same(template));
+        
+        EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenterImpl((EditQAStepTemplateView)editor.proxy(), (QAStepTemplatesPanelView) view
+                .proxy());        
+        expects(editor, 1, "observe", new IsInstanceOf(EditQAStepTemplatesPresenter.class));
+        expects(editor, 1, "display", same(type));
+        expects(editor, 1, "populateFields", same(template));
 
-        presenter.doEdit((EditQAStepTemplateView) editor.proxy(), template);
+        presenter.display(type, template);
+    }
+
+    public void testShouldDoEdit() throws EmfException {
+        Mock view = mock(QAStepTemplatesPanelView.class);
+        Mock editor = mock(EditQAStepTemplateView.class);
+        EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenterImpl((EditQAStepTemplateView)editor.proxy(), (QAStepTemplatesPanelView) view
+                .proxy());  
+        
+        expects(view, 1, "refresh");
+        expects(editor, 1, "loadTemplate");
+        
+        presenter.doEdit();
     }
 
 }

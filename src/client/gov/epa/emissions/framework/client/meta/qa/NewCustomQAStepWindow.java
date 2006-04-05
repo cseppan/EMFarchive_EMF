@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
-import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
@@ -53,12 +52,11 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
     private EditableQATabView tabView;
 
     public NewCustomQAStepWindow(DesktopManager desktopManager) {
-        super("New Custom QA Step", new Dimension(550, 450), desktopManager);
+        super("Add Custom QA Step", new Dimension(550, 450), desktopManager);
     }
 
     public void display(EmfDataset dataset, Version[] versions, EditableQATabView tabView) {
-        DatasetType type = dataset.getDatasetType();
-        super.setTitle(super.getTitle() + ": " + type.getName());
+        super.setTitle(super.getTitle() + ": " + dataset.getName());
 
         this.dataset = dataset;
         this.tabView = tabView;
@@ -91,6 +89,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
 
         program = new EditableComboBox(new QAProperties().programs());
         program.setSelectedItem("");
+        program.setPrototypeDisplayValue("To make the combobox a bit wider");
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
 
         arguments = new TextArea("", "", 40, 2);

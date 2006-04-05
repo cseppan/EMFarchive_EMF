@@ -37,11 +37,13 @@ public class QAStepTest extends TestCase {
         step.setComments("result");
         step.setStatus("status");
         step.setDescription("description");
+        step.setConfiguration("dataset one");
         
         assertEquals(date, step.getDate());
         assertEquals("user", step.getWho());
         assertEquals("result", step.getComments());
         assertEquals("status", step.getStatus());
         assertEquals("description", step.getDescription());
+        assertEquals("dataset one", step.getConfiguration());
     }
 }

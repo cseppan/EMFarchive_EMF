@@ -15,13 +15,17 @@ public class QAStepRowSource implements RowSource {
 
     public QAStepRowSource(QAStep source) {
         this.source = source;
-        dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mmaaa");
     }
 
     public Object[] values() {
+        String comments = source.getComments();
+        if(comments != null && comments.length() > 50)
+            comments = comments.substring(0, 45) + "  ...";
+        
         return new Object[] { new Integer(source.getVersion()), source.getName(), Boolean.valueOf(source.isRequired()),
                 source.getOrder() + "", source.getStatus(), format(source.getDate()), source.getWho(),
-                source.getComments(), source.getProgram(), source.getProgramArguments() };
+                comments, source.getProgram(), source.getProgramArguments(), source.getConfiguration() };
     }
 
     private Object format(Date date) {

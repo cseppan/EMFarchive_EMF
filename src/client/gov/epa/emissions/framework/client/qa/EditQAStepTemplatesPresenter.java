@@ -4,30 +4,9 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.framework.services.EmfException;
 
-public class EditQAStepTemplatesPresenter {
-
-    private EditQAStepTemplatesView view;
-
-    private DatasetType type;
-
-    public EditQAStepTemplatesPresenter(DatasetType type, EditQAStepTemplatesView view) {
-        this.type = type;
-        this.view = view;
-    }
-
-    public void display() {
-        view.observe(this);
-    }
-
-    public void doEdit(EditQAStepTemplateView view, QAStepTemplate template) {
-        view.observe(this);
-        view.display(type);
-        view.display(template);
-    }
-
-    public void doEdit_WRONG_PRESENTER(EditQAStepTemplateView view) throws EmfException {
-        view.loadTemplate();
-        this.view.refresh();
-    }
-
+public interface EditQAStepTemplatesPresenter {
+    
+    void display(DatasetType type, QAStepTemplate template);
+    
+    void doEdit() throws EmfException;
 }

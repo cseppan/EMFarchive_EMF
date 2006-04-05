@@ -28,6 +28,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         step1.setOrder(1);
         step1.setComments("result1");
         step1.setStatus("status1");
+        step1.setConfiguration("dataset one");
 
         step2 = new QAStep();
         step2.setVersion(2);
@@ -39,13 +40,14 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         step2.setOrder(2);
         step2.setComments("result2");
         step2.setStatus("status2");
+        step2.setConfiguration("dataset two");
 
         data = new QAStepsTableData(new QAStep[] { step1, step2 });
     }
 
     public void testShouldHaveNineColumns() {
         String[] columns = data.columns();
-        assertEquals(10, columns.length);
+        assertEquals(11, columns.length);
         assertEquals("Version", columns[0]);
         assertEquals("Name", columns[1]);
         assertEquals("Required", columns[2]);
@@ -56,6 +58,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         assertEquals("Comment", columns[7]);
         assertEquals("Program", columns[8]);
         assertEquals("Arguments", columns[9]);
+        assertEquals("Configuration", columns[10]);
     }
 
     public void testShouldReturnAppropriateColumnClassForEachCol() {
@@ -91,7 +94,7 @@ public class QAStepsTableDataTest extends EmfMockObjectTestCase {
         assertEquals(step1.getOrder() + "", row.getValueAt(3));
         assertEquals(step1.getStatus(), row.getValueAt(4));
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mmaaa");
         assertEquals(dateFormat.format(step1.getDate()), row.getValueAt(5));
 
         assertEquals(step1.getWho(), row.getValueAt(6));

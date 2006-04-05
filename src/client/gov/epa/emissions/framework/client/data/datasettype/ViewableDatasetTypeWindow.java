@@ -135,17 +135,17 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         table.setRowHeight(16);
 
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
-        panel.add(createViewButton(tableData, type), BorderLayout.SOUTH);
+        panel.add(createViewButton(tableData), BorderLayout.SOUTH);
 
         return panel;
     }
     
-    private JPanel createViewButton(final EditableQAStepTemplateTableData data, final DatasetType type) {
+    private JPanel createViewButton(final EditableQAStepTemplateTableData data) {
         JPanel panel = new JPanel(new BorderLayout());
         
         Button view = new Button("View", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                showTemplateWindows(data, type);
+                showTemplateWindows(data);
             }
         });
         
@@ -162,12 +162,12 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         return table.getValueAt(rowIndex, colIndex).toString();
     }
 
-    private void showTemplateWindows(EditableQAStepTemplateTableData data, DatasetType type) {
+    private void showTemplateWindows(EditableQAStepTemplateTableData data) {
         QAStepTemplate[] selected = data.getSelected();
         
         for(int i = 0; i < selected.length; i++) {
-            ViewableQAStepTemplateView view = new ViewableQAStepTemplateWindow(selected[i].getName(), desktopManager);
-            ViewableQAStepTemplatePresenter presenter = new ViewableQAStepTemplatePresenter(view, selected[i], type);
+            ViewableQAStepTemplateView view = new ViewableQAStepTemplateWindow((i + 1) + "<>" + selected[i].getName(), desktopManager);
+            ViewableQAStepTemplatePresenter presenter = new ViewableQAStepTemplatePresenter(view, selected[i]);
             presenter.display();
         }
     }

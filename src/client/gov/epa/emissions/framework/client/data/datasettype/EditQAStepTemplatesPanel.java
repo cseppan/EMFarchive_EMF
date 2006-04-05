@@ -8,13 +8,14 @@ import gov.epa.emissions.commons.gui.EditableTable;
 import gov.epa.emissions.commons.gui.Editor;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.qa.EditQAStepTemplateWindow;
-import gov.epa.emissions.framework.client.qa.EditQAStepTemplatesPresenter;
-import gov.epa.emissions.framework.client.qa.EditQAStepTemplatesView;
 import gov.epa.emissions.framework.client.qa.EditableQAStepTemplateTableData;
 import gov.epa.emissions.framework.client.qa.NewQAStepTemplatePresenter;
 import gov.epa.emissions.framework.client.qa.NewQAStepTemplateView;
 import gov.epa.emissions.framework.client.qa.NewQAStepTemplateWindow;
+import gov.epa.emissions.framework.client.qa.QAStepTemplatesPanelPresenter;
+import gov.epa.emissions.framework.client.qa.QAStepTemplatesPanelView;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 
@@ -25,6 +26,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -32,7 +34,7 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTemplatesView, Editor {
+public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesPanelView, Editor {
 
     protected EditableEmfTableModel tableModel;
 
@@ -42,16 +44,19 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
 
     protected DatasetType type;
 
-    protected EditQAStepTemplatesPresenter presenter;
+    protected QAStepTemplatesPanelPresenter presenter;
 
     private EditableQAStepTemplateTableData tableData;
 
     private DesktopManager desktopManager;
 
-    public EditQAStepTemplatesPanel(DatasetType type, ManageChangeables changeablesList,
-            DesktopManager desktopManager) {
+    private EmfConsole parent;
+
+    public EditQAStepTemplatesPanel(DatasetType type, ManageChangeables changeablesList, DesktopManager desktopManager,
+            EmfConsole parent) {
         this.changeablesList = changeablesList;
         this.type = type;
+        this.parent = parent;
         tableData = new EditableQAStepTemplateTableData(type.getQaStepTemplates());
         this.desktopManager = desktopManager;
 
@@ -132,7 +137,8 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
     protected void doEdit() {
         QAStepTemplate[] selected = tableData.getSelected();
         for (int i = 0; i < selected.length; i++) {
-            EditQAStepTemplateWindow view = new EditQAStepTemplateWindow(desktopManager);
+            EditQAStepTemplateWindow view = new EditQAStepTemplateWindow((i + 1) + "<>" + selected[i].getName(),
+                    desktopManager);
             presenter.doEdit(view, selected[i]);
         }
     }
@@ -166,13 +172,25 @@ public class EditQAStepTemplatesPanel extends JPanel implements EditQAStepTempla
         table.addKeyListener(keyListener);
     }
 
-    public void observe(EditQAStepTemplatesPresenter presenter) {
+    public void observe(QAStepTemplatesPanelPresenter presenter) {
         this.presenter = presenter;
     }
 
     private void doRemove() {
-        tableData.removeSelected();
-        refresh();
+        QAStepTemplate[] templates = tableData.getSelected();
+
+        if (templates.length == 0)
+            return;
+
+        String title = "Warning";
+        String message = "Are you sure you want to remove the selected template(s)?";
+        int selection = JOptionPane.showConfirmDialog(parent, message, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection == JOptionPane.YES_OPTION) {
+            tableData.removeSelected();
+            refresh();
+        }
     }
 
     private void doAdd() {

@@ -99,7 +99,7 @@ public class WindowMenu extends JMenu implements WindowMenuView {
 
         public WindowMenuItem(ManagedView view) {
             super(view.getTitle());
-            super.setName(view.getName());
+            super.setName(view.getName() + "view name");
             this.view = view;
 
             super.addActionListener(new ActionListener() {

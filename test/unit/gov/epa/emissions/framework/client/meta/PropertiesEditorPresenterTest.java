@@ -10,17 +10,20 @@ import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTabPrese
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTabView;
 import gov.epa.emissions.framework.client.meta.qa.EditableQATabPresenter;
+import gov.epa.emissions.framework.client.meta.revisions.RevisionsTabView;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTabPresenter;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
+import gov.epa.emissions.framework.services.editor.Revision;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.jmock.Mock;
+import org.jmock.core.constraint.IsInstanceOf;
 
 public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
 
@@ -199,5 +202,41 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
         qaPresenter.expects(once()).method("display");
 
         presenter.set((EditableQATabPresenter) qaPresenter.proxy());
+    }
+    
+    public void testShouldDisplayDataTabOnSetDataTab() {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("test");
+        dataset.setDatasetType(new DatasetType());
+
+        Mock view = mock(DataTabView.class);
+        view.expects(once()).method("display").with(same(dataset));
+        view.expects(once()).method("observe").with(new IsInstanceOf(DataTabPresenter.class));
+
+        Mock session = mock(EmfSession.class);
+        session.stubs().method("dataViewService");
+        
+        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, (DatasetPropertiesEditorView)this.view.proxy(), (EmfSession) session.proxy());
+
+        presenter.set((DataTabView) view.proxy());
+    }
+    
+    public void testShouldDisplayRevisionsTabOnSetRevisionsTab() throws Exception {
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("test");
+        dataset.setDatasetType(new DatasetType());
+
+        Mock view = mock(RevisionsTabView.class);
+        view.expects(once()).method("display");
+
+        Mock session = mock(EmfSession.class);
+        Mock service = mock(DataCommonsService.class);
+        Revision[] revisions = new Revision[0];
+        service.stubs().method("getRevisions").will(returnValue(revisions));
+        session.stubs().method("dataCommonsService").will(returnValue(service.proxy()));
+
+        PropertiesEditorPresenter presenter = new PropertiesEditorPresenterImpl(dataset, (DatasetPropertiesEditorView)this.view.proxy(), (EmfSession) session.proxy());
+
+        presenter.set((RevisionsTabView) view.proxy());
     }
 }

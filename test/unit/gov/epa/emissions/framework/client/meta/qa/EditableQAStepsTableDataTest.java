@@ -28,6 +28,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         step1.setRequired(true);
         step1.setDate(new Date());
         step1.setOrder(1);
+        step1.setConfiguration("dataset one");
 
         step2 = new QAStep();
         step2.setName("name2");
@@ -36,6 +37,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         step2.setDate(new Date());
         step2.setRequired(false);
         step2.setOrder(2);
+        step2.setConfiguration("dataset two");
 
         data = new EditableQAStepsTableData(new QAStep[] { step1, step2 });
     }
@@ -43,7 +45,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
     public void testShouldHaveTenColumns() {
         String[] columns = data.columns();
 
-        assertEquals(10, columns.length);
+        assertEquals(11, columns.length);
         assertEquals("Version", columns[0]);
         assertEquals("Name", columns[1]);
         assertEquals("Required", columns[2]);
@@ -54,6 +56,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         assertEquals("Comment", columns[7]);
         assertEquals("Program", columns[8]);
         assertEquals("Arguments", columns[9]);
+        assertEquals("Configuration", columns[10]);
     }
 
     public void testShouldReturnCorrectTypesAsColumnClassForAllCols() {
@@ -67,6 +70,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         assertEquals(String.class, data.getColumnClass(7));
         assertEquals(String.class, data.getColumnClass(8));
         assertEquals(String.class, data.getColumnClass(9));
+        assertEquals(String.class, data.getColumnClass(10));
     }
 
     public void testAllColumnsShouldBeUneditableExceptSelect() {
@@ -93,7 +97,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         assertEquals(step1.getOrder() + "", row.getValueAt(3));
         assertEquals(step1.getStatus(), row.getValueAt(4));
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mmaaa");
         assertEquals(dateFormat.format(step1.getDate()), row.getValueAt(5));
 
         assertEquals(step1.getWho(), row.getValueAt(6));

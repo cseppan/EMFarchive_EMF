@@ -32,6 +32,8 @@ public class QAStep {
     private int id;
     
     private String description;
+    
+    private String configuration;
 
     public int getId() {
         return id;
@@ -158,6 +160,14 @@ public class QAStep {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(String configuration) {
+        this.configuration = configuration;
     }
 
 }

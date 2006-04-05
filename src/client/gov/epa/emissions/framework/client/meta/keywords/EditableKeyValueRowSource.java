@@ -54,11 +54,11 @@ public class EditableKeyValueRowSource implements RowSource {
     public void validate(int rowNumber) throws EmfException {
         Keyword keyword = source.getKeyword();
         if (keyword == null || keyword.getName().trim().length() == 0) {
-            throw new EmfException("empty keyword at row "+rowNumber);
+            throw new EmfException("On Keywords panel, empty keyword at row "+rowNumber);
         }
         String value = source.getValue();
         if (value == null || value.trim().length() == 0) {
-            throw new EmfException("empty keyword value at row "+rowNumber);
+            throw new EmfException("On Keywords panel, empty keyword value at row "+rowNumber);
         }
     }
 }

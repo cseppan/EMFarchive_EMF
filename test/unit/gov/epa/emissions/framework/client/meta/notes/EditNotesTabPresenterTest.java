@@ -89,4 +89,23 @@ public class EditNotesTabPresenterTest extends EmfMockObjectTestCase {
 
         presenter.addNote((NewNoteView) newNoteView.proxy(), user, dataset, notes, types, versions);
     }
+    
+    public void testShouldDisplayNoteOnViewNote() throws Exception {
+        Note note = new Note();
+        
+        EmfDataset dataset = new EmfDataset();
+        dataset.setId(2);
+        User user = new User();
+        EmfSession session = session(user, null, null);
+        
+        Mock view = mock(NoteView.class);
+        expects(view, 1, "display", same(note));
+        
+        Mock view2 = mock(EditNotesTabView.class);
+        
+        EditNotesTabPresenterImpl presenter = new EditNotesTabPresenterImpl(dataset, session, (EditNotesTabView) view2
+                .proxy());
+        
+        presenter.doViewNote(note, (NoteView)view.proxy());
+    }
 }

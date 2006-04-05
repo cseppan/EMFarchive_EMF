@@ -92,7 +92,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         TextArea description = new TextArea("", step.getDescription(), 40, 10);
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
-        result.setEditable(false);
+        description.setEditable(false);
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description", scrollableDesc, panel);
 

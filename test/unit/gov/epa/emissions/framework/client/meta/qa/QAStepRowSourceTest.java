@@ -21,24 +21,26 @@ public class QAStepRowSourceTest extends TestCase {
         step.setOrder((float) 823.2);
         step.setComments("result");
         step.setStatus("status");
+        step.setConfiguration("dataset one");
 
         QAStepRowSource source = new QAStepRowSource(step);
 
         Object[] values = source.values();
-        assertEquals(10, values.length);
+        assertEquals(11, values.length);
         assertEquals(new Integer(step.getVersion()), values[0]);
         assertEquals(step.getName(), values[1]);
         assertEquals(step.isRequired(), ((Boolean) values[2]).booleanValue());
         assertEquals(step.getOrder() + "", values[3]);
         assertEquals(step.getStatus(), values[4]);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mmaaa");
         assertEquals(dateFormat.format(step.getDate()), values[5]);
 
         assertEquals(step.getWho(), values[6]);
         assertEquals(step.getComments(), values[7]);
         assertEquals(step.getProgram(), values[8]);
         assertEquals(step.getProgramArguments(), values[9]);
+        assertEquals(step.getConfiguration(), values[10]);
     }
 
     public void testShouldTrackOriginalSource() {

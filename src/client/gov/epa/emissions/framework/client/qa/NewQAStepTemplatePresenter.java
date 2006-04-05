@@ -7,9 +7,9 @@ public class NewQAStepTemplatePresenter {
 
     private NewQAStepTemplateView view;
     
-    private EditQAStepTemplatesView parentView;
+    private QAStepTemplatesPanelView parentView;
 
-    public NewQAStepTemplatePresenter(EditQAStepTemplatesView parentView, NewQAStepTemplateView view) {
+    public NewQAStepTemplatePresenter(QAStepTemplatesPanelView parentView, NewQAStepTemplateView view) {
         this.view = view;
         this.parentView = parentView;
     }

@@ -12,7 +12,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeyValueTableData;
 import gov.epa.emissions.framework.client.meta.keywords.Keywords;
-import gov.epa.emissions.framework.client.qa.EditQAStepTemplatesPresenter;
+import gov.epa.emissions.framework.client.qa.QAStepTemplatesPanelPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -51,10 +51,13 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private EditQAStepTemplatesPanel qaStepTemplatesPanel;
 
+    private EmfConsole parent;
+
     public EditableDatasetTypeWindow(EmfConsole parent, DesktopManager desktopManager) {
         super("Edit Dataset Type", new Dimension(600, 550), desktopManager);
 
         this.desktopManager = desktopManager;
+        this.parent = parent;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -111,15 +114,15 @@ public class EditableDatasetTypeWindow extends DisposableInteralFrame implements
 
     private JPanel createKeywordsPanel(DatasetType type, Keyword[] keywords) {
         keywordsTableData = new EditableKeyValueTableData(type.getKeyVals(), new Keywords(keywords));
-        keywordsPanel = new DatasetTypeKeywordsPanel(keywordsTableData, keywords, this);
+        keywordsPanel = new DatasetTypeKeywordsPanel(keywordsTableData, keywords, this, parent);
         keywordsPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 
         return keywordsPanel;
     }
 
     private JPanel createQAStepTemplatesPanel(DatasetType type) {
-        qaStepTemplatesPanel = new EditQAStepTemplatesPanel(type, this, desktopManager);
-        EditQAStepTemplatesPresenter presenter = new EditQAStepTemplatesPresenter(type, qaStepTemplatesPanel);
+        qaStepTemplatesPanel = new EditQAStepTemplatesPanel(type, this, desktopManager, parent);
+        QAStepTemplatesPanelPresenter presenter = new QAStepTemplatesPanelPresenter(type, qaStepTemplatesPanel);
         presenter.display();
 
         return qaStepTemplatesPanel;

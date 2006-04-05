@@ -23,7 +23,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
     private JPanel layout;
 
-    private EditQAStepTemplatesPresenter presenter;
+    private EditQAStepTemplatesPresenterImpl presenter;
 
     private QAStepTemplate template;
 
@@ -33,12 +33,12 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
     private QAStepTemplatePanel templatePanel;
 
-    public EditQAStepTemplateWindow(DesktopManager desktopManager) {
+    public EditQAStepTemplateWindow(String title, DesktopManager desktopManager) {
         super("Edit QA Step Template", new Dimension(550, 480), desktopManager);
+        super.setLabel(super.getTitle() + ": " + title);
     }
 
     public void display(DatasetType type) {
-        super.setLabel(super.getTitle() + ": " + type.getName());
         layout = createLayout(type);
         super.getContentPane().add(layout);
         super.display();
@@ -86,7 +86,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
     private JPanel buttonsPanel(final DatasetType type) {
         JPanel panel = new JPanel();
 
-        ok = new Button("OK", new AbstractAction() {
+        ok = new Button("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit(type);
                 close();
@@ -95,7 +95,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new Button("Cancel", new AbstractAction() {
+        Button cancel = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doClose();
             }
@@ -109,7 +109,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         clearMessage();
         verifyInput(type);
         try {
-            presenter.doEdit_WRONG_PRESENTER(this);
+            presenter.doEdit();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -127,7 +127,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         return shouldCreate;
     }
 
-    public void observe(EditQAStepTemplatesPresenter presenter) {
+    public void observe(EditQAStepTemplatesPresenterImpl presenter) {
         this.presenter = presenter;
     }
 
@@ -140,7 +140,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         template.setDescription(templatePanel.getDescription().trim());
     }
 
-    public void display(QAStepTemplate template) {
+    public void populateFields(QAStepTemplate template) {
         this.template = template;
         templatePanel.setFields(template);
         resetChanges();

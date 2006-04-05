@@ -86,7 +86,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         User user = new User();
 
         Mock view = mock(EditQAStepView.class);
-        expectsOnce(view, "display", new Constraint[] { same(step), same(dataset), same(user) });
+        expectsOnce(view, "display", new Constraint[] { same(step), same(dataset), same(user), same("") });
         expects(view, "observe");
 
         Mock session = mock(EmfSession.class);
@@ -95,7 +95,7 @@ public class EditableQATabPresenterTest extends EmfMockObjectTestCase {
         EditableQATabPresenterImpl presenter = new EditableQATabPresenterImpl(dataset, (EmfSession) session.proxy(),
                 null);
 
-        presenter.doEdit(step, (EditQAStepView) view.proxy());
+        presenter.doEdit(step, (EditQAStepView) view.proxy(), "");
     }
 
     public void testShouldSaveQAStepOnSave() throws EmfException {

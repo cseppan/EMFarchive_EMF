@@ -64,17 +64,22 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private User user;
 
+    private TextField config;
+    
+    private static int count = 0;
+
     public EditQAStepWindow(DesktopManager desktopManager) {
         super("Edit QA Step", new Dimension(600, 625), desktopManager);
     }
 
-    public void display(QAStep step, EmfDataset dataset, User user) {
+    public void display(QAStep step, EmfDataset dataset, User user, String versionName) {
         this.step = step;
         this.user = user;
 
-        super.setLabel(super.getTitle() + ": " + step.getName());
+        super.setLabel(super.getTitle() + ": " + (++count) + " " 
+                + step.getName() + " - " + dataset.getName());
 
-        JPanel layout = createLayout(step, dataset);
+        JPanel layout = createLayout(step, versionName);
         super.getContentPane().add(layout);
         super.display();
     }
@@ -87,24 +92,24 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         this.presenter = presenter;
     }
 
-    private JPanel createLayout(QAStep step, EmfDataset dataset) {
+    private JPanel createLayout(QAStep step, String versionName) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
 
-        panel.add(inputPanel(step, dataset));
+        panel.add(inputPanel(step, versionName));
         panel.add(buttonsPanel());
 
         return panel;
     }
 
-    private JPanel inputPanel(QAStep step, EmfDataset dataset) {
+    private JPanel inputPanel(QAStep step, String versionName) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        panel.add(upperPanel(step, dataset));
+        panel.add(upperPanel(step, versionName));
         panel.add(lowerPanel(step));
 
         return panel;
@@ -126,13 +131,17 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         addChangeable(date);
         layoutGenerator.addLabelWidgetPair("Date:", date, panel);
 
+        config = new TextField("config", step.getWho(), 40);
+        addChangeable(config);
+        layoutGenerator.addLabelWidgetPair("Configuration:", config, panel);
+        
         comments = new TextArea("Comments", step.getComments(), 40, 3);
         addChangeable(comments);
         ScrollableComponent scrollableComment = ScrollableComponent.createWithVerticalScrollBar(comments);
         layoutGenerator.addLabelWidgetPair("Comments:", scrollableComment, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -155,16 +164,16 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         return step.getStatus() != null ? step.getStatus() : new QAProperties().initialStatus();
     }
 
-    private JPanel upperPanel(QAStep step, EmfDataset dataset) {
+    private JPanel upperPanel(QAStep step, String versionName) {
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Name:", new Label(step.getName()), panel);
-        layoutGenerator.addLabelWidgetPair("Dataset:", new Label(dataset.getName()), panel);
-        layoutGenerator.addLabelWidgetPair("Version:", new Label(step.getVersion() + ""), panel);
+        layoutGenerator.addLabelWidgetPair("Version:", new Label(step.getVersion() + " " + versionName), panel);
 
         program = new EditableComboBox(new QAProperties().programs());
+        program.setPrototypeDisplayValue("To make the combobox a bit wider");
         program.setSelectedItem(step.getProgram());
         addChangeable(program);
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
@@ -191,7 +200,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 8, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 7, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -237,7 +246,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = new Button("OK", new AbstractAction() {
+        Button ok = new Button("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit();
             }
@@ -245,7 +254,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
-        Button cancel = new Button("Cancel", new AbstractAction() {
+        Button cancel = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doClose();
             }
@@ -271,6 +280,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         step.setComments(comments.getText());
         step.setWho(who.getText());
         step.setDate(date.value());
+        step.setConfiguration(config.getText());
 
         presenter.doEdit();
     }

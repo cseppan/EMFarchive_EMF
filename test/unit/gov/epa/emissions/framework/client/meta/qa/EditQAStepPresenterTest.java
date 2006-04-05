@@ -37,7 +37,7 @@ public class EditQAStepPresenterTest extends EmfMockObjectTestCase {
         User user = new User();
 
         Mock view = mock(EditQAStepView.class);
-        expectsOnce(view, "display", new Constraint[] { same(step), same(dataset), same(user) });
+        expectsOnce(view, "display", new Constraint[] { same(step), same(dataset), same(user), same("") });
 
         Mock session = mock(EmfSession.class);
         stub(session, "user", user);
@@ -46,6 +46,6 @@ public class EditQAStepPresenterTest extends EmfMockObjectTestCase {
                 (EmfSession) session.proxy());
         expects(view, "observe");
 
-        presenter.display(step);
+        presenter.display(step, "");
     }
 }

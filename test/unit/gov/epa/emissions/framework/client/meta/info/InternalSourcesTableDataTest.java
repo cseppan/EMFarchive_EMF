@@ -27,9 +27,9 @@ public class InternalSourcesTableDataTest extends MockObjectTestCase {
         assertEquals(5, columns.length);
         assertEquals("Table", columns[0]);
         assertEquals("Type", columns[1]);
-        assertEquals("Table Columns", columns[2]);
-        assertEquals("Source", columns[3]);
-        assertEquals("Size", columns[4]);
+        assertEquals("Source", columns[2]);
+        assertEquals("Size", columns[3]);
+        assertEquals("Table Columns", columns[4]);
     }
 
     public void testShouldReturnStringAsColumnClassForAllOtherColumns() {
@@ -69,9 +69,9 @@ public class InternalSourcesTableDataTest extends MockObjectTestCase {
         Row row = (Row) rows.get(0);
         assertEquals("table", row.getValueAt(0));
         assertEquals("type", row.getValueAt(1));
-        assertEquals("1, 2", row.getValueAt(2));
-        assertEquals("source", row.getValueAt(3));
-        assertEquals(new Long(2800), row.getValueAt(4));
+        assertEquals("source", row.getValueAt(2));
+        assertEquals(new Long(2800), row.getValueAt(3));
+        assertEquals("1, 2", row.getValueAt(4));
     }
 
     public void testShouldReturnARowRepresentingAnInternalSourceEntry() {

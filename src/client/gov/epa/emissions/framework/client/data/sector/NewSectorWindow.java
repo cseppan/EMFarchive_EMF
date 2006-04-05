@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -39,11 +40,14 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
     
     private SectorCriteriaPanel criteriaPanel;
 
+    private EmfConsole parent;
+
     private static int counter;
 
-    public NewSectorWindow(DesktopManager desktopManager) {
+    public NewSectorWindow(DesktopManager desktopManager, EmfConsole parent) {
         super("Create New Sector", new Dimension(550, 400), desktopManager);
 
+        this.parent = parent;
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -98,7 +102,7 @@ public class NewSectorWindow extends DisposableInteralFrame implements NewSector
 
     private JPanel createCriteriaPanel(Sector sector) {
         criteriaTableData = new SectorCriteriaTableData(sector.getSectorCriteria());
-        criteriaPanel = new SectorCriteriaPanel("", criteriaTableData, this);
+        criteriaPanel = new SectorCriteriaPanel("", criteriaTableData, this, parent);
         criteriaPanel.setBorder(BorderFactory.createTitledBorder("Criteria"));
 
         return criteriaPanel;

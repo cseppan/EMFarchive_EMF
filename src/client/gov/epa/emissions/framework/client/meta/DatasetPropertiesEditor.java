@@ -13,6 +13,7 @@ import gov.epa.emissions.framework.client.meta.logs.LogsTab;
 import gov.epa.emissions.framework.client.meta.logs.LogsTabPresenter;
 import gov.epa.emissions.framework.client.meta.notes.EditNotesTab;
 import gov.epa.emissions.framework.client.meta.qa.EditableQATab;
+import gov.epa.emissions.framework.client.meta.revisions.RevisionsTab;
 import gov.epa.emissions.framework.client.meta.summary.EditableSummaryTab;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -50,6 +51,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         super("Dataset Properties Editor", new Dimension(700, 510), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
+        this.desktopManager = desktopManager;
     }
 
     private JTabbedPane createTabbedPane(EmfDataset dataset, Version[] versions, MessagePanel messagePanel) {
@@ -57,8 +59,10 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         tabbedPane.setName("tabbedPane");
 
         tabbedPane.addTab("Summary", createSummaryTab(dataset, versions, messagePanel));
+        tabbedPane.addTab("Data", createDataTab(parentConsole));
         tabbedPane.addTab("Keywords", createKeywordsTab());
         tabbedPane.addTab("Notes", createNotesTab(parentConsole));
+        tabbedPane.addTab("Revisions", createRevisionsTab(parentConsole));
         tabbedPane.addTab("Logs", createLogsTab(dataset, parentConsole));
         tabbedPane.addTab("Tables", createInfoTab(dataset, parentConsole));
         tabbedPane.addTab("QA", createQATab());
@@ -78,6 +82,12 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
             showError("Could not load Summary Tab." + e.getMessage());
             return createErrorTab("Could not load Summary Tab." + e.getMessage());
         }
+    }
+    
+    private JPanel createDataTab(EmfConsole parentConsole) {
+        DataTab view = new DataTab(parentConsole, desktopManager);
+        presenter.set(view);
+        return view;
     }
 
     private JPanel createQATab() {
@@ -100,7 +110,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private JPanel createKeywordsTab() {
-        keywordsTab = new EditableKeywordsTab(this);
+        keywordsTab = new EditableKeywordsTab(this, parentConsole);
         try {
             presenter.set(keywordsTab);
             return keywordsTab;
@@ -112,7 +122,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private JPanel createNotesTab(EmfConsole parentConsole) {
         try {
-            EditNotesTab view = new EditNotesTab(parentConsole, this, messagePanel);
+            EditNotesTab view = new EditNotesTab(parentConsole, this, messagePanel, desktopManager);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
@@ -121,6 +131,17 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
         }
     }
 
+    private JPanel createRevisionsTab(EmfConsole parentConsole) {
+        try {
+            RevisionsTab view = new RevisionsTab(parentConsole, desktopManager);
+            presenter.set(view);
+            return view;
+        } catch (EmfException e) {
+            messagePanel.setError("Could not load Revisions tab. Failed communication with remote EMF Services.");
+            return createErrorTab("Could not load Revisions tab. Failed communication with remote EMF Services.");
+        }
+    }
+    
     private JPanel createLogsTab(EmfDataset dataset, EmfConsole parentConsole) {
         try {
             LogsTab view = new LogsTab(parentConsole);

@@ -144,7 +144,7 @@ public class EditableKeyValueTableDataTest extends TestCase {
         try {
             data.sources();
         } catch (EmfException e) {
-            assertEquals("empty keyword at row 4", e.getMessage());
+            assertEquals("On Keywords panel, empty keyword at row 4", e.getMessage());
             return;
         }
         assertFalse("blank key values are not allowed", true);

@@ -17,7 +17,7 @@ public class InternalSourcesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Table", "Type", "Table Columns", "Source", "Size" };
+        return new String[] { "Table", "Type", "Source", "Size", "Table Columns" };
     }
 
     public List rows() {
@@ -37,8 +37,8 @@ public class InternalSourcesTableData extends AbstractTableData {
 
         for (int i = 0; i < sources.length; i++) {
             InternalSource element = sources[i];
-            Object[] values = { element.getTable(), element.getType(), concat(element.getCols()), element.getSource(),
-                    new Long(element.getSourceSize()) };
+            Object[] values = { element.getTable(), element.getType(), element.getSource(),
+                    new Long(element.getSourceSize()), concat(element.getCols()) };
 
             Row row = new ViewableRow(element, values);
             rows.add(row);

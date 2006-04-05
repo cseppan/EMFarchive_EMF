@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.notes;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.Note;
@@ -13,6 +14,8 @@ import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
@@ -32,11 +35,15 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
     private MessagePanel messagePanel;
 
-    public EditNotesTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel) {
+    private DesktopManager desktopManager;
+    
+    public EditNotesTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
+            DesktopManager desktopManager) {
         super.setName("editNotesTab");
         this.parentConsole = parentConsole;
         this.changeables = changeables;
         this.messagePanel = messagePanel;
+        this.desktopManager = desktopManager;
 
         super.setLayout(new BorderLayout());
     }
@@ -75,16 +82,34 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
     }
 
     private JPanel controlPanel(final EditNotesTabPresenter presenter) {
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel container = new JPanel();
 
         Button add = new Button("Add", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doNewNote(presenter);
             }
         });
-        panel.add(add, BorderLayout.LINE_START);
+        container.add(add);
+
+        Button view = new Button("View", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doViewNote(presenter);
+            }
+        });
+        container.add(view);
+        
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(container, BorderLayout.WEST);
 
         return panel;
+    }
+
+    protected void doViewNote(EditNotesTabPresenter presenter) {
+        List notes = selectModel.selected();
+        for(Iterator iter = notes.iterator(); iter.hasNext();) {
+            ViewNoteWindow window = new ViewNoteWindow(desktopManager);
+            presenter.doViewNote((Note) iter.next(), window); 
+        }
     }
 
     protected void doNewNote(EditNotesTabPresenter presenter) {

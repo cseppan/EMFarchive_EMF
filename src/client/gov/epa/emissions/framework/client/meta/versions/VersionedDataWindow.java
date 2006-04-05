@@ -78,7 +78,7 @@ public class VersionedDataWindow extends ReusableInteralFrame implements Version
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                presenter.doClose();
+                    presenter.doClose();
             }
         });
 

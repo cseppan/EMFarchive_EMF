@@ -318,6 +318,7 @@ CREATE TABLE emf.qa_steps
   comments text,
   status varchar(15),
   description text,
+  configuration varchar(255),
   UNIQUE (dataset_id, version, name)
 ) 
 WITHOUT OIDS;

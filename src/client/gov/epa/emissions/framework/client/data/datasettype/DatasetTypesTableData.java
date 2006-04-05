@@ -16,11 +16,11 @@ public class DatasetTypesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Description", "Min Files", "Max Files" };
+        return new String[] { "Name", "# Keywords", "# QA Step Templates", "Min Files", "Max Files", "Description" };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 0 || col == 1)
+        if (col == 0 || col == 5)
             return String.class;
 
         return Integer.class;
@@ -39,14 +39,24 @@ public class DatasetTypesTableData extends AbstractTableData {
 
         for (int i = 0; i < types.length; i++) {
             DatasetType element = types[i];
-            Object[] values = { element.getName(), element.getDescription(), new Integer(element.getMinFiles()),
-                    new Integer(element.getMaxFiles()) };
+            Object[] values = { element.getName(), new Integer(element.getKeyVals().length), 
+                    new Integer(element.getQaStepTemplates().length), new Integer(element.getMinFiles()),
+                    new Integer(element.getMaxFiles()), getShortDescription(element) };
 
             Row row = new ViewableRow(element, values);
             rows.add(row);
         }
 
         return rows;
+    }
+    
+    private String getShortDescription(DatasetType type) {
+        String description = type.getDescription();
+        
+        if(description != null && description.length() > 50)
+            return description.substring(0, 46) + " ...";
+        
+        return description;
     }
 
 }
