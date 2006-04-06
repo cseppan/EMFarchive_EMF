@@ -13,6 +13,7 @@ import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfServiceImpl;
 import gov.epa.emissions.framework.services.InfrastructureException;
+import gov.epa.emissions.framework.services.PerformanceMetrics;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import javax.sql.DataSource;
@@ -91,6 +92,7 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
 
     public void closeSession(DataAccessToken token) throws EmfException {
         accessor.closeSession(token);
+        new PerformanceMetrics().gc();
     }
 
     /**
@@ -98,6 +100,7 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
      */
     protected void finalize() throws Throwable {
         accessor.shutdown();
+        LOG.error("finalizing view....");
         super.finalize();
     }
 
