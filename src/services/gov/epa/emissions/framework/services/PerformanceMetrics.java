@@ -32,9 +32,13 @@ public class PerformanceMetrics {
     }
 
     public void dumpStats() {
-        long current = usedMemory();
-        LOG.warn("Time: " + (time() - startTime) + " secs using " + (current - startMemory) + " MB memory "
-                + "(current:" + current + ", start: " + startMemory + ")");
+        dumpStats("");
+    }
+
+    public void dumpStats(String prefix) {
+        long end = usedMemory();
+        LOG.warn(prefix + "\tTime: " + (time() - startTime) + " secs using " + (end - startMemory) + " MB memory "
+                + "(end:" + end + ", start: " + startMemory + ")");
     }
 
     public long usedMemory() {
@@ -52,4 +56,5 @@ public class PerformanceMetrics {
     public long totalMemory() {
         return Runtime.getRuntime().totalMemory() / megabyte();
     }
+
 }

@@ -129,8 +129,8 @@ public class ExportService {
 
         try {
             for (int i = 0; i < datasets.length; i++) {
-                EmfDataset dataset = datasets[i];
                 Services services = services();
+                EmfDataset dataset = datasets[i];
                 if (isExportable(dataset, services, user))
                     doExport(user, dirName, purpose, overwrite, path, dataset);
             }
