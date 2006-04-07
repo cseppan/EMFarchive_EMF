@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.editor;
 
 import java.sql.SQLException;
 
+import gov.epa.emissions.commons.PerformanceMetrics;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Page;
@@ -13,7 +14,6 @@ import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfServiceImpl;
 import gov.epa.emissions.framework.services.InfrastructureException;
-import gov.epa.emissions.framework.services.PerformanceMetrics;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import javax.sql.DataSource;
