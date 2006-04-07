@@ -115,7 +115,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
             DataEditorService service, ClosingRule closingRule) throws EmfException {
         tablePresenter.submitChanges();
         try {
-            token = service.save(token);
+            token = service.save(token, dataset);
             tablePresenter.reloadCurrent();
             view.updateLockPeriod(token.lockStart(), token.lockEnd());
             changesSaved = true;

@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 
@@ -117,12 +118,13 @@ public class DataEditorServiceTransport implements DataEditorService {
         call.request(new Object[] { token });
     }
 
-    public DataAccessToken save(DataAccessToken token) throws EmfException {
+    public DataAccessToken save(DataAccessToken token, EmfDataset dataset) throws EmfException {
         call.addParam("token", mappings.dataAccessToken());
+        call.addParam("dataset", mappings.dataset());
         call.setOperation("save");
         call.setReturnType(mappings.dataAccessToken());
 
-        return (DataAccessToken) call.requestResponse(new Object[] { token });
+        return (DataAccessToken) call.requestResponse(new Object[] { token, dataset });
     }
 
     public Version markFinal(DataAccessToken token) throws EmfException {

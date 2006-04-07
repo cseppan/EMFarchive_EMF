@@ -14,6 +14,8 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfServiceImpl;
 import gov.epa.emissions.framework.services.InfrastructureException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.persistence.DatasetDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.SQLException;
@@ -125,7 +127,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
     }
 
-    public DataAccessToken save(DataAccessToken token) throws EmfException {
+    public DataAccessToken save(DataAccessToken token, EmfDataset dataset) throws EmfException {
         if (!accessor.isLockOwned(token)) {
             Version current = accessor.currentVersion(token.getVersion());
             throw new EmfException("Cannot save as the lock is currently owned by " + current.getLockOwner()
@@ -133,14 +135,16 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         }
 
         DataAccessToken extended = accessor.renewLock(token);
-        return doSave(extended, cache, sessionFactory);
+        return doSave(extended, cache, sessionFactory, dataset);
     }
 
     private DataAccessToken doSave(DataAccessToken token, DataAccessCache cache,
-            HibernateSessionFactory hibernateSessionFactory) throws EmfException {
+            HibernateSessionFactory hibernateSessionFactory, EmfDataset dataset) throws EmfException {
         try {
             Session session = hibernateSessionFactory.getSession();
             cache.save(token, session);
+            DatasetDAO dao = new DatasetDAO();
+            dao.updateWithoutLocking(dataset, session);
             session.close();
         } catch (Exception e) {
             LOG.error("Could not update Dataset: " + token.datasetId() + " with changes for Version: "

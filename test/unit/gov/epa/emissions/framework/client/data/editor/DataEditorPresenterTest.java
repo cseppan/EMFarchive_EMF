@@ -123,12 +123,14 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
     public void testShouldSubmitAnyChangesAndSaveChangesOnSave() throws Exception {
         Mock view = mock(DataEditorView.class);
         view.expects(once()).method("updateLockPeriod");
+        
+        EmfDataset dataset = new EmfDataset();
 
         Mock service = mock(DataEditorService.class);
         DataAccessToken token = new DataAccessToken();
         Version version = new Version();
         token.setVersion(version);
-        service.expects(once()).method("save").with(same(token)).will(returnValue(token));
+        service.expects(once()).method("save").with(same(token), same(dataset)).will(returnValue(token));
         DataEditorService serviceProxy = (DataEditorService) service.proxy();
 
         DataEditorView viewProxy = (DataEditorView) view.proxy();
@@ -138,7 +140,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
 
         EditableTablePresenter tablePresenterProxy = (EditableTablePresenter) tablePresenter.proxy();
 
-        DataEditorPresenterImpl p = new DataEditorPresenterImpl(null, version, null, null);
+        DataEditorPresenterImpl p = new DataEditorPresenterImpl(dataset, version, null, null);
         p.save(viewProxy, token, tablePresenterProxy, serviceProxy, null);
 
         assertTrue("Changes should be saved on save", p.areChangesSaved());
@@ -147,9 +149,11 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
     public void testOnSaveShouldDiscardChangesCloseSessionAndNotifyUserOfFailureIfSaveFails() throws Exception {
         Mock view = mock(DataEditorView.class);
         view.expects(once()).method("notifySaveFailure").with(eq("Failure"));
+        
+        EmfDataset dataset = new EmfDataset();
 
         Mock service = mock(DataEditorService.class);
-        service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class)).will(
+        service.expects(once()).method("save").with(new IsInstanceOf(DataAccessToken.class), same(dataset)).will(
                 throwException(new EmfException("Failure")));
 
         DataAccessToken token = new DataAccessToken();
@@ -167,7 +171,7 @@ public class DataEditorPresenterTest extends EmfMockObjectTestCase {
         closingRule.expects(once()).method("proceedWithClose");
         ClosingRule closingRuleProxy = (ClosingRule) closingRule.proxy();
 
-        DataEditorPresenterImpl p = new DataEditorPresenterImpl(null, null, null, null);
+        DataEditorPresenterImpl p = new DataEditorPresenterImpl(dataset, null, null, null);
         p.save(viewProxy, token, tablePresenterProxy, serviceProxy, closingRuleProxy);
 
         assertFalse("Changes should not be saved on discard", p.areChangesSaved());

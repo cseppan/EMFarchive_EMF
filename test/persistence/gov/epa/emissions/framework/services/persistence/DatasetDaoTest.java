@@ -185,8 +185,7 @@ public class DatasetDaoTest extends ServiceTestCase {
     }
 
     public void testShouldObtainLockedDatasetForUpdate() {
-        UserDAO userDao = new UserDAO();
-        User owner = userDao.get("emf", session);
+        User owner = userDAO.get("emf", session);
         EmfDataset dataset = newDataset();
 
         try {

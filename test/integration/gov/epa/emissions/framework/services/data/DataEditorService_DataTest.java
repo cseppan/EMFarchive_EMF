@@ -23,10 +23,16 @@ import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.DataEditorServiceImpl;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
+import gov.epa.emissions.framework.services.persistence.UserDAO;
 
 import java.io.File;
 import java.util.Date;
 import java.util.Random;
+
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 
 public class DataEditorService_DataTest extends ServiceTestCase {
 
@@ -44,13 +50,14 @@ public class DataEditorService_DataTest extends ServiceTestCase {
 
     protected void doSetUp() throws Exception {
         service = new DataEditorServiceImpl(emf(), super.dbServer(), sessionFactory());
-        UserService userService = new UserServiceImpl(sessionFactory());
+        UserServiceImpl userService = new UserServiceImpl(sessionFactory());
 
         datasource = emissions();
         dataset = new EmfDataset();
         table = "test" + new Date().getTime();
         dataset.setName(table);
         setTestValues(dataset);
+        addDataset();
 
         doImport(dataset);
 
@@ -222,12 +229,49 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         changeset.addNew(record8);
 
         service.submit(token, changeset, 1);
-        service.save(token);
+        service.save(token, dataset);
 
         DefaultVersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
         int v0RecordsCount = reader.fetch(versionZero(), dataset.getName(), session).total();
 
         assertEquals(v0RecordsCount + 3, reader.fetch(v1, dataset.getName(), session).total());
+    }
+
+    public void testDatasetModifiedDateUpdatedOnSave() throws Exception {
+        Date originalTimestamp = dataset.getModifiedDateTime();
+        Date expectedTimestamp = new Date(dataset.getModifiedDateTime().getTime() + 4500);
+        dataset.setModifiedDateTime(expectedTimestamp);
+        service.save(token, dataset);
+
+        EmfDataset modified = load(dataset);
+        Date modifiedTimestamp = modified.getModifiedDateTime();
+        assertTrue("Modified Timestamp should be update on save", originalTimestamp.getTime() < modifiedTimestamp
+                .getTime());
+    }
+
+    private void addDataset() {
+        UserDAO userDAO = new UserDAO();
+        User owner = userDAO.get("emf", session);
+        dataset.setCreator(owner.getUsername());
+
+        dataset.setModifiedDateTime(new Date());
+        add(dataset);
+    }
+
+    private EmfDataset load(EmfDataset dataset) {
+        session.clear();
+        Transaction tx = null;
+
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(EmfDataset.class).add(Restrictions.eq("name", dataset.getName()));
+            tx.commit();
+
+            return (EmfDataset) crit.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
     public void testLockRenewedOnSave() throws Exception {
@@ -241,7 +285,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         changeset.addNew(record6);
 
         service.submit(token, changeset, 1);
-        DataAccessToken saved = service.save(token);
+        DataAccessToken saved = service.save(token, dataset);
         assertTrue("Should renew lock on save", saved.isLocked(user));
     }
 
@@ -267,7 +311,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         changeset2.addNew(record7);
         service.submit(token, changeset2, 1);
 
-        service.save(token);
+        service.save(token, dataset);
 
         VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
         int v0RecordsCount = reader.fetch(versionZero(), dataset.getName(), session).total();
@@ -449,7 +493,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         service.submit(token, page1ChangeSet, 1);
 
         int recordsBeforeSave = service.getTotalRecords(token);
-        service.save(token);
+        service.save(token, dataset);
 
         assertEquals(recordsBeforeSave, service.getTotalRecords(token));
     }
