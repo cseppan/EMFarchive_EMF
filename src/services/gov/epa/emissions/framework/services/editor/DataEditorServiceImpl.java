@@ -143,8 +143,10 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         try {
             Session session = hibernateSessionFactory.getSession();
             cache.save(token, session);
+            
             DatasetDAO dao = new DatasetDAO();
             dao.updateWithoutLocking(dataset, session);
+            
             session.close();
         } catch (Exception e) {
             LOG.error("Could not update Dataset: " + token.datasetId() + " with changes for Version: "

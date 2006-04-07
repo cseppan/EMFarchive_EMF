@@ -13,6 +13,8 @@ import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 
+import java.util.Date;
+
 public class DataEditorPresenterImpl implements DataEditorPresenter {
 
     DataEditorView view;
@@ -114,6 +116,7 @@ public class DataEditorPresenterImpl implements DataEditorPresenter {
     void save(DataEditorView view, DataAccessToken token, EditableTablePresenter tablePresenter,
             DataEditorService service, ClosingRule closingRule) throws EmfException {
         tablePresenter.submitChanges();
+        dataset.setModifiedDateTime(new Date());
         try {
             token = service.save(token, dataset);
             tablePresenter.reloadCurrent();
