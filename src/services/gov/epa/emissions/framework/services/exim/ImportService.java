@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -86,7 +87,7 @@ public class ImportService {
             Importer importer = importerFactory.createVersioned(dataset, path, fileNames);
             ImportTask eximTask = new ImportTask(dataset, fileNames, importer, user, services, sessionFactory);
 
-            threadPool.execute(eximTask);
+            threadPool.execute(new GCEnforcerTask("Import of Dataset: " + dataset.getName(), eximTask));
         } catch (Exception e) {
             log.error("Exception attempting to start import of file: " + fileNames[0], e);
             throw new EmfException("Import failed: " + e.getMessage());

@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.exim;
 
-import gov.epa.emissions.commons.PerformanceMetrics;
 import gov.epa.emissions.commons.io.importer.Importer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -52,8 +51,6 @@ public class ImportTask implements Runnable {
             logError("Failed to import file(s) : " + filesList(), e);
             setStatus("Failed to import dataset " + dataset.getName() + ".Reason: " + e.getMessage());
             removeDataset(dataset);
-        } finally {
-            new PerformanceMetrics().gc();
         }
     }
 

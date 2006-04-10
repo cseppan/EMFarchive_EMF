@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
@@ -149,7 +150,7 @@ public class ExportService {
                 "Version " + dataset.getDefaultVersion(), purpose, dirName);
 
         ExportTask eximTask = new ExportTask(user, file, dataset, services, accesslog, exporter, sessionFactory);
-        threadPool.execute(eximTask);
+        threadPool.execute(new GCEnforcerTask("Export of Dataset: " + dataset.getName(), eximTask));
     }
 
     private Version version(EmfDataset dataset) {

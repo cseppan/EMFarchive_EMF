@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.exim;
 
-import gov.epa.emissions.commons.PerformanceMetrics;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
@@ -11,15 +10,9 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import EDU.oswego.cs.dl.util.concurrent.BoundedBuffer;
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
 public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
-
-    private static Log LOG = LogFactory.getLog(ExImServiceImpl.class);
 
     private VersionedExporterFactory exporterFactory;
 
@@ -30,13 +23,13 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     private ExportService exportService;
 
     public ExImServiceImpl() throws Exception {
+        super("ExIm Service");
         init(dbServer, HibernateSessionFactory.get());
-        LOG.debug("creating ExImService - " + this.hashCode());
     }
 
     protected void finalize() throws Throwable {
-        LOG.debug("closing ExImService - " + this.hashCode());
-        new PerformanceMetrics().gc();
+        threadPool.shutdownAfterProcessingCurrentlyQueuedTasks();
+        threadPool.awaitTerminationAfterShutdown();
         super.finalize();
     }
 
@@ -56,9 +49,8 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     }
 
     private PooledExecutor createThreadPool() {
-        // TODO: thread pooling policy
-        PooledExecutor threadPool = new PooledExecutor(new BoundedBuffer(10), 20);
-        threadPool.setMinimumPoolSize(3);
+        PooledExecutor threadPool = new PooledExecutor(20);
+        threadPool.setMinimumPoolSize(1);
         threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
 
         return threadPool;

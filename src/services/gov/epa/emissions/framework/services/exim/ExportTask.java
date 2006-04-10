@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.services.exim;
 
-import gov.epa.emissions.commons.PerformanceMetrics;
 import gov.epa.emissions.commons.io.Exporter;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
@@ -58,22 +57,14 @@ public class ExportTask implements Runnable {
     public void run() {
         try {
             setStartStatus();
-            
-            PerformanceMetrics metrics = new PerformanceMetrics();
-            metrics.startTracking();
             exporter.export(file);
-            metrics.dumpStats("ExportTask - export");
-            
-            metrics.startTracking();
+
             loggingService.setAccessLog(accesslog);
             updateDataset(dataset);
             setStatus("Completed export for " + dataset.getName() + ":" + file.getName());
-            metrics.dumpStats("ExportTask - status + dataset updates");
         } catch (Exception e) {
             log.error("Problem on attempting to run Export on file : " + file, e);
             setStatus("Export failure." + e.getMessage());
-        } finally {
-            new PerformanceMetrics().gc();
         }
     }
 

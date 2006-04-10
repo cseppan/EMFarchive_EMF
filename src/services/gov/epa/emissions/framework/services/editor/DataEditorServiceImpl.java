@@ -41,6 +41,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     private DataAccessor accessor;
 
     public DataEditorServiceImpl() throws Exception {
+        super("Data Editor Service");
         try {
             init(dbServer, dbServer.getEmissionsDatasource(), HibernateSessionFactory.get());
         } catch (Exception ex) {
