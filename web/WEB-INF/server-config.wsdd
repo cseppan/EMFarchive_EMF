@@ -64,7 +64,7 @@
 	<service name="gov.epa.emf.services.exim.ExImService" provider="java:RPC"
 		style="RPC" use="encoded">
 		<parameter name="allowedMethods" value="*"/>
-		<parameter name="scope" value="request"/>
+		<parameter name="scope" value="session"/>
 		<parameter name="className"
 			value="gov.epa.emissions.framework.services.exim.ExImServiceImpl"/>
 	</service>
