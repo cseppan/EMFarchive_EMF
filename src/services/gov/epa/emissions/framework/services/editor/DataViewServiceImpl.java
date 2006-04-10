@@ -92,8 +92,11 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
     }
 
     public void closeSession(DataAccessToken token) throws EmfException {
-        accessor.closeSession(token);
-        new PerformanceMetrics().gc();
+        try {
+            accessor.closeSession(token);
+        } finally {
+            new PerformanceMetrics().gc("Closing Data View session - (" + token+ ")");
+        }
     }
 
     /**

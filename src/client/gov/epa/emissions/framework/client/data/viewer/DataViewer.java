@@ -115,11 +115,7 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         JPanel rightPanel = new JPanel();
         Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    presenter.doClose();
-                } catch (EmfException e) {
-                    messagePanel.setError("Could not close: " + e.getMessage());
-                }
+                doClose();
             }
         });
         rightPanel.add(close);
@@ -133,6 +129,18 @@ public class DataViewer extends DisposableInteralFrame implements DataView {
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
+    }
+
+    private void doClose() {
+        try {
+            presenter.doClose();
+        } catch (EmfException e) {
+            messagePanel.setError("Could not close: " + e.getMessage());
+        }
+    }
+
+    public void windowClosing() {
+        doClose();
     }
 
 }

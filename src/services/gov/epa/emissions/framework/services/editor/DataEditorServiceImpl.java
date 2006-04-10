@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.editor;
 
+import gov.epa.emissions.commons.PerformanceMetrics;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Page;
@@ -203,7 +204,11 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public void closeSession(DataAccessToken token) throws EmfException {
-        accessor.closeEditSession(token);
+        try {
+            accessor.closeEditSession(token);
+        } finally {
+            new PerformanceMetrics().gc("Closing Data Editor session - (" + token + ")");
+        }
     }
 
     /**

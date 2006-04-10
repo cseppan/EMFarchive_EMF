@@ -37,7 +37,7 @@ public class DataAccessToken {
         this.version = version;
     }
 
-    public Object key() {
+    public String key() {
         return "DatasetId:" + version.getDatasetId() + ", Version:" + version.getVersion() + ", Table:" + getTable();
     }
 
@@ -64,6 +64,10 @@ public class DataAccessToken {
 
     public long getLockTimeInterval() {
         return lockTimeInterval;
+    }
+
+    public String toString() {
+        return key();
     }
 
 }
