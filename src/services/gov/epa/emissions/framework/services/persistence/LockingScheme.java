@@ -70,14 +70,14 @@ public class LockingScheme {
         }
     }
 
-    public Lockable releaseLock(Lockable locked, Session session, List all) throws EmfException {
+    public Lockable releaseLock(Lockable locked, Session session, List all) {
         Lockable current = current(locked, all);
         return releaseLock(current, session);
     }
 
-    private Lockable releaseLock(Lockable current, Session session) throws EmfException {
+    private Lockable releaseLock(Lockable current, Session session) {
         if (!current.isLocked())
-            throw new EmfException("Cannot release the lock without owning it");
+            return current;// abort
 
         Transaction tx = session.beginTransaction();
         try {

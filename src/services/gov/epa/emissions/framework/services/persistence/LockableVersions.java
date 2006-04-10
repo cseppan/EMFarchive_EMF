@@ -30,7 +30,7 @@ public class LockableVersions {
         return Arrays.asList(all);
     }
 
-    public Version releaseLocked(Version locked, Session session) throws EmfException {
+    public Version releaseLocked(Version locked, Session session)  {
         return (Version) lockingScheme.releaseLock(locked, session, all(locked, session));
     }
 

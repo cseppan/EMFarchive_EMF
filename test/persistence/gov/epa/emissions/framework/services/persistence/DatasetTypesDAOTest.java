@@ -78,7 +78,7 @@ public class DatasetTypesDAOTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldReleaseDatasetTypeLock() throws EmfException {
+    public void testShouldReleaseDatasetTypeLock() {
         User owner = userDao.get("emf", session);
         List list = dao.getAll(session);
         DatasetType type = (DatasetType) list.get(0);

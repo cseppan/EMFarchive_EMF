@@ -7,9 +7,6 @@ import gov.epa.emissions.commons.db.HibernateTestCase;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.persistence.LockableVersions;
-import gov.epa.emissions.framework.services.persistence.UserDAO;
 
 import java.sql.SQLException;
 
@@ -76,7 +73,7 @@ public class LockableVersionsTest extends HibernateTestCase {
         assertFalse("Should have failed to obtain lock as it's already locked by another user", result.isLocked(user));
     }
 
-    public void testShouldReleaseLockOnRelease() throws EmfException {
+    public void testShouldReleaseLockOnRelease() {
         Version version = versions.get(1, 0, session);
         Version locked = lockableVersions.obtainLocked(owner, version, session);
 
@@ -85,19 +82,6 @@ public class LockableVersionsTest extends HibernateTestCase {
 
         Version loadedFromDb = versions.get(1, 0, session);
         assertFalse("Should have released lock", loadedFromDb.isLocked());
-    }
-
-    public void testShouldFailToReleaseLockIfNotObtained() {
-        Version version = versions.get(1, 0, session);
-
-        try {
-            lockableVersions.releaseLocked(version, session);
-        } catch (EmfException e) {
-            assertEquals("Cannot release the lock without owning it", e.getMessage());
-            return;
-        }
-
-        fail("Should have failed to release lock that was not obtained");
     }
 
     public void testShouldUpdateVersionAfterObtainingLock() throws Exception {

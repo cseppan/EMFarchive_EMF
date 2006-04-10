@@ -88,11 +88,11 @@ public class DataCommonsDAO {
         return datasetTypesDAO.update(type, session);
     }
 
-    public Sector releaseLockedSector(Sector locked, Session session) throws EmfException {
+    public Sector releaseLockedSector(Sector locked, Session session)  {
         return sectorsDao.releaseLocked(locked, session);
     }
 
-    public DatasetType releaseLockedDatasetType(DatasetType locked, Session session) throws EmfException {
+    public DatasetType releaseLockedDatasetType(DatasetType locked, Session session) {
         return datasetTypesDAO.releaseLocked(locked, session);
     }
 

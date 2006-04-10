@@ -2,8 +2,6 @@ package gov.epa.emissions.framework.services.persistence;
 
 import gov.epa.emissions.commons.db.HibernateTestCase;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.persistence.UserDAO;
 
 import java.util.List;
 
@@ -83,9 +81,9 @@ public class UserDAOTest extends HibernateTestCase {
     public void testShouldFailToRemoveUserIfLockedByAnotherUser() throws Exception {
         User owner = dao.get("admin", session);
         dao.obtainLocked(owner, user(user.getUsername()), session);
-        
+
         try {
-            user.setLockOwner(null);//erasing existing owner
+            user.setLockOwner(null);// erasing existing owner
             dao.remove(user, session);
         } catch (Exception e) {
             return;
@@ -126,17 +124,6 @@ public class UserDAOTest extends HibernateTestCase {
 
         User loadedFromDb = user(user.getUsername());
         assertFalse("Should have released lock", loadedFromDb.isLocked());
-    }
-
-    public void testShouldFailToReleaseSectorLockIfNotObtained() {
-        try {
-            dao.releaseLocked(user, session);
-        } catch (EmfException e) {
-            assertEquals("Cannot release the lock without owning it", e.getMessage());
-            return;
-        }
-
-        fail("Should have failed to release lock that was not obtained");
     }
 
     private User newUser(UserDAO dao) {

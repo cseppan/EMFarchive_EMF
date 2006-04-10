@@ -28,7 +28,7 @@ public class DatasetTypesDAO {
         return (DatasetType) lockingScheme.getLocked(user, type, session, getAll(session));
     }
 
-    public DatasetType releaseLocked(DatasetType locked, Session session) throws EmfException {
+    public DatasetType releaseLocked(DatasetType locked, Session session)  {
         return (DatasetType) lockingScheme.releaseLock(locked, session, getAll(session));
     }
 

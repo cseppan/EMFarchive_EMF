@@ -32,7 +32,7 @@ public class SectorsDAO {
         return (Sector) lockingScheme.releaseLockOnUpdate(sector, session, getAll(session));
     }
 
-    public Sector releaseLocked(Sector locked, Session session) throws EmfException {
+    public Sector releaseLocked(Sector locked, Session session)  {
         return (Sector) lockingScheme.releaseLock(locked, session, getAll(session));
     }
 

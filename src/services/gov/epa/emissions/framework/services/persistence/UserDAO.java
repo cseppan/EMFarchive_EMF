@@ -87,7 +87,7 @@ public class UserDAO {
         return (User) lockingScheme.releaseLockOnUpdate(user, session, all(session));
     }
 
-    public User releaseLocked(User locked, Session session) throws EmfException {
+    public User releaseLocked(User locked, Session session)  {
         return (User) lockingScheme.releaseLock(locked, session, all(session));
     }
 }

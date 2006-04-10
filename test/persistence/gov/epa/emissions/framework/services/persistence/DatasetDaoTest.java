@@ -235,7 +235,7 @@ public class DatasetDaoTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldReleaseLock() throws EmfException {
+    public void testShouldReleaseLock() {
         UserDAO userDao = new UserDAO();
         User owner = userDao.get("emf", session);
         EmfDataset dataset = newDataset();
@@ -250,21 +250,6 @@ public class DatasetDaoTest extends ServiceTestCase {
         } finally {
             remove(dataset);
         }
-    }
-
-    public void testShouldFailToReleaseLockIfNotObtained() {
-        EmfDataset dataset = newDataset();
-
-        try {
-            dao.releaseLocked(dataset, session);
-        } catch (EmfException e) {
-            assertEquals("Cannot release the lock without owning it", e.getMessage());
-            return;
-        } finally {
-            remove(dataset);
-        }
-
-        fail("Should have failed to release lock that was not obtained");
     }
 
     private EmfDataset newDataset() {

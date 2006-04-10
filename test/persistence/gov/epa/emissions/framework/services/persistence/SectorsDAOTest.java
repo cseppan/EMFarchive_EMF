@@ -66,7 +66,7 @@ public class SectorsDAOTest extends ServiceTestCase {
         assertFalse(result.isLocked(user));// failed to obtain lock for another user
     }
 
-    public void testShouldReleaseSectorLock() throws EmfException {
+    public void testShouldReleaseSectorLock() {
         User owner = userDao.get("emf", session);
         List sectors = dao.getAll(session);
         Sector sector = (Sector) sectors.get(0);
@@ -77,20 +77,6 @@ public class SectorsDAOTest extends ServiceTestCase {
 
         Sector sectorLoadedFromDb = currentSector(sector);
         assertFalse("Should have released lock", sectorLoadedFromDb.isLocked());
-    }
-
-    public void testShouldFailToReleaseSectorLockIfNotObtained() {
-        List sectors = dao.getAll(session);
-        Sector sector = (Sector) sectors.get(0);
-
-        try {
-            dao.releaseLocked(sector, session);
-        } catch (EmfException e) {
-            assertEquals("Cannot release the lock without owning it", e.getMessage());
-            return;
-        }
-
-        fail("Should have failed to release lock that was not obtained");
     }
 
     public void testShouldUpdateSector() throws EmfException {
