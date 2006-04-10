@@ -18,12 +18,15 @@ public class RemoteServiceLocator implements ServiceLocator {
 
     private EmfCall editCall;
 
+    private EmfCall eximCall;
+
     public RemoteServiceLocator(String baseUrl) throws Exception {
         this.baseUrl = baseUrl;
         editCall = this.createSessionEnabledCall("DataEditor Service", baseUrl
                 + "/gov.epa.emf.services.editor.DataEditorService");
         viewCall = this.createSessionEnabledCall("DataView Service", baseUrl
                 + "/gov.epa.emf.services.editor.DataViewService");
+        eximCall = this.createSessionEnabledCall("ExIm Service", baseUrl + "/gov.epa.emf.services.exim.ExImService");
     }
 
     public UserService userService() {
@@ -31,7 +34,7 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
 
     public ExImService eximService() {
-        return new ExImServiceTransport(baseUrl + "/gov.epa.emf.services.exim.ExImService");
+        return new ExImServiceTransport(eximCall);
     }
 
     public DataService dataService() {

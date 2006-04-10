@@ -128,11 +128,8 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     }
 
     public DataAccessToken save(DataAccessToken token, EmfDataset dataset) throws EmfException {
-        if (!accessor.isLockOwned(token)) {
-            Version current = accessor.currentVersion(token.getVersion());
-            throw new EmfException("Cannot save as the lock is currently owned by " + current.getLockOwner()
-                    + ", obtained at " + current.getDate());
-        }
+        if (!accessor.isLockOwned(token))
+            return token;// abort
 
         DataAccessToken extended = accessor.renewLock(token);
         return doSave(extended, cache, sessionFactory, dataset);
@@ -143,10 +140,10 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
         try {
             Session session = hibernateSessionFactory.getSession();
             cache.save(token, session);
-            
+
             DatasetDAO dao = new DatasetDAO();
             dao.updateWithoutLocking(dataset, session);
-            
+
             session.close();
         } catch (Exception e) {
             LOG.error("Could not update Dataset: " + token.datasetId() + " with changes for Version: "

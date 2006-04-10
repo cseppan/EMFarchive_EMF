@@ -130,7 +130,7 @@ public class SessionLifecycle {
 
     public DataAccessToken closeEdit(DataAccessToken token) throws EmfException {
         if (!isLockOwned(token))
-            throw new EmfException("Cannot unlock unless locked");
+            return token;//abort
 
         releaseLock(token);
         close(token);

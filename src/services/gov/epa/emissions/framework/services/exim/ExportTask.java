@@ -72,6 +72,8 @@ public class ExportTask implements Runnable {
         } catch (Exception e) {
             log.error("Problem on attempting to run Export on file : " + file, e);
             setStatus("Export failure." + e.getMessage());
+        } finally {
+            new PerformanceMetrics().gc();
         }
     }
 

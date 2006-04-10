@@ -8,17 +8,13 @@ import gov.epa.emissions.framework.services.exim.ExImService;
 
 public class ExImServiceTransport implements ExImService {
 
-    private CallFactory callFactory;
-
     private EmfMappings mappings;
 
-    public ExImServiceTransport(String endpoint) {
-        callFactory = new CallFactory(endpoint);
-        mappings = new EmfMappings();
-    }
+    private EmfCall call;
 
-    private EmfCall call() throws EmfException {
-        return callFactory.createCall("Export-Import Service");
+    public ExImServiceTransport(EmfCall call) {
+        this.call = call;
+        mappings = new EmfMappings();
     }
 
     public void exportDatasets(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException {
@@ -32,8 +28,6 @@ public class ExImServiceTransport implements ExImService {
 
     private void doExport(String operationName, User user, EmfDataset[] datasets, String folder, String purpose)
             throws EmfException {
-        EmfCall call = call();
-
         call.setOperation(operationName);
         call.addParam("user", mappings.user());
         call.addParam("datasets", mappings.datasets());
@@ -44,9 +38,8 @@ public class ExImServiceTransport implements ExImService {
         call.request(new Object[] { user, datasets, folder, purpose });
     }
 
-    public void importDataset(User user, String folderPath, String[] fileNames, DatasetType datasetType, String datasetName) throws EmfException {
-        EmfCall call = call();
-
+    public void importDataset(User user, String folderPath, String[] fileNames, DatasetType datasetType,
+            String datasetName) throws EmfException {
         call.setOperation("importDataset");
         call.addParam("user", mappings.user());
         call.addParam("folderPath", mappings.string());
@@ -58,9 +51,8 @@ public class ExImServiceTransport implements ExImService {
         call.request(new Object[] { user, folderPath, fileNames, datasetType, datasetName });
     }
 
-    public void importDatasets(User user, String folderPath, String[] fileNames, DatasetType datasetType) throws EmfException {
-        EmfCall call = call();
-
+    public void importDatasets(User user, String folderPath, String[] fileNames, DatasetType datasetType)
+            throws EmfException {
         call.setOperation("importDatasets");
         call.addParam("user", mappings.user());
         call.addParam("folderPath", mappings.string());
@@ -70,16 +62,14 @@ public class ExImServiceTransport implements ExImService {
 
         call.request(new Object[] { user, folderPath, fileNames, datasetType });
     }
-    
-    public String[] getFilenamesFromPattern (String folder, String pattern) throws EmfException {
-        EmfCall call = call();
 
+    public String[] getFilenamesFromPattern(String folder, String pattern) throws EmfException {
         call.setOperation("getFilenamesFromPattern");
         call.addParam("folder", mappings.string());
         call.addParam("pattern", mappings.string());
         call.setReturnType(mappings.strings());
 
-        return (String[])call.requestResponse(new Object[] { folder, pattern });
+        return (String[]) call.requestResponse(new Object[] { folder, pattern });
     }
 
 }

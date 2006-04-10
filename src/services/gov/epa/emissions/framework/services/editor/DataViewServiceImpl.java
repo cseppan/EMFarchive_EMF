@@ -33,6 +33,7 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
             LOG.error("could not initialize DataView Service", ex);
             throw new InfrastructureException("could not initialize DataView Service");
         }
+        LOG.debug("created DataView Service - " + this.hashCode());
     }
 
     public DataViewServiceImpl(DataSource datasource, DbServer dbServer, HibernateSessionFactory sessionFactory)
@@ -100,7 +101,7 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
      */
     protected void finalize() throws Throwable {
         accessor.shutdown();
-        LOG.error("finalizing view....");
+        LOG.debug("finalizing view...." + this.hashCode());
         super.finalize();
     }
 
