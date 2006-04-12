@@ -136,8 +136,12 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         template.setProgram(templatePanel.getProgramName());
         template.setProgramArguments(templatePanel.getProgramArgs());
         template.setRequired(templatePanel.getRequired());
-        template.setOrder(Float.parseFloat(templatePanel.getOrder()));
+        template.setOrder(getOrder());
         template.setDescription(templatePanel.getDescription().trim());
+    }
+
+    private float getOrder() {
+        return templatePanel.getOrder().length() == 0 ? 0 : Float.parseFloat(templatePanel.getOrder());
     }
 
     public void populateFields(QAStepTemplate template) {
