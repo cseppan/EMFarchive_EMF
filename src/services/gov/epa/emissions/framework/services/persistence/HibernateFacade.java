@@ -48,8 +48,18 @@ public class HibernateFacade {
     }
 
     public boolean nameUsed(String name, Class clazz, Session session) {
-        Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("name", name));
-        return crit.uniqueResult() != null;
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("name", name));
+            boolean result = crit.uniqueResult() != null;
+            tx.commit();
+
+            return result;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
     public void update(Object object, Session session) {

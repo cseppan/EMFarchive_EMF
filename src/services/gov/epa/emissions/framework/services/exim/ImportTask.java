@@ -13,6 +13,7 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
 
 public class ImportTask implements Runnable {
@@ -43,26 +44,36 @@ public class ImportTask implements Runnable {
     }
 
     public void run() {
+        Session session = null;
         try {
-            prepare();
+            session = sessionFactory.getSession();
+            session.setFlushMode(FlushMode.NEVER);
+            
+            prepare(session);
             importer.run();
-            complete();
+            complete(session);
         } catch (Exception e) {
             logError("Failed to import file(s) : " + filesList(), e);
             setStatus("Failed to import dataset " + dataset.getName() + ".Reason: " + e.getMessage());
             removeDataset(dataset);
+        } finally {
+            if (session != null)
+                session.flush();
+                session.close();
         }
     }
 
-    private void prepare() throws EmfException {
+    private void prepare(Session session) throws EmfException {
         addStartStatus();
-        addDataset(dataset);
         dataset.setStatus("Started import");
+        addDataset(dataset, session);
     }
 
-    private void complete() {
+    private void complete(Session session) {
         dataset.setStatus("Imported");
-        updateDataset(dataset);
+        dataset.setModifiedDateTime(new Date());
+
+        updateDataset(dataset, session);
         addCompletedStatus();
     }
 
@@ -76,27 +87,17 @@ public class ImportTask implements Runnable {
         return fileList.toString();
     }
 
-    void addDataset(EmfDataset dataset) throws EmfException {
+    void addDataset(EmfDataset dataset, Session session) throws EmfException {
         DatasetDAO dao = new DatasetDAO();
-        Session session = sessionFactory.getSession();
-        try {
-            if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))
-                throw new EmfException("The selected dataset name is already in use");
+        if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))
+            throw new EmfException("The selected dataset name is already in use");
 
-            dao.add(dataset, session);
-        } finally {
-            session.close();
-        }
+        dao.add(dataset, session);
     }
 
-    void updateDataset(EmfDataset dataset) {
+    void updateDataset(EmfDataset dataset, Session session) {
         DatasetDAO dao = new DatasetDAO();
-        Session session = sessionFactory.getSession();
-        try {
-            dao.updateWithoutLocking(dataset, session);
-        } finally {
-            session.close();
-        }
+        dao.updateWithoutLocking(dataset, session);
     }
 
     void removeDataset(EmfDataset dataset) {
