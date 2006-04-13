@@ -20,6 +20,7 @@ import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
@@ -71,13 +72,14 @@ public class EmfMappings extends Mappings {
         bean(call, Note.class, note());
         bean(call, NoteType.class, notetype());
         bean(call, Revision.class, revision());
-        
+
         bean(call, QAStepTemplate.class, qaStepTemplate());
         bean(call, QAStep.class, qaStep());
 
         bean(call, TableMetadata.class, tablemetadata());
         bean(call, ColumnMetaData.class, columnmetadata());
 
+        bean(call, Case.class, caseObject());
     }
 
     private void registerArrays(Call call) {
@@ -114,6 +116,8 @@ public class EmfMappings extends Mappings {
 
         array(call, QAStepTemplate[].class, qaStepTemplates());
         array(call, QAStep[].class, qaSteps());
+
+        array(call, Case[].class, cases());
     }
 
     public QName logs() {
@@ -271,7 +275,7 @@ public class EmfMappings extends Mappings {
     public QName qaStep() {
         return qname("QAStep");
     }
-    
+
     public QName qaSteps() {
         return qname("QASteps");
     }
@@ -286,6 +290,14 @@ public class EmfMappings extends Mappings {
 
     public QName columnmetadatas() {
         return qname("ColumnMetaDatas");
+    }
+
+    public QName caseObject() {
+        return qname("Case");
+    }
+
+    public QName cases() {
+        return qname("Cases");
     }
 
 }

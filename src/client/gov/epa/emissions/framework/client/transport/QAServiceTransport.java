@@ -24,7 +24,7 @@ public class QAServiceTransport implements QAService {
         EmfCall call = call();
 
         call.setOperation("getQASteps");
-        call.addStringParam("dataset");
+        call.addParam("dataset", mappings.dataset());
         call.setReturnType(mappings.qaSteps());
         Object[] params = new Object[] { dataset };
 

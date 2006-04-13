@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.LoggingService;
 import gov.epa.emissions.framework.services.basic.UserService;
+import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
@@ -59,6 +60,10 @@ public class RemoteServiceLocator implements ServiceLocator {
 
     public DataViewService dataViewService() {
         return new DataViewServiceTransport(viewCall);
+    }
+
+    public CaseService caseService() {
+        return new CaseServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.casemanagement.CaseService");
     }
 
     /*
