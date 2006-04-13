@@ -323,4 +323,34 @@ CREATE TABLE emf.qa_steps
 ) 
 WITHOUT OIDS;
 -- emf.qa_steps
---
+-------------------------------------------------------------------------------
+--  CASE MANAGEMENT
+-------------------------------------------------------------------------------
+-- emf.cases
+CREATE TABLE emf.cases
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE,
+  abbreviation_id int4 NOT NULL REFERENCES emf.case_abbreviations(id),
+  desc text,
+  creator_id int4 NOT NULL REFERENCES emf.users(id),
+  aqm_id int4 NOT NULL REFERENCES emf.aqm(id),
+  category_id int4 NOT NULL REFERENCES emf.case_categories(id),
+  project_id int4 NOT NULL REFERENCES emf.projects(id),
+  region_id int4 NOT NULL REFERENCES emf.regions(id),
+  run_status varchar(255) NOT NULL,
+  grid_id int4 NOT NULL REFERENCES emf.grids(id),
+  speciations_id int4 NOT NULL REFERENCES emf.speciations(id),
+  met_year_id int4 NOT NULL REFERENCES emf.meteorlogical_years(id),
+  emissions_year_id int4 NOT NULL REFERENCES emf.emissions_years(id),
+  last_modified_date timestamp,
+  copied_from varchar(255) NOT NULL
+) 
+WITHOUT OIDS;
+-- emf.cases
+
+
+
+
+
+--------------------------------------------------------------------------------
