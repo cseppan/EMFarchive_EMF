@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.persistence;
+package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.Keyword;
@@ -26,7 +26,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-public class DataCommonsDAOTest extends ServiceTestCase {
+public class CaseCommonsDAOTest extends ServiceTestCase {
 
     private DataCommonsDAO dao;
 

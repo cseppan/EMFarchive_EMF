@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.persistence;
+package gov.epa.emissions.framework.services.basic;
 
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.DbUpdate;

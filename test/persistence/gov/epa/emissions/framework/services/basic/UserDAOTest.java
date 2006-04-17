@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.persistence;
+package gov.epa.emissions.framework.services.basic;
 
 import gov.epa.emissions.commons.db.HibernateTestCase;
 import gov.epa.emissions.commons.security.User;
