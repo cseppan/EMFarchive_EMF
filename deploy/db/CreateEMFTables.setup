@@ -326,13 +326,77 @@ WITHOUT OIDS;
 -------------------------------------------------------------------------------
 --  CASE MANAGEMENT
 -------------------------------------------------------------------------------
+
+-- emf.case_abbreviations
+CREATE TABLE emf.case_abbreviations
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf.case_abbreviations
+
+-- emf.case_categories
+CREATE TABLE emf.case_categories
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf.case_categories
+
+-- emf.aqm
+CREATE TABLE emf.aqm
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf.aqm
+
+-- emf.grids
+CREATE TABLE emf.grids
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf.grids
+
+-- emf.speciations
+CREATE TABLE emf.speciations
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf.speciations
+
+-- emf.meteorlogical_years
+CREATE TABLE emf.meteorlogical_years
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf.meteorlogical_years
+
+-- emf.emissions_years
+CREATE TABLE emf.emissions_years
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf.emissions_years
+
 -- emf.cases
 CREATE TABLE emf.cases
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE,
   abbreviation_id int4 NOT NULL REFERENCES emf.case_abbreviations(id),
-  desc text,
+  description text,
   creator_id int4 NOT NULL REFERENCES emf.users(id),
   aqm_id int4 NOT NULL REFERENCES emf.aqm(id),
   category_id int4 NOT NULL REFERENCES emf.case_categories(id),
@@ -348,9 +412,5 @@ CREATE TABLE emf.cases
 ) 
 WITHOUT OIDS;
 -- emf.cases
-
-
-
-
 
 --------------------------------------------------------------------------------
