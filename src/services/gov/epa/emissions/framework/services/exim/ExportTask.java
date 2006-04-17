@@ -7,9 +7,9 @@ import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.Status;
-import gov.epa.emissions.framework.services.basic.StatusServiceImpl;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.persistence.DatasetDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
@@ -30,7 +30,7 @@ public class ExportTask implements Runnable {
 
     private File file;
 
-    private StatusServiceImpl statusServices;
+    private StatusDAO statusServices;
 
     private LoggingServiceImpl loggingService;
 
@@ -91,7 +91,7 @@ public class ExportTask implements Runnable {
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 
-        statusServices.create(endStatus);
+        statusServices.add(endStatus);
     }
 
 }

@@ -10,10 +10,10 @@ import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.Status;
-import gov.epa.emissions.framework.services.basic.StatusServiceImpl;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.persistence.DatasetDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.io.File;
@@ -50,7 +50,7 @@ public class ImportService {
     private Services services() {
         Services services = new Services();
         services.setLoggingService(new LoggingServiceImpl(sessionFactory));
-        services.setStatusService(new StatusServiceImpl(sessionFactory));
+        services.setStatusService(new StatusDAO(sessionFactory));
         services.setDataService(new DataServiceImpl(sessionFactory));
 
         return services;
@@ -115,7 +115,7 @@ public class ImportService {
         endStatus.setMessage("Import of Dataset " + dataset.getName() + " failed. Reason: " + errorMessage);
         endStatus.setTimestamp(new Date());
 
-        services.getStatus().create(endStatus);
+        services.getStatus().add(endStatus);
     }
 
     private EmfDataset createDataset(String datasetName, User user, DatasetType datasetType) {
@@ -153,7 +153,7 @@ public class ImportService {
     }
 
     private void showMultipleDatasets(User user, String[] filenames) {
-        StatusServiceImpl status = services().getStatus();
+        StatusDAO status = services().getStatus();
         int filecount = filenames.length;
         String message = "Starting to import multiple datasets (" + filecount + " in total): ";
         for (int i = 0; i < filecount; i++) {
@@ -165,14 +165,14 @@ public class ImportService {
         setStatus(message, user, status);
     }
 
-    private void setStatus(String message, User user, StatusServiceImpl statusServices) {
+    private void setStatus(String message, User user, StatusDAO statusServices) {
         Status endStatus = new Status();
         endStatus.setUsername(user.getUsername());
         endStatus.setType("Import");
         endStatus.setMessage(message);
         endStatus.setTimestamp(new Date());
 
-        statusServices.create(endStatus);
+        statusServices.add(endStatus);
     }
 
 }

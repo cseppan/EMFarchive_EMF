@@ -12,7 +12,7 @@ import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.Status;
-import gov.epa.emissions.framework.services.basic.StatusServiceImpl;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -58,7 +58,7 @@ public class ExportService {
     private Services services() {
         Services services = new Services();
         services.setLoggingService(new LoggingServiceImpl(sessionFactory));
-        services.setStatusService(new StatusServiceImpl(sessionFactory));
+        services.setStatusService(new StatusDAO(sessionFactory));
         services.setDataService(new DataServiceImpl(sessionFactory));
 
         return services;
@@ -89,7 +89,7 @@ public class ExportService {
         if ((datasetType.getExporterClassName().equals("")) || (datasetType.getExporterClassName() == null)) {
             String message = "The exporter for dataset type '" + datasetType + " is not supported";
             Status status = status(user, message);
-            services.getStatus().create(status);
+            services.getStatus().add(status);
             return false;
         }
         return true;

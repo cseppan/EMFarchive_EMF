@@ -8,13 +8,13 @@ import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
+import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.editor.DataAccessCacheImpl;
 import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.DataAccessor;
 import gov.epa.emissions.framework.services.editor.DataAccessorImpl;
 import gov.epa.emissions.framework.services.editor.DefaultVersionedRecordsWriterFactory;
 import gov.epa.emissions.framework.services.editor.VersionedRecordsWriterFactory;
-import gov.epa.emissions.framework.services.persistence.UserDAO;
 
 public class DataAccessorTest extends ServiceTestCase {
 

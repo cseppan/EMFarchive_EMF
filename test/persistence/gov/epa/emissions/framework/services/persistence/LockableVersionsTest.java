@@ -7,6 +7,8 @@ import gov.epa.emissions.commons.db.HibernateTestCase;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.basic.UserDAO;
+import gov.epa.emissions.framework.services.editor.LockableVersions;
 
 import java.sql.SQLException;
 

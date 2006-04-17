@@ -1,6 +1,7 @@
-package gov.epa.emissions.framework.services.persistence;
+package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 
 import java.util.List;
 

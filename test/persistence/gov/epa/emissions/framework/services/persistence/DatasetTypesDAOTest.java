@@ -7,8 +7,8 @@ import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
-import gov.epa.emissions.framework.services.persistence.DatasetTypesDAO;
-import gov.epa.emissions.framework.services.persistence.UserDAO;
+import gov.epa.emissions.framework.services.basic.UserDAO;
+import gov.epa.emissions.framework.services.data.DatasetTypesDAO;
 
 import java.util.Iterator;
 import java.util.List;

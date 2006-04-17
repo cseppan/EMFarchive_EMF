@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.persistence;
 
 import gov.epa.emissions.commons.db.HibernateTestCase;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.basic.UserDAO;
 
 import java.util.List;
 

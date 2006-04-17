@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.services.persistence;
+package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
@@ -12,6 +12,7 @@ import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.editor.Revision;
+import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 
 import java.util.Iterator;
 import java.util.List;

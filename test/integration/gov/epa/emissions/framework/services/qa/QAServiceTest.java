@@ -7,9 +7,9 @@ import org.hibernate.criterion.Restrictions;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
+import gov.epa.emissions.framework.services.basic.UserDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
-import gov.epa.emissions.framework.services.persistence.UserDAO;
 
 public class QAServiceTest extends ServiceTestCase {
     private QAService service;

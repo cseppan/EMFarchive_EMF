@@ -1,11 +1,11 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
-import gov.epa.emissions.framework.services.basic.StatusServiceImpl;
+import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
 
 public class Services {
-    private StatusServiceImpl status;
+    private StatusDAO status;
 
     private DataServiceImpl data;
 
@@ -27,11 +27,11 @@ public class Services {
         this.logging = logging;
     }
 
-    public StatusServiceImpl getStatus() {
+    public StatusDAO getStatus() {
         return status;
     }
 
-    public void setStatusService(StatusServiceImpl status) {
+    public void setStatusService(StatusDAO status) {
         this.status = status;
     }
 

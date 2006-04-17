@@ -7,14 +7,14 @@ import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.basic.UserDAO;
+import gov.epa.emissions.framework.services.data.DataCommonsDAO;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.editor.Revision;
-import gov.epa.emissions.framework.services.persistence.DataCommonsDAO;
-import gov.epa.emissions.framework.services.persistence.DatasetDAO;
-import gov.epa.emissions.framework.services.persistence.UserDAO;
 
 import java.util.Date;
 import java.util.Iterator;

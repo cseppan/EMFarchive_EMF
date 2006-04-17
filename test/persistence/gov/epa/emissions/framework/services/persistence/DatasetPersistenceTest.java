@@ -11,10 +11,10 @@ import gov.epa.emissions.commons.db.DbUpdate;
 import gov.epa.emissions.commons.db.HibernateTestCase;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.basic.UserDAO;
+import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.persistence.DataCommonsDAO;
 import gov.epa.emissions.framework.services.persistence.ExImDbUpdate;
-import gov.epa.emissions.framework.services.persistence.UserDAO;
 
 import java.util.Date;
 import java.util.List;

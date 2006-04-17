@@ -1,9 +1,9 @@
 package gov.epa.emissions.framework.services.qa;
 
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.QAStep;
-import gov.epa.emissions.framework.services.persistence.DatasetDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import org.apache.commons.logging.Log;

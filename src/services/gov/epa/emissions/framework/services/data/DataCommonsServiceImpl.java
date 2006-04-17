@@ -10,7 +10,6 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.editor.Revision;
-import gov.epa.emissions.framework.services.persistence.DataCommonsDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.List;

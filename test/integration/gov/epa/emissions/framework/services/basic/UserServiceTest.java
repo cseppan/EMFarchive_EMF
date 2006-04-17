@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.basic;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
-import gov.epa.emissions.framework.services.persistence.UserDAO;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;

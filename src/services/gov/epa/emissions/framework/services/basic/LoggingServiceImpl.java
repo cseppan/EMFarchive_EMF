@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.services.basic;
 
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
-import gov.epa.emissions.framework.services.persistence.LoggingDAO;
 
 import java.util.List;
 
