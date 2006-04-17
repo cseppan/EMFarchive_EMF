@@ -345,14 +345,14 @@ CREATE TABLE emf.case_categories
 WITHOUT OIDS;
 -- emf.case_categories
 
--- emf.aqm
-CREATE TABLE emf.aqm
+-- emf.air_quality_models
+CREATE TABLE emf.air_quality_models
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE
 ) 
 WITHOUT OIDS;
--- emf.aqm
+-- emf.air_quality_models
 
 -- emf.grids
 CREATE TABLE emf.grids
@@ -398,7 +398,7 @@ CREATE TABLE emf.cases
   abbreviation_id int4 NOT NULL REFERENCES emf.case_abbreviations(id),
   description text,
   creator_id int4 NOT NULL REFERENCES emf.users(id),
-  aqm_id int4 NOT NULL REFERENCES emf.aqm(id),
+  aqm_id int4 NOT NULL REFERENCES emf.air_quality_models(id),
   category_id int4 NOT NULL REFERENCES emf.case_categories(id),
   project_id int4 NOT NULL REFERENCES emf.projects(id),
   region_id int4 NOT NULL REFERENCES emf.regions(id),

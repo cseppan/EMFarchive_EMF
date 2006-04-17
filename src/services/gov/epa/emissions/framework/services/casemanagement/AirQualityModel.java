@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.casemanagement;
 
 import java.io.Serializable;
 
-public class AirQualitModel implements Serializable, Comparable {
+public class AirQualityModel implements Serializable, Comparable {
 
     private int id;
 
@@ -11,11 +11,11 @@ public class AirQualitModel implements Serializable, Comparable {
     /*
      * Default constructor needed for hibernate and axis serialization
      */
-    public AirQualitModel() {
+    public AirQualityModel() {
         super();
     }
 
-    public AirQualitModel(String name) {
+    public AirQualityModel(String name) {
         this.name = name;
     }
 
@@ -36,10 +36,10 @@ public class AirQualitModel implements Serializable, Comparable {
     }
 
     public boolean equals(Object other) {
-        if (other == null || !(other instanceof AirQualitModel))
+        if (other == null || !(other instanceof AirQualityModel))
             return false;
 
-        return ((AirQualitModel) other).name == this.name;
+        return ((AirQualityModel) other).name == this.name;
     }
 
     public int hashCode() {
@@ -51,6 +51,6 @@ public class AirQualitModel implements Serializable, Comparable {
     }
 
     public int compareTo(Object other) {
-        return name.compareTo(((AirQualitModel) other).getName());
+        return name.compareTo(((AirQualityModel) other).getName());
     }
 }

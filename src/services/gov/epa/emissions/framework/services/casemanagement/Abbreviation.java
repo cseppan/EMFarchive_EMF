@@ -11,8 +11,7 @@ public class Abbreviation implements Serializable, Comparable {
     /*
      * Default constructor needed for hibernate and axis serialization
      */
-    public Abbreviation() {
-        super();
+    public Abbreviation() {//tagging
     }
 
     public Abbreviation(String name) {
