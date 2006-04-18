@@ -1,5 +1,8 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
+import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.security.User;
+
 public class Case implements Comparable {
 
     private int id;
@@ -21,6 +24,10 @@ public class Case implements Comparable {
     private Speciation speciation;
 
     private String description;
+
+    private User creator;
+
+    private Project project;
 
     /*
      * Default constructor needed for hibernate and axis serialization
@@ -130,6 +137,23 @@ public class Case implements Comparable {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public Project getProject() {
+        return project;
     }
 
 }

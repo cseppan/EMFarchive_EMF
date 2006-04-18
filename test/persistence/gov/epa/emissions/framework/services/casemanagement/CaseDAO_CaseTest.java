@@ -1,6 +1,9 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
+import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.ServiceTestCase;
+import gov.epa.emissions.framework.services.basic.UserDAO;
 
 import java.util.List;
 
@@ -85,7 +88,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         session.clear();
         try {
             List list = dao.getCases(session);
-            assertEquals(totalBeforeAdd + 1, list.size());
 
             Case added = (Case) list.get(totalBeforeAdd);
             assertEquals(element.getDescription(), added.getDescription());
@@ -95,8 +97,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
     }
 
     public void testShouldPersistCaseWithAnAbbreviationOnAdd() {
-        int totalBeforeAdd = dao.getCases(session).size();
-
         Case element = new Case("test" + Math.random());
         Abbreviation abbreviation = new Abbreviation("test" + Math.random());
         add(abbreviation);
@@ -107,7 +107,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         session.clear();
         try {
             List list = dao.getCases(session);
-            assertEquals(totalBeforeAdd + 1, list.size());
             assertEquals(abbreviation, ((Case) list.get(0)).getAbbreviation());
         } finally {
             remove(element);
@@ -115,8 +114,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
     }
 
     public void testShouldPersistCaseWithAnAirQualityModelOnAdd() {
-        int totalBeforeAdd = dao.getCases(session).size();
-
         Case element = new Case("test" + Math.random());
         AirQualityModel aqm = new AirQualityModel("test" + Math.random());
         add(aqm);
@@ -127,7 +124,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         session.clear();
         try {
             List list = dao.getCases(session);
-            assertEquals(totalBeforeAdd + 1, list.size());
             assertEquals(aqm, ((Case) list.get(0)).getAirQualityModel());
         } finally {
             remove(element);
@@ -135,8 +131,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
     }
 
     public void testShouldPersistCaseWithCaseCategoryOnAdd() {
-        int totalBeforeAdd = dao.getCases(session).size();
-
         Case element = new Case("test" + Math.random());
         CaseCategory attrib = new CaseCategory("test" + Math.random());
         add(attrib);
@@ -147,7 +141,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         session.clear();
         try {
             List list = dao.getCases(session);
-            assertEquals(totalBeforeAdd + 1, list.size());
             assertEquals(attrib, ((Case) list.get(0)).getCaseCategory());
         } finally {
             remove(element);
@@ -155,8 +148,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
     }
 
     public void testShouldPersistCaseWithEmissionsYearOnAdd() {
-        int totalBeforeAdd = dao.getCases(session).size();
-
         Case element = new Case("test" + Math.random());
         EmissionsYear attrib = new EmissionsYear("test" + Math.random());
         add(attrib);
@@ -167,7 +158,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         session.clear();
         try {
             List list = dao.getCases(session);
-            assertEquals(totalBeforeAdd + 1, list.size());
             assertEquals(attrib, ((Case) list.get(0)).getEmissionsYear());
         } finally {
             remove(element);
@@ -175,8 +165,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
     }
 
     public void testShouldPersistCaseWithGridOnAdd() {
-        int totalBeforeAdd = dao.getCases(session).size();
-
         Case element = new Case("test" + Math.random());
         Grid attrib = new Grid("test" + Math.random());
         add(attrib);
@@ -187,7 +175,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         session.clear();
         try {
             List list = dao.getCases(session);
-            assertEquals(totalBeforeAdd + 1, list.size());
             assertEquals(attrib, ((Case) list.get(0)).getGrid());
         } finally {
             remove(element);
@@ -195,8 +182,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
     }
 
     public void testShouldPersistCaseWithMeteorlogicalYearOnAdd() {
-        int totalBeforeAdd = dao.getCases(session).size();
-
         Case element = new Case("test" + Math.random());
         MeteorlogicalYear attrib = new MeteorlogicalYear("test" + Math.random());
         add(attrib);
@@ -207,7 +192,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         session.clear();
         try {
             List list = dao.getCases(session);
-            assertEquals(totalBeforeAdd + 1, list.size());
             assertEquals(attrib, ((Case) list.get(0)).getMeteorlogicalYear());
         } finally {
             remove(element);
@@ -215,8 +199,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
     }
 
     public void testShouldPersistCaseWithSpeciationOnAdd() {
-        int totalBeforeAdd = dao.getCases(session).size();
-
         Case element = new Case("test" + Math.random());
         Speciation attrib = new Speciation("test" + Math.random());
         add(attrib);
@@ -227,8 +209,41 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         session.clear();
         try {
             List list = dao.getCases(session);
-            assertEquals(totalBeforeAdd + 1, list.size());
             assertEquals(attrib, ((Case) list.get(0)).getSpeciation());
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldPersistCaseWithCreatorOnAdd() {
+        Case element = new Case("test" + Math.random());
+        UserDAO userDAO = new UserDAO();
+        User creator = userDAO.get("emf", session);
+        element.setCreator(creator);
+
+        dao.add(element, session);
+
+        session.clear();
+        try {
+            List list = dao.getCases(session);
+            assertEquals(creator, ((Case) list.get(0)).getCreator());
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldPersistCaseWithProjectOnAdd() {
+        Case element = new Case("test" + Math.random());
+        Project attrib = new Project("test" + Math.random());
+        add(attrib);
+        element.setProject(attrib);
+
+        dao.add(element, session);
+
+        session.clear();
+        try {
+            List list = dao.getCases(session);
+            assertEquals(attrib, ((Case) list.get(0)).getProject());
         } finally {
             remove(element);
         }

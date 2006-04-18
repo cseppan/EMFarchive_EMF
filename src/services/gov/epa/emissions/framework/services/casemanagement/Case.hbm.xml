@@ -45,7 +45,16 @@
             name="speciation" 
             class="gov.epa.emissions.framework.services.casemanagement.Speciation"
             column="speciation_id"/> 
-	
+
+	 <many-to-one
+            name="creator" 
+            class="gov.epa.emissions.commons.security.User"
+            column="creator_id"/> 
+            
+	<many-to-one cascade="save-update"
+            name="project" 
+            class="gov.epa.emissions.commons.data.Project"
+            column="project_id"/> 
   </class> 
 </hibernate-mapping>  
 
