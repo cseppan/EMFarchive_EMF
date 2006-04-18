@@ -39,7 +39,7 @@ public class Grid implements Serializable, Comparable {
         if (other == null || !(other instanceof Grid))
             return false;
 
-        return ((Grid) other).name == this.name;
+        return ((Grid) other).name.equals(this.name);
     }
 
     public int hashCode() {

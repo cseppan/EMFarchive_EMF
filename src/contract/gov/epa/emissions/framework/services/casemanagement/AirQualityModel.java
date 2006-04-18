@@ -37,7 +37,7 @@ public class AirQualityModel implements Comparable {
         if (other == null || !(other instanceof AirQualityModel))
             return false;
 
-        return ((AirQualityModel) other).name == this.name;
+        return ((AirQualityModel) other).name.equals(this.name);
     }
 
     public int hashCode() {

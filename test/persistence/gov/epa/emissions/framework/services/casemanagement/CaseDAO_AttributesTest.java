@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.services.ServiceTestCase;
 
 import java.util.List;
 
-public class CaseDAOTest extends ServiceTestCase {
+public class CaseDAO_AttributesTest extends ServiceTestCase {
 
     private CaseDAO dao;
 
@@ -20,6 +20,7 @@ public class CaseDAOTest extends ServiceTestCase {
         Abbreviation element = new Abbreviation("test" + Math.random());
         add(element);
 
+        session.clear();
         try {
             List list = dao.getAbbreviations(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -34,6 +35,7 @@ public class CaseDAOTest extends ServiceTestCase {
         Abbreviation element = new Abbreviation("test" + Math.random());
         dao.add(element, session);
 
+        session.clear();
         try {
             List list = dao.getAbbreviations(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -47,6 +49,7 @@ public class CaseDAOTest extends ServiceTestCase {
         AirQualityModel element = new AirQualityModel("test" + Math.random());
         add(element);
 
+        session.clear();
         try {
             List list = dao.getAirQualityModels(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -61,6 +64,7 @@ public class CaseDAOTest extends ServiceTestCase {
         AirQualityModel element = new AirQualityModel("test" + Math.random());
         dao.add(element, session);
 
+        session.clear();
         try {
             List list = dao.getAirQualityModels(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -74,6 +78,7 @@ public class CaseDAOTest extends ServiceTestCase {
         CaseCategory element = new CaseCategory("test" + Math.random());
         add(element);
 
+        session.clear();
         try {
             List list = dao.getCaseCategories(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -88,6 +93,7 @@ public class CaseDAOTest extends ServiceTestCase {
         CaseCategory element = new CaseCategory("test" + Math.random());
         dao.add(element, session);
 
+        session.clear();
         try {
             List list = dao.getCaseCategories(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -101,6 +107,7 @@ public class CaseDAOTest extends ServiceTestCase {
         EmissionsYear element = new EmissionsYear("test" + Math.random());
         dao.add(element, session);
 
+        session.clear();
         try {
             List list = dao.getEmissionsYears(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -114,6 +121,7 @@ public class CaseDAOTest extends ServiceTestCase {
         EmissionsYear element = new EmissionsYear("test" + Math.random());
         add(element);
 
+        session.clear();
         try {
             List list = dao.getEmissionsYears(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -128,6 +136,7 @@ public class CaseDAOTest extends ServiceTestCase {
         Grid element = new Grid("test" + Math.random());
         dao.add(element, session);
 
+        session.clear();
         try {
             List list = dao.getGrids(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -141,6 +150,7 @@ public class CaseDAOTest extends ServiceTestCase {
         Grid element = new Grid("test" + Math.random());
         add(element);
 
+        session.clear();
         try {
             List list = dao.getGrids(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -155,6 +165,7 @@ public class CaseDAOTest extends ServiceTestCase {
         MeteorlogicalYear element = new MeteorlogicalYear("test" + Math.random());
         dao.add(element, session);
 
+        session.clear();
         try {
             List list = dao.getMeteorlogicalYears(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -168,6 +179,7 @@ public class CaseDAOTest extends ServiceTestCase {
         MeteorlogicalYear element = new MeteorlogicalYear("test" + Math.random());
         add(element);
 
+        session.clear();
         try {
             List list = dao.getMeteorlogicalYears(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -182,6 +194,7 @@ public class CaseDAOTest extends ServiceTestCase {
         Speciation element = new Speciation("test" + Math.random());
         dao.add(element, session);
 
+        session.clear();
         try {
             List list = dao.getSpeciations(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -195,6 +208,7 @@ public class CaseDAOTest extends ServiceTestCase {
         Speciation element = new Speciation("test" + Math.random());
         add(element);
 
+        session.clear();
         try {
             List list = dao.getSpeciations(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -204,30 +218,4 @@ public class CaseDAOTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldPersistEmptyCaseOnAdd() {
-        int totalBeforeAdd = dao.getCases(session).size();
-        Case element = new Case("test" + Math.random());
-        dao.add(element, session);
-
-        try {
-            List list = dao.getCases(session);
-            assertEquals(totalBeforeAdd + 1, list.size());
-        } finally {
-            remove(element);
-        }
-    }
-    
-    public void testShouldGetAllCases() {
-        int totalBeforeAdd = dao.getCases(session).size();
-        Case element = new Case("test" + Math.random());
-        add(element);
-
-        try {
-            List list = dao.getCases(session);
-            assertEquals(totalBeforeAdd + 1, list.size());
-            assertTrue(list.contains(element));
-        } finally {
-            remove(element);
-        }
-    }
 }

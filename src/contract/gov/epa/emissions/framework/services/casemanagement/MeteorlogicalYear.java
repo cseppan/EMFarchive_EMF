@@ -37,7 +37,7 @@ public class MeteorlogicalYear implements Comparable {
         if (other == null || !(other instanceof MeteorlogicalYear))
             return false;
 
-        return ((MeteorlogicalYear) other).name == this.name;
+        return ((MeteorlogicalYear) other).name.equals(this.name);
     }
 
     public int hashCode() {

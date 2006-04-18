@@ -36,7 +36,7 @@ public class Abbreviation implements Comparable {
         if (other == null || !(other instanceof Abbreviation))
             return false;
 
-        return ((Abbreviation) other).name == this.name;
+        return ((Abbreviation) other).name.equals(this.name);
     }
 
     public int hashCode() {

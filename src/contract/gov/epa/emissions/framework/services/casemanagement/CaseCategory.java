@@ -37,7 +37,7 @@ public class CaseCategory implements Comparable {
         if (other == null || !(other instanceof CaseCategory))
             return false;
 
-        return ((CaseCategory) other).name == this.name;
+        return ((CaseCategory) other).name.equals(this.name);
     }
 
     public int hashCode() {

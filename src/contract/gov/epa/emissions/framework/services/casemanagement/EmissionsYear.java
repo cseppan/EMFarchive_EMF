@@ -37,7 +37,7 @@ public class EmissionsYear implements Comparable {
         if (other == null || !(other instanceof EmissionsYear))
             return false;
 
-        return ((EmissionsYear) other).name == this.name;
+        return ((EmissionsYear) other).name.equals(this.name);
     }
 
     public int hashCode() {

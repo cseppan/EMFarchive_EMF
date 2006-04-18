@@ -37,7 +37,7 @@ public class Speciation implements Comparable {
         if (other == null || !(other instanceof Speciation))
             return false;
 
-        return ((Speciation) other).name == this.name;
+        return ((Speciation) other).name.equals(this.name);
     }
 
     public int hashCode() {

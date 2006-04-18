@@ -395,20 +395,20 @@ CREATE TABLE emf.cases
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE,
-  abbreviation_id int4 NOT NULL REFERENCES emf.case_abbreviations(id),
+  abbreviation_id int4 REFERENCES emf.case_abbreviations(id),
   description text,
-  creator_id int4 NOT NULL REFERENCES emf.users(id),
-  aqm_id int4 NOT NULL REFERENCES emf.air_quality_models(id),
-  category_id int4 NOT NULL REFERENCES emf.case_categories(id),
-  project_id int4 NOT NULL REFERENCES emf.projects(id),
-  region_id int4 NOT NULL REFERENCES emf.regions(id),
-  run_status varchar(255) NOT NULL,
-  grid_id int4 NOT NULL REFERENCES emf.grids(id),
-  speciations_id int4 NOT NULL REFERENCES emf.speciations(id),
-  met_year_id int4 NOT NULL REFERENCES emf.meteorlogical_years(id),
-  emissions_year_id int4 NOT NULL REFERENCES emf.emissions_years(id),
+  creator_id int4  REFERENCES emf.users(id),
+  air_quality_model_id int4  REFERENCES emf.air_quality_models(id),
+  category_id int4  REFERENCES emf.case_categories(id),
+  project_id int4  REFERENCES emf.projects(id),
+  region_id int4  REFERENCES emf.regions(id),
+  run_status varchar(255),
+  grid_id int4 REFERENCES emf.grids(id),
+  speciation_id int4 REFERENCES emf.speciations(id),
+  meteorlogical_year_id int4 REFERENCES emf.meteorlogical_years(id),
+  emissions_year_id int4 REFERENCES emf.emissions_years(id),
   last_modified_date timestamp,
-  copied_from varchar(255) NOT NULL
+  copied_from varchar(255)
 ) 
 WITHOUT OIDS;
 -- emf.cases

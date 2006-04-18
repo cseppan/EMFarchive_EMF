@@ -9,6 +9,42 @@
 	  <generator class="identity"/>
  	</id>
 	<property name="name"	column="name"	type="java.lang.String"	not-null="true"/>
+	
+	 <many-to-one cascade="save-update"
+            name="abbreviation" 
+            class="gov.epa.emissions.framework.services.casemanagement.Abbreviation"
+            column="abbreviation_id"/> 
+
+	 <many-to-one cascade="save-update"
+            name="airQualityModel" 
+            class="gov.epa.emissions.framework.services.casemanagement.AirQualityModel"
+            column="air_quality_model_id"/> 
+
+	 <many-to-one cascade="save-update"
+            name="caseCategory" 
+            class="gov.epa.emissions.framework.services.casemanagement.CaseCategory"
+            column="category_id"/> 
+
+	 <many-to-one cascade="save-update"
+            name="emissionsYear" 
+            class="gov.epa.emissions.framework.services.casemanagement.EmissionsYear"
+            column="emissions_year_id"/> 
+
+	 <many-to-one cascade="save-update"
+            name="grid" 
+            class="gov.epa.emissions.framework.services.casemanagement.Grid"
+            column="grid_id"/> 
+
+	 <many-to-one cascade="save-update"
+            name="meteorlogicalYear" 
+            class="gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear"
+            column="meteorlogical_year_id"/> 
+
+	 <many-to-one cascade="save-update"
+            name="speciation" 
+            class="gov.epa.emissions.framework.services.casemanagement.Speciation"
+            column="speciation_id"/> 
+	
   </class> 
 </hibernate-mapping>  
 
