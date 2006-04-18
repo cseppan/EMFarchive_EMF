@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
-import java.io.Serializable;
-
-public class Abbreviation implements Serializable, Comparable {
+public class Abbreviation implements Comparable {
 
     private int id;
 
@@ -11,7 +9,7 @@ public class Abbreviation implements Serializable, Comparable {
     /*
      * Default constructor needed for hibernate and axis serialization
      */
-    public Abbreviation() {//tagging
+    public Abbreviation() {// tagging
     }
 
     public Abbreviation(String name) {

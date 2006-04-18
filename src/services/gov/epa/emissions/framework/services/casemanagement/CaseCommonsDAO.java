@@ -27,6 +27,22 @@ public class CaseCommonsDAO {
         addObject(object, session);
     }
 
+    public void add(EmissionsYear object, Session session) {
+        addObject(object, session);
+    }
+
+    public void add(Grid object, Session session) {
+        addObject(object, session);
+    }
+
+    public void add(MeteorlogicalYear object, Session session) {
+        addObject(object, session);
+    }
+
+    public void add(Speciation object, Session session) {
+        addObject(object, session);
+    }
+
     public List getAbbreviations(Session session) {
         return session.createCriteria(Abbreviation.class).addOrder(Order.asc("name")).list();
     }
@@ -37,6 +53,22 @@ public class CaseCommonsDAO {
 
     public List getCaseCategories(Session session) {
         return session.createCriteria(CaseCategory.class).addOrder(Order.asc("name")).list();
+    }
+
+    public List getEmissionsYears(Session session) {
+        return session.createCriteria(EmissionsYear.class).addOrder(Order.asc("name")).list();
+    }
+
+    public List getGrids(Session session) {
+        return session.createCriteria(Grid.class).addOrder(Order.asc("name")).list();
+    }
+
+    public List getMeteorlogicalYears(Session session) {
+        return session.createCriteria(MeteorlogicalYear.class).addOrder(Order.asc("name")).list();
+    }
+
+    public List getSpeciations(Session session) {
+        return session.createCriteria(Speciation.class).addOrder(Order.asc("name")).list();
     }
 
     private void addObject(Object obj, Session session) {

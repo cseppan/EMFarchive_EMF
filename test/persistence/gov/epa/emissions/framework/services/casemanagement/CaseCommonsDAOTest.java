@@ -96,4 +96,111 @@ public class CaseCommonsDAOTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldPersistEmissionsYearOnAdd() {
+        int totalBeforeAdd = dao.getEmissionsYears(session).size();
+        EmissionsYear element = new EmissionsYear("test" + Math.random());
+        dao.add(element, session);
+
+        try {
+            List list = dao.getEmissionsYears(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldGetAllEmissionsYears() {
+        int totalBeforeAdd = dao.getEmissionsYears(session).size();
+        EmissionsYear element = new EmissionsYear("test" + Math.random());
+        add(element);
+
+        try {
+            List list = dao.getEmissionsYears(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(element));
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldPersistGridOnAdd() {
+        int totalBeforeAdd = dao.getGrids(session).size();
+        Grid element = new Grid("test" + Math.random());
+        dao.add(element, session);
+
+        try {
+            List list = dao.getGrids(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldGetAllGrids() {
+        int totalBeforeAdd = dao.getGrids(session).size();
+        Grid element = new Grid("test" + Math.random());
+        add(element);
+
+        try {
+            List list = dao.getGrids(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(element));
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldPersistMeteorlogicalYearOnAdd() {
+        int totalBeforeAdd = dao.getMeteorlogicalYears(session).size();
+        MeteorlogicalYear element = new MeteorlogicalYear("test" + Math.random());
+        dao.add(element, session);
+
+        try {
+            List list = dao.getMeteorlogicalYears(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldGetAllMeteorlogicalYears() {
+        int totalBeforeAdd = dao.getMeteorlogicalYears(session).size();
+        MeteorlogicalYear element = new MeteorlogicalYear("test" + Math.random());
+        add(element);
+
+        try {
+            List list = dao.getMeteorlogicalYears(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(element));
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldPersistSpeciationOnAdd() {
+        int totalBeforeAdd = dao.getSpeciations(session).size();
+        Speciation element = new Speciation("test" + Math.random());
+        dao.add(element, session);
+        
+        try {
+            List list = dao.getSpeciations(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+        } finally {
+            remove(element);
+        }
+    }
+    
+    public void testShouldGetAllSpeciations() {
+        int totalBeforeAdd = dao.getSpeciations(session).size();
+        Speciation element = new Speciation("test" + Math.random());
+        add(element);
+        
+        try {
+            List list = dao.getSpeciations(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(element));
+        } finally {
+            remove(element);
+        }
+    }
 }

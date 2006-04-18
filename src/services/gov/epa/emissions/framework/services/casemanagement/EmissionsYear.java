@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
-import java.io.Serializable;
-
-public class EmissionsYear implements Serializable, Comparable {
+public class EmissionsYear implements Comparable {
 
     private int id;
 

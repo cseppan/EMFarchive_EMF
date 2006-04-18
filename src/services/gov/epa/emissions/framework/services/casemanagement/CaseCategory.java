@@ -1,8 +1,6 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
-import java.io.Serializable;
-
-public class CaseCategory implements Serializable, Comparable {
+public class CaseCategory implements Comparable {
 
     private int id;
 
