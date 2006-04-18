@@ -17,6 +17,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
 
     public void testShouldPersistEmptyCaseOnAdd() {
         int totalBeforeAdd = dao.getCases(session).size();
+
         Case element = new Case("test" + Math.random());
         dao.add(element, session);
 
@@ -24,6 +25,36 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         try {
             List list = dao.getCases(session);
             assertEquals(totalBeforeAdd + 1, list.size());
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldRemoveCaseOnRemove() {
+        int totalBeforeAdd = dao.getCases(session).size();
+        Case element = new Case("test" + Math.random());
+        dao.add(element, session);
+
+        session.clear();
+        dao.remove(element, session);
+        List list = dao.getCases(session);
+        assertEquals(totalBeforeAdd, list.size());
+    }
+
+    public void testShouldUpdateCaseOnUpdate() {
+        int totalBeforeAdd = dao.getCases(session).size();
+        Case element = new Case("test" + Math.random());
+        dao.add(element, session);
+
+        session.clear();
+        element.setName(element.getName() + "-changed");
+        try {
+            dao.update(element, session);
+            List list = dao.getCases(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+
+            Case updated = (Case) list.get(totalBeforeAdd);
+            assertEquals(element.getName(), updated.getName());
         } finally {
             remove(element);
         }
@@ -39,6 +70,25 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
             List list = dao.getCases(session);
             assertEquals(totalBeforeAdd + 1, list.size());
             assertTrue(list.contains(element));
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldPersistCaseWithDescriptionOnAdd() {
+        int totalBeforeAdd = dao.getCases(session).size();
+
+        Case element = new Case("test" + Math.random());
+        element.setDescription("desc");
+        dao.add(element, session);
+
+        session.clear();
+        try {
+            List list = dao.getCases(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+
+            Case added = (Case) list.get(totalBeforeAdd);
+            assertEquals(element.getDescription(), added.getDescription());
         } finally {
             remove(element);
         }

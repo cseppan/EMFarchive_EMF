@@ -83,4 +83,12 @@ public class CaseDAO {
         return session.createCriteria(Case.class).addOrder(Order.asc("name")).list();
     }
 
+    public void remove(Case element, Session session) {
+        hibernateFacade.remove(element, session);
+    }
+
+    public void update(Case element, Session session) {
+        hibernateFacade.update(element, session);
+    }
+
 }

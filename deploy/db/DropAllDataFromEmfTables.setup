@@ -1,3 +1,4 @@
+------------------------ Data Management tables ------------------------------
 delete from emf.datasets_sectors;
 delete from emissions.versions;
 delete from emf.countries;
@@ -21,6 +22,21 @@ delete from emf.notes;
 delete from emf.note_types;
 delete from emf.revisions;
 
-
+----------------------------- QA Management tables -------------------------------
 delete from emf.qa_steps;
 delete from emf.dataset_types_qa_step_templates;
+
+------------------------------ Case Management tables ------------------------------
+delete from emf.cases;
+delete from emf.emissions_years;
+delete from emf.meteorlogical_years;
+delete from emf.speciations;
+delete from emf.grids;
+delete from emf.air_quality_models;
+delete from emf.case_categories;
+delete from emf.case_abbreviations;
+
+
+
+
+

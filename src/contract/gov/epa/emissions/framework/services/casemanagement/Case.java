@@ -20,6 +20,8 @@ public class Case implements Comparable {
 
     private Speciation speciation;
 
+    private String description;
+
     /*
      * Default constructor needed for hibernate and axis serialization
      */
@@ -120,6 +122,14 @@ public class Case implements Comparable {
 
     public Speciation getSpeciation() {
         return speciation;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
 }
