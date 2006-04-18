@@ -4,12 +4,12 @@ import gov.epa.emissions.framework.services.ServiceTestCase;
 
 import java.util.List;
 
-public class CaseCommonsDAOTest extends ServiceTestCase {
+public class CaseDAOTest extends ServiceTestCase {
 
-    private CaseCommonsDAO dao;
+    private CaseDAO dao;
 
     protected void doSetUp() throws Exception {
-        dao = new CaseCommonsDAO();
+        dao = new CaseDAO();
     }
 
     protected void doTearDown() {// no op
@@ -181,7 +181,7 @@ public class CaseCommonsDAOTest extends ServiceTestCase {
         int totalBeforeAdd = dao.getSpeciations(session).size();
         Speciation element = new Speciation("test" + Math.random());
         dao.add(element, session);
-        
+
         try {
             List list = dao.getSpeciations(session);
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -189,14 +189,41 @@ public class CaseCommonsDAOTest extends ServiceTestCase {
             remove(element);
         }
     }
-    
+
     public void testShouldGetAllSpeciations() {
         int totalBeforeAdd = dao.getSpeciations(session).size();
         Speciation element = new Speciation("test" + Math.random());
         add(element);
-        
+
         try {
             List list = dao.getSpeciations(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(element));
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldPersistEmptyCaseOnAdd() {
+        int totalBeforeAdd = dao.getCases(session).size();
+        Case element = new Case("test" + Math.random());
+        dao.add(element, session);
+
+        try {
+            List list = dao.getCases(session);
+            assertEquals(totalBeforeAdd + 1, list.size());
+        } finally {
+            remove(element);
+        }
+    }
+    
+    public void testShouldGetAllCases() {
+        int totalBeforeAdd = dao.getCases(session).size();
+        Case element = new Case("test" + Math.random());
+        add(element);
+
+        try {
+            List list = dao.getCases(session);
             assertEquals(totalBeforeAdd + 1, list.size());
             assertTrue(list.contains(element));
         } finally {

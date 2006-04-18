@@ -7,11 +7,11 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 
-public class CaseCommonsDAO {
+public class CaseDAO {
 
     private HibernateFacade hibernateFacade;
 
-    public CaseCommonsDAO() {
+    public CaseDAO() {
         hibernateFacade = new HibernateFacade();
     }
 
@@ -43,6 +43,14 @@ public class CaseCommonsDAO {
         addObject(object, session);
     }
 
+    public void add(Case object, Session session) {
+        addObject(object, session);
+    }
+
+    private void addObject(Object obj, Session session) {
+        hibernateFacade.add(obj, session);
+    }
+
     public List getAbbreviations(Session session) {
         return session.createCriteria(Abbreviation.class).addOrder(Order.asc("name")).list();
     }
@@ -71,8 +79,8 @@ public class CaseCommonsDAO {
         return session.createCriteria(Speciation.class).addOrder(Order.asc("name")).list();
     }
 
-    private void addObject(Object obj, Session session) {
-        hibernateFacade.add(obj, session);
+    public List getCases(Session session) {
+        return session.createCriteria(Case.class).addOrder(Order.asc("name")).list();
     }
 
 }
