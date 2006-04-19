@@ -4,9 +4,24 @@ import gov.epa.emissions.framework.services.EmfException;
 
 public interface CaseService {
 
-    Case[] getCases() throws EmfException;
-
     Abbreviation[] getAbbreviations() throws EmfException;
 
     AirQualityModel[] getAirQualityModels() throws EmfException;
+
+    CaseCategory[] getCaseCategories() throws EmfException;
+
+    EmissionsYear[] getEmissionsYears() throws EmfException;
+
+    Grid[] getGrids() throws EmfException;
+
+    MeteorlogicalYear[] getMeteorlogicalYears() throws EmfException;
+
+    Speciation[] getSpeciations() throws EmfException;
+
+    Case[] getCases() throws EmfException;
+
+    void addCase(Case element) throws EmfException;
+
+    void removeCase(Case element) throws EmfException;
+
 }

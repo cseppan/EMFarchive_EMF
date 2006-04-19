@@ -64,4 +64,91 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
+    public CaseCategory[] getCaseCategories() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List results = dao.getCaseCategories(session);
+            session.close();
+
+            return (CaseCategory[]) results.toArray(new CaseCategory[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Case Categories", e);
+            throw new EmfException("Could not get all Case Categories");
+        }
+    }
+
+    public EmissionsYear[] getEmissionsYears() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List results = dao.getEmissionsYears(session);
+            session.close();
+
+            return (EmissionsYear[]) results.toArray(new EmissionsYear[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Emissions Years", e);
+            throw new EmfException("Could not get all Emissions Years");
+        }
+    }
+
+    public Grid[] getGrids() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List results = dao.getGrids(session);
+            session.close();
+
+            return (Grid[]) results.toArray(new Grid[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Grids", e);
+            throw new EmfException("Could not get all Grids");
+        }
+    }
+
+    public MeteorlogicalYear[] getMeteorlogicalYears() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List results = dao.getMeteorlogicalYears(session);
+            session.close();
+
+            return (MeteorlogicalYear[]) results.toArray(new MeteorlogicalYear[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Meteorlogical Years", e);
+            throw new EmfException("Could not get all Meteorlogical Years");
+        }
+    }
+
+    public Speciation[] getSpeciations() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List results = dao.getSpeciations(session);
+            session.close();
+
+            return (Speciation[]) results.toArray(new Speciation[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Speciations", e);
+            throw new EmfException("Could not get all Speciations");
+        }
+    }
+
+    public void addCase(Case element) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.add(element, session);
+            session.close();
+        } catch (RuntimeException e) {
+            LOG.error("Could not add Case: " + element, e);
+            throw new EmfException("Could not add Case: " + element);
+        }
+    }
+    
+    public void removeCase(Case element) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.remove(element, session);
+            session.close();
+        } catch (RuntimeException e) {
+            LOG.error("Could not remove Case: " + element, e);
+            throw new EmfException("Could not remove Case: " + element);
+        }
+    }
+
 }
