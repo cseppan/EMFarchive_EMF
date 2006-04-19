@@ -408,7 +408,9 @@ CREATE TABLE emf.cases
   meteorlogical_year_id int4 REFERENCES emf.meteorlogical_years(id),
   emissions_year_id int4 REFERENCES emf.emissions_years(id),
   last_modified_date timestamp,
-  copied_from varchar(255)
+  copied_from varchar(255),
+  lock_owner varchar(255),  
+  lock_date timestamp
 ) 
 WITHOUT OIDS;
 -- emf.cases

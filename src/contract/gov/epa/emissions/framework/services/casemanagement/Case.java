@@ -1,9 +1,13 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
+import java.util.Date;
+
+import gov.epa.emissions.commons.data.Lockable;
+import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.security.User;
 
-public class Case implements Comparable {
+public class Case implements Comparable, Lockable {
 
     private int id;
 
@@ -29,14 +33,17 @@ public class Case implements Comparable {
 
     private Project project;
 
+    private Mutex lock;
+
     /*
      * Default constructor needed for hibernate and axis serialization
      */
     public Case() {
-        super();
+        lock = new Mutex();
     }
 
     public Case(String name) {
+        this();
         this.name = name;
     }
 
@@ -147,13 +154,40 @@ public class Case implements Comparable {
         return creator;
     }
 
-    
     public void setProject(Project project) {
         this.project = project;
     }
 
     public Project getProject() {
         return project;
+    }
+
+    public Date getLockDate() {
+        return lock.getLockDate();
+    }
+
+    public void setLockDate(Date lockDate) {
+        lock.setLockDate(lockDate);
+    }
+
+    public String getLockOwner() {
+        return lock.getLockOwner();
+    }
+
+    public void setLockOwner(String owner) {
+        lock.setLockOwner(owner);
+    }
+
+    public boolean isLocked(String owner) {
+        return lock.isLocked(owner);
+    }
+
+    public boolean isLocked(User owner) {
+        return lock.isLocked(owner);
+    }
+
+    public boolean isLocked() {
+        return lock.isLocked();
     }
 
 }

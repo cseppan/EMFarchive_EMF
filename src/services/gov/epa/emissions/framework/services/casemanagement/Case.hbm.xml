@@ -55,6 +55,10 @@
             name="project" 
             class="gov.epa.emissions.commons.data.Project"
             column="project_id"/> 
+            
+	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
+  	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
+            
   </class> 
 </hibernate-mapping>  
 
