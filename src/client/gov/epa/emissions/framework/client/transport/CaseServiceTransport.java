@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.transport;
 
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
+import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 
@@ -26,6 +28,16 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(mappings.cases());
 
         return (Case[]) call.requestResponse(new Object[] {});
+    }
+
+    public Abbreviation[] getAbbreviations() {
+        // NOTE Auto-generated method stub
+        return null;
+    }
+
+    public AirQualityModel[] getAirQualityModels() {
+        // NOTE Auto-generated method stub
+        return null;
     }
 
 }
