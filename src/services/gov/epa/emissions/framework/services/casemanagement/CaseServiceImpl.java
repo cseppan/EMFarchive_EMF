@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -139,7 +140,7 @@ public class CaseServiceImpl implements CaseService {
             throw new EmfException("Could not add Case: " + element);
         }
     }
-    
+
     public void removeCase(Case element) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
@@ -148,6 +149,46 @@ public class CaseServiceImpl implements CaseService {
         } catch (RuntimeException e) {
             LOG.error("Could not remove Case: " + element, e);
             throw new EmfException("Could not remove Case: " + element);
+        }
+    }
+
+    public Case obtainLocked(User owner, Case element) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            Case locked = dao.obtainLocked(owner, element, session);
+            session.close();
+
+            return locked;
+        } catch (RuntimeException e) {
+            LOG.error("Could not obtain lock for Case: " + element + " by owner: " + owner.getUsername(), e);
+            throw new EmfException("Could not obtain lock for Case: " + element + " by owner: " + owner.getUsername());
+        }
+    }
+
+    public Case releaseLocked(Case locked) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            Case released = dao.releaseLocked(locked, session);
+            session.close();
+
+            return released;
+        } catch (RuntimeException e) {
+            LOG.error("Could not release lock for Case: " + locked + " by owner: " + locked.getLockOwner(), e);
+            throw new EmfException("Could not release lock for Case: " + locked + " by owner: " + locked.getLockOwner());
+        }
+    }
+
+    public Case update(Case element) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+
+            Case released = dao.update(element, session);
+            session.close();
+
+            return released;
+        } catch (RuntimeException e) {
+            LOG.error("Could not update Case: " + element, e);
+            throw new EmfException("Could not update Case: " + element);
         }
     }
 

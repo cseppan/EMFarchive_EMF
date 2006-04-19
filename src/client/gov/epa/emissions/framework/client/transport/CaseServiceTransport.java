@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
 import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
@@ -35,49 +36,118 @@ public class CaseServiceTransport implements CaseService {
         return (Case[]) call.requestResponse(new Object[] {});
     }
 
-    public Abbreviation[] getAbbreviations() {
-        // NOTE Auto-generated method stub
-        return null;
+    public Abbreviation[] getAbbreviations() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getAbbreviations");
+        call.setReturnType(mappings.abbreviations());
+
+        return (Abbreviation[]) call.requestResponse(new Object[] {});
     }
 
-    public AirQualityModel[] getAirQualityModels() {
-        // NOTE Auto-generated method stub
-        return null;
+    public AirQualityModel[] getAirQualityModels() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getAirQualityModels");
+        call.setReturnType(mappings.airQualityModels());
+
+        return (AirQualityModel[]) call.requestResponse(new Object[] {});
     }
 
-    public CaseCategory[] getCaseCategories() {
-        // NOTE Auto-generated method stub
-        return null;
+    public CaseCategory[] getCaseCategories() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCaseCategories");
+        call.setReturnType(mappings.caseCategories());
+
+        return (CaseCategory[]) call.requestResponse(new Object[] {});
     }
 
-    public EmissionsYear[] getEmissionsYears() {
-        // NOTE Auto-generated method stub
-        return null;
+    public EmissionsYear[] getEmissionsYears() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getEmissionsYears");
+        call.setReturnType(mappings.emissionsYears());
+
+        return (EmissionsYear[]) call.requestResponse(new Object[] {});
     }
 
-    public Grid[] getGrids() {
-        // NOTE Auto-generated method stub
-        return null;
+    public Grid[] getGrids() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getGrids");
+        call.setReturnType(mappings.grids());
+
+        return (Grid[]) call.requestResponse(new Object[] {});
     }
 
-    public MeteorlogicalYear[] getMeteorlogicalYears() {
-        // NOTE Auto-generated method stub
-        return null;
+    public MeteorlogicalYear[] getMeteorlogicalYears() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getMeteorlogicalYears");
+        call.setReturnType(mappings.meteorlogicalYears());
+
+        return (MeteorlogicalYear[]) call.requestResponse(new Object[] {});
     }
 
-    public Speciation[] getSpeciations() {
-        // NOTE Auto-generated method stub
-        return null;
+    public Speciation[] getSpeciations() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getSpeciations");
+        call.setReturnType(mappings.speciations());
+
+        return (Speciation[]) call.requestResponse(new Object[] {});
     }
 
-    public void addCase(Case element) {
-        // NOTE Auto-generated method stub
+    public void addCase(Case element) throws EmfException {
+        EmfCall call = call();
 
+        call.setOperation("addCase");
+        call.addParam("element", mappings.caseObject());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { element });
     }
 
-    public void removeCase(Case element) {
-        // NOTE Auto-generated method stub
+    public void removeCase(Case element) throws EmfException {
+        EmfCall call = call();
 
+        call.setOperation("removeCase");
+        call.addParam("element", mappings.caseObject());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { element });
+    }
+
+    public Case obtainLocked(User owner, Case element) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("obtainLocked");
+        call.addParam("owner", mappings.user());
+        call.addParam("element", mappings.caseObject());
+        call.setReturnType(mappings.caseObject());
+
+        return (Case) call.requestResponse(new Object[] { owner, element });
+    }
+
+    public Case releaseLocked(Case locked) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("releaseLocked");
+        call.addParam("element", mappings.caseObject());
+        call.setReturnType(mappings.caseObject());
+
+        return (Case) call.requestResponse(new Object[] { locked });
+    }
+
+    public Case update(Case element) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("update");
+        call.addParam("element", mappings.caseObject());
+        call.setReturnType(mappings.caseObject());
+
+        return (Case) call.requestResponse(new Object[] { element });
     }
 
 }

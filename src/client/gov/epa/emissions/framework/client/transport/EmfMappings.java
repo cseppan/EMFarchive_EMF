@@ -20,7 +20,14 @@ import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.Status;
+import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
+import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
+import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
+import gov.epa.emissions.framework.services.casemanagement.Grid;
+import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
+import gov.epa.emissions.framework.services.casemanagement.Speciation;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
@@ -118,6 +125,13 @@ public class EmfMappings extends Mappings {
         array(call, QAStep[].class, qaSteps());
 
         array(call, Case[].class, cases());
+        array(call, Abbreviation[].class, abbreviations());
+        array(call, AirQualityModel[].class, airQualityModels());
+        array(call, CaseCategory[].class, caseCategories());
+        array(call, EmissionsYear[].class, emissionsYears());
+        array(call, Grid[].class, grids());
+        array(call, MeteorlogicalYear[].class, meteorlogicalYears());
+        array(call, Speciation[].class, speciations());
     }
 
     public QName logs() {
@@ -298,6 +312,34 @@ public class EmfMappings extends Mappings {
 
     public QName cases() {
         return qname("Cases");
+    }
+
+    public QName abbreviations() {
+        return qname("Abbreviations");
+    }
+
+    public QName airQualityModels() {
+        return qname("AirQualityModels");
+    }
+
+    public QName caseCategories() {
+        return qname("CaseCategories");
+    }
+
+    public QName emissionsYears() {
+        return qname("EmissionsYears");
+    }
+
+    public QName grids() {
+        return qname("Grids");
+    }
+
+    public QName meteorlogicalYears() {
+        return qname("MeteorlogicalYears");
+    }
+
+    public QName speciations() {
+        return qname("Speciations");
     }
 
 }
