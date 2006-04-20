@@ -136,7 +136,8 @@ public class EmfConsole extends EmfFrame implements EmfConsoleView {
 
     private JMenu createManageMenu(EmfSession session, MessagePanel messagePanel) {
         manageMenu = new ManageMenu(session, this, messagePanel, desktopManager);
-
+        new ManageMenuPresenter(manageMenu, session).observe();
+        
         return manageMenu;
     }
 

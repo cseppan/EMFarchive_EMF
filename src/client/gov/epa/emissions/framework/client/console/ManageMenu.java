@@ -6,17 +6,17 @@ import gov.epa.emissions.framework.client.admin.UpdateMyProfileWindow;
 import gov.epa.emissions.framework.client.admin.UpdateUserPresenter;
 import gov.epa.emissions.framework.client.admin.UpdateUserPresenterImpl;
 import gov.epa.emissions.framework.client.admin.UsersManager;
-import gov.epa.emissions.framework.client.admin.UsersManagerPresenter;
+import gov.epa.emissions.framework.client.admin.UsersManagerView;
 import gov.epa.emissions.framework.client.admin.ViewMyProfileWindow;
-import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserPresenter;
+import gov.epa.emissions.framework.client.casemanagement.CaseBrowserView;
+import gov.epa.emissions.framework.client.casemanagement.CaseBrowserWindow;
+import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserWindow;
-import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerPresenter;
+import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerView;
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerWindow;
-import gov.epa.emissions.framework.client.data.sector.SectorsManagerPresenter;
+import gov.epa.emissions.framework.client.data.sector.SectorsManagerView;
 import gov.epa.emissions.framework.client.data.sector.SectorsManagerWindow;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.basic.UserService;
-import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.event.ActionEvent;
@@ -25,15 +25,17 @@ import java.awt.event.ActionListener;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-public class ManageMenu extends JMenu {
+public class ManageMenu extends JMenu implements ManageMenuView {
 
-    private EmfConsolePresenter presenter;
+    private EmfConsolePresenter emfConsolePresenter;
 
     private EmfSession session;
 
     private EmfConsole parent;
 
     private DesktopManager desktopManager;
+
+    private ManageMenuPresenter presenter;
 
     // FIXME: where's the associated Presenter ?
     public ManageMenu(EmfSession session, EmfConsole parent, MessagePanel messagePanel) {
@@ -45,7 +47,9 @@ public class ManageMenu extends JMenu {
 
         super.add(createDatasets(parent, messagePanel));
         super.add(createDatasetTypes(parent, messagePanel));
-        super.add(createSectors(session.dataCommonsService(), parent, messagePanel));
+        super.add(createSectors(parent, messagePanel));
+        super.addSeparator();
+        super.add(createCases(parent, messagePanel));
         super.addSeparator();
 
         manageUsers(session.user(), messagePanel);
@@ -73,11 +77,7 @@ public class ManageMenu extends JMenu {
             JMenuItem users = new JMenuItem("Users");
             users.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    try {
-                        presenter.notifyManageUsers();
-                    } catch (EmfException e) {
-                        messagePanel.setError(e.getMessage());
-                    }
+                    doManagerUsers(messagePanel);
                 }
             });
 
@@ -90,11 +90,7 @@ public class ManageMenu extends JMenu {
         menuItem.setName("datasets");
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    displayDatasets(parent);
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
-                }
+                doDisplayDatasets(parent, messagePanel);
             }
         });
 
@@ -107,50 +103,35 @@ public class ManageMenu extends JMenu {
         menuItem.setName("datasetTypes");
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    displayDatasetTypes(parent);
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
-                }
+                doManageDatasetTypes(parent, messagePanel);
             }
         });
 
         return menuItem;
     }
 
-    private JMenuItem createSectors(final DataCommonsService service, final EmfConsole parent,
-            final MessagePanel messagePanel) {
+    private JMenuItem createSectors(final EmfConsole parent, final MessagePanel messagePanel) {
         JMenuItem menuItem = new JMenuItem("Sectors");
         menuItem.setName("sectors");
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                try {
-                    displaySectors(service, parent);
-                } catch (EmfException e) {
-                    messagePanel.setError(e.getMessage());
-                }
+                doManageSectors(parent, messagePanel);
             }
         });
 
         return menuItem;
     }
 
-    protected void displayDatasetTypes(EmfConsole parent) throws EmfException {
-        DatasetTypesManagerWindow view = new DatasetTypesManagerWindow(parent, desktopManager);
-        DatasetTypesManagerPresenter presenter = new DatasetTypesManagerPresenter(session, view);
-        presenter.doDisplay();
-    }
+    private JMenuItem createCases(final EmfConsole parent, final MessagePanel messagePanel) {
+        JMenuItem menuItem = new JMenuItem("Cases");
+        menuItem.setName("cases");
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                doManageCases(parent, messagePanel);
+            }
+        });
 
-    protected void displaySectors(DataCommonsService service, EmfConsole parent) throws EmfException {
-        SectorsManagerWindow view = new SectorsManagerWindow(parent, desktopManager);
-        SectorsManagerPresenter presenter = new SectorsManagerPresenter(session, view, service);
-        presenter.doDisplay();
-    }
-
-    private void displayDatasets(EmfConsole parent) throws EmfException {
-        DatasetsBrowserWindow datasetsBrowserView = new DatasetsBrowserWindow(session, parent, desktopManager);
-        DatasetsBrowserPresenter presenter = new DatasetsBrowserPresenter(session);
-        presenter.doDisplay(datasetsBrowserView);
+        return menuItem;
     }
 
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
@@ -166,14 +147,60 @@ public class ManageMenu extends JMenu {
     }
 
     public void displayUserManager() throws EmfException {
-        UserService userService = session.userService();
-        UsersManager usesrManagerView = new UsersManager(session, parent, desktopManager);
-        UsersManagerPresenter presenter = new UsersManagerPresenter(session, userService);
-        presenter.display(usesrManagerView);
+        UsersManagerView view = new UsersManager(session, parent, desktopManager);
+        presenter.doDisplayUserManager(view);
     }
 
     public void observe(EmfConsolePresenter presenter) {
+        this.emfConsolePresenter = presenter;
+    }
+
+    public void observe(ManageMenuPresenter presenter) {
         this.presenter = presenter;
+    }
+
+    private void doManagerUsers(final MessagePanel messagePanel) {
+        try {
+            emfConsolePresenter.notifyManageUsers();
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void doDisplayDatasets(final EmfConsole parent, final MessagePanel messagePanel) {
+        try {
+            DatasetsBrowserView datasetsBrowserView = new DatasetsBrowserWindow(session, parent, desktopManager);
+            presenter.doDisplayDatasetsBrowser(datasetsBrowserView);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void doManageDatasetTypes(final EmfConsole parent, final MessagePanel messagePanel) {
+        try {
+            DatasetTypesManagerView view = new DatasetTypesManagerWindow(parent, desktopManager);
+            presenter.doDisplayDatasetTypesManager(view);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void doManageSectors(final EmfConsole parent, final MessagePanel messagePanel) {
+        try {
+            SectorsManagerView view = new SectorsManagerWindow(parent, desktopManager);
+            presenter.doDisplaySectors(view);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void doManageCases(final EmfConsole parent, final MessagePanel messagePanel) {
+        CaseBrowserView view = new CaseBrowserWindow(parent, desktopManager);
+        try {
+            presenter.doDisplayCases(view);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
     }
 
 }

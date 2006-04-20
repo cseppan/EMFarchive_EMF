@@ -32,16 +32,16 @@ public class CaseBrowserPresenterTest extends EmfMockObjectTestCase {
         Mock browser = mock(CaseBrowserView.class);
         Case[] cases = new Case[0];
         expects(browser, 1, "refresh", eq(cases));
-        
+
         Mock service = mock(CaseService.class);
         stub(service, "getCases", cases);
-        
+
         Mock session = mock(EmfSession.class);
         stub(session, "caseService", service.proxy());
-        
+
         CaseBrowserPresenter presenter = new CaseBrowserPresenter((EmfSession) session.proxy(),
                 (CaseBrowserView) browser.proxy());
-        
+
         presenter.doRefresh();
     }
 
@@ -75,5 +75,14 @@ public class CaseBrowserPresenterTest extends EmfMockObjectTestCase {
                 (CaseBrowserView) browser.proxy());
 
         presenter.doAdd(caseObj);
+    }
+
+    public void testShouldCloseViewOnClose() {
+        Mock browser = mock(CaseBrowserView.class);
+        expects(browser, 1, "close");
+
+        CaseBrowserPresenter presenter = new CaseBrowserPresenter(null, (CaseBrowserView) browser.proxy());
+
+        presenter.doClose();
     }
 }

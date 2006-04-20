@@ -38,4 +38,9 @@ public class CaseBrowserPresenter implements RefreshObserver {
     public void doRefresh() throws EmfException {
         view.refresh(service().getCases());
     }
+
+    
+    public void doClose() {
+        view.close();
+    }
 }
