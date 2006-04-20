@@ -4,8 +4,9 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 
-public class CaseBrowserPresenter {
+public class CaseBrowserPresenter implements RefreshObserver {
 
     private CaseBrowserView view;
 
@@ -34,4 +35,7 @@ public class CaseBrowserPresenter {
         service().addCase(caseObj);
     }
 
+    public void doRefresh() throws EmfException {
+        view.refresh(service().getCases());
+    }
 }
