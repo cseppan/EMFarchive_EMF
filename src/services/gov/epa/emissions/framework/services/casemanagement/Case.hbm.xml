@@ -55,6 +55,15 @@
             name="project" 
             class="gov.epa.emissions.commons.data.Project"
             column="project_id"/> 
+
+	<many-to-one cascade="save-update"
+            name="region" 
+            class="gov.epa.emissions.commons.data.Region"
+            column="region_id"/> 
+            
+    <property name="runStatus" column="run_status" type="java.lang.String" not-null="false"/>
+  	<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
+    <property name="copiedFrom" column="copied_from" type="java.lang.String" not-null="false"/>
             
 	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
   	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>

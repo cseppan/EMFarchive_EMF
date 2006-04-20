@@ -1,11 +1,13 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
 import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserDAO;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -50,8 +52,6 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         assertEquals(totalBeforeAdd, list.size());
     }
 
-    
-
     public void testShouldGetAllCases() {
         int totalBeforeAdd = dao.getCases(session).size();
         Case element = newCase();
@@ -66,11 +66,15 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldPersistCaseWithDescriptionOnAdd() {
+    public void testShouldPersistCaseWithPrimitiveAttributesOnAdd() {
         int totalBeforeAdd = dao.getCases(session).size();
 
         Case element = new Case("test" + Math.random());
         element.setDescription("desc");
+        element.setRunStatus("started");
+        element.setLastModifiedDate(new Date());
+        element.setCopiedFrom("another dataset");
+        
         dao.add(element, session);
 
         session.clear();
@@ -79,6 +83,9 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
 
             Case added = (Case) list.get(totalBeforeAdd);
             assertEquals(element.getDescription(), added.getDescription());
+            assertEquals(element.getRunStatus(), added.getRunStatus());
+            assertEquals(element.getLastModifiedDate(), added.getLastModifiedDate());
+            assertEquals(element.getCopiedFrom(), added.getCopiedFrom());
         } finally {
             remove(element);
         }
@@ -237,6 +244,23 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldPersistCaseWithRegionOnAdd() {
+        Case element = new Case("test" + Math.random());
+        Region attrib = new Region("test" + Math.random());
+        add(attrib);
+        element.setRegion(attrib);
+        
+        dao.add(element, session);
+        
+        session.clear();
+        try {
+            List list = dao.getCases(session);
+            assertEquals(attrib, ((Case) list.get(0)).getRegion());
+        } finally {
+            remove(element);
+        }
+    }
+
     public void testShouldObtainLockedCaseForUpdate() {
         UserDAO userDAO = new UserDAO();
         User owner = userDAO.get("emf", session);
@@ -317,10 +341,10 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
     private Case newCase() {
         Case element = new Case("test" + Math.random());
         add(element);
-        
+
         return element;
     }
-    
+
     private Case load(Case dataset) {
         Transaction tx = null;
 

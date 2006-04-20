@@ -104,4 +104,5 @@ public class CaseDAO {
     public Case update(Case locked, Session session) throws EmfException {
         return (Case) lockingScheme.releaseLockOnUpdate(locked, session, getCases(session));
     }
+
 }

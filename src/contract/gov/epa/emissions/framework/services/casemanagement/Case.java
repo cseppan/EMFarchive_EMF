@@ -1,11 +1,12 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
-import java.util.Date;
-
 import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
+
+import java.util.Date;
 
 public class Case implements Comparable, Lockable {
 
@@ -34,6 +35,14 @@ public class Case implements Comparable, Lockable {
     private Project project;
 
     private Mutex lock;
+
+    private Region region;
+
+    private String runStatus;
+
+    private Date lastModifiedDate;
+
+    private String copiedFrom;
 
     /*
      * Default constructor needed for hibernate and axis serialization
@@ -162,6 +171,10 @@ public class Case implements Comparable, Lockable {
         return project;
     }
 
+    public Region getRegion() {
+        return region;
+    }
+
     public Date getLockDate() {
         return lock.getLockDate();
     }
@@ -188,6 +201,34 @@ public class Case implements Comparable, Lockable {
 
     public boolean isLocked() {
         return lock.isLocked();
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
+    public void setRunStatus(String runStatus) {
+        this.runStatus = runStatus;
+    }
+
+    public String getRunStatus() {
+        return runStatus;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setCopiedFrom(String copiedFrom) {
+        this.copiedFrom = copiedFrom;
+    }
+
+    public String getCopiedFrom() {
+        return copiedFrom;
     }
 
 }
