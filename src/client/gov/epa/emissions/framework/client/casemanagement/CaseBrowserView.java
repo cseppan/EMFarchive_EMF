@@ -8,4 +8,6 @@ public interface CaseBrowserView extends ManagedView {
     void display(Case[] cases);
 
     void observe(CaseBrowserPresenter presenter);
+
+    void refresh(Case[] cases);
 }

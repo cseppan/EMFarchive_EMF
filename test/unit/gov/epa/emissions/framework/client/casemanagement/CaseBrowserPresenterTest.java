@@ -28,6 +28,23 @@ public class CaseBrowserPresenterTest extends EmfMockObjectTestCase {
         presenter.display();
     }
 
+    public void testShouldRefreshBrowserOnRefresh() throws EmfException {
+        Mock browser = mock(CaseBrowserView.class);
+        Case[] cases = new Case[0];
+        expects(browser, 1, "refresh", eq(cases));
+        
+        Mock service = mock(CaseService.class);
+        stub(service, "getCases", cases);
+        
+        Mock session = mock(EmfSession.class);
+        stub(session, "caseService", service.proxy());
+        
+        CaseBrowserPresenter presenter = new CaseBrowserPresenter((EmfSession) session.proxy(),
+                (CaseBrowserView) browser.proxy());
+        
+        presenter.doRefresh();
+    }
+
     public void testShouldRemoveCaseOnRemove() throws EmfException {
         Mock browser = mock(CaseBrowserView.class);
 
