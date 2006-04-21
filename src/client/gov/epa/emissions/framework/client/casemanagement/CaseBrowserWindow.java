@@ -21,6 +21,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -131,7 +133,6 @@ public class CaseBrowserWindow extends ReusableInteralFrame implements CaseBrows
             public void actionPerformed(ActionEvent e) {
                 viewCases();
             }
-
         };
 
         String message = "Opening too many windows. Do you want proceed?";
@@ -156,6 +157,14 @@ public class CaseBrowserWindow extends ReusableInteralFrame implements CaseBrows
         });
         crudPanel.add(newButton);
 
+        JButton removeButton = new JButton("Remove");
+        newButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                removeSelectedCases();
+            }
+        });
+        crudPanel.add(removeButton);
+
         return crudPanel;
     }
 
@@ -165,7 +174,24 @@ public class CaseBrowserWindow extends ReusableInteralFrame implements CaseBrows
     private void editCases() {// TODO
     }
 
-    private void createNewCase() {// TODO
+    private void createNewCase() {
+        NewCaseWindow view = new NewCaseWindow(desktopManager);
+        presenter.doNew(view);
+    }
+
+    private void removeSelectedCases() {
+        for (Iterator iter = selected().iterator(); iter.hasNext();) {
+            Case element = (Case) iter.next();
+            try {
+                presenter.doRemove(element);
+            } catch (EmfException e) {
+                messagePanel.setError("Could not remove " + element + "." + e.getMessage());
+            }
+        }
+    }
+
+    private List selected() {
+        return selectModel.selected();
     }
 
     public EmfConsole getParentConsole() {

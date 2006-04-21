@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 
 import org.jmock.Mock;
+import org.jmock.core.constraint.IsInstanceOf;
 
 public class CaseBrowserPresenterTest extends EmfMockObjectTestCase {
 
@@ -61,20 +62,14 @@ public class CaseBrowserPresenterTest extends EmfMockObjectTestCase {
         presenter.doRemove(caseObj);
     }
 
-    public void testShouldAddCasesOnRemove() throws EmfException {
-        Mock browser = mock(CaseBrowserView.class);
+    public void testShouldDisplayNewCaseViewOnNew() {
+        CaseBrowserPresenter presenter = new CaseBrowserPresenter(null, null);
 
-        Mock service = mock(CaseService.class);
-        Mock session = mock(EmfSession.class);
-        stub(session, "caseService", service.proxy());
-
-        Case caseObj = new Case();
-        expects(service, 1, "addCase", same(caseObj));
-
-        CaseBrowserPresenter presenter = new CaseBrowserPresenter((EmfSession) session.proxy(),
-                (CaseBrowserView) browser.proxy());
-
-        presenter.doAdd(caseObj);
+        Mock view = mock(NewCaseView.class);
+        expects(view, 1, "display");
+        expects(view, 1, "observe", new IsInstanceOf(NewCasePresenter.class));
+        
+        presenter.doNew((NewCaseView) view.proxy());
     }
 
     public void testShouldCloseViewOnClose() {

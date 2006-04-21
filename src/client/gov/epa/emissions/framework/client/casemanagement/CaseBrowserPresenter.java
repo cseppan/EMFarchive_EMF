@@ -31,16 +31,16 @@ public class CaseBrowserPresenter implements RefreshObserver {
         service().removeCase(caseObj);
     }
 
-    public void doAdd(Case caseObj) throws EmfException {
-        service().addCase(caseObj);
-    }
-
     public void doRefresh() throws EmfException {
         view.refresh(service().getCases());
     }
 
-    
     public void doClose() {
         view.close();
+    }
+
+    public void doNew(NewCaseView view) {
+        NewCasePresenter presenter = new NewCasePresenter(session, view);
+        presenter.doDisplay();
     }
 }

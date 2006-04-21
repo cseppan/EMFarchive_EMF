@@ -59,8 +59,8 @@ public class CasesTableDataTest extends TestCase {
         assertEquals(String.class, data.getColumnClass(0));
         assertEquals(String.class, data.getColumnClass(1));
         assertEquals(String.class, data.getColumnClass(2));
-        assertEquals(Integer.class, data.getColumnClass(3));
-        assertEquals(Integer.class, data.getColumnClass(4));
+        assertEquals(String.class, data.getColumnClass(3));
+        assertEquals(String.class, data.getColumnClass(4));
         assertEquals(Date.class, data.getColumnClass(5));
         assertEquals(String.class, data.getColumnClass(6));
     }
@@ -88,8 +88,8 @@ public class CasesTableDataTest extends TestCase {
         assertEquals("name1", row.getValueAt(0));
         assertEquals("category1", row.getValueAt(1));
         assertEquals("region1", row.getValueAt(2));
-        assertEquals(new Integer(2003), row.getValueAt(3));
-        assertEquals(new Integer(2002), row.getValueAt(4));
+        assertEquals("2003", row.getValueAt(3));
+        assertEquals("2002", row.getValueAt(4));
         assertEquals(format(case1.getLastModifiedDate()), row.getValueAt(5));
         assertEquals(case1.getRunStatus(), row.getValueAt(6));
     }

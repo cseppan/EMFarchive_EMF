@@ -6,8 +6,4 @@ public interface NewDatasetTypeView extends ManagedView {
 
     void observe(NewDatasetTypePresenter presenter);
 
-    void display();
-
-    void close();
-
 }

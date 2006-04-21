@@ -22,9 +22,6 @@ public class CasesTableData extends AbstractTableData {
     }
 
     public Class getColumnClass(int col) {
-        if (col == 3 || col == 4)
-            return Integer.class;
-
         if (col == 5)
             return Date.class;
 
@@ -44,10 +41,8 @@ public class CasesTableData extends AbstractTableData {
 
         for (int i = 0; i < types.length; i++) {
             Case element = types[i];
-            Object[] values = { element.getName(), element.getCaseCategory().getName(), element.getRegion().getName(),
-                    toInteger(element.getEmissionsYear().getName()),
-                    toInteger(element.getMeteorlogicalYear().getName()), format(element.getLastModifiedDate()),
-                    element.getRunStatus() };
+            Object[] values = { element.getName(), caseCategory(element), region(element), emissionsYear(element),
+                    meteorlogicalYear(element), format(element.getLastModifiedDate()), element.getRunStatus() };
 
             Row row = new ViewableRow(element, values);
             rows.add(row);
@@ -56,8 +51,20 @@ public class CasesTableData extends AbstractTableData {
         return rows;
     }
 
-    private Integer toInteger(String val) {
-        return Integer.valueOf(val);
+    private String meteorlogicalYear(Case element) {
+        return element.getMeteorlogicalYear() != null ? element.getMeteorlogicalYear().getName() : "";
+    }
+
+    private String emissionsYear(Case element) {
+        return element.getEmissionsYear() != null ? element.getEmissionsYear().getName() : "";
+    }
+
+    private String region(Case element) {
+        return element.getRegion() != null ? element.getRegion().getName() : "N/A";
+    }
+
+    private String caseCategory(Case element) {
+        return element.getCaseCategory() != null ? element.getCaseCategory().getName() : "N/A";
     }
 
 }

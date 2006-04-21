@@ -138,7 +138,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
         Action createAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                createDatasetTypes();
+                createDatasetType();
             }
         };
         Button newButton = new Button("New", createAction);
@@ -177,8 +177,9 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
         }
     }
 
-    private void createDatasetTypes() {
-        presenter.displayNewDatasetTypeView(newTypeView());
+    private void createDatasetType() {
+        NewDatasetTypeWindow view = new NewDatasetTypeWindow(desktopManager);
+        presenter.displayNewDatasetTypeView(view);
     }
 
     private List selected() {
@@ -192,11 +193,6 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
 
     private EditableDatasetTypeView editableView() {
         EditableDatasetTypeWindow view = new EditableDatasetTypeWindow(parentConsole, desktopManager);
-        return view;
-    }
-
-    private NewDatasetTypeView newTypeView() {
-        NewDatasetTypeWindow view = new NewDatasetTypeWindow(desktopManager);
         return view;
     }
 
