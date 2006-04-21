@@ -140,7 +140,7 @@ public class CaseServiceTransport implements CaseService {
         return (Case) call.requestResponse(new Object[] { locked });
     }
 
-    public Case update(Case element) throws EmfException {
+    public Case updateCase(Case element) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("update");

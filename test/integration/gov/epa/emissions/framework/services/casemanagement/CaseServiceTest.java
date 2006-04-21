@@ -211,7 +211,7 @@ public class CaseServiceTest extends ServiceTestCase {
             Case locked = service.obtainLocked(owner, element);
             locked.setDescription("TEST case");
 
-            Case released = service.update(locked);
+            Case released = service.updateCase(locked);
             assertEquals("TEST case", released.getDescription());
             assertEquals(released.getLockOwner(), null);
             assertFalse("Lock should be released on update", released.isLocked());

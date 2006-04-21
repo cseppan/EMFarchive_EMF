@@ -178,7 +178,7 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
-    public Case update(Case element) throws EmfException {
+    public Case updateCase(Case element) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
 

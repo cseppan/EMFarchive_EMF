@@ -29,6 +29,6 @@ public interface CaseService {
 
     Case releaseLocked(Case locked) throws EmfException;
 
-    Case update(Case element) throws EmfException;
+    Case updateCase(Case element) throws EmfException;
 
 }
