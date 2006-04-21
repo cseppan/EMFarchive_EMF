@@ -37,7 +37,8 @@
         <mapping resource="gov/epa/emissions/framework/services/data/NoteType.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/editor/Revision.hbm.xml"/>
         <mapping resource="gov/epa/emissions/framework/services/data/QAStep.hbm.xml"/>
-
+		<mapping resource="gov/epa/emissions/framework/services/data/ControlMeasure.hbm.xml"/>
+		
 		<!-- Mappings : Case Management -->
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/Abbreviation.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/AirQualityModel.hbm.xml"/>

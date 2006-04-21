@@ -1,3 +1,6 @@
+--------------CoST Tables-----------------------------------------
+DROP TABLE emf.control_measures CASCADE;
+
 --------------------------- Case Management tables ----------------------------------------
 DROP TABLE emf.cases CASCADE;
 DROP TABLE emf.emissions_years CASCADE;
@@ -54,13 +57,13 @@ DROP TABLE emf.internal_sources CASCADE;
 -- emf internal and external sources
 --
 -- emf regions, projects and intended use
-DROP TABLE intended_uses CASCADE;
-DROP TABLE projects CASCADE;
-DROP TABLE regions CASCADE;
+DROP TABLE emf.intended_uses CASCADE;
+DROP TABLE emf.projects CASCADE;
+DROP TABLE emf.regions CASCADE;
 -- emf regions, projects and intended use
 --
 -- emf datasets_sectors
-DROP TABLE datasets_sectors CASCADE;
+DROP TABLE emf.datasets_sectors CASCADE;
 -- emf datasets_sectors
 --
 -- emf notes and note_types

@@ -28,6 +28,7 @@ import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
 import gov.epa.emissions.framework.services.casemanagement.Grid;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
+import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
@@ -87,6 +88,8 @@ public class EmfMappings extends Mappings {
         bean(call, ColumnMetaData.class, columnmetadata());
 
         bean(call, Case.class, caseObject());
+        
+        bean(call, ControlMeasure.class, controlMeasure());
     }
 
     private void registerArrays(Call call) {
@@ -132,6 +135,7 @@ public class EmfMappings extends Mappings {
         array(call, Grid[].class, grids());
         array(call, MeteorlogicalYear[].class, meteorlogicalYears());
         array(call, Speciation[].class, speciations());
+        array(call, ControlMeasure[].class, controlMeasures());
     }
 
     public QName logs() {
@@ -340,6 +344,14 @@ public class EmfMappings extends Mappings {
 
     public QName speciations() {
         return qname("Speciations");
+    }
+    
+    public QName controlMeasure() {
+        return qname("ControlMeasure");
+    }
+    
+    public QName controlMeasures() {
+        return qname("ControlMeasures");
     }
 
 }

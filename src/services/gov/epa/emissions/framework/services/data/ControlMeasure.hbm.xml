@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false"> 
+	<class name="gov.epa.emissions.framework.services.cost.ControlMeasure" table="control_measures" schema="emf">
+        <id name="id" type="integer" column="id">
+            <generator class="identity"/>
+        </id>
+          
+        <property name="name" column="name" type="java.lang.String" not-null="true"/>
+        <property name="description" column="description" type="java.lang.String" not-null="false"/>
+        <property name="deviceCode" column="device_code" type="integer" not-null="true"/>
+        <property name="equipmentLife" column="equipment_life" type="float" not-null="false"/>
+        <property name="majorPollutant" column="major_pollutant" type="java.lang.String" not-null="false"/>
+        <property name="ruleEffectiveness" column="rule_effectiveness" type="float" not-null="false"/>
+        <property name="rulePenetration" column="rule_penetration" type="float" not-null="false"/>
+        <property name="annualizedCost" column="annualized_cost" type="float" not-null="false"/>
+        
+        <many-to-one cascade="save-update"
+            name="creator" 
+            class="gov.epa.emissions.commons.security.User"
+            column="creator"/> 
+    </class>
+</hibernate-mapping>  
+

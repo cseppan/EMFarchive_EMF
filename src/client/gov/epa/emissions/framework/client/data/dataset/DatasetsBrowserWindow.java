@@ -61,7 +61,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
             throws EmfException {
-        super("Datasets Browser", new Dimension(850, 450), desktopManager);
+        super("Datasets Manager", new Dimension(850, 450), desktopManager);
         super.setName("datasetsBrowser");
         this.session = session;
         this.parentConsole = parentConsole;
