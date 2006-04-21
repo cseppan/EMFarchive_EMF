@@ -3,8 +3,8 @@ package gov.epa.emissions.framework.client.console;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.admin.UsersManagerPresenter;
 import gov.epa.emissions.framework.client.admin.UsersManagerView;
-import gov.epa.emissions.framework.client.casemanagement.CaseBrowserPresenter;
-import gov.epa.emissions.framework.client.casemanagement.CaseBrowserView;
+import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenterImpl;
+import gov.epa.emissions.framework.client.casemanagement.CaseManagerView;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserPresenter;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerPresenter;
@@ -48,8 +48,8 @@ public class ManageMenuPresenter {
         presenter.doDisplay();
     }
 
-    public void doDisplayCases(CaseBrowserView view) throws EmfException {
-        new CaseBrowserPresenter(session, view).display();
+    public void doDisplayCases(CaseManagerView view) throws EmfException {
+        new CaseManagerPresenterImpl(session, view).display();
     }
 
 }

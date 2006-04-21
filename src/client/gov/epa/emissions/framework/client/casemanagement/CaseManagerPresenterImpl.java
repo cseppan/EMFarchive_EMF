@@ -6,13 +6,13 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
-public class CaseBrowserPresenter implements RefreshObserver {
+public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPresenter {
 
-    private CaseBrowserView view;
+    private CaseManagerView view;
 
     private EmfSession session;
 
-    public CaseBrowserPresenter(EmfSession session, CaseBrowserView view) {
+    public CaseManagerPresenterImpl(EmfSession session, CaseManagerView view) {
         this.session = session;
         this.view = view;
     }
@@ -40,7 +40,7 @@ public class CaseBrowserPresenter implements RefreshObserver {
     }
 
     public void doNew(NewCaseView view) {
-        NewCasePresenter presenter = new NewCasePresenter(session, view);
+        NewCasePresenter presenter = new NewCasePresenter(session, view, this);
         presenter.doDisplay();
     }
 }

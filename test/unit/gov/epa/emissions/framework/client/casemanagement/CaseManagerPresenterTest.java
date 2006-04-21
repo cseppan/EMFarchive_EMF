@@ -9,10 +9,10 @@ import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import org.jmock.Mock;
 import org.jmock.core.constraint.IsInstanceOf;
 
-public class CaseBrowserPresenterTest extends EmfMockObjectTestCase {
+public class CaseManagerPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldDisplayBrowserOnDisplay() throws EmfException {
-        Mock browser = mock(CaseBrowserView.class);
+        Mock browser = mock(CaseManagerView.class);
         Case[] cases = new Case[0];
         expects(browser, 1, "display", eq(cases));
 
@@ -22,15 +22,15 @@ public class CaseBrowserPresenterTest extends EmfMockObjectTestCase {
         Mock session = mock(EmfSession.class);
         stub(session, "caseService", service.proxy());
 
-        CaseBrowserPresenter presenter = new CaseBrowserPresenter((EmfSession) session.proxy(),
-                (CaseBrowserView) browser.proxy());
+        CaseManagerPresenter presenter = new CaseManagerPresenterImpl((EmfSession) session.proxy(),
+                (CaseManagerView) browser.proxy());
         expects(browser, 1, "observe", same(presenter));
 
         presenter.display();
     }
 
     public void testShouldRefreshBrowserOnRefresh() throws EmfException {
-        Mock browser = mock(CaseBrowserView.class);
+        Mock browser = mock(CaseManagerView.class);
         Case[] cases = new Case[0];
         expects(browser, 1, "refresh", eq(cases));
 
@@ -40,14 +40,14 @@ public class CaseBrowserPresenterTest extends EmfMockObjectTestCase {
         Mock session = mock(EmfSession.class);
         stub(session, "caseService", service.proxy());
 
-        CaseBrowserPresenter presenter = new CaseBrowserPresenter((EmfSession) session.proxy(),
-                (CaseBrowserView) browser.proxy());
+        CaseManagerPresenterImpl presenter = new CaseManagerPresenterImpl((EmfSession) session.proxy(),
+                (CaseManagerView) browser.proxy());
 
         presenter.doRefresh();
     }
 
     public void testShouldRemoveCaseOnRemove() throws EmfException {
-        Mock browser = mock(CaseBrowserView.class);
+        Mock browser = mock(CaseManagerView.class);
 
         Mock service = mock(CaseService.class);
         Mock session = mock(EmfSession.class);
@@ -56,14 +56,14 @@ public class CaseBrowserPresenterTest extends EmfMockObjectTestCase {
         Case caseObj = new Case();
         expects(service, 1, "removeCase", same(caseObj));
 
-        CaseBrowserPresenter presenter = new CaseBrowserPresenter((EmfSession) session.proxy(),
-                (CaseBrowserView) browser.proxy());
+        CaseManagerPresenter presenter = new CaseManagerPresenterImpl((EmfSession) session.proxy(),
+                (CaseManagerView) browser.proxy());
 
         presenter.doRemove(caseObj);
     }
 
     public void testShouldDisplayNewCaseViewOnNew() {
-        CaseBrowserPresenter presenter = new CaseBrowserPresenter(null, null);
+        CaseManagerPresenter presenter = new CaseManagerPresenterImpl(null, null);
 
         Mock view = mock(NewCaseView.class);
         expects(view, 1, "display");
@@ -73,10 +73,10 @@ public class CaseBrowserPresenterTest extends EmfMockObjectTestCase {
     }
 
     public void testShouldCloseViewOnClose() {
-        Mock browser = mock(CaseBrowserView.class);
+        Mock browser = mock(CaseManagerView.class);
         expects(browser, 1, "close");
 
-        CaseBrowserPresenter presenter = new CaseBrowserPresenter(null, (CaseBrowserView) browser.proxy());
+        CaseManagerPresenter presenter = new CaseManagerPresenterImpl(null, (CaseManagerView) browser.proxy());
 
         presenter.doClose();
     }

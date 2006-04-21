@@ -30,9 +30,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class CaseBrowserWindow extends ReusableInteralFrame implements CaseBrowserView, RefreshObserver {
+public class CaseManagerWindow extends ReusableInteralFrame implements CaseManagerView, RefreshObserver {
 
-    private CaseBrowserPresenter presenter;
+    private CaseManagerPresenterImpl presenter;
 
     private SortFilterSelectModel selectModel;
 
@@ -44,9 +44,8 @@ public class CaseBrowserWindow extends ReusableInteralFrame implements CaseBrows
 
     private EmfConsole parentConsole;
 
-    public CaseBrowserWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Case Browser", new Dimension(700, 600), desktopManager);
-        super.setName("caseBrowser");
+    public CaseManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
+        super("Case Manager", new Dimension(700, 600), desktopManager);
 
         this.parentConsole = parentConsole;
 
@@ -54,7 +53,7 @@ public class CaseBrowserWindow extends ReusableInteralFrame implements CaseBrows
         this.getContentPane().add(layout);
     }
 
-    public void observe(CaseBrowserPresenter presenter) {
+    public void observe(CaseManagerPresenterImpl presenter) {
         this.presenter = presenter;
     }
 
@@ -129,17 +128,31 @@ public class CaseBrowserWindow extends ReusableInteralFrame implements CaseBrows
     private JPanel createCrudPanel() {
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
-        Action viewAction = new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                viewCases();
-            }
-        };
-
+        
         String message = "Opening too many windows. Do you want proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
-        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
-        crudPanel.add(viewButton);
 
+        crudPanel.add(viewButton(confirmDialog));
+        crudPanel.add(editButton(confirmDialog));
+
+        Button newButton = new Button("New", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                createNewCase();
+            }
+        });
+        crudPanel.add(newButton);
+
+        Button removeButton = new Button("Remove", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                removeSelectedCases();
+            }
+        });
+        crudPanel.add(removeButton);
+
+        return crudPanel;
+    }
+
+    private SelectAwareButton editButton(ConfirmDialog confirmDialog) {
         Action editAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 editCases();
@@ -147,25 +160,18 @@ public class CaseBrowserWindow extends ReusableInteralFrame implements CaseBrows
 
         };
         SelectAwareButton editButton = new SelectAwareButton("Edit", editAction, selectModel, confirmDialog);
-        crudPanel.add(editButton);
+        return editButton;
+    }
 
-        JButton newButton = new JButton("New");
-        newButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                createNewCase();
+    private SelectAwareButton viewButton(ConfirmDialog confirmDialog) {
+        Action viewAction = new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                viewCases();
             }
-        });
-        crudPanel.add(newButton);
+        };
 
-        JButton removeButton = new JButton("Remove");
-        newButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                removeSelectedCases();
-            }
-        });
-        crudPanel.add(removeButton);
-
-        return crudPanel;
+        SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
+        return viewButton;
     }
 
     private void viewCases() {// TODO
@@ -184,6 +190,7 @@ public class CaseBrowserWindow extends ReusableInteralFrame implements CaseBrows
             Case element = (Case) iter.next();
             try {
                 presenter.doRemove(element);
+                doRefresh();
             } catch (EmfException e) {
                 messagePanel.setError("Could not remove " + element + "." + e.getMessage());
             }

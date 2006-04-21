@@ -8,8 +8,8 @@ import gov.epa.emissions.framework.client.admin.UpdateUserPresenterImpl;
 import gov.epa.emissions.framework.client.admin.UsersManager;
 import gov.epa.emissions.framework.client.admin.UsersManagerView;
 import gov.epa.emissions.framework.client.admin.ViewMyProfileWindow;
-import gov.epa.emissions.framework.client.casemanagement.CaseBrowserView;
-import gov.epa.emissions.framework.client.casemanagement.CaseBrowserWindow;
+import gov.epa.emissions.framework.client.casemanagement.CaseManagerView;
+import gov.epa.emissions.framework.client.casemanagement.CaseManagerWindow;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerView;
@@ -46,10 +46,10 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         this.parent = parent;
 
         super.add(createDatasets(parent, messagePanel));
+        super.add(createCases(parent, messagePanel));
+        super.addSeparator();
         super.add(createDatasetTypes(parent, messagePanel));
         super.add(createSectors(parent, messagePanel));
-        super.addSeparator();
-        super.add(createCases(parent, messagePanel));
         super.addSeparator();
 
         manageUsers(session.user(), messagePanel);
@@ -195,7 +195,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
     }
 
     private void doManageCases(final EmfConsole parent, final MessagePanel messagePanel) {
-        CaseBrowserView view = new CaseBrowserWindow(parent, desktopManager);
+        CaseManagerView view = new CaseManagerWindow(parent, desktopManager);
         try {
             presenter.doDisplayCases(view);
         } catch (EmfException e) {

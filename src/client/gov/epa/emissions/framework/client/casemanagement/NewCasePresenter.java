@@ -10,9 +10,12 @@ public class NewCasePresenter {
 
     private EmfSession session;
 
-    public NewCasePresenter(EmfSession session, NewCaseView view) {
+    private CaseManagerPresenter managerPresenter;
+
+    public NewCasePresenter(EmfSession session, NewCaseView view, CaseManagerPresenter managerPresenter) {
         this.session = session;
         this.view = view;
+        this.managerPresenter = managerPresenter;
     }
 
     public void doDisplay() {
@@ -29,8 +32,22 @@ public class NewCasePresenter {
     }
 
     public void doSave(Case newCase) throws EmfException {
+        if (isDuplicate(newCase))
+            throw new EmfException("Duplicate name - '" + newCase.getName() + "'.");
+
         service().addCase(newCase);
         closeView();
+        managerPresenter.doRefresh();
+    }
+
+    private boolean isDuplicate(Case newCase) throws EmfException {
+        Case[] cases = service().getCases();
+        for (int i = 0; i < cases.length; i++) {
+            if (cases[i].getName().equals(newCase.getName()))
+                return true;
+        }
+
+        return false;
     }
 
     private CaseService service() {

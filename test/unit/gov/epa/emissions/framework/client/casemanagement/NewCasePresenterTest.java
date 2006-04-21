@@ -14,7 +14,7 @@ public class NewCasePresenterTest extends EmfMockObjectTestCase {
         Mock view = mock(NewCaseView.class);
         expects(view, 1, "display");
 
-        NewCasePresenter p = new NewCasePresenter(null, (NewCaseView) view.proxy());
+        NewCasePresenter p = new NewCasePresenter(null, (NewCaseView) view.proxy(), null);
         expects(view, 1, "observe", same(p));
 
         p.doDisplay();
@@ -24,7 +24,7 @@ public class NewCasePresenterTest extends EmfMockObjectTestCase {
         Mock view = mock(NewCaseView.class);
         expects(view, 1, "close");
 
-        NewCasePresenter p = new NewCasePresenter(null, (NewCaseView) view.proxy());
+        NewCasePresenter p = new NewCasePresenter(null, (NewCaseView) view.proxy(), null);
 
         p.doClose();
     }
@@ -36,12 +36,40 @@ public class NewCasePresenterTest extends EmfMockObjectTestCase {
         Mock service = mock(CaseService.class);
         Case newCase = new Case();
         expects(service, 1, "addCase", same(newCase));
+        stub(service, "getCases", new Case[0]);
 
         Mock session = mock(EmfSession.class);
         stub(session, "caseService", service.proxy());
 
-        NewCasePresenter p = new NewCasePresenter((EmfSession) session.proxy(), (NewCaseView) view.proxy());
+        Mock managerPresenter = mock(CaseManagerPresenter.class);
+        expects(managerPresenter, 1, "doRefresh");
+
+        NewCasePresenter p = new NewCasePresenter((EmfSession) session.proxy(), (NewCaseView) view.proxy(),
+                (CaseManagerPresenter) managerPresenter.proxy());
 
         p.doSave(newCase);
+    }
+
+    public void testShouldRaiseErrorIfDuplicateCaseNameOnSave() {
+        Mock view = mock(NewCaseView.class);
+
+        Mock service = mock(CaseService.class);
+        Case newCase = new Case("test-case");
+        Case[] cases = new Case[] { new Case("test-case") };
+        stub(service, "getCases", cases);
+
+        Mock session = mock(EmfSession.class);
+        stub(session, "caseService", service.proxy());
+
+        NewCasePresenter p = new NewCasePresenter((EmfSession) session.proxy(), (NewCaseView) view.proxy(), null);
+
+        try {
+            p.doSave(newCase);
+        } catch (EmfException e) {
+            assertEquals("Duplicate name - 'test-case'.", e.getMessage());
+            return;
+        }
+
+        fail("Should have raised an error if name is duplicate");
     }
 }

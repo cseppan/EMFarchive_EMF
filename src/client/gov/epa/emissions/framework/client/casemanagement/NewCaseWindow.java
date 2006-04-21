@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -62,13 +63,14 @@ public class NewCaseWindow extends DisposableInteralFrame implements NewCaseView
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        name = new TextField("name", 40);
+        name = new TextField("name", 30);
         addChangeable(name);
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
-        description = new TextArea("Description", "", 40, 3);
+        description = new TextArea("Description", "", 30, 4);
         addChangeable(description);
-        layoutGenerator.addLabelWidgetPair("Description:", description, panel);
+        layoutGenerator.addLabelWidgetPair("Description:",
+                ScrollableComponent.createWithVerticalScrollBar(description), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
