@@ -49,6 +49,9 @@
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/Speciation.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/Case.hbm.xml"/>
 
+		<!-- Mappings : CoST -->
+	   	<mapping resource="gov/epa/emissions/framework/services/cost/ControlStrategy.hbm.xml"/>
+	
     </session-factory>
     
 </hibernate-configuration>

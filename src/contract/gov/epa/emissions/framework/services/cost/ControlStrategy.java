@@ -1,0 +1,206 @@
+package gov.epa.emissions.framework.services.cost;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import gov.epa.emissions.commons.data.Dataset;
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Lockable;
+import gov.epa.emissions.commons.data.Mutex;
+import gov.epa.emissions.commons.data.Project;
+import gov.epa.emissions.commons.data.Region;
+import gov.epa.emissions.commons.security.User;
+
+public class ControlStrategy implements Lockable {
+
+    private int id;
+
+    private String name;
+
+    private String description;
+
+    private Region region;
+
+    private Project project;
+
+    private double discountRate;
+
+    private int costYear;
+
+    private int analysisYear;
+
+    private User creator;
+
+    private Date lastModifiedDate;
+
+    private DatasetType datasetType;
+
+    private List datasetsList;
+
+    private String majorPollutant;
+
+    private double majorPollutantControlEfficiency;
+
+    private int analysisType;
+
+    private Mutex lock;
+
+    public ControlStrategy() {
+        this.lock = new Mutex();
+    }
+
+    public ControlStrategy(String name) {
+        this();
+        this.name = name;
+    }
+
+    public int getAnalysisType() {
+        return analysisType;
+    }
+
+    public void setAnalysisType(int analysisType) {
+        this.analysisType = analysisType;
+    }
+
+    public int getAnalysisYear() {
+        return analysisYear;
+    }
+
+    public void setAnalysisYear(int analysisYear) {
+        this.analysisYear = analysisYear;
+    }
+
+    public int getCostYear() {
+        return costYear;
+    }
+
+    public void setCostYear(int costYear) {
+        this.costYear = costYear;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    public Dataset[] getDatasets() {
+        return (Dataset[]) datasetsList.toArray(new Dataset[0]);
+    }
+
+    public void setDatasets(Dataset[] datasets) {
+        this.datasetsList = Arrays.asList(datasets);
+    }
+
+    public DatasetType getDatasetType() {
+        return datasetType;
+    }
+
+    public void setDatasetType(DatasetType datasetType) {
+        this.datasetType = datasetType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public double getDiscountRate() {
+        return discountRate;
+    }
+
+    public void setDiscountRate(double discountRate) {
+        this.discountRate = discountRate;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public String getMajorPollutant() {
+        return majorPollutant;
+    }
+
+    public void setMajorPollutant(String majorPollutant) {
+        this.majorPollutant = majorPollutant;
+    }
+
+    public double getMajorPollutantControlEfficiency() {
+        return majorPollutantControlEfficiency;
+    }
+
+    public void setMajorPollutantControlEfficiency(double majorPollutantControlEfficiency) {
+        this.majorPollutantControlEfficiency = majorPollutantControlEfficiency;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
+    public Date getLockDate() {
+        return lock.getLockDate();
+    }
+
+    public void setLockDate(Date lockDate) {
+        lock.setLockDate(lockDate);
+    }
+
+    public String getLockOwner() {
+        return lock.getLockOwner();
+    }
+
+    public void setLockOwner(String owner) {
+        lock.setLockOwner(owner);
+    }
+
+    public boolean isLocked(String owner) {
+        return lock.isLocked(owner);
+    }
+
+    public boolean isLocked(User owner) {
+        return lock.isLocked(owner);
+    }
+
+    public boolean isLocked() {
+        return lock.isLocked();
+    }
+
+}

@@ -31,12 +31,12 @@ public class ControlMeasure implements Lockable {
     private Mutex lock;
     
     public ControlMeasure() {
-        super();
+        this.lock = new Mutex();
     }
     
     public ControlMeasure(String name) {
+        this();
         this.name = name;
-        this.lock = new Mutex();
     }
     
     public float getAnnualizedCost() {

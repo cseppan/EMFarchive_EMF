@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false"> 
+  <class name="gov.epa.emissions.framework.services.cost.ControlStrategy" table="control_strategies" schema="emf"> 
+ 	<id name="id" type="integer" column="id">
+	  <generator class="identity"/>
+ 	</id>
+	<property name="name"	column="name"	type="java.lang.String"	not-null="true"/>
+	<property name="description"	column="description"	type="java.lang.String"/>
+	
+	<many-to-one cascade="save-update"
+            name="region" 
+            class="gov.epa.emissions.commons.data.Region"
+            column="region_id"/> 
+            
+	<many-to-one cascade="save-update"
+            name="project" 
+            class="gov.epa.emissions.commons.data.Project"
+            column="project_id"/> 
+
+	<property name="discountRate"	column="discount_rate"	type="java.lang.Double"/>
+	<property name="costYear"	column="cost_year"	type="java.lang.Integer"/>
+	<property name="analysisYear"	column="analysis_year"	type="java.lang.Integer"/>
+		
+	 <many-to-one
+            name="creator" 
+            class="gov.epa.emissions.commons.security.User"
+            column="creator_id"/> 
+            
+  	<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
+<!--  	
+  	<array name="datasets" table="datasets_control_strategies" cascade="save-update">
+    	<key column="dataset_id" not-null="true"/>
+	    <list-index column="list_index"/>
+    	<many-to-many class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>
+	</array>
+-->
+	<many-to-one cascade="save-update"
+            name="datasetType" 
+            class="gov.epa.emissions.commons.data.DatasetType"
+            column="dataset_type_id"/> 
+
+	<property name="majorPollutant"	column="major_pollutant"	type="java.lang.String"/>
+	<property name="majorPollutantControlEfficiency"	column="major_pollutant_control_efficiency"	type="java.lang.Double"/>
+	<property name="analysisType"	column="analysis_type"	type="java.lang.Integer"/>
+	
+	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
+  	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
+
+  </class> 
+</hibernate-mapping>  
