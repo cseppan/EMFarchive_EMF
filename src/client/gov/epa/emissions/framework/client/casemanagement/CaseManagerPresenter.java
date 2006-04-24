@@ -5,14 +5,14 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 
 public interface CaseManagerPresenter {
 
-    public abstract void display() throws EmfException;
+    void display() throws EmfException;
 
-    public abstract void doRemove(Case caseObj) throws EmfException;
+    void doRemove(Case caseObj) throws EmfException;
 
-    public abstract void doRefresh() throws EmfException;
+    void doRefresh() throws EmfException;
 
-    public abstract void doClose();
+    void doClose();
 
-    public abstract void doNew(NewCaseView view);
+    void doNew(NewCaseView view);
 
 }

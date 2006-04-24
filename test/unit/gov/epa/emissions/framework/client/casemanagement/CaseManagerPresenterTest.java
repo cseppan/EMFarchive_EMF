@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.casemanagement;
 
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
@@ -68,8 +69,17 @@ public class CaseManagerPresenterTest extends EmfMockObjectTestCase {
         Mock view = mock(NewCaseView.class);
         expects(view, 1, "display");
         expects(view, 1, "observe", new IsInstanceOf(NewCasePresenter.class));
-        
+
         presenter.doNew((NewCaseView) view.proxy());
+    }
+
+    public void testShouldDisplayCaseEditorOnEdit() throws EmfException {
+        CaseManagerPresenterImpl presenter = new CaseManagerPresenterImpl(null, null);
+
+        Mock editorPresenter = mock(CaseEditorPresenter.class);
+        expects(editorPresenter, 1, "doDisplay");
+
+        presenter.displayEditor((CaseEditorPresenter) editorPresenter.proxy());
     }
 
     public void testShouldCloseViewOnClose() {

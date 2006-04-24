@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenter;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorPresenterImpl;
 import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditorView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -25,7 +26,7 @@ public class CaseEditorPresenterTest extends EmfMockObjectTestCase {
         stub(session, "user", new User());
         expects(service, 1, "obtainLocked", caseObj.proxy());
 
-        CaseEditorPresenter p = new CaseEditorPresenter((Case) caseObj.proxy(), (EmfSession) session.proxy(),
+        CaseEditorPresenter p = new CaseEditorPresenterImpl((Case) caseObj.proxy(), (EmfSession) session.proxy(),
                 (CaseEditorView) view.proxy(), null);
         expects(view, 1, "observe", same(p));
 
@@ -41,7 +42,7 @@ public class CaseEditorPresenterTest extends EmfMockObjectTestCase {
         stub(session, "caseService", service.proxy());
         expects(service, 1, "releaseLocked");
 
-        CaseEditorPresenter p = new CaseEditorPresenter(null, (EmfSession) session.proxy(), (CaseEditorView) view.proxy(),
+        CaseEditorPresenter p = new CaseEditorPresenterImpl(null, (EmfSession) session.proxy(), (CaseEditorView) view.proxy(),
                 null);
 
         p.doClose();
@@ -62,7 +63,7 @@ public class CaseEditorPresenterTest extends EmfMockObjectTestCase {
         Mock managerPresenter = mock(CaseManagerPresenter.class);
         expects(managerPresenter, 1, "doRefresh");
 
-        CaseEditorPresenter p = new CaseEditorPresenter(caseObj, (EmfSession) session.proxy(), (CaseEditorView) view.proxy(),
+        CaseEditorPresenter p = new CaseEditorPresenterImpl(caseObj, (EmfSession) session.proxy(), (CaseEditorView) view.proxy(),
                 (CaseManagerPresenter) managerPresenter.proxy());
 
         p.doSave();
@@ -77,7 +78,7 @@ public class CaseEditorPresenterTest extends EmfMockObjectTestCase {
         Mock session = mock(EmfSession.class);
         stub(session, "caseService", service.proxy());
 
-        CaseEditorPresenter p = new CaseEditorPresenter(caseObj, (EmfSession) session.proxy(), null, null);
+        CaseEditorPresenter p = new CaseEditorPresenterImpl(caseObj, (EmfSession) session.proxy(), null, null);
 
         try {
             p.doSave();
