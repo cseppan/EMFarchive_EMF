@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
-import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.ui.InfoDialog;
@@ -33,7 +32,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
     private EmfSession session;
 
-    public CaseEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
+    public CaseEditor(EmfSession session, DesktopManager desktopManager) {
         super("Case Editor", new Dimension(700, 510), desktopManager);
         this.session = session;
         this.desktopManager = desktopManager;

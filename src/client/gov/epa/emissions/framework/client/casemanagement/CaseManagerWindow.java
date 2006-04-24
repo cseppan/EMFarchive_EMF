@@ -5,7 +5,9 @@ import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
+import gov.epa.emissions.framework.client.casemanagement.editor.CaseEditor;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -44,9 +46,14 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
     private EmfConsole parentConsole;
 
-    public CaseManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
+    private List cases;
+
+    private EmfSession session;
+
+    public CaseManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Case Manager", new Dimension(700, 600), desktopManager);
 
+        this.session = session;
         this.parentConsole = parentConsole;
 
         layout = new JPanel();
@@ -128,7 +135,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private JPanel createCrudPanel() {
         JPanel crudPanel = new JPanel();
         crudPanel.setLayout(new FlowLayout());
-        
+
         String message = "Opening too many windows. Do you want proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
 
@@ -177,7 +184,22 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private void viewCases() {// TODO
     }
 
-    private void editCases() {// TODO
+    private void editCases() {
+        cases = selected();
+        if (cases.isEmpty()) {
+            messagePanel.setMessage("Please select one or more Cases");
+            return;
+        }
+
+        for (Iterator iter = cases.iterator(); iter.hasNext();) {
+            Case caseObj = (Case) iter.next();
+            CaseEditor view = new CaseEditor(session, desktopManager);
+            try {
+                presenter.doEdit(view, caseObj);
+            } catch (EmfException e) {
+                showError(e.getMessage());
+            }
+        }
     }
 
     private void createNewCase() {
@@ -192,9 +214,13 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
                 presenter.doRemove(element);
                 doRefresh();
             } catch (EmfException e) {
-                messagePanel.setError("Could not remove " + element + "." + e.getMessage());
+                showError("Could not remove " + element + "." + e.getMessage());
             }
         }
+    }
+
+    private void showError(String message) {
+        messagePanel.setError(message);
     }
 
     private List selected() {

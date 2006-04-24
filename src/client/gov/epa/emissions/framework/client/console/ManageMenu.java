@@ -195,7 +195,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
     }
 
     private void doManageCases(final EmfConsole parent, final MessagePanel messagePanel) {
-        CaseManagerView view = new CaseManagerWindow(parent, desktopManager);
+        CaseManagerView view = new CaseManagerWindow(session, parent, desktopManager);
         try {
             presenter.doDisplayCases(view);
         } catch (EmfException e) {
