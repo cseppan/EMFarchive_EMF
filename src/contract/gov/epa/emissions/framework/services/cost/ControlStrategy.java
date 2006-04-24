@@ -1,9 +1,5 @@
 package gov.epa.emissions.framework.services.cost;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Lockable;
@@ -11,6 +7,11 @@ import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 public class ControlStrategy implements Lockable {
 
@@ -48,11 +49,23 @@ public class ControlStrategy implements Lockable {
 
     public ControlStrategy() {
         this.lock = new Mutex();
+        this.datasetsList = new ArrayList();
     }
 
     public ControlStrategy(String name) {
         this();
         this.name = name;
+    }
+
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof ControlStrategy))
+            return false;
+
+        return ((ControlStrategy) other).name.equals(this.name);
+    }
+
+    public int hashCode() {
+        return name.hashCode();
     }
 
     public int getAnalysisType() {

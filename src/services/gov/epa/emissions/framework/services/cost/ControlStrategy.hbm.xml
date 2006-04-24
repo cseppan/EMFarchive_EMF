@@ -31,13 +31,13 @@
             column="creator_id"/> 
             
   	<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
-<!--  	
+
   	<array name="datasets" table="datasets_control_strategies" cascade="save-update">
-    	<key column="dataset_id" not-null="true"/>
+    	<key column="control_strategy_id" not-null="true"/>
 	    <list-index column="list_index"/>
     	<many-to-many class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>
 	</array>
--->
+		
 	<many-to-one cascade="save-update"
             name="datasetType" 
             class="gov.epa.emissions.commons.data.DatasetType"
