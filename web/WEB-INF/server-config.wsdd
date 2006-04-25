@@ -130,7 +130,7 @@
 		<parameter name="allowedMethods" value="*"/>
 		<parameter name="scope" value="session"/>
 		<parameter name="className"
-			value="gov.epa.emissions.framework.services.cost.ControlStrategyService"/>
+			value="gov.epa.emissions.framework.services.cost.ControlStrategyServiceImpl"/>
 	</service>
 	
 	<!-- Structs (Java Beans-style)-->
@@ -245,7 +245,6 @@
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasure"
 		qname="ns1:ControlMeasure" xmlns:ns1="urn:gov.epa.services.CostService"/>
-		
 	
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlStrategy"

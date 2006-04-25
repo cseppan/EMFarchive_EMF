@@ -1,12 +1,12 @@
 package gov.epa.emissions.framework.services.cost;
 
-import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +61,8 @@ public class ControlStrategy implements Lockable {
         if (other == null || !(other instanceof ControlStrategy))
             return false;
 
-        return ((ControlStrategy) other).name.equals(this.name);
+        final ControlStrategy controlStrategy = (ControlStrategy) other;
+        return controlStrategy.name.equals(this.name);
     }
 
     public int hashCode() {
@@ -100,11 +101,11 @@ public class ControlStrategy implements Lockable {
         this.creator = creator;
     }
 
-    public Dataset[] getDatasets() {
-        return (Dataset[]) datasetsList.toArray(new Dataset[0]);
+    public EmfDataset[] getDatasets() {
+        return (EmfDataset[]) datasetsList.toArray(new EmfDataset[0]);
     }
 
-    public void setDatasets(Dataset[] datasets) {
+    public void setDatasets(EmfDataset[] datasets) {
         this.datasetsList = Arrays.asList(datasets);
     }
 

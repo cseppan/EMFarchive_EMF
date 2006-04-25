@@ -5,13 +5,13 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 
-public class ControlStrategyTransport implements ControlStrategyService {
+public class ControlStrategyServiceTransport implements ControlStrategyService {
 
     private CallFactory callFactory;
 
     private EmfMappings mappings;
 
-    public ControlStrategyTransport(String endpoint) {
+    public ControlStrategyServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
         mappings = new EmfMappings();
     }
@@ -33,7 +33,6 @@ public class ControlStrategyTransport implements ControlStrategyService {
         EmfCall call = call();
 
         call.setOperation("addControlStrategy");
-        call.setReturnType(mappings.controlStrategy());
         call.addParam("element", mappings.controlStrategy());
         call.setVoidReturnType();
 
@@ -46,7 +45,7 @@ public class ControlStrategyTransport implements ControlStrategyService {
         call.setOperation("obtainLocked");
         call.addParam("owner", mappings.user());
         call.addParam("element", mappings.controlStrategy());
-        call.setReturnType(mappings.controlStrategies());
+        call.setReturnType(mappings.controlStrategy());
 
         return (ControlStrategy) call.requestResponse(new Object[] { owner, element });
 

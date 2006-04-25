@@ -39,8 +39,10 @@ public class EmfCall {
         try {
             call.invoke(params);
         } catch (AxisFault fault) {
+            fault.printStackTrace();
             throw new EmfServiceException(fault);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException("Unable to connect to " + service);
         } finally {
             call.removeAllParameters();

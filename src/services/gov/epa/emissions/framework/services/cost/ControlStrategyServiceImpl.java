@@ -40,9 +40,11 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
     public void addControlStrategy(ControlStrategy element) throws EmfException {
         try {
+            System.out.println("addControl Strategy start..");
             Session session = sessionFactory.getSession();
             dao.add(element, session);
             session.close();
+            System.out.println("addControl Strategy end.");
         } catch (RuntimeException e) {
             LOG.error("Could not add Control Strategy: " + element, e);
             throw new EmfException("Could not add Control Strategy: " + element);
