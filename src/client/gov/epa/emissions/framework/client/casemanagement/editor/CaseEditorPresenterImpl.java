@@ -75,7 +75,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     private boolean isDuplicate(Case newCase) throws EmfException {
         Case[] cases = service().getCases();
         for (int i = 0; i < cases.length; i++) {
-            if (cases[i].getName().equals(newCase.getName()))
+            if (cases[i].getName().equals(newCase.getName()) && cases[i].getId() != newCase.getId())
                 return true;
         }
 
@@ -87,7 +87,8 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     }
 
     public void set(EditableCaseSummaryTabView summaryView) {
-        EditableCaseSummaryTabPresenterImpl summaryPresenter = new EditableCaseSummaryTabPresenterImpl(caseObj, summaryView);
+        EditableCaseSummaryTabPresenterImpl summaryPresenter = new EditableCaseSummaryTabPresenterImpl(caseObj,
+                summaryView);
         presenters.add(summaryPresenter);
     }
 

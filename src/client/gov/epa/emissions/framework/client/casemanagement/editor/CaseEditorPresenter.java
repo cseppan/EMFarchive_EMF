@@ -4,12 +4,12 @@ import gov.epa.emissions.framework.services.EmfException;
 
 public interface CaseEditorPresenter {
 
-    public abstract void doDisplay() throws EmfException;
+    void doDisplay() throws EmfException;
 
-    public abstract void doClose() throws EmfException;
+    void doClose() throws EmfException;
 
-    public abstract void doSave() throws EmfException;
+    void doSave() throws EmfException;
 
-    public abstract void set(EditableCaseSummaryTabView summaryView);
+    void set(EditableCaseSummaryTabView summaryView);
 
 }

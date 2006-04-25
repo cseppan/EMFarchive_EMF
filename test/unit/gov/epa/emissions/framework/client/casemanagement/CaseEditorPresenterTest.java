@@ -42,8 +42,8 @@ public class CaseEditorPresenterTest extends EmfMockObjectTestCase {
         stub(session, "caseService", service.proxy());
         expects(service, 1, "releaseLocked");
 
-        CaseEditorPresenter p = new CaseEditorPresenterImpl(null, (EmfSession) session.proxy(), (CaseEditorView) view.proxy(),
-                null);
+        CaseEditorPresenter p = new CaseEditorPresenterImpl(null, (EmfSession) session.proxy(), (CaseEditorView) view
+                .proxy(), null);
 
         p.doClose();
     }
@@ -53,7 +53,7 @@ public class CaseEditorPresenterTest extends EmfMockObjectTestCase {
         expects(view, 1, "close");
 
         Mock service = mock(CaseService.class);
-        Case caseObj = new Case();
+        Case caseObj = new Case("name");
         expects(service, 1, "updateCase", same(caseObj));
         stub(service, "getCases", new Case[0]);
 
@@ -63,16 +63,20 @@ public class CaseEditorPresenterTest extends EmfMockObjectTestCase {
         Mock managerPresenter = mock(CaseManagerPresenter.class);
         expects(managerPresenter, 1, "doRefresh");
 
-        CaseEditorPresenter p = new CaseEditorPresenterImpl(caseObj, (EmfSession) session.proxy(), (CaseEditorView) view.proxy(),
-                (CaseManagerPresenter) managerPresenter.proxy());
+        CaseEditorPresenter p = new CaseEditorPresenterImpl(caseObj, (EmfSession) session.proxy(),
+                (CaseEditorView) view.proxy(), (CaseManagerPresenter) managerPresenter.proxy());
 
         p.doSave();
     }
 
     public void testShouldRaiseErrorIfDuplicateCaseNameOnSave() {
         Mock service = mock(CaseService.class);
-        Case caseObj = new Case("test-case");
-        Case[] cases = new Case[] { new Case("test-case") };
+        
+        Case duplicateCase = new Case("case2");
+        duplicateCase.setId(1243);
+        Case caseObj = new Case("case2");
+        caseObj.setId(9324);
+        Case[] cases = new Case[] { new Case("case1"), duplicateCase, caseObj };
         stub(service, "getCases", cases);
 
         Mock session = mock(EmfSession.class);
@@ -83,7 +87,7 @@ public class CaseEditorPresenterTest extends EmfMockObjectTestCase {
         try {
             p.doSave();
         } catch (EmfException e) {
-            assertEquals("Duplicate name - 'test-case'.", e.getMessage());
+            assertEquals("Duplicate name - 'case2'.", e.getMessage());
             return;
         }
 

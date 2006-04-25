@@ -5,6 +5,8 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 
+import java.util.Date;
+
 public class NewCasePresenter {
     private NewCaseView view;
 
@@ -35,6 +37,9 @@ public class NewCasePresenter {
         if (isDuplicate(newCase))
             throw new EmfException("Duplicate name - '" + newCase.getName() + "'.");
 
+        newCase.setCreator(session.user());
+        newCase.setLastModifiedDate(new Date());
+        
         service().addCase(newCase);
         closeView();
         managerPresenter.doRefresh();

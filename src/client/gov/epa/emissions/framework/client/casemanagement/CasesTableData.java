@@ -60,11 +60,11 @@ public class CasesTableData extends AbstractTableData {
     }
 
     private String region(Case element) {
-        return element.getRegion() != null ? element.getRegion().getName() : "N/A";
+        return element.getRegion() != null ? element.getRegion().getName() : "";
     }
 
     private String caseCategory(Case element) {
-        return element.getCaseCategory() != null ? element.getCaseCategory().getName() : "N/A";
+        return element.getCaseCategory() != null ? element.getCaseCategory().getName() : "";
     }
 
 }

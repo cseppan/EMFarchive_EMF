@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
@@ -40,6 +41,8 @@ public class NewCasePresenterTest extends EmfMockObjectTestCase {
 
         Mock session = mock(EmfSession.class);
         stub(session, "caseService", service.proxy());
+        User user = new User();
+        stub(session, "user", user);
 
         Mock managerPresenter = mock(CaseManagerPresenter.class);
         expects(managerPresenter, 1, "doRefresh");
@@ -48,6 +51,9 @@ public class NewCasePresenterTest extends EmfMockObjectTestCase {
                 (CaseManagerPresenter) managerPresenter.proxy());
 
         p.doSave(newCase);
+        
+        assertSame(user , newCase.getCreator());
+        assertNotNull(newCase.getLastModifiedDate());
     }
 
     public void testShouldRaiseErrorIfDuplicateCaseNameOnSave() {
