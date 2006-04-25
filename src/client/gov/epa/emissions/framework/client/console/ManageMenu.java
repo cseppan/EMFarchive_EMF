@@ -10,6 +10,8 @@ import gov.epa.emissions.framework.client.admin.UsersManagerView;
 import gov.epa.emissions.framework.client.admin.ViewMyProfileWindow;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerView;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerWindow;
+import gov.epa.emissions.framework.client.cost.controlmeasure.ControlMeasuresManagerView;
+import gov.epa.emissions.framework.client.cost.controlmeasure.ControlMeasuresManagerWindow;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerView;
@@ -50,6 +52,9 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         super.addSeparator();
         super.add(createDatasetTypes(parent, messagePanel));
         super.add(createSectors(parent, messagePanel));
+        super.addSeparator();
+        super.add(createControlMeasures(parent, messagePanel));
+        super.add(createControlStrategies(parent, messagePanel));
         super.addSeparator();
 
         manageUsers(session.user(), messagePanel);
@@ -133,6 +138,30 @@ public class ManageMenu extends JMenu implements ManageMenuView {
 
         return menuItem;
     }
+    
+    private JMenuItem createControlMeasures(final EmfConsole parent, final MessagePanel messagePanel) {
+        JMenuItem menuItem = new JMenuItem("Control Measures");
+        menuItem.setName("controlMeasures");
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                doDisplayControlMeasures(parent, messagePanel);
+            }
+        });
+
+        return menuItem;
+    }
+    
+    private JMenuItem createControlStrategies(final EmfConsole parent, final MessagePanel messagePanel) {
+        JMenuItem menuItem = new JMenuItem("Control Strategies");
+        menuItem.setName("controlStrategies");
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                //TODO:
+            }
+        });
+
+        return menuItem;
+    }
 
     private void displayMyProfile(EmfSession session, MessagePanel messagePanel) {
         UpdateMyProfileWindow updatable = new UpdateMyProfileWindow(desktopManager);
@@ -198,6 +227,15 @@ public class ManageMenu extends JMenu implements ManageMenuView {
         CaseManagerView view = new CaseManagerWindow(session, parent, desktopManager);
         try {
             presenter.doDisplayCases(view);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+    
+    private void doDisplayControlMeasures(final EmfConsole parent, final MessagePanel messagePanel) {
+        try {
+            ControlMeasuresManagerView controlMeasuresManagerView = new ControlMeasuresManagerWindow(session, parent, desktopManager);
+            presenter.doDisplayControlMeasuresManager(controlMeasuresManagerView);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

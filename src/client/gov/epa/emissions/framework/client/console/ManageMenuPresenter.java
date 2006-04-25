@@ -5,6 +5,8 @@ import gov.epa.emissions.framework.client.admin.UsersManagerPresenter;
 import gov.epa.emissions.framework.client.admin.UsersManagerView;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenterImpl;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerView;
+import gov.epa.emissions.framework.client.cost.controlmeasure.ControlMeasuresManagerPresenter;
+import gov.epa.emissions.framework.client.cost.controlmeasure.ControlMeasuresManagerView;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserPresenter;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerPresenter;
@@ -50,6 +52,11 @@ public class ManageMenuPresenter {
 
     public void doDisplayCases(CaseManagerView view) throws EmfException {
         new CaseManagerPresenterImpl(session, view).display();
+    }
+    
+    public void doDisplayControlMeasuresManager(ControlMeasuresManagerView view) {
+        ControlMeasuresManagerPresenter presenter = new ControlMeasuresManagerPresenter(session);
+        presenter.doDisplay(view);
     }
 
 }
