@@ -15,6 +15,9 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.io.importer.TemporalResolution;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.data.IntendedUses;
+import gov.epa.emissions.framework.client.data.Projects;
+import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -299,13 +302,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         }
     }
 
-    private Project project(String projectName) {
-        for (int i = 0; i < allProjects.length; i++) {
-            if (projectName.equals(allProjects[i].getName())) {
-                return allProjects[i];
-            }
-        }
-        return new Project(projectName);
+    private Project project(String name) {
+        return new Projects(allProjects).get(name);
     }
 
     private void updateRegion() {
@@ -321,13 +319,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         }
     }
 
-    private Region region(String region) {
-        for (int i = 0; i < allRegions.length; i++) {
-            if (region.equals(allRegions[i].getName())) {
-                return allRegions[i];
-            }
-        }
-        return new Region(region);
+    private Region region(String name) {
+        return new Regions(allRegions).get(name);
     }
 
     private void updateIntendedUse() {
@@ -343,13 +336,8 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
         }
     }
 
-    private IntendedUse intendedUse(String intendedUseName) {
-        for (int i = 0; i < allIntendedUses.length; i++) {
-            if (intendedUseName.equals(allIntendedUses[i].getName())) {
-                return allIntendedUses[i];
-            }
-        }
-        return new IntendedUse(intendedUseName);
+    private IntendedUse intendedUse(String name) {
+        return new IntendedUses(allIntendedUses).get(name);
     }
 
 }
