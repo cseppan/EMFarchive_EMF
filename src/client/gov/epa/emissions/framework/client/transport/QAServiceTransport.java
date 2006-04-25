@@ -9,11 +9,11 @@ public class QAServiceTransport implements QAService {
 
     private CallFactory callFactory;
 
-    private EmfMappings mappings;
+    private DataMappings mappings;
 
     public QAServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
-        mappings = new EmfMappings();
+        mappings = new DataMappings();
     }
 
     private EmfCall call() throws EmfException {

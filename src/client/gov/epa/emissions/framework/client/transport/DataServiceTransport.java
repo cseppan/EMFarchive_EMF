@@ -8,11 +8,11 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 public class DataServiceTransport implements DataService {
     private CallFactory callFactory;
 
-    private EmfMappings mappings;
+    private DataMappings mappings;
 
     public DataServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
-        mappings = new EmfMappings();
+        mappings = new DataMappings();
     }
 
     private EmfCall call() throws EmfException {

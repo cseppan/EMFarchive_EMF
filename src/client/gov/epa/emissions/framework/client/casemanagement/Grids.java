@@ -24,4 +24,7 @@ public class Grids {
         return new Grid(name);
     }
 
+    public Grid[] all() {
+        return (Grid[]) list.toArray(new Grid[0]);
+    }
 }

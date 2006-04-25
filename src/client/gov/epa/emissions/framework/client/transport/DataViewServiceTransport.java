@@ -10,11 +10,11 @@ import gov.epa.emissions.framework.services.editor.DataViewService;
 public class DataViewServiceTransport implements DataViewService {
     private EmfCall call;
 
-    private EmfMappings mappings;
+    private DataMappings mappings;
 
     public DataViewServiceTransport(EmfCall call) {
         this.call = call;
-        mappings = new EmfMappings();
+        mappings = new DataMappings();
     }
 
     public Page applyConstraints(DataAccessToken token, String rowFilter, String sortOrder) throws EmfException {

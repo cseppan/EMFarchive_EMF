@@ -25,4 +25,7 @@ public class Regions {
         return new Region(name);
     }
 
+    public Region[] all() {
+        return (Region[]) list.toArray(new Region[0]);
+    }
 }

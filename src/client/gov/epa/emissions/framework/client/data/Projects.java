@@ -24,4 +24,7 @@ public class Projects {
         return new Project(name);
     }
 
+    public Project[] all() {
+        return (Project[]) list.toArray(new Project[0]);
+    }
 }

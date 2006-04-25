@@ -8,11 +8,11 @@ public class LoggingServiceTransport implements LoggingService {
 
     private CallFactory callFactory;
 
-    private EmfMappings mappings;
+    private DataMappings mappings;
 
     public LoggingServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
-        mappings = new EmfMappings();
+        mappings = new DataMappings();
     }
 
     private EmfCall call() throws EmfException {

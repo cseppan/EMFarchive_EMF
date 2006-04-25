@@ -16,11 +16,14 @@ public class CaseServiceTransport implements CaseService {
 
     private CallFactory callFactory;
 
-    private EmfMappings mappings;
+    private DataMappings dataMappings;
+
+    private CaseMappings caseMappings;
 
     public CaseServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
-        mappings = new EmfMappings();
+        dataMappings = new DataMappings();
+        caseMappings = new CaseMappings();
     }
 
     private EmfCall call() throws EmfException {
@@ -31,7 +34,7 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("getCases");
-        call.setReturnType(mappings.cases());
+        call.setReturnType(caseMappings.cases());
 
         return (Case[]) call.requestResponse(new Object[] {});
     }
@@ -40,7 +43,7 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("getAbbreviations");
-        call.setReturnType(mappings.abbreviations());
+        call.setReturnType(caseMappings.abbreviations());
 
         return (Abbreviation[]) call.requestResponse(new Object[] {});
     }
@@ -49,7 +52,7 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("getAirQualityModels");
-        call.setReturnType(mappings.airQualityModels());
+        call.setReturnType(caseMappings.airQualityModels());
 
         return (AirQualityModel[]) call.requestResponse(new Object[] {});
     }
@@ -58,7 +61,7 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("getCaseCategories");
-        call.setReturnType(mappings.caseCategories());
+        call.setReturnType(caseMappings.caseCategories());
 
         return (CaseCategory[]) call.requestResponse(new Object[] {});
     }
@@ -67,7 +70,7 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("getEmissionsYears");
-        call.setReturnType(mappings.emissionsYears());
+        call.setReturnType(caseMappings.emissionsYears());
 
         return (EmissionsYear[]) call.requestResponse(new Object[] {});
     }
@@ -76,7 +79,7 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("getGrids");
-        call.setReturnType(mappings.grids());
+        call.setReturnType(caseMappings.grids());
 
         return (Grid[]) call.requestResponse(new Object[] {});
     }
@@ -85,7 +88,7 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("getMeteorlogicalYears");
-        call.setReturnType(mappings.meteorlogicalYears());
+        call.setReturnType(caseMappings.meteorlogicalYears());
 
         return (MeteorlogicalYear[]) call.requestResponse(new Object[] {});
     }
@@ -94,7 +97,7 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("getSpeciations");
-        call.setReturnType(mappings.speciations());
+        call.setReturnType(caseMappings.speciations());
 
         return (Speciation[]) call.requestResponse(new Object[] {});
     }
@@ -103,7 +106,7 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("addCase");
-        call.addParam("element", mappings.caseObject());
+        call.addParam("element", caseMappings.caseObject());
         call.setVoidReturnType();
 
         call.request(new Object[] { element });
@@ -113,7 +116,7 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("removeCase");
-        call.addParam("element", mappings.caseObject());
+        call.addParam("element", caseMappings.caseObject());
         call.setVoidReturnType();
 
         call.request(new Object[] { element });
@@ -123,9 +126,9 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("obtainLocked");
-        call.addParam("owner", mappings.user());
-        call.addParam("element", mappings.caseObject());
-        call.setReturnType(mappings.caseObject());
+        call.addParam("owner", dataMappings.user());
+        call.addParam("element", caseMappings.caseObject());
+        call.setReturnType(caseMappings.caseObject());
 
         return (Case) call.requestResponse(new Object[] { owner, element });
     }
@@ -134,8 +137,8 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("releaseLocked");
-        call.addParam("element", mappings.caseObject());
-        call.setReturnType(mappings.caseObject());
+        call.addParam("element", caseMappings.caseObject());
+        call.setReturnType(caseMappings.caseObject());
 
         return (Case) call.requestResponse(new Object[] { locked });
     }
@@ -144,8 +147,8 @@ public class CaseServiceTransport implements CaseService {
         EmfCall call = call();
 
         call.setOperation("update");
-        call.addParam("element", mappings.caseObject());
-        call.setReturnType(mappings.caseObject());
+        call.addParam("element", caseMappings.caseObject());
+        call.setReturnType(caseMappings.caseObject());
 
         return (Case) call.requestResponse(new Object[] { element });
     }

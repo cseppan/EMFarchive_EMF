@@ -16,13 +16,13 @@ import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.services.editor.Revision;
 
 public class DataCommonsServiceTransport implements DataCommonsService {
-    private EmfMappings mappings;
+    private DataMappings mappings;
 
     private CallFactory callFactory;
 
     public DataCommonsServiceTransport(String endPoint) {
         callFactory = new CallFactory(endPoint);
-        mappings = new EmfMappings();
+        mappings = new DataMappings();
     }
 
     private EmfCall call() throws EmfException {

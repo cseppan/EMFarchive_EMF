@@ -9,11 +9,11 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 
     private CallFactory callFactory;
 
-    private EmfMappings mappings;
+    private DataMappings mappings;
 
     public ControlStrategyServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
-        mappings = new EmfMappings();
+        mappings = new DataMappings();
     }
 
     private EmfCall call() throws EmfException {

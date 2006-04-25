@@ -11,13 +11,13 @@ import gov.epa.emissions.framework.services.editor.DataAccessToken;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
 
 public class DataEditorServiceTransport implements DataEditorService {
-    private EmfMappings mappings;
+    private DataMappings mappings;
 
     private EmfCall call;
 
     public DataEditorServiceTransport(EmfCall call) {
         this.call = call;
-        mappings = new EmfMappings();
+        mappings = new DataMappings();
     }
 
     public Page getPage(DataAccessToken token, int pageNumber) throws EmfException {

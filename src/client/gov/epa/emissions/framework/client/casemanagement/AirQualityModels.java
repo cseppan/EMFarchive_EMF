@@ -24,4 +24,8 @@ public class AirQualityModels {
         return new AirQualityModel(name);
     }
 
+    public AirQualityModel[] all() {
+        return (AirQualityModel[]) list.toArray(new AirQualityModel[0]);
+    }
+
 }

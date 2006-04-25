@@ -11,7 +11,7 @@ public class EmfCall {
 
     private Call call;
 
-    private EmfMappings mappings;
+    private DataMappings mappings;
 
     private String service;
 
@@ -19,7 +19,7 @@ public class EmfCall {
         this.call = call;
         this.service = service;
 
-        mappings = new EmfMappings();
+        mappings = new DataMappings();
         mappings.register(call);
     }
 

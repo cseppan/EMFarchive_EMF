@@ -8,13 +8,13 @@ import gov.epa.emissions.framework.services.exim.ExImService;
 
 public class ExImServiceTransport implements ExImService {
 
-    private EmfMappings mappings;
+    private DataMappings mappings;
 
     private EmfCall call;
 
     public ExImServiceTransport(EmfCall call) {
         this.call = call;
-        mappings = new EmfMappings();
+        mappings = new DataMappings();
     }
 
     public void exportDatasets(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException {

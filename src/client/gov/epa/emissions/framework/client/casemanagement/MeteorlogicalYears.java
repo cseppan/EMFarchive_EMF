@@ -23,5 +23,7 @@ public class MeteorlogicalYears {
         }
         return new MeteorlogicalYear(name);
     }
-
+    public MeteorlogicalYear[] all() {
+        return (MeteorlogicalYear[]) list.toArray(new MeteorlogicalYear[0]);
+    }
 }

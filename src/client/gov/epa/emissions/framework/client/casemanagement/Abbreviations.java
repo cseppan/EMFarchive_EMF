@@ -24,4 +24,8 @@ public class Abbreviations {
         return new Abbreviation(name);
     }
 
+    public Abbreviation[] all() {
+        return (Abbreviation[]) list.toArray(new Abbreviation[0]);
+    }
+
 }

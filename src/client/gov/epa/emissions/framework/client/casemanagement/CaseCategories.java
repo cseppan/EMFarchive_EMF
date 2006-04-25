@@ -24,4 +24,7 @@ public class CaseCategories {
         return new CaseCategory(name);
     }
 
+    public CaseCategory[] all() {
+        return (CaseCategory[]) list.toArray(new CaseCategory[0]);
+    }
 }

@@ -20,14 +20,6 @@ import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.Status;
-import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
-import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
-import gov.epa.emissions.framework.services.casemanagement.Case;
-import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
-import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
-import gov.epa.emissions.framework.services.casemanagement.Grid;
-import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
-import gov.epa.emissions.framework.services.casemanagement.Speciation;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -42,7 +34,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.axis.client.Call;
 
-public class EmfMappings extends Mappings {
+public class DataMappings extends Mappings {
 
     public void register(Call call) {
         registerBeans(call);
@@ -88,8 +80,10 @@ public class EmfMappings extends Mappings {
         bean(call, TableMetadata.class, tablemetadata());
         bean(call, ColumnMetaData.class, columnmetadata());
 
-        bean(call, Case.class, caseObject());
-        
+        controlBeans(call);
+    }
+
+    private void controlBeans(Call call) {
         bean(call, ControlMeasure.class, controlMeasure());
         bean(call, ControlStrategy.class, controlStrategy());
     }
@@ -129,15 +123,6 @@ public class EmfMappings extends Mappings {
         array(call, QAStepTemplate[].class, qaStepTemplates());
         array(call, QAStep[].class, qaSteps());
 
-        array(call, Case[].class, cases());
-        array(call, Abbreviation[].class, abbreviations());
-        array(call, AirQualityModel[].class, airQualityModels());
-        array(call, CaseCategory[].class, caseCategories());
-        array(call, EmissionsYear[].class, emissionsYears());
-        array(call, Grid[].class, grids());
-        array(call, MeteorlogicalYear[].class, meteorlogicalYears());
-        array(call, Speciation[].class, speciations());
-        
         array(call, ControlMeasure[].class, controlMeasures());
         array(call, ControlStrategy[].class, controlStrategies());
     }
@@ -314,57 +299,20 @@ public class EmfMappings extends Mappings {
         return qname("ColumnMetaDatas");
     }
 
-    public QName caseObject() {
-        return qname("Case");
-    }
-
-    public QName cases() {
-        return qname("Cases");
-    }
-
-    public QName abbreviations() {
-        return qname("Abbreviations");
-    }
-
-    public QName airQualityModels() {
-        return qname("AirQualityModels");
-    }
-
-    public QName caseCategories() {
-        return qname("CaseCategories");
-    }
-
-    public QName emissionsYears() {
-        return qname("EmissionsYears");
-    }
-
-    public QName grids() {
-        return qname("Grids");
-    }
-
-    public QName meteorlogicalYears() {
-        return qname("MeteorlogicalYears");
-    }
-
-    public QName speciations() {
-        return qname("Speciations");
-    }
-    
     public QName controlMeasure() {
         return qname("ControlMeasure");
     }
-    
+
     public QName controlMeasures() {
         return qname("ControlMeasures");
     }
-    
+
     public QName controlStrategy() {
         return qname("ControlStrategy");
     }
-    
+
     public QName controlStrategies() {
         return qname("ControlStrategies");
     }
-
 
 }

@@ -7,11 +7,11 @@ import gov.epa.emissions.framework.services.basic.UserService;
 public class UserServiceTransport implements UserService {
     private CallFactory callFactory;
 
-    private EmfMappings mappings;
+    private DataMappings mappings;
 
     public UserServiceTransport(String endpoint) {
         callFactory = new CallFactory(endpoint);
-        mappings = new EmfMappings();
+        mappings = new DataMappings();
     }
 
     public void authenticate(String username, String password) throws EmfException {

@@ -24,4 +24,7 @@ public class EmissionsYears {
         return new EmissionsYear(name);
     }
 
+    public EmissionsYear[] all() {
+        return (EmissionsYear[]) list.toArray(new EmissionsYear[0]);
+    }
 }

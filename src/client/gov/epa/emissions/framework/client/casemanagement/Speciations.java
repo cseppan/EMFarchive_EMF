@@ -24,4 +24,7 @@ public class Speciations {
         return new Speciation(name);
     }
 
+    public Speciation[] all() {
+        return (Speciation[]) list.toArray(new Speciation[0]);
+    }
 }
