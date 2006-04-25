@@ -68,7 +68,7 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
     
     public CostService costService() {
-        return new CostServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.cost.CostService");
+        return new CostServiceTransport(baseUrl + "/gov.epa.emf.services.cost.CostService");
     }
 
     /*

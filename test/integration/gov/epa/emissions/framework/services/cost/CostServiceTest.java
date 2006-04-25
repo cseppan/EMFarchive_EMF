@@ -15,7 +15,7 @@ public class CostServiceTest extends ServiceTestCase {
 
     public void testShouldGetControlMeasures() throws Exception {
 
-        ControlMeasure cm = new ControlMeasure("cm one");
+        ControlMeasure cm = new ControlMeasure("cm test one");
         cm.setEquipmentLife(12);
         add(cm);
 
@@ -23,7 +23,7 @@ public class CostServiceTest extends ServiceTestCase {
             ControlMeasure[] cms = service.getMeasures();
 
             assertEquals(1, cms.length);
-            assertEquals("cm one", cms[0].getName());
+            assertEquals("cm test one", cms[0].getName());
             assertEquals(new Float(12), new Float(cms[0].getEquipmentLife()));
         } finally {
             remove(cm);

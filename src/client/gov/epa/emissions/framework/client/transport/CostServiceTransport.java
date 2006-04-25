@@ -16,7 +16,7 @@ public class CostServiceTransport implements CostService {
     }
 
     private EmfCall call() throws EmfException {
-        return callFactory.createCall("CoST Service");
+        return callFactory.createCall("CostService");
     }
     
     public ControlMeasure[] getMeasures() throws EmfException {
@@ -24,9 +24,7 @@ public class CostServiceTransport implements CostService {
 
         call.setOperation("getMeasures");
         call.setReturnType(mappings.controlMeasures());
-        Object[] params = new Object[] { };
 
-        return (ControlMeasure[]) call.requestResponse(params);
+        return (ControlMeasure[]) call.requestResponse(new Object[] {});
     }
-
 }
