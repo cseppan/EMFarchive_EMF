@@ -29,7 +29,7 @@ public class DataCommonsTransportServiceTestCase extends ServiceTestCase {
     private UserService userService;
 
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory();
+        HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         service = new DataCommonsServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
 

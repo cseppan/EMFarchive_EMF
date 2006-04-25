@@ -10,7 +10,7 @@ import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 public class ExImServiceImplTestCase extends ExImServiceTestCase {
 
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory();
+        HibernateSessionFactory sessionFactory = sessionFactory(configFile());
 
         ExImService exim = new ExImServiceImpl(emf(), super.dbServer(), sessionFactory);
         UserService user = new UserServiceImpl(sessionFactory);

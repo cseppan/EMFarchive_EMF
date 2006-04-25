@@ -10,12 +10,12 @@ import java.util.Properties;
 public abstract class WebServicesTestCase extends ServiceTestCase {
 
     protected Properties config() throws Exception {
-        String folder = "test";
-        File conf = new File(folder, "webservices.conf");
+        File conf = configFile();
 
         if (!conf.exists() || !conf.isFile()) {
             String error = "File: " + conf + " does not exist. Please copy either of the two TEMPLATE files "
-                    + "(from " + folder + "), name it " + conf.getName() + ", configure " + "it as needed, and rerun.";
+                    + "(from " + conf.getParent() + "), name it " + conf.getName() + ", configure "
+                    + "it as needed, and rerun.";
             throw new RuntimeException(error);
         }
 
@@ -23,6 +23,11 @@ public abstract class WebServicesTestCase extends ServiceTestCase {
         properties.load(new FileInputStream(conf));
 
         return properties;
+    }
+
+    protected File configFile() {
+        String folder = "test";
+        return new File(folder, "webservices.conf");
     }
 
     abstract protected void doTearDown() throws Exception;

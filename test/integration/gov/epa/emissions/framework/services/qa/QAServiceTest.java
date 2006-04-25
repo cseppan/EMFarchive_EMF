@@ -17,7 +17,7 @@ public class QAServiceTest extends ServiceTestCase {
     private UserDAO userDAO;
 
     public void doSetUp() throws Exception {
-        service = new QAServiceImpl(sessionFactory());
+        service = new QAServiceImpl(sessionFactory(configFile()));
         userDAO = new UserDAO();
     }
 

@@ -21,7 +21,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
     private UserServiceImpl userService;
 
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory();
+        HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         service = new ControlStrategyServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
     }

@@ -14,7 +14,7 @@ public class CostServiceTransportTestCase extends ServiceTestCase {
     private CostService help;
 
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory();
+        HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         help = new CostServiceImpl(sessionFactory);
         
         RemoteServiceLocator rl = new RemoteServiceLocator(DEFAULT_URL);

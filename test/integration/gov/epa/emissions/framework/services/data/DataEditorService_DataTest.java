@@ -49,8 +49,8 @@ public class DataEditorService_DataTest extends ServiceTestCase {
     private User user;
 
     protected void doSetUp() throws Exception {
-        service = new DataEditorServiceImpl(emf(), super.dbServer(), sessionFactory());
-        UserServiceImpl userService = new UserServiceImpl(sessionFactory());
+        service = new DataEditorServiceImpl(emf(), super.dbServer(), sessionFactory(configFile()));
+        UserServiceImpl userService = new UserServiceImpl(sessionFactory(configFile()));
 
         datasource = emissions();
         dataset = new EmfDataset();

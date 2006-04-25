@@ -7,7 +7,7 @@ public class CostServiceTest extends ServiceTestCase {
     private CostService service;
 
     public void doSetUp() throws Exception {
-        service = new CostServiceImpl(sessionFactory());
+        service = new CostServiceImpl(sessionFactory(configFile()));
     }
 
     protected void doTearDown() throws Exception {// no op

@@ -24,7 +24,7 @@ public class LoggingServiceTest extends ServiceTestCase {
     private DataServiceImpl dataService;
 
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory();
+        HibernateSessionFactory sessionFactory = sessionFactory(configFile());
 
         dcService = new DataCommonsServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);

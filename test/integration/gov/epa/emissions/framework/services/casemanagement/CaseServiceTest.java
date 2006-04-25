@@ -21,7 +21,7 @@ public class CaseServiceTest extends ServiceTestCase {
     private UserServiceImpl userService;
 
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory();
+        HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         service = new CaseServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
     }

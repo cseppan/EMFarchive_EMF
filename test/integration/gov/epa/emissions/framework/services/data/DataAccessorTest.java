@@ -48,7 +48,7 @@ public class DataAccessorTest extends ServiceTestCase {
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
         DataAccessCacheImpl cache = new DataAccessCacheImpl(reader, writerFactory, datasource, sqlDataTypes());
 
-        return new DataAccessorImpl(cache, sessionFactory());
+        return new DataAccessorImpl(cache, sessionFactory(configFile()));
     }
 
     protected void doTearDown() throws Exception {

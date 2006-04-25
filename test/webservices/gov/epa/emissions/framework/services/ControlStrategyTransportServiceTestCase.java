@@ -14,7 +14,7 @@ public class ControlStrategyTransportServiceTestCase extends WebServicesTestCase
     private ControlStrategyService service;
 
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory();
+        HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         service = new ControlStrategyServiceImpl(sessionFactory);
 
         ServiceLocator rl = serviceLocator();
@@ -23,18 +23,18 @@ public class ControlStrategyTransportServiceTestCase extends WebServicesTestCase
     
     public void testShouldGetNoControlStrategies() throws EmfException {
         ControlStrategy[] controlStrategies = service.getControlStrategies();
-        assertEquals(controlStrategies.length, 0);
+        assertEquals("fetch 0 strategies",controlStrategies.length, 0);
     }
 
-    public void itestShouldAddControlStrategy() throws EmfException {
+    public void testShouldAddControlStrategy() throws EmfException {
         ControlStrategy controlStrategy = controlStrategy();
         css.addControlStrategy(controlStrategy);
-
+        ControlStrategy[] controlStrategies= null;
         try {
-            ControlStrategy[] controlStrategies = service.getControlStrategies();
-            assertEquals(controlStrategies.length, 1);
+            controlStrategies = service.getControlStrategies();
+            assertEquals(1,controlStrategies.length);
         } finally {
-            remove(controlStrategy);
+          remove(controlStrategies[0]);
         }
     }
 

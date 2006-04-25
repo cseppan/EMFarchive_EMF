@@ -13,7 +13,7 @@ public class UserServiceTest extends ServiceTestCase {
     private UserService service;
 
     public void doSetUp() throws Exception {
-        service = new UserServiceImpl(sessionFactory());
+        service = new UserServiceImpl(sessionFactory(configFile()));
     }
 
     protected void doTearDown() throws Exception {// no op

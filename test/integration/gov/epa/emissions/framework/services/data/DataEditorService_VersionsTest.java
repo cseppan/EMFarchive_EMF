@@ -37,8 +37,8 @@ public class DataEditorService_VersionsTest extends ServiceTestCase {
     private UserServiceImpl userService;
 
     protected void doSetUp() throws Exception {
-        service = new DataEditorServiceImpl(emf(), super.dbServer(), sessionFactory());
-        userService = new UserServiceImpl(sessionFactory());
+        service = new DataEditorServiceImpl(emf(), super.dbServer(), sessionFactory(configFile()));
+        userService = new UserServiceImpl(sessionFactory(configFile()));
 
         datasource = emissions();
 

@@ -36,7 +36,7 @@ public abstract class ServiceTestCase extends TestCase {
 
     final protected void setUp() throws Exception {
         dbSetup = new EmfDatabaseSetup(config());
-        session = sessionFactory().getSession();
+        session = sessionFactory(configFile()).getSession();
 
         doSetUp();
     }
@@ -44,12 +44,12 @@ public abstract class ServiceTestCase extends TestCase {
     abstract protected void doSetUp() throws Exception;
 
     protected Properties config() throws Exception {
-        String folder = "test";
-        File conf = new File(folder, "postgres.conf");
+        File conf = configFile();
 
         if (!conf.exists() || !conf.isFile()) {
             String error = "File: " + conf + " does not exist. Please copy either of the two TEMPLATE files "
-                    + "(from " + folder + "), name it " + conf.getName() + ", configure " + "it as needed, and rerun.";
+                    + "(from " + conf.getParent() + "), name it " + conf.getName() + ", configure "
+                    + "it as needed, and rerun.";
             throw new RuntimeException(error);
         }
 
@@ -57,6 +57,11 @@ public abstract class ServiceTestCase extends TestCase {
         properties.load(new FileInputStream(conf));
 
         return properties;
+    }
+
+    protected File configFile() {
+        String folder = "test";
+        return new File(folder, "postgres.conf");
     }
 
     final protected void tearDown() throws Exception {
@@ -93,8 +98,8 @@ public abstract class ServiceTestCase extends TestCase {
         modifier.dropAllData(table);
     }
 
-    protected HibernateSessionFactory sessionFactory() throws Exception {
-        LocalHibernateConfiguration config = new LocalHibernateConfiguration();
+    protected HibernateSessionFactory sessionFactory(File configFile) throws Exception {
+        LocalHibernateConfiguration config = new LocalHibernateConfiguration(configFile);
         return new HibernateSessionFactory(config.factory());
     }
 

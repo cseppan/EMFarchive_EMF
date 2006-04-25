@@ -33,7 +33,7 @@ public class DataViewServiceTest extends ServiceTestCase {
     private DataAccessToken token;
 
     protected void doSetUp() throws Exception {
-        this.service = new DataViewServiceImpl(emf(), super.dbServer(), sessionFactory());
+        this.service = new DataViewServiceImpl(emf(), super.dbServer(), sessionFactory(configFile()));
 
         datasource = emissions();
 

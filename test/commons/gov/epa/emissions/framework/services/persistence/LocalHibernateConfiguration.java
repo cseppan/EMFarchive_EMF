@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.persistence;
 
 import gov.epa.emissions.commons.db.postgres.PostgresDbConfig;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Properties;
 
@@ -12,19 +13,19 @@ public class LocalHibernateConfiguration {
 
     private SessionFactory sessionFactory;
 
-    public LocalHibernateConfiguration() throws Exception {
+    public LocalHibernateConfiguration(File configFile) throws Exception {
         Configuration config = new Configuration().configure();
         Properties props = config.getProperties();
         props.remove("hibernate.connection.datasource");
 
-        props.putAll(testsConfig());
+        props.putAll(testsConfig(configFile.getAbsolutePath()));
 
         config = config.setProperties(props);
         sessionFactory = config.buildSessionFactory();
     }
 
-    private Map testsConfig() throws Exception {
-        return new PostgresDbConfig("test/postgres.conf").properties();
+    private Map testsConfig(String configFileName) throws Exception {
+        return new PostgresDbConfig(configFileName).properties();
     }
 
     public SessionFactory factory() {
