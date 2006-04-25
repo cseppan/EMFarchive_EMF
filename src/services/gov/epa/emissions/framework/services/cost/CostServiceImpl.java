@@ -37,4 +37,12 @@ public class CostServiceImpl implements CostService {
         }
     }
 
+    public void addMeasure(ControlMeasure measure) {
+        dao.add(measure, sessionFactory.getSession());
+    }
+
+    public void removeMeasure(ControlMeasure measure) {
+        dao.remove(measure, sessionFactory.getSession());
+    }
+
 }

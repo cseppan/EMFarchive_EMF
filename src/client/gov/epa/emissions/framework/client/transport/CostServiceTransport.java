@@ -27,4 +27,24 @@ public class CostServiceTransport implements CostService {
 
         return (ControlMeasure[]) call.requestResponse(new Object[] {});
     }
+
+    public void addMeasure(ControlMeasure measure) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("addMeasure");
+        call.addParam("measure", mappings.controlMeasure());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { measure });
+    }
+
+    public void removeMeasure(ControlMeasure measure) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("removeMeasure");
+        call.addParam("measure", mappings.controlMeasure());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { measure });
+    }
 }
