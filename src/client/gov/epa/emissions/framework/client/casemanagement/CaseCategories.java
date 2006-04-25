@@ -16,7 +16,7 @@ public class CaseCategories {
     }
 
     public CaseCategory get(String name) {
-        if (name == null)
+        if(name == null || name.trim().length() == 0)
             return null;
 
         name = name.trim();

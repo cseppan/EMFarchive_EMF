@@ -33,7 +33,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private EmfSession session;
 
     public CaseEditor(EmfSession session, DesktopManager desktopManager) {
-        super("Case Editor", new Dimension(700, 600), desktopManager);
+        super("Case Editor", new Dimension(800, 500), desktopManager);
         this.session = session;
         this.desktopManager = desktopManager;
     }
@@ -49,7 +49,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
     private JPanel createSummaryTab(Case caseObj, MessagePanel messagePanel) {
         try {
-            EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, session, messagePanel, this);
+            EditableCaseSummaryTab view = new EditableCaseSummaryTab(caseObj, session, this);
             presenter.set(view);
             return view;
         } catch (EmfException e) {

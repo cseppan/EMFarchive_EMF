@@ -98,6 +98,10 @@ public abstract class ServiceTestCase extends TestCase {
         modifier.dropAllData(table);
     }
 
+    protected HibernateSessionFactory sessionFactory() throws Exception {
+        return sessionFactory(configFile());
+    }
+
     protected HibernateSessionFactory sessionFactory(File configFile) throws Exception {
         LocalHibernateConfiguration config = new LocalHibernateConfiguration(configFile);
         return new HibernateSessionFactory(config.factory());
