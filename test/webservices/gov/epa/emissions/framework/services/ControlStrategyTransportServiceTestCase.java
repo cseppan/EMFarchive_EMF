@@ -34,7 +34,7 @@ public class ControlStrategyTransportServiceTestCase extends WebServicesTestCase
             controlStrategies = service.getControlStrategies();
             assertEquals(1,controlStrategies.length);
         } finally {
-          remove(controlStrategies[0]);
+          //remove(controlStrategies[0]);
         }
     }
 

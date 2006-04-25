@@ -12,6 +12,8 @@ import gov.epa.emissions.framework.client.casemanagement.CaseManagerView;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerWindow;
 import gov.epa.emissions.framework.client.cost.controlmeasure.ControlMeasuresManagerView;
 import gov.epa.emissions.framework.client.cost.controlmeasure.ControlMeasuresManagerWindow;
+import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategyManagerView;
+import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategyManagerWindow;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserView;
 import gov.epa.emissions.framework.client.data.dataset.DatasetsBrowserWindow;
 import gov.epa.emissions.framework.client.data.datasettype.DatasetTypesManagerView;
@@ -138,7 +140,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
 
         return menuItem;
     }
-    
+
     private JMenuItem createControlMeasures(final EmfConsole parent, final MessagePanel messagePanel) {
         JMenuItem menuItem = new JMenuItem("Control Measures");
         menuItem.setName("controlMeasures");
@@ -150,13 +152,13 @@ public class ManageMenu extends JMenu implements ManageMenuView {
 
         return menuItem;
     }
-    
+
     private JMenuItem createControlStrategies(final EmfConsole parent, final MessagePanel messagePanel) {
         JMenuItem menuItem = new JMenuItem("Control Strategies");
         menuItem.setName("controlStrategies");
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                //TODO:
+                doManageControlStrategies(parent, messagePanel);
             }
         });
 
@@ -231,11 +233,21 @@ public class ManageMenu extends JMenu implements ManageMenuView {
             messagePanel.setError(e.getMessage());
         }
     }
-    
+
     private void doDisplayControlMeasures(final EmfConsole parent, final MessagePanel messagePanel) {
         try {
-            ControlMeasuresManagerView controlMeasuresManagerView = new ControlMeasuresManagerWindow(session, parent, desktopManager);
+            ControlMeasuresManagerView controlMeasuresManagerView = new ControlMeasuresManagerWindow(session, parent,
+                    desktopManager);
             presenter.doDisplayControlMeasuresManager(controlMeasuresManagerView);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
+    private void doManageControlStrategies(final EmfConsole parent, final MessagePanel messagePanel) {
+        ControlStrategyManagerView view = new ControlStrategyManagerWindow(session, parent, desktopManager);
+        try {
+            presenter.doDisplayControlStrategies(view);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
