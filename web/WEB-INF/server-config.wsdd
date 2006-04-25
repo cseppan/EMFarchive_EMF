@@ -151,10 +151,6 @@
 		qname="ns1:QAStep" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
 	<beanMapping
-		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Case"
-		qname="ns1:Case" xmlns:ns1="urn:gov.epa.services.EmfService"/>
-
-	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.editor.Revision"
 		qname="ns1:Revision" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 
@@ -250,6 +246,81 @@
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlStrategy"
 		qname="ns1:ControlStrategy" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 	
+	<!-- CASE MANAGEMENT -->
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Case"
+		qname="ns1:Case" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:Cases" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Case[]"
+		innerType="ns1:Case"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Abbreviation"
+		qname="ns1:Abbreviation" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:Abbreviations" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Abbreviation[]"
+		innerType="ns1:Abbreviation"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+	
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.AirQualityModel"
+		qname="ns1:AirQualityModel" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:AirQualityModels" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.AirQualityModel[]"
+		innerType="ns1:AirQualityModel"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.CaseCategory"
+		qname="ns1:CaseCategory" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:CaseCategories" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.CaseCategory[]"
+		innerType="ns1:CaseCategory"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.EmissionsYear"
+		qname="ns1:EmissionsYear" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:EmissionsYears" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.EmissionsYear[]"
+		innerType="ns1:EmissionsYear"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Grid"
+		qname="ns1:Grid" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:Grids" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Grid[]"
+		innerType="ns1:Grid"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear"
+		qname="ns1:MeteorlogicalYear" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:MeteorlogicalYears" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear[]"
+		innerType="ns1:MeteorlogicalYear"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Speciation"
+		qname="ns1:Speciation" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:Speciations" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Speciation[]"
+		innerType="ns1:Speciation"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+	
+	<!-- ================================================================= -->
+	
 	<!-- Arrays of Structs -->
 	<arrayMapping qname="ns1:ColumnMetaDatas" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.commons.io.ColumnMetaData[]"
@@ -274,11 +345,6 @@
 	<arrayMapping qname="ns1:Notes" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.data.Note[]"
 		innerType="ns1:Note"
-		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
-
-	<arrayMapping qname="ns1:Cases" xmlns:ns1="urn:gov.epa.services.EmfService"
-		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Case[]"
-		innerType="ns1:Case"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<arrayMapping qname="ns1:NoteTypes" xmlns:ns1="urn:gov.epa.services.EmfService"

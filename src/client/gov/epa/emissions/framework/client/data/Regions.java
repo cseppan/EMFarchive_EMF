@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Region;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class Regions {
@@ -14,8 +15,10 @@ public class Regions {
         this.list = new ArrayList(Arrays.asList(array));
     }
 
-    // FIXME: why we are creating new item?
     public Region get(String name) {
+        if (name == null)
+            return null;
+
         name = name.trim();
         for (int i = 0; i < list.size(); i++) {
             Region item = ((Region) list.get(i));
@@ -25,7 +28,13 @@ public class Regions {
         return new Region(name);
     }
 
-    public Region[] all() {
-        return (Region[]) list.toArray(new Region[0]);
+    public String[] names() {
+        List names = new ArrayList();
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
+            Region element = (Region) iter.next();
+            names.add(element.getName());
+        }
+
+        return (String[]) names.toArray(new String[0]);
     }
 }

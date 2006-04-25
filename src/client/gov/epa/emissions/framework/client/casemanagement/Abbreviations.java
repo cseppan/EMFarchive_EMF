@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class Abbreviations {
@@ -15,6 +16,9 @@ public class Abbreviations {
     }
 
     public Abbreviation get(String name) {
+        if (name == null)
+            return null;
+
         name = name.trim();
         for (int i = 0; i < list.size(); i++) {
             Abbreviation item = ((Abbreviation) list.get(i));
@@ -24,8 +28,14 @@ public class Abbreviations {
         return new Abbreviation(name);
     }
 
-    public Abbreviation[] all() {
-        return (Abbreviation[]) list.toArray(new Abbreviation[0]);
+    public String[] names() {
+        List names = new ArrayList();
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
+            Abbreviation element = (Abbreviation) iter.next();
+            names.add(element.getName());
+        }
+
+        return (String[]) names.toArray(new String[0]);
     }
 
 }

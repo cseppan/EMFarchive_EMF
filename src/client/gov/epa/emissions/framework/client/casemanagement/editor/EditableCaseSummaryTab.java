@@ -100,7 +100,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(createOverviewSection());
         panel.add(createLowerSection());
-        
+
         super.add(panel, BorderLayout.CENTER);
     }
 
@@ -154,7 +154,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private TextArea description() {
-        description = new TextArea("description", caseObj.getDescription());
+        description = new TextArea("description", caseObj.getDescription(), 40, 3);
         changeablesList.addChangeable(description);
 
         return description;
@@ -171,8 +171,9 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox projects() throws EmfException {
         projects = new Projects(session.dataCommonsService().getProjects());
-        projectsCombo = new EditableComboBox(projects.all());
-        projectsCombo.setSelectedItem(caseObj.getProject());
+        projectsCombo = new EditableComboBox(projects.names());
+        String name = caseObj.getProject() != null ? caseObj.getProject().getName() : "";
+        projectsCombo.setSelectedItem(name);
         projectsCombo.setPreferredSize(new Dimension(250, 5));
 
         changeablesList.addChangeable(projectsCombo);
@@ -180,10 +181,25 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return projectsCombo;
     }
 
+    private EditableComboBox regions() throws EmfException {
+        regions = new Regions(session.dataCommonsService().getRegions());
+        regionsCombo = new EditableComboBox(regions.names());
+
+        String name = caseObj.getRegion() != null ? caseObj.getRegion().getName() : "";
+        regionsCombo.setSelectedItem(name);
+        regionsCombo.setPreferredSize(new Dimension(250, 5));
+
+        changeablesList.addChangeable(regionsCombo);
+
+        return regionsCombo;
+    }
+
     private EditableComboBox abbreviations() throws EmfException {
         abbreviations = new Abbreviations(session.caseService().getAbbreviations());
-        abbreviationsCombo = new EditableComboBox(abbreviations.all());
-        abbreviationsCombo.setSelectedItem(caseObj.getAbbreviation());
+        abbreviationsCombo = new EditableComboBox(abbreviations.names());
+
+        String name = caseObj.getAbbreviation() != null ? caseObj.getAbbreviation().getName() : "";
+        abbreviationsCombo.setSelectedItem(name);
         abbreviationsCombo.setPreferredSize(new Dimension(250, 5));
 
         changeablesList.addChangeable(abbreviationsCombo);
@@ -193,8 +209,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox airQualityModels() throws EmfException {
         airQualityModels = new AirQualityModels(session.caseService().getAirQualityModels());
-        airQualityModelsCombo = new EditableComboBox(airQualityModels.all());
-        airQualityModelsCombo.setSelectedItem(caseObj.getAirQualityModel());
+        airQualityModelsCombo = new EditableComboBox(airQualityModels.names());
+
+        String name = caseObj.getAirQualityModel() != null ? caseObj.getAirQualityModel().getName() : "";
+        airQualityModelsCombo.setSelectedItem(name);
         airQualityModelsCombo.setPreferredSize(new Dimension(250, 5));
 
         changeablesList.addChangeable(airQualityModelsCombo);
@@ -204,8 +222,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox categories() throws EmfException {
         categories = new CaseCategories(session.caseService().getCaseCategories());
-        categoriesCombo = new EditableComboBox(categories.all());
-        categoriesCombo.setSelectedItem(caseObj.getAirQualityModel());
+        categoriesCombo = new EditableComboBox(categories.names());
+        
+        String name = caseObj.getCaseCategory() != null ? caseObj.getCaseCategory().getName() : "";
+        categoriesCombo.setSelectedItem(name);
         categoriesCombo.setPreferredSize(new Dimension(250, 5));
 
         changeablesList.addChangeable(categoriesCombo);
@@ -215,8 +235,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox emissionsYears() throws EmfException {
         emissionsYears = new EmissionsYears(session.caseService().getEmissionsYears());
-        emissionsYearCombo = new EditableComboBox(emissionsYears.all());
-        emissionsYearCombo.setSelectedItem(caseObj.getEmissionsYear());
+        emissionsYearCombo = new EditableComboBox(emissionsYears.names());
+        
+        String name = caseObj.getEmissionsYear() != null ? caseObj.getEmissionsYear().getName() : "";
+        emissionsYearCombo.setSelectedItem(name);
         emissionsYearCombo.setPreferredSize(new Dimension(250, 5));
 
         changeablesList.addChangeable(emissionsYearCombo);
@@ -226,8 +248,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox grids() throws EmfException {
         grids = new Grids(session.caseService().getGrids());
-        gridCombo = new EditableComboBox(grids.all());
-        gridCombo.setSelectedItem(caseObj.getGrid());
+        gridCombo = new EditableComboBox(grids.names());
+        
+        String name = caseObj.getGrid() != null ? caseObj.getGrid().getName() : "";
+        gridCombo.setSelectedItem(name);
         gridCombo.setPreferredSize(new Dimension(250, 5));
 
         changeablesList.addChangeable(gridCombo);
@@ -237,8 +261,10 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
 
     private EditableComboBox meteorlogicalYears() throws EmfException {
         meteorlogicalYears = new MeteorlogicalYears(session.caseService().getMeteorlogicalYears());
-        meteorlogicalYearCombo = new EditableComboBox(meteorlogicalYears.all());
-        meteorlogicalYearCombo.setSelectedItem(caseObj.getMeteorlogicalYear());
+        meteorlogicalYearCombo = new EditableComboBox(meteorlogicalYears.names());
+        
+        String name = caseObj.getMeteorlogicalYear() != null ? caseObj.getMeteorlogicalYear().getName() : "";
+        meteorlogicalYearCombo.setSelectedItem(name);
         meteorlogicalYearCombo.setPreferredSize(new Dimension(250, 5));
 
         changeablesList.addChangeable(meteorlogicalYearCombo);
@@ -249,23 +275,14 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     private EditableComboBox speciations() throws EmfException {
         speciations = new Speciations(session.caseService().getSpeciations());
         speciationCombo = new EditableComboBox(speciations.all());
-        speciationCombo.setSelectedItem(caseObj.getSpeciation());
+        
+        String name = caseObj.getSpeciation() != null ? caseObj.getSpeciation().getName() : "";
+        speciationCombo.setSelectedItem(name);
         speciationCombo.setPreferredSize(new Dimension(250, 5));
 
         changeablesList.addChangeable(speciationCombo);
 
         return speciationCombo;
-    }
-
-    private EditableComboBox regions() throws EmfException {
-        regions = new Regions(session.dataCommonsService().getRegions());
-        regionsCombo = new EditableComboBox(regions.all());
-        regionsCombo.setSelectedItem(caseObj.getRegion());
-        regionsCombo.setPreferredSize(new Dimension(250, 5));
-
-        changeablesList.addChangeable(regionsCombo);
-
-        return regionsCombo;
     }
 
     private String format(Date date) {
@@ -279,10 +296,19 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         return label;
     }
 
-    public void save(Case caseObj) {// TODO
-        caseObj.setProject(projects.get((String)projectsCombo.getSelectedItem()));
-        caseObj.setAbbreviation(abbreviations.get((String)abbreviationsCombo.getSelectedItem()));
-        
+    public void save(Case caseObj) {
+        caseObj.setName(name.getText());
+        caseObj.setDescription(description.getText());
+
+        caseObj.setProject(projects.get((String) projectsCombo.getSelectedItem()));
+        caseObj.setRegion(regions.get((String) regionsCombo.getSelectedItem()));
+        caseObj.setAbbreviation(abbreviations.get((String) abbreviationsCombo.getSelectedItem()));
+        caseObj.setAirQualityModel(airQualityModels.get((String) airQualityModelsCombo.getSelectedItem()));
+        caseObj.setCaseCategory(categories.get((String) categoriesCombo.getSelectedItem()));
+        caseObj.setEmissionsYear(emissionsYears.get((String) emissionsYearCombo.getSelectedItem()));
+        caseObj.setGrid(grids.get((String) gridCombo.getSelectedItem()));
+        caseObj.setMeteorlogicalYear(meteorlogicalYears.get((String) meteorlogicalYearCombo.getSelectedItem()));
+        caseObj.setSpeciation(speciations.get((String) speciationCombo.getSelectedItem()));
     }
 
 }

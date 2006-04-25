@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Project;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class Projects {
@@ -15,6 +16,9 @@ public class Projects {
     }
 
     public Project get(String name) {
+        if(name == null)
+            return null;
+        
         name = name.trim();
         for (int i = 0; i < list.size(); i++) {
             Project item = ((Project) list.get(i));
@@ -24,7 +28,13 @@ public class Projects {
         return new Project(name);
     }
 
-    public Project[] all() {
-        return (Project[]) list.toArray(new Project[0]);
+    public String[] names() {
+        List names = new ArrayList();
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
+            Project element = (Project) iter.next();
+            names.add(element.getName());
+        }
+        
+        return (String[]) names.toArray(new String[0]);
     }
 }

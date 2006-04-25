@@ -15,7 +15,7 @@ import org.apache.axis.client.Call;
 
 public class CaseMappings extends Mappings {
 
-    public void map(Call call) {
+    public void register(Call call) {
         beans(call);
         arrays(call);
     }
@@ -23,6 +23,12 @@ public class CaseMappings extends Mappings {
     private void beans(Call call) {
         bean(call, Case.class, caseObject());
         bean(call, Abbreviation.class, abbreviation());
+        bean(call, AirQualityModel.class, airQualityModel());
+        bean(call, CaseCategory.class, caseCategory());
+        bean(call, EmissionsYear.class, emissionsYear());
+        bean(call, Grid.class, grid());
+        bean(call, MeteorlogicalYear.class, meteorlogicalYear());
+        bean(call, Speciation.class, speciation());
     }
 
     private void arrays(Call call) {

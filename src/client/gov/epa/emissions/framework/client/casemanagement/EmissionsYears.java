@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class EmissionsYears {
@@ -15,6 +16,9 @@ public class EmissionsYears {
     }
 
     public EmissionsYear get(String name) {
+        if (name == null)
+            return null;
+
         name = name.trim();
         for (int i = 0; i < list.size(); i++) {
             EmissionsYear item = ((EmissionsYear) list.get(i));
@@ -24,7 +28,13 @@ public class EmissionsYears {
         return new EmissionsYear(name);
     }
 
-    public EmissionsYear[] all() {
-        return (EmissionsYear[]) list.toArray(new EmissionsYear[0]);
+    public String[] names() {
+        List names = new ArrayList();
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
+            EmissionsYear element = (EmissionsYear) iter.next();
+            names.add(element.getName());
+        }
+
+        return (String[]) names.toArray(new String[0]);
     }
 }

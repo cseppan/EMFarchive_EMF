@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class CaseCategories {
@@ -15,6 +16,9 @@ public class CaseCategories {
     }
 
     public CaseCategory get(String name) {
+        if (name == null)
+            return null;
+
         name = name.trim();
         for (int i = 0; i < list.size(); i++) {
             CaseCategory item = ((CaseCategory) list.get(i));
@@ -24,7 +28,13 @@ public class CaseCategories {
         return new CaseCategory(name);
     }
 
-    public CaseCategory[] all() {
-        return (CaseCategory[]) list.toArray(new CaseCategory[0]);
+    public String[] names() {
+        List names = new ArrayList();
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
+            CaseCategory element = (CaseCategory) iter.next();
+            names.add(element.getName());
+        }
+
+        return (String[]) names.toArray(new String[0]);
     }
 }

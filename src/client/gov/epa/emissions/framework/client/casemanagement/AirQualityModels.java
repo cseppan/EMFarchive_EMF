@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class AirQualityModels {
@@ -15,6 +16,9 @@ public class AirQualityModels {
     }
 
     public AirQualityModel get(String name) {
+        if (name == null)
+            return null;
+
         name = name.trim();
         for (int i = 0; i < list.size(); i++) {
             AirQualityModel item = ((AirQualityModel) list.get(i));
@@ -24,8 +28,14 @@ public class AirQualityModels {
         return new AirQualityModel(name);
     }
 
-    public AirQualityModel[] all() {
-        return (AirQualityModel[]) list.toArray(new AirQualityModel[0]);
+    public String[] names() {
+        List names = new ArrayList();
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
+            AirQualityModel element = (AirQualityModel) iter.next();
+            names.add(element.getName());
+        }
+
+        return (String[]) names.toArray(new String[0]);
     }
 
 }

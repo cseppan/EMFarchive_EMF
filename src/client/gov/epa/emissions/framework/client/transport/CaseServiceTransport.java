@@ -146,7 +146,7 @@ public class CaseServiceTransport implements CaseService {
     public Case updateCase(Case element) throws EmfException {
         EmfCall call = call();
 
-        call.setOperation("update");
+        call.setOperation("updateCase");
         call.addParam("element", caseMappings.caseObject());
         call.setReturnType(caseMappings.caseObject());
 

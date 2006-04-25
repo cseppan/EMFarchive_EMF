@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class MeteorlogicalYears {
@@ -15,6 +16,9 @@ public class MeteorlogicalYears {
     }
 
     public MeteorlogicalYear get(String name) {
+        if (name == null)
+            return null;
+
         name = name.trim();
         for (int i = 0; i < list.size(); i++) {
             MeteorlogicalYear item = ((MeteorlogicalYear) list.get(i));
@@ -23,7 +27,14 @@ public class MeteorlogicalYears {
         }
         return new MeteorlogicalYear(name);
     }
-    public MeteorlogicalYear[] all() {
-        return (MeteorlogicalYear[]) list.toArray(new MeteorlogicalYear[0]);
+
+    public String[] names() {
+        List names = new ArrayList();
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
+            MeteorlogicalYear element = (MeteorlogicalYear) iter.next();
+            names.add(element.getName());
+        }
+
+        return (String[]) names.toArray(new String[0]);
     }
 }

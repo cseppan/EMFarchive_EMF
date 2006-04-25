@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.services.casemanagement.Grid;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class Grids {
@@ -15,6 +16,9 @@ public class Grids {
     }
 
     public Grid get(String name) {
+        if (name == null)
+            return null;
+
         name = name.trim();
         for (int i = 0; i < list.size(); i++) {
             Grid item = ((Grid) list.get(i));
@@ -24,7 +28,13 @@ public class Grids {
         return new Grid(name);
     }
 
-    public Grid[] all() {
-        return (Grid[]) list.toArray(new Grid[0]);
+    public String[] names() {
+        List names = new ArrayList();
+        for (Iterator iter = list.iterator(); iter.hasNext();) {
+            Grid element = (Grid) iter.next();
+            names.add(element.getName());
+        }
+
+        return (String[]) names.toArray(new String[0]);
     }
 }
