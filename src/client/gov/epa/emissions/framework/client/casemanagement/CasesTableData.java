@@ -17,12 +17,12 @@ public class CasesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Category", "Region", "Emissions Year", "Meteorlogical Year", "Last Modified",
-                "Run Status" };
+        return new String[] { "Name", "Project", "Region", "Creator", "Category", "Run Status", "Abbreviation",
+                "Air Quality Model", "Emissions Year", "Meteorlogical Year", "Speciation", "Last Modified Date" };
     }
 
     public Class getColumnClass(int col) {
-        if (col == 5)
+        if (col == 11)
             return Date.class;
 
         return String.class;
@@ -40,15 +40,31 @@ public class CasesTableData extends AbstractTableData {
         List rows = new ArrayList();
 
         for (int i = 0; i < types.length; i++) {
-            Case element = types[i];
-            Object[] values = { element.getName(), caseCategory(element), region(element), emissionsYear(element),
-                    meteorlogicalYear(element), format(element.getLastModifiedDate()), element.getRunStatus() };
-
-            Row row = new ViewableRow(element, values);
+            Row row = new ViewableRow(types[i], rowValues(types[i]));
             rows.add(row);
         }
 
         return rows;
+    }
+
+    private Object[] rowValues(Case element) {
+        Object[] values = { element.getName(), project(element), region(element), creator(element),
+                caseCategory(element), element.getRunStatus(), abbreviation(element), airQualityModel(element),
+                emissionsYear(element), meteorlogicalYear(element), speciation(element),
+                format(element.getLastModifiedDate()) };
+        return values;
+    }
+
+    private String abbreviation(Case element) {
+        return element.getAbbreviation() != null ? element.getAbbreviation().getName() : "";
+    }
+
+    private String airQualityModel(Case element) {
+        return element.getAirQualityModel() != null ? element.getAirQualityModel().getName() : "";
+    }
+
+    private String speciation(Case element) {
+        return element.getSpeciation() != null ? element.getSpeciation().getName() : "";
     }
 
     private String meteorlogicalYear(Case element) {
@@ -65,6 +81,14 @@ public class CasesTableData extends AbstractTableData {
 
     private String caseCategory(Case element) {
         return element.getCaseCategory() != null ? element.getCaseCategory().getName() : "";
+    }
+
+    private String project(Case element) {
+        return element.getProject() != null ? element.getProject().getName() : "";
+    }
+
+    private String creator(Case element) {
+        return element.getCreator() != null ? element.getCreator().getName() : "";
     }
 
 }
