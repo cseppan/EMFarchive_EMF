@@ -43,6 +43,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private EmfTableModel model;
 
     private JPanel browserPanel;
+    
+    private DesktopManager desktopManager;
 
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
             throws EmfException {
@@ -50,6 +52,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         super.setName("controlMeasures");
         this.session = session;
         this.parentConsole = parentConsole;
+        this.desktopManager = desktopManager;
 
         CostService service = session.costService();
         model = new EmfTableModel(new ControlMeasureTableData(service.getMeasures()));
@@ -151,7 +154,11 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private Action newControlMeasureAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                //TODO:
+                try {
+                    presenter.doDisplayCMEditor(new ControlMeasure("new measure"), desktopManager);
+                } catch (EmfException e) {
+                    showError(e.getMessage());
+                }
             }
         };
         
