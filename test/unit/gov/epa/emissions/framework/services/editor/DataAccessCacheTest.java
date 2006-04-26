@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.services.editor;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.VersionedRecordsFactory;
 import gov.epa.emissions.commons.db.version.VersionedRecordsWriter;
 import gov.epa.emissions.framework.services.EmfProperties;
 import gov.epa.emissions.framework.services.EmfProperty;
@@ -24,7 +24,7 @@ public class DataAccessCacheTest extends MockObjectTestCase {
         Mock records = mock(ScrollableVersionedRecords.class);
         records.expects(atLeastOnce()).method("close");
 
-        Mock reader = mock(VersionedRecordsReader.class);
+        Mock reader = mock(VersionedRecordsFactory.class);
         reader.stubs().method("optimizedFetch").withAnyArguments().will(returnValue(records.proxy()));
 
         Mock writer = mock(VersionedRecordsWriter.class);
@@ -36,7 +36,7 @@ public class DataAccessCacheTest extends MockObjectTestCase {
         session = null;
         Mock properties = properties();
 
-        cache = new DataAccessCacheImpl((VersionedRecordsReader) reader.proxy(),
+        cache = new DataAccessCacheImpl((VersionedRecordsFactory) reader.proxy(),
                 (VersionedRecordsWriterFactory) writerFactory.proxy(), null, null, (EmfProperties) properties.proxy());
     }
 

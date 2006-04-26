@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.version.ChangeSet;
-import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.VersionedRecordsFactory;
 import gov.epa.emissions.framework.services.EmfProperties;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 
@@ -16,12 +16,12 @@ public class DataAccessCacheImpl implements DataAccessCache {
 
     private DataUpdatesCache updates;
 
-    public DataAccessCacheImpl(VersionedRecordsReader reader, VersionedRecordsWriterFactory writerFactory,
+    public DataAccessCacheImpl(VersionedRecordsFactory reader, VersionedRecordsWriterFactory writerFactory,
             Datasource datasource, SqlDataTypes sqlTypes) {
         this(reader, writerFactory, datasource, sqlTypes, new EmfPropertiesDAO());
     }
 
-    public DataAccessCacheImpl(VersionedRecordsReader reader, VersionedRecordsWriterFactory writerFactory,
+    public DataAccessCacheImpl(VersionedRecordsFactory reader, VersionedRecordsWriterFactory writerFactory,
             Datasource datasource, SqlDataTypes sqlTypes, EmfProperties properties) {
         view = new DataViewCacheImpl(reader, properties);
         updates = new DataUpdatesCacheImpl(writerFactory, datasource, sqlTypes, properties);

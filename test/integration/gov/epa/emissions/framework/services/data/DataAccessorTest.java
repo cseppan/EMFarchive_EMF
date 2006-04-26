@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsFactory;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.Column;
@@ -43,7 +43,7 @@ public class DataAccessorTest extends ServiceTestCase {
     }
 
     private DataAccessor createService() throws Exception {
-        DefaultVersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
+        DefaultVersionedRecordsFactory reader = new DefaultVersionedRecordsFactory(datasource);
 
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
         DataAccessCacheImpl cache = new DataAccessCacheImpl(reader, writerFactory, datasource, sqlDataTypes());

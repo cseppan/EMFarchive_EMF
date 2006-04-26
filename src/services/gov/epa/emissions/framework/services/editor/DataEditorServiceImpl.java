@@ -6,9 +6,9 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.TableDefinition;
 import gov.epa.emissions.commons.db.version.ChangeSet;
-import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsFactory;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.VersionedRecordsFactory;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.commons.security.User;
@@ -33,7 +33,7 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
 
     private Versions versions;
 
-    private VersionedRecordsReader reader;
+    private VersionedRecordsFactory factory;
 
     private DataAccessCache cache;
 
@@ -60,10 +60,10 @@ public class DataEditorServiceImpl extends EmfServiceImpl implements DataEditorS
     private void init(DbServer dbServer, Datasource datasource, HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         versions = new Versions();
-        reader = new DefaultVersionedRecordsReader(datasource);
+        factory = new DefaultVersionedRecordsFactory(datasource);
 
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
-        cache = new DataAccessCacheImpl(reader, writerFactory, datasource, dbServer.getSqlDataTypes());
+        cache = new DataAccessCacheImpl(factory, writerFactory, datasource, dbServer.getSqlDataTypes());
 
         accessor = new DataAccessorImpl(cache, sessionFactory);
     }

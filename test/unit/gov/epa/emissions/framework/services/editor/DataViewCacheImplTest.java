@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.editor;
 
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.VersionedRecordsFactory;
 
 import org.hibernate.Session;
 import org.jmock.Mock;
@@ -12,8 +12,8 @@ import org.jmock.core.Constraint;
 public class DataViewCacheImplTest extends MockObjectTestCase {
 
     public void testShouldReinitializeRecordsReaderOnApplyConstraints() throws Exception {
-        Mock reader = mock(VersionedRecordsReader.class);
-        DataViewCacheImpl cache = new DataViewCacheImpl((VersionedRecordsReader) reader.proxy());
+        Mock reader = mock(VersionedRecordsFactory.class);
+        DataViewCacheImpl cache = new DataViewCacheImpl((VersionedRecordsFactory) reader.proxy());
 
         DataAccessToken token = new DataAccessToken();
         token.setVersion(new Version());

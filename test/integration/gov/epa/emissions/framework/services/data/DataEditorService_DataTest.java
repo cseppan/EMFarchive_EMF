@@ -3,10 +3,10 @@ package gov.epa.emissions.framework.services.data;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
-import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsFactory;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecord;
-import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.VersionedRecordsFactory;
 import gov.epa.emissions.commons.db.version.Versions;
 import gov.epa.emissions.commons.io.DataFormatFactory;
 import gov.epa.emissions.commons.io.importer.Importer;
@@ -231,7 +231,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
         service.submit(token, changeset, 1);
         service.save(token, dataset);
 
-        DefaultVersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
+        DefaultVersionedRecordsFactory reader = new DefaultVersionedRecordsFactory(datasource);
         int v0RecordsCount = reader.fetch(versionZero(), dataset.getName(), session).total();
 
         assertEquals(v0RecordsCount + 3, reader.fetch(v1, dataset.getName(), session).total());
@@ -313,7 +313,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
 
         service.save(token, dataset);
 
-        VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
+        VersionedRecordsFactory reader = new DefaultVersionedRecordsFactory(datasource);
         int v0RecordsCount = reader.fetch(versionZero(), dataset.getName(), session).total();
 
         int v1Count = reader.fetch(v1, dataset.getName(), session).total();
@@ -323,7 +323,7 @@ public class DataEditorService_DataTest extends ServiceTestCase {
     public void testShouldDiscardChangesOnDiscard() throws Exception {
         Version v1 = versionOne();
 
-        VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
+        VersionedRecordsFactory reader = new DefaultVersionedRecordsFactory(datasource);
         int v1Count = reader.fetch(v1, dataset.getName(), session).total();
 
         DataAccessToken token = token(v1, table);

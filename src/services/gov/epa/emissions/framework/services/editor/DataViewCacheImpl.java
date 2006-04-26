@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.services.editor;
 
 import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
-import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.VersionedRecordsFactory;
 import gov.epa.emissions.framework.services.EmfProperties;
 import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
@@ -19,15 +19,15 @@ public class DataViewCacheImpl implements DataViewCache {
 
     private Map readersMap;
 
-    private VersionedRecordsReader recordsReader;
+    private VersionedRecordsFactory recordsReader;
 
     private EmfProperties properties;
 
-    public DataViewCacheImpl(VersionedRecordsReader reader) {
+    public DataViewCacheImpl(VersionedRecordsFactory reader) {
         this(reader, new EmfPropertiesDAO());
     }
 
-    public DataViewCacheImpl(VersionedRecordsReader reader, EmfProperties properties) {
+    public DataViewCacheImpl(VersionedRecordsFactory reader, EmfProperties properties) {
         this.properties = properties;
         recordsReader = reader;
         readersMap = new HashMap();

@@ -7,9 +7,9 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.TableDefinition;
-import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.DefaultVersionedRecordsFactory;
 import gov.epa.emissions.commons.db.version.Version;
-import gov.epa.emissions.commons.db.version.VersionedRecordsReader;
+import gov.epa.emissions.commons.db.version.VersionedRecordsFactory;
 import gov.epa.emissions.commons.io.TableMetadata;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfServiceImpl;
@@ -43,9 +43,9 @@ public class DataViewServiceImpl extends EmfServiceImpl implements DataViewServi
     }
 
     private void init(DbServer dbServer, Datasource datasource, HibernateSessionFactory sessionFactory) {
-        VersionedRecordsReader reader = new DefaultVersionedRecordsReader(datasource);
+        VersionedRecordsFactory factory = new DefaultVersionedRecordsFactory(datasource);
         VersionedRecordsWriterFactory writerFactory = new DefaultVersionedRecordsWriterFactory();
-        DataAccessCacheImpl cache = new DataAccessCacheImpl(reader, writerFactory, datasource, dbServer
+        DataAccessCacheImpl cache = new DataAccessCacheImpl(factory, writerFactory, datasource, dbServer
                 .getSqlDataTypes());
 
         accessor = new DataAccessorImpl(cache, sessionFactory);
