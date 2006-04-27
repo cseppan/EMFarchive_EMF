@@ -261,7 +261,6 @@ public class PaginationPanel extends JPanel {
             public void actionPerformed(ActionEvent event) {
                 doDisplayPrevious();
             }
-
         };
         prevButton = new IconButton("Prev", "Go to Previous Page", res.prev("Go to Previous Page"), action);
         return prevButton;
