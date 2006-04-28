@@ -10,4 +10,6 @@ public interface ControlStrategiesManagerPresenter {
 
     void doClose();
 
+    void doNew(ControlStrategyView view);
+
 }

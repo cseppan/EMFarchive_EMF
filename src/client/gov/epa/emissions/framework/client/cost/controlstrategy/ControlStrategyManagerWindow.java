@@ -32,7 +32,7 @@ import javax.swing.JScrollPane;
 public class ControlStrategyManagerWindow extends ReusableInteralFrame implements ControlStrategyManagerView,
         RefreshObserver {
 
-    private ControlStrategiesManagerPresenterImpl presenter;
+    private ControlStrategiesManagerPresenter presenter;
 
     private SortFilterSelectModel selectModel;
 
@@ -183,7 +183,8 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     }
 
     private void createNewCase() {
-        tempMessage();
+        ControlStrategyView view = new ControlStrategyWindow(desktopManager);
+        presenter.doNew(view);
     }
 
     private void removeSelectedCases() {

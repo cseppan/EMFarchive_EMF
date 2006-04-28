@@ -33,4 +33,10 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
         view.close();
     }
 
+    public void doNew(ControlStrategyView view) {
+        ControlStrategyPresenter presenter = new ControlStrategyPresenterImpl(session, view, this);
+        presenter.doDisplay();
+        
+    }
+
 }
