@@ -131,7 +131,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         addChangeable(date);
         layoutGenerator.addLabelWidgetPair("Date:", date, panel);
 
-        config = new TextField("config", step.getWho(), 40);
+        config = new TextField("config", step.getConfiguration(), 40);
         addChangeable(config);
         layoutGenerator.addLabelWidgetPair("Configuration:", config, panel);
         

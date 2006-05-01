@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.FormattedDateField;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
+import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
@@ -28,7 +29,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
-import abbot.editor.widgets.TextField;
 
 public class SetQAStatusWindow extends DisposableInteralFrame implements SetQAStatusView {
 
@@ -105,7 +105,7 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
 
     private ComboBox status() {
         QAProperties qaProperties = new QAProperties();
-        status = new ComboBox(qaProperties.initialStatus(), qaProperties.status());
+        status = new ComboBox("Choose a status", qaProperties.status());
 
         status.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
