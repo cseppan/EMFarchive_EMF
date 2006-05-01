@@ -145,6 +145,11 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         clearMessage();
 
         List selected = selectModel.selected();
+        if(selected.size() == 0) {
+            messagePanel.setMessage("Please select a QA step.");
+            return;
+        }
+        
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             QAStep step = (QAStep) iter.next();
             EditQAStepWindow view = new EditQAStepWindow(desktop);
@@ -186,6 +191,8 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         QAStep[] steps = (QAStep[]) selected.toArray(new QAStep[0]);
         if (steps.length > 0)
             presenter.doSetStatus(new SetQAStatusWindow(desktop), steps);
+        else
+            messagePanel.setMessage("Please select a QA step.");
     }
 
     public void informLackOfTemplatesForAddingNewSteps(DatasetType type) {

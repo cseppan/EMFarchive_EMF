@@ -194,6 +194,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         step.setProgramArguments(arguments.getText());
         step.setOrder(Float.parseFloat(order.getText()));
         step.setDescription(description.getText().trim());
+        step.setWho(dataset.getCreator());
 
         return step;
     }

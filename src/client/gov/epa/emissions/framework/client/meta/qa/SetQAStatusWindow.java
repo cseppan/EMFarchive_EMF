@@ -137,9 +137,15 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
     }
 
     private void doOk() {
+        Object statusObj = status.getSelectedItem();
+        if(statusObj == null) {
+            messagePanel.setMessage("Please select a status");
+            return;
+        }
+            
         for (int i = 0; i < steps.size(); i++) {
             QAStep step = steps.get(i);
-            step.setStatus(status.getSelectedItem().toString());
+            step.setStatus(statusObj.toString());
             step.setDate(date.value());
             step.setWho(who.getText());
 
