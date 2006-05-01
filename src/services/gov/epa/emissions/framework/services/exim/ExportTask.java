@@ -60,7 +60,7 @@ public class ExportTask implements Runnable {
             exporter.export(file);
 
             loggingService.setAccessLog(accesslog);
-            updateDataset(dataset);
+            //updateDataset(dataset);  //Disabled because of nothing updated during exporting
             setStatus("Completed export for " + dataset.getName() + ":" + file.getName());
         } catch (Exception e) {
             log.error("Problem on attempting to run Export on file : " + file, e);

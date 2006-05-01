@@ -204,13 +204,23 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
     }
 
     protected void exportSelectedDatasets() {
-        EmfDataset[] emfDatasets = getNonExternalDatasets(getSelectedDatasets());
+        EmfDataset[] emfDatasets = getNonExternalDatasets(getRefreshedSelectedDatasets());
 
         ExportWindow exportView = new ExportWindow(emfDatasets, desktopManager);
         getDesktopPane().add(exportView);
 
         ExportPresenter exportPresenter = new ExportPresenterImpl(session);
         presenter.doExport(exportView, exportPresenter, emfDatasets);
+    }
+
+    private List getRefreshedSelectedDatasets() {
+        try {
+            doRefresh();
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+        
+        return selectModel.selected();
     }
 
     private EmfDataset[] getNonExternalDatasets(List emfDatasets) {
