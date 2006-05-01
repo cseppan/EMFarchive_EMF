@@ -28,6 +28,9 @@ insert into emf.sectors values (DEFAULT, 'Biogenic','Biogenic');
 --emf.properties
 insert into emf.properties values(DEFAULT, 'lock.time-interval', '3600000');
 insert into emf.properties values(DEFAULT, 'page-size', '100');
+insert into emf.properties values(DEFAULT, 'batch-size', '10000');
+insert into emf.properties values(DEFAULT, 'export-batch-size', '10000');
+
 --emf.properties
 
 -- emf.dataset_types

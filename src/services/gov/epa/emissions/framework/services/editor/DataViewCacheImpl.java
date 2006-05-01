@@ -92,9 +92,9 @@ public class DataViewCacheImpl implements DataViewCache {
     private void initReader(DataAccessToken token, int pageSize, Session session) throws SQLException {
         if (readersMap.containsKey(token.key()))
             return;
-
-        ScrollableVersionedRecords records = recordsReader
-                .optimizedFetch(token.getVersion(), token.getTable(), session);
+        int batchSize = batchSize(properties, session);
+        ScrollableVersionedRecords records = recordsReader.optimizedFetch(token.getVersion(), token.getTable(),
+                batchSize, session);
         PageReader reader = new PageReader(pageSize, records);
 
         cacheReader(token, reader);
@@ -111,10 +111,16 @@ public class DataViewCacheImpl implements DataViewCache {
 
     private void reinitialize(DataAccessToken token, int pageSize, String columnFilter, String rowFilter,
             String sortOrder, Session session) throws Exception {
+        int batchSize = batchSize(properties, session);
         ScrollableVersionedRecords records = recordsReader.optimizedFetch(token.getVersion(), token.getTable(),
-                columnFilter, rowFilter, sortOrder, session);
+                batchSize, columnFilter, rowFilter, sortOrder, session);
 
         PageReader reader = new PageReader(pageSize, records);
         cacheReader(token, reader);
+    }
+
+    private int batchSize(EmfProperties properties, Session session) {
+        EmfProperty batchSize = properties.getProperty("batch-size", session);
+        return Integer.parseInt(batchSize.getValue());
     }
 }

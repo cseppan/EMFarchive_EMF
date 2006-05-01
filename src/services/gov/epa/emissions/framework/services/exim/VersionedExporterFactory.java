@@ -21,9 +21,12 @@ public class VersionedExporterFactory {
 
     private SqlDataTypes sqlDataTypes;
 
-    public VersionedExporterFactory(DbServer dbServer, SqlDataTypes sqlDataTypes) {
+    private int batchSize;
+
+    public VersionedExporterFactory(DbServer dbServer, SqlDataTypes sqlDataTypes, int batchSize) {
         this.dbServer = dbServer;
         this.sqlDataTypes = sqlDataTypes;
+        this.batchSize = batchSize;
     }
 
     public Exporter create(Dataset dataset, Version version) throws EmfException {
@@ -33,8 +36,9 @@ public class VersionedExporterFactory {
             Class exporterClass = Class.forName(exporterName);
 
             Class[] classParams = new Class[] { Dataset.class, DbServer.class, SqlDataTypes.class,
-                    DataFormatFactory.class };
-            Object[] params = new Object[] { dataset, dbServer, sqlDataTypes, new VersionedDataFormatFactory(version) };
+                    DataFormatFactory.class, Integer.class };
+            Object[] params = new Object[] { dataset, dbServer, sqlDataTypes, new VersionedDataFormatFactory(version),
+                    new Integer(batchSize) };
 
             Constructor exporterConstructor = exporterClass.getDeclaredConstructor(classParams);
             return (Exporter) exporterConstructor.newInstance(params);

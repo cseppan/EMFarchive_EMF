@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.services.editor;
 import gov.epa.emissions.commons.db.version.ScrollableVersionedRecords;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.db.version.VersionedRecordsFactory;
+import gov.epa.emissions.framework.services.EmfProperties;
+import gov.epa.emissions.framework.services.EmfProperty;
 
 import org.hibernate.Session;
 import org.jmock.Mock;
@@ -13,7 +15,12 @@ public class DataViewCacheImplTest extends MockObjectTestCase {
 
     public void testShouldReinitializeRecordsReaderOnApplyConstraints() throws Exception {
         Mock reader = mock(VersionedRecordsFactory.class);
-        DataViewCacheImpl cache = new DataViewCacheImpl((VersionedRecordsFactory) reader.proxy());
+        
+        Session session = (Session) mock(Session.class).proxy();
+        
+        int batchSize = 10000;
+        Mock properties = properties(session,batchSize);
+        DataViewCacheImpl cache = new DataViewCacheImpl((VersionedRecordsFactory) reader.proxy(),(EmfProperties) properties.proxy());
 
         DataAccessToken token = new DataAccessToken();
         token.setVersion(new Version());
@@ -22,8 +29,8 @@ public class DataViewCacheImplTest extends MockObjectTestCase {
         String columnFilter = "col";
         String rowFilter = "row";
         String sortOrder = "sort";
-        Session session = (Session) mock(Session.class).proxy();
-        Constraint[] constraints = new Constraint[] { eq(token.getVersion()), eq(token.getTable()), eq(columnFilter),
+        
+        Constraint[] constraints = new Constraint[] { eq(token.getVersion()), eq(token.getTable()), eq(batchSize), eq(columnFilter),
                 eq(rowFilter), eq(sortOrder), same(session) };
         
         Mock records = mock(ScrollableVersionedRecords.class);
@@ -31,4 +38,18 @@ public class DataViewCacheImplTest extends MockObjectTestCase {
 
         cache.init(token, 10, columnFilter, rowFilter, sortOrder, session);
     }
+    
+    private Mock properties(Session session, int batchSize) {
+        Mock properties = mock(EmfProperties.class);
+
+        EmfProperty property = new EmfProperty();
+        property.setName("batch-size");
+        property.setValue(""+batchSize);
+        
+        properties.expects(once()).method("getProperty").with(eq("batch-size"), eq(session)).will(returnValue(property));
+        
+        return properties;
+    }
+    
+    
 }

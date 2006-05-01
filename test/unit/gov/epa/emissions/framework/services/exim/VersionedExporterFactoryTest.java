@@ -17,7 +17,7 @@ import org.jmock.cglib.MockObjectTestCase;
 public class VersionedExporterFactoryTest extends MockObjectTestCase {
 
     public void testShouldBeAbleCreateOrlExporter() throws Exception {
-        VersionedExporterFactory factory = new VersionedExporterFactory(dbServer(), null);
+        VersionedExporterFactory factory = new VersionedExporterFactory(dbServer(), null,10000);
 
         DatasetType datasetType = new DatasetType();
         datasetType.setExporterClassName(ORLOnRoadExporter.class.getName());
@@ -36,7 +36,7 @@ public class VersionedExporterFactoryTest extends MockObjectTestCase {
         Mock types = mock(SqlDataTypes.class);
         types.stubs().method("intType").withNoArguments().will(returnValue("integer"));
 
-        VersionedExporterFactory factory = new VersionedExporterFactory(dbServer(), (SqlDataTypes) types.proxy());
+        VersionedExporterFactory factory = new VersionedExporterFactory(dbServer(), (SqlDataTypes) types.proxy(),10000);
 
         DatasetType datasetType = new DatasetType();
         datasetType.setExporterClassName(TemporalProfileExporter.class.getName());

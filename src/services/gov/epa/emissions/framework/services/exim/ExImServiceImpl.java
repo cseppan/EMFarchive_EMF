@@ -14,8 +14,6 @@ import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
 public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
-    private VersionedExporterFactory exporterFactory;
-
     private PooledExecutor threadPool;
 
     private ImportService importService;
@@ -41,8 +39,7 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
     private void init(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         threadPool = createThreadPool();
 
-        exporterFactory = new VersionedExporterFactory(dbServer, dbServer.getSqlDataTypes());
-        exportService = new ExportService(exporterFactory, threadPool, sessionFactory);
+        exportService = new ExportService(dbServer, threadPool, sessionFactory);
 
         ImporterFactory importerFactory = new ImporterFactory(dbServer, dbServer.getSqlDataTypes());
         importService = new ImportService(importerFactory, sessionFactory, threadPool);

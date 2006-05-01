@@ -43,11 +43,17 @@ public class DataAccessCacheTest extends MockObjectTestCase {
     private Mock properties() {
         Mock properties = mock(EmfProperties.class);
 
-        EmfProperty property = new EmfProperty();
-        property.setName("page-size");
-        property.setValue("100");
+        EmfProperty pageSize = new EmfProperty();
+        pageSize.setName("page-size");
+        pageSize.setValue("100");
+        
+        EmfProperty batchSize = new EmfProperty();
+        batchSize.setName("batch-size");
+        batchSize.setValue("10000");
+        
+        properties.stubs().method("getProperty").with(eq("page-size"), eq(null)).will(returnValue(pageSize));
 
-        properties.stubs().method("getProperty").with(eq("page-size"), eq(null)).will(returnValue(property));
+        properties.stubs().method("getProperty").with(eq("batch-size"), eq(null)).will(returnValue(batchSize));
         return properties;
     }
 
