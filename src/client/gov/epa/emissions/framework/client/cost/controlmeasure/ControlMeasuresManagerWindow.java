@@ -116,18 +116,18 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
 
-        Button newControlMeasure = new Button("New", newControlMeasureAction());
-        panel.add(newControlMeasure);
+        Button view = new Button("View", viewAction());
+        panel.add(view);
+
+        Button edit = new Button("Edit", editAction());
+        panel.add(edit);
         
         Button copy = new Button("Copy", copyAction());
         panel.add(copy);
         
-        Button edit = new Button("Edit", editAction());
-        panel.add(edit);
+        Button newControlMeasure = new Button("New", newControlMeasureAction());
+        panel.add(newControlMeasure);
         
-        Button view = new Button("View", viewAction());
-        panel.add(view);
-
         return panel;
     }
 
