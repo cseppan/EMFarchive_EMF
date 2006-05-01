@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.editor;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.PageReader;
 import gov.epa.emissions.commons.db.version.ChangeSet;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.editor.ChangeSets.ChangeSetsIterator;
 
 import org.hibernate.Session;
@@ -47,8 +48,9 @@ public class PageFetch {
     }
 
     public Page getPageWithRecord(DataAccessToken token, int record, Session session) throws Exception {
-        int pageCount = cache.pageSize(token);
+        int pageCount = getPageCount(token);
         int pageNumber = pageNumber(token, record, pageCount, session);
+        
         return getPage(token, pageNumber, session);
     }
 
@@ -60,13 +62,16 @@ public class PageFetch {
             ChangeSets sets = cache.changesets(token, i, session);
             int pageMax = pageSize + sets.netIncrease();
             high = low + pageMax;
+
             if ((low < record) && (record <= high))
                 return i;
 
             low += pageMax;
         }
+        if(record>high) //record id is in the last page
+            return pageCount;
 
-        return 0;
+        throw new EmfException("invalid record id-"+record);
     }
 
     public int getTotalRecords(DataAccessToken token, Session session) throws Exception {

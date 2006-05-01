@@ -24,7 +24,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToolBar;
-import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -128,13 +127,15 @@ public class PaginationPanel extends JPanel {
     private JFormattedTextField recordInputField(final int max) {
         recordInput = new NumberFormattedTextField(1, max, 7, new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                System.out.println("value-"+recordInput.getValue());
                 if (!verifyInput(slider))
                     return;
+                
                 int record = Integer.parseInt(recordInput.getText());
                 displayPage(record);
             }
         });
-        recordInput.setInputVerifier(new NumberVerifier());
+        //recordInput.setInputVerifier(new NumberVerifier());
         recordInput.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent event) {
                 if ("value".equals(event.getPropertyName())) {
@@ -212,12 +213,9 @@ public class PaginationPanel extends JPanel {
     }
 
     private boolean verifyInput(JSlider slider) {
-        AbstractFormatter formatter = recordInput.getFormatter();
-        String val = recordInput.getText();
+        Integer val = (Integer) recordInput.getValue();
 
         try {
-            Integer.parseInt(val);
-            formatter.stringToValue(val);
             recordInput.commitEdit();
 
             messagePanel.clear();

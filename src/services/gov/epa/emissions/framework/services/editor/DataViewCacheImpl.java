@@ -113,8 +113,8 @@ public class DataViewCacheImpl implements DataViewCache {
             String sortOrder, Session session) throws Exception {
         ScrollableVersionedRecords records = recordsReader.optimizedFetch(token.getVersion(), token.getTable(),
                 columnFilter, rowFilter, sortOrder, session);
-        PageReader reader = new PageReader(pageSize, records);
 
+        PageReader reader = new PageReader(pageSize, records);
         cacheReader(token, reader);
     }
 }
