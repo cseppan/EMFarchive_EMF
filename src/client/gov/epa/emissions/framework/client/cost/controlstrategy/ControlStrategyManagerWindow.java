@@ -45,7 +45,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     private EmfConsole parentConsole;
 
     public ControlStrategyManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("ControlStrategy Manager", new Dimension(700, 600), desktopManager);
+        super("Control Strategy Manager", new Dimension(700, 400), desktopManager);
 
         this.parentConsole = parentConsole;
 
