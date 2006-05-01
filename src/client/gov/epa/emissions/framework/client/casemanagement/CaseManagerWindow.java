@@ -51,7 +51,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
     private EmfSession session;
 
     public CaseManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Case Manager", new Dimension(700, 600), desktopManager);
+        super("Case Manager", new Dimension(700, 400), desktopManager);
 
         this.session = session;
         this.parentConsole = parentConsole;
