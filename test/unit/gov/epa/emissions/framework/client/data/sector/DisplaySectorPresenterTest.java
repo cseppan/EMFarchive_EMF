@@ -24,7 +24,7 @@ public class DisplaySectorPresenterTest extends MockObjectTestCase {
     public void testShouldCloseViewOnClose() throws Exception {
         Sector sector = new Sector();
         Mock view = mock(ViewableSectorView.class);
-        view.expects(once()).method("close");
+        view.expects(once()).method("disposeView");
 
         ViewableSectorPresenter presenter = new ViewableSectorPresenterImpl((ViewableSectorView) view.proxy(), sector);
 

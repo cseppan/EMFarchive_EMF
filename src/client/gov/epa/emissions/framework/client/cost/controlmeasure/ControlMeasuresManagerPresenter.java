@@ -24,7 +24,7 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
     public void doRefresh() throws EmfException {

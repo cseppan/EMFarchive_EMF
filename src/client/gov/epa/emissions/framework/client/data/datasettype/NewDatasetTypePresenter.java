@@ -43,7 +43,7 @@ public class NewDatasetTypePresenter {
     }
 
     private void closeView() {
-        view.close();
+        view.disposeView();
     }
 
     public void doSave(String name, String minfiles, String maxfiles, String type) throws EmfException {

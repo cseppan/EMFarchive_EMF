@@ -22,7 +22,7 @@ public class RegisterUserPresenter {
     }
 
     public void doCancel() {
-        view.close();
+        view.disposeView();
     }
 
     public void display(RegisterUserView view) {

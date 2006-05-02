@@ -37,7 +37,7 @@ public class RegisterUserPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldCloseViewOnCancelAction() {
-        view.expects(once()).method("close").withNoArguments();
+        view.expects(once()).method("disposeView").withNoArguments();
 
         presenter.doCancel();
     }

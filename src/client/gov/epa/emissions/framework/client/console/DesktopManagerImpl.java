@@ -61,7 +61,7 @@ public class DesktopManagerImpl implements DesktopManager {
             Object key = list.get(i);
             ManagedView view = (ManagedView) windowNames.get(key);
             if (!view.hasChanges()) {
-                view.close();// closeWindow is called inside this method
+                view.windowClosing();// closeWindow is called inside this method
             }
         }
         return checkForUnSavedWindows(windowNames);
@@ -84,7 +84,7 @@ public class DesktopManagerImpl implements DesktopManager {
             Object key = list.get(i);
             ManagedView view = (ManagedView) windowNames.get(key);
             view.resetChanges();
-            view.close();
+            view.disposeView();
         }
     }
 

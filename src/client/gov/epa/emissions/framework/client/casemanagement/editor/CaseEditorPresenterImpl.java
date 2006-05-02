@@ -48,7 +48,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
     }
 
     private void closeView() {
-        view.close();
+        view.disposeView();
     }
 
     public void doSave() throws EmfException {

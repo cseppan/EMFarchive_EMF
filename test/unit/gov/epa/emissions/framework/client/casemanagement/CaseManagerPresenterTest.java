@@ -84,7 +84,7 @@ public class CaseManagerPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldCloseViewOnClose() {
         Mock browser = mock(CaseManagerView.class);
-        expects(browser, 1, "close");
+        expects(browser, 1, "disposeView");
 
         CaseManagerPresenter presenter = new CaseManagerPresenterImpl(null, (CaseManagerView) browser.proxy());
 

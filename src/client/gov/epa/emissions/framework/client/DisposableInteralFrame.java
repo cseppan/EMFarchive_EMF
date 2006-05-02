@@ -15,12 +15,12 @@ public abstract class DisposableInteralFrame extends EmfInternalFrame {
     }
 
     public void windowClosing() {
-        close();
+        disposeView();
     }
 
-    final public void close() {
+    final public void disposeView() {
         super.dispose();
-        super.close();
+        super.disposeView();
     }
 
     public boolean isAlive() {

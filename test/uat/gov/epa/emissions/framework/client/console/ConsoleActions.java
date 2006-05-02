@@ -19,7 +19,7 @@ public class ConsoleActions {
     }
 
     public void close() {
-        console.close();
+        console.disposeView();
     }
 
 }

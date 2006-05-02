@@ -47,7 +47,7 @@ public class ControlStrategiesManagerPresenterTest extends EmfMockObjectTestCase
 
     public void testShouldCloseViewOnClose() {
         Mock browser = mock(ControlStrategyManagerView.class);
-        expects(browser, 1, "close");
+        expects(browser, 1, "disposeView");
 
         ControlStrategiesManagerPresenter presenter = new ControlStrategiesManagerPresenterImpl(null, (ControlStrategyManagerView) browser.proxy());
 

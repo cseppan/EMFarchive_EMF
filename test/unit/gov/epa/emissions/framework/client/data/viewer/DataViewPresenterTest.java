@@ -62,7 +62,7 @@ public class DataViewPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldCloseViewAndCloseDataEditSessionOnClose() throws Exception {
         Mock view = mock(DataView.class);
-        view.expects(once()).method("close").withNoArguments();
+        view.expects(once()).method("disposeView").withNoArguments();
 
         Version version = new Version();
         String table = "table";

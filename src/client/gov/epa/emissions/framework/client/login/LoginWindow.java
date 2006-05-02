@@ -89,7 +89,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
 
         JButton cancel = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                close();
+                disposeView();
             }
         });
         container.add(cancel);
@@ -107,7 +107,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
             messagePanel.clear();
             super.refreshLayout();
             launchConsole(user);
-            close();
+            disposeView();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -179,7 +179,7 @@ public class LoginWindow extends EmfFrame implements LoginView {
             messagePanel.setError(ex.getMessage());
             return;
         }
-        close();
+        disposeView();
     }
 
     private void launchRegisterUser() throws Exception {

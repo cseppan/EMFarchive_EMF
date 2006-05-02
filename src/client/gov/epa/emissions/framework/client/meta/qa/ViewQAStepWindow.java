@@ -108,7 +108,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
         JPanel panel = new JPanel();
         Button close = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                close();
+                disposeView();
             }
         });
         getRootPane().setDefaultButton(close);

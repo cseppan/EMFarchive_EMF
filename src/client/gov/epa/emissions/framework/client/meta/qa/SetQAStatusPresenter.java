@@ -31,6 +31,6 @@ public class SetQAStatusPresenter {
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 }

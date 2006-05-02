@@ -27,7 +27,7 @@ public class EditQAStepPresenter {
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
     public void doEdit() {

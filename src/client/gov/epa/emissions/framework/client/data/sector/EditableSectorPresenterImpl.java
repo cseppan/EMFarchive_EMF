@@ -45,7 +45,7 @@ public class EditableSectorPresenterImpl implements EditableSectorPresenter {
     }
 
     private void closeView() {
-        editable.close();
+        editable.disposeView();
     }
 
     public void doSave() throws EmfException {

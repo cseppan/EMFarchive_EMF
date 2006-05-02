@@ -36,7 +36,7 @@ public class ControlMeasuresEditorPresenterImpl implements ControlMeasuresEditor
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
     
     public void doSave() throws EmfException {
@@ -51,7 +51,7 @@ public class ControlMeasuresEditorPresenterImpl implements ControlMeasuresEditor
         }
         service.addMeasure(measure);
 
-        view.close();
+        view.disposeView();
     }
 
     public void set(EditableCMSummaryTabView summary) {

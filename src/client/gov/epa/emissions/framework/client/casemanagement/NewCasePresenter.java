@@ -30,7 +30,7 @@ public class NewCasePresenter {
     }
 
     private void closeView() {
-        view.close();
+        view.disposeView();
     }
 
     public void doSave(Case newCase) throws EmfException {

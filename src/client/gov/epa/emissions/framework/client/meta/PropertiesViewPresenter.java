@@ -40,7 +40,7 @@ public class PropertiesViewPresenter {
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
     public void set(SummaryTabView summary) {

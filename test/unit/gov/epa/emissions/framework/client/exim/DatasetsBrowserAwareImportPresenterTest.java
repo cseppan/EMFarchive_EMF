@@ -55,7 +55,7 @@ public class DatasetsBrowserAwareImportPresenterTest extends MockObjectTestCase 
     }
 
     public void testShouldRefreshDatasetsBrowserAndCloseWindowOnDone() {
-        view.expects(once()).method("close");
+        view.expects(once()).method("disposeView");
 
         EmfDataset[] datasets = new EmfDataset[0];
         dataServices.stubs().method("getDatasets").will(returnValue(datasets));

@@ -105,7 +105,7 @@ public class ImportPresenterTest extends MockObjectTestCase {
     }
 
     public void testClosesViewOnDoneImport() {
-        view.expects(once()).method("close");
+        view.expects(once()).method("disposeView");
 
         presenter.doDone();
     }

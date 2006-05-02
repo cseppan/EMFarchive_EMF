@@ -9,6 +9,6 @@ public interface NewSectorView extends ManagedView {
 
     void display(Sector sector);
 
-    void close();
+    void disposeView();
 
 }

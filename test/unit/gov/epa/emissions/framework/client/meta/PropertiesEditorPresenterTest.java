@@ -61,7 +61,7 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
     }
 
     public void testShouldCloseViewAndReleaseLockOnNotifyClose() throws Exception {
-        view.expects(once()).method("close");
+        view.expects(once()).method("disposeView");
         dataService.expects(once()).method("releaseLockedDataset").with(same(dataset)).will(returnValue(dataset));
 
         presenter.doClose();
@@ -117,7 +117,7 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() throws Exception {
         dataService.expects(once()).method("updateDataset").with(eq(dataset));
-        expects(view, "close");
+        expects(view, "disposeView");
 
         presenter.save(dataset, (DataService) dataService.proxy(), presenters(), (DatasetPropertiesEditorView) view
                 .proxy());
@@ -134,7 +134,7 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldUpdateDatasetWithChangesFromTabsAndSaveDatasetOnUpdate() throws Exception {
         dataService.expects(once()).method("updateDataset").with(eq(dataset));
-        expects(view, "close");
+        expects(view, "disposeView");
 
         presenter.save(dataset, (DataService) dataService.proxy(), presenters(), (DatasetPropertiesEditorView) view
                 .proxy());
@@ -166,7 +166,7 @@ public class PropertiesEditorPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldDisplayErrorMessageOnDatasetsBrowserIfGettingUpdatedDatasetsFailOnSave() throws Exception {
         dataService.expects(once()).method("updateDataset").with(eq(dataset));
-        view.expects(once()).method("close");
+        view.expects(once()).method("disposeView");
 
         presenter.save(dataset, (DataService) dataService.proxy(), presenters(), (DatasetPropertiesEditorView) view
                 .proxy());

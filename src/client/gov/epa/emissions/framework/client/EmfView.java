@@ -8,7 +8,8 @@ import gov.epa.emissions.framework.ui.Position;
  */
 public interface EmfView {
 
-    void close();
+    /* dispose the view, won't release the locks if any */
+    void disposeView();
 
     void display();
 

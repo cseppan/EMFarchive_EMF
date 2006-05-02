@@ -84,7 +84,7 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
         JPanel panel = new JPanel();
         Button ok = new Button("Ok", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                close();
+                disposeView();
             }
         });
         getRootPane().setDefaultButton(ok);

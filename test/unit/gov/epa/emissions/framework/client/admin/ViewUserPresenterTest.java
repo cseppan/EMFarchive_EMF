@@ -31,7 +31,7 @@ public class ViewUserPresenterTest extends MockObjectTestCase {
         view.expects(once()).method("observe").with(same(presenter));
         presenter.display((UserView) view.proxy());
 
-        view.expects(once()).method("close").withNoArguments();
+        view.expects(once()).method("disposeView").withNoArguments();
         presenter.doClose();
     }
 

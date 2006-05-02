@@ -55,7 +55,7 @@ public class ClosingRule {
             saveRevision();
 
         dataEditorService().closeSession(token);
-        view.close();
+        view.disposeView();
     }
 
     private void saveRevision() throws EmfException {

@@ -19,7 +19,7 @@ public class ViewableDatasetTypePresenterImpl implements ViewableDatasetTypePres
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
 }

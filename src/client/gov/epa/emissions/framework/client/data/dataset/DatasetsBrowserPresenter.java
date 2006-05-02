@@ -35,7 +35,7 @@ public class DatasetsBrowserPresenter implements RefreshObserver {
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
     public void doExport(ExportView exportView, ExportPresenter presenter, EmfDataset[] datasets) {

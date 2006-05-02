@@ -66,7 +66,7 @@ public class DataViewPresenter {
 
     public void doClose() throws EmfException {
         viewService().closeSession(token);
-        view.close();
+        view.disposeView();
     }
 
     public void doAddNote(NewNoteView view) throws EmfException {

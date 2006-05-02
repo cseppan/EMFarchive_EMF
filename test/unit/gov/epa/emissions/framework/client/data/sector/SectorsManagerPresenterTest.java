@@ -46,7 +46,7 @@ public class SectorsManagerPresenterTest extends MockObjectTestCase {
 
     public void testShouldCloseViewOnClose() throws Exception {
         Mock view = mock(SectorsManagerView.class);
-        view.expects(once()).method("close").withNoArguments();
+        view.expects(once()).method("disposeView").withNoArguments();
 
         SectorsManagerPresenter p = new SectorsManagerPresenter(null, (SectorsManagerView) view.proxy(), null);
 

@@ -27,7 +27,7 @@ public class DatasetTypesManagerPresenter implements RefreshObserver {
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
     public void doEdit(DatasetType type, EditableDatasetTypeView editable, ViewableDatasetTypeView viewable)

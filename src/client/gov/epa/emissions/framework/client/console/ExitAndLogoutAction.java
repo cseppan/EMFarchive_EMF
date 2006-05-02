@@ -17,7 +17,7 @@ public class ExitAndLogoutAction {
         String message = "Do you want to log out of the Emission Modeling Framework?";
         if (confirm(message)) {
             if (desktopManager.closeAll()) {
-                emfConsole.close();
+                emfConsole.disposeView();
                 return true;
             }
         }
@@ -28,7 +28,7 @@ public class ExitAndLogoutAction {
         String message = "Do you want to exit the Emission Modeling Framework?";
         if (confirm(message)) {
             if (desktopManager.closeAll()) {
-                emfConsole.close();
+                emfConsole.disposeView();
                 System.exit(0);
             }
         }

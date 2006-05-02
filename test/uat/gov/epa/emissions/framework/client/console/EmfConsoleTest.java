@@ -27,7 +27,7 @@ public class EmfConsoleTest extends UserAcceptanceTestCase {
     }
 
     protected void tearDown() {
-        window.close();
+        window.disposeView();
     }
 
     public void testShouldShowLoginOnLogout() throws Exception {

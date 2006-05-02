@@ -66,7 +66,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
     public void testShouldCloseViewOnClose() throws Exception {
         Sector sector = new Sector();
         Mock view = mock(EditableSectorView.class);
-        view.expects(once()).method("close");
+        view.expects(once()).method("disposeView");
 
         User user = new User();
         user.setUsername("user");
@@ -85,7 +85,7 @@ public class EditableSectorPresenterTest extends MockObjectTestCase {
         Sector sector = new Sector();
 
         Mock view = mock(EditableSectorView.class);
-        view.expects(once()).method("close");
+        view.expects(once()).method("disposeView");
 
         User user = new User();
         Mock service = mock(DataCommonsService.class);

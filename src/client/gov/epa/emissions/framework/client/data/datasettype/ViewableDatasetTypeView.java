@@ -9,6 +9,6 @@ public interface ViewableDatasetTypeView extends ManagedView {
 
     void display(DatasetType type);
 
-    void close();
+    void disposeView();
 
 }

@@ -26,7 +26,7 @@ public class LoginPresenter {
     }
 
     public void doCancel() {
-        view.close();
+        view.disposeView();
     }
 
     public void display(LoginView view) {

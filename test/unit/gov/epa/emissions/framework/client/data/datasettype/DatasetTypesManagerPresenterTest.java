@@ -35,7 +35,7 @@ public class DatasetTypesManagerPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldCloseViewOnClose() throws Exception {
         Mock view = mock(DatasetTypesManagerView.class);
-        view.expects(once()).method("close").withNoArguments();
+        view.expects(once()).method("disposeView").withNoArguments();
 
         DatasetTypesManagerPresenter p = new DatasetTypesManagerPresenter(null, (DatasetTypesManagerView) view.proxy());
 

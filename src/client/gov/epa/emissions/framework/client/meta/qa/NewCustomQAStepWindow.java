@@ -170,7 +170,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
 
         Button cancel = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                close();
+                disposeView();
             }
         });
         panel.add(cancel);
@@ -180,7 +180,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
 
     private void doOk() {
         tabView.add(step());
-        close();
+        disposeView();
     }
 
     public QAStep step() {

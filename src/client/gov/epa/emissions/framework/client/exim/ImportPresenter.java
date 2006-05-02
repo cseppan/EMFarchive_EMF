@@ -47,7 +47,7 @@ public class ImportPresenter {
     }
 
     public void doDone() {
-        view.close();
+        view.disposeView();
     }
 
     public void display(ImportView view) {

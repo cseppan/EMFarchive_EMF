@@ -41,7 +41,7 @@ public abstract class EmfFrame extends JFrame implements EmfView {
         super.setLocation(new Point(position.x(), position.y()));
     }
 
-    final public void close() {
+    final public void disposeView() {
         super.dispose();
     }
 

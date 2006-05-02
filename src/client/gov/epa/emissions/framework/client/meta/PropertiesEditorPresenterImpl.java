@@ -58,7 +58,7 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
 
     public void doClose() throws EmfException {
         dataService().releaseLockedDataset(dataset);
-        view.close();
+        view.disposeView();
     }
 
     public void doSave() throws EmfException {
@@ -73,7 +73,7 @@ public class PropertiesEditorPresenterImpl implements PropertiesEditorPresenter 
         }
         service.updateDataset(dataset);
 
-        view.close();
+        view.disposeView();
     }
 
     public void set(EditableSummaryTabView summary) {

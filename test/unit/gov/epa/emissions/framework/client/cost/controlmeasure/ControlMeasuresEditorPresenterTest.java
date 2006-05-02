@@ -57,7 +57,7 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() throws Exception {
         costService.expects(once()).method("addMeasure").with(eq(measure));
-        expects(view, "close");
+        expects(view, "disposeView");
 
         presenter.save(measure, (CostService) costService.proxy(), presenters(), (ControlMeasuresEditorView) view
                 .proxy());

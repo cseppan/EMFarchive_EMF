@@ -23,7 +23,7 @@ public class UsersManagerPresenter implements RefreshObserver {
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
     public void display(UsersManagerView view) throws EmfException {

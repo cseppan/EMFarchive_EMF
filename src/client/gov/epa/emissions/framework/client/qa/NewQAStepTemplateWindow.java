@@ -86,7 +86,7 @@ public class NewQAStepTemplateWindow extends DisposableInteralFrame implements N
 
         Button cancel = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                close();
+                disposeView();
             }
         });
         panel.add(cancel);
@@ -97,7 +97,7 @@ public class NewQAStepTemplateWindow extends DisposableInteralFrame implements N
     private void doNew(DatasetType type) {
         if (verifyInput(type)) {
             presenter.addNew(template());
-            close();
+            disposeView();
         }
     }
 

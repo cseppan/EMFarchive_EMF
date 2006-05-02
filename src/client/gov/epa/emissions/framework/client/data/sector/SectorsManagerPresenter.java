@@ -25,7 +25,7 @@ public class SectorsManagerPresenter {
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
     public void doEdit(Sector sector, EditableSectorView editSectorView, ViewableSectorView displaySectorView)

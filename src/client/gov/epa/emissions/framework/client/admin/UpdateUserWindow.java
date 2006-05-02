@@ -91,7 +91,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
             return;
         }
 
-        close();
+        disposeView();
     }
 
     public void observe(UpdateUserPresenter presenter) {
@@ -102,7 +102,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
         String message = "Would you like to close without saving and lose your updates?";
         YesNoDialog dialog = new YesNoDialog(this, "Close", message);
         if (dialog.confirm())
-            close();
+            disposeView();
     }
 
     public void windowClosing() {

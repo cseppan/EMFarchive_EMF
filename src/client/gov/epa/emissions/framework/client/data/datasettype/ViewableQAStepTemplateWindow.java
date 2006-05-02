@@ -103,7 +103,7 @@ public class ViewableQAStepTemplateWindow extends DisposableInteralFrame impleme
         JPanel panel = new JPanel();
         Button ok = new Button("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                close();
+                disposeView();
             }
         });
         getRootPane().setDefaultButton(ok);

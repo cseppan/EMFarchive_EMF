@@ -31,7 +31,7 @@ public class VersionedDataPresenterTest extends MockObjectTestCase {
         Mock view = mock(VersionedDataView.class);
         VersionedDataPresenter p = displayPresenter(view);
 
-        view.expects(once()).method("close").withNoArguments();
+        view.expects(once()).method("disposeView").withNoArguments();
         p.doClose();
     }
 

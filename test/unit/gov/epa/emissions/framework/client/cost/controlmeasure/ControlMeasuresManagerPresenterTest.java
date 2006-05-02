@@ -41,7 +41,7 @@ public class ControlMeasuresManagerPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldCloseViewOnClickOfCloseButton() {
-        view.expects(once()).method("close").withNoArguments();
+        view.expects(once()).method("disposeView").withNoArguments();
 
         presenter.doClose();
     }

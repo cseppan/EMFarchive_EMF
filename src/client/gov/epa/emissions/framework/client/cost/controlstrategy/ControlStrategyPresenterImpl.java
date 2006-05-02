@@ -32,7 +32,7 @@ public class ControlStrategyPresenterImpl implements ControlStrategyPresenter {
     }
 
     private void closeView() {
-        view.close();
+        view.disposeView();
     }
 
     public void doSave(ControlStrategy newControlStrategy) throws EmfException {

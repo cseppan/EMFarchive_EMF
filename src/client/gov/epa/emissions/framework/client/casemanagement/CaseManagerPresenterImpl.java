@@ -38,7 +38,7 @@ public class CaseManagerPresenterImpl implements RefreshObserver, CaseManagerPre
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
     public void doNew(NewCaseView view) {

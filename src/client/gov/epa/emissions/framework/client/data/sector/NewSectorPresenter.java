@@ -28,7 +28,7 @@ public class NewSectorPresenter {
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
     public void doSave() throws EmfException {

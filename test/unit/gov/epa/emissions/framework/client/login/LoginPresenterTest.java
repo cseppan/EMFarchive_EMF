@@ -58,7 +58,7 @@ public class LoginPresenterTest extends MockObjectTestCase {
     }
 
     public void testShouldCloseViewOnNotifyCancel() {
-        view.expects(once()).method("close").withNoArguments();
+        view.expects(once()).method("disposeView").withNoArguments();
 
         presenter.doCancel();
     }

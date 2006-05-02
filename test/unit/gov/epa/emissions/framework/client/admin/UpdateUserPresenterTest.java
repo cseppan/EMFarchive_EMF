@@ -58,7 +58,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         userView.expects(once()).method("observe").with(new IsInstanceOf(ViewUserPresenter.class));
 
         Mock updatable = mock(UpdatableUserView.class);
-        updatable.expects(once()).method("close").withNoArguments();
+        updatable.expects(once()).method("disposeView").withNoArguments();
         
         presenter.display((UpdatableUserView) updatable.proxy(), (UserView) userView.proxy());
     }
@@ -70,7 +70,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         UpdateUserPresenter presenter = displayablePresenter(user);
         presenter.display((UpdatableUserView) view.proxy(), null);
 
-        view.expects(once()).method("close").withNoArguments();
+        view.expects(once()).method("disposeView").withNoArguments();
         service.expects(once()).method("releaseLocked").with(same(user)).will(returnValue(user));
 
         presenter.doClose();
@@ -97,7 +97,7 @@ public class UpdateUserPresenterTest extends MockObjectTestCase {
         service.expects(once()).method("updateUser").with(eq(user));
         presenter.doSave();
 
-        view.expects(once()).method("close").withNoArguments();
+        view.expects(once()).method("disposeView").withNoArguments();
         service.expects(once()).method("releaseLocked").with(same(user)).will(returnValue(user));
         presenter.doClose();
     }

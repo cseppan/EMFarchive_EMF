@@ -78,7 +78,7 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
     public void testShouldCloseViewOnClose() throws Exception {
         DatasetType type = new DatasetType();
         Mock view = mock(EditableDatasetTypeView.class);
-        view.expects(once()).method("close");
+        view.expects(once()).method("disposeView");
 
         User user = new User();
         Mock service = mock(DataCommonsService.class);
@@ -117,7 +117,7 @@ public class EditableDatasetTypePresenterTest extends MockObjectTestCase {
         DatasetType typeProxy = (DatasetType) type.proxy();
 
         Mock view = mock(EditableDatasetTypeView.class);
-        view.expects(once()).method("close");
+        view.expects(once()).method("disposeView");
 
         User user = new User();
         user.setUsername("test");

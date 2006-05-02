@@ -19,7 +19,7 @@ public class ViewUserPresenterImpl implements ViewUserPresenter {
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
 }

@@ -66,8 +66,6 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
         dimensions(dimension);
     }
 
-    abstract public void windowClosing();
-
     public void bringToFront() {
         super.toFront();
         try {
@@ -96,7 +94,7 @@ public abstract class EmfInternalFrame extends JInternalFrame implements Managed
         super.validate();
     }
 
-    public void close() {
+    public void disposeView() {
         desktopManager.closeWindow(this);
     }
 

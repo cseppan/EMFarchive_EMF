@@ -25,7 +25,7 @@ public class ViewableDatasetTypePresenterTest extends MockObjectTestCase {
 
     public void testShouldCloseViewOnClose() {
         Mock view = mock(ViewableDatasetTypeView.class);
-        view.expects(once()).method("close");
+        view.expects(once()).method("disposeView");
 
         ViewableDatasetTypePresenter presenter = new ViewableDatasetTypePresenterImpl((ViewableDatasetTypeView) view
                 .proxy(), null);

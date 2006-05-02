@@ -10,6 +10,6 @@ public interface EditableDatasetTypeView extends ManagedView {
 
     void display(DatasetType type, Keyword[] masterKeywords);
 
-    void close();
+    void disposeView();
 
 }

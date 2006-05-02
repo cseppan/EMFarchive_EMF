@@ -28,7 +28,7 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
 
         if (!user.isLocked(session.user())) {// view mode, locked by another user
             new ViewUserPresenterImpl(user).display(view);
-            update.close();// close the unnecessary
+            update.disposeView();// close the unnecessary
             return;
         }
 
@@ -50,7 +50,7 @@ public class UpdateUserPresenterImpl implements UpdateUserPresenter {
         }
 
         service.releaseLocked(user);
-        updateView.close();
+        updateView.disposeView();
     }
 
     public void onChange() {

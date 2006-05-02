@@ -12,9 +12,9 @@ public class DisposableUpdateUserWindow extends UpdateUserWindow {
         super(desktopManager);
     }
 
-    public void close() {
+    public void disposeView() {
         super.dispose();
-        super.close();
+        super.disposeView();
     }
 
     public boolean isAlive() {

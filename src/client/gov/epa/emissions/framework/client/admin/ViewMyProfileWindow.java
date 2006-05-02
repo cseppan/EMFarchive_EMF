@@ -8,9 +8,9 @@ public class ViewMyProfileWindow extends ViewUserWindow {
         super(desktopManager);
     }
 
-    public void close() {
+    public void disposeView() {
         super.setVisible(false);
-        super.close();
+        super.disposeView();
     }
 
     public void bringToFront() {
@@ -23,6 +23,6 @@ public class ViewMyProfileWindow extends ViewUserWindow {
     }
 
     public void windowClosing() {
-        close();
+        disposeView();
     }
 }

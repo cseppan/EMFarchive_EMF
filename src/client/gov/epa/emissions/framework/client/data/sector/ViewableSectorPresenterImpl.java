@@ -19,7 +19,7 @@ public class ViewableSectorPresenterImpl implements ViewableSectorPresenter {
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
 }

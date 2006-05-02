@@ -89,7 +89,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
         ok = new Button("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doEdit(type);
-                close();
+                disposeView();
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -152,7 +152,7 @@ public class EditQAStepTemplateWindow extends DisposableInteralFrame implements 
 
     private void doClose() {
         if (shouldDiscardChanges())
-            super.close();
+            super.disposeView();
     }
 
 }

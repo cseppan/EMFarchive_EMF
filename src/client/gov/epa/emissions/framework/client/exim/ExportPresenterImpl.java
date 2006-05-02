@@ -21,7 +21,7 @@ public class ExportPresenterImpl implements ExportPresenter {
     }
 
     public void notifyDone() {
-        view.close();
+        view.disposeView();
     }
 
     public void display(ExportView view) {

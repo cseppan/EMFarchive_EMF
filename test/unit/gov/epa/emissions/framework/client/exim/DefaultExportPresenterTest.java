@@ -85,7 +85,7 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
 
     public void testClosesViewOnDoneExport() {
         Mock view = mock(ExportView.class);
-        view.expects(once()).method("close");
+        view.expects(once()).method("disposeView");
 
         ExportPresenter presenter = new ExportPresenterImpl((EmfSession) session.proxy());
 

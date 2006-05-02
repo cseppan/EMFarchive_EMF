@@ -81,7 +81,7 @@ public class RegisterUserPanel extends JPanel {
             return;
         }
 
-        container.close();
+        container.disposeView();
     }
 
     public void refresh() {

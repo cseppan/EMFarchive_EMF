@@ -38,7 +38,7 @@ public class UsersManagerPresenterTest extends EmfMockObjectTestCase {
     }
 
     public void testShouldCloseViewOnClickOfCloseButton() {
-        view.expects(once()).method("close").withNoArguments();
+        view.expects(once()).method("disposeView").withNoArguments();
         presenter.doClose();
     }
 

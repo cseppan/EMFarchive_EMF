@@ -35,7 +35,7 @@ public class CaseEditorPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldCloseViewOnClose() throws EmfException {
         Mock view = mock(CaseEditorView.class);
-        expects(view, 1, "close");
+        expects(view, 1, "disposeView");
 
         Mock service = mock(CaseService.class);
         Mock session = mock(EmfSession.class);
@@ -50,7 +50,7 @@ public class CaseEditorPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldSaveCaseAndCloseViewOnSave() throws EmfException {
         Mock view = mock(CaseEditorView.class);
-        expects(view, 1, "close");
+        expects(view, 1, "disposeView");
 
         Mock service = mock(CaseService.class);
         Case caseObj = new Case("name");

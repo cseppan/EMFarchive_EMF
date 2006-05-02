@@ -15,7 +15,7 @@ public class SetQAStatusPresenterTest extends EmfMockObjectTestCase {
         expects(tabView, "refresh");
 
         Mock view = mock(SetQAStatusView.class);
-        expects(view, "close");
+        expects(view, "disposeView");
 
         SetQAStatusPresenter presenter = new SetQAStatusPresenter((SetQAStatusView) view.proxy(), null,
                 (EditableQATabView) tabView.proxy(), null);
@@ -24,7 +24,7 @@ public class SetQAStatusPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldCloseViewOnClose() {
         Mock view = mock(SetQAStatusView.class);
-        expects(view, "close");
+        expects(view, "disposeView");
 
         SetQAStatusPresenter presenter = new SetQAStatusPresenter((SetQAStatusView) view.proxy(), null, null, null);
         presenter.doClose();

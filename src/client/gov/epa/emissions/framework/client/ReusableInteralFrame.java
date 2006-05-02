@@ -16,12 +16,12 @@ public abstract class ReusableInteralFrame extends EmfInternalFrame {
     }
 
     public void windowClosing() {
-        close();
+        disposeView();
     }
 
-    public void close() {
+    public void disposeView() {
         super.setVisible(false);
-        super.close();
+        super.disposeView();
     }
 
     public void bringToFront() {

@@ -30,7 +30,7 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
     }
 
     public void doClose() {
-        view.close();
+        view.disposeView();
     }
 
     public void doNew(ControlStrategyView view) {

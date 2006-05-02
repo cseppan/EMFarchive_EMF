@@ -23,7 +23,7 @@ public class ControlStrategyPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldCloseViewOnClose() throws EmfException {
         Mock view = mock(ControlStrategyView.class);
-        expects(view, 1, "close");
+        expects(view, 1, "disposeView");
 
         ControlStrategyPresenter p = new ControlStrategyPresenterImpl(null, (ControlStrategyView) view.proxy(), null);
 
@@ -32,7 +32,7 @@ public class ControlStrategyPresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldSaveControlStrategyAndCloseViewOnSave() throws EmfException {
         Mock view = mock(ControlStrategyView.class);
-        expects(view, 1, "close");
+        expects(view, 1, "disposeView");
 
         Mock service = mock(ControlStrategyService.class);
         ControlStrategy newControlStrategy = new ControlStrategy();

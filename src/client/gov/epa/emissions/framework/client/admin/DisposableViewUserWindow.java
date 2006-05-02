@@ -8,9 +8,9 @@ public class DisposableViewUserWindow extends ViewUserWindow {
         super(desktopManager);
     }
 
-    public void close() {
+    public void disposeView() {
         super.dispose();
-        super.close();
+        super.disposeView();
     }
 
     public boolean isAlive() {
@@ -18,6 +18,6 @@ public class DisposableViewUserWindow extends ViewUserWindow {
     }
 
     public void windowClosing() {
-        close();
+        disposeView();
     }
 }

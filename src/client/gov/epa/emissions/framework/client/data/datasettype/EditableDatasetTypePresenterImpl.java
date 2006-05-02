@@ -55,7 +55,7 @@ public class EditableDatasetTypePresenterImpl implements EditableDatasetTypePres
     }
 
     private void closeView() {
-        editable.close();
+        editable.disposeView();
     }
 
     public void doSave(String name, String description, KeyVal[] keyVals, String sortOrder) throws EmfException {

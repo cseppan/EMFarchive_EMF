@@ -23,7 +23,7 @@ public class NewCasePresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldCloseViewOnClose() {
         Mock view = mock(NewCaseView.class);
-        expects(view, 1, "close");
+        expects(view, 1, "disposeView");
 
         NewCasePresenter p = new NewCasePresenter(null, (NewCaseView) view.proxy(), null);
 
@@ -32,7 +32,7 @@ public class NewCasePresenterTest extends EmfMockObjectTestCase {
 
     public void testShouldSaveCaseAndCloseViewOnSave() throws EmfException {
         Mock view = mock(NewCaseView.class);
-        expects(view, 1, "close");
+        expects(view, 1, "disposeView");
 
         Mock service = mock(CaseService.class);
         Case newCase = new Case();
