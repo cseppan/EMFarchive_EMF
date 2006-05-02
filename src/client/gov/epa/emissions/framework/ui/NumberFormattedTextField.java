@@ -60,7 +60,7 @@ public class NumberFormattedTextField extends JFormattedTextField implements Cha
     }
 
     public void setRange(int min, int max) {
-        super.setFormatterFactory(new DefaultFormatterFactory(integerFormatter(min, max)));
+        super.setFormatter(integerFormatter(min, max));
     }
 
     public boolean isEmpty() {

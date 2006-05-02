@@ -127,15 +127,14 @@ public class PaginationPanel extends JPanel {
     private JFormattedTextField recordInputField(final int max) {
         recordInput = new NumberFormattedTextField(1, max, 7, new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("value-"+recordInput.getValue());
                 if (!verifyInput(slider))
                     return;
-                
-                int record = Integer.parseInt(recordInput.getText());
+
+                Integer value = (Integer) recordInput.getValue();
+                int record = value.intValue();
                 displayPage(record);
             }
         });
-        //recordInput.setInputVerifier(new NumberVerifier());
         recordInput.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent event) {
                 if ("value".equals(event.getPropertyName())) {
@@ -175,7 +174,6 @@ public class PaginationPanel extends JPanel {
             current.setText("0");
             return;
         }
-
         current.setText(page.getMin() + " - " + page.getMax());
         slider.setValue(page.getMin());
     }
@@ -213,11 +211,9 @@ public class PaginationPanel extends JPanel {
     }
 
     private boolean verifyInput(JSlider slider) {
-        Integer val = (Integer) recordInput.getValue();
-
+        String val = recordInput.getText();
         try {
             recordInput.commitEdit();
-
             messagePanel.clear();
             return true;
         } catch (Exception pe) {
