@@ -87,6 +87,7 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
         layoutGenerator.addLabelWidgetPair("When", date, panel);
 
         who = new TextField(user.getName(), 40);
+        who.setText(user.getName());
         layoutGenerator.addLabelWidgetPair("Who", who, panel);
 
         comment = new TextArea("", "", 40, 4);
