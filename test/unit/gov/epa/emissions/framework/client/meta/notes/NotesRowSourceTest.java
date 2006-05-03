@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
 import junit.framework.TestCase;
@@ -29,7 +30,7 @@ public class NotesRowSourceTest extends TestCase {
         assertEquals(note.getVersion(), ((Long)values[3]).longValue());
         assertEquals(note.getCreator().getName(), values[4]);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         assertEquals(dateFormat.format(note.getDate()), values[5]);
 
         assertEquals(note.getReferences(), values[6]);

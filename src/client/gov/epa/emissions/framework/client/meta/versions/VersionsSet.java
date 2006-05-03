@@ -42,6 +42,16 @@ public class VersionsSet {
         return (String[]) list.toArray(new String[0]);
     }
 
+    public String[] nameAndNumbersOfFinalVersions() {
+        List list = new ArrayList();
+        for (int i = 0; i < versions.length; i++) {
+            if (versions[i].isFinalVersion())
+                list.add(versions[i].getName() + " (" + versions[i].getVersion() + ")");
+        }
+        
+        return (String[]) list.toArray(new String[0]);
+    }
+
     public String[] names() {
         List list = new ArrayList();
         for (int i = 0; i < versions.length; i++) {
@@ -54,7 +64,7 @@ public class VersionsSet {
     public String[] nameAndNumbers() {
         List list = new ArrayList();
         for (int i = 0; i < versions.length; i++) {
-            list.add(versions[i].getVersion() + " (" + versions[i].getName() + ")");
+            list.add(versions[i].getName() + " (" + versions[i].getVersion() + ")");
         }
 
         return (String[]) list.toArray(new String[0]);
@@ -91,8 +101,8 @@ public class VersionsSet {
         return null;
     }
 
-    public Version getVersionFromNumberAndName(String numberAndName) {
-        int ver = getVersionNumber(numberAndName);
+    public Version getVersionFromNameAndNumber(String nameAndNumber) {
+        int ver = getVersionNumber(nameAndNumber);
         
         for (int i = 0; i < versions.length; i++) {
             if (versions[i].getVersion() == ver)
@@ -102,13 +112,11 @@ public class VersionsSet {
         return null;
     }
 
-    private int getVersionNumber(String numberAndName) {
-        String numberPlusName = numberAndName.trim();
-        int i = 0;
-        for(; i < numberPlusName.length(); i++)
-            if(!Character.isDigit(numberPlusName.charAt(i)))
-                break;
-        return Integer.parseInt(numberPlusName.substring(0, i));
+    private int getVersionNumber(String nameAndNumber) {
+        int forPerenth = nameAndNumber.indexOf('(');
+        int backPerenth = nameAndNumber.indexOf(')');
+        
+        return Integer.parseInt(nameAndNumber.substring(forPerenth+1, backPerenth));
     }
 
     public String getDefaultVersionName(EmfDataset dataset) {
@@ -122,6 +130,10 @@ public class VersionsSet {
     
     public Version[] all() {
         return versions;
+    }
+    
+    public int size() {
+        return versions.length;
     }
 
 }

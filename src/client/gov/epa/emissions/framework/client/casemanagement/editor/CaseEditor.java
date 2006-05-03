@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.ui.InfoDialog;
@@ -126,7 +127,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     }
 
     private String format(Date lockDate) {
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         return dateFormat.format(lockDate);
     }
 

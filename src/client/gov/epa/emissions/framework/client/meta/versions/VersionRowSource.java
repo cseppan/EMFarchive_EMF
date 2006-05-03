@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.RowSource;
 
 import java.text.DateFormat;
@@ -18,7 +19,7 @@ public class VersionRowSource implements RowSource {
     public VersionRowSource(Version source) {
         this.source = source;
         this.selected = Boolean.FALSE;
-        dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
     }
 
     public Object[] values() {

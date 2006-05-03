@@ -8,11 +8,14 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
@@ -21,9 +24,12 @@ import javax.swing.SpringLayout;
 
 public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepView {
     private JPanel layout;
+    
+    private DateFormat dateFormat;
 
     public ViewQAStepWindow(DesktopManager desktopManager) {
         super("View QA Step", new Dimension(550, 450), desktopManager);
+        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
         layout = new JPanel();
         super.getContentPane().add(layout);
@@ -70,7 +76,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
 
         TextField when = new TextField("", 10);
         if (step.getDate() != null)
-            when.setText(step.getDate().toString());
+            when.setText(dateFormat.format(step.getDate()));
         when.setEditable(false);
         layoutGenerator.addLabelWidgetPair("When", when, panel);
 

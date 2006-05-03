@@ -26,8 +26,15 @@ public class ControlMeasuresEditorPresenterImpl implements ControlMeasuresEditor
         presenters = new ArrayList();
     }
 
-    public void doDisplay() {
+    public void doDisplay() throws EmfException {
         view.observe(this);
+        
+        measure = session.costService().obtainLockedMeasure(session.user(), measure);
+        if (!measure.isLocked(session.user())) {// view mode, locked by another user
+            view.notifyLockFailure(measure);
+            return;
+        }
+        
         display();
     }
 

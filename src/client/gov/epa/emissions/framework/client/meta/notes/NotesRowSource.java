@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.ui.RowSource;
 
@@ -15,7 +16,7 @@ public class NotesRowSource implements RowSource {
 
     public NotesRowSource(Note source) {
         this.note = source;
-        dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
     }
 
     public Object[] values() {

@@ -69,7 +69,7 @@ public class NewVersionDialog extends Dialog {
 
     private String[] versionNames(Version[] versions) {
         VersionsSet set = new VersionsSet(versions);
-        return set.namesOfFinalVersions();
+        return set.nameAndNumbersOfFinalVersions();
     }
 
     private JComboBox createVersionsCombo(DefaultComboBoxModel model) {
@@ -138,7 +138,7 @@ public class NewVersionDialog extends Dialog {
     }
 
     public Version version() {
-        return versionsSet.version(((String) versionsModel.getSelectedItem()));
+        return versionsSet.getVersionFromNameAndNumber((String) versionsModel.getSelectedItem());
     }
 
     public String name() {

@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.client.meta.info.InfoTab;
 import gov.epa.emissions.framework.client.meta.info.InfoTabPresenter;
 import gov.epa.emissions.framework.client.meta.keywords.EditableKeywordsTab;
@@ -227,7 +228,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private String format(Date lockDate) {
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         return dateFormat.format(lockDate);
     }
 

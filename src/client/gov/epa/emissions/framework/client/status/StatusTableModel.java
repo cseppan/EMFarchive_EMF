@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.status;
 
 import gov.epa.emissions.commons.gui.TableHeader;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.basic.Status;
 
 import java.text.DateFormat;
@@ -31,7 +32,7 @@ public class StatusTableModel extends AbstractTableModel {
         this.statusList = new ArrayList();
 
         this.rows = new ArrayList();
-        dateFormat = new SimpleDateFormat("hh:mm:ss MM/dd/yyyy");
+        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
     }
 
     public int getRowCount() {

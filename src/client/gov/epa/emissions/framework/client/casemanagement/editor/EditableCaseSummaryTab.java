@@ -16,6 +16,7 @@ import gov.epa.emissions.framework.client.casemanagement.Grids;
 import gov.epa.emissions.framework.client.casemanagement.MeteorlogicalYears;
 import gov.epa.emissions.framework.client.casemanagement.RunStatuses;
 import gov.epa.emissions.framework.client.casemanagement.Speciations;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.client.data.Projects;
 import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
@@ -36,7 +37,7 @@ import javax.swing.SpringLayout;
 
 public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummaryTabView {
 
-    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
 
     private Case caseObj;
 

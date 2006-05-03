@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.emissions.framework.ui.TableData;
@@ -73,7 +74,7 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
         if (!sector.isLocked())
             return "";
 
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         return "Locked by " + sector.getLockOwner() + " at " + dateFormat.format(sector.getLockDate());
     }
 

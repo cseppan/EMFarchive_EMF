@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.RowSource;
 
@@ -15,7 +16,7 @@ public class QAStepRowSource implements RowSource {
 
     public QAStepRowSource(QAStep source) {
         this.source = source;
-        dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mmaaa");
+        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
     }
 
     public Object[] values() {

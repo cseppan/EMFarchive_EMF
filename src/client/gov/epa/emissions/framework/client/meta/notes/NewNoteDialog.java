@@ -264,7 +264,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
     }
 
     private Version version() {
-        return versionsSet.getVersionFromNumberAndName((String) versionsModel.getSelectedItem());
+        return versionsSet.getVersionFromNameAndNumber((String) versionsModel.getSelectedItem());
     }
 
 }

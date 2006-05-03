@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.meta.qa;
 import gov.epa.emissions.commons.gui.Changeables;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.Row;
 
@@ -97,7 +98,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         assertEquals(step1.getOrder() + "", row.getValueAt(3));
         assertEquals(step1.getStatus(), row.getValueAt(4));
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mmaaa");
+        SimpleDateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         assertEquals(dateFormat.format(step1.getDate()), row.getValueAt(5));
 
         assertEquals(step1.getWho(), row.getValueAt(6));

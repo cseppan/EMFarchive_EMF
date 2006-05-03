@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.status;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.ui.ImageResources;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -49,7 +50,7 @@ public class StatusWindow extends ReusableInteralFrame implements StatusView, Re
         super.setClosable(false);
         super.setMaximizable(false);
 
-        dateFormat = new SimpleDateFormat("hh:mm:ss MM/dd/yyyy");
+        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
     }
 
     private JPanel createLayout() {

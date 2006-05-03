@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.Changeables;
 import gov.epa.emissions.commons.gui.DefaultChangeables;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.data.NoteType;
 import gov.epa.emissions.framework.ui.Row;
@@ -85,7 +86,7 @@ public class NotesTableDataTest extends EmfMockObjectTestCase {
         assertEquals(note0.getVersion(), ((Long)row.getValueAt(3)).longValue());
         assertEquals(note0.getCreator().getName(), row.getValueAt(4));
 
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         assertEquals(dateFormat.format(note0.getDate()), row.getValueAt(5));
 
         assertEquals(note0.getDetails(), row.getValueAt(6));

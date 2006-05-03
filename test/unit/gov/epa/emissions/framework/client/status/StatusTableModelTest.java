@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.status;
 
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.client.status.StatusTableModel;
 import gov.epa.emissions.framework.services.basic.Status;
 
@@ -51,7 +52,7 @@ public class StatusTableModelTest extends MockObjectTestCase {
     }
 
     public void testShouldReturnUserAttributesAtSpecifiedIndex() {
-        DateFormat dateFormat = new SimpleDateFormat("hh:mm:ss MM/dd/yyyy");
+        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         assertEquals(status2.getType(), model.getValueAt(0, 0));
         assertEquals(status2.getMessage(), model.getValueAt(0, 1));
         assertEquals(dateFormat.format(status2.getTimestamp()), model.getValueAt(0, 2));

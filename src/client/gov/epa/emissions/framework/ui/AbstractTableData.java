@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.ui;
 
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ public abstract class AbstractTableData implements TableData {
     private DateFormat dateFormat;
 
     public AbstractTableData() {
-        dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
     }
 
     final protected String format(Date date) {

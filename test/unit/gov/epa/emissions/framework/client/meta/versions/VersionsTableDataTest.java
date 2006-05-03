@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.meta.versions;
 
 import gov.epa.emissions.commons.db.version.Version;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.ui.EditableRow;
 import gov.epa.emissions.framework.ui.Row;
 
@@ -78,7 +79,7 @@ public class VersionsTableDataTest extends TestCase {
         assertEquals(version0.getVersion(), ((Integer) row.getValueAt(2)).intValue());
         assertEquals(version0.getBase(), ((Long) row.getValueAt(3)).longValue());
         assertFalse(((Boolean) row.getValueAt(4)).booleanValue());
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         assertEquals(dateFormat.format(version0.getDate()), row.getValueAt(5));
     }
 

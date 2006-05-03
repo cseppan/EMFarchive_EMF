@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.CostService;
@@ -18,7 +19,7 @@ public class CostServiceTransport implements CostService {
     private EmfCall call() throws EmfException {
         return callFactory.createCall("CostService");
     }
-    
+
     public ControlMeasure[] getMeasures() throws EmfException {
         EmfCall call = call();
 
@@ -46,5 +47,16 @@ public class CostServiceTransport implements CostService {
         call.setVoidReturnType();
 
         call.request(new Object[] { measure });
+    }
+
+    public ControlMeasure obtainLockedMeasure(User owner, ControlMeasure measure) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("obtainLockedMeasure");
+        call.addParam("owner", mappings.user());
+        call.addParam("measure", mappings.controlMeasure());
+        call.setReturnType(mappings.controlMeasure());
+
+        return (ControlMeasure) call.requestResponse(new Object[] { owner, measure });
     }
 }

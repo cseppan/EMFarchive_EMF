@@ -10,6 +10,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.client.qa.EditableQAStepTemplateTableData;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -81,7 +82,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         if (!type.isLocked())
             return "";
 
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         return "Locked by User: " + type.getLockOwner() + " at " + dateFormat.format(type.getLockDate());
     }
 

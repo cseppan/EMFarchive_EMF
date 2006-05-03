@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.Label;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.editor.Revision;
 
@@ -76,7 +77,7 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
     }
 
     private String format(Date date) {
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+        SimpleDateFormat format = new SimpleDateFormat(EmfDateFormat.format());
         return date != null ? format.format(date) : "";
     }
 

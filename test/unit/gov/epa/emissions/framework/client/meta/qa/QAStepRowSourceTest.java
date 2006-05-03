@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.data.QAStep;
 
 import java.text.SimpleDateFormat;
@@ -33,7 +34,7 @@ public class QAStepRowSourceTest extends TestCase {
         assertEquals(step.getOrder() + "", values[3]);
         assertEquals(step.getStatus(), values[4]);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mmaaa");
+        SimpleDateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         assertEquals(dateFormat.format(step.getDate()), values[5]);
 
         assertEquals(step.getWho(), values[6]);

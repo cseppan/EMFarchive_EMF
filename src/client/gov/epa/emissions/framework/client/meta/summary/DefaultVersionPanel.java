@@ -9,8 +9,6 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,7 +29,7 @@ public class DefaultVersionPanel extends JPanel {
     }
 
     private void createLayout(ManageChangeables changeables) {
-        super.add(new JLabel("Default Version"));
+        super.add(new JLabel("Default Version:"));
 
         ComboBox combo = comboBox(changeables);
         combo.addItemListener(new ItemListener() {
@@ -58,29 +56,19 @@ public class DefaultVersionPanel extends JPanel {
     }
 
     private String[] labels(VersionsSet versionsSet) {
-        String[] names = versionsSet.names();
-        Integer[] numbers = versionsSet.versions();
-
-        List labels = new ArrayList();
-        for (int i = 0; i < names.length; i++) {
-            String version = displayableVersion(names[i], numbers[i].intValue());
-            labels.add(version);
-        }
-
-        return (String[]) labels.toArray(new String[0]);
+        return versionsSet.nameAndNumbers();
     }
 
     private String getDefaultVersion(VersionsSet versionsSet) {
-        String name = versionsSet.getVersionName(dataset.getDefaultVersion());
-        return displayableVersion(name, dataset.getDefaultVersion());
-    }
-
-    private String displayableVersion(String name, int version) {
-        return version + " - " + name;
+        int ver = dataset.getDefaultVersion();
+        return versionsSet.getVersionName(ver) + " (" + ver + ")";
     }
 
     public void updateDataset() {
-        int version = Integer.parseInt(selected.split("-")[0].trim());
+        int forPerenth = selected.indexOf('(');
+        int backPerenth = selected.indexOf(')');
+        
+        int version = Integer.parseInt(selected.substring(forPerenth+1, backPerenth));
         dataset.setDefaultVersion(version);
     }
 

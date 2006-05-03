@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.ui.RefreshObserver;
@@ -55,7 +56,7 @@ public class UsersManagerPresenter implements RefreshObserver {
     private void delete(User userToDelete) throws EmfException {
         userToDelete = service.obtainLocked(session.user(), userToDelete);
         if (!userToDelete.isLocked(session.user())) {// locked by another user
-            DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+            DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
             String message = "Locked by " + userToDelete.getLockOwner() + " at "
                     + dateFormat.format(userToDelete.getLockDate());
             throw new EmfException(message);

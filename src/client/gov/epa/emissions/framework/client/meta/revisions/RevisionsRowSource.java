@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.revisions;
 
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.ui.RowSource;
 
@@ -15,7 +16,7 @@ public class RevisionsRowSource implements RowSource {
 
     public RevisionsRowSource(Revision revision) {
         this.revision = revision;
-        dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
     }
 
     public Object[] values() {
