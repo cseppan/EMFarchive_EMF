@@ -16,7 +16,8 @@ public class EditableSummaryTabPresenterTest extends MockObjectTestCase {
     public void testUpdateDatasetOnSave() throws EmfException {
         Mock dataset = mock(EmfDataset.class);
         dataset.expects(once()).method("setModifiedDateTime").with(new IsInstanceOf(Date.class));
-
+        dataset.expects(once()).method("getName").withNoArguments().will(returnValue("test"));
+        
         Mock view = mock(EditableSummaryTabView.class);
         Object datasetProxy = dataset.proxy();
         view.expects(once()).method("save").with(eq(datasetProxy));
@@ -25,5 +26,24 @@ public class EditableSummaryTabPresenterTest extends MockObjectTestCase {
                 .proxy());
 
         presenter.doSave();
+    }
+    
+    public void testShouldNotAllowEmptyNameOnSave() {
+        Mock dataset = mock(EmfDataset.class);
+        dataset.expects(once()).method("setModifiedDateTime").with(new IsInstanceOf(Date.class));
+        dataset.expects(once()).method("getName").withNoArguments().will(returnValue(" "));
+        
+        Mock view = mock(EditableSummaryTabView.class);
+        Object datasetProxy = dataset.proxy();
+        view.expects(once()).method("save").with(eq(datasetProxy));
+
+        EditableSummaryTabPresenter presenter = new EditableSummaryTabPresenterImpl((EmfDataset) datasetProxy, (EditableSummaryTabView) view
+                .proxy());
+
+        try {
+            presenter.doSave();
+        } catch (EmfException e) {
+            assertEquals("Name field should be a non-empty string.",e.getMessage());
+        }
     }
 }

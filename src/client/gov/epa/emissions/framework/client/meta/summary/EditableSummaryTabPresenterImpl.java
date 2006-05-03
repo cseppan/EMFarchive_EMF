@@ -19,6 +19,14 @@ public class EditableSummaryTabPresenterImpl implements EditableSummaryTabPresen
     public void doSave() throws EmfException {
         dataset.setModifiedDateTime(new Date());
         view.save(dataset);
+        verifyEmptyName(dataset);
+
+    }
+
+    private void verifyEmptyName(EmfDataset dataset) throws EmfException {
+        if (dataset.getName().trim().equals("")) {
+            throw new EmfException("Name field should be a non-empty string.");
+        }
     }
 
 }
