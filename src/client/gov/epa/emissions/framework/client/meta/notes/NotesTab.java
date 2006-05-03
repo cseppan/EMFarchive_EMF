@@ -1,11 +1,11 @@
 package gov.epa.emissions.framework.client.meta.notes;
 
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
+import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.ui.EmfTableModel;
-import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -56,7 +56,7 @@ public class NotesTab extends JPanel implements NotesTabView {
         EmfTableModel model = new EmfTableModel(new NotesTableData(notes));
         selectModel = new SortFilterSelectModel(model);
 
-        SortFilterTablePanel panel = new SortFilterTablePanel(parentConsole, selectModel);
+        SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
         panel.getTable().setName("notesTable");
         panel.setPreferredSize(new Dimension(450, 60));
 

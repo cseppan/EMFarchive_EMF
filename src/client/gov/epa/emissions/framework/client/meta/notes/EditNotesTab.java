@@ -3,13 +3,13 @@ package gov.epa.emissions.framework.client.meta.notes;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
+import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
-import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -36,7 +36,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
     private MessagePanel messagePanel;
 
     private DesktopManager desktopManager;
-    
+
     public EditNotesTab(EmfConsole parentConsole, ManageChangeables changeables, MessagePanel messagePanel,
             DesktopManager desktopManager) {
         super.setName("editNotesTab");
@@ -74,7 +74,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
     }
 
     private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-        SortFilterTablePanel sortFilterPanel = new SortFilterTablePanel(parentConsole, selectModel);
+        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
 
         JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
         sortFilterPanel.setPreferredSize(new Dimension(450, 60));
@@ -97,7 +97,7 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
             }
         });
         container.add(view);
-        
+
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(container, BorderLayout.WEST);
 
@@ -106,9 +106,9 @@ public class EditNotesTab extends JPanel implements EditNotesTabView {
 
     protected void doViewNote(EditNotesTabPresenter presenter) {
         List notes = selectModel.selected();
-        for(Iterator iter = notes.iterator(); iter.hasNext();) {
+        for (Iterator iter = notes.iterator(); iter.hasNext();) {
             ViewNoteWindow window = new ViewNoteWindow(desktopManager);
-            presenter.doViewNote((Note) iter.next(), window); 
+            presenter.doViewNote((Note) iter.next(), window);
         }
     }
 

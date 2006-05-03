@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.gui.BorderlessButton;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
+import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.meta.versions.VersionsSet;
@@ -14,7 +15,6 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
-import gov.epa.mims.analysisengine.table.SortFilterTablePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -75,7 +75,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     }
 
     private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
-        SortFilterTablePanel sortFilterPanel = new SortFilterTablePanel(parentConsole, selectModel);
+        SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
 
         JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
         sortFilterPanel.setPreferredSize(new Dimension(450, 60));
