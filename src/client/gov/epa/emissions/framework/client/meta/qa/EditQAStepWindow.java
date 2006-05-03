@@ -133,6 +133,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
         config = new TextField("config", step.getConfiguration(), 40);
         addChangeable(config);
+        config.setToolTipText("Enter the name of the Dataset that is the configuration " +
+                "file (e.g., a REPCONFIG file)");
         layoutGenerator.addLabelWidgetPair("Configuration:", config, panel);
         
         comments = new TextArea("Comments", step.getComments(), 40, 3);

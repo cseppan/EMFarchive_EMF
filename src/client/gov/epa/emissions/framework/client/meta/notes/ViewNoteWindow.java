@@ -22,7 +22,7 @@ public class ViewNoteWindow extends DisposableInteralFrame implements NoteView {
     private JPanel layout;
 
     public ViewNoteWindow(DesktopManager desktopManager) {
-        super("View Note", new Dimension(450, 250), desktopManager);
+        super("View Note", new Dimension(550, 250), desktopManager);
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));

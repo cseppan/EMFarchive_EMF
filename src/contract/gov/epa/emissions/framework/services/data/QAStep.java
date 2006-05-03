@@ -64,6 +64,7 @@ public class QAStep {
         this.programArguments = template.getProgramArguments();
         this.required = template.isRequired();
         this.order = template.getOrder();
+        this.description = template.getDescription();
     }
 
     public String getProgram() {

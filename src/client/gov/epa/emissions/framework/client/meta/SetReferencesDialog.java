@@ -88,7 +88,7 @@ public class SetReferencesDialog extends Dialog {
     public String referencesList() {
         StringBuffer result = new StringBuffer();
         for (int i = 0; i < selected.length; i++) {
-            result.append(selected[i].getName());
+            result.append(selected[i].getName() + " (" + selected[i].getId() + ")");
             if ((i + 1) < selected.length)
                 result.append(", ");
         }

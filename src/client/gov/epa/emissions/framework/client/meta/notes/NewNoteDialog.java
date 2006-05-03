@@ -120,7 +120,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
 
         layoutReferences(notes, panel, layoutGenerator);
 
-        versionsModel = new DefaultComboBoxModel(versionsSet.names());
+        versionsModel = new DefaultComboBoxModel(versionsSet.nameAndNumbers());
         JComboBox versionsCombo = createCombo(versionsModel);
         versionsCombo.setSelectedItem(version);
         layoutGenerator.addLabelWidgetPair("Version", versionsCombo, panel);
@@ -264,7 +264,7 @@ public class NewNoteDialog extends Dialog implements NewNoteView {
     }
 
     private Version version() {
-        return versionsSet.version((String) versionsModel.getSelectedItem());
+        return versionsSet.getVersionFromNumberAndName((String) versionsModel.getSelectedItem());
     }
 
 }

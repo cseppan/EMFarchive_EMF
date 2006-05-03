@@ -50,6 +50,15 @@ public class VersionsSet {
 
         return (String[]) list.toArray(new String[0]);
     }
+    
+    public String[] nameAndNumbers() {
+        List list = new ArrayList();
+        for (int i = 0; i < versions.length; i++) {
+            list.add(versions[i].getVersion() + " (" + versions[i].getName() + ")");
+        }
+
+        return (String[]) list.toArray(new String[0]);
+    }
 
     public String name(int version) {
         String[] names = names();
@@ -80,6 +89,26 @@ public class VersionsSet {
         }
 
         return null;
+    }
+
+    public Version getVersionFromNumberAndName(String numberAndName) {
+        int ver = getVersionNumber(numberAndName);
+        
+        for (int i = 0; i < versions.length; i++) {
+            if (versions[i].getVersion() == ver)
+                return versions[i];
+        }
+        
+        return null;
+    }
+
+    private int getVersionNumber(String numberAndName) {
+        String numberPlusName = numberAndName.trim();
+        int i = 0;
+        for(; i < numberPlusName.length(); i++)
+            if(!Character.isDigit(numberPlusName.charAt(i)))
+                break;
+        return Integer.parseInt(numberPlusName.substring(0, i));
     }
 
     public String getDefaultVersionName(EmfDataset dataset) {
