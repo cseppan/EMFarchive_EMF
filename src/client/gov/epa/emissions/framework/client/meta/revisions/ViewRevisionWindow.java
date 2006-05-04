@@ -24,9 +24,11 @@ import javax.swing.SpringLayout;
 public class ViewRevisionWindow extends DisposableInteralFrame implements RevisionView {
 
     private JPanel layout;
+    
+    private static int count = 0;
 
     public ViewRevisionWindow(DesktopManager desktopManager) {
-        super("View Note", new Dimension(350, 275), desktopManager);
+        super("View Revision", new Dimension(550, 275), desktopManager);
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -34,7 +36,7 @@ public class ViewRevisionWindow extends DisposableInteralFrame implements Revisi
     }
 
     public void display(Revision revision, EmfDataset dataset) {
-        String name = "View Note: " + revision.getWhat();
+        String name = "View Revision: " + (++count) + " " + revision.getWhat();
         super.setTitle(name);
         super.setName(name);
 
