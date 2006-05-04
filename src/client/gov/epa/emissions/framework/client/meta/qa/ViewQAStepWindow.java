@@ -36,7 +36,7 @@ public class ViewQAStepWindow extends DisposableInteralFrame implements QAStepVi
     }
 
     public void display(QAStep step) {
-        super.setLabel(super.getTitle() + " : " + step.getName());
+        super.setLabel(super.getTitle() + " : " + step.getVersion() + " " + step.getName());
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
 
         layout.add(inputPanel(step));
