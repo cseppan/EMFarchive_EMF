@@ -35,7 +35,10 @@ public class ControlStrategyPresenterTest extends EmfMockObjectTestCase {
         expects(view, 1, "disposeView");
 
         Mock service = mock(ControlStrategyService.class);
+        
         ControlStrategy newControlStrategy = new ControlStrategy();
+        newControlStrategy.setName("test");
+        
         expects(service, 1, "addControlStrategy", same(newControlStrategy));
         stub(service, "getControlStrategies", new ControlStrategy[0]);
 

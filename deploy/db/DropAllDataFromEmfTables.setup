@@ -1,41 +1,48 @@
 ------------------------ Data Management tables ------------------------------
-delete from emf.datasets_sectors;
-delete from emissions.versions;
-delete from emf.countries;
-delete from emf.dataset_access_logs;
-delete from emf.dataset_types;
-delete from emf.datasets;
-delete from emf.properties;
-delete from emf.sectors;
-delete from emf.status;
-delete from emf.sector_criteria;
-delete from emf.datasets_keywords;
-delete from emf.keywords;
-delete from emf.dataset_types_keywords;
-delete from emf.external_sources;
-delete from emf.internal_sources;
-delete from emf.users;
-delete from emf.intended_uses;
-delete from emf.projects;
-delete from emf.regions;
-delete from emf.notes;
-delete from emf.note_types;
-delete from emf.revisions;
+DELETE FROM emf.datasets_sectors;
+DELETE FROM emissions.versions;
+DELETE FROM emf.countries;
+DELETE FROM emf.dataset_access_logs;
+DELETE FROM emf.dataset_types;
+DELETE FROM emf.datasets;
+DELETE FROM emf.properties;
+DELETE FROM emf.sectors;
+DELETE FROM emf.status;
+DELETE FROM emf.sector_criteria;
+DELETE FROM emf.datasets_keywords;
+DELETE FROM emf.keywords;
+DELETE FROM emf.dataset_types_keywords;
+DELETE FROM emf.external_sources;
+DELETE FROM emf.internal_sources;
+DELETE FROM emf.users;
+DELETE FROM emf.intended_uses;
+DELETE FROM emf.projects;
+DELETE FROM emf.regions;
+DELETE FROM emf.notes;
+DELETE FROM emf.note_types;
+DELETE FROM emf.revisions;
 
 ----------------------------- QA Management tables -------------------------------
-delete from emf.qa_steps;
-delete from emf.dataset_types_qa_step_templates;
+DELETE FROM emf.qa_steps;
+DELETE FROM emf.dataset_types_qa_step_templates;
 
------------------------------- Case Management tables ------------------------------
-delete from emf.cases;
-delete from emf.emissions_years;
-delete from emf.meteorlogical_years;
-delete from emf.speciations;
-delete from emf.grids;
-delete from emf.air_quality_models;
-delete from emf.case_categories;
-delete from emf.case_abbreviations;
+------------------------------ Case Management tables ----------------------------
 
+DELETE FROM emf.cases;
+DELETE FROM emf.emissions_years;
+DELETE FROM emf.meteorlogical_years;
+DELETE FROM emf.speciations;
+DELETE FROM emf.grids;
+DELETE FROM emf.air_quality_models;
+DELETE FROM emf.case_categories;
+DELETE FROM emf.case_abbreviations;
+
+
+-------------------CoST tables ----------------------------------------------
+
+DELETE FROM emf.control_measures;
+DELETE FROM emf.control_strategies;
+DELETE FROM emf.datasets_control_strategies;
 
 
 

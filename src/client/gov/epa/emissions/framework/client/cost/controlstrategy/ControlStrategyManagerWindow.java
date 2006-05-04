@@ -5,7 +5,6 @@ import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
-import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -22,6 +21,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -44,7 +44,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
 
     private EmfConsole parentConsole;
 
-    public ControlStrategyManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
+    public ControlStrategyManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Control Strategy Manager", new Dimension(700, 400), desktopManager);
 
         this.parentConsole = parentConsole;
@@ -179,7 +179,25 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     }
 
     private void editCases() {
-        tempMessage();
+        List controlStrategies = selected();
+        if (controlStrategies.isEmpty()) {
+            messagePanel.setMessage("Please select one or more Control Strategies");
+            return;
+        }
+        for (int i = 0; i < controlStrategies.size(); i++) {
+            ControlStrategy controlStrategy = (ControlStrategy) controlStrategies.get(i);
+            EditControlStrategyView view = new EditControlStrategyWindow(controlStrategy, desktopManager);
+            try {
+                presenter.doEdit(view, controlStrategy);
+            } catch (EmfException e) {
+                messagePanel.setError(e.getMessage());
+            }
+        }
+
+    }
+
+    private List selected() {
+        return selectModel.selected();
     }
 
     private void createNewCase() {

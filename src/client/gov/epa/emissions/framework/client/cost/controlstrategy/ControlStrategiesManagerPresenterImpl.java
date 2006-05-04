@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy;
 
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
@@ -37,6 +38,15 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
         ControlStrategyPresenter presenter = new ControlStrategyPresenterImpl(session, view, this);
         presenter.doDisplay();
         
+    }
+
+    public void doEdit(EditControlStrategyView view, ControlStrategy controlStrategy) throws EmfException {
+        EditControlStrategyPresenter presenter = new EditControlStrategyPresenterImpl(controlStrategy, session, view, this);
+        displayEditor(presenter);
+    }
+
+    void displayEditor(EditControlStrategyPresenter presenter) throws EmfException {
+        presenter.doDisplay();
     }
 
 }

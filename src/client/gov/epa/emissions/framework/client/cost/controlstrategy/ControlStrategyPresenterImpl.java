@@ -36,8 +36,7 @@ public class ControlStrategyPresenterImpl implements ControlStrategyPresenter {
     }
 
     public void doSave(ControlStrategy newControlStrategy) throws EmfException {
-        if (isDuplicate(newControlStrategy))
-            throw new EmfException("Duplicate name - '" + newControlStrategy.getName() + "'.");
+        validateName(newControlStrategy);
 
         newControlStrategy.setCreator(session.user());
         newControlStrategy.setLastModifiedDate(new Date());
@@ -47,10 +46,20 @@ public class ControlStrategyPresenterImpl implements ControlStrategyPresenter {
         managerPresenter.doRefresh();
     }
 
-    private boolean isDuplicate(ControlStrategy newControlStrategy) throws EmfException {
+    private void validateName(ControlStrategy controlStrategy) throws EmfException {
+        // emptyName
+        String name = controlStrategy.getName();
+        if (name.trim().equals(""))
+            throw new EmfException("Empty string is not allowed for the name.");
+
+        if (isDuplicate(name))
+            throw new EmfException("Duplicate name - '" + name + "'.");
+    }
+
+    private boolean isDuplicate(String name) throws EmfException {
         ControlStrategy[] controlStrategies = service().getControlStrategies();
         for (int i = 0; i < controlStrategies.length; i++) {
-            if (controlStrategies[i].getName().equals(newControlStrategy.getName()))
+            if (controlStrategies[i].getName().equals(name))
                 return true;
         }
         return false;

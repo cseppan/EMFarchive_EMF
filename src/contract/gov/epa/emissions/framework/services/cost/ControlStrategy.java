@@ -62,7 +62,7 @@ public class ControlStrategy implements Lockable {
             return false;
 
         final ControlStrategy controlStrategy = (ControlStrategy) other;
-        return controlStrategy.name.equals(this.name);
+        return controlStrategy.getName().equals(this.name);
     }
 
     public int hashCode() {
