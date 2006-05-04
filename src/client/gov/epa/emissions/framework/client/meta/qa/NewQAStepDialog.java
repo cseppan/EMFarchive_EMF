@@ -34,7 +34,7 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
 
     private JComboBox versionsSelection;
 
-    private VersionsSet versions;
+    private VersionsSet versionsSet;
 
     private EmfDataset dataset;
 
@@ -47,7 +47,7 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
         super.setSize(new Dimension(550, 350));
         super.center();
 
-        this.versions = new VersionsSet(versions);
+        this.versionsSet = new VersionsSet(versions);
     }
 
     public void display(EmfDataset dataset, DatasetType type) {
@@ -75,7 +75,7 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        versionsSelection = new JComboBox(versions.all());
+        versionsSelection = new JComboBox(versionsSet.nameAndNumbers());
         layoutGenerator.addLabelWidgetPair("Version", versionsSelection, panel);
 
         JList required = new JList(templates.required());
@@ -149,7 +149,7 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
     }
 
     private Version selectedVersion() {
-        return (Version) versionsSelection.getSelectedItem();
+        return versionsSet.getVersionFromNameAndNumber((String)versionsSelection.getSelectedItem());
     }
 
 }

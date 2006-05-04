@@ -173,7 +173,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addLabelWidgetPair("Name:", new Label(step.getName()), panel);
-        layoutGenerator.addLabelWidgetPair("Version:", new Label(step.getVersion() + " " + versionName), panel);
+        layoutGenerator.addLabelWidgetPair("Version:", new Label(versionName + " (" + step.getVersion() + ")"), panel);
 
         program = new EditableComboBox(new QAProperties().programs());
         program.setPrototypeDisplayValue("To make the combobox a bit wider");

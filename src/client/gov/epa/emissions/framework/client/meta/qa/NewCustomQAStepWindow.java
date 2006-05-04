@@ -31,7 +31,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
 
     private JComboBox versionsSelection;
 
-    private VersionsSet versions;
+    private VersionsSet versionsSet;
 
     private EmfDataset dataset;
 
@@ -60,7 +60,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
 
         this.dataset = dataset;
         this.tabView = tabView;
-        this.versions = new VersionsSet(versions);
+        this.versionsSet = new VersionsSet(versions);
 
         JPanel layout = createLayout();
         super.getContentPane().add(layout);
@@ -110,7 +110,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         ScrollableComponent scrollableDesc = ScrollableComponent.createWithVerticalScrollBar(description);
         layoutGenerator.addLabelWidgetPair("Description:", scrollableDesc, panel);
 
-        versionsSelection = new JComboBox(versions.all());
+        versionsSelection = new JComboBox(versionsSet.nameAndNumbers());
         layoutGenerator.addLabelWidgetPair("Version:", versionsSelection, panel);
 
         // Lay out the panel.
@@ -200,7 +200,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
     }
 
     private Version selectedVersion() {
-        return (Version) versionsSelection.getSelectedItem();
+        return versionsSet.getVersionFromNameAndNumber((String) versionsSelection.getSelectedItem());
     }
 
 }
