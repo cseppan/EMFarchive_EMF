@@ -144,7 +144,12 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private Action editAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                //TODO:
+                try {
+                    if(getSelectedMeasures().size() > 0)
+                        presenter.doDisplayCMEditor((ControlMeasure)getSelectedMeasures().get(0), "edit", desktopManager);
+                } catch (EmfException e) {
+                    showError(e.getMessage());
+                }
             }
         };
         
@@ -152,16 +157,19 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     private Action newControlMeasureAction() {
+        return getAction(new ControlMeasure("New control measure"), "new");
+    }
+
+    private Action getAction(final ControlMeasure controlMeasure, final String newOrEdit) {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
-                    presenter.doDisplayCMEditor(new ControlMeasure("new measure"), desktopManager);
+                    presenter.doDisplayCMEditor(controlMeasure, newOrEdit, desktopManager);
                 } catch (EmfException e) {
                     showError(e.getMessage());
                 }
             }
         };
-        
         return action;
     }
 

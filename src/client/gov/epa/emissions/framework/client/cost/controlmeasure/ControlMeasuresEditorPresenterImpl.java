@@ -18,6 +18,8 @@ public class ControlMeasuresEditorPresenterImpl implements ControlMeasuresEditor
     private List presenters;
     
     private EmfSession session;
+    
+    private String newOrEdit;
 
     public ControlMeasuresEditorPresenterImpl(ControlMeasure measure, ControlMeasuresEditorView view, EmfSession session) {
         this.measure = measure;
@@ -26,20 +28,26 @@ public class ControlMeasuresEditorPresenterImpl implements ControlMeasuresEditor
         presenters = new ArrayList();
     }
 
-    public void doDisplay() throws EmfException {
+    public void doDisplay(String newOrEdit) throws EmfException {
         view.observe(this);
+        this.newOrEdit = newOrEdit;
         
+        if(newOrEdit.equalsIgnoreCase("edit"))
+            obtainLock();
+        
+        display();
+    }
+    
+    private void obtainLock() throws EmfException {
         measure = session.costService().obtainLockedMeasure(session.user(), measure);
         if (!measure.isLocked(session.user())) {// view mode, locked by another user
             view.notifyLockFailure(measure);
             return;
         }
-        
-        display();
     }
 
     void display() {
-        view.display(measure);
+        view.display(measure, newOrEdit);
     }
 
     public void doClose() {

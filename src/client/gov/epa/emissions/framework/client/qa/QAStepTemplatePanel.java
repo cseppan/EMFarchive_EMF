@@ -94,7 +94,7 @@ public class QAStepTemplatePanel extends JPanel {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    Float.parseFloat(order.getText());
+                    parseNumber();
                 } catch (NumberFormatException ex) {
                     messagePanel.setError("Order should be a floating point number");
                 }
@@ -121,10 +121,15 @@ public class QAStepTemplatePanel extends JPanel {
     private void keyActions() {
         try {
             messagePanel.clear();
-            Float.parseFloat(order.getText());
+            parseNumber();
         } catch (NumberFormatException ex) {
             messagePanel.setError("Order should be a floating point number");
         }
+    }
+    
+    private void parseNumber() {
+        if (!order.getText().equals(""))
+            Float.parseFloat(order.getText());
     }
     
     public String getTemplateName() {

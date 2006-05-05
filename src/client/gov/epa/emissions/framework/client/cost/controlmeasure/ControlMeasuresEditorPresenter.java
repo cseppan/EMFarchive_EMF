@@ -4,7 +4,7 @@ import gov.epa.emissions.framework.services.EmfException;
 
 public interface ControlMeasuresEditorPresenter {
 
-    void doDisplay() throws EmfException;
+    void doDisplay(String newOrEdit) throws EmfException;
 
     void doClose() throws EmfException;
 

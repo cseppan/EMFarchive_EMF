@@ -52,9 +52,9 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
         presenter = new ControlMeasuresEditorPresenterImpl(measure, viewProxy, sessionProxy);
 
         view.expects(once()).method("observe").with(eq(presenter));
-        view.expects(once()).method("display").with(eq(measure));
+        view.expects(once()).method("display").with(eq(measure), eq(""));
 
-        presenter.doDisplay();
+        presenter.doDisplay("");
     }
 
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() throws Exception {

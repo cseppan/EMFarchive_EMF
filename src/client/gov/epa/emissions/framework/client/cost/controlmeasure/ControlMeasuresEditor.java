@@ -5,8 +5,10 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -14,6 +16,8 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.JPanel;
@@ -24,33 +28,36 @@ public class ControlMeasuresEditor extends DisposableInteralFrame implements Con
     private ControlMeasuresEditorPresenter presenter;
 
     private MessagePanel messagePanel;
-    
+
     private EmfSession session;
+    
+    DateFormat dateFormat;
 
     public ControlMeasuresEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Dataset Properties Editor", new Dimension(700, 510), desktopManager);
+        super("Control Measures Editor", new Dimension(700, 510), desktopManager);
         this.desktopManager = desktopManager;
         this.session = session;
+        this.dateFormat = new SimpleDateFormat(EmfDateFormat.format());
     }
 
-    private JTabbedPane createTabbedPane(ControlMeasure measure, MessagePanel messagePanel) {
+    private JTabbedPane createTabbedPane(ControlMeasure measure, MessagePanel messagePanel, String newOrEdit) {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setName("tabbedPane");
 
-        tabbedPane.addTab("Summary", createSummaryTab(measure, messagePanel));
+        tabbedPane.addTab("Summary", createSummaryTab(measure, messagePanel, newOrEdit));
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         return tabbedPane;
     }
 
-    private JPanel createSummaryTab(ControlMeasure measure, MessagePanel messagePanel) {
-        EditableCMSummaryTab view = new EditableCMSummaryTab(measure, session, messagePanel, this);
+    private JPanel createSummaryTab(ControlMeasure measure, MessagePanel messagePanel, String newOrEdit) {
+        EditableCMSummaryTab view = new EditableCMSummaryTab(measure, session, messagePanel, this, newOrEdit);
         presenter.set(view);
         return view;
     }
-    
-    public void display(ControlMeasure measure) {
+
+    public void display(ControlMeasure measure, String newOrEdit) {
         super.setTitle("Control Measures Editor: " + measure.getName());
         super.setName("controlMeasuresEditor:" + measure.getId());
         Container contentPane = super.getContentPane();
@@ -59,7 +66,7 @@ public class ControlMeasuresEditor extends DisposableInteralFrame implements Con
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel, BorderLayout.PAGE_START);
-        panel.add(createTabbedPane(measure, messagePanel), BorderLayout.CENTER);
+        panel.add(createTabbedPane(measure, messagePanel, newOrEdit), BorderLayout.CENTER);
         panel.add(createBottomPanel(), BorderLayout.PAGE_END);
 
         contentPane.add(panel);
@@ -117,7 +124,6 @@ public class ControlMeasuresEditor extends DisposableInteralFrame implements Con
         }
     }
 
-    
     private void doSave() {
         try {
             presenter.doSave();
@@ -128,8 +134,11 @@ public class ControlMeasuresEditor extends DisposableInteralFrame implements Con
     }
 
     public void notifyLockFailure(ControlMeasure measure) {
-        // NOTE Auto-generated method stub
-        
+        String message = "Cannot edit Properties of ControlMeasure: " + measure.getName()
+                + System.getProperty("line.separator") + " as it was locked by User: " + measure.getLockOwner()
+                + "(at " + dateFormat.format(measure.getLockDate()) + ")";
+        InfoDialog dialog = new InfoDialog(this, "Message", message);
+        dialog.confirm();
     }
 
 }

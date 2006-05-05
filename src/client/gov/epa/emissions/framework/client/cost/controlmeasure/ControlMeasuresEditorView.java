@@ -7,7 +7,7 @@ public interface ControlMeasuresEditorView extends ManagedView {
 
     void observe(ControlMeasuresEditorPresenter presenter);
 
-    void display(ControlMeasure measure);
+    void display(ControlMeasure measure, String newOrEdit);
 
     void showError(String message);
 
