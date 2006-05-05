@@ -88,9 +88,11 @@ public class DataServiceTest extends ServiceTestCase {
 
         try {
             EmfDataset locked = service.obtainLockedDataset(owner, dataset);
+            locked.setName("TEST");
             locked.setDescription("TEST dataset");
 
             EmfDataset released = service.updateDataset(locked);
+            assertEquals("TEST", released.getName());
             assertEquals("TEST dataset", released.getDescription());
             assertEquals(released.getLockOwner(), null);
             assertFalse("Lock should be released on update", released.isLocked());

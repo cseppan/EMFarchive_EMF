@@ -34,7 +34,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             return;
         }
 
-        view.display();
+        view.display(controlStrategy);
     }
 
     public void doClose() throws EmfException {
@@ -47,9 +47,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     public void doSave() throws EmfException {
+        view.update();// TODO move to the tab classes
         validateName(controlStrategy);
-        
-        view.update(controlStrategy);// TODO move to the tab classes
         
         controlStrategy.setCreator(session.user());
         controlStrategy.setLastModifiedDate(new Date());

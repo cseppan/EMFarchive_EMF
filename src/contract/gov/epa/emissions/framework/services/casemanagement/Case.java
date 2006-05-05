@@ -75,8 +75,8 @@ public class Case implements Comparable, Lockable {
     public boolean equals(Object other) {
         if (other == null || !(other instanceof Case))
             return false;
-
-        return ((Case) other).name.equals(this.name);
+        final Case caze = (Case) other;
+        return caze.name.equals(name) || caze.id == id;
     }
 
     public int hashCode() {

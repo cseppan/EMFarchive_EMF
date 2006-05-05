@@ -7,10 +7,10 @@ public interface EditControlStrategyView extends ManagedView {
 
     void observe(EditControlStrategyPresenter presenter);
 
-    void display();
+    void display(ControlStrategy controlStrategy);
     
     void notifyLockFailure(ControlStrategy controlStrategy);
 
-    void update(ControlStrategy controlStrategy);
+    void update();
 
 }

@@ -2,19 +2,13 @@ package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 public class DatasetDAO {
@@ -57,31 +51,11 @@ public class DatasetDAO {
     }
 
     public boolean exists(String name, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(EmfDataset.class).add(Restrictions.eq("name", name));
-            tx.commit();
-
-            return crit.uniqueResult() != null;
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        return hibernateFacade.exists(name, EmfDataset.class, session);
     }
 
     public List all(Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            List all = session.createCriteria(EmfDataset.class).addOrder(Order.asc("name")).list();
-            tx.commit();
-
-            return all;
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        return hibernateFacade.getAll(EmfDataset.class, session);
     }
 
     public void add(EmfDataset dataset, Session session) {
@@ -110,11 +84,10 @@ public class DatasetDAO {
 
     public QAStep[] steps(EmfDataset dataset, Session session) {
         Criterion criterion = Restrictions.eq("datasetId", new Integer(dataset.getId()));
-        List steps = session.createCriteria(QAStep.class).add(criterion ).list();
+        List steps = session.createCriteria(QAStep.class).add(criterion).list();
         return (QAStep[]) steps.toArray(new QAStep[0]);
     }
 
-    
     public void update(QAStep[] steps, Session session) {
         hibernateFacade.update(steps, session);
     }

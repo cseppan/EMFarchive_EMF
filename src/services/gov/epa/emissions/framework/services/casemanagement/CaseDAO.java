@@ -58,35 +58,35 @@ public class CaseDAO {
     }
 
     public List getAbbreviations(Session session) {
-        return session.createCriteria(Abbreviation.class).addOrder(Order.asc("name")).list();
+        return hibernateFacade.getAll(Abbreviation.class, Order.asc("name"), session);
     }
 
     public List getAirQualityModels(Session session) {
-        return session.createCriteria(AirQualityModel.class).addOrder(Order.asc("name")).list();
+        return hibernateFacade.getAll(AirQualityModel.class, Order.asc("name"), session);        
     }
 
     public List getCaseCategories(Session session) {
-        return session.createCriteria(CaseCategory.class).addOrder(Order.asc("name")).list();
+        return hibernateFacade.getAll(CaseCategory.class, Order.asc("name"), session);
     }
 
     public List getEmissionsYears(Session session) {
-        return session.createCriteria(EmissionsYear.class).addOrder(Order.asc("name")).list();
+        return hibernateFacade.getAll(EmissionsYear.class, Order.asc("name"), session);
     }
 
     public List getGrids(Session session) {
-        return session.createCriteria(Grid.class).addOrder(Order.asc("name")).list();
+        return hibernateFacade.getAll(Grid.class, Order.asc("name"), session);
     }
 
     public List getMeteorlogicalYears(Session session) {
-        return session.createCriteria(MeteorlogicalYear.class).addOrder(Order.asc("name")).list();
+        return hibernateFacade.getAll(MeteorlogicalYear.class, Order.asc("name"), session);
     }
 
     public List getSpeciations(Session session) {
-        return session.createCriteria(Speciation.class).addOrder(Order.asc("name")).list();
+        return hibernateFacade.getAll(Speciation.class, Order.asc("name"), session);
     }
 
     public List getCases(Session session) {
-        return session.createCriteria(Case.class).addOrder(Order.asc("name")).list();
+        return hibernateFacade.getAll(Case.class, Order.asc("name"), session);
     }
 
     public void remove(Case element, Session session) {

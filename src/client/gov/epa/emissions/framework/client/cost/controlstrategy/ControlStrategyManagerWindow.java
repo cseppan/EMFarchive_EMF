@@ -155,7 +155,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     private SelectAwareButton editButton(ConfirmDialog confirmDialog) {
         Action editAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                editCases();
+                editControlStrategies();
             }
 
         };
@@ -166,7 +166,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     private SelectAwareButton viewButton(ConfirmDialog confirmDialog) {
         Action viewAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                viewCases();
+                viewControlStrategies();
             }
         };
 
@@ -174,11 +174,11 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         return viewButton;
     }
 
-    private void viewCases() {
+    private void viewControlStrategies() {
         tempMessage();
     }
 
-    private void editCases() {
+    private void editControlStrategies() {
         List controlStrategies = selected();
         if (controlStrategies.isEmpty()) {
             messagePanel.setMessage("Please select one or more Control Strategies");
@@ -186,7 +186,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         }
         for (int i = 0; i < controlStrategies.size(); i++) {
             ControlStrategy controlStrategy = (ControlStrategy) controlStrategies.get(i);
-            EditControlStrategyView view = new EditControlStrategyWindow(controlStrategy, desktopManager);
+            EditControlStrategyView view = new EditControlStrategyWindow(desktopManager);
             try {
                 presenter.doEdit(view, controlStrategy);
             } catch (EmfException e) {

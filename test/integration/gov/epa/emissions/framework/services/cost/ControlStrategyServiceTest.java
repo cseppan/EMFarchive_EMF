@@ -96,12 +96,16 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
     public void testShouldUpdateControlStrategy() throws Exception {
         User owner = userService.getUser("emf");
         ControlStrategy element = controlStrategy();
-
+        ControlStrategy released = null;
         try {
             ControlStrategy locked = service.obtainLocked(owner, element);
+            
+            session.clear();
+            locked.setName("TEST");
             locked.setDescription("TEST control strategy");
 
-            ControlStrategy released = service.updateControlStrategy(locked);
+            released = service.updateControlStrategy(locked);
+            assertEquals("TEST", released.getName());
             assertEquals("TEST control strategy", released.getDescription());
             assertEquals(released.getLockOwner(), null);
             assertFalse("Lock should be released on update", released.isLocked());

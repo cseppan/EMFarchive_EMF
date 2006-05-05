@@ -93,11 +93,44 @@ public class HibernateFacade {
     }
 
     public List getAll(Class clazz, Order order, Session session) {
-        return session.createCriteria(clazz).addOrder(order).list();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            List list = session.createCriteria(clazz).addOrder(order).list();
+            tx.commit();
+            return list;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
     public List getAll(Class clazz, Session session) {
-        return session.createCriteria(clazz).list();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            List list = session.createCriteria(clazz).list();
+            tx.commit();
+
+            return list;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public boolean exists(String name, Class clazz, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("name", name));
+            tx.commit();
+
+            return crit.uniqueResult() != null;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
     }
 
 }

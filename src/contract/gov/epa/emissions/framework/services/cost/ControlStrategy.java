@@ -61,8 +61,9 @@ public class ControlStrategy implements Lockable {
         if (other == null || !(other instanceof ControlStrategy))
             return false;
 
-        final ControlStrategy controlStrategy = (ControlStrategy) other;
-        return controlStrategy.getName().equals(this.name);
+        final ControlStrategy cs = (ControlStrategy) other;
+
+        return cs.name.equals(name) || cs.id == id;
     }
 
     public int hashCode() {

@@ -41,9 +41,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     private TextArea description;
 
-    public EditControlStrategyWindow(ControlStrategy controlStrategy, DesktopManager desktopManager) {
+    public EditControlStrategyWindow(DesktopManager desktopManager) {
         super("Edit a Control Strategy", new Dimension(500, 200), desktopManager);
-        this.controlStrategy = controlStrategy;
 
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
@@ -56,8 +55,9 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     }
 
-    public void display() {
+    public void display(ControlStrategy controlStrategy) {
         super.setLabel("Edit a ControlStrategy");
+        this.controlStrategy = controlStrategy;
         layout.removeAll();
         doLayout(layout);
 
@@ -161,7 +161,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         return dateFormat.format(lockDate);
     }
 
-    public void update(ControlStrategy controlStrategy) {
+    public void update() {
         controlStrategy.setName(name.getText());
         controlStrategy.setDescription(description.getText());
     }

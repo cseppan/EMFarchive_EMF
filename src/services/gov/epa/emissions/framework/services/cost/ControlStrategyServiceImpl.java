@@ -30,7 +30,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
     public ControlStrategy[] getControlStrategies() throws EmfException {
         try {
-            List cs = dao.getControlStrategies(sessionFactory.getSession());
+            List cs = dao.all(sessionFactory.getSession());
             return (ControlStrategy[]) cs.toArray(new ControlStrategy[0]);
         } catch (HibernateException e) {
             LOG.error("could not retrieve all control strategies.");
@@ -84,6 +84,9 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     public ControlStrategy updateControlStrategy(ControlStrategy element) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
+            
+            if (!dao.canUpdate(element, session))
+                throw new EmfException("Control Strategy name already in use");
 
             ControlStrategy released = dao.update(element, session);
             session.close();

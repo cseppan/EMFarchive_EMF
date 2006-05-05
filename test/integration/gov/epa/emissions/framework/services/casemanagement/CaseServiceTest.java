@@ -203,15 +203,17 @@ public class CaseServiceTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldUpdateDataset() throws Exception {
+    public void testShouldUpdateCase() throws Exception {
         User owner = userService.getUser("emf");
         Case element = newCase();
 
         try {
             Case locked = service.obtainLocked(owner, element);
+            locked.setName("TEST");
             locked.setDescription("TEST case");
 
             Case released = service.updateCase(locked);
+            assertEquals("TEST",released.getName());
             assertEquals("TEST case", released.getDescription());
             assertEquals(released.getLockOwner(), null);
             assertFalse("Lock should be released on update", released.isLocked());
