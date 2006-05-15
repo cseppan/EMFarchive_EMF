@@ -291,7 +291,7 @@ CREATE TABLE emf.dataset_types_qa_step_templates
   id SERIAL PRIMARY KEY,
   dataset_type_id int4 NOT NULL REFERENCES emf.dataset_types(id),
   list_index int4,
-  name varchar(255) UNIQUE NOT NULL,
+  name varchar(255) NOT NULL,
   program text,
   program_arguments text,
   required bool,
