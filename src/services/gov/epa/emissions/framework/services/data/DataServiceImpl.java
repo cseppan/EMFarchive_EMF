@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.data;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -84,6 +85,19 @@ public class DataServiceImpl implements DataService {
         } catch (RuntimeException e) {
             LOG.error("Could not update Dataset: " + dataset.getName(), e);
             throw new EmfException("Could not update Dataset: " + dataset.getName());
+        }
+    }
+
+    public EmfDataset[] getDatasets(DatasetType datasetType) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List datasets = dao.getDatasets(session,datasetType);
+            session.close();
+
+            return (EmfDataset[]) datasets.toArray(new EmfDataset[datasets.size()]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Datasets for dataset type "+datasetType, e);
+            throw new EmfException("Could not get all Datasets for dataset type "+datasetType);
         }
     }
 }

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
+import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategySummaryTabView;
 import gov.epa.emissions.framework.services.EmfException;
 
 public interface EditControlStrategyPresenter {
@@ -9,5 +10,7 @@ public interface EditControlStrategyPresenter {
     void doClose() throws EmfException;
     
     void doSave() throws EmfException;
+
+    void set(EditControlStrategySummaryTabView view);
 
 }

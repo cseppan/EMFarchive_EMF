@@ -6,6 +6,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -127,6 +128,19 @@ public class HibernateFacade {
             tx.commit();
 
             return crit.uniqueResult() != null;
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    public List get(Class clazz, Criterion criterion, Order order, Session session) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            List list = session.createCriteria(clazz).add(criterion).addOrder(order).list();
+            tx.commit();
+            return list;
         } catch (HibernateException e) {
             tx.rollback();
             throw e;

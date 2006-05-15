@@ -1,12 +1,10 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableComponent;
-import gov.epa.emissions.commons.gui.TextArea;
-import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategySummaryTab;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -14,6 +12,8 @@ import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -23,31 +23,24 @@ import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BoxLayout;
+import javax.swing.Box;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SpringLayout;
+import javax.swing.JTabbedPane;
 
 public class EditControlStrategyWindow extends DisposableInteralFrame implements EditControlStrategyView {
-
-    private ControlStrategy controlStrategy;
-
-    private JPanel layout;
 
     private EditControlStrategyPresenter presenter;
 
     private SingleLineMessagePanel messagePanel;
 
-    private TextField name;
+    private EmfSession session;
 
-    private TextArea description;
+    private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
-    public EditControlStrategyWindow(DesktopManager desktopManager) {
-        super("Edit a Control Strategy", new Dimension(500, 200), desktopManager);
-
-        layout = new JPanel();
-        layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
-        super.getContentPane().add(layout);
-
+    public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session) {
+        super("Edit a Control Strategy", new Dimension(800, 510), desktopManager);
+        this.session = session;
     }
 
     public void observe(EditControlStrategyPresenter presenter) {
@@ -57,41 +50,64 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     public void display(ControlStrategy controlStrategy) {
         super.setLabel("Edit a ControlStrategy");
-        this.controlStrategy = controlStrategy;
-        layout.removeAll();
-        doLayout(layout);
 
+        doLayout(controlStrategy);
+        pack();
         super.display();
     }
 
-    private void doLayout(JPanel layout) {
+    private void doLayout(ControlStrategy controlStrategy) {
+        Container contentPane = getContentPane();
+        contentPane.removeAll();
+
         messagePanel = new SingleLineMessagePanel();
-        layout.add(messagePanel);
-        layout.add(createInputPanel());
-        layout.add(createButtonsPanel());
+
+        JPanel layout = new JPanel();
+        layout.setLayout(new BorderLayout());
+        layout.add(messagePanel, BorderLayout.PAGE_START);
+        layout.add(createTabbedPane(controlStrategy));
+        layout.add(createButtonsPanel(), BorderLayout.PAGE_END);
+
+        contentPane.add(layout);
     }
 
-    private JPanel createInputPanel() {
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+    private JTabbedPane createTabbedPane(ControlStrategy controlStrategy) {
+        JTabbedPane tabbedPane = new JTabbedPane();
 
-        name = new TextField("name", 30);
-        addChangeable(name);
-        name.setText(controlStrategy.getName());
-        layoutGenerator.addLabelWidgetPair("Name:", name, panel);
+        tabbedPane.addTab("Summary", createSummaryTab(controlStrategy));
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        // These are just added to illustrate what is coming later
+        tabbedPane.addTab("Filters", new JPanel());
+        tabbedPane.addTab("Parameters", new JPanel());
+        tabbedPane.addTab("Outputs", new JPanel());
 
-        description = new TextArea("Description", "", 30, 4);
-        addChangeable(description);
-        description.setText(controlStrategy.getDescription());
-        layoutGenerator.addLabelWidgetPair("Description:",
-                ScrollableComponent.createWithVerticalScrollBar(description), panel);
+        return tabbedPane;
+    }
 
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
-                5, 0, // initialX, initialY
-                10, 10);// xPad, yPad
+    private JPanel createSummaryTab(ControlStrategy controlStrategy) {
+        try {
+            EditControlStrategySummaryTab view = new EditControlStrategySummaryTab(controlStrategy, session, this,
+                    messagePanel);
+            this.presenter.set(view);
+            return view;
+        } catch (EmfException e) {
+            showError("Could not load Summary Tab." + e.getMessage());
+            return createErrorTab("Could not load Summary Tab." + e.getMessage());
+        }
+
+    }
+
+    private JPanel createErrorTab(String message) {// TODO
+        JPanel panel = new JPanel(false);
+        JLabel label = new JLabel(message);
+        label.setForeground(Color.RED);
+        panel.add(label);
 
         return panel;
+    }
+
+    private void showError(String message) {
+        messagePanel.setError(message);
     }
 
     private JPanel createButtonsPanel() {
@@ -108,9 +124,20 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         container.add(new Button("Close", closeAction()));
         getRootPane().setDefaultButton(saveButton);
 
+        container.add(Box.createHorizontalStrut(40));
+        container.add(new Button("Run", runAction()));
+        
         panel.add(container, BorderLayout.CENTER);
 
         return panel;
+    }
+
+    private Action runAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                //TODO:
+            }
+        };
     }
 
     private Action closeAction() {
@@ -136,7 +163,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 resetChanges();
-                
+
                 try {
                     presenter.doSave();
                 } catch (EmfException e) {
@@ -157,13 +184,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     private String format(Date lockDate) {
-        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         return dateFormat.format(lockDate);
-    }
-
-    public void update() {
-        controlStrategy.setName(name.getText());
-        controlStrategy.setDescription(description.getText());
     }
 
 }

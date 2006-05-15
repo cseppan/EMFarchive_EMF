@@ -245,7 +245,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
     }
 
     private void doManageControlStrategies(final EmfConsole parent, final MessagePanel messagePanel) {
-        ControlStrategyManagerView view = new ControlStrategyManagerWindow(parent, desktopManager);
+        ControlStrategyManagerView view = new ControlStrategyManagerWindow(parent, session, desktopManager);
         try {
             presenter.doDisplayControlStrategies(view);
         } catch (EmfException e) {

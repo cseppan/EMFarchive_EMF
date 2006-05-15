@@ -11,6 +11,4 @@ public interface EditControlStrategyView extends ManagedView {
     
     void notifyLockFailure(ControlStrategy controlStrategy);
 
-    void update();
-
 }

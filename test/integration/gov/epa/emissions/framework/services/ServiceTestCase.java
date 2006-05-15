@@ -24,9 +24,11 @@ import javax.sql.DataSource;
 
 import junit.framework.TestCase;
 
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 
 public abstract class ServiceTestCase extends TestCase {
 
@@ -151,4 +153,31 @@ public abstract class ServiceTestCase extends TestCase {
         }
     }
 
+    protected void save(Object obj) {
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.save(obj);
+            tx.commit();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
+    protected Object load(Class clazz, String name) {
+        Transaction tx = null;
+    
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(clazz).add(Restrictions.eq("name", name));
+            tx.commit();
+            return crit.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
 }
+

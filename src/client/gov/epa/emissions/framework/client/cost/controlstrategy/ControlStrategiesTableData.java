@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
+import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
@@ -18,11 +19,13 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Region", "Last Modified" };
+        return new String[] { "Name", "Last Modified", "Region", "Project", "Analysis Type", "Dataset Type",
+                "Discount Rate", "Cost Year" };
+
     }
 
     public Class getColumnClass(int col) {
-        if (col == 2)
+        if (col == 1)
             return Date.class;
 
         return String.class;
@@ -38,15 +41,20 @@ public class ControlStrategiesTableData extends AbstractTableData {
 
     private List createRows(ControlStrategy[] controlStrategies) {
         List rows = new ArrayList();
-
         for (int i = 0; i < controlStrategies.length; i++) {
             ControlStrategy element = controlStrategies[i];
-            Object[] values = { element.getName(), region(element), format(element.getLastModifiedDate()) };
+            Object[] values = { element.getName(), format(element.getLastModifiedDate()), region(element),
+                    project(element), "", "", "", "" };
             Row row = new ViewableRow(element, values);
             rows.add(row);
         }
 
         return rows;
+    }
+
+    private String project(ControlStrategy element) {
+        Project project = element.getProject();
+        return project != null ? project.getName() : "";
     }
 
     private String region(ControlStrategy element) {

@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.data;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 public class DatasetDAO {
@@ -84,6 +86,7 @@ public class DatasetDAO {
 
     public QAStep[] steps(EmfDataset dataset, Session session) {
         Criterion criterion = Restrictions.eq("datasetId", new Integer(dataset.getId()));
+        
         List steps = session.createCriteria(QAStep.class).add(criterion).list();
         return (QAStep[]) steps.toArray(new QAStep[0]);
     }
@@ -94,6 +97,12 @@ public class DatasetDAO {
 
     public void add(QAStep[] steps, Session session) {
         hibernateFacade.add(steps, session);
+    }
+
+    public List getDatasets(Session session, DatasetType datasetType) {
+        Criterion criterion = Restrictions.eq("datasetType", datasetType);
+        Order order = Order.asc("name");
+        return hibernateFacade.get(EmfDataset.class, criterion, order, session);
     }
 
 }

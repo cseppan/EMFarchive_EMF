@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.DataService;
@@ -57,6 +58,18 @@ public class DataServiceTransport implements DataService {
         call.setReturnType(mappings.dataset());
 
         return (EmfDataset) call.requestResponse(new Object[] { locked });
+    }
+
+    public EmfDataset[] getDatasets(DatasetType datasetType) throws EmfException {
+
+        EmfCall call = call();
+
+        call.setOperation("getDatasets");
+        call.addParam("datasetType", mappings.datasetType());
+        call.setReturnType(mappings.datasets());
+
+        return (EmfDataset[]) call.requestResponse(new Object[] {});
+    
     }
 
 }

@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -44,9 +45,12 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
 
     private EmfConsole parentConsole;
 
-    public ControlStrategyManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Control Strategy Manager", new Dimension(700, 400), desktopManager);
+    private EmfSession session;
 
+    public ControlStrategyManagerWindow(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
+        super("Control Strategy Manager", new Dimension(700, 400), desktopManager);
+        
+        this.session = session;
         this.parentConsole = parentConsole;
 
         layout = new JPanel();
@@ -186,7 +190,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         }
         for (int i = 0; i < controlStrategies.size(); i++) {
             ControlStrategy controlStrategy = (ControlStrategy) controlStrategies.get(i);
-            EditControlStrategyView view = new EditControlStrategyWindow(desktopManager);
+            EditControlStrategyView view = new EditControlStrategyWindow(desktopManager, session);
             try {
                 presenter.doEdit(view, controlStrategy);
             } catch (EmfException e) {

@@ -33,20 +33,26 @@ public class ControlStrategiesTableDataTest extends TestCase {
     }
 
     public void testShouldHaveTwoColumns() {
+
         String[] columns = data.columns();
-        assertEquals(3, columns.length);
+        assertEquals(8, columns.length);
         assertEquals("Name", columns[0]);
-        assertEquals("Region", columns[1]);
-        assertEquals("Last Modified", columns[2]);
+        assertEquals("Last Modified", columns[1]);
+        assertEquals("Region", columns[2]);
+        assertEquals("Project", columns[3]);
+        assertEquals("Analysis Type", columns[4]);
+        assertEquals("Dataset Type", columns[5]);
+        assertEquals("Discount Rate", columns[6]);
+        assertEquals("Cost Year", columns[7]);
+
     }
 
-    public void testShouldHaveAppropriateColumnClassDefinedForAllColumns() {
+public void testShouldHaveAppropriateColumnClassDefinedForAllColumns() {
         assertEquals(String.class, data.getColumnClass(0));
-        assertEquals(String.class, data.getColumnClass(1));
-        assertEquals(Date.class, data.getColumnClass(2));
-    }
-
-    public void testAllColumnsShouldBeUnEditable() {
+        assertEquals(Date.class, data.getColumnClass(1));
+        assertEquals(String.class, data.getColumnClass(2));
+        
+    }    public void testAllColumnsShouldBeUnEditable() {
         assertFalse("All cells should be uneditable", data.isEditable(0));
         assertFalse("All cells should be uneditable", data.isEditable(1));
         assertFalse("All cells should be uneditable", data.isEditable(2));
@@ -63,8 +69,9 @@ public class ControlStrategiesTableDataTest extends TestCase {
 
         Row row = (Row) rows.get(0);
         assertEquals("name1", row.getValueAt(0));
-        assertEquals("region1", row.getValueAt(1));
-        assertEquals(format(controlStrategy1.getLastModifiedDate()), row.getValueAt(2));
+        assertEquals(format(controlStrategy1.getLastModifiedDate()), row.getValueAt(1));
+        assertEquals("region1", row.getValueAt(2));
+
     }
 
     private String format(Date date) {

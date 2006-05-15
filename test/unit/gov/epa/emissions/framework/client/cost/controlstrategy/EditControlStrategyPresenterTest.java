@@ -48,7 +48,6 @@ public class EditControlStrategyPresenterTest extends EmfMockObjectTestCase {
     public void testShouldSaveControlStrategyAndCloseViewOnSave() throws EmfException {
         Mock view = mock(EditControlStrategyView.class);
         expects(view, 1, "disposeView");
-        expects(view, 1, "update");
 
         Mock service = mock(ControlStrategyService.class);
         ControlStrategy comtrolStrategy = new ControlStrategy("name");
@@ -71,7 +70,6 @@ public class EditControlStrategyPresenterTest extends EmfMockObjectTestCase {
     public void testShouldRaiseErrorIfDuplicateControlStrategyNameOnSave() {
         
         Mock view = mock(EditControlStrategyView.class);
-        expects(view, 1, "update");
 
         Mock service = mock(ControlStrategyService.class);
         
