@@ -17,6 +17,8 @@
         <property name="ruleEffectiveness" column="rule_effectiveness" type="float" not-null="false"/>
         <property name="rulePenetration" column="rule_penetration" type="float" not-null="false"/>
         <property name="annualizedCost" column="annualized_cost" type="float" not-null="false"/>
+        <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
+        <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
         
         <many-to-one cascade="save-update"
             name="creator" 

@@ -124,4 +124,14 @@ public class RevisionPanel extends JPanel {
 
         return true;
     }
+    
+    public void enableWhatNWhy() {
+        what.setEnabled(true);
+        why.setEnabled(true);
+    }
+
+    public void disableWhatNWhy() {
+        what.setEnabled(false);
+        why.setEnabled(false);
+    }
 }

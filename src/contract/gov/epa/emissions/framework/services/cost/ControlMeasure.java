@@ -1,12 +1,13 @@
 package gov.epa.emissions.framework.services.cost;
 
-import java.util.Date;
-
 import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.security.User;
 
-public class ControlMeasure implements Lockable {
+import java.io.Serializable;
+import java.util.Date;
+
+public class ControlMeasure implements Lockable, Serializable {
     
     private int id;
     
@@ -34,10 +35,10 @@ public class ControlMeasure implements Lockable {
         this.lock = new Mutex();
     }
     
-    public ControlMeasure(String name) {
-        this();
-        this.name = name;
-    }
+//    public ControlMeasure(String name) {
+//        this();
+//        this.name = name;
+//    }
     
     public float getAnnualizedCost() {
         return annualizedCost;
@@ -146,5 +147,18 @@ public class ControlMeasure implements Lockable {
     public boolean isLocked() {
         return lock.isLocked();
     }
+    
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof ControlMeasure)) {
+            return false;
+        }
 
+        ControlMeasure otherMeasure = (ControlMeasure) other;
+
+        return (id == otherMeasure.getId());
+    }
+    
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

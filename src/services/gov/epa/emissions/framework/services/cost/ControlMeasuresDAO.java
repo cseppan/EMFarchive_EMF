@@ -2,18 +2,12 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
 import java.util.List;
 
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 public class ControlMeasuresDAO {
 
@@ -42,7 +36,7 @@ public class ControlMeasuresDAO {
     }
 
     public boolean canUpdate(ControlMeasure measure, Session session) {
-        if (!exists(measure.getId(), EmfDataset.class, session)) {
+        if (!exists(measure.getId(), ControlMeasure.class, session)) {
             return false;
         }
 
@@ -55,31 +49,11 @@ public class ControlMeasuresDAO {
     }
 
     public boolean exists(String name, Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            Criteria crit = session.createCriteria(ControlMeasure.class).add(Restrictions.eq("name", name));
-            tx.commit();
-
-            return crit.uniqueResult() != null;
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        return hibernateFacade.exists(name, ControlMeasure.class, session);
     }
 
     public List all(Session session) {
-        Transaction tx = null;
-        try {
-            tx = session.beginTransaction();
-            List all = session.createCriteria(ControlMeasure.class).addOrder(Order.asc("name")).list();
-            tx.commit();
-
-            return all;
-        } catch (HibernateException e) {
-            tx.rollback();
-            throw e;
-        }
+        return hibernateFacade.getAll(ControlMeasure.class, session);
     }
 
     public void add(ControlMeasure measure, Session session) {

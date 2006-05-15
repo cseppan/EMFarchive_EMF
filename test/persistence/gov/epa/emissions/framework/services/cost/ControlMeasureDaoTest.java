@@ -32,7 +32,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     }
 
     public void testShouldAddControlMeasureToDatabaseOnAdd() throws Exception {
-        ControlMeasure cm = new ControlMeasure("cm one");
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
         try {
             dao.add(cm, session);
             ControlMeasure result = load(cm);
@@ -45,7 +46,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     }
 
     public void testShouldUpdateControlMeasureOnUpdate() throws Exception {
-        ControlMeasure cm = new ControlMeasure("cm one");
+        ControlMeasure cm = new ControlMeasure();
 
         try {
             cm.setName("cm one modified");
@@ -61,8 +62,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     }
 
     public void testShouldGetControlMeasures() throws Exception {
-        ControlMeasure cm = new ControlMeasure("cm one");
-
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
         add(cm);
 
         try {
@@ -76,8 +77,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     }
 
     public void testShouldUpdateQASteps() throws Exception {
-        ControlMeasure cm = new ControlMeasure("cm one");
-
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
         add(cm);
 
         try {
@@ -100,7 +101,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     }
 
     public void testShouldAddNewControlMeasuresOnUpdateQASteps() throws Exception {
-        ControlMeasure cm = new ControlMeasure("cm one");
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
 
         try {
             dao.update(new ControlMeasure[] { cm }, session);
@@ -115,7 +117,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     }
 
     public void testShouldSaveNewControlMeasures() throws Exception {
-        ControlMeasure cm = new ControlMeasure("cm one");
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
 
         try {
             dao.add(new ControlMeasure[] { cm }, session);
@@ -131,7 +134,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     }
 
     public void testShouldRemoveControlMeasureFromDatabaseOnRemove() throws Exception {
-        ControlMeasure cm = new ControlMeasure("cm one");
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
 
         add(cm);
 
@@ -142,8 +146,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     }
 
     public void testShouldConfirmControlMeasureExistsWhenQueriedByName() throws Exception {
-        ControlMeasure cm = new ControlMeasure("cm one");
-
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
         add(cm);
 
         try {
@@ -156,8 +160,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
 
     public void testShouldObtainLockedControlMeasureForUpdate() {
         User owner = userDAO.get("emf", session);
-        ControlMeasure cm = new ControlMeasure("cm one");
-        
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
         add(cm);
 
         try {
@@ -174,8 +178,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     public void testShouldUpdateControlMeasureAfterObtainingLock() throws EmfException {
         UserDAO userDao = new UserDAO();
         User owner = userDao.get("emf", session);
-        ControlMeasure cm = new ControlMeasure("cm one");
-        
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
         add(cm);
 
         try {
@@ -194,8 +198,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     public void testShouldFailToGetLockWhenAlreadyLockedByAnotherUser() {
         UserDAO userDao = new UserDAO();
         User owner = userDao.get("emf", session);
-        ControlMeasure cm = new ControlMeasure("cm one");
-        
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
         add(cm);
 
         try {
@@ -214,8 +218,8 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     public void testShouldReleaseLock() {
         UserDAO userDao = new UserDAO();
         User owner = userDao.get("emf", session);
-        ControlMeasure cm = new ControlMeasure("cm one");
-        
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm one");
         add(cm);
 
         try {

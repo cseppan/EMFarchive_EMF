@@ -15,8 +15,9 @@ public class CostServiceTest extends ServiceTestCase {
 
     public void testShouldGetControlMeasures() throws Exception {
 
-        ControlMeasure cm = new ControlMeasure("cm test one");
+        ControlMeasure cm = new ControlMeasure();
         cm.setEquipmentLife(12);
+        cm.setName("cm test one");
         add(cm);
 
         try {
@@ -32,8 +33,9 @@ public class CostServiceTest extends ServiceTestCase {
 
     public void testShouldAddOneControlMeasure() throws Exception {
 
-        ControlMeasure cm = new ControlMeasure("cm test added");
+        ControlMeasure cm = new ControlMeasure();
         cm.setEquipmentLife(12);
+        cm.setName("cm test added");
         service.addMeasure(cm);
 
         try {
@@ -49,8 +51,9 @@ public class CostServiceTest extends ServiceTestCase {
 
     public void testShouldRemoveOneControlMeasure() throws Exception {
 
-        ControlMeasure cm = new ControlMeasure("cm test added");
+        ControlMeasure cm = new ControlMeasure();
         cm.setEquipmentLife(12);
+        cm.setName("cm test added");
         service.addMeasure(cm);
 
         ControlMeasure[] cms = service.getMeasures();

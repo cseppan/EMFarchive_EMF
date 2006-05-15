@@ -17,8 +17,8 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Creator", "AnnualizedCost", "RuleEffectiveness", "RulePenetration", 
-                "MajorPollutant", "Description" };
+        return new String[] { "Name", "Creator", "Annd. Cost", "Rule Eff.", "Rule Pen.", 
+                "Major Poll.", "Description" };
     }
 
     public List rows() {

@@ -33,7 +33,8 @@ public class CostServiceTransportTest extends ServiceTestCase {
     }
 
     public void testShouldAddOneControlMeasure() throws RemoteException {
-        ControlMeasure cm = new ControlMeasure("cm test added");
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("cm test added");
         cm.setEquipmentLife(12);
         service.addMeasure(cm);
 
@@ -41,8 +42,8 @@ public class CostServiceTransportTest extends ServiceTestCase {
         assertEquals(all.length, 1);
         assertEquals("cm test added", all[0].getName());
         
-        //service.removeMeasure(all[0]);
-        //assertEquals(all.length, service.getMeasures().length);
+        service.removeMeasure(all[0]);
+        assertEquals(all.length - 1, service.getMeasures().length);
     }
 
     protected void doTearDown() throws Exception {// no op

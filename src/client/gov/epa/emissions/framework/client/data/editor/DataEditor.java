@@ -56,6 +56,8 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private ChangeAwareButton save, discard;
 
+    private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
+ 
     public DataEditor(EmfDataset dataset, EmfConsole parent, DesktopManager desktopManager) {
         super("Data Editor: " + dataset.getName(), desktopManager);
         setDimension();
@@ -146,6 +148,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private JPanel revisionPanel(Note[] notes) {
         revisionPanel = new RevisionPanel(user, dataset, version, notes, parent);
+        revisionPanel.disableWhatNWhy();
         return revisionPanel;
     }
 
@@ -250,6 +253,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
 
     private void doClose() {
         clearMessages();
+        revisionPanel.enableWhatNWhy();
         try {
             presenter.doClose();
         } catch (EmfException e) {
@@ -292,7 +296,6 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     private String format(Date lockDate) {
-        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         return dateFormat.format(lockDate);
     }
 
@@ -306,6 +309,7 @@ public class DataEditor extends DisposableInteralFrame implements DataEditorView
     }
 
     public void signalChanges() {
+        revisionPanel.enableWhatNWhy();
         enableSaveDiscard();
         super.signalChanges();
     }

@@ -4,6 +4,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.CostService;
+import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,11 +21,15 @@ public class ControlMeasuresEditorPresenterImpl implements ControlMeasuresEditor
     private EmfSession session;
     
     private String newOrEdit;
+    
+    private RefreshObserver parent;
 
-    public ControlMeasuresEditorPresenterImpl(ControlMeasure measure, ControlMeasuresEditorView view, EmfSession session) {
+    public ControlMeasuresEditorPresenterImpl(ControlMeasure measure, ControlMeasuresEditorView view, 
+            EmfSession session, RefreshObserver parent) {
         this.measure = measure;
         this.view = view;
         this.session = session;
+        this.parent = parent;
         presenters = new ArrayList();
     }
 
@@ -50,8 +55,9 @@ public class ControlMeasuresEditorPresenterImpl implements ControlMeasuresEditor
         view.display(measure, newOrEdit);
     }
 
-    public void doClose() {
+    public void doClose() throws EmfException {
         view.disposeView();
+        parent.doRefresh();
     }
     
     public void doSave() throws EmfException {
@@ -64,9 +70,12 @@ public class ControlMeasuresEditorPresenterImpl implements ControlMeasuresEditor
             ControlMeasureTabPresenter element = (ControlMeasureTabPresenter) iter.next();
             element.doSave();
         }
-        service.addMeasure(measure);
+        
+        if(newOrEdit != null && !newOrEdit.equalsIgnoreCase("edit"))
+            service.addMeasure(measure);
 
         view.disposeView();
+        parent.doRefresh();
     }
 
     public void set(EditableCMSummaryTabView summary) {

@@ -9,7 +9,7 @@ public class ControlMeasureTest extends TestCase {
     public void testShouldSetAndGetAttributesCorrectly() {
         Date date = new Date();
         User user = new User("test user", "xxx", "xxx", "xxx@xxx.com", "xxx", "xxxxx1234", true, true);
-        ControlMeasure cm = new ControlMeasure("CM one");
+        ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one modified");
         cm.setAnnualizedCost(1000);
         cm.setCreator(user);
