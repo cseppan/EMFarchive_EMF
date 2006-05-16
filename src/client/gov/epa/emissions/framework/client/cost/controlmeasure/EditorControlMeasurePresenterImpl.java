@@ -10,22 +10,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ControlMeasuresEditorPresenterImpl implements ControlMeasuresEditorPresenter {
+public class EditorControlMeasurePresenterImpl implements ControlMeasurePresenter {
 
     private ControlMeasure measure;
 
-    private ControlMeasuresEditorView view;
+    private ControlMeasureView view;
 
     private List presenters;
-    
+
     private EmfSession session;
-    
-    private String newOrEdit;
-    
+
     private RefreshObserver parent;
 
-    public ControlMeasuresEditorPresenterImpl(ControlMeasure measure, ControlMeasuresEditorView view, 
-            EmfSession session, RefreshObserver parent) {
+    public EditorControlMeasurePresenterImpl(ControlMeasure measure, ControlMeasureView view, EmfSession session,
+            RefreshObserver parent) {
         this.measure = measure;
         this.view = view;
         this.session = session;
@@ -33,46 +31,40 @@ public class ControlMeasuresEditorPresenterImpl implements ControlMeasuresEditor
         presenters = new ArrayList();
     }
 
-    public void doDisplay(String newOrEdit) throws EmfException {
-        view.observe(this);
-        this.newOrEdit = newOrEdit;
-        
-        if(newOrEdit.equalsIgnoreCase("edit"))
-            obtainLock();
-        
-        display();
+    public void doDisplay(String newOrEdit) {
+        // FIXME: remove
     }
-    
-    private void obtainLock() throws EmfException {
+
+    public void doDisplay() throws EmfException {
+        view.observe(this);
         measure = session.costService().obtainLockedMeasure(session.user(), measure);
         if (!measure.isLocked(session.user())) {// view mode, locked by another user
             view.notifyLockFailure(measure);
             return;
         }
+        display();
     }
 
     void display() {
-        view.display(measure, newOrEdit);
+        view.display(measure);
     }
 
     public void doClose() throws EmfException {
         view.disposeView();
         parent.doRefresh();
     }
-    
+
     public void doSave() throws EmfException {
         save(measure, session.costService(), presenters, view);
     }
 
-    void save(ControlMeasure measure, CostService service, List presenters, ControlMeasuresEditorView view)
+    void save(ControlMeasure measure, CostService service, List presenters, ControlMeasureView view)
             throws EmfException {
         for (Iterator iter = presenters.iterator(); iter.hasNext();) {
             ControlMeasureTabPresenter element = (ControlMeasureTabPresenter) iter.next();
             element.doSave();
         }
-        
-        if(newOrEdit != null && !newOrEdit.equalsIgnoreCase("edit"))
-            service.addMeasure(measure);
+        // FIXME: update control measure
 
         view.disposeView();
         parent.doRefresh();

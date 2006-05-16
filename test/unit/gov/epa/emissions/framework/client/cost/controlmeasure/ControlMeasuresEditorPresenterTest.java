@@ -17,7 +17,7 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
 
     private Mock view;
 
-    private ControlMeasuresEditorPresenterImpl presenter;
+    private EditorControlMeasurePresenterImpl presenter;
 
     private ControlMeasure measure;
 
@@ -30,7 +30,7 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
     protected void setUp() {
         measure = new ControlMeasure();
         measure.setName("");
-        view = mock(ControlMeasuresEditorView.class);
+        view = mock(ControlMeasureView.class);
         costService = mock(CostService.class);
         
         managerPresenter = mock(RefreshObserver.class);
@@ -39,9 +39,9 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
         session = mock(EmfSession.class);
         session.stubs().method("costService").withNoArguments().will(returnValue(costService.proxy()));
 
-        ControlMeasuresEditorView viewProxy = (ControlMeasuresEditorView) view.proxy();
+        ControlMeasureView viewProxy = (ControlMeasureView) view.proxy();
         EmfSession sessionProxy = (EmfSession) session.proxy();
-        presenter = new ControlMeasuresEditorPresenterImpl(measure, viewProxy, sessionProxy, (RefreshObserver)managerPresenter.proxy());
+        presenter = new EditorControlMeasurePresenterImpl(measure, viewProxy, sessionProxy, (RefreshObserver)managerPresenter.proxy());
     }
 
     public void testShouldDisplayViewOnDisplayAfterObtainingLock() throws Exception {
@@ -54,20 +54,20 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
 
         session.stubs().method("user").withNoArguments().will(returnValue(owner));
 
-        ControlMeasuresEditorView viewProxy = (ControlMeasuresEditorView) view.proxy();
+        ControlMeasureView viewProxy = (ControlMeasureView) view.proxy();
         EmfSession sessionProxy = (EmfSession) session.proxy();
-        presenter = new ControlMeasuresEditorPresenterImpl(measure, viewProxy, sessionProxy, (RefreshObserver)managerPresenter.proxy());
+        presenter = new EditorControlMeasurePresenterImpl(measure, viewProxy, sessionProxy, (RefreshObserver)managerPresenter.proxy());
 
         view.expects(once()).method("observe").with(eq(presenter));
-        view.expects(once()).method("display").with(eq(measure), eq(""));
+        view.expects(once()).method("display").with(eq(measure));
 
-        presenter.doDisplay("");
+        presenter.doDisplay();
     }
 
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() throws Exception {
         //costService.expects(once()).method("addMeasure").with(eq(measure));
         expects(view, "disposeView");
-        presenter.save(measure, (CostService) costService.proxy(), presenters(), (ControlMeasuresEditorView) view
+        presenter.save(measure, (CostService) costService.proxy(), presenters(), (ControlMeasureView) view
                 .proxy());
     }
 

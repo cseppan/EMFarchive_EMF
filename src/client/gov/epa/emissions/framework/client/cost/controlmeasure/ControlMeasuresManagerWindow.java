@@ -138,17 +138,31 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     private Action editAction() {
-        return getAction("edit");
+        Action action = new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                ControlMeasure[] measures = (ControlMeasure[]) getSelectedMeasures().toArray(new ControlMeasure[0]);
+                if (measures.length == 0)
+                    showError("Please select a control measure.");
+                try {
+                    for (int i = 0; i < measures.length; i++)
+                        presenter.doEdit(measures[i],desktopManager);
+
+                } catch (EmfException e) {
+                    showError(e.getMessage());
+                }
+            }
+        };
+        return action;
     }
 
     private Action newControlMeasureAction() {
         return getAction("new");
     }
-    
+
     private Action copyAction() {
         return getAction("copy");
     }
-    
+
     private Action getAction(final String newOrEdit) {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
@@ -168,12 +182,12 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
             presenter.doDisplayCMEditor(new ControlMeasure(), newOrEdit, desktopManager);
             return;
         }
-        
-        ControlMeasure[] measures = (ControlMeasure[])getSelectedMeasures().toArray(new ControlMeasure[0]);
+
+        ControlMeasure[] measures = (ControlMeasure[]) getSelectedMeasures().toArray(new ControlMeasure[0]);
         if (measures.length == 0)
             showError("Please select a control measure.");
-        
-        for(int i = 0; i < measures.length; i++)
+
+        for (int i = 0; i < measures.length; i++)
             presenter.doDisplayCMEditor(measures[i], newOrEdit, desktopManager);
     }
 

@@ -3,11 +3,13 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 import gov.epa.emissions.framework.client.ManagedView;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 
-public interface ControlMeasuresEditorView extends ManagedView {
+public interface ControlMeasureView extends ManagedView {
 
-    void observe(ControlMeasuresEditorPresenter presenter);
+    void observe(ControlMeasurePresenter presenter);
 
     void display(ControlMeasure measure, String newOrEdit);
+    
+    void display(ControlMeasure measure);
 
     void showError(String message);
 
