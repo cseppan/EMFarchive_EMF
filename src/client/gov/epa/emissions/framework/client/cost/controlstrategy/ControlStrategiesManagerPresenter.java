@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
+import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 

@@ -1,4 +1,4 @@
-package gov.epa.emissions.framework.client.cost.controlstrategy;
+package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.framework.client.ManagedView;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;

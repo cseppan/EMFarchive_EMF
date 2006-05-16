@@ -1,10 +1,7 @@
-package gov.epa.emissions.framework.client.cost.controlstrategy;
+package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.framework.client.EmfSession;
-import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategySummaryTabPresenter;
-import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategySummaryTabPresenterImpl;
-import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategySummaryTabView;
-import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyTabPresenter;
+import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategiesManagerPresenter;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;

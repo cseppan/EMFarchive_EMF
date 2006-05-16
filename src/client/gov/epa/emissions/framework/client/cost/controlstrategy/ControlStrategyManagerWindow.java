@@ -9,6 +9,8 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyView;
+import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyWindow;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.ui.EmfTableModel;
