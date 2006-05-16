@@ -32,7 +32,7 @@
             
   	<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
 
-  	<array name="datasets" table="datasets_control_strategies" cascade="save-update">
+  	<array name="datasets" table="datasets_control_strategies" >
     	<key column="control_strategy_id" not-null="true"/>
 	    <list-index column="list_index"/>
     	<many-to-many class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>

@@ -227,6 +227,10 @@ public class EmfDataset implements Dataset, Lockable {
         return (id == otherDataset.getId());
     }
 
+    public int hashCode() {
+        return name.hashCode();
+    }
+
     public String getStatus() {
         return status;
     }
@@ -382,14 +386,14 @@ public class EmfDataset implements Dataset, Lockable {
     public boolean isExternal() {
         return getInternalSources().length == 0;
     }
-    
+
     public KeyVal[] mergeKeyVals() {
         List result = new ArrayList();
         result.addAll(keyValsList);
-        
-        if(datasetType == null)
+
+        if (datasetType == null)
             return (KeyVal[]) result.toArray(new KeyVal[0]);
-        
+
         KeyVal[] datasetTypeKeyVals = datasetType.getKeyVals();
 
         for (int i = 0; i < datasetTypeKeyVals.length; i++) {
@@ -408,6 +412,10 @@ public class EmfDataset implements Dataset, Lockable {
         }
 
         return false;
+    }
+
+    public String toString() {
+        return name;
     }
 
 }
