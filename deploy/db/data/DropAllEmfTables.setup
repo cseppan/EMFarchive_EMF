@@ -1,18 +1,3 @@
---------------CoST Tables-----------------------------------------
-DROP TABLE emf.control_measures CASCADE;
-DROP TABLE emf.control_strategies CASCADE;
-DROP TABLE emf.datasets_control_strategies CASCADE;
-
---------------------------- Case Management tables ----------------------------------------
-DROP TABLE emf.cases CASCADE;
-DROP TABLE emf.emissions_years CASCADE;
-DROP TABLE emf.meteorlogical_years CASCADE;
-DROP TABLE emf.speciations CASCADE;
-DROP TABLE emf.grids CASCADE;
-DROP TABLE emf.air_quality_models CASCADE;
-DROP TABLE emf.case_categories CASCADE;
-DROP TABLE emf.case_abbreviations CASCADE;
-
 
 ------------------------------------------- Data Management tables----------------------------
 --emissions.versions

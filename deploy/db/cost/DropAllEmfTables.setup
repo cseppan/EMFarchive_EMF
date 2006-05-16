@@ -1,0 +1,4 @@
+--------------CoST Tables-----------------------------------------
+DROP TABLE emf.control_measures CASCADE;
+DROP TABLE emf.control_strategies CASCADE;
+DROP TABLE emf.datasets_control_strategies CASCADE;

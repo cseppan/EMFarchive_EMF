@@ -1,0 +1,9 @@
+-------------------CoST tables ----------------------------------------------
+
+DELETE FROM emf.control_measures;
+DELETE FROM emf.control_strategies;
+DELETE FROM emf.datasets_control_strategies;
+
+
+
+

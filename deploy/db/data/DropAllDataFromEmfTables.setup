@@ -25,25 +25,3 @@ DELETE FROM emf.revisions;
 ----------------------------- QA Management tables -------------------------------
 DELETE FROM emf.qa_steps;
 DELETE FROM emf.dataset_types_qa_step_templates;
-
------------------------------- Case Management tables ----------------------------
-
-DELETE FROM emf.cases;
-DELETE FROM emf.emissions_years;
-DELETE FROM emf.meteorlogical_years;
-DELETE FROM emf.speciations;
-DELETE FROM emf.grids;
-DELETE FROM emf.air_quality_models;
-DELETE FROM emf.case_categories;
-DELETE FROM emf.case_abbreviations;
-
-
--------------------CoST tables ----------------------------------------------
-
-DELETE FROM emf.control_measures;
-DELETE FROM emf.control_strategies;
-DELETE FROM emf.datasets_control_strategies;
-
-
-
-
