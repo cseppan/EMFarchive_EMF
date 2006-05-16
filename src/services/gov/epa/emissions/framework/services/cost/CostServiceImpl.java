@@ -61,4 +61,8 @@ public class CostServiceImpl implements CostService {
         }
     }
 
+    public ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException {
+        return dao.update(measure, sessionFactory.getSession());
+    }
+
 }

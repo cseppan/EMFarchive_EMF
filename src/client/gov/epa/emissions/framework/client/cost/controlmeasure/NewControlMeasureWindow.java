@@ -38,7 +38,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     }
 
     public void display(ControlMeasure measure) {
-        setWindowTitle(measure);
+        setWindowTitle();
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
 
@@ -82,9 +82,10 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
         return view;
     }
 
-    private void setWindowTitle(ControlMeasure measure) {
-        super.setTitle("New Control Measure: " + count++);
-        super.setName("newControlMeasure" + measure.getId());
+    private void setWindowTitle() {
+        int number = ++count;
+        super.setTitle("New Control Measure: " + number);
+        super.setName("newControlMeasure" + number);
     }
 
     private JPanel createBottomPanel() {

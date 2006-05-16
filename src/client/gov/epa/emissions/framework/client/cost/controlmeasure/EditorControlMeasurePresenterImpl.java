@@ -60,7 +60,8 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
             ControlMeasureTabPresenter element = (ControlMeasureTabPresenter) iter.next();
             element.doSave();
         }
-        // FIXME: update control measure
+
+        service.updateMeasure(measure);
 
         view.disposeView();
         parent.doRefresh();

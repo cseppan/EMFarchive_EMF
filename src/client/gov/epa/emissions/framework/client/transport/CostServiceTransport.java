@@ -59,4 +59,14 @@ public class CostServiceTransport implements CostService {
 
         return (ControlMeasure) call.requestResponse(new Object[] { owner, measure });
     }
+
+    public ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("updateMeasure");
+        call.addParam("measure", mappings.controlMeasure());
+        call.setReturnType(mappings.controlMeasure());
+        
+        return (ControlMeasure) call.requestResponse(new Object[] { measure });
+    }
 }

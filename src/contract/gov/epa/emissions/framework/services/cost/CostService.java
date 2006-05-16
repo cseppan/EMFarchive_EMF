@@ -9,6 +9,8 @@ public interface CostService {
         
         void addMeasure(ControlMeasure measure) throws EmfException;
         
+        ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException;
+        
         void removeMeasure(ControlMeasure measure) throws EmfException;
         
         ControlMeasure obtainLockedMeasure(User user, ControlMeasure measure) throws EmfException;
