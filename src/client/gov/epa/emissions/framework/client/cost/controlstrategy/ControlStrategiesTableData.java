@@ -44,7 +44,8 @@ public class ControlStrategiesTableData extends AbstractTableData {
         for (int i = 0; i < controlStrategies.length; i++) {
             ControlStrategy element = controlStrategies[i];
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), region(element),
-                    project(element), "", "", "", "" };
+                    project(element), analysisType(element), datasetType(element), discountRate(element),
+                    costYear(element) };
             Row row = new ViewableRow(element, values);
             rows.add(row);
         }
@@ -59,6 +60,22 @@ public class ControlStrategiesTableData extends AbstractTableData {
 
     private String region(ControlStrategy element) {
         return element.getRegion() != null ? element.getRegion().getName() : "";
+    }
+
+    private String analysisType(ControlStrategy element) {
+        return "" + element.getAnalysisType();
+    }
+
+    private String datasetType(ControlStrategy element) {
+        return element.getDatasetType().getName();
+    }
+
+    private String discountRate(ControlStrategy element) {
+        return "" + element.getDiscountRate();
+    }
+
+    private String costYear(ControlStrategy element) {
+        return "" + element.getCostYear();
     }
 
 }

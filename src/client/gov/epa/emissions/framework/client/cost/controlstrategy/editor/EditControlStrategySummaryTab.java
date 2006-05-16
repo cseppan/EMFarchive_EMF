@@ -13,6 +13,8 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
+import gov.epa.emissions.framework.client.data.Projects;
+import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -70,6 +72,10 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private ComboBox datasetTypeCombo;
 
     private TextField majorPollutant;
+
+    private Region[] allRegions;
+
+    private Project[] allProjects;
 
     public EditControlStrategySummaryTab(ControlStrategy controlStrategy, EmfSession session,
             ManageChangeables changeablesList, MessagePanel messagePanel) throws EmfException {
@@ -155,6 +161,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private ComboBox datasetTypeCombo() throws EmfException {
         DatasetType[] datasetTypes = session.dataCommonsService().getDatasetTypes();
         datasetTypeCombo = new ComboBox("Choose a dataset type", datasetTypes);
+        datasetTypeCombo.setSelectedItem(controlStrategy.getDatasetType());
         return datasetTypeCombo;
     }
 
@@ -281,8 +288,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private EditableComboBox projects() throws EmfException {
-        Project[] projects = session.dataCommonsService().getProjects();
-        projectsCombo = new EditableComboBox(projects);
+        allProjects = session.dataCommonsService().getProjects();
+        projectsCombo = new EditableComboBox(allProjects);
         projectsCombo.setSelectedItem(controlStrategy.getProject());
         projectsCombo.setPreferredSize(comboSize);
         changeablesList.addChangeable(projectsCombo);
@@ -291,8 +298,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private EditableComboBox regions() throws EmfException {
-        Region[] regions = session.dataCommonsService().getRegions();
-        regionsCombo = new EditableComboBox(regions);
+        allRegions = session.dataCommonsService().getRegions();
+        regionsCombo = new EditableComboBox(allRegions);
         regionsCombo.setSelectedItem(controlStrategy.getRegion());
         regionsCombo.setPreferredSize(comboSize);
 
@@ -337,11 +344,49 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     public void save(ControlStrategy controlStrategy) throws EmfException {
         controlStrategy.setName(name.getText());
         controlStrategy.setDescription(description.getText());
-
+        updateProject();
+        
+        controlStrategy.setDatasetType((DatasetType) datasetTypeCombo.getSelectedItem());
+        
         controlStrategy.setDiscountRate(discountRate.getValue());
         controlStrategy.setCostYear(costYear.getValue());
+        controlStrategy.setAnalysisYear(analysisYear.getValue());
+        updateRegion();
+        controlStrategy.setMajorPollutant(majorPollutant.getText());
+        
+    }
 
-        // /controlStrategy.setProject((Project) projectsCombo.getSelectedItem());
-        // /controlStrategy.setRegion((Region) regionsCombo.getSelectedItem());
+    private void updateRegion() {
+        Object selected = regionsCombo.getSelectedItem();
+        if (selected instanceof String) {
+            String regionName = ((String) selected).trim();
+            if (regionName.length() > 0) {
+                Region region = region(regionName);// checking for duplicates
+                controlStrategy.setRegion(region);
+            }
+        } else if (selected instanceof Region) {
+            controlStrategy.setRegion((Region) selected);
+        }
+    }
+
+    private Region region(String regionName) {
+        return new Regions(allRegions).get(regionName);
+    }
+    
+    private void updateProject() {
+        Object selected = projectsCombo.getSelectedItem();
+        if (selected instanceof String) {
+            String projectName = ((String) selected).trim();
+            if (projectName.length() > 0) {
+                Project project = project(projectName);// checking for duplicates
+                controlStrategy.setProject(project);
+            }
+        } else if (selected instanceof Region) {
+            controlStrategy.setRegion((Region) selected);
+        }
+    }
+
+    private Project project(String projectName) {
+        return new Projects(allProjects).get(projectName);
     }
 }

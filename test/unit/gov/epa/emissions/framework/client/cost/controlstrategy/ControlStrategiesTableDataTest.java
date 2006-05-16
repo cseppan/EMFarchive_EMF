@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
+import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.ui.Row;
@@ -22,11 +24,23 @@ public class ControlStrategiesTableDataTest extends TestCase {
         controlStrategy1 = new ControlStrategy();
         controlStrategy1.setName("name1");
         controlStrategy1.setRegion(new Region("region1"));
+        controlStrategy1.setProject(new Project("project1"));
+        controlStrategy1.setDatasetType(new DatasetType("datasetType1"));
+        controlStrategy1.setDiscountRate(0.5);
+        controlStrategy1.setCostYear(2000);
+        controlStrategy1.setAnalysisYear(2001);
+        controlStrategy1.setMajorPollutant("NoX");
         controlStrategy1.setLastModifiedDate(new Date());
 
         controlStrategy2 = new ControlStrategy();
         controlStrategy2.setName("name2");
         controlStrategy2.setRegion(new Region("region2"));
+        controlStrategy2.setProject(new Project("project2"));
+        controlStrategy2.setDatasetType(new DatasetType("datasetType2"));
+        controlStrategy2.setDiscountRate(0.5);
+        controlStrategy2.setCostYear(2000);
+        controlStrategy2.setAnalysisYear(2001);
+        controlStrategy2.setMajorPollutant("PM3");
         controlStrategy2.setLastModifiedDate(new Date());
 
         data = new ControlStrategiesTableData(new ControlStrategy[] { controlStrategy1, controlStrategy2 });
@@ -47,12 +61,14 @@ public class ControlStrategiesTableDataTest extends TestCase {
 
     }
 
-public void testShouldHaveAppropriateColumnClassDefinedForAllColumns() {
+    public void testShouldHaveAppropriateColumnClassDefinedForAllColumns() {
         assertEquals(String.class, data.getColumnClass(0));
         assertEquals(Date.class, data.getColumnClass(1));
         assertEquals(String.class, data.getColumnClass(2));
-        
-    }    public void testAllColumnsShouldBeUnEditable() {
+
+    }
+
+    public void testAllColumnsShouldBeUnEditable() {
         assertFalse("All cells should be uneditable", data.isEditable(0));
         assertFalse("All cells should be uneditable", data.isEditable(1));
         assertFalse("All cells should be uneditable", data.isEditable(2));
@@ -71,6 +87,11 @@ public void testShouldHaveAppropriateColumnClassDefinedForAllColumns() {
         assertEquals("name1", row.getValueAt(0));
         assertEquals(format(controlStrategy1.getLastModifiedDate()), row.getValueAt(1));
         assertEquals("region1", row.getValueAt(2));
+        assertEquals("project1", row.getValueAt(3));
+        assertEquals("0", row.getValueAt(4));
+        assertEquals("datasetType1", row.getValueAt(5));
+        assertEquals("0.5", row.getValueAt(6));
+        assertEquals("2000", row.getValueAt(7));
 
     }
 
