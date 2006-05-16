@@ -32,17 +32,17 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
         view.clearMessage();
     }
 
-    public void doDisplayCMEditor(ControlMeasure measure, String newOrEdit, DesktopManager desktopManager) throws EmfException {
-        ControlMeasureView editor = new ControlMeasureEditor(session,desktopManager);
-        ControlMeasurePresenter presenter = new EditorControlMeasurePresenterImpl(
-                measure, editor, session, this);
-        presenter.doDisplay(newOrEdit);
-    }
-    
     public void doEdit(ControlMeasure measure, DesktopManager desktopManager) throws EmfException {
         ControlMeasureView editor = new ControlMeasureEditor(session, desktopManager);
         ControlMeasurePresenter presenter = new EditorControlMeasurePresenterImpl(
                 measure, editor, session, this);
+        presenter.doDisplay();
+    }
+
+    public void doCreateNew(ControlMeasure measure, DesktopManager desktopManager) throws EmfException {
+        ControlMeasureView window = new NewControlMeasureWindow(session, desktopManager);
+        ControlMeasurePresenter presenter = new NewControlMeasurePresenterImpl(
+                measure, window, session, this);
         presenter.doDisplay();
     }
 
