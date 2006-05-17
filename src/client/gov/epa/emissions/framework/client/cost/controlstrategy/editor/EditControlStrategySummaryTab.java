@@ -12,6 +12,7 @@ import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.client.data.Projects;
 import gov.epa.emissions.framework.client.data.Regions;
@@ -21,10 +22,12 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.DoubleTextField;
 import gov.epa.emissions.framework.ui.IntTextField;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.text.SimpleDateFormat;
@@ -33,11 +36,13 @@ import java.util.Date;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpringLayout;
 
@@ -77,13 +82,18 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private Project[] allProjects;
 
+    protected EmfConsole parentConsole;
+
+    private TextField datasetTextField;
+
     public EditControlStrategySummaryTab(ControlStrategy controlStrategy, EmfSession session,
-            ManageChangeables changeablesList, MessagePanel messagePanel) throws EmfException {
+            ManageChangeables changeablesList, MessagePanel messagePanel, EmfConsole parentConsole) throws EmfException {
         super.setName("summary");
         this.controlStrategy = controlStrategy;
         this.session = session;
         this.changeablesList = changeablesList;
         this.messagePanel = messagePanel;
+        this.parentConsole = parentConsole;
 
         setLayout();
     }
@@ -120,34 +130,50 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private JPanel datasetPanel() {
-        TextArea datasetsTextArea = new TextArea("datasets", selectedDatasets(controlStrategy));
-        JScrollPane scrollPane = new JScrollPane(datasetsTextArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+        datasetTextField = new TextField("datasets", 25);
+        datasetTextField.setText(selectedDatasets(controlStrategy.getDatasets()));
+        changeablesList.addChangeable(datasetTextField);
+        
+        JScrollPane scrollPane = new JScrollPane(datasetTextField, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         Button chooseButton = new Button("Choose", chooseDatasetAction());
-        JPanel choosePanel = new JPanel();
-        choosePanel.setLayout(new BoxLayout(choosePanel, BoxLayout.Y_AXIS));
-        choosePanel.add(Box.createVerticalStrut(20));
-        choosePanel.add(chooseButton);
-        choosePanel.add(Box.createVerticalStrut(20));
 
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.add(scrollPane);
-        panel.add(choosePanel, BorderLayout.EAST);
+        panel.add(chooseButton, BorderLayout.EAST);
         return panel;
     }
 
     private Action chooseDatasetAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                messagePanel.clear();
-                messagePanel.setMessage("Under Construction");
+                try {
+                    DatasetType datasetType = selectedDatasetType();
+                    DatasetChooserDialog dialog = new DatasetChooserDialog(datasetType, session, parentConsole,
+                            EditControlStrategySummaryTab.this);
+                    dialog.show();
+                    EmfDataset dataset = dialog.dataset();
+                    if (dataset != null) {
+                        datasetTextField.setText(dataset.getName());
+                        controlStrategy.setDatasets(new EmfDataset[] { dataset });
+                    }
+                } catch (EmfException exp) {
+                    messagePanel.setError(exp.getMessage());
+                }
             }
         };
     }
 
-    private String selectedDatasets(ControlStrategy controlStrategy) {
-        EmfDataset[] datasets = controlStrategy.getDatasets();
+    protected DatasetType selectedDatasetType() throws EmfException {
+        DatasetType datasetType = (DatasetType) datasetTypeCombo.getSelectedItem();
+        if (datasetType == null) {
+            throw new EmfException("Please select a dataset type");
+        }
+        return datasetType;
+    }
+
+    private String selectedDatasets(EmfDataset[] datasets) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < datasets.length - 1; i++) {
             sb.append(datasets[i].getName() + "\n");
@@ -161,6 +187,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private ComboBox datasetTypeCombo() throws EmfException {
         DatasetType[] datasetTypes = session.dataCommonsService().getDatasetTypes();
         datasetTypeCombo = new ComboBox("Choose a dataset type", datasetTypes);
+        changeablesList.addChangeable(datasetTypeCombo);
         datasetTypeCombo.setSelectedItem(controlStrategy.getDatasetType());
         return datasetTypeCombo;
     }
@@ -345,15 +372,15 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setName(name.getText());
         controlStrategy.setDescription(description.getText());
         updateProject();
-        
+
         controlStrategy.setDatasetType((DatasetType) datasetTypeCombo.getSelectedItem());
-        
+
         controlStrategy.setDiscountRate(discountRate.getValue());
         controlStrategy.setCostYear(costYear.getValue());
         controlStrategy.setAnalysisYear(analysisYear.getValue());
         updateRegion();
         controlStrategy.setMajorPollutant(majorPollutant.getText());
-        
+
     }
 
     private void updateRegion() {
@@ -372,7 +399,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private Region region(String regionName) {
         return new Regions(allRegions).get(regionName);
     }
-    
+
     private void updateProject() {
         Object selected = projectsCombo.getSelectedItem();
         if (selected instanceof String) {
@@ -388,5 +415,63 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private Project project(String projectName) {
         return new Projects(allProjects).get(projectName);
+    }
+
+    class DatasetChooserDialog extends JDialog {
+
+        private JList list;
+
+        private EmfDataset selectedDataset;
+
+        DatasetChooserDialog(DatasetType datasetType, EmfSession session, EmfConsole console, JComponent parent)
+                throws EmfException {
+            super(console);
+            JPanel panel = datasetsPanel(datasetType, session);
+            JPanel buttonPanel = buttonPanel();
+
+            Container contentPane = getContentPane();
+            contentPane.setLayout(new BorderLayout(5, 5));
+            contentPane.add(panel);
+            contentPane.add(buttonPanel, BorderLayout.SOUTH);
+            setTitle("Choose a dataset");
+            pack();
+            setLocation(ScreenUtils.getPointToCenter(parent));
+            setModal(true);
+        }
+
+        public EmfDataset dataset() {
+            return selectedDataset;
+        }
+
+        private JPanel buttonPanel() {
+            Button ok = new Button("OK", selectDatasetset());
+            JPanel panel = new JPanel();
+            panel.add(ok);
+            return panel;
+        }
+
+        private Action selectDatasetset() {
+            return new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    selectedDataset = (EmfDataset) list.getSelectedValue();
+                    DatasetChooserDialog.this.setVisible(false);
+                    DatasetChooserDialog.this.dispose();
+                }
+            };
+        }
+
+        private JPanel datasetsPanel(DatasetType datasetType, EmfSession session) throws EmfException {
+            EmfDataset[] datasets = session.dataService().getDatasets(datasetType);
+            list = new JList(datasets);
+            list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+            JScrollPane scrollPane = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            scrollPane.setPreferredSize(new Dimension(200, 200));
+            JPanel panel = new JPanel(new BorderLayout(10, 10));
+            panel.add(scrollPane);
+            return panel;
+        }
+
     }
 }

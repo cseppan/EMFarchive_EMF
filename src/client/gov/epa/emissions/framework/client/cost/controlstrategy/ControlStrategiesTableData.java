@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.ui.AbstractTableData;
@@ -67,7 +68,8 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     private String datasetType(ControlStrategy element) {
-        return element.getDatasetType().getName();
+        DatasetType datasetType = element.getDatasetType();
+        return (datasetType != null) ? datasetType.getName() : "";
     }
 
     private String discountRate(ControlStrategy element) {

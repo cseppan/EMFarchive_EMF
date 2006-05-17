@@ -68,7 +68,7 @@ public class DataServiceTransport implements DataService {
         call.addParam("datasetType", mappings.datasetType());
         call.setReturnType(mappings.datasets());
 
-        return (EmfDataset[]) call.requestResponse(new Object[] {});
+        return (EmfDataset[]) call.requestResponse(new Object[] {datasetType});
     
     }
 

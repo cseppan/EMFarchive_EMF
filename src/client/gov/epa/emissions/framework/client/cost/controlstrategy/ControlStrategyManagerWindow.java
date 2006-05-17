@@ -192,7 +192,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         }
         for (int i = 0; i < controlStrategies.size(); i++) {
             ControlStrategy controlStrategy = (ControlStrategy) controlStrategies.get(i);
-            EditControlStrategyView view = new EditControlStrategyWindow(desktopManager, session);
+            EditControlStrategyView view = new EditControlStrategyWindow(desktopManager, session, parentConsole);
             try {
                 presenter.doEdit(view, controlStrategy);
             } catch (EmfException e) {

@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -34,12 +35,15 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private SingleLineMessagePanel messagePanel;
 
     private EmfSession session;
+    
+    private EmfConsole parentConsole;
 
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
-    public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session) {
+    public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
         super("Edit a Control Strategy", new Dimension(800, 510), desktopManager);
         this.session = session;
+        this.parentConsole = parentConsole;
     }
 
     public void observe(EditControlStrategyPresenter presenter) {
@@ -86,7 +90,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private JPanel createSummaryTab(ControlStrategy controlStrategy) {
         try {
             EditControlStrategySummaryTab view = new EditControlStrategySummaryTab(controlStrategy, session, this,
-                    messagePanel);
+                    messagePanel, parentConsole);
             this.presenter.set(view);
             return view;
         } catch (EmfException e) {
