@@ -85,8 +85,8 @@
  -->
 
     <session-config>
-        <!-- Default to 5 minute session timeouts -->
-        <session-timeout>5</session-timeout>
+        <!-- Default - no time out-->
+        <session-timeout>0</session-timeout>
     </session-config>
 
     <!-- currently the W3C havent settled on a media type for WSDL;
