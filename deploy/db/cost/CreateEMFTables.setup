@@ -43,6 +43,7 @@ CREATE TABLE emf.control_strategies
   major_pollutant varchar(255),
   major_pollutant_control_efficiency real,
   analysis_type int4,
+  dataset_version int4,
   lock_owner varchar(255),
   lock_date timestamp
 ) 

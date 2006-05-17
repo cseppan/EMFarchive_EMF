@@ -44,6 +44,8 @@ public class ControlStrategy implements Lockable {
     private double majorPollutantControlEfficiency;
 
     private int analysisType;
+    
+    private int datasetVersion;
 
     private Mutex lock;
 
@@ -216,6 +218,14 @@ public class ControlStrategy implements Lockable {
 
     public boolean isLocked() {
         return lock.isLocked();
+    }
+
+    public int getDatasetVersion() {
+        return datasetVersion;
+    }
+
+    public void setDatasetVersion(int datasetVersion) {
+        this.datasetVersion = datasetVersion;
     }
 
 }

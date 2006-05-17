@@ -37,6 +37,8 @@
 	    <list-index column="list_index"/>
     	<many-to-many class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>
 	</array>
+	
+	<property name="datasetVersion" column="dataset_version" type="integer" not-null="true"/>
 		
 	<many-to-one cascade="save-update"
             name="datasetType" 

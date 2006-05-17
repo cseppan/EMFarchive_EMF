@@ -196,6 +196,7 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
             try {
                 presenter.doEdit(view, controlStrategy);
             } catch (EmfException e) {
+                e.printStackTrace();
                 messagePanel.setError(e.getMessage());
             }
         }
