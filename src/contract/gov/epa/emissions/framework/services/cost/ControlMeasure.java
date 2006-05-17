@@ -6,53 +6,59 @@ import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class ControlMeasure implements Lockable, Serializable {
-    
+
     private int id;
-    
+
     private String name;
 
     private String description;
-    
+
     private int deviceCode, costYear;
-    
+
     private float equipmentLife;
-    
+
     private String majorPollutant;
-    
+
     private User creator;
-    
+
     private float ruleEffectiveness;
-    
+
     private float rulePenetration;
-    
+
     private float annualizedCost;
-    
+
     private float minUncontrolledEmissions;
-    
+
     private float maxUncontrolledEmissions;
-    
+
     private Region region;
-    
+
     private String cmClass;
-    
+
     private String abbreviation;
-    
+
     private Date lastModifiedTime;
-    
+
     private Mutex lock;
-    
+
+    private List sccs;
+
     public ControlMeasure() {
         this.lock = new Mutex();
+        sccs = new ArrayList();
     }
-    
+
     public ControlMeasure(String name) {
         this();
         this.name = name;
     }
-    
+
     public float getAnnualizedCost() {
         return annualizedCost;
     }
@@ -160,7 +166,7 @@ public class ControlMeasure implements Lockable, Serializable {
     public boolean isLocked() {
         return lock.isLocked();
     }
-    
+
     public boolean equals(Object other) {
         if (other == null || !(other instanceof ControlMeasure)) {
             return false;
@@ -170,7 +176,7 @@ public class ControlMeasure implements Lockable, Serializable {
 
         return (id == otherMeasure.getId());
     }
-    
+
     public int hashCode() {
         return name.hashCode();
     }
@@ -229,5 +235,13 @@ public class ControlMeasure implements Lockable, Serializable {
 
     public void setCostYear(int costYear) {
         this.costYear = costYear;
+    }
+
+    public String[] getSccs() {
+        return (String[]) sccs.toArray(new String[0]);
+    }
+
+    public void setSccs(String[] sccs) {
+        this.sccs = Arrays.asList(sccs);
     }
 }
