@@ -10,6 +10,6 @@ public interface ControlMeasurePresenter {
 
     void doSave() throws EmfException;
 
-    void set(EditableCMSummaryTabView summary);
+    void set(EditableCMTabView controlMeasureTabView);
 
 }

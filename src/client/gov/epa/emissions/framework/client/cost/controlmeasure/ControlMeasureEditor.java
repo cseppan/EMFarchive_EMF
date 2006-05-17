@@ -70,8 +70,10 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
         return tabbedPane;
     }
 
-    private Component createSCCTab(ControlMeasure measure, MessagePanel messagePanel2) {
-        return new JPanel();
+    private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {
+        EditableCMTabView view = new EditableSCCTab(measure, session, messagePanel);
+        presenter.set(view);
+        return (JPanel) view;
     }
 
     private Component createEfficiencyTab(ControlMeasure measure, MessagePanel messagePanel2) {
