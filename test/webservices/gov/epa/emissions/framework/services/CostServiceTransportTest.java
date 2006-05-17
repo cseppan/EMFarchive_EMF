@@ -41,6 +41,7 @@ public class CostServiceTransportTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm test added");
         cm.setEquipmentLife(12);
+        cm.setAbbreviation("12345678");
         service.addMeasure(cm);
 
         ControlMeasure[] all = service.getMeasures();
@@ -56,6 +57,7 @@ public class CostServiceTransportTest extends ServiceTestCase {
         ControlMeasure cm = new ControlMeasure();
         cm.setEquipmentLife(12);
         cm.setName("cm test added");
+        cm.setAbbreviation("12345678");
         service.addMeasure(cm);
         
         ControlMeasure cmModified = service.obtainLockedMeasure(owner, service.getMeasures()[0]);

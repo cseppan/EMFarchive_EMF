@@ -1,5 +1,8 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import java.util.Date;
+
+import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfSession;
@@ -38,13 +41,19 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
 
         measure.setName(name.getText());
         measure.setDescription(description.getText());
-        measure.setAnnualizedCost(cost);
+        measure.setMinUncontrolledEmissions(minUnctrldEmiss);
+        measure.setMaxUncontrolledEmissions(maxUnctrldEmiss);
         measure.setCreator(session.user());
         measure.setDeviceCode(deviceId);
         measure.setEquipmentLife(life);
         measure.setMajorPollutant(majorPollutant.getSelectedItem() + "");
-        measure.setRuleEffectiveness(eff);
-        measure.setRulePenetration(penetr);
+        measure.setRuleEffectiveness(effectivness);
+        measure.setRulePenetration(penetratrion);
+        measure.setCmClass(cmClass.getSelectedItem() + "");
+        measure.setRegion((Region)region.getSelectedItem());
+        measure.setLastModifiedTime(new Date());
+        measure.setAbbreviation(abbreviation.getText());
+        measure.setCostYear(year);
     }
 
     private void validateFields() throws EmfException {
@@ -54,22 +63,28 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
             throw new EmfException("Name field should be a non-empty string.");
         }
 
-        parseInteger(costYear);
+        if (abbreviation.getText().equals("")) {
+            throw new EmfException("Abbreviation field should be a 8-character string.");
+        }
+
+
+        year = parseInteger(costYear);
         deviceId = parseInteger(deviceCode);
-        eff = parseFloat(ruleEffectiveness);
-        cost = parseFloat(anualizedCost);
+        effectivness = parseFloat(ruleEffectiveness);
+        minUnctrldEmiss = parseFloat(minUncontrolledEmission);
+        maxUnctrldEmiss = parseFloat(maxUncontrolledEmission);
         life = parseFloat(equipmentLife);
-        penetr = parseFloat(rulePenetration);
+        penetratrion = parseFloat(rulePenetration);
     }
     
     private int parseInteger(TextField numberField) throws EmfException {
         int val = 0;
         try {
-            Integer.parseInt(numberField.getText());
+            val = Integer.parseInt(numberField.getText());
         } catch (NumberFormatException ex) {
             throw new EmfException(numberField.getName() + " field should be an integer number.");
         }
-
+        
         return val;
     }
     

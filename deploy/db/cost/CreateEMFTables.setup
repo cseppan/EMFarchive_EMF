@@ -5,16 +5,22 @@ CREATE TABLE emf.control_measures
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE,
+  abbreviation varchar(255) NOT NULL UNIQUE,
+  cm_class varchar(255),
   description text,
   device_code int4,
   equipment_life real,
   major_pollutant varchar(255),
   creator int4  REFERENCES emf.users(id),
+  region int4  REFERENCES emf.regions(id),
   rule_effectiveness real,
   rule_penetration real,
-  annualized_cost real,
+  min_uncontrolled_emissions real,
+  max_uncontrolled_emissions real,
+  cost_year int4,
+  last_modified_time timestamp,
   lock_owner varchar(255),
-  lock_date timestamp  
+  lock_date timestamp
 ) 
 WITHOUT OIDS;
 -- emf.control_measures

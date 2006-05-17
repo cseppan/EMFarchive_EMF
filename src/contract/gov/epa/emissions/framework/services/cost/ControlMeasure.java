@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
+import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
 
 import java.io.Serializable;
@@ -15,7 +16,7 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private String description;
     
-    private int deviceCode;
+    private int deviceCode, costYear;
     
     private float equipmentLife;
     
@@ -29,16 +30,28 @@ public class ControlMeasure implements Lockable, Serializable {
     
     private float annualizedCost;
     
+    private float minUncontrolledEmissions;
+    
+    private float maxUncontrolledEmissions;
+    
+    private Region region;
+    
+    private String cmClass;
+    
+    private String abbreviation;
+    
+    private Date lastModifiedTime;
+    
     private Mutex lock;
     
     public ControlMeasure() {
         this.lock = new Mutex();
     }
     
-//    public ControlMeasure(String name) {
-//        this();
-//        this.name = name;
-//    }
+    public ControlMeasure(String name) {
+        this();
+        this.name = name;
+    }
     
     public float getAnnualizedCost() {
         return annualizedCost;
@@ -160,5 +173,61 @@ public class ControlMeasure implements Lockable, Serializable {
     
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public String getAbbreviation() {
+        return abbreviation;
+    }
+
+    public void setAbbreviation(String abbreviation) {
+        this.abbreviation = abbreviation;
+    }
+
+    public String getCmClass() {
+        return cmClass;
+    }
+
+    public void setCmClass(String cmClass) {
+        this.cmClass = cmClass;
+    }
+
+    public Date getLastModifiedTime() {
+        return lastModifiedTime;
+    }
+
+    public void setLastModifiedTime(Date lastModifiedTime) {
+        this.lastModifiedTime = lastModifiedTime;
+    }
+
+    public float getMaxUncontrolledEmissions() {
+        return maxUncontrolledEmissions;
+    }
+
+    public void setMaxUncontrolledEmissions(float maxUncontrolledEmissions) {
+        this.maxUncontrolledEmissions = maxUncontrolledEmissions;
+    }
+
+    public float getMinUncontrolledEmissions() {
+        return minUncontrolledEmissions;
+    }
+
+    public void setMinUncontrolledEmissions(float minUncontrolledEmissions) {
+        this.minUncontrolledEmissions = minUncontrolledEmissions;
+    }
+
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
+    public int getCostYear() {
+        return costYear;
+    }
+
+    public void setCostYear(int costYear) {
+        this.costYear = costYear;
     }
 }

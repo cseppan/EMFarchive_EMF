@@ -11,19 +11,28 @@
           
         <property name="name" column="name" type="java.lang.String" not-null="true"/>
         <property name="description" column="description" type="java.lang.String" not-null="false"/>
+        <property name="abbreviation" column="abbreviation" type="java.lang.String" not-null="false"/>
+        <property name="cmClass" column="cm_class" type="java.lang.String" not-null="false"/>
         <property name="deviceCode" column="device_code" type="integer" not-null="true"/>
+        <property name="costYear" column="cost_year" type="integer" not-null="true"/>
         <property name="equipmentLife" column="equipment_life" type="float" not-null="false"/>
         <property name="majorPollutant" column="major_pollutant" type="java.lang.String" not-null="false"/>
         <property name="ruleEffectiveness" column="rule_effectiveness" type="float" not-null="false"/>
         <property name="rulePenetration" column="rule_penetration" type="float" not-null="false"/>
-        <property name="annualizedCost" column="annualized_cost" type="float" not-null="false"/>
+        <property name="minUncontrolledEmissions" column="min_uncontrolled_emissions" type="float" not-null="false"/>
+        <property name="maxUncontrolledEmissions" column="max_uncontrolled_emissions" type="float" not-null="false"/>
         <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
         <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
+        <property name="lastModifiedTime" column="last_modified_time" type="java.util.Date" not-null="false" length="4"/>
         
         <many-to-one cascade="save-update"
             name="creator" 
             class="gov.epa.emissions.commons.security.User"
             column="creator"/> 
+        <many-to-one cascade="save-update"
+            name="region" 
+            class="gov.epa.emissions.commons.data.Region"
+            column="region"/> 
     </class>
 </hibernate-mapping>  
 

@@ -34,6 +34,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     public void testShouldAddControlMeasureToDatabaseOnAdd() throws Exception {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
+        cm.setAbbreviation("12345678");
         try {
             dao.add(cm, session);
             ControlMeasure result = load(cm);
@@ -50,7 +51,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
 
         try {
             cm.setName("cm one modified");
-
+            cm.setAbbreviation("12345678");
             dao.updateWithoutLocking(cm, session);
             ControlMeasure result = load(cm);
 
@@ -64,6 +65,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     public void testShouldGetControlMeasures() throws Exception {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
+        cm.setAbbreviation("12345678");
         add(cm);
 
         try {
@@ -79,6 +81,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     public void testShouldUpdateQASteps() throws Exception {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
+        cm.setAbbreviation("12345678");
         add(cm);
 
         try {
@@ -103,6 +106,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     public void testShouldAddNewControlMeasuresOnUpdateQASteps() throws Exception {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
+        cm.setAbbreviation("12345678");
 
         try {
             dao.update(new ControlMeasure[] { cm }, session);
@@ -119,6 +123,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     public void testShouldSaveNewControlMeasures() throws Exception {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
+        cm.setAbbreviation("12345678");
 
         try {
             dao.add(new ControlMeasure[] { cm }, session);
@@ -136,6 +141,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     public void testShouldRemoveControlMeasureFromDatabaseOnRemove() throws Exception {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
+        cm.setAbbreviation("12345678");
 
         add(cm);
 
@@ -148,6 +154,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
     public void testShouldConfirmControlMeasureExistsWhenQueriedByName() throws Exception {
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
+        cm.setAbbreviation("12345678");
         add(cm);
 
         try {
@@ -162,6 +169,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         User owner = userDAO.get("emf", session);
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
+        cm.setAbbreviation("12345678");
         add(cm);
 
         try {
@@ -180,6 +188,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         User owner = userDao.get("emf", session);
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
+        cm.setAbbreviation("12345678");
         add(cm);
 
         try {
@@ -200,6 +209,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         User owner = userDao.get("emf", session);
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
+        cm.setAbbreviation("12345678");
         add(cm);
 
         try {
@@ -220,6 +230,7 @@ public class ControlMeasureDaoTest extends ServiceTestCase {
         User owner = userDao.get("emf", session);
         ControlMeasure cm = new ControlMeasure();
         cm.setName("cm one");
+        cm.setAbbreviation("12345678");
         add(cm);
 
         try {

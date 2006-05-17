@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
@@ -9,6 +10,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -18,6 +20,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -50,15 +53,21 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     protected TextField costYear;
 
-    protected TextField anualizedCost;
+    protected TextField abbreviation;
 
-    private ComboBox region;
+    protected TextField minUncontrolledEmission;
 
-    private ComboBox cmClass;
+    protected TextField maxUncontrolledEmission;
 
-    private ListWidget sectors;
+    protected JLabel lastModifiedTime;
 
-    private ListWidget controlPrograms;
+    protected ComboBox region;
+
+    protected ComboBox cmClass;
+
+    protected ListWidget sectors;
+
+    protected ListWidget controlPrograms;
 
     protected MessagePanel messagePanel;
 
@@ -69,15 +78,11 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     private String[] pollutants = { "NOx                                      ", "PM10", "PM2.5", "SO2", "VOC", "CO",
             "CO2", "EC", "OC", "NH3", "Hg" };
 
-    protected int deviceId = 1;
+    private String[] classes = { "Production", "Developmental", "Hypothetical", "Obselete" };
 
-    protected float cost = 0;
+    protected int deviceId = 1, year = 1900;
 
-    protected float life = 0;
-
-    protected float eff = 0;
-
-    protected float penetr = 0;
+    protected float cost = 0, life = 0, effectivness = 0, penetratrion = 0, minUnctrldEmiss = 0, maxUnctrldEmiss = 0;
 
     public ControlMeasureSummaryTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel,
             ManageChangeables changeablesList) {
@@ -95,21 +100,29 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     private void populateFields() {
         String cmName = measure.getName();
+        Date modifiedTime = measure.getLastModifiedTime();
+        Region cmRegion = measure.getRegion();
         name.setText(getText(cmName));
         description.setText(getText(measure.getDescription()));
         creator.setText(getText(measure.getCreator().getName()));
         majorPollutant.setSelectedItem(getText(measure.getMajorPollutant()));
-        costYear.setText("");
-        anualizedCost.setText(measure.getAnnualizedCost() + "");
+        cmClass.setSelectedItem(getText(measure.getCmClass()));
+        costYear.setText(measure.getCostYear() + "");
         deviceCode.setText(measure.getDeviceCode() + "");
         equipmentLife.setText(measure.getEquipmentLife() + "");
         ruleEffectiveness.setText(measure.getRuleEffectiveness() + "");
         rulePenetration.setText(measure.getRulePenetration() + "");
-
+        if (modifiedTime != null)
+            lastModifiedTime.setText(DATE_FORMATTER.format(modifiedTime));
+        if (cmRegion != null)
+            region.setSelectedItem(cmRegion);
+        minUncontrolledEmission.setText(measure.getMinUncontrolledEmissions() + "");
+        maxUncontrolledEmission.setText(measure.getMaxUncontrolledEmissions() + "");
+        abbreviation.setText(getText(measure.getAbbreviation()));
     }
 
     private String getText(String value) {
-        return (value!=null)?value:"";
+        return (value != null) ? value : "";
     }
 
     private JPanel createOverviewSection() {
@@ -117,17 +130,49 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        // name
-        name = new TextField("Control measure name", 40);
+        layoutGenerator.addWidgetPair(createLeftOverview(), createRightOverview(), panel);
+        widgetLayout(1, 2, 50, 5, 10, 10, layoutGenerator, panel);
+
+        return panel;
+    }
+
+    private JPanel createLeftOverview() {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        name = new TextField("Control measure name", 20);
         changeablesList.addChangeable(name);
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         // description
         description = new TextArea("description", measure.getDescription());
         changeablesList.addChangeable(description);
-        layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description), panel);
+        ScrollableComponent descPane = new ScrollableComponent(description);
+        descPane.setPreferredSize(new Dimension(225, 50));
+        layoutGenerator.addLabelWidgetPair("Description:", descPane, panel);
 
-        widgetLayout(2, 2, 50, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(2, 2, 5, 5, 10, 10, layoutGenerator, panel);
+
+        return panel;
+    }
+
+    private JPanel createRightOverview() {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+
+        abbreviation = new TextField("Abbreviation", 12);
+        changeablesList.addChangeable(abbreviation);
+        layoutGenerator.addLabelWidgetPair("Abbreviation:", abbreviation, panel);
+
+        cmClass = new ComboBox("Choose a class", classes);
+        cmClass.setPreferredSize(new Dimension(135, 20));
+        changeablesList.addChangeable(cmClass);
+        layoutGenerator.addLabelWidgetPair("Class:", cmClass, panel);
+
+        lastModifiedTime = new JLabel("");
+        layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
+
+        widgetLayout(3, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -151,22 +196,27 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         creator = new JLabel(session.user().getName());
         layoutGenerator.addLabelWidgetPair("Creator:", creator, panel);
 
-        costYear = new TextField("Cost year", 15);
-        changeablesList.addChangeable(costYear);
-        layoutGenerator.addLabelWidgetPair("Cost year:", costYear, panel);
-
-        deviceCode = new TextField("Device code", 15);
-        changeablesList.addChangeable(deviceCode);
-        layoutGenerator.addLabelWidgetPair("Device code:", deviceCode, panel);
-
-        ruleEffectiveness = new TextField("Rule effectiveness", 15);
-        changeablesList.addChangeable(ruleEffectiveness);
-        layoutGenerator.addLabelWidgetPair("Rule effectiveness:", ruleEffectiveness, panel);
-
-        region = new ComboBox("Choose a region", new String[] { "" });
+        majorPollutant = new EditableComboBox(pollutants);
+        majorPollutant.setSelectedIndex(0);
+        changeablesList.addChangeable(majorPollutant);
+        layoutGenerator.addLabelWidgetPair("Major pollutant:", majorPollutant, panel);
+        
+        try {
+            region = new ComboBox("Choose a region", session.dataCommonsService().getRegions());
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
         region.setPreferredSize(new Dimension(168, 20));
         changeablesList.addChangeable(region);
         layoutGenerator.addLabelWidgetPair("Region:", region, panel);
+        
+        ruleEffectiveness = new TextField("Rule Eff.", 15);
+        changeablesList.addChangeable(ruleEffectiveness);
+        layoutGenerator.addLabelWidgetPair("Rule Eff.:", ruleEffectiveness, panel);
+
+        rulePenetration = new TextField("Rule Pen.", 15);
+        changeablesList.addChangeable(rulePenetration);
+        layoutGenerator.addLabelWidgetPair("Rule Pen.:", rulePenetration, panel);
 
         sectors = new ListWidget(new String[] { "               " }, new String[] { "" });
         JScrollPane listScroller = new JScrollPane(sectors);
@@ -183,27 +233,26 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        majorPollutant = new EditableComboBox(pollutants);
-        changeablesList.addChangeable(majorPollutant);
-        layoutGenerator.addLabelWidgetPair("Major pollutant:", majorPollutant, panel);
+        costYear = new TextField("Cost year", 15);
+        changeablesList.addChangeable(costYear);
+        layoutGenerator.addLabelWidgetPair("Cost year:", costYear, panel);
 
-        anualizedCost = new TextField("Annualized cost", 15);
-        changeablesList.addChangeable(anualizedCost);
-        layoutGenerator.addLabelWidgetPair("Annualized cost:", anualizedCost, panel);
+        minUncontrolledEmission = new TextField("Min Uncntrld. Emiss.", 15);
+        changeablesList.addChangeable(minUncontrolledEmission);
+        layoutGenerator.addLabelWidgetPair("Min Uncntrld. Emiss.:", minUncontrolledEmission, panel);
+
+        maxUncontrolledEmission = new TextField("Max Uncntrld. Emiss.", 15);
+        changeablesList.addChangeable(maxUncontrolledEmission);
+        layoutGenerator.addLabelWidgetPair("Max Uncntrld. Emiss.:", maxUncontrolledEmission, panel);
 
         equipmentLife = new TextField("Equipment life", 15);
         changeablesList.addChangeable(equipmentLife);
         layoutGenerator.addLabelWidgetPair("Equipment life:", equipmentLife, panel);
 
-        rulePenetration = new TextField("Rule penetration", 15);
-        changeablesList.addChangeable(rulePenetration);
-        layoutGenerator.addLabelWidgetPair("Rule penetration:", rulePenetration, panel);
-
-        cmClass = new ComboBox("Choose a class", new String[] { "" });
-        cmClass.setPreferredSize(new Dimension(168, 20));
-        changeablesList.addChangeable(cmClass);
-        layoutGenerator.addLabelWidgetPair("Class:", cmClass, panel);
-
+        deviceCode = new TextField("Device code", 15);
+        changeablesList.addChangeable(deviceCode);
+        layoutGenerator.addLabelWidgetPair("Device code:", deviceCode, panel);
+        
         controlPrograms = new ListWidget(new String[] { "               " }, new String[] { "" });
         JScrollPane listScroller = new JScrollPane(controlPrograms);
         listScroller.setPreferredSize(new Dimension(170, 60));

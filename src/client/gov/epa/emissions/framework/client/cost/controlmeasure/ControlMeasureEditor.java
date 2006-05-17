@@ -84,10 +84,6 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
         return view;
     }
 
-    public void display(ControlMeasure measure, String newOrEdit) {
-        // FIXME: remove
-    }
-
     private void setWindowTitle(ControlMeasure measure) {
         super.setTitle("Edit Control Measure: " + measure.getName());
         super.setName("editControlMeasure" + measure.getId());

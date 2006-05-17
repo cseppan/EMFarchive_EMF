@@ -17,7 +17,7 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Creator", "Annd. Cost", "Rule Eff.", "Rule Pen.", 
+        return new String[] { "Name", "Creator", "Abbreviation", "Rule Eff.", "Rule Pen.", 
                 "Major Poll.", "Description" };
     }
 
@@ -30,7 +30,7 @@ public class ControlMeasureTableData extends AbstractTableData {
 
         for (int i = 0; i < measures.length; i++) {
             ControlMeasure measure = measures[i];
-            Object[] values = { measure.getName(), measure.getCreator().getName(), new Float(measure.getAnnualizedCost()),
+            Object[] values = { measure.getName(), measure.getCreator().getName(), measure.getAbbreviation(),
                     new Float(measure.getRuleEffectiveness()), new Float(measure.getRulePenetration()), measure.getMajorPollutant(),
                     measure.getDescription() };
 
