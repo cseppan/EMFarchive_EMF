@@ -11,6 +11,8 @@ public interface CostService {
         
         ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException;
         
+        ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException;
+        
         void removeMeasure(ControlMeasure measure) throws EmfException;
         
         ControlMeasure obtainLockedMeasure(User user, ControlMeasure measure) throws EmfException;

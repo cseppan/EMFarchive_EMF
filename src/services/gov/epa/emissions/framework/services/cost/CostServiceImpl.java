@@ -60,6 +60,22 @@ public class CostServiceImpl implements CostService {
                     + owner.getUsername());
         }
     }
+    
+    public ControlMeasure releaseLockedControlMeasure(ControlMeasure locked) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            ControlMeasure released = dao.releaseLocked(locked, session);
+            session.close();
+
+            return released;
+        } catch (RuntimeException e) {
+            LOG.error(
+                    "Could not release lock for ControlMeasure: " + locked.getName() + " by owner: " + locked.getLockOwner(),
+                    e);
+            throw new EmfException("Could not release lock for ControlMeasure: " + locked.getName() + " by owner: "
+                    + locked.getLockOwner());
+        }
+    }
 
     public ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException {
         return dao.update(measure, sessionFactory.getSession());

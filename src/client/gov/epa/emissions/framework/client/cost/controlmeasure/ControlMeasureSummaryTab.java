@@ -131,7 +131,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addWidgetPair(createLeftOverview(), createRightOverview(), panel);
-        widgetLayout(1, 2, 50, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(1, 2, 25, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
