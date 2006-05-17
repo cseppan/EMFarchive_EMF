@@ -1,9 +1,15 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.basic.UserServiceImpl;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
+
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 
 public class CostServiceTest extends ServiceTestCase {
 
@@ -78,6 +84,44 @@ public class CostServiceTest extends ServiceTestCase {
             remove(cm);
         }
     }
+    
+    public void testShouldLockControlMeasure() throws EmfException {
+        User owner = userService.getUser("emf");
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("xxxx");
+        cm.setAbbreviation("yyyyyyyy");
+        service.addMeasure(cm);
+
+        try {
+            ControlMeasure locked = service.obtainLockedMeasure(owner, cm);
+            assertTrue("Should have released lock", locked.isLocked());
+
+            ControlMeasure loadedFromDb = load(cm);
+            assertTrue("Should have released lock", loadedFromDb.isLocked());
+        } finally {
+            remove(cm);
+        }
+    }
+
+    public void testShouldReleaseLockedControlMeasure() throws EmfException {
+        User owner = userService.getUser("emf");
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("xxxx");
+        cm.setAbbreviation("yyyyyyyy");
+        service.addMeasure(cm);
+
+        try {
+            ControlMeasure locked = service.obtainLockedMeasure(owner, cm);
+            ControlMeasure released = service.releaseLockedControlMeasure(locked);
+            assertFalse("Should have released lock", released.isLocked());
+
+            ControlMeasure loadedFromDb = load(cm);
+            assertFalse("Should have released lock", loadedFromDb.isLocked());
+        } finally {
+            remove(cm);
+        }
+    }
+
 
     public void testShouldRemoveOneControlMeasure() throws Exception {
 
@@ -96,4 +140,21 @@ public class CostServiceTest extends ServiceTestCase {
         service.removeMeasure(cm);
         assertEquals(0, service.getMeasures().length);
     }
+    
+    private ControlMeasure load(ControlMeasure cm) {
+        session.clear();// flush cached objects
+
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Criteria crit = session.createCriteria(ControlMeasure.class).add(Restrictions.eq("name", cm.getName()));
+            tx.commit();
+
+            return (ControlMeasure) crit.uniqueResult();
+        } catch (HibernateException e) {
+            tx.rollback();
+            throw e;
+        }
+    }
+
 }

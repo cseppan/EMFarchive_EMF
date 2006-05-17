@@ -73,6 +73,27 @@ public class CostServiceTransportTest extends ServiceTestCase {
         }
     }
     
+    public void testShouldLockUnlockControlMeasure() throws EmfException {
+        User owner = userService.getUser("emf");
+        ControlMeasure cm = new ControlMeasure();
+        cm.setName("xxxx");
+        cm.setAbbreviation("yyyyyyyy");
+        service.addMeasure(cm);
+        
+        ControlMeasure released = null;
+
+        try {
+            ControlMeasure locked = service.obtainLockedMeasure(owner, service.getMeasures()[0]);
+            assertTrue("Should have released lock", locked.isLocked());
+
+            released = service.releaseLockedControlMeasure(locked);
+            assertFalse("Should have released lock", released.isLocked());
+
+        } finally {
+            service.removeMeasure(released);
+        }
+    }
+
     protected void doTearDown() throws Exception {// no op
     }
 
