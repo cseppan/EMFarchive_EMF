@@ -62,6 +62,8 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
         tabbedPane.addTab("Efficiencies", createEfficiencyTab(measure, messagePanel));
 
         tabbedPane.addTab("SCCs", createSCCTab(measure, messagePanel));
+        
+        tabbedPane.addTab("Costs", createCostsTab(measure, messagePanel));
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -80,6 +82,12 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
         EditableCMSummaryTab view = new EditableCMSummaryTab(measure, session, messagePanel, this);
         presenter.set(view);
         return view;
+    }
+    
+    private Component createCostsTab(ControlMeasure measure, MessagePanel messagePanel2) {
+        EditableCostsTabView view = new EditableCostsTab(measure, session, messagePanel);
+        presenter.set(view);
+        return (JPanel) view;
     }
 
     private void setWindowTitle() {

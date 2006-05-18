@@ -11,5 +11,6 @@ public interface ControlMeasurePresenter {
     void doSave() throws EmfException;
 
     void set(EditableCMTabView controlMeasureTabView);
-
+    
+    void set(EditableCostsTabView costTabView);
 }

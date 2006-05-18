@@ -1,14 +1,16 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.framework.services.cost.data.CostRecord;
+import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
+import gov.epa.emissions.framework.ui.InlineEditableTableData;
 import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ControlMeasureCostTableData {
+public class ControlMeasureCostTableData extends AbstractTableData implements InlineEditableTableData {
 
     private List rows;
 
@@ -20,28 +22,8 @@ public class ControlMeasureCostTableData {
         rows.add(row(record));
     }
 
-    public void removeSelected() {
-        remove(getSelected());
-    }
-
-    private void remove(CostRecord record) {
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            EditableRow row = (EditableRow) iter.next();
-            CostRecord source = (CostRecord) row.source();
-            if (source == record) {
-                rows.remove(row);
-                return;
-            }
-        }
-    }
-
-    private void remove(CostRecord[] records) {
-        for (int i = 0; i < records.length; i++)
-            remove(records[i]);
-    }
-
     public String[] columns() {
-        return new String[] { "Select", "Record ID", "Pollutant", "Cost Year", "Discount Rate", "a", "b" };
+        return new String[] { "Record ID", "Pollutant", "Cost Year", "Discount Rate", "a", "b" };
     }
 
     public List rows() {
@@ -49,7 +31,7 @@ public class ControlMeasureCostTableData {
     }
 
     public boolean isEditable(int col) {
-        return (col == 1) ? false:true;
+        return (col == 0) ? false:true;
     }
 
     private List createRows(CostRecord[] records) {
@@ -79,19 +61,6 @@ public class ControlMeasureCostTableData {
 
     }
 
-    public CostRecord[] getSelected() {
-        List selected = new ArrayList();
-
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            EditableRow row = (EditableRow) iter.next();
-            CostRecordRowSource rowSource = (CostRecordRowSource) row.rowSource();
-            if (rowSource.isSelected())
-                selected.add(rowSource.source());
-        }
-
-        return (CostRecord[]) selected.toArray(new CostRecord[0]);
-    }
-
     public CostRecord[] sources() {
         List sources = sourcesList();
         return (CostRecord[]) sources.toArray(new CostRecord[0]);
@@ -110,6 +79,21 @@ public class ControlMeasureCostTableData {
     public void sortByOrder() {
         CostRecords records = new CostRecords(sources());
         this.rows = createRows(records.sortByOrder());
+    }
+
+    public void addBlankRow() {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public void removeSelected() {
+        // NOTE Auto-generated method stub
+        
+    }
+
+    public boolean shouldTrackChange(int col) {
+        // NOTE Auto-generated method stub
+        return false;
     }
 
 }

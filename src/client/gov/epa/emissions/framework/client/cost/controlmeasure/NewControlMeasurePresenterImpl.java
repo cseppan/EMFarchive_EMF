@@ -62,5 +62,10 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         presenters.add(summaryPresenter);
     }
 
+    public void set(EditableCostsTabView costTabView) {
+        EditableCMCostTabPresenterImpl costTabPresenter = new EditableCMCostTabPresenterImpl(measure, costTabView);
+        presenters.add(costTabPresenter);
+    }
+
 
 }
