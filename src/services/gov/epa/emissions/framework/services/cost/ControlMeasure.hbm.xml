@@ -33,6 +33,10 @@
             name="region" 
             class="gov.epa.emissions.commons.data.Region"
             column="region"/> 
+        <many-to-one cascade="save-update"
+            name="cost" 
+            class="gov.epa.emissions.framework.services.cost.data.ControlMeasureCost"
+            column="cost"/> 
     </class>
 </hibernate-mapping>  
 

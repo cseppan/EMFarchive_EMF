@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ public class ControlMeasure implements Lockable, Serializable {
     private float maxUncontrolledEmissions;
 
     private Region region;
+    
+    private ControlMeasureCost cost;
 
     private String cmClass;
 
@@ -243,5 +246,13 @@ public class ControlMeasure implements Lockable, Serializable {
 
     public void setSccs(String[] sccs) {
         this.sccs = Arrays.asList(sccs);
+    }
+
+    public ControlMeasureCost getCost() {
+        return cost;
+    }
+
+    public void setCost(ControlMeasureCost cost) {
+        this.cost = cost;
     }
 }

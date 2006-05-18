@@ -1,5 +1,16 @@
 -- -------------CoST Tables--------------
 
+-- emf.control_measure_costs
+CREATE TABLE emf.control_measure_costs
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE,
+  lock_owner varchar(255),
+  lock_date timestamp
+)
+WITHOUT OIDS;
+-- emf.control_measure_costs
+
 -- emf.control_measures
 CREATE TABLE emf.control_measures
 (
@@ -13,6 +24,7 @@ CREATE TABLE emf.control_measures
   major_pollutant varchar(255),
   creator int4  REFERENCES emf.users(id),
   region int4  REFERENCES emf.regions(id),
+  cost int4 REFERENCES emf.control_measure_costs (id),
   rule_effectiveness real,
   rule_penetration real,
   min_uncontrolled_emissions real,
@@ -24,7 +36,6 @@ CREATE TABLE emf.control_measures
 ) 
 WITHOUT OIDS;
 -- emf.control_measures
-
 
 -- emf.control_strategies
 CREATE TABLE emf.control_strategies
@@ -50,7 +61,7 @@ CREATE TABLE emf.control_strategies
 WITHOUT OIDS;
 -- emf.control_strategies
 
---emf.datasets_control_strategies
+-- emf.datasets_control_strategies
 CREATE TABLE emf.datasets_control_strategies
 (
   id SERIAL PRIMARY KEY,
@@ -59,4 +70,22 @@ CREATE TABLE emf.datasets_control_strategies
   dataset_id int4 REFERENCES emf.datasets (id)
 ) 
 WITHOUT OIDS;
+-- emf.datasets_control_strategies
+
+-- emf.cmcost_costrecords
+CREATE TABLE emf.cmcost_costrecords
+(
+  id SERIAL PRIMARY KEY,
+  cmcost_id int4 NOT NULL REFERENCES emf.control_measure_costs(id),
+  list_index int4,
+  name varchar(255),
+  pollutant varchar(255),
+  cost_year int4,
+  discount_rate real,
+  parameter_a real,
+  parameter_b real,
+  UNIQUE (cmcost_id, list_index)
+) 
+WITHOUT OIDS;
+-- emf.cmcost_costrecords
 --------------------------------------------------------------------------------

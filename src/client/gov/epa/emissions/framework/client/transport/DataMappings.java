@@ -22,6 +22,8 @@ import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
+import gov.epa.emissions.framework.services.cost.data.CostRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
@@ -86,6 +88,8 @@ public class DataMappings extends Mappings {
     private void controlBeans(Call call) {
         bean(call, ControlMeasure.class, controlMeasure());
         bean(call, ControlStrategy.class, controlStrategy());
+        bean(call, ControlMeasureCost.class, controlMeasureCost());
+        bean(call, CostRecord.class, costRecord());
     }
 
     private void registerArrays(Call call) {
@@ -125,6 +129,8 @@ public class DataMappings extends Mappings {
 
         array(call, ControlMeasure[].class, controlMeasures());
         array(call, ControlStrategy[].class, controlStrategies());
+        array(call, CostRecord[].class, costRecords());
+        array(call, ControlMeasureCost[].class, controlMeasureCosts());
     }
 
     public QName logs() {
@@ -313,6 +319,22 @@ public class DataMappings extends Mappings {
 
     public QName controlStrategies() {
         return qname("ControlStrategies");
+    }
+    
+    public QName costRecord() {
+        return qname("CostRecord");
+    }
+
+    public QName costRecords() {
+        return qname("CostRecords");
+    }
+
+    public QName controlMeasureCost() {
+        return qname("ControlMeasureCost");
+    }
+    
+    private QName controlMeasureCosts() {
+        return qname("ControlMeasureCosts");
     }
 
 }
