@@ -37,6 +37,20 @@ CREATE TABLE emf.control_measures
 WITHOUT OIDS;
 -- emf.control_measures
 
+
+-- emf.control_measure_sccs
+CREATE TABLE emf.control_measure_sccs
+(
+   id SERIAL PRIMARY KEY,
+   control_measures_id  int4 NOT NULL REFERENCES emf.control_measures(id),
+   list_index int4,
+   name varchar(255)
+)
+
+-- emf.control_measure_sccs
+
+
+
 -- emf.control_strategies
 CREATE TABLE emf.control_strategies
 (
