@@ -1,16 +1,15 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.framework.services.cost.data.CostRecord;
-import gov.epa.emissions.framework.ui.AbstractTableData;
+import gov.epa.emissions.framework.ui.AbstractEditableTableData;
 import gov.epa.emissions.framework.ui.EditableRow;
-import gov.epa.emissions.framework.ui.InlineEditableTableData;
 import gov.epa.emissions.framework.ui.RowSource;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ControlMeasureCostTableData extends AbstractTableData implements InlineEditableTableData {
+public class ControlMeasureCostTableData extends AbstractEditableTableData {
 
     private List rows;
 
@@ -31,7 +30,7 @@ public class ControlMeasureCostTableData extends AbstractTableData implements In
     }
 
     public boolean isEditable(int col) {
-        return (col == 0) ? false:true;
+        return (col == 1) ? false:true;
     }
 
     private List createRows(CostRecord[] records) {
@@ -79,21 +78,6 @@ public class ControlMeasureCostTableData extends AbstractTableData implements In
     public void sortByOrder() {
         CostRecords records = new CostRecords(sources());
         this.rows = createRows(records.sortByOrder());
-    }
-
-    public void addBlankRow() {
-        // NOTE Auto-generated method stub
-        
-    }
-
-    public void removeSelected() {
-        // NOTE Auto-generated method stub
-        
-    }
-
-    public boolean shouldTrackChange(int col) {
-        // NOTE Auto-generated method stub
-        return false;
     }
 
 }

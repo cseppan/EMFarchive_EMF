@@ -8,7 +8,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
 import gov.epa.emissions.framework.services.cost.data.CostRecord;
-import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
@@ -26,9 +26,11 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
 
     private EmfConsole parentConsole;
 
-    private EmfTableModel model;
+    private EditableEmfTableModel model;
     
     private ControlMeasureCostTableData tableData;
+    
+    private ControlMeasureCost cost;
 
     private JPanel mainPanel;
 
@@ -39,12 +41,14 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     }
 
     private void doLayout(ControlMeasure measure) {
-        ControlMeasureCost cost = measure.getCost();
+        this.cost = measure.getCost();
         CostRecord[] costRecords = null;
         if (cost != null)
             costRecords = cost.getCostRecords();
-        else
+        else {
+            this.cost = new ControlMeasureCost("");
             costRecords = new CostRecord[0];
+        }
         updateMainPanel(costRecords);
 
         setLayout(new BorderLayout());
@@ -57,11 +61,12 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
         initModel(costRecords);
         JScrollPane pane = sortFilterPane(parentConsole);// FIXME: pass the parentConsol
         mainPanel.add(pane);
+        mainPanel.validate();
     }
 
     private void initModel(CostRecord[] costRecords) {
         tableData = new ControlMeasureCostTableData(costRecords);
-        model = new EmfTableModel(tableData);
+        model = new EditableEmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
     }
 
@@ -97,7 +102,8 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 tableData.add(new CostRecord());
-                selectModel.refresh();
+                refreshData();
+                updateMainPanel(tableData.sources());
             }
         };
     }
@@ -109,9 +115,14 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
             }
         };
     }
+    
+    public void refreshData() {
+        tableData.sortByOrder();
+    }
 
     public void save(ControlMeasure measure) {
-        //
+        cost.setCostRecords(tableData.sources());
+        measure.setCost(cost);
     }
 
 }

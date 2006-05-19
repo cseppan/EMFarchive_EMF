@@ -6,8 +6,8 @@ import java.util.Comparator;
 
 public class CostRecordsComparator implements Comparator {
     public int compare(Object record1, Object record2) {
-        float order1 = ((CostRecord) record1).getOrder();
-        float order2 = ((CostRecord) record2).getOrder();
+        float order1 = ((CostRecord) record1).getId();
+        float order2 = ((CostRecord) record2).getId();
 
         //Note: this comparator imposes orderings that are inconsistent with equals
         if (order1 > order2)

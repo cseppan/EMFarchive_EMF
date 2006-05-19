@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class ControlMeasureCost implements Serializable, Lockable, Comparable {
+public class ControlMeasureCost implements Serializable, Lockable {
 
     private String name;
     
@@ -79,13 +79,13 @@ public class ControlMeasureCost implements Serializable, Lockable, Comparable {
         return lock.isLocked();
     }
     
-    public int compareTo(Object o) {
-        return name.compareTo(((ControlMeasureCost) o).getName());
-    }
-    
-    public int hashCode() {
-        return name.hashCode();
-    }
+//    public int compareTo(Object o) {
+//        return name.compareTo(((ControlMeasureCost) o).getName());
+//    }
+//    
+//    public int hashCode() {
+//        return name.hashCode();
+//    }
 
     public boolean equals(Object other) {
         return (other instanceof ControlMeasureCost && ((ControlMeasureCost) other).id == id);

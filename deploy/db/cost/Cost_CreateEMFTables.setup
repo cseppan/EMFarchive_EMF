@@ -4,7 +4,7 @@
 CREATE TABLE emf.control_measure_costs
 (
   id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE,
+  name varchar(255),
   lock_owner varchar(255),
   lock_date timestamp
 )
@@ -46,10 +46,8 @@ CREATE TABLE emf.control_measure_sccs
    list_index int4,
    name varchar(255)
 )
-
+WITHOUT OIDS;
 -- emf.control_measure_sccs
-
-
 
 -- emf.control_strategies
 CREATE TABLE emf.control_strategies
@@ -57,7 +55,7 @@ CREATE TABLE emf.control_strategies
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE,
   description text,
-  region_id int4 REFERENCES emf.regions (id),
+  region_id int4 REFERENCES emf.regions(id),
   project_id int4 REFERENCES emf.projects (id),
   discount_rate real,
   cost_year int4,
