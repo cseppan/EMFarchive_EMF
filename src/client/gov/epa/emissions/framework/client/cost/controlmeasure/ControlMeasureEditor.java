@@ -73,7 +73,7 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
     }
 
     private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {
-        EditableCMTabView view = new EditableSCCTab(measure, session, messagePanel);
+        EditableCMTabView view = new EditableCMSCCTab(measure, session, messagePanel);
         presenter.set(view);
         return (JPanel) view;
     }

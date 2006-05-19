@@ -18,7 +18,7 @@ import javax.swing.Action;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class EditableSCCTab extends JPanel implements EditableCMTabView {
+public class EditableCMSCCTab extends JPanel implements EditableCMTabView {
 
     private SortFilterSelectModel selectModel;
 
@@ -28,7 +28,7 @@ public class EditableSCCTab extends JPanel implements EditableCMTabView {
 
     private JPanel mainPanel;
 
-    public EditableSCCTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel) {
+    public EditableCMSCCTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel) {
         this.mainPanel = new JPanel(new BorderLayout());
         this.parentConsole = null;
         doLayout(measure);
