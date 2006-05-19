@@ -18,16 +18,18 @@ public class SCCTableDataTest extends TestCase {
         data = new SCCTableData(sccs);
     }
 
-    public void testShouldHaveOneColumn() {
-        assertEquals(1,data.columns().length);
+    public void testShouldHaveTwoColumns() {
+        assertEquals(2,data.columns().length);
     }
     
-    public void testColumnClassShouldBeString(){
-        assertEquals(String.class,data.getColumnClass(0));
+    public void testColumnClasses(){
+        assertEquals(Boolean.class,data.getColumnClass(0));
+        assertEquals(String.class,data.getColumnClass(1));
     }
     
-    public void testAllColumnsShouldBeUnEditable() {
-        assertEquals(false,data.isEditable(0));
+    public void testAllColumnsShouldBeEditable() {
+        assertEquals(true,data.isEditable(0));
+        assertEquals(true,data.isEditable(1));
     }
     
     public void testShouldReturnTheRowsCorrespondingToCount() {

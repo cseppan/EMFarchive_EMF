@@ -33,6 +33,7 @@ public class CostServiceImpl implements CostService {
             List all = dao.all(sessionFactory.getSession());
             return (ControlMeasure[]) all.toArray(new ControlMeasure[0]);
         } catch (HibernateException e) {
+            e.printStackTrace();
             LOG.error("could not retrieve control measures.");
             throw new EmfException("could not retrieve control measures.");
         }

@@ -50,11 +50,11 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private Mutex lock;
 
-    private List sccs;
+    private List sccsList;
 
     public ControlMeasure() {
         this.lock = new Mutex();
-        sccs = new ArrayList();
+        sccsList = new ArrayList();
     }
 
     public ControlMeasure(String name) {
@@ -241,11 +241,11 @@ public class ControlMeasure implements Lockable, Serializable {
     }
 
     public String[] getSccs() {
-        return (String[]) sccs.toArray(new String[0]);
+        return (String[]) sccsList.toArray(new String[0]);
     }
 
     public void setSccs(String[] sccs) {
-        this.sccs = Arrays.asList(sccs);
+        this.sccsList = Arrays.asList(sccs);
     }
 
     public ControlMeasureCost getCost() {
