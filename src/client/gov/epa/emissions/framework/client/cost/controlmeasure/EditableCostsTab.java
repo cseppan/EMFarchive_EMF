@@ -102,8 +102,7 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 tableData.add(new CostRecord());
-                refreshData();
-                updateMainPanel(tableData.sources());
+                refreshPanel();
             }
         };
     }
@@ -111,13 +110,24 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     private Action removeAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // remove selected data
+                doRemove();
             }
         };
     }
     
+    protected void doRemove() {
+        CostRecord[] records = (CostRecord[])selectModel.selected().toArray(new CostRecord[0]);
+        tableData.remove(records);
+        refreshPanel();
+    }
+
     public void refreshData() {
         tableData.sortByOrder();
+    }
+    
+    public void refreshPanel() {
+        refreshData();
+        updateMainPanel(tableData.sources());
     }
 
     public void save(ControlMeasure measure) {

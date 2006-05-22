@@ -12,15 +12,13 @@ public class CostRecordRowSource implements RowSource {
     }
 
     public Object[] values() {
-        return new Object[] { new Integer(source.getId()), source.getPollutant(), 
+        return new Object[] { source.getPollutant(), 
                 new Integer(source.getCostYear()), new Float(source.getDiscountRate()),
                 new Float(source.getA()), new Float(source.getB()) };
     }
 
     public void setValueAt(int column, Object val) {
         switch (column) {
-        case 0:
-            break;
         case 1:
             source.setPollutant((String) val);
             break;
