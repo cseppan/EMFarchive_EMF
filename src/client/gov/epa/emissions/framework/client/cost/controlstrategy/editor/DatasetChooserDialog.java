@@ -38,7 +38,7 @@ public class DatasetChooserDialog extends JDialog {
         contentPane.setLayout(new BorderLayout(5, 5));
         contentPane.add(panel);
         contentPane.add(buttonPanel, BorderLayout.SOUTH);
-        setTitle("Choose a dataset");
+        setTitle("Choose a dataset ("+datasetType.getName()+")");
         pack();
         setLocation(ScreenUtils.getPointToCenter(parent));
         setModal(true);
@@ -72,7 +72,7 @@ public class DatasetChooserDialog extends JDialog {
 
         JScrollPane scrollPane = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setPreferredSize(new Dimension(200, 200));
+        scrollPane.setPreferredSize(new Dimension(300, 300));
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.add(scrollPane);
         return panel;
