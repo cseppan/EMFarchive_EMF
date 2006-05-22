@@ -353,7 +353,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private JPanel resultsPanel() {
         JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("Resutls"));
+        panel.setBorder(BorderFactory.createTitledBorder("Results"));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         JLabel costValue = new JLabel("  -   ");
