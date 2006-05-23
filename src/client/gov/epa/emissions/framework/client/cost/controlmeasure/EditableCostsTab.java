@@ -56,7 +56,7 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     }
 
     private String getNote() {
-        return "<html> Cost per ton will be calculate based on formula: Y = a*X + b <br>" + "</html>";
+        return "<html><br> Cost per ton will be calculate based on formula: Y = a*X + b <br>" + "</html>";
     }
 
     private void doLayout(ControlMeasure measure) {
