@@ -95,7 +95,7 @@ public class EditableQAStepsTableDataTest extends EmfMockObjectTestCase {
         assertEquals(step1.getVersion(), ((Integer) row.getValueAt(0)).intValue());
         assertEquals(step1.getName(), row.getValueAt(1));
         assertEquals(step1.isRequired(), ((Boolean) row.getValueAt(2)).booleanValue());
-        assertEquals(step1.getOrder() + "", row.getValueAt(3));
+        assertEquals(step1.getOrder() + "", row.getValueAt(3) + "");
         assertEquals(step1.getStatus(), row.getValueAt(4));
 
         SimpleDateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());

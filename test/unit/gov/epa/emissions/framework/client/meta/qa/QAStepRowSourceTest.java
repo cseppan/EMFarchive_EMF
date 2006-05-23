@@ -31,7 +31,7 @@ public class QAStepRowSourceTest extends TestCase {
         assertEquals(new Integer(step.getVersion()), values[0]);
         assertEquals(step.getName(), values[1]);
         assertEquals(step.isRequired(), ((Boolean) values[2]).booleanValue());
-        assertEquals(step.getOrder() + "", values[3]);
+        assertEquals(step.getOrder() + "", values[3] + "");
         assertEquals(step.getStatus(), values[4]);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
