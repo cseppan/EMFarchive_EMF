@@ -120,6 +120,21 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         maxUncontrolledEmission.setText(measure.getMaxUncontrolledEmissions() + "");
         abbreviation.setText(getText(measure.getAbbreviation()));
     }
+    
+    protected void disableFields() {
+        name.setEditable(false);
+        description.setEditable(false);
+        majorPollutant.setEnabled(false);
+        costYear.setEditable(false);
+        deviceCode.setEditable(false);
+        equipmentLife.setEditable(false);
+        ruleEffectiveness.setEditable(false);
+        rulePenetration.setEditable(false);
+        region.setEnabled(false);
+        cmClass.setEnabled(false);
+        sectors.setEnabled(false);
+        controlPrograms.setEnabled(false);
+    }
 
     private String getText(String value) {
         return (value != null) ? value : "";

@@ -1,16 +1,15 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
-import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
 import gov.epa.emissions.framework.services.cost.data.CostRecord;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
-import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -18,6 +17,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -38,11 +38,17 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     private ControlMeasure measure;
     
     private DesktopManager desktopManager;
+    
+    private ManageChangeables changeablesList;
 
-    public EditableCostsTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel, DesktopManager desktopManager) {
+    private EmfConsole parent;
+
+    public EditableCostsTab(ControlMeasure measure, ManageChangeables changeablesList, EmfConsole parent, DesktopManager desktopManager) {
         this.mainPanel = new JPanel(new BorderLayout());
         this.parentConsole = null;
+        this.changeablesList = changeablesList;
         this.desktopManager = desktopManager;
+        this.parent = parent;
         doLayout(measure);
     }
 
@@ -130,12 +136,23 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     
     protected void doRemove() {
         CostRecord[] records = (CostRecord[])selectModel.selected().toArray(new CostRecord[0]);
-        tableData.remove(records);
-        refreshPanel();
+
+        if (records.length == 0)
+            return;
+
+        String title = "Warning";
+        String message = "Are you sure you want to remove the selected row(s)?";
+        int selection = JOptionPane.showConfirmDialog(parent, message, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection == JOptionPane.YES_OPTION) {
+            tableData.remove(records);
+            refreshPanel();
+        }
     }
     
     protected void doAdd() {
-        CostRecordView view = new CostRecordWindow(desktopManager);
+        CostRecordView view = new CostRecordWindow(changeablesList, desktopManager);
         CostRecordPresenter presenter = new CostRecordPresenter(this, view);
         presenter.display(measure);
     }

@@ -145,7 +145,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                     showError("Please select a control measure.");
                 try {
                     for (int i = 0; i < measures.length; i++)
-                        presenter.doEdit(measures[i], desktopManager);
+                        presenter.doEdit(parentConsole, measures[i], desktopManager);
 
                 } catch (EmfException e) {
                     showError(e.getMessage());
@@ -172,7 +172,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         clearMessage();
         ControlMeasure measure = new ControlMeasure();
         measure.setCreator(session.user());
-        presenter.doCreateNew(measure, desktopManager);
+        presenter.doCreateNew(parentConsole, measure, desktopManager);
     }
     
     private Action copyAction() {
@@ -200,7 +200,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
             showError("Please select a control measure.");
 
         for (int i = 0; i < measures.length; i++) {
-            presenter.doEdit(measures[i], desktopManager);
+            presenter.doEdit(parentConsole, measures[i], desktopManager);
         }
     }
 

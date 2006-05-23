@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.ui.EditableRow;
@@ -19,15 +20,18 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView {
 
     private SCCTableData tableData;
 
+    private EmfConsole parent;
+
     public EditableCMSCCTab(ControlMeasure measure, EmfSession session, ManageChangeables changeables,
-            MessagePanel messagePanel) {
+            MessagePanel messagePanel, EmfConsole parent) {
+        this.parent = parent;
         doLayout(measure, changeables);
     }
 
     private void doLayout(ControlMeasure measure, ManageChangeables changeables) {
         String[] sccs = measure.getSccs();
         tableData = new SCCTableData(sccs);
-        panel = new EditableTablePanel("", tableData, changeables, null);
+        panel = new EditableTablePanel("", tableData, changeables, parent);
         setLayout(new BorderLayout());
         add(panel, BorderLayout.CENTER);
     }

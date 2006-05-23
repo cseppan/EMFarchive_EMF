@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
@@ -31,12 +32,15 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
 
     private EmfSession session;
 
+    private EmfConsole parent;
+
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
-    public ControlMeasureEditor(EmfSession session, DesktopManager desktopManager) {
+    public ControlMeasureEditor(EmfConsole parent, EmfSession session, DesktopManager desktopManager) {
         super("Control Measure Editor", new Dimension(700, 510), desktopManager);
         this.desktopManager = desktopManager;
         this.session = session;
+        this.parent = parent;
     }
 
     public void display(ControlMeasure measure) {
@@ -73,13 +77,13 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
     }
 
     private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {
-        EditableCMTabView view = new EditableCMSCCTab(measure, session,this, messagePanel);
+        EditableCMTabView view = new EditableCMSCCTab(measure, session,this, messagePanel, parent);
         presenter.set(view);
         return (JPanel) view;
     }
     
     private Component createCostsTab(ControlMeasure measure, MessagePanel messagePanel2) {
-        EditableCostsTabView view = new EditableCostsTab(measure, session, messagePanel, desktopManager);
+        EditableCostsTabView view = new EditableCostsTab(measure, this, parent, desktopManager);
         presenter.set(view);
         return (JPanel) view;
     }
