@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
 import gov.epa.emissions.framework.services.cost.data.CostRecord;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
+import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -17,6 +18,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -28,28 +30,33 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     private EmfConsole parentConsole;
 
     private EditableEmfTableModel model;
-    
+
     private ControlMeasureCostTableData tableData;
-    
+
     private ControlMeasureCost cost;
 
     private JPanel mainPanel;
-    
+
     private ControlMeasure measure;
-    
+
     private DesktopManager desktopManager;
-    
+
     private ManageChangeables changeablesList;
 
-    private EmfConsole parent;
+    private MessagePanel messagePanel;
 
-    public EditableCostsTab(ControlMeasure measure, ManageChangeables changeablesList, EmfConsole parent, DesktopManager desktopManager) {
+    public EditableCostsTab(ControlMeasure measure, ManageChangeables changeablesList, EmfConsole parent,
+            DesktopManager desktopManager, MessagePanel messagePanel) {
         this.mainPanel = new JPanel(new BorderLayout());
-        this.parentConsole = null;
+        this.parentConsole = parent;
         this.changeablesList = changeablesList;
         this.desktopManager = desktopManager;
-        this.parent = parent;
+        this.messagePanel = messagePanel;
         doLayout(measure);
+    }
+
+    private String getNote() {
+        return "<html> Cost per ton will be calculate based on formula: Y = a*X + b <br>" + "</html>";
     }
 
     private void doLayout(ControlMeasure measure) {
@@ -65,14 +72,22 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
         updateMainPanel(costRecords);
 
         setLayout(new BorderLayout());
+        add(notePanel(getNote()), BorderLayout.NORTH);
         add(mainPanel, BorderLayout.CENTER);
         add(controlPanel(), BorderLayout.SOUTH);
+    }
+
+    private JPanel notePanel(String note) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(new JLabel(note), BorderLayout.LINE_START);
+
+        return panel;
     }
 
     private void updateMainPanel(CostRecord[] costRecords) {
         mainPanel.removeAll();
         initModel(costRecords);
-        JScrollPane pane = sortFilterPane(parentConsole);// FIXME: pass the parentConsol
+        JScrollPane pane = sortFilterPane(parentConsole);
         mainPanel.add(pane);
         mainPanel.validate();
     }
@@ -94,7 +109,7 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     private JPanel controlPanel() {
         Button addButton = new Button("Add", addAction());
         Button removeButton = new Button("Remove", removeAction());
-        Button editButton = new Button("Edit", removeAction());
+        Button editButton = new Button("Edit", editAction());
         Button importButton = new Button("Import", importAction());
         importButton.setEnabled(false);
 
@@ -103,11 +118,19 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
         panel.add(removeButton);
         panel.add(editButton);
         panel.add(importButton);
-        
+
         JPanel container = new JPanel(new BorderLayout());
         container.add(panel, BorderLayout.LINE_START);
-        
+
         return container;
+    }
+
+    private Action editAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                doEdit();
+            }
+        };
     }
 
     private Action importAction() {
@@ -133,16 +156,18 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
             }
         };
     }
-    
+
     protected void doRemove() {
-        CostRecord[] records = (CostRecord[])selectModel.selected().toArray(new CostRecord[0]);
+        messagePanel.clear();
+        
+        CostRecord[] records = getSelectedRecords();
 
         if (records.length == 0)
             return;
 
         String title = "Warning";
         String message = "Are you sure you want to remove the selected row(s)?";
-        int selection = JOptionPane.showConfirmDialog(parent, message, title, JOptionPane.YES_NO_OPTION,
+        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
         if (selection == JOptionPane.YES_OPTION) {
@@ -150,17 +175,37 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
             refreshPanel();
         }
     }
-    
+
     protected void doAdd() {
+        messagePanel.clear();
         CostRecordView view = new CostRecordWindow(changeablesList, desktopManager);
         CostRecordPresenter presenter = new CostRecordPresenter(this, view);
-        presenter.display(measure);
+        presenter.display(measure, null);
+    }
+
+    private void doEdit() {
+        messagePanel.clear();
+        
+        CostRecord[] records = getSelectedRecords();
+        
+        if(records.length == 0)
+            messagePanel.setError("Please select a record.");
+        
+        for (int i = 0; i < records.length; i++) {
+            CostRecordView view = new CostRecordWindow(changeablesList, desktopManager);
+            CostRecordPresenter presenter = new CostRecordPresenter(this, view);
+            presenter.display(measure, records[i]);
+        }
+    }
+
+    private CostRecord[] getSelectedRecords() {
+        return (CostRecord[]) selectModel.selected().toArray(new CostRecord[0]);
     }
 
     public void refreshData() {
         tableData.sortByOrder();
     }
-    
+
     public void refreshPanel() {
         refreshData();
         updateMainPanel(tableData.sources());
@@ -173,6 +218,10 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
 
     public void add(CostRecord record) {
         tableData.add(record);
+        refreshPanel();
+    }
+
+    public void edit(CostRecord record) {
         refreshPanel();
     }
 

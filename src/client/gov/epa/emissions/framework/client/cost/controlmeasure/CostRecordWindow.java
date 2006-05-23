@@ -40,19 +40,25 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
     
     private boolean verified = false;
     
+    private CostRecord record;
+    
     private static int count = 0;
 
     public CostRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager) {
-        super("Cost Record", new Dimension(400, 280), desktopManager);
+        super("CostRecord", new Dimension(400, 280), desktopManager);
         this.changeablesList = changeablesList;
         this.verifier = new NumberFieldVerifier("");
     }
 
-    public void display(ControlMeasure measure) {
-        super.setLabel(super.getTitle() + " for ControlMeasure: " + measure.getName() + " " + ++count);
+    public void display(ControlMeasure measure, CostRecord record) {
+        super.setLabel(super.getTitle() + " " + ++count + " for ControlMeasure: " + measure.getName());
         JPanel layout = createLayout(measure);
         super.getContentPane().add(layout);
         super.display();
+        this.record = record;
+        
+        if(record != null)
+            populateFields();
     }
 
     private JPanel createLayout(ControlMeasure measure) {
@@ -108,6 +114,15 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
 
         return panel;
     }
+    
+    private void populateFields() {
+        name.setText(record.getName());
+        pollutant.setText(record.getPollutant());
+        year.setText(record.getCostYear()+"");
+        discountRate.setText(record.getDiscountRate()+"");
+        a.setText(record.getA()+"");
+        b.setText(record.getB()+"");
+    }
 
     protected void verifyInput() {
         try {
@@ -126,7 +141,7 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
         JPanel panel = new JPanel();
         Button ok = new Button("OK", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doNew();
+                doOK();
             }
         });
         getRootPane().setDefaultButton(ok);
@@ -142,6 +157,13 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
         return panel;
     }
 
+    protected void doOK() {
+        if(this.record == null)
+            doNew();
+        else 
+            doEdit(this.record);
+    }
+
     private void doNew() {
         verifyInput();
         if(verified == false)
@@ -150,16 +172,30 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
         presenter.addNew(costRecord());
         disposeView();
     }
+    
+    private void doEdit(CostRecord record) {
+        verifyInput();
+        if(verified == false)
+            return;
+        
+        presenter.doEdit(setRecord(record));
+        disposeView();
+    }
 
     public CostRecord costRecord() {
         CostRecord record = new CostRecord();
+        
+        return setRecord(record);
+    }
+
+    private CostRecord setRecord(CostRecord record) {
         record.setName(name.getText());
         record.setPollutant(pollutant.getText());
         record.setCostYear(costYear);
         record.setA(paramA);
         record.setB(paramB);
         record.setDiscountRate(discount);
-
+        
         return record;
     }
 

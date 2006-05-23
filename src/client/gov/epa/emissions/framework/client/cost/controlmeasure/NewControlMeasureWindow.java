@@ -89,7 +89,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     }
     
     private Component createCostsTab(ControlMeasure measure, MessagePanel messagePanel2) {
-        EditableCostsTabView view = new EditableCostsTab(measure, this, parent, desktopManager);
+        EditableCostsTabView view = new EditableCostsTab(measure, this, parent, desktopManager, messagePanel);
         presenter.set(view);
         return (JPanel) view;
     }

@@ -8,4 +8,6 @@ public interface EditableCostsTabView {
     void save(ControlMeasure measure) throws EmfException;
     
     void add(CostRecord record);
+    
+    void edit(CostRecord record);
 }

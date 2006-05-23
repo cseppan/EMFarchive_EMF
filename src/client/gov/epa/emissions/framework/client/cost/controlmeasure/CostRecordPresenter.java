@@ -14,12 +14,16 @@ public class CostRecordPresenter {
         this.parentView = parentView;
     }
     
-    public void display(ControlMeasure measure) {
+    public void display(ControlMeasure measure, CostRecord record) {
         view.observe(this);
-        view.display(measure);
+        view.display(measure, record);
     }
     
     public void addNew(CostRecord record) {
         parentView.add(record);
+    }
+    
+    public void doEdit(CostRecord record) {
+        parentView.edit(record);
     }
 }
