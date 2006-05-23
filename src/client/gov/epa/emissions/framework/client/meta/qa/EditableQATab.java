@@ -15,6 +15,7 @@ import gov.epa.emissions.framework.services.data.QAStep;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.mims.analysisengine.table.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -76,10 +77,15 @@ public class EditableQATab extends JPanel implements EditableQATabView {
 
     private JScrollPane createSortFilterPanel(EmfConsole parentConsole) {
         SortFilterSelectionPanel sortFilterPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
-
+        sortFilterPanel.sort(sortCriteria());
         JScrollPane scrollPane = new JScrollPane(sortFilterPanel);
         sortFilterPanel.setPreferredSize(new Dimension(450, 60));
         return scrollPane;
+    }
+    
+    private SortCriteria sortCriteria() {
+        String[] columnNames = { "Version", "Order" };
+        return new SortCriteria(columnNames, new boolean[] { false, false }, new boolean[] { true, true });
     }
 
     private JPanel createButtonsSection() {
