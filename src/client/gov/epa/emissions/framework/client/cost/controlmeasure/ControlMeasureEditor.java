@@ -79,7 +79,7 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
     }
     
     private Component createCostsTab(ControlMeasure measure, MessagePanel messagePanel2) {
-        EditableCostsTabView view = new EditableCostsTab(measure, session, messagePanel);
+        EditableCostsTabView view = new EditableCostsTab(measure, session, messagePanel, desktopManager);
         presenter.set(view);
         return (JPanel) view;
     }

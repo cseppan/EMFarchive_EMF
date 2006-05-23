@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
@@ -33,14 +34,20 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     private ControlMeasureCost cost;
 
     private JPanel mainPanel;
+    
+    private ControlMeasure measure;
+    
+    private DesktopManager desktopManager;
 
-    public EditableCostsTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel) {
+    public EditableCostsTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel, DesktopManager desktopManager) {
         this.mainPanel = new JPanel(new BorderLayout());
         this.parentConsole = null;
+        this.desktopManager = desktopManager;
         doLayout(measure);
     }
 
     private void doLayout(ControlMeasure measure) {
+        this.measure = measure;
         this.cost = measure.getCost();
         CostRecord[] costRecords = null;
         if (cost != null)
@@ -79,15 +86,22 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     }
 
     private JPanel controlPanel() {
-        Button importButton = new Button("Import", importAction());
         Button addButton = new Button("Add", addAction());
         Button removeButton = new Button("Remove", removeAction());
+        Button editButton = new Button("Edit", removeAction());
+        Button importButton = new Button("Import", importAction());
+        importButton.setEnabled(false);
 
         JPanel panel = new JPanel();
-        panel.add(importButton);
         panel.add(addButton);
         panel.add(removeButton);
-        return panel;
+        panel.add(editButton);
+        panel.add(importButton);
+        
+        JPanel container = new JPanel(new BorderLayout());
+        container.add(panel, BorderLayout.LINE_START);
+        
+        return container;
     }
 
     private Action importAction() {
@@ -101,8 +115,7 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     private Action addAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                tableData.add(new CostRecord());
-                refreshPanel();
+                doAdd();
             }
         };
     }
@@ -120,6 +133,12 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
         tableData.remove(records);
         refreshPanel();
     }
+    
+    protected void doAdd() {
+        CostRecordView view = new CostRecordWindow(desktopManager);
+        CostRecordPresenter presenter = new CostRecordPresenter(this, view);
+        presenter.display(measure);
+    }
 
     public void refreshData() {
         tableData.sortByOrder();
@@ -133,6 +152,11 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     public void save(ControlMeasure measure) {
         cost.setCostRecords(tableData.sources());
         measure.setCost(cost);
+    }
+
+    public void add(CostRecord record) {
+        tableData.add(record);
+        refreshPanel();
     }
 
 }
