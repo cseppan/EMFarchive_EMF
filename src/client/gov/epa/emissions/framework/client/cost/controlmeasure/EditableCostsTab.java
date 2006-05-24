@@ -110,7 +110,7 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     
     private SortCriteria sortCriteria() {
         String[] columnNames = { "Pollutant", "Cost Year", "Discount Rate" };
-        return new SortCriteria(columnNames, new boolean[] { false, false, false }, new boolean[] { true, true, true });
+        return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { true, true, true });
     }
 
     private JPanel controlPanel() {

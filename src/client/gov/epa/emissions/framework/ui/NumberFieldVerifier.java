@@ -17,7 +17,7 @@ public class NumberFieldVerifier {
         try {
             val = Integer.parseInt(numberField.getText());
         } catch (NumberFormatException ex) {
-            throw new EmfException(message + numberField.getName() + " field should be an integer number.");
+            throw new EmfException(message + numberField.getName() + " should be an integer.");
         }
         
         return val;
@@ -28,7 +28,7 @@ public class NumberFieldVerifier {
         try {
             val = Double.parseDouble(numberField.getText());
         } catch (NumberFormatException ex) {
-            throw new EmfException(message + numberField.getName() + " field should be a double number.");
+            throw new EmfException(message + numberField.getName() + " should be a double.");
         }
         
         return val;
@@ -39,7 +39,7 @@ public class NumberFieldVerifier {
         try {
             val = Float.parseFloat(numberField.getText());
         } catch (NumberFormatException ex) {
-            throw new EmfException(message + numberField.getName() + " field should be a floating point number.");
+            throw new EmfException(message + numberField.getName() + " should be a floating point number.");
         }
 
         return val;

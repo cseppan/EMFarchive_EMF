@@ -45,11 +45,11 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
         messagePanel.clear();
 
         if (name.getText().equals("")) {
-            throw new EmfException("Summary tab: Name field should be a non-empty string.");
+            throw new EmfException("Summary tab: Name should be a non-empty string.");
         }
 
         if (abbreviation.getText().equals("")) {
-            throw new EmfException("Summary tab: Abbreviation field should be a 8-character string.");
+            throw new EmfException("Summary tab: Abbreviation should be an 8-character string.");
         }
 
 
