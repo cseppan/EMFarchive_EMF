@@ -51,6 +51,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
             throws EmfException {
         super("Control Measures Manager", new Dimension(650, 250), desktopManager);
         super.setName("controlMeasures");
+        super.setMinimumSize(new Dimension(10, 10));
         this.session = session;
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;

@@ -22,7 +22,7 @@ public class ControlMeasureCostTableData extends AbstractEditableTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Pollutant", "Cost Year", "Discount Rate", "a", "b" };
+        return new String[] { "Pollutant", "Cost Year", "Discount Rate", "Slope", "Constant" };
     }
 
     public List rows() {
@@ -30,7 +30,7 @@ public class ControlMeasureCostTableData extends AbstractEditableTableData {
     }
 
     public boolean isEditable(int col) {
-        return true;
+        return false;
     }
 
     private List createRows(CostRecord[] records) {
@@ -49,15 +49,14 @@ public class ControlMeasureCostTableData extends AbstractEditableTableData {
     public Class getColumnClass(int col) {
         if (col == 0)
             return Boolean.class;
-
-        if (col == 1 || col == 3)
-            return Integer.class;
-
-        if (col == 2)
+        
+        if (col == 1)
             return String.class;
         
-        return Float.class;
+        if (col == 2)
+            return Integer.class;
 
+        return Float.class;
     }
 
     public CostRecord[] sources() {

@@ -17,34 +17,16 @@ public class CostRecordRowSource implements RowSource {
                 new Float(source.getA()), new Float(source.getB()) };
     }
 
-    public void setValueAt(int column, Object val) {
-        switch (column) {
-        case 1:
-            source.setPollutant((String) val);
-            break;
-        case 2:
-            source.setCostYear(Integer.parseInt(val.toString()));
-            break;
-        case 3:
-            source.setDiscountRate(((Float) val).floatValue());
-            break;
-        case 4:
-            source.setA(((Float) val).floatValue());
-        case 5:
-            source.setB(((Float) val).floatValue());
-            break;
-        default:
-            throw new RuntimeException("invalid column - " + column);
-        }
-    }
-
     public Object source() {
         return source;
     }
 
     public void validate(int rowNumber) {
         // NOTE no validation needed
+    }
 
+    public void setValueAt(int column, Object val) {
+        // NOTE Auto-generated method stub
     }
 
 }

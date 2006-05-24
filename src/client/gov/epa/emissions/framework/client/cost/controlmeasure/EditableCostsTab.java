@@ -11,6 +11,7 @@ import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
 import gov.epa.emissions.framework.services.cost.data.CostRecord;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.mims.analysisengine.table.SortCriteria;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -56,7 +57,7 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     }
 
     private String getNote() {
-        return "<html><br> Cost per ton will be calculate based on formula: Y = a*X + b <br>" + "</html>";
+        return "<html><br> Cost per ton will be calculated based on formula: cost/ton = slope*(uncontrolled emission) + constant <br>" + "</html>";
     }
 
     private void doLayout(ControlMeasure measure) {
@@ -101,9 +102,15 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     private JScrollPane sortFilterPane(EmfConsole parentConsole) {
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
         panel.getTable().setName("controlMeasureSccTable");
+        panel.sort(sortCriteria());
         panel.setPreferredSize(new Dimension(450, 120));
 
         return new JScrollPane(panel);
+    }
+    
+    private SortCriteria sortCriteria() {
+        String[] columnNames = { "Pollutant", "Cost Year", "Discount Rate" };
+        return new SortCriteria(columnNames, new boolean[] { false, false, false }, new boolean[] { true, true, true });
     }
 
     private JPanel controlPanel() {

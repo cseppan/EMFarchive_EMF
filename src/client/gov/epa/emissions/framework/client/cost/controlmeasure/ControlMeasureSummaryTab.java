@@ -225,13 +225,13 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         changeablesList.addChangeable(region);
         layoutGenerator.addLabelWidgetPair("Region:", region, panel);
         
-        ruleEffectiveness = new TextField("Rule Eff.", 15);
+        ruleEffectiveness = new TextField("Rule Effectiveness", 15);
         changeablesList.addChangeable(ruleEffectiveness);
-        layoutGenerator.addLabelWidgetPair("Rule Eff.:", ruleEffectiveness, panel);
+        layoutGenerator.addLabelWidgetPair("Rule Effectiveness:", ruleEffectiveness, panel);
 
-        rulePenetration = new TextField("Rule Pen.", 15);
+        rulePenetration = new TextField("Rule Penetration", 15);
         changeablesList.addChangeable(rulePenetration);
-        layoutGenerator.addLabelWidgetPair("Rule Pen.:", rulePenetration, panel);
+        layoutGenerator.addLabelWidgetPair("Rule Penetration:", rulePenetration, panel);
 
         sectors = new ListWidget(new String[] { "               " }, new String[] { "" });
         JScrollPane listScroller = new JScrollPane(sectors);
@@ -252,13 +252,13 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         changeablesList.addChangeable(costYear);
         layoutGenerator.addLabelWidgetPair("Cost year:", costYear, panel);
 
-        minUncontrolledEmission = new TextField("Min Uncntrld. Emiss.", 15);
+        minUncontrolledEmission = new TextField("Min Uncntrld. Emission", 15);
         changeablesList.addChangeable(minUncontrolledEmission);
-        layoutGenerator.addLabelWidgetPair("Min Uncntrld. Emiss.:", minUncontrolledEmission, panel);
+        layoutGenerator.addLabelWidgetPair("Min Uncntrld. Emission:", minUncontrolledEmission, panel);
 
-        maxUncontrolledEmission = new TextField("Max Uncntrld. Emiss.", 15);
+        maxUncontrolledEmission = new TextField("Max Uncntrld. Emission", 15);
         changeablesList.addChangeable(maxUncontrolledEmission);
-        layoutGenerator.addLabelWidgetPair("Max Uncntrld. Emiss.:", maxUncontrolledEmission, panel);
+        layoutGenerator.addLabelWidgetPair("Max Uncntrld. Emission:", maxUncontrolledEmission, panel);
 
         equipmentLife = new TextField("Equipment life", 15);
         changeablesList.addChangeable(equipmentLife);

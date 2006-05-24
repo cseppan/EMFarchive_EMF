@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -28,7 +29,9 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
 
     private CostRecordPresenter presenter;
 
-    private TextField name, pollutant, year, discountRate, a, b;
+    private TextField name, year, discountRate, a, b;
+    
+    private EditableComboBox pollutant;
     
     private int costYear;
     
@@ -43,15 +46,18 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
     private CostRecord record;
     
     private static int count = 0;
+    
+    private String[] pollutants = { "NOx", "PM10", "PM2.5", "SO2", "VOC", "CO",
+            "CO2", "EC", "OC", "NH3", "Hg" };
 
     public CostRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager) {
-        super("CostRecord", new Dimension(400, 280), desktopManager);
+        super("Cost Record", new Dimension(400, 300), desktopManager);
         this.changeablesList = changeablesList;
         this.verifier = new NumberFieldVerifier("");
     }
 
     public void display(ControlMeasure measure, CostRecord record) {
-        super.setLabel(super.getTitle() + " " + ++count + " for ControlMeasure: " + measure.getName());
+        super.setLabel(super.getTitle() + " " + ++count + " for Control Measure: " + measure.getName());
         JPanel layout = createLayout(measure);
         super.getContentPane().add(layout);
         super.display();
@@ -82,7 +88,7 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
         changeablesList.addChangeable(name);
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
-        pollutant = new TextField("", 20);
+        pollutant = new EditableComboBox(pollutants);
         pollutant.setName("Pollutant");
         changeablesList.addChangeable(pollutant);
         layoutGenerator.addLabelWidgetPair("Pollutant:", pollutant, panel);
@@ -98,14 +104,14 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
         layoutGenerator.addLabelWidgetPair("Discount rate:", discountRate, panel);
 
         a = new TextField("", 20);
-        a.setName("Parameter a");
+        a.setName("Slope");
         changeablesList.addChangeable(a);
-        layoutGenerator.addLabelWidgetPair("Parameter a:", a, panel);
+        layoutGenerator.addLabelWidgetPair("Slope:", a, panel);
 
         b = new TextField("", 20);
-        b.setName("Parameter b");
+        b.setName("Constant");
         changeablesList.addChangeable(b);
-        layoutGenerator.addLabelWidgetPair("Parameter b:", b, panel);
+        layoutGenerator.addLabelWidgetPair("Constant:", b, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
@@ -117,7 +123,7 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
     
     private void populateFields() {
         name.setText(record.getName());
-        pollutant.setText(record.getPollutant());
+        pollutant.setSelectedItem(record.getPollutant());
         year.setText(record.getCostYear()+"");
         discountRate.setText(record.getDiscountRate()+"");
         a.setText(record.getA()+"");
@@ -190,7 +196,7 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
 
     private CostRecord setRecord(CostRecord record) {
         record.setName(name.getText());
-        record.setPollutant(pollutant.getText());
+        record.setPollutant(pollutant.getSelectedItem()+"");
         record.setCostYear(costYear);
         record.setA(paramA);
         record.setB(paramB);
