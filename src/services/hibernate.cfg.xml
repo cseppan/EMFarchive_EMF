@@ -52,6 +52,7 @@
 	   	<mapping resource="gov/epa/emissions/framework/services/cost/ControlStrategy.hbm.xml"/>
 		<mapping resource="gov/epa/emissions/framework/services/cost/ControlMeasure.hbm.xml"/>
 		<mapping resource="gov/epa/emissions/framework/services/cost/ControlMeasureCost.hbm.xml"/>
+		<mapping resource="gov/epa/emissions/framework/services/cost/ControlMeasureEfficiency.hbm.xml"/>
     </session-factory>
     
 </hibernate-configuration>

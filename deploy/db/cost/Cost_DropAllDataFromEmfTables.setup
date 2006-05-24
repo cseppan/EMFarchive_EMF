@@ -6,6 +6,8 @@ DELETE FROM emf.datasets_control_strategies;
 DELETE FROM emf.control_measure_costs;
 DELETE FROM emf.cmcost_costrecords;
 DELETE FROM emf.control_measure_sccs;
+DELETE FROM emf.control_measure_efficiency;
+DELETE FROM emf.cm_efficiency_records;
 
 
 
