@@ -8,34 +8,37 @@ public class SCCTableDataTest extends TestCase {
 
     private SCCTableData data;
 
-    private String[] sccs;
+    private Scc[] sccs;
 
     protected void setUp() {
-        sccs = new String[2];
-        sccs[0] = "name1";
-        sccs[1] = "name2";
+        sccs = new Scc[2];
+        sccs[0] = new Scc("name1", "description1");
+        sccs[1] = new Scc("name2", "description2");
 
         data = new SCCTableData(sccs);
     }
 
     public void testShouldHaveTwoColumns() {
-        assertEquals(2,data.columns().length);
+        String[] columns = data.columns();
+        assertEquals(2, columns.length);
+        assertEquals("SCC", columns[0]);
+        assertEquals("Description", columns[1]);
     }
-    
-    public void testColumnClasses(){
-        assertEquals(Boolean.class,data.getColumnClass(0));
-        assertEquals(String.class,data.getColumnClass(1));
+
+    public void testColumnClasses() {
+        assertEquals(String.class, data.getColumnClass(0));
+        assertEquals(String.class, data.getColumnClass(1));
     }
-    
+
     public void testAllColumnsShouldBeEditable() {
-        assertEquals(true,data.isEditable(0));
-        assertEquals(true,data.isEditable(1));
+        assertEquals(false, data.isEditable(0));
+        assertEquals(false, data.isEditable(1));
     }
-    
+
     public void testShouldReturnTheRowsCorrespondingToCount() {
         List rows = data.rows();
         assertNotNull("Should have 2 rows", rows);
         assertEquals(2, rows.size());
     }
-    
+
 }
