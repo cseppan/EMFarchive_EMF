@@ -37,11 +37,11 @@ public class ControlMeasureEfficiency implements Serializable, Lockable {
         this.name = name;
     }
 
-    public EfficiencyRecord[] getEifficiencyRecords() {
+    public EfficiencyRecord[] getEfficiencyRecords() {
         return (EfficiencyRecord[])efficiencyRecords.toArray(new EfficiencyRecord[0]);
     }
 
-    public void setCostRecords(EfficiencyRecord[] efficiencyRecords) {
+    public void setEfficiencyRecords(EfficiencyRecord[] efficiencyRecords) {
         this.efficiencyRecords.clear();
         this.efficiencyRecords.addAll(Arrays.asList(efficiencyRecords));
     }
