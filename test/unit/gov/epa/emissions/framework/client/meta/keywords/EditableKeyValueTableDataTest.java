@@ -54,7 +54,7 @@ public class EditableKeyValueTableDataTest extends TestCase {
         assertEquals(3, columns.length);
         assertEquals("Select", columns[0]);
         assertEquals("Keyword", columns[1]);
-        assertEquals("Default Value", columns[2]);
+        assertEquals("Value", columns[2]);
     }
 
     public void testShouldReturnBooleanAsColumnClassForSelectColumnAndStringForAllOtherColumns() {
