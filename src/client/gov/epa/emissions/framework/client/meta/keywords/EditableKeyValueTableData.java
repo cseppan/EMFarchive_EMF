@@ -31,7 +31,7 @@ public class EditableKeyValueTableData extends AbstractEditableTableData impleme
     }
 
     public String[] columns() {
-        return new String[] { "Select", "Keyword", "Default Value" };
+        return new String[] { "Select", "Keyword", "Value" };
     }
 
     public List rows() {
