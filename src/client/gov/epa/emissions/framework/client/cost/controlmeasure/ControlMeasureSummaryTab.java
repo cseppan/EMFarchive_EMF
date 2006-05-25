@@ -95,10 +95,9 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         super.setLayout(new BorderLayout());
         super.add(createOverviewSection(), BorderLayout.PAGE_START);
         super.add(createAttributeSection(), BorderLayout.CENTER);
-        populateFields();
     }
 
-    private void populateFields() {
+    protected void populateFields() {
         String cmName = measure.getName();
         Date modifiedTime = measure.getLastModifiedTime();
         Region cmRegion = measure.getRegion();

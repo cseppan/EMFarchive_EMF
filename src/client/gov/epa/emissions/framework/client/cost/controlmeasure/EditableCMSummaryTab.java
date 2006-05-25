@@ -20,6 +20,15 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
         super.setName("summary");
         this.verifier = new NumberFieldVerifier("Summary tab: ");
     }
+    
+    public void populateDefaultValues() {
+        ruleEffectiveness.setText("1.0");
+        rulePenetration.setText("1.0");
+    }
+    
+    public void populateValues() {
+        super.populateFields();
+    }
 
     public void save(ControlMeasure measure) throws EmfException {
         validateFields();
