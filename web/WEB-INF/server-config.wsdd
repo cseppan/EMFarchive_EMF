@@ -249,6 +249,14 @@
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.CostRecord"
 		qname="ns1:CostRecord" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.ControlMeasureEfficiency"
+		qname="ns1:ControlMeasureEfficiency" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.EfficiencyRecord"
+		qname="ns1:EfficiencyRecord" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 	
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlStrategy"
@@ -467,6 +475,16 @@
 	<arrayMapping qname="ns1:ControlMeasureCosts" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.ControlMeasureCost[]"
 		innerType="ns1:ControlMeasureCost"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<arrayMapping qname="ns1:EfficiencyRecords" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.EfficiencyRecord[]"
+		innerType="ns1:EfficiencyRecord"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<arrayMapping qname="ns1:ControlMeasureEfficiencys" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.ControlMeasureEfficiency[]"
+		innerType="ns1:ControlMeasureEfficiency"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 			
 	<arrayMapping qname="ns1:ControlStrategies"

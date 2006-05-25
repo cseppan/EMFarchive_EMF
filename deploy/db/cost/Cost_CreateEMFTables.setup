@@ -25,6 +25,7 @@ CREATE TABLE emf.control_measures
   creator int4  REFERENCES emf.users(id),
   region int4  REFERENCES emf.regions(id),
   cost int4 REFERENCES emf.control_measure_costs (id),
+  efficiency int4 REFERENCES emf.control_measure_efficiency (id),
   rule_effectiveness real,
   rule_penetration real,
   min_uncontrolled_emissions real,

@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
+import gov.epa.emissions.framework.services.cost.data.ControlMeasureEfficiency;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,6 +42,8 @@ public class ControlMeasure implements Lockable, Serializable {
     private Region region;
     
     private ControlMeasureCost cost;
+    
+    private ControlMeasureEfficiency efficiency;
 
     private String cmClass;
 
@@ -254,5 +257,13 @@ public class ControlMeasure implements Lockable, Serializable {
 
     public void setCost(ControlMeasureCost cost) {
         this.cost = cost;
+    }
+
+    public ControlMeasureEfficiency getEfficiency() {
+        return efficiency;
+    }
+
+    public void setEfficiency(ControlMeasureEfficiency efficiency) {
+        this.efficiency = efficiency;
     }
 }

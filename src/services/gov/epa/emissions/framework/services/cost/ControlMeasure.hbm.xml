@@ -37,6 +37,10 @@
             name="cost" 
             class="gov.epa.emissions.framework.services.cost.data.ControlMeasureCost"
             column="cost"/> 
+        <many-to-one cascade="save-update"
+            name="efficiency" 
+            class="gov.epa.emissions.framework.services.cost.data.ControlMeasureEfficiency"
+            column="efficiency"/> 
             
        <array name="sccs" table="control_measure_sccs" >
     	<key column="control_measures_id" not-null="true"/>

@@ -82,14 +82,17 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
         return (JPanel) view;
     }
     
-    private Component createCostsTab(ControlMeasure measure, MessagePanel messagePanel2) {
+    private Component createCostsTab(ControlMeasure measure, MessagePanel messagePanel) {
         EditableCostsTabView view = new EditableCostsTab(measure, this, parent, desktopManager, messagePanel);
         presenter.set(view);
         return (JPanel) view;
     }
 
-    private Component createEfficiencyTab(ControlMeasure measure, MessagePanel messagePanel2) {
-        return new JPanel();
+    private Component createEfficiencyTab(ControlMeasure measure, MessagePanel messagePanel) {
+        EditableEfficiencyTab view = new EditableEfficiencyTab(measure, this, parent, desktopManager, messagePanel);
+        presenter.set(view);
+        
+        return view;
     }
 
     private JPanel createSummaryTab(ControlMeasure measure, MessagePanel messagePanel) {

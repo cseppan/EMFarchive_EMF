@@ -67,5 +67,10 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         presenters.add(costTabPresenter);
     }
 
+    public void set(EditableEfficiencyTabView effTabView) {
+        EditableCMEfficiencyTabPresenterImpl effTabPresenter = new EditableCMEfficiencyTabPresenterImpl(measure, effTabView);
+        presenters.add(effTabPresenter);
+    }
+
 
 }

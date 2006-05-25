@@ -13,4 +13,6 @@ public interface ControlMeasurePresenter {
     void set(EditableCMTabView controlMeasureTabView);
     
     void set(EditableCostsTabView costTabView);
+    
+    void set(EditableEfficiencyTabView effTabView);
 }

@@ -23,7 +23,9 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
+import gov.epa.emissions.framework.services.cost.data.ControlMeasureEfficiency;
 import gov.epa.emissions.framework.services.cost.data.CostRecord;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
@@ -90,6 +92,8 @@ public class DataMappings extends Mappings {
         bean(call, ControlStrategy.class, controlStrategy());
         bean(call, ControlMeasureCost.class, controlMeasureCost());
         bean(call, CostRecord.class, costRecord());
+        bean(call, ControlMeasureEfficiency.class, controlMeasureEfficiency());
+        bean(call, EfficiencyRecord.class, efficiencyRecord());
     }
 
     private void registerArrays(Call call) {
@@ -131,6 +135,8 @@ public class DataMappings extends Mappings {
         array(call, ControlStrategy[].class, controlStrategies());
         array(call, CostRecord[].class, costRecords());
         array(call, ControlMeasureCost[].class, controlMeasureCosts());
+        array(call, EfficiencyRecord[].class, efficiencyRecords());
+        array(call, ControlMeasureEfficiency[].class, controlMeasureEfficiencys());
     }
 
     public QName logs() {
@@ -335,6 +341,22 @@ public class DataMappings extends Mappings {
     
     private QName controlMeasureCosts() {
         return qname("ControlMeasureCosts");
+    }
+    
+    private QName efficiencyRecord() {
+        return qname("EfficiencyRecord");
+    }
+
+    private QName efficiencyRecords() {
+        return qname("EfficiencyRecords");
+    }
+
+    private QName controlMeasureEfficiency() {
+        return qname("ControlMeasureEfficiency");
+    }
+
+    private QName controlMeasureEfficiencys() {
+        return qname("ControlMeasureEfficiencys");
     }
 
 }
