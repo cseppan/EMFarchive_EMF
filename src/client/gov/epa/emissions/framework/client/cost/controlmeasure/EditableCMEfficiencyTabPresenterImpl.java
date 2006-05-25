@@ -7,14 +7,11 @@ public class EditableCMEfficiencyTabPresenterImpl implements ControlMeasureTabPr
 
     private EditableEfficiencyTabView view;
 
-    private ControlMeasure measure;
-
-    public EditableCMEfficiencyTabPresenterImpl(ControlMeasure measure, EditableEfficiencyTabView view) {
-        this.measure = measure;
+    public EditableCMEfficiencyTabPresenterImpl(EditableEfficiencyTabView view) {
         this.view = view;
     }
 
-    public void doSave() throws EmfException {
+    public void doSave(ControlMeasure measure) throws EmfException {
         view.save(measure);
     }
 

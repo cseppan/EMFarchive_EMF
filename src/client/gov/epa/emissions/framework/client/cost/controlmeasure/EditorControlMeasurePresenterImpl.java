@@ -59,7 +59,7 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
             throws EmfException {
         for (Iterator iter = presenters.iterator(); iter.hasNext();) {
             ControlMeasureTabPresenter element = (ControlMeasureTabPresenter) iter.next();
-            element.doSave();
+            element.doSave(measure);
         }
 
         service.updateMeasure(measure);
@@ -69,17 +69,17 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
     }
 
     public void set(EditableCMTabView summary) {
-        EditableCMSummaryTabPresenterImpl summaryPresenter = new EditableCMSummaryTabPresenterImpl(measure, summary);
-        presenters.add(summaryPresenter);
+        ControlMeasureTabPresenterImpl tabPresenter = new ControlMeasureTabPresenterImpl(summary);
+        presenters.add(tabPresenter);
     }
 
     public void set(EditableCostsTabView costTabView) {
-        EditableCMCostTabPresenterImpl costTabPresenter = new EditableCMCostTabPresenterImpl(measure, costTabView);
+        EditableCMCostTabPresenterImpl costTabPresenter = new EditableCMCostTabPresenterImpl(costTabView);
         presenters.add(costTabPresenter);
     }
 
     public void set(EditableEfficiencyTabView effTabView) {
-        EditableCMEfficiencyTabPresenterImpl effTabPresenter = new EditableCMEfficiencyTabPresenterImpl(measure, effTabView);
+        EditableCMEfficiencyTabPresenterImpl effTabPresenter = new EditableCMEfficiencyTabPresenterImpl(effTabView);
         presenters.add(effTabPresenter);
     }
 

@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
-public class EditableCMSummaryTabPresenterTest extends MockObjectTestCase {
+public class ControlMeasureTabPresenterTest extends MockObjectTestCase {
 
     public void testUpdateDatasetOnSave() throws EmfException {
         Mock measure = mock(ControlMeasure.class);
@@ -15,9 +15,9 @@ public class EditableCMSummaryTabPresenterTest extends MockObjectTestCase {
         Object measureProxy = measure.proxy();
         view.expects(once()).method("save").with(eq(measureProxy));
 
-        EditableCMSummaryTabPresenter presenter = new EditableCMSummaryTabPresenterImpl((ControlMeasure) measureProxy, (EditableCMTabView) view
+        ControlMeasureTabPresenter presenter = new EditableCMSummaryTabPresenterImpl((EditableCMTabView) view
                 .proxy());
 
-        presenter.doSave();
+        presenter.doSave((ControlMeasure) measure.proxy());
     }
 }
