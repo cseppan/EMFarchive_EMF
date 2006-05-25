@@ -7,7 +7,7 @@
 <listEntry value="4"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="EMF"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DEMF_PREFERENCE=&quot;C:\Documents and Settings\CEP user\EMFPrefs.txt&quot;"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DEMF_PREFERENCE=&quot;deploy/preference/EMFPrefs.txt&quot;&#13;&#10;-DUSER_PREFERENCES=&quot;sort_filter_selection_panel_format_pref.txt&quot;"/>
 <stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JDK 1.5"/>
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
