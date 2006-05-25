@@ -11,6 +11,17 @@ CREATE TABLE emf.control_measure_costs
 WITHOUT OIDS;
 -- emf.control_measure_costs
 
+-- emf.control_measure_efficiency
+CREATE TABLE emf.control_measure_efficiency
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255),
+  lock_owner varchar(255),
+  lock_date timestamp
+)
+WITHOUT OIDS;
+-- emf.control_measure_efficiency
+
 -- emf.control_measures
 CREATE TABLE emf.control_measures
 (
@@ -101,17 +112,6 @@ CREATE TABLE emf.cmcost_costrecords
 ) 
 WITHOUT OIDS;
 -- emf.cmcost_costrecords
-
--- emf.control_measure_efficiency
-CREATE TABLE emf.control_measure_efficiency
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255),
-  lock_owner varchar(255),
-  lock_date timestamp
-)
-WITHOUT OIDS;
--- emf.control_measure_efficiency
 
 -- emf.cm_efficiency_records
 CREATE TABLE emf.cm_efficiency_records
