@@ -29,7 +29,7 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
 
     private EfficiencyRecordPresenter presenter;
 
-    private TextField name, efficiency;
+    private TextField efficiency;
     
     private EditableComboBox pollutant;
     
@@ -49,13 +49,16 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
             "CO2", "EC", "OC", "NH3", "Hg" };
 
     public EfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager) {
-        super("Efficiency Record", new Dimension(400, 200), desktopManager);
+        super("Efficiency Record", new Dimension(400, 180), desktopManager);
         this.changeablesList = changeablesList;
         this.verifier = new NumberFieldVerifier("");
     }
 
     public void display(ControlMeasure measure, EfficiencyRecord record) {
-        super.setLabel(super.getTitle() + " " + ++count + " for Control Measure: " + measure.getName());
+        String name = measure.getName();
+        if(name == null)
+            name = "New Control Measure";
+        super.setLabel(super.getTitle() + " " + ++count + " for Control Measure: " + name);
         JPanel layout = createLayout(measure);
         super.getContentPane().add(layout);
         super.display();
@@ -81,11 +84,6 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        name = new TextField("", 20);
-        name.setName("Name");
-        changeablesList.addChangeable(name);
-        layoutGenerator.addLabelWidgetPair("Name:", name, panel);
-
         pollutant = new EditableComboBox(pollutants);
         pollutant.setName("Pollutant");
         changeablesList.addChangeable(pollutant);
@@ -97,7 +95,7 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
         layoutGenerator.addLabelWidgetPair("Efficiency:", efficiency, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -105,7 +103,6 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
     }
     
     private void populateFields() {
-        name.setText(record.getName());
         pollutant.setSelectedItem(record.getPollutant());
         efficiency.setText(record.getEfficiency()+"");
     }
@@ -156,7 +153,6 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
     }
 
     private EfficiencyRecord setRecord(EfficiencyRecord record) {
-        record.setName(name.getText());
         record.setPollutant(pollutant.getSelectedItem()+"");
         record.setEfficiency(efficiencyValue);
         

@@ -48,11 +48,6 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
             throw new EmfException("Summary tab: Name should be a non-empty string.");
         }
 
-        if (abbreviation.getText().equals("")) {
-            throw new EmfException("Summary tab: Abbreviation should be an 8-character string.");
-        }
-
-
         year = verifier.parseInteger(costYear);
         deviceId = verifier.parseInteger(deviceCode);
         effectivness = verifier.parseFloat(ruleEffectiveness);

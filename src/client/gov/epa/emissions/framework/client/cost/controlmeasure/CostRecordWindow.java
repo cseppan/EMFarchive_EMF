@@ -29,7 +29,7 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
 
     private CostRecordPresenter presenter;
 
-    private TextField name, year, discountRate, a, b;
+    private TextField year, discountRate, a, b;
     
     private EditableComboBox pollutant;
     
@@ -51,13 +51,16 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
             "CO2", "EC", "OC", "NH3", "Hg" };
 
     public CostRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager) {
-        super("Cost Record", new Dimension(400, 300), desktopManager);
+        super("Cost Record", new Dimension(430, 260), desktopManager);
         this.changeablesList = changeablesList;
         this.verifier = new NumberFieldVerifier("");
     }
 
     public void display(ControlMeasure measure, CostRecord record) {
-        super.setLabel(super.getTitle() + " " + ++count + " for Control Measure: " + measure.getName());
+        String name = measure.getName();
+        if(name == null)
+            name = "New Control Measure";
+        super.setLabel(super.getTitle() + " " + ++count + " for Control Measure: " + name);
         JPanel layout = createLayout(measure);
         super.getContentPane().add(layout);
         super.display();
@@ -82,11 +85,6 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
     private Component recordPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-
-        name = new TextField("", 20);
-        name.setName("Name");
-        changeablesList.addChangeable(name);
-        layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         pollutant = new EditableComboBox(pollutants);
         pollutant.setName("Pollutant");
@@ -114,7 +112,7 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
         layoutGenerator.addLabelWidgetPair("Constant:", b, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -122,7 +120,6 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
     }
     
     private void populateFields() {
-        name.setText(record.getName());
         pollutant.setSelectedItem(record.getPollutant());
         year.setText(record.getCostYear()+"");
         discountRate.setText(record.getDiscountRate()+"");
@@ -195,7 +192,6 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
     }
 
     private CostRecord setRecord(CostRecord record) {
-        record.setName(name.getText());
         record.setPollutant(pollutant.getSelectedItem()+"");
         record.setCostYear(costYear);
         record.setA(paramA);

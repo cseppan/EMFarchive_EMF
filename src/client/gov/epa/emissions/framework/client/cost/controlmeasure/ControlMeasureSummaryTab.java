@@ -80,9 +80,9 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     private String[] classes = { "Production", "Developmental", "Hypothetical", "Obselete" };
 
-    protected int deviceId = 1, year = 1900;
+    protected int deviceId = 1, year;
 
-    protected float cost = 0, life = 0, effectivness = 0, penetratrion = 0, minUnctrldEmiss = 0, maxUnctrldEmiss = 0;
+    protected float cost, life, effectivness, penetratrion, minUnctrldEmiss, maxUnctrldEmiss;
 
     public ControlMeasureSummaryTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel,
             ManageChangeables changeablesList) {
