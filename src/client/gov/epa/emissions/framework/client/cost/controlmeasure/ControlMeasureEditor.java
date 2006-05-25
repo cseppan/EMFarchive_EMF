@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.ui.ErrorPanel;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
@@ -77,9 +78,15 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
     }
 
     private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {
-        EditableCMTabView view = new EditableCMSCCTab(measure, session,this, messagePanel, parent);
-        presenter.set(view);
-        return (JPanel) view;
+        EditableCMTabView view;
+        try {
+            view = new EditableCMSCCTab(measure, session,this, messagePanel, parent);
+            presenter.set(view);
+            return (JPanel) view;
+        } catch (EmfException e) {
+            return new ErrorPanel("Could not create SCC tab\n"+e.getMessage());
+        }
+        
     }
     
     private Component createCostsTab(ControlMeasure measure, MessagePanel messagePanel) {

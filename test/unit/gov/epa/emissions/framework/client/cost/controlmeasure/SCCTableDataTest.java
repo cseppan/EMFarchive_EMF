@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+
 import java.util.List;
 
 import junit.framework.TestCase;

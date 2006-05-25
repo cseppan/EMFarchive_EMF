@@ -6,7 +6,10 @@ import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.CostService;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -33,18 +36,20 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
 
     private JPanel mainPanel;
 
+    private EmfSession session;
+
     public EditableCMSCCTab(ControlMeasure measure, EmfSession session, ManageChangeables changeables,
-            MessagePanel messagePanel, EmfConsole parent) {
+            MessagePanel messagePanel, EmfConsole parent) throws EmfException {
         this.parent = parent;
         this.messagePanel = messagePanel;
+        this.session = session;
         this.parent = parent;
         mainPanel = new JPanel(new BorderLayout());
         doLayout(measure, changeables);
     }
 
-    private void doLayout(ControlMeasure measure, ManageChangeables changeables) {
-        String[] sccs = measure.getSccs();
-        Scc[] sccObjs = createSccs(sccs);
+    private void doLayout(ControlMeasure measure, ManageChangeables changeables) throws EmfException {
+        Scc[] sccObjs = createSccs(measure);
         SortFilterSelectionPanel sortFilterSelectionPanel = sortFilterPanel(sccObjs);
         mainPanel.removeAll();
         mainPanel.add(sortFilterSelectionPanel);
@@ -99,12 +104,11 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
         messagePanel.setError("Under construction");
     }
 
-    private Scc[] createSccs(String[] sccs) {
-        Scc[] sccObjs = new Scc[sccs.length];
-        for (int i = 0; i < sccs.length; i++) {
-            sccObjs[i] = new Scc(sccs[i], "");// FIXME: get the description from join
-        }
-        return sccObjs;
+    private Scc[] createSccs(ControlMeasure measure) throws EmfException {
+        CostService service = session.costService();
+        Scc[] sccs = service.getSccs(measure);
+        
+        return sccs;
     }
 
     public void save(ControlMeasure measure) {
@@ -113,7 +117,7 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
         for (int i = 0; i < sccs.size(); i++) {
             ViewableRow row = (ViewableRow) sccs.get(i);
             Scc scc = (Scc) row.source();
-            newSccs[i] = scc.code();
+            newSccs[i] = scc.getCode();
         }
         measure.setSccs(newSccs);
     }

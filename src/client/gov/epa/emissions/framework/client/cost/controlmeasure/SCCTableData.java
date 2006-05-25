@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -25,7 +26,7 @@ public class SCCTableData extends AbstractTableData {
     }
 
     private Row row(Scc scc) {
-        String [] values = {scc.code(),scc.description()};
+        String [] values = {scc.getCode(),scc.getDescription()};
         return  new ViewableRow(scc,values);
     }
 

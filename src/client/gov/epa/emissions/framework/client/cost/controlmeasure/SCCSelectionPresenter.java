@@ -1,5 +1,8 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Sccs;
+
 
 public class SCCSelectionPresenter {
 

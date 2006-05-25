@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.CostService;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 
 public class CostServiceTransport implements CostService {
 
@@ -69,15 +70,27 @@ public class CostServiceTransport implements CostService {
 
         return (ControlMeasure) call.requestResponse(new Object[] { locked });
     }
-    
+
     public ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException {
         EmfCall call = call();
 
         call.setOperation("updateMeasure");
         call.addParam("measure", mappings.controlMeasure());
         call.setReturnType(mappings.controlMeasure());
-        
+
         return (ControlMeasure) call.requestResponse(new Object[] { measure });
+    }
+
+    public Scc[] getSccs(ControlMeasure measure) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getSccs");
+        call.addParam("measure", mappings.controlMeasure());
+        call.setReturnType(mappings.sccs());
+
+        Scc[] sccs = (Scc[]) call.requestResponse(new Object[] { measure });
+        
+        return sccs;
     }
 
 }

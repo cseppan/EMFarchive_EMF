@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EMFService;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 
 public interface CostService extends EMFService{
     
@@ -17,4 +18,6 @@ public interface CostService extends EMFService{
         void removeMeasure(ControlMeasure measure) throws EmfException;
         
         ControlMeasure obtainLockedMeasure(User user, ControlMeasure measure) throws EmfException;
+        
+        Scc[] getSccs(ControlMeasure measure) throws EmfException;
 }

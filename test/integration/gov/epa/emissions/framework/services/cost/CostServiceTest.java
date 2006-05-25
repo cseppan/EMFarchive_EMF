@@ -20,7 +20,7 @@ public class CostServiceTest extends ServiceTestCase {
     public void doSetUp() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
         userService = new UserServiceImpl(sessionFactory);
-        service = new CostServiceImpl(sessionFactory);
+        service = new CostServiceImpl(emf(),dbServer(),sessionFactory);
     }
 
     protected void doTearDown() throws Exception {// no op

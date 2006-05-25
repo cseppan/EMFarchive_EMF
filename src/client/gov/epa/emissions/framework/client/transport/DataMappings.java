@@ -22,6 +22,7 @@ import gov.epa.emissions.framework.services.basic.AccessLog;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
 import gov.epa.emissions.framework.services.cost.data.ControlMeasureEfficiency;
 import gov.epa.emissions.framework.services.cost.data.CostRecord;
@@ -94,6 +95,7 @@ public class DataMappings extends Mappings {
         bean(call, CostRecord.class, costRecord());
         bean(call, ControlMeasureEfficiency.class, controlMeasureEfficiency());
         bean(call, EfficiencyRecord.class, efficiencyRecord());
+        bean(call, Scc.class, scc());
     }
 
     private void registerArrays(Call call) {
@@ -137,6 +139,7 @@ public class DataMappings extends Mappings {
         array(call, ControlMeasureCost[].class, controlMeasureCosts());
         array(call, EfficiencyRecord[].class, efficiencyRecords());
         array(call, ControlMeasureEfficiency[].class, controlMeasureEfficiencys());
+        array(call, Scc[].class, sccs());
     }
 
     public QName logs() {
@@ -326,7 +329,7 @@ public class DataMappings extends Mappings {
     public QName controlStrategies() {
         return qname("ControlStrategies");
     }
-    
+
     public QName costRecord() {
         return qname("CostRecord");
     }
@@ -338,11 +341,11 @@ public class DataMappings extends Mappings {
     public QName controlMeasureCost() {
         return qname("ControlMeasureCost");
     }
-    
+
     private QName controlMeasureCosts() {
         return qname("ControlMeasureCosts");
     }
-    
+
     private QName efficiencyRecord() {
         return qname("EfficiencyRecord");
     }
@@ -357,6 +360,14 @@ public class DataMappings extends Mappings {
 
     private QName controlMeasureEfficiencys() {
         return qname("ControlMeasureEfficiencys");
+    }
+
+    public QName scc() {
+        return qname("scc");
+    }
+
+    public QName sccs() {
+        return qname("sccs");
     }
 
 }

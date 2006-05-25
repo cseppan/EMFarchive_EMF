@@ -34,7 +34,7 @@ public class EmfCall {
     public void setStringReturnType() {
         mappings.setStringReturnType(call);
     }
-
+    
     public void request(Object[] params) throws EmfException {
         try {
             call.invoke(params);

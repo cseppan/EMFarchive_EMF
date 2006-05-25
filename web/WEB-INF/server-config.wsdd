@@ -259,9 +259,13 @@
 		qname="ns1:EfficiencyRecord" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 	
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.controlmeasure.Scc"
+		qname="ns1:Scc" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlStrategy"
 		qname="ns1:ControlStrategy" xmlns:ns1="urn:gov.epa.services.EmfService"/>
-	
+		
 	<!-- CASE MANAGEMENT -->
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Case"
@@ -491,6 +495,12 @@
 		xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlStrategy[]"
 		innerType="ns1:ControlStrategy"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+	
+	<arrayMapping qname="ns1:Sccs"
+		xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.controlmeasure.Scc[]"
+		innerType="ns1:Scc"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
 </deployment>

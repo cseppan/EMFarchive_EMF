@@ -5,6 +5,8 @@ import gov.epa.emissions.commons.io.importer.CommaDelimitedTokenizer;
 import gov.epa.emissions.commons.io.importer.DelimitedFileReader;
 import gov.epa.emissions.commons.io.importer.FileVerifier;
 import gov.epa.emissions.commons.io.importer.Reader;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Sccs;
 
 import java.io.File;
 import java.util.List;
