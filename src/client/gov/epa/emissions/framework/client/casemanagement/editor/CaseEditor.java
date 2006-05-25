@@ -7,12 +7,12 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
+import gov.epa.emissions.framework.ui.ErrorPanel;
 import gov.epa.emissions.framework.ui.InfoDialog;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -21,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -59,13 +58,8 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         }
     }
 
-    protected JPanel createErrorTab(String message) {// TODO
-        JPanel panel = new JPanel(false);
-        JLabel label = new JLabel(message);
-        label.setForeground(Color.RED);
-        panel.add(label);
-
-        return panel;
+    protected JPanel createErrorTab(String message) {
+        return new ErrorPanel(message);
     }
 
     public void display(Case caseObj) {
