@@ -263,11 +263,13 @@
 		<property name="client.dist" value="${build.home}/client" />
 		<property name="client.dist.lib" value="${client.dist}/lib" />
 		<property name="client.jar" value="${client.dist}/${app.name}-client.jar" />
+		<property name="client.dist.ref" value="${client.dist}/config/ref/delimited" />
 	</target>
 
 	<target name="client-dist-sandbox" depends="clean, init, compile-client, client-env" description="Builds the sandbox for EMF Client distribution">
 		<mkdir dir="${client.dist}" />
 		<mkdir dir="${client.dist.lib}" />
+		<mkdir dir="${client.dist.ref}" />
 
 		<copy todir="${client.dist.lib}">
 			<fileset dir="${lib.dir}">
@@ -287,6 +289,18 @@
 				<include name="*.properties" />
 			</fileset>
 		</copy>
+		<copy todir="${client.dist.ref}">
+			<fileset dir="config/ref/delimited">
+				<include name="scc.txt" />
+			</fileset>
+		</copy>
+
+		<copy todir="${client.dist}">
+			<fileset dir=".">
+				<include name="sort_filter_selection_panel_format_pref.txt" />
+			</fileset>
+		</copy>
+
 	</target>
 
 	<target name="client-dist" depends="client-dist-sandbox" description="Builds the EMF Client distribution ">
@@ -347,7 +361,7 @@
 	<target name="tomcat-restart" depends="tomcat-stop, tomcat-start" />
 
 	<target name="tomcat-start">
-        <echo message="Starting with: ${tomcat.start}"/>
+		<echo message="Starting with: ${tomcat.start}" />
 		<exec executable="${jdk.home}/bin/java.exe" dir="${build.home}" output="${build.home}/tomcat-start.txt" error="${build.home}/tomcat-start-error.txt" failonerror="yes">
 			<arg line="${tomcat.start}" />
 		</exec>
@@ -447,8 +461,15 @@
 	<!--  ===============END Coverage Targets =============================== -->
 
 	<!--  ===============START Launch EMF ============================== -->
+	<!-- format preferences -->
+	<property name="url" value="http://localhost:8080/emf/services" />
+	<property name="format_pref" location="sort_filter_selection_panel_format_pref.txt" />
 	<target name="launch-EMF">
-		<java classname="gov.epa.emissions.framework.client.Launcher" classpathref="classpath" fork="true" failonerror="true" />
+		<java classname="gov.epa.emissions.framework.client.Launcher" classpathref="classpath" fork="true" failonerror="true" >
+			<jvmarg value="-DUSER_PREFERENCES=${format_pref}" />
+			<arg line="${url}" />
+
+		</java>
 	</target>
 	<!--  ===============END Launch EMF ============================== -->
 
