@@ -26,7 +26,7 @@ public class Launcher {
                         + " [url]"
                         + "\n\turl - location of EMF Services. Defaults to "
                         + DEFAULT_URL
-                        + "\n\tspecify '-DEMF_PREFERENCE=<full path to EMFPrefs.txt>' to override location of User Preferences");
+                        + "\n\tspecify '-DUSER_PREFERENCES=<full path to EMFPrefs.txt>' to override location of User Preferences");
     }
 
     private static void run(String[] args) throws Exception {

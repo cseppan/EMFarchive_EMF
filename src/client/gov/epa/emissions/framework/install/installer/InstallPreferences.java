@@ -20,7 +20,7 @@ public class InstallPreferences {
     
     private static final String WEB_SITE = "web.site";
 
-    public static final String EMF_PREFERENCE = "EMF_PREFERENCE";
+    public static final String EMF_PREFERENCE = "USER_PREFERENCES";
 
     private Properties props;
 

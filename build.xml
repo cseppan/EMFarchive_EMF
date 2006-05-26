@@ -295,12 +295,6 @@
 			</fileset>
 		</copy>
 
-		<copy todir="${client.dist}">
-			<fileset dir=".">
-				<include name="sort_filter_selection_panel_format_pref.txt" />
-			</fileset>
-		</copy>
-
 	</target>
 
 	<target name="client-dist" depends="client-dist-sandbox" description="Builds the EMF Client distribution ">

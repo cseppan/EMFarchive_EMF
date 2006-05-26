@@ -25,7 +25,7 @@ public class DefaultUserPreferences implements UserPreference {
 
     private static Log log = LogFactory.getLog(DefaultUserPreferences.class);
 
-    public static final String EMF_PREFERENCE = "EMF_PREFERENCE";
+    public static final String EMF_PREFERENCE = "USER_PREFERENCES";
 
     private Properties props;
 
