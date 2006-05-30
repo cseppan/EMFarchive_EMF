@@ -16,7 +16,7 @@
 
 
 	<target name="run" description="Runs the EMF Client">
-		<java classname="gov.epa.emissions.framework.client.Launcher" classpathref="classpath" fork="true" failonerror="true">
+		<java classname="gov.epa.emissions.framework.client.EMFClient" classpathref="classpath" fork="true" failonerror="true">
 			<jvmarg value="-DUSER_PREFERENCES=${format_pref}" />
 			<!-- URL property can be overridden on command line, using the '-D' option-->
 			<arg line="${url}" />

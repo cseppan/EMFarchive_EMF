@@ -424,7 +424,7 @@ public class InstallWindow extends JFrame implements InstallView  {
     private void checkUpdates() {
         Object[] possibleValues = { "Update", "Reinstall" };
         Object selectedValue = JOptionPane.showInputDialog(installFrame, 
-                "The TRIM Home Directory already exists. Would you like to reinstall " +
+                "The Client Home Directory already exists. Would you like to reinstall " +
                 "or update?\n Please choose one:", "Input",
                 JOptionPane.INFORMATION_MESSAGE, null,
                 possibleValues, possibleValues[0]);

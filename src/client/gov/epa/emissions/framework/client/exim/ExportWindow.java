@@ -53,7 +53,7 @@ public class ExportWindow extends DisposableInteralFrame implements ExportView {
         StringBuffer buf = new StringBuffer("Export: ");
         for (int i = 0; i < datasets.length; i++) {
             buf.append(datasets[i].getName());
-            if (i + 1 <= datasets.length)
+            if (i + 1 < datasets.length)
                 buf.append(", ");
         }
 

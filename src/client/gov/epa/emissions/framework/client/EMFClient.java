@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.client.transport.ServiceLocator;
 
 import javax.swing.JFrame;
 
-public class Launcher {
+public class EMFClient {
     private static final String DEFAULT_URL = "http://localhost:8080/emf/services";// default
 
     public static void main(String[] args) throws Exception {
@@ -22,7 +22,7 @@ public class Launcher {
     private static void displayHelp() {
         System.out
                 .println("Usage\njava "
-                        + Launcher.class.getName()
+                        + EMFClient.class.getName()
                         + " [url]"
                         + "\n\turl - location of EMF Services. Defaults to "
                         + DEFAULT_URL

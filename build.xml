@@ -262,6 +262,7 @@
 	<target name="client-env">
 		<property name="client.dist" value="${build.home}/client" />
 		<property name="client.dist.lib" value="${client.dist}/lib" />
+		<property name="client.dist.dir" value="deploy/client" />
 		<property name="client.jar" value="${client.dist}/${app.name}-client.jar" />
 		<property name="client.dist.ref" value="${client.dist}/config/ref/delimited" />
 	</target>
@@ -305,10 +306,34 @@
 		<jar jarfile="${build.home}/${app.name}-client.jar" basedir="${build.classes.dir}">
 			<include name="**/*" />
 		</jar>
+		
+	</target>
+
+	<target name="client-installer-dist" depends="clean, init, compile-client, client-env, client-dist-sandbox" description="Builds the EMF Client installer distribution files excluding dependent jar file">
+		<jar jarfile="${client.dist.dir}/${app.name}-client.jar" basedir="${build.classes.dir}">
+			<include name="**/*" />
+		</jar>
+
+		<jar jarfile="${client.dist.dir}/emf-client-installer.jar" basedir="${build.classes.dir}">
+			<include name="**/gov/epa/emissions/framework/install/installer/*" />
+            <manifest>
+                <attribute name="Main-Class"
+                    value="gov.epa.emissions.framework.install.installer.Launcher" />
+            </manifest>
+		</jar>
+		
+		<java classname="gov.epa.emissions.framework.install.installer.CreateDownloadFilesList" fork="true" failonerror="true">
+			<classpath>
+				<pathelement location="${client.jar}" />
+				<fileset dir="${client.dist.lib}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</java>
 	</target>
 
 	<target name="run-client" depends="client-env, client-dist-sandbox" description="Runs the EMF Client">
-		<java classname="gov.epa.emissions.framework.client.Launcher" fork="true" failonerror="true">
+		<java classname="gov.epa.emissions.framework.client.EMFClient" fork="true" failonerror="true">
 			<classpath>
 				<pathelement location="${client.jar}" />
 				<fileset dir="${client.dist.lib}">

@@ -34,7 +34,7 @@ public class ClientBatchFile {
         writer.println(sep + sep + "@echo on" + sep + sep);
         writer.println("%JAVA_EXE% -Xmx400M -DUSER_PREFERENCES=" + 
                 "\"" + System.getProperty("user.home") + "\\" + preference + "\" " +
-                "-classpath %CLASSPATH% gov.epa.emissions.framework.client.Launcher " +
+                "-classpath %CLASSPATH% gov.epa.emissions.framework.client.EMFClient " +
                 server + sep);
         writer.close();
          
@@ -51,21 +51,10 @@ public class ClientBatchFile {
 
     private String[] getJarFiles() throws Exception {
         File libDir = new File(batchFile.getParent() + "\\lib");
+        if (!libDir.exists())
+            libDir = new File(System.getProperty("user.dir") + "\\lib");
         String[] fileNames = libDir.list();
         return new FilePatternMatcher(libDir, "*.jar").matchingNames(fileNames);
     }
     
-//    public static void main(String[] args) {
-//        try {
-//            String fileName = System.getProperty("user.home") + "/EMFClient.bat";
-//            String preference="EMFPrefs.txt";
-//            String javahome = System.getProperty("java.home");
-//            new ClientBatchFile(fileName).create(preference, javahome);
-//            CreateDownloadFilesList filelist = new CreateDownloadFilesList("lib", ';');
-//            filelist.createFilesList();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
 }

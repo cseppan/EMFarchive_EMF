@@ -56,14 +56,22 @@ public class Tools {
         }
     }
 
-    public static void writePreference(String website, String input, String output, 
-            String javahome, String emfhome, String server) throws Exception {
+    public static void writePreference(String website, String input, String output, String javahome, String emfhome,
+            String server) throws Exception {
         String separator = Constants.SEPARATOR;
+        
+        String analysisEnginePrefString = separator + separator 
+                + "#Analysis Engine Preferences" + separator 
+                + "format.double.decimal_places=2"
+                + separator + "format.double.option=Standard_Notation" + separator
+                + "#legal options: Standard_Notation,Scientific_Notation, Dollars, Percentage, Custom" + separator
+                + "format.double.significant_digits=4";
+
         String emfPrefString = "local.input.drive=" + input.charAt(0) + ":/" + separator + "local.output.drive="
-                + output.charAt(0) + ":/" + separator + "remote.input.drive=/data/" + separator + "remote.output.drive=/data/"
-                + separator + "default.input.folder=" + input.substring(3).replace('\\', '/') + separator
-                + "default.output.folder=" + output.substring(3).replace('\\', '/') + separator
-                + "server.address=" + server + separator;
+                + output.charAt(0) + ":/" + separator + "remote.input.drive=/data/" + separator
+                + "remote.output.drive=/data/" + separator + "default.input.folder="
+                + input.substring(3).replace('\\', '/') + separator + "default.output.folder="
+                + output.substring(3).replace('\\', '/') + separator + "server.address=" + server + separator;
 
         String towrite = "#EMF Client Installer - Preferences" + separator + "#comments '#'" + separator
                 + "#preference specified by key,value pair separted by '='" + separator + "#case sensitive" + separator
@@ -78,9 +86,9 @@ public class Tools {
         PrintWriter emfPrefWriter = new PrintWriter(new BufferedWriter(new FileWriter(System.getProperty("user.home")
                 + "\\" + Constants.EMF_CLIENT_PREFERENCES_FILE)));
         userPrefWriter.write(towrite);
-        emfPrefWriter.write(emfPrefString);
+        emfPrefWriter.write(emfPrefString + analysisEnginePrefString);
         userPrefWriter.close();
         emfPrefWriter.close();
     }
-    
+
 }
