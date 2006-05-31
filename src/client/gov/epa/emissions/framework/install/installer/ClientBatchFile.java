@@ -32,6 +32,7 @@ public class ClientBatchFile {
         writer.println(sep + sep + "@echo on" + sep + sep);
         writer.println("%JAVA_EXE% -Xmx400M -DUSER_PREFERENCES=" + 
                 "\"" + System.getProperty("user.home") + "\\" + preference + "\" " +
+                "-DEMF_HOME=%EMF_HOME% " + 
                 "-classpath %CLASSPATH% gov.epa.emissions.framework.client.EMFClient " +
                 server + sep);
         writer.close();

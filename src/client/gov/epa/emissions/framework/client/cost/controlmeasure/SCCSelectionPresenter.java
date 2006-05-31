@@ -16,7 +16,10 @@ public class SCCSelectionPresenter {
 
     public void display(SCCSelectionView view) throws Exception {
         Sccs sccs = new Sccs();
-        SccFileReader reader = new SccFileReader("config/ref/delimited/scc.txt", sccs);
+        String emfHome = System.getProperty("EMF_HOME");
+        if(emfHome == null)
+            emfHome = ".";
+        SccFileReader reader = new SccFileReader(emfHome + "/config/ref/delimited/scc.txt", sccs);
         reader.read();
         view.observe(this);
         this.tableData = new SCCTableData(sccs.getSccs());

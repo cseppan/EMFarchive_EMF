@@ -265,7 +265,7 @@
 		<property name="client.dist.dir" value="deploy/client" />
 		<property name="client.jar" value="${client.dist}/${app.name}-client.jar" />
 		<property name="client.dist.ref" value="${client.dist}/config/ref/delimited" />
-		<property name="commons.class.base" value="../Commons/build/sandbox/dist/classes" />
+		<property name="scc.ref.dir" value="config/ref/delimited" />
 	</target>
 
 	<target name="client-dist-sandbox" depends="clean, init, compile-client, client-env" description="Builds the sandbox for EMF Client distribution">
@@ -311,8 +311,9 @@
 	</target>
 
 	<target name="client-installer-dist" depends="clean, init, compile-client, client-env, client-dist-sandbox" description="Builds the EMF Client installer distribution files excluding dependent jar file">
-		<jar jarfile="${client.dist.dir}/${app.name}-client.jar" basedir="${build.classes.dir}">
-			<include name="**/*" />
+		<jar jarfile="${client.dist.dir}/${app.name}-client.jar">
+			<fileset dir="${build.classes.dir}" includes="**/*" />
+			<fileset dir="." includes="${scc.ref.dir}/scc.txt" />
 		</jar>
 
 		<jar jarfile="${client.dist.dir}/emf-client-installer.jar">
