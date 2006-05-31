@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCCTab {
@@ -50,7 +51,8 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
 
     private void doLayout(ControlMeasure measure, ManageChangeables changeables) throws EmfException {
         Scc[] sccObjs = createSccs(measure);
-        SortFilterSelectionPanel sortFilterSelectionPanel = sortFilterPanel(sccObjs);
+        tableData = new SCCTableData(sccObjs);
+        SortFilterSelectionPanel sortFilterSelectionPanel = sortFilterPanel();
         mainPanel.removeAll();
         mainPanel.add(sortFilterSelectionPanel);
 
@@ -59,8 +61,7 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
         add(buttonPanel(), BorderLayout.SOUTH);
     }
 
-    private SortFilterSelectionPanel sortFilterPanel(Scc[] sccObjs) {
-        tableData = new SCCTableData(sccObjs);
+    private SortFilterSelectionPanel sortFilterPanel() {
         tableModel = new EmfTableModel(tableData);
         sortFilterSelectModel = new SortFilterSelectModel(tableModel);
         SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parent, sortFilterSelectModel);
@@ -101,7 +102,23 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
     }
 
     protected void remove() {
-        messagePanel.setError("Under construction");
+        List selected = sortFilterSelectModel.selected();
+        Scc[] records = (Scc[])selected.toArray(new Scc[0]);
+        
+        if (records.length == 0)
+            return;
+
+        String title = "Warning";
+        String message = "Are you sure you want to remove the selected row(s)?";
+        int selection = JOptionPane.showConfirmDialog(parent, message, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection == JOptionPane.YES_OPTION) {
+            tableData.remove(records);
+            SortFilterSelectionPanel panel = sortFilterPanel();
+            mainPanel.removeAll();
+            mainPanel.add(panel);
+        }
     }
 
     private Scc[] createSccs(ControlMeasure measure) throws EmfException {
@@ -123,7 +140,8 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
     }
 
     public void add(Scc[] sccs) {
-        SortFilterSelectionPanel panel = sortFilterPanel(sccs);
+        tableData.add(sccs);
+        SortFilterSelectionPanel panel = sortFilterPanel();
         mainPanel.removeAll();
         mainPanel.add(panel);
     }

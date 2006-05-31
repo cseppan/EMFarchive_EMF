@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class SCCTableData extends AbstractTableData {
@@ -44,6 +45,50 @@ public class SCCTableData extends AbstractTableData {
 
     public boolean isEditable(int col) {
         return false;
+    }
+
+    public void add(Scc[] sccs) {
+        for(int i = 0; i < sccs.length; i++)
+            rows.add(row(sccs[i]));
+        
+        refresh();
+    }
+
+    public void refresh() {
+        this.rows = createRows(sources());
+    }
+    
+    public Scc[] sources() {
+        List sources = sourcesList();
+        return (Scc[]) sources.toArray(new Scc[0]);
+    }
+
+    private List sourcesList() {
+        List sources = new ArrayList();
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            ViewableRow row = (ViewableRow) iter.next();
+            sources.add(row.source());
+        }
+        
+        return sources;
+    }
+
+    private void remove(Scc record) {
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            ViewableRow row = (ViewableRow) iter.next();
+            Scc source = (Scc) row.source();
+            if (source == record) {
+                rows.remove(row);
+                return;
+            }
+        }
+    }
+
+    public void remove(Scc[] records) {
+        for (int i = 0; i < records.length; i++)
+            remove(records[i]);
+        
+        refresh();
     }
 
 }
