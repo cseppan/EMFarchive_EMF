@@ -57,7 +57,7 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     }
 
     private String getNote() {
-        return "<html><br> Cost per ton will be calculated based on the formula:  cost/ton = slope*(uncontrolled emissions) + constant <br>" + "</html>";
+        return "<html><br>&nbsp;&nbsp;Cost per ton will be calculated based on the formula:  cost/ton = slope*(uncontrolled emissions) + constant<br></html>";
     }
 
     private void doLayout(ControlMeasure measure) {
@@ -80,8 +80,8 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
 
     private JPanel notePanel(String note) {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(new JLabel(note), BorderLayout.LINE_START);
-
+        panel.add(new JLabel(note), BorderLayout.CENTER);
+        panel.setMinimumSize(new Dimension(500,30));
         return panel;
     }
 

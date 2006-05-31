@@ -96,7 +96,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
     }
     
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Pollutant", "Efficiency" };
+        String[] columnNames = { "Pollutant", "Percent Reduction"};
         return new SortCriteria(columnNames, new boolean[] { true, true }, new boolean[] { true, true });
     }
 

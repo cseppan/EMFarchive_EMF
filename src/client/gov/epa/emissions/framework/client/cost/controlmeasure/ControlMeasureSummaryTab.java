@@ -109,8 +109,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         costYear.setText(measure.getCostYear() + "");
         deviceCode.setText(measure.getDeviceCode() + "");
         equipmentLife.setText(measure.getEquipmentLife() + "");
-        ruleEffectiveness.setText(measure.getRuleEffectiveness() + "");
-        rulePenetration.setText(measure.getRulePenetration() + "");
+        ruleEffectiveness.setText((measure.getRuleEffectiveness()*100) + "");
+        rulePenetration.setText((measure.getRulePenetration()*100) + "");
         if (modifiedTime != null)
             lastModifiedTime.setText(DATE_FORMATTER.format(modifiedTime));
         if (cmRegion != null)
@@ -224,13 +224,13 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         changeablesList.addChangeable(region);
         layoutGenerator.addLabelWidgetPair("Region:", region, panel);
         
-        ruleEffectiveness = new TextField("Rule Effectiveness", 15);
+        ruleEffectiveness = new TextField("Rule Effectiveness (%)", 15);
         changeablesList.addChangeable(ruleEffectiveness);
-        layoutGenerator.addLabelWidgetPair("Rule Effectiveness:", ruleEffectiveness, panel);
+        layoutGenerator.addLabelWidgetPair("Rule Effectiveness (%):", ruleEffectiveness, panel);
 
-        rulePenetration = new TextField("Rule Penetration", 15);
+        rulePenetration = new TextField("Rule Penetration (%)", 15);
         changeablesList.addChangeable(rulePenetration);
-        layoutGenerator.addLabelWidgetPair("Rule Penetration:", rulePenetration, panel);
+        layoutGenerator.addLabelWidgetPair("Rule Penetration (%):", rulePenetration, panel);
 
         sectors = new ListWidget(new String[] { "               " }, new String[] { "" });
         JScrollPane listScroller = new JScrollPane(sectors);
@@ -251,21 +251,21 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         changeablesList.addChangeable(costYear);
         layoutGenerator.addLabelWidgetPair("Cost year:", costYear, panel);
 
-        minUncontrolledEmission = new TextField("Min Uncntrld. Emission", 15);
+        minUncontrolledEmission = new TextField("Min Uncntrld. Emissions (T/yr)", 15);
         changeablesList.addChangeable(minUncontrolledEmission);
-        layoutGenerator.addLabelWidgetPair("Min Uncntrld. Emission:", minUncontrolledEmission, panel);
+        layoutGenerator.addLabelWidgetPair("Min Uncntrld. Emissions (T/yr):", minUncontrolledEmission, panel);
 
-        maxUncontrolledEmission = new TextField("Max Uncntrld. Emission", 15);
+        maxUncontrolledEmission = new TextField("Max Uncntrld. Emissions (T/yr)", 15);
         changeablesList.addChangeable(maxUncontrolledEmission);
-        layoutGenerator.addLabelWidgetPair("Max Uncntrld. Emission:", maxUncontrolledEmission, panel);
+        layoutGenerator.addLabelWidgetPair("Max Uncntrld. Emissions (T/yr):", maxUncontrolledEmission, panel);
 
         equipmentLife = new TextField("Equipment life", 15);
         changeablesList.addChangeable(equipmentLife);
-        layoutGenerator.addLabelWidgetPair("Equipment life:", equipmentLife, panel);
+        layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);
 
-        deviceCode = new TextField("Device code", 15);
+        deviceCode = new TextField("NEI Device code", 15);
         changeablesList.addChangeable(deviceCode);
-        layoutGenerator.addLabelWidgetPair("Device code:", deviceCode, panel);
+        layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
         
         controlPrograms = new ListWidget(new String[] { "               " }, new String[] { "" });
         JScrollPane listScroller = new JScrollPane(controlPrograms);
@@ -287,11 +287,18 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     }
 
     private JPanel addRemoveButtonPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel();
+        // TBD: this needs to be changed so you have handles to the buttons
+        // and can set actions
+        JButton addButton = new JButton("Add");
+        addButton.setEnabled(false);
+        JButton removeButton = new JButton("Remove");
+        removeButton.setEnabled(false);
 
-        panel.add(new JButton("Add"), BorderLayout.LINE_START);
-        panel.add(new JButton("Remove"), BorderLayout.CENTER);
-
+        panel.add(addButton);
+        panel.add(removeButton);
+        // for now, disable these
+        
         return panel;
     }
 

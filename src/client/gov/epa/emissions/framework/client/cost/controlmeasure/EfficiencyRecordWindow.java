@@ -89,10 +89,11 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
         changeablesList.addChangeable(pollutant);
         layoutGenerator.addLabelWidgetPair("Pollutant:", pollutant, panel);
 
-        efficiency = new TextField("", 20);
-        efficiency.setName("Efficiency");
+        efficiency = new TextField("", 10);
+        efficiency.setName("Percent Reduction");
         changeablesList.addChangeable(efficiency);
-        layoutGenerator.addLabelWidgetPair("Efficiency:", efficiency, panel);
+        layoutGenerator.addLabelWidgetPair("Percent Reduction (%):", efficiency, panel);
+        efficiency.setToolTipText("Enter the percent reduction as a percentage (e.g., 90%, or -10% for a disbenefit)");
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
@@ -110,6 +111,8 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
     protected void verifyInput() {
         try {
             efficiencyValue = verifier.parseFloat(efficiency);
+            if (efficiencyValue > 100)
+                throw new EmfException("Percent reduction must be less than or equal to 100.0");
             verified = true;
         } catch (EmfException e) {
             verified = false;

@@ -41,8 +41,8 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
         measure.setDeviceCode(deviceId);
         measure.setEquipmentLife(life);
         measure.setMajorPollutant(majorPollutant.getSelectedItem() + "");
-        measure.setRuleEffectiveness(effectivness);
-        measure.setRulePenetration(penetratrion);
+        measure.setRuleEffectiveness((float)(effectivness/100.0));
+        measure.setRulePenetration((float)(penetratrion/100.0));
         measure.setCmClass(cmClass.getSelectedItem() + "");
         measure.setRegion((Region)region.getSelectedItem());
         measure.setLastModifiedTime(new Date());
@@ -64,6 +64,14 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
         maxUnctrldEmiss = verifier.parseFloat(maxUncontrolledEmission);
         life = verifier.parseFloat(equipmentLife);
         penetratrion = verifier.parseFloat(rulePenetration);
+        if ((effectivness < 0) || (effectivness > 100))
+        {
+            throw new EmfException("Rule Effectiveness must be between 0 and 100");
+        }
+        if ((penetratrion < 0) || (penetratrion > 100))
+        {
+            throw new EmfException("Rule Penetration must be between 0 and 100");
+        }
     }
     
 }

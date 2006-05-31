@@ -22,7 +22,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Pollutant", "Efficiency" };
+        return new String[] { "Pollutant", "Percent Reduction" };
     }
 
     public List rows() {

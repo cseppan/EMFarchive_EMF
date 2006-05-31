@@ -38,7 +38,7 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public ControlMeasureEditor(EmfConsole parent, EmfSession session, DesktopManager desktopManager) {
-        super("Control Measure Editor", new Dimension(700, 510), desktopManager);
+        super("Control Measure Editor", new Dimension(750, 510), desktopManager);
         this.desktopManager = desktopManager;
         this.session = session;
         this.parent = parent;
