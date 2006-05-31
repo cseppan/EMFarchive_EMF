@@ -265,6 +265,7 @@
 		<property name="client.dist.dir" value="deploy/client" />
 		<property name="client.jar" value="${client.dist}/${app.name}-client.jar" />
 		<property name="client.dist.ref" value="${client.dist}/config/ref/delimited" />
+		<property name="commons.class.base" value="../Commons/build/sandbox/dist/classes" />
 	</target>
 
 	<target name="client-dist-sandbox" depends="clean, init, compile-client, client-env" description="Builds the sandbox for EMF Client distribution">
@@ -314,8 +315,9 @@
 			<include name="**/*" />
 		</jar>
 
-		<jar jarfile="${client.dist.dir}/emf-client-installer.jar" basedir="${build.classes.dir}">
-			<include name="**/gov/epa/emissions/framework/install/installer/*" />
+		<jar jarfile="${client.dist.dir}/emf-client-installer.jar">
+			<fileset dir="${build.classes.dir}" includes="gov/epa/emissions/framework/install/installer/*" />
+			
             <manifest>
                 <attribute name="Main-Class"
                     value="gov.epa.emissions.framework.install.installer.Launcher" />

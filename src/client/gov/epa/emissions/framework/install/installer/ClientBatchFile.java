@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.install.installer;
 
-import gov.epa.emissions.commons.io.importer.FilePatternMatcher;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;

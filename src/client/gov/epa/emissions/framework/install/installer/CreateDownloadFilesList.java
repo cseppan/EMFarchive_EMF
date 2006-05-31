@@ -18,12 +18,16 @@ public class CreateDownloadFilesList {
     private PrintWriter printer;
 
     private int counter = 0;
+    
+    private File sccFile, clientJarFile;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mmaaa");
 
     public CreateDownloadFilesList(String dir, char delimiter) {
         this.dir = dir;
         this.delimiter = delimiter;
+        this.sccFile = new File(Constants.SCC_FILE);
+        this.clientJarFile = new File(Constants.CLIENT_JAR_FILE);
     }
 
     protected void createFilesList() throws Exception {
@@ -36,6 +40,8 @@ public class CreateDownloadFilesList {
                 + "deploy" + File.separatorChar + "client" + File.separatorChar + Constants.FILE_LIST)));
         printHeader();
         createFilesList(files);
+        print(sccFile);
+        print(clientJarFile);
         printer.close();
     }
 
@@ -44,13 +50,10 @@ public class CreateDownloadFilesList {
         String[] fileNames = path.list();
         try {
             String[] jarFiles = new FilePatternMatcher(path, "*.jar").matchingNames(fileNames);
-            File[] jars = new File[jarFiles.length + 2];
+            File[] jars = new File[jarFiles.length];
             for (int i = 0; i < jarFiles.length; i++)
                 jars[i] = new File(dir, jarFiles[i]);
 
-            jars[jarFiles.length] = new File(Constants.SCC_FILE);
-            jars[jarFiles.length + 1] = new File(Constants.CLIENT_JAR_FILE);
-            
             return jars;
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,16 +106,16 @@ public class CreateDownloadFilesList {
     }
 
     private String getRelativePath(File file) {
-         String absFilePath = file.getAbsolutePath();
-         String relativePath = "/lib/" + file.getName();
-         
-         if(absFilePath.equalsIgnoreCase(Constants.SCC_FILE))
-             relativePath = "/config/ref/delimited/" + file.getName();
-         
-         if(absFilePath.equalsIgnoreCase(Constants.CLIENT_JAR_FILE))
-             relativePath = File.separatorChar + file.getName();
-         
-        return relativePath;
+        String absFilePath = file.getAbsolutePath();
+        String relativePath = "/lib/" + file.getName();
+        
+        if(absFilePath.equalsIgnoreCase(Constants.SCC_FILE))
+            relativePath = "/config/ref/delimited/" + file.getName();
+        
+        if(absFilePath.equalsIgnoreCase(Constants.CLIENT_JAR_FILE))
+            relativePath = File.separatorChar + file.getName();
+        
+       return relativePath;
     }
 
     private void printHeader() {
