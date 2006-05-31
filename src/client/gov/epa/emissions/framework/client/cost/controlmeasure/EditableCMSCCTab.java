@@ -2,7 +2,6 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
@@ -12,6 +11,7 @@ import gov.epa.emissions.framework.services.cost.CostService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.TrackableSortFilterSelectModel;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.awt.BorderLayout;
@@ -31,13 +31,15 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
 
     private EmfTableModel tableModel;
 
-    private SortFilterSelectModel sortFilterSelectModel;
+    private TrackableSortFilterSelectModel sortFilterSelectModel;
 
     private MessagePanel messagePanel;
 
     private JPanel mainPanel;
 
     private EmfSession session;
+    
+    private ManageChangeables changeables;
 
     public EditableCMSCCTab(ControlMeasure measure, EmfSession session, ManageChangeables changeables,
             MessagePanel messagePanel, EmfConsole parent) throws EmfException {
@@ -50,6 +52,7 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
     }
 
     private void doLayout(ControlMeasure measure, ManageChangeables changeables) throws EmfException {
+        this.changeables = changeables;
         Scc[] sccObjs = createSccs(measure);
         tableData = new SCCTableData(sccObjs);
         SortFilterSelectionPanel sortFilterSelectionPanel = sortFilterPanel();
@@ -63,7 +66,8 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
 
     private SortFilterSelectionPanel sortFilterPanel() {
         tableModel = new EmfTableModel(tableData);
-        sortFilterSelectModel = new SortFilterSelectModel(tableModel);
+        sortFilterSelectModel = new TrackableSortFilterSelectModel(tableModel);
+        changeables.addChangeable(sortFilterSelectModel);
         SortFilterSelectionPanel sortFilterSelectionPanel = new SortFilterSelectionPanel(parent, sortFilterSelectModel);
         return sortFilterSelectionPanel;
     }
@@ -72,7 +76,11 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
         JPanel panel = new JPanel();
         panel.add(new Button("Add", addAction()));
         panel.add(new Button("Remove", removeAction()));
-        return panel;
+        
+        JPanel container = new JPanel(new BorderLayout());
+        container.add(panel, BorderLayout.LINE_START);
+        
+        return container;
     }
 
     private Action addAction() {
@@ -84,7 +92,7 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
     }
 
     private void selectionView() {
-        SCCSelectionView view = new SCCSelectionDialog(parent);
+        SCCSelectionView view = new SCCSelectionDialog(parent, changeables);
         SCCSelectionPresenter presenter = new SCCSelectionPresenter(EditableCMSCCTab.this, view);
         try {
             presenter.display(view);

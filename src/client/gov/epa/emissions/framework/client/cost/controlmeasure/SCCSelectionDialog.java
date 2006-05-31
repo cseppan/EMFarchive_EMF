@@ -1,11 +1,12 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.SortFilterSelectModel;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.ui.EmfTableModel;
+import gov.epa.emissions.framework.ui.TrackableSortFilterSelectModel;
 import gov.epa.mims.analysisengine.gui.ScreenUtils;
 
 import java.awt.BorderLayout;
@@ -20,20 +21,24 @@ import javax.swing.JPanel;
 
 public class SCCSelectionDialog extends JDialog implements SCCSelectionView {
 
-    private SortFilterSelectModel selectModel;
+    private TrackableSortFilterSelectModel selectModel;
 
     private EmfConsole parent;
 
     private SCCSelectionPresenter presenter;
+    
+    private ManageChangeables changeables;
 
-    public SCCSelectionDialog(EmfConsole parent) {
+    public SCCSelectionDialog(EmfConsole parent, ManageChangeables changeables) {
         super(parent);
         this.parent = parent;
+        this.changeables = changeables;
     }
 
     public void display(SCCTableData tableData) {
         EmfTableModel tableModel = new EmfTableModel(tableData);
-        selectModel = new SortFilterSelectModel(tableModel);
+        selectModel = new TrackableSortFilterSelectModel(tableModel);
+        changeables.addChangeable(selectModel);
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parent, selectModel);
 
         Container contentPane = getContentPane();
