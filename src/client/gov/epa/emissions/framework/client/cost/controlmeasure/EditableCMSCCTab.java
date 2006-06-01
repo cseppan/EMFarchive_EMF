@@ -93,7 +93,7 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
 
     private void selectionView() {
         SCCSelectionView view = new SCCSelectionDialog(parent, changeables);
-        SCCSelectionPresenter presenter = new SCCSelectionPresenter(EditableCMSCCTab.this, view);
+        SCCSelectionPresenter presenter = new SCCSelectionPresenter(this, view);
         try {
             presenter.display(view);
         } catch (Exception exp) {
