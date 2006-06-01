@@ -49,7 +49,7 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
             "CO2", "EC", "OC", "NH3", "Hg" };
 
     public EfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager) {
-        super("Efficiency Record", new Dimension(400, 180), desktopManager);
+        super("Add Efficiency Record", new Dimension(400, 180), desktopManager);
         this.changeablesList = changeablesList;
         this.verifier = new NumberFieldVerifier("");
     }

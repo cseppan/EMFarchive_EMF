@@ -33,6 +33,7 @@ public class SCCSelectionDialog extends JDialog implements SCCSelectionView {
         super(parent);
         this.parent = parent;
         this.changeables = changeables;
+        this.setSize(600,500);
     }
 
     public void display(SCCTableData tableData) {

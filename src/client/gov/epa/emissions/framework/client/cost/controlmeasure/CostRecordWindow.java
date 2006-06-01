@@ -51,7 +51,7 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
             "CO2", "EC", "OC", "NH3", "Hg" };
 
     public CostRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager) {
-        super("Cost Record", new Dimension(430, 260), desktopManager);
+        super("Add Cost Record", new Dimension(430, 260), desktopManager);
         this.changeablesList = changeablesList;
         this.verifier = new NumberFieldVerifier("");
     }
