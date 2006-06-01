@@ -321,7 +321,7 @@
 			
             <manifest>
                 <attribute name="Main-Class"
-                    value="gov.epa.emissions.framework.install.installer.Launcher" />
+                    value="gov.epa.emissions.framework.install.installer.EMFClient" />
             </manifest>
 		</jar>
 		
@@ -336,6 +336,7 @@
 	</target>
 
 	<target name="run-client" depends="client-env, client-dist-sandbox" description="Runs the EMF Client">
+		<property name="userprefs" location="${user.home}/EMFPrefs.txt" />
 		<java classname="gov.epa.emissions.framework.client.EMFClient" fork="true" failonerror="true">
 			<classpath>
 				<pathelement location="${client.jar}" />
@@ -343,6 +344,7 @@
 					<include name="**/*.jar" />
 				</fileset>
 			</classpath>
+			<jvmarg value="-DUSER_PREFERENCES=${userprefs}" />
 		</java>
 	</target>
 
@@ -487,7 +489,7 @@
 	<property name="url" value="http://localhost:8080/emf/services" />
 	<property name="format_pref" location="sort_filter_selection_panel_format_pref.txt" />
 	<target name="launch-EMF">
-		<java classname="gov.epa.emissions.framework.client.Launcher" classpathref="classpath" fork="true" failonerror="true" >
+		<java classname="gov.epa.emissions.framework.client.EMFClient" classpathref="classpath" fork="true" failonerror="true" >
 			<jvmarg value="-DUSER_PREFERENCES=${format_pref}" />
 			<arg line="${url}" />
 
