@@ -105,9 +105,7 @@ CREATE TABLE emf.cmcost_costrecords
   name varchar(255),
   pollutant varchar(255),
   cost_year int4,
-  discount_rate real,
-  parameter_a real,
-  parameter_b real,
+  cost_per_ton real,
   UNIQUE (cmcost_id, list_index)
 ) 
 WITHOUT OIDS;

@@ -19,9 +19,7 @@
 				<property name="name" column="name" type="java.lang.String" not-null="false"/>
 		        <property name="pollutant" column="pollutant" type="java.lang.String" not-null="false"/>
         		<property name="costYear" column="cost_year" type="integer" not-null="false"/>
-        		<property name="discountRate" column="discount_rate" type="float" not-null="false"/>
-        		<property name="a" column="parameter_a" type="float" not-null="false"/>
-        		<property name="b" column="parameter_b" type="float" not-null="false"/>
+        		<property name="costPerTon" column="cost_per_ton" type="float" not-null="false"/>
       		</composite-element>
  		</array>
  	

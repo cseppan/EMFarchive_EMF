@@ -19,7 +19,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -56,9 +55,9 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
         doLayout(measure);
     }
 
-    private String getNote() {
-        return "<html><br>&nbsp;&nbsp;Cost per ton will be calculated based on the formula:  cost/ton = slope*(uncontrolled emissions) + constant<br></html>";
-    }
+//    private String getNote() {
+//        return "<html><br>&nbsp;&nbsp;Cost per ton will be calculated based on the formula:  cost/ton = slope*(uncontrolled emissions) + constant<br></html>";
+//    }
 
     private void doLayout(ControlMeasure measure) {
         this.measure = measure;
@@ -73,17 +72,17 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
         updateMainPanel(costRecords);
 
         setLayout(new BorderLayout());
-        add(notePanel(getNote()), BorderLayout.NORTH);
+//        add(notePanel(getNote()), BorderLayout.NORTH);
         add(mainPanel, BorderLayout.CENTER);
         add(controlPanel(), BorderLayout.SOUTH);
     }
 
-    private JPanel notePanel(String note) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(new JLabel(note), BorderLayout.CENTER);
-        panel.setMinimumSize(new Dimension(500,30));
-        return panel;
-    }
+//    private JPanel notePanel(String note) {
+//        JPanel panel = new JPanel(new BorderLayout());
+//        panel.add(new JLabel(note), BorderLayout.CENTER);
+//        panel.setMinimumSize(new Dimension(500,30));
+//        return panel;
+//    }
 
     private void updateMainPanel(CostRecord[] costRecords) {
         mainPanel.removeAll();
@@ -109,7 +108,7 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     }
     
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Pollutant", "Cost Year", "Discount Rate" };
+        String[] columnNames = { "Pollutant", "Cost Year", "Cost per Ton" };
         return new SortCriteria(columnNames, new boolean[] { true, true, true }, new boolean[] { true, true, true });
     }
 

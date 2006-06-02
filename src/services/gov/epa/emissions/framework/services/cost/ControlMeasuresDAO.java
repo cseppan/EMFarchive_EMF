@@ -7,6 +7,7 @@ import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -92,7 +93,11 @@ public class ControlMeasuresDAO {
 
     public Scc[] geSccs(ControlMeasure measure, Session session, DbServer dbServer) throws EmfException {
         RetrieveSCC retrieveSCC = new RetrieveSCC(measure, dbServer);
-        return retrieveSCC.sccs();
+        try {
+            return retrieveSCC.sccs();
+        } catch (SQLException e) {
+            throw new EmfException(e.getMessage());
+        }
 
     }
 

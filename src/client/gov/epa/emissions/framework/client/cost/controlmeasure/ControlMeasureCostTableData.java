@@ -22,7 +22,7 @@ public class ControlMeasureCostTableData extends AbstractEditableTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Pollutant", "Cost Year", "Discount Rate", "Slope", "Constant" };
+        return new String[] { "Pollutant", "Cost Year", "Cost per Ton" };
     }
 
     public List rows() {

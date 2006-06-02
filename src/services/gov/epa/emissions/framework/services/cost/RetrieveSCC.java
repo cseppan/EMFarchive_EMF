@@ -1,7 +1,6 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 
 import java.sql.ResultSet;
@@ -20,15 +19,14 @@ public class RetrieveSCC {
         this.dbServer = dbServer;
     }
 
-    public Scc[] sccs() throws EmfException {
+    public Scc[] sccs() throws SQLException {
         int id = measure.getId();
 
-        try {
-            ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(query(id));
-            return values(set);
-        } catch (SQLException e) {
-            throw new EmfException(e.getMessage());
-        }
+        ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(query(id));
+        Scc[] sccs = values(set);
+        dbServer.disconnect();
+
+        return sccs;
     }
 
     private Scc[] values(ResultSet rs) throws SQLException {

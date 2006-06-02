@@ -13,8 +13,7 @@ public class CostRecordRowSource implements RowSource {
 
     public Object[] values() {
         return new Object[] { source.getPollutant(), 
-                new Integer(source.getCostYear()), new Float(source.getDiscountRate()),
-                new Float(source.getA()), new Float(source.getB()) };
+                new Integer(source.getCostYear()), new Float(source.getCostPerTon()) };
     }
 
     public Object source() {

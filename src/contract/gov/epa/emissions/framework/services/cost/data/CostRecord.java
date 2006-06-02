@@ -8,25 +8,7 @@ public class CostRecord implements Serializable {
     
     private int id, costYear;
     
-    private float discountRate, a, b;
-
-    private float order;
-    
-    public float getA() {
-        return a;
-    }
-
-    public void setA(float a) {
-        this.a = a;
-    }
-
-    public float getB() {
-        return b;
-    }
-
-    public void setB(float b) {
-        this.b = b;
-    }
+    private float costPerTon;
 
     public int getCostYear() {
         return costYear;
@@ -34,14 +16,6 @@ public class CostRecord implements Serializable {
 
     public void setCostYear(int costYear) {
         this.costYear = costYear;
-    }
-
-    public float getDiscountRate() {
-        return discountRate;
-    }
-
-    public void setDiscountRate(float discountRate) {
-        this.discountRate = discountRate;
     }
 
     public int getId() {
@@ -67,13 +41,13 @@ public class CostRecord implements Serializable {
     public void setPollutant(String pollutant) {
         this.pollutant = pollutant;
     }
+
+    public float getCostPerTon() {
+        return costPerTon;
+    }
+
+    public void setCostPerTon(float costPerTon) {
+        this.costPerTon = costPerTon;
+    }
     
-    public float getOrder() {
-        return order;
-    }
-
-    public void setOrder(float order) {
-        this.order = order;
-    }
-
 }

@@ -29,13 +29,13 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
 
     private CostRecordPresenter presenter;
 
-    private TextField year, discountRate, a, b;
+    private TextField year, costPerTon;
     
     private EditableComboBox pollutant;
     
     private int costYear;
     
-    private float discount, paramA, paramB;
+    private float cost;
 
     private ManageChangeables changeablesList;
 
@@ -51,7 +51,7 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
             "CO2", "EC", "OC", "NH3", "Hg" };
 
     public CostRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager) {
-        super("Add Cost Record", new Dimension(430, 260), desktopManager);
+        super("Cost Record", new Dimension(430, 200), desktopManager);
         this.changeablesList = changeablesList;
         this.verifier = new NumberFieldVerifier("");
     }
@@ -96,23 +96,13 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
         changeablesList.addChangeable(year);
         layoutGenerator.addLabelWidgetPair("Cost year:", year, panel);
 
-        discountRate = new TextField("", 20);
-        discountRate.setName("Discount rate");
-        changeablesList.addChangeable(discountRate);
-        layoutGenerator.addLabelWidgetPair("Discount rate:", discountRate, panel);
-
-        a = new TextField("", 20);
-        a.setName("Slope");
-        changeablesList.addChangeable(a);
-        layoutGenerator.addLabelWidgetPair("Slope:", a, panel);
-
-        b = new TextField("", 20);
-        b.setName("Constant");
-        changeablesList.addChangeable(b);
-        layoutGenerator.addLabelWidgetPair("Constant:", b, panel);
+        costPerTon = new TextField("", 20);
+        costPerTon.setName("Cost per Ton");
+        changeablesList.addChangeable(costPerTon);
+        layoutGenerator.addLabelWidgetPair("Cost per Ton:", costPerTon, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 5, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -122,17 +112,13 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
     private void populateFields() {
         pollutant.setSelectedItem(record.getPollutant());
         year.setText(record.getCostYear()+"");
-        discountRate.setText(record.getDiscountRate()+"");
-        a.setText(record.getA()+"");
-        b.setText(record.getB()+"");
+        costPerTon.setText(record.getCostPerTon()+"");
     }
 
     protected void verifyInput() {
         try {
             costYear = verifier.parseInteger(year);
-            discount = verifier.parseFloat(discountRate);
-            paramA = verifier.parseFloat(a);
-            paramB = verifier.parseFloat(b);
+            cost = verifier.parseFloat(costPerTon);
             verified = true;
         } catch (EmfException e) {
             verified = false;
@@ -194,9 +180,7 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
     private CostRecord setRecord(CostRecord record) {
         record.setPollutant(pollutant.getSelectedItem()+"");
         record.setCostYear(costYear);
-        record.setA(paramA);
-        record.setB(paramB);
-        record.setDiscountRate(discount);
+        record.setCostPerTon(cost);
         
         return record;
     }

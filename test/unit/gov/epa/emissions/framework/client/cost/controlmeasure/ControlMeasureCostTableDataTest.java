@@ -14,16 +14,13 @@ public class ControlMeasureCostTableDataTest extends TestCase {
         CostRecord record2 = new CostRecord();
         CostRecord record3 = new CostRecord();
         
-        record1.setA(1);
-        record1.setB(1);
+        record1.setCostPerTon(101);
         record1.setCostYear(1901);
         
-        record2.setA(2);
-        record2.setB(2);
+        record2.setCostPerTon(102);
         record2.setCostYear(1902);
         
-        record3.setA(3);
-        record3.setB(3);
+        record3.setCostPerTon(103);
         record3.setCostYear(1903);
         
         records = new CostRecord[3];
@@ -45,9 +42,7 @@ public class ControlMeasureCostTableDataTest extends TestCase {
     public void testShouldReturnCorrectColNames() {
         assertEquals("Pollutant", data.columns()[0]);
         assertEquals("Cost Year", data.columns()[1]);
-        assertEquals("Discount Rate", data.columns()[2]);
-        assertEquals("Slope", data.columns()[3]);
-        assertEquals("Constant", data.columns()[4]);
+        assertEquals("Cost per Ton", data.columns()[2]);
     }
     
     public void testShouldReturnCorrectRowSource() {

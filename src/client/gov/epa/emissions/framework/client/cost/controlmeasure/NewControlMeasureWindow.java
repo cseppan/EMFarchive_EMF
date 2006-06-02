@@ -84,7 +84,6 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
         } catch (EmfException e) {
             return new ErrorPanel("Could not create SCC tab\n"+e.getMessage());
         }
-        
     }
 
     private Component createEfficiencyTab(ControlMeasure measure, MessagePanel messagePanel) {

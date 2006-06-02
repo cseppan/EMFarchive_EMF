@@ -86,7 +86,6 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
         } catch (EmfException e) {
             return new ErrorPanel("Could not create SCC tab\n"+e.getMessage());
         }
-        
     }
     
     private Component createCostsTab(ControlMeasure measure, MessagePanel messagePanel) {

@@ -13,7 +13,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 public class CostServiceImpl extends EmfServiceImpl implements CostService {
@@ -46,21 +45,40 @@ public class CostServiceImpl extends EmfServiceImpl implements CostService {
 
     public ControlMeasure[] getMeasures() throws EmfException {
         try {
-            List all = dao.all(sessionFactory.getSession());
+            Session session = sessionFactory.getSession();
+            List all = dao.all(session);
+            session.close();
+            session.disconnect();
+
             return (ControlMeasure[]) all.toArray(new ControlMeasure[0]);
-        } catch (HibernateException e) {
-            e.printStackTrace();
-            LOG.error("could not retrieve control measures.");
+        } catch (RuntimeException e) {
+            LOG.error("could not retrieve control measures.", e);
             throw new EmfException("could not retrieve control measures.");
         }
     }
 
-    public void addMeasure(ControlMeasure measure) {
-        dao.add(measure, sessionFactory.getSession());
+    public void addMeasure(ControlMeasure measure) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.add(measure, session);
+            session.close();
+            session.disconnect();
+        } catch (RuntimeException e) {
+            LOG.error("Could not add control measure: " + measure.getName(), e);
+            throw new EmfException("Could not add control measure: " + measure.getName());
+        }
     }
 
-    public void removeMeasure(ControlMeasure measure) {
-        dao.remove(measure, sessionFactory.getSession());
+    public void removeMeasure(ControlMeasure measure) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            dao.remove(measure, session);
+            session.close();
+            session.disconnect();
+        } catch (RuntimeException e) {
+            LOG.error("Could not remove control measure: " + measure.getName(), e);
+            throw new EmfException("Could not remove control measure: " + measure.getName());
+        }
     }
 
     public ControlMeasure obtainLockedMeasure(User owner, ControlMeasure measure) throws EmfException {
@@ -68,6 +86,7 @@ public class CostServiceImpl extends EmfServiceImpl implements CostService {
             Session session = sessionFactory.getSession();
             ControlMeasure locked = dao.obtainLocked(owner, measure, session);
             session.close();
+            session.disconnect();
 
             return locked;
         } catch (RuntimeException e) {
@@ -83,6 +102,7 @@ public class CostServiceImpl extends EmfServiceImpl implements CostService {
             Session session = sessionFactory.getSession();
             ControlMeasure released = dao.releaseLocked(locked, session);
             session.close();
+            session.disconnect();
 
             return released;
         } catch (RuntimeException e) {
@@ -94,12 +114,31 @@ public class CostServiceImpl extends EmfServiceImpl implements CostService {
     }
 
     public ControlMeasure updateMeasure(ControlMeasure measure) throws EmfException {
-        return dao.update(measure, sessionFactory.getSession());
+        try {
+            Session session = sessionFactory.getSession();
+            ControlMeasure updated = dao.update(measure, session);
+            session.close();
+            session.disconnect();
+
+            return updated;
+        } catch (RuntimeException e) {
+            LOG.error("Could not update for ControlMeasure: " + measure.getName(), e);
+            throw new EmfException("Could not update for ControlMeasure: " + measure.getName());
+        }
     }
 
     public Scc[] getSccs(ControlMeasure measure) throws EmfException {
-        Scc[] sccs = dao.geSccs(measure, sessionFactory.getSession(), dbServer);
-        return sccs;
+        try {
+            Session session = sessionFactory.getSession();
+            Scc[] sccs = dao.geSccs(measure, session, dbServer);
+            session.close();
+            session.disconnect();
+
+            return sccs;
+        } catch (RuntimeException e) {
+            LOG.error("Could not get SCCs for ControlMeasure: " + measure.getName(), e);
+            throw new EmfException("Could not get SCCs for ControlMeasure: " + measure.getName());
+        }
     }
 
 }
