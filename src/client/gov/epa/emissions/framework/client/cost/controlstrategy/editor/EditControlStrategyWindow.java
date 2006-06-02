@@ -126,6 +126,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
         Button saveButton = new Button("Save", saveAction());
         container.add(saveButton);
+        Button copyButton = new Button("Copy", saveAction());
+        container.add(copyButton);
         container.add(new Button("Close", closeAction()));
         getRootPane().setDefaultButton(saveButton);
 
