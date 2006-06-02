@@ -234,7 +234,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         layoutGenerator.addLabelWidgetPair("Discount Rate:", discountRateTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Cost Year:", costYearTextField(), panel);
-        layoutGenerator.addLabelWidgetPair("Inentory Year:", analysisYearTextField(), panel);
+        layoutGenerator.addLabelWidgetPair("Inventory Year:", analysisYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Region:", regions(), panel);
 
         // Lay out the panel.
@@ -246,19 +246,19 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private DoubleTextField discountRateTextField() {
-        discountRate = new DoubleTextField("discount rate", 0.0, 1.0, 20);
+        discountRate = new DoubleTextField("discount rate", 0.0, 1.0, 10);
         discountRate.setValue(controlStrategy.getDiscountRate());
         return discountRate;
     }
 
     private IntTextField costYearTextField() {
-        costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 20);
+        costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 10);
         costYear.setValue(controlStrategy.getCostYear());
         return costYear;
     }
 
     private IntTextField analysisYearTextField() {
-        analysisYear = new IntTextField("Inventory year", 0, Integer.MAX_VALUE, 20);
+        analysisYear = new IntTextField("Inventory year", 0, Integer.MAX_VALUE, 10);
         analysisYear.setValue(controlStrategy.getAnalysisYear());
         return analysisYear;
     }
