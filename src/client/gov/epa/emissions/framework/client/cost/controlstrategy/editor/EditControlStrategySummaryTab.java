@@ -108,7 +108,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         JPanel panel = new JPanel(new SpringLayout());
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-
+   
         layoutGenerator.addLabelWidgetPair("Name:", name(), panel);
         layoutGenerator.addLabelWidgetPair("Description:", new ScrollableComponent(description()), panel);
         layoutGenerator.addLabelWidgetPair("Project:", projects(), panel);
@@ -118,7 +118,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 6, 2, // rows, cols
-                10, 5, // initialX, initialY
+                5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
@@ -173,7 +173,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     protected DatasetType selectedDatasetType() throws EmfException {
         DatasetType datasetType = (DatasetType) datasetTypeCombo.getSelectedItem();
         if (datasetType == null) {
-            throw new EmfException("Please select a dataset type");
+            throw new EmfException("Please select an inventory type");
         }
         return datasetType;
     }
@@ -191,7 +191,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private ComboBox datasetTypeCombo() throws EmfException {
         DatasetType[] datasetTypes = session.dataCommonsService().getDatasetTypes();
-        datasetTypeCombo = new ComboBox("Choose a dataset type", datasetTypes);
+        datasetTypeCombo = new ComboBox("Choose an inventory type", datasetTypes);
         datasetTypeCombo.setSelectedItem(controlStrategy.getDatasetType());
         changeablesList.addChangeable(datasetTypeCombo);
         return datasetTypeCombo;
@@ -199,8 +199,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private ComboBox typeOfAnalysis() {
         // FIXME: temp values
-        String[] analysis = { "Maximum Reduction" };
-        ComboBox combo = new ComboBox("Choose an Analysis", analysis);
+        String[] analysis = { "Maximum Emissions Reduction" };
+        ComboBox combo = new ComboBox("Choose a type of analysis", analysis);
 
         return combo;
     }
@@ -210,8 +210,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
         layoutGenerator.addLabelWidgetPair("Type of Analysis:", typeOfAnalysis(), middlePanel);
-        layoutGenerator.addLabelWidgetPair("Dataset Type:", datasetTypeCombo(), middlePanel);
-        layoutGenerator.addLabelWidgetPair("Datasets :", datasetAndVersionPanel(), middlePanel);
+        layoutGenerator.addLabelWidgetPair("Inventory Type:", datasetTypeCombo(), middlePanel);
+        layoutGenerator.addLabelWidgetPair("Inventory Dataset:", datasetAndVersionPanel(), middlePanel);
 
         layoutGenerator.makeCompactGrid(middlePanel, 3, 2, // rows, cols
                 5, 5, // initialX, initialY
@@ -240,7 +240,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
                 5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
+                30, 10);// xPad, yPad
 
         return panel;
     }
@@ -258,7 +258,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private IntTextField analysisYearTextField() {
-        analysisYear = new IntTextField("analysis year", 0, Integer.MAX_VALUE, 20);
+        analysisYear = new IntTextField("Inventory year", 0, Integer.MAX_VALUE, 20);
         analysisYear.setValue(controlStrategy.getAnalysisYear());
         return analysisYear;
     }
@@ -362,7 +362,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         JLabel emissionReductionValue = new JLabel("  -   ");
         emissionReductionValue.setBackground(Color.white);
 
-        layoutGenerator.addLabelWidgetPair("Total Cost:", costValue, panel);
+        layoutGenerator.addLabelWidgetPair("Total Annualized Cost:", costValue, panel);
         layoutGenerator.addLabelWidgetPair("Major Pollutant Reduction:", emissionReductionValue, panel);
 
         // Lay out the panel.

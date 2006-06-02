@@ -145,7 +145,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         layoutGenerator.addWidgetPair(createLeftOverview(), createRightOverview(), panel);
-        widgetLayout(1, 2, 45, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(1, 2, 5, 5, 5, 5, layoutGenerator, panel);
 
         return panel;
     }
@@ -154,7 +154,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        name = new TextField("Control measure name", 20);
+        name = new TextField("Control measure name", 27);
         changeablesList.addChangeable(name);
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
@@ -162,7 +162,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         description = new TextArea("description", measure.getDescription());
         changeablesList.addChangeable(description);
         ScrollableComponent descPane = new ScrollableComponent(description);
-        descPane.setPreferredSize(new Dimension(225, 50));
+        descPane.setPreferredSize(new Dimension(300, 50));
         layoutGenerator.addLabelWidgetPair("Description:", descPane, panel);
 
         widgetLayout(2, 2, 5, 5, 10, 10, layoutGenerator, panel);
@@ -278,12 +278,12 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         return panel;
     }
 
-    private void widgetLayout(int i, int j, int k, int l, int m, int n, SpringLayoutGenerator layoutGenerator,
+    private void widgetLayout(int rows, int cols, int initX, int initY, int xPad, int yPad, SpringLayoutGenerator layoutGenerator,
             JPanel panel) {
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, i, j, // rows, cols
-                k, l, // initialX, initialY
-                m, n);// xPad, yPad
+        layoutGenerator.makeCompactGrid(panel, rows, cols, // rows, cols
+                initX, initY, // initialX, initialY
+                xPad, yPad);// xPad, yPad
     }
 
     private JPanel addRemoveButtonPanel() {

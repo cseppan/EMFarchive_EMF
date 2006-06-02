@@ -41,7 +41,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
-        super("Edit a Control Strategy", new Dimension(800, 510), desktopManager);
+        super("Edit a Control Strategy", new Dimension(650, 490), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
     }
@@ -80,8 +80,10 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         tabbedPane.addTab("Summary", createSummaryTab(controlStrategy));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         // These are just added to illustrate what is coming later
+        tabbedPane.addTab("Pollutants", new JPanel());
+        tabbedPane.addTab("SCCs", new JPanel());
+        tabbedPane.addTab("Counties", new JPanel());
         tabbedPane.addTab("Filters", new JPanel());
-        tabbedPane.addTab("Parameters", new JPanel());
         tabbedPane.addTab("Outputs", new JPanel());
 
         return tabbedPane;
@@ -119,7 +121,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         JPanel container = new JPanel();
         FlowLayout layout = new FlowLayout();
         layout.setHgap(20);
-        layout.setVgap(25);
+        layout.setVgap(15);
         container.setLayout(layout);
 
         Button saveButton = new Button("Save", saveAction());
@@ -127,7 +129,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         container.add(new Button("Close", closeAction()));
         getRootPane().setDefaultButton(saveButton);
 
-        container.add(Box.createHorizontalStrut(40));
+        container.add(Box.createHorizontalStrut(20));
         container.add(new Button("Run", runAction()));
         
         panel.add(container, BorderLayout.CENTER);
