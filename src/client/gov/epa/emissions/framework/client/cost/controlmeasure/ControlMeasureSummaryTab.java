@@ -106,7 +106,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         creator.setText(getText(measure.getCreator().getName()));
         majorPollutant.setSelectedItem(getText(measure.getMajorPollutant()));
         cmClass.setSelectedItem(getText(measure.getCmClass()));
-        costYear.setText(measure.getCostYear() + "");
+        //costYear.setText(measure.getCostYear() + "");
         deviceCode.setText(measure.getDeviceCode() + "");
         equipmentLife.setText(measure.getEquipmentLife() + "");
         ruleEffectiveness.setText((measure.getRuleEffectiveness()*100) + "");
@@ -247,9 +247,9 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        costYear = new TextField("Cost year", 15);
-        changeablesList.addChangeable(costYear);
-        layoutGenerator.addLabelWidgetPair("Cost year:", costYear, panel);
+//        costYear = new TextField("Cost year", 15);
+//        changeablesList.addChangeable(costYear);
+        layoutGenerator.addLabelWidgetPair(" ", new JLabel(" "), panel); // to hold the place
 
         minUncontrolledEmission = new TextField("Min Uncntrld. Emissions (T/yr)", 15);
         changeablesList.addChangeable(minUncontrolledEmission);

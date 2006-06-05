@@ -1,10 +1,13 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.ComboBox;
+import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.ReusableInteralFrame;
+import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
@@ -18,6 +21,7 @@ import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 import gov.epa.mims.analysisengine.table.SortCriteria;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -25,8 +29,10 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
 
 public class ControlMeasuresManagerWindow extends ReusableInteralFrame implements ControlMeasuresManagerView,
         RefreshObserver {
@@ -44,12 +50,22 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private EmfTableModel model;
 
     private JPanel browserPanel;
+    
+    private ComboBox pollutant;
+    
+    private EditableComboBox costYear;
 
     private DesktopManager desktopManager;
+    
+    private String[] pollutants = { "NOx", "PM10", "PM2.5", "SO2", "VOC", "CO",
+            "CO2", "EC", "OC", "NH3", "Hg" };
+
+    private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004",
+            "2005", "2006" };
 
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
             throws EmfException {
-        super("Control Measures Manager", new Dimension(650, 350), desktopManager);
+        super("Control Measures Manager", new Dimension(700, 350), desktopManager);
         super.setName("controlMeasures");
         super.setMinimumSize(new Dimension(10, 10));
         this.session = session;
@@ -85,7 +101,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         SortFilterSelectionPanel panel = new SortFilterSelectionPanel(parentConsole, selectModel);
         panel.sort(sortCriteria());
         panel.getTable().setName("controlMeasuresTable");
-        panel.setPreferredSize(new Dimension(450, 120));
+        panel.setPreferredSize(new Dimension(550, 120));
 
         return new JScrollPane(panel);
     }
@@ -111,6 +127,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new BorderLayout());
         controlPanel.add(createLeftControlPanel(), BorderLayout.LINE_START);
+        controlPanel.add(createRightControlPanel(), BorderLayout.LINE_END);
 
         return controlPanel;
     }
@@ -131,6 +148,35 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         Button newControlMeasure = new Button("New", newControlMeasureAction());
         panel.add(newControlMeasure);
 
+        return panel;
+    }
+    
+    private Component createRightControlPanel() {
+        JPanel panel = new JPanel();
+
+        pollutant = new ComboBox(pollutants);
+        panel.add(getItem("Pollutant", pollutant));
+
+        costYear = new EditableComboBox(years);
+        panel.add(getItem("Cost Year", costYear));
+
+        Button importButton = new Button("Import", viewAction());
+        panel.add(importButton);
+        importButton.setEnabled(false);
+
+        return panel;
+    }
+
+    private Component getItem(String label, JComboBox box) {
+        JPanel panel = new JPanel(new SpringLayout());
+        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        
+        box.setPreferredSize(new Dimension(80,25));
+        layoutGenerator.addLabelWidgetPair(label, box, panel);
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+                1, 1, // initialX, initialY
+                5, 5);// xPad, yPad
+        
         return panel;
     }
 

@@ -14,4 +14,6 @@ public interface EditControlStrategyPresenter {
 
     void setResults();
 
+    void stopRun();
+
 }

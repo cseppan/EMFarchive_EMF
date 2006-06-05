@@ -109,4 +109,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         summaryTabView.setResults();
     }
 
+    public void stopRun() {
+        summaryTabView.stopRun();
+    }
+
 }

@@ -47,7 +47,7 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
         measure.setRegion((Region)region.getSelectedItem());
         measure.setLastModifiedTime(new Date());
         measure.setAbbreviation(abbreviation.getText());
-        measure.setCostYear(year);
+        //measure.setCostYear(year);
     }
 
     private void validateFields() throws EmfException {
@@ -57,7 +57,7 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
             throw new EmfException("Summary tab: Name should be a non-empty string.");
         }
 
-        year = verifier.parseInteger(costYear);
+        //year = verifier.parseInteger(costYear);
         deviceId = verifier.parseInteger(deviceCode);
         effectivness = verifier.parseFloat(ruleEffectiveness);
         minUnctrldEmiss = verifier.parseFloat(minUncontrolledEmission);

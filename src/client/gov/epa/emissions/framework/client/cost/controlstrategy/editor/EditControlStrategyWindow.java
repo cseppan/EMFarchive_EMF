@@ -133,10 +133,19 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
         container.add(Box.createHorizontalStrut(20));
         container.add(new Button("Run", runAction()));
+        container.add(new Button("Stop", stopAction()));
         
         panel.add(container, BorderLayout.CENTER);
 
         return panel;
+    }
+
+    private Action stopAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                presenter.stopRun();
+            }
+        };
     }
 
     private Action runAction() {

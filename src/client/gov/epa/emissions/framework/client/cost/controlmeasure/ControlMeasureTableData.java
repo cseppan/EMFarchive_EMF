@@ -3,6 +3,8 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
+import gov.epa.emissions.framework.services.cost.data.ControlMeasureEfficiency;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -21,7 +23,7 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Creator", "Abbreviation", "Rule Eff.", "Rule Pen.", 
+        return new String[] { "Name", "Creator", "Abbreviation", "Control Eff.", "Cost per Ton", "Rule Eff.", "Rule Pen.", 
                 "Major Poll.", "Description", "Region", "Equipment Life", "Class", 
                 "Last Modified Time", "NEI Device Code" };
     }
@@ -36,6 +38,7 @@ public class ControlMeasureTableData extends AbstractTableData {
         for (int i = 0; i < measures.length; i++) {
             ControlMeasure measure = measures[i];
             Object[] values = { measure.getName(), measure.getCreator().getName(), measure.getAbbreviation(),
+                    getControlEfficiency(measure), getCostPerTon(measure),
                     new Float(measure.getRuleEffectiveness()), new Float(measure.getRulePenetration()), measure.getMajorPollutant(),
                     measure.getDescription(), getRegionName(measure), new Float(measure.getEquipmentLife()),
                     measure.getCmClass(), getLastModifiedTime(measure),
@@ -48,6 +51,22 @@ public class ControlMeasureTableData extends AbstractTableData {
         return rows;
     }
     
+    private Float getCostPerTon(ControlMeasure measure) {
+        ControlMeasureCost cost = measure.getCost();
+        if(cost != null)
+            return new Float(100);
+        
+        return null;
+    }
+
+    private Float getControlEfficiency(ControlMeasure measure) {
+        ControlMeasureEfficiency eff = measure.getEfficiency();
+        if(eff != null)
+            return new Float(0.50);
+        
+        return null;
+    }
+
     private Object getLastModifiedTime(ControlMeasure measure) {
         DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         

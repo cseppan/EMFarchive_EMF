@@ -10,4 +10,6 @@ public interface EditControlStrategySummaryTabView {
     
     void setResults();
 
+    void stopRun();
+
 }

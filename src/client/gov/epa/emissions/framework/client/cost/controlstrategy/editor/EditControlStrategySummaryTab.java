@@ -381,7 +381,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         String startDateString = getFormmatedDate(controlStrategy.getStartDate());
         startDate = new JLabel(startDateString == null?
-                "Not started" : startDateString + " by user " + controlStrategy.getCreator().getName());
+                "Not started" : startDateString + " by " + controlStrategy.getCreator().getName());
         startDate.setBackground(Color.white);
         
         String completionDateString = getFormmatedDate(controlStrategy.getCompletionDate());
@@ -398,7 +398,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("Start Date:", startDate, panel);
         layoutGenerator.addLabelWidgetPair("Completion Date:", completionDate, panel);
         layoutGenerator.addLabelWidgetPair("Total Annualized Cost:", costValue, panel);
-        layoutGenerator.addLabelWidgetPair("Major Pollutant Reduction:", emissionReductionValue, panel);
+        layoutGenerator.addLabelWidgetPair("Major Poll. Reduction:", emissionReductionValue, panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
@@ -477,9 +477,14 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
             startDate.setText(getFormmatedDate(start));
         }
         
-        controlStrategy.setRunStatus("In process");
+        controlStrategy.setRunStatus("Running");
         
         completionDate.setText("Running...");
+    }
+
+    public void stopRun() {
+        controlStrategy.setRunStatus("Stopped");
+        completionDate.setText("");
     }
 
 }
