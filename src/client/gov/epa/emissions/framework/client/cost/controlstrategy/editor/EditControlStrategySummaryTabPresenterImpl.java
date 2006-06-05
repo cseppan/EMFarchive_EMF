@@ -18,4 +18,8 @@ public class EditControlStrategySummaryTabPresenterImpl implements EditControlSt
         view.save(controlStrategy);
     }
 
+    public void setResults() {
+        view.setResults();
+    }
+    
 }

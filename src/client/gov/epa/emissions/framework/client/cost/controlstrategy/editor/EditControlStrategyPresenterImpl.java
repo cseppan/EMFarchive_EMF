@@ -22,6 +22,8 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     private ControlStrategy controlStrategy;
 
     private List presenters;
+    
+    private EditControlStrategySummaryTabView summaryTabView;
 
     public EditControlStrategyPresenterImpl(ControlStrategy controlStrategy, EmfSession session,
             EditControlStrategyView view, ControlStrategiesManagerPresenter controlStrategiesManagerPresenter) {
@@ -98,8 +100,13 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     public void set(EditControlStrategySummaryTabView view) {
+        this.summaryTabView = view;
         EditControlStrategySummaryTabPresenter presenter = new EditControlStrategySummaryTabPresenterImpl(controlStrategy,view);
         presenters.add(presenter);
+    }
+
+    public void setResults() {
+        summaryTabView.setResults();
     }
 
 }

@@ -20,7 +20,7 @@ import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.ui.DoubleTextField;
+import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.IntTextField;
 import gov.epa.emissions.framework.ui.MessagePanel;
 
@@ -30,7 +30,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -57,7 +59,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private Dimension comboSize = new Dimension(200, 20);
 
-    private DoubleTextField discountRate;
+//    private DoubleTextField discountRate;
 
     private MessagePanel messagePanel;
 
@@ -80,6 +82,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private TextField datasetTextField;
 
     private VersionPanel versionPanel;
+    
+    private JLabel startDate, completionDate, costValue,  emissionReductionValue;
 
     public EditControlStrategySummaryTab(ControlStrategy controlStrategy, EmfSession session,
             ManageChangeables changeablesList, MessagePanel messagePanel, EmfConsole parentConsole) throws EmfException {
@@ -190,11 +194,21 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private ComboBox datasetTypeCombo() throws EmfException {
-        DatasetType[] datasetTypes = session.dataCommonsService().getDatasetTypes();
+        DatasetType[] datasetTypes = getORLTypes();
         datasetTypeCombo = new ComboBox("Choose an inventory type", datasetTypes);
         datasetTypeCombo.setSelectedItem(controlStrategy.getDatasetType());
         changeablesList.addChangeable(datasetTypeCombo);
         return datasetTypeCombo;
+    }
+
+    private DatasetType[] getORLTypes() throws EmfException {
+        List orlTypes = new ArrayList();
+        DatasetType[] datasetTypes = session.dataCommonsService().getDatasetTypes();
+        for(int i = 0; i < datasetTypes.length; i++)
+            if(datasetTypes[i].getImporterClassName().indexOf("ORL") >= 0)
+                orlTypes.add(datasetTypes[i]);
+        
+        return (DatasetType[])orlTypes.toArray(new DatasetType[0]);
     }
 
     private ComboBox typeOfAnalysis() {
@@ -222,20 +236,29 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private JPanel createLowerSection() throws EmfException {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(createLowerLeftSection(), BorderLayout.CENTER);
-        panel.add(createLowerRightSection(), BorderLayout.EAST);
+        panel.add(getBorderedPanel(createLowerLeftSection(), "Parameters"), BorderLayout.WEST);
+        panel.add(resultsPanel(), BorderLayout.CENTER);
+        return panel;
+    }
+    
+    private JPanel getBorderedPanel(JPanel component, String border) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(new Border(border));
+        panel.add(component);
+        
         return panel;
     }
 
     private JPanel createLowerLeftSection() throws EmfException {
         JPanel panel = new JPanel(new SpringLayout());
-        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
+//        panel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Discount Rate:", discountRateTextField(), panel);
+//        layoutGenerator.addLabelWidgetPair("Discount Rate:", discountRateTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Cost Year:", costYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Inventory Year:", analysisYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Region:", regions(), panel);
+        layoutGenerator.addLabelWidgetPair("Major Pollutant:", majorPollutantTextField(), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
@@ -245,11 +268,11 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return panel;
     }
 
-    private DoubleTextField discountRateTextField() {
-        discountRate = new DoubleTextField("discount rate", 0.0, 1.0, 10);
-        discountRate.setValue(controlStrategy.getDiscountRate());
-        return discountRate;
-    }
+//    private DoubleTextField discountRateTextField() {
+//        discountRate = new DoubleTextField("discount rate", 0.0, 1.0, 10);
+//        discountRate.setValue(controlStrategy.getDiscountRate());
+//        return discountRate;
+//    }
 
     private IntTextField costYearTextField() {
         costYear = new IntTextField("cost year", 0, Integer.MAX_VALUE, 10);
@@ -263,30 +286,30 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return analysisYear;
     }
 
-    private JPanel createLowerRightSection() {
-        JPanel lowerRightPanel = new JPanel(new BorderLayout());
+//    private JPanel createLowerRightSection() {
+//        JPanel lowerRightPanel = new JPanel(new BorderLayout());
+//
+////        JPanel lowerRightUpperpanel = createLowerRightUpperPanel();
+//        lowerRightPanel.add(lowerRightUpperpanel);
+//        JPanel lowerRightLowerPanel = resultsPanel();
+//        lowerRightPanel.add(lowerRightLowerPanel, BorderLayout.SOUTH);
+//
+//        return lowerRightPanel;
+//    }
 
-        JPanel lowerRightUpperpanel = createLowerRightUpperPanel();
-        lowerRightPanel.add(lowerRightUpperpanel);
-        JPanel lowerRightLowerPanel = resultsPanel();
-        lowerRightPanel.add(lowerRightLowerPanel, BorderLayout.SOUTH);
-
-        return lowerRightPanel;
-    }
-
-    private JPanel createLowerRightUpperPanel() {
-        JPanel panel = new JPanel(new SpringLayout());
-
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        layoutGenerator.addLabelWidgetPair("Major Pollutant:", majorPollutantTextField(), panel);
-
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
-
-        return panel;
-    }
+//    private JPanel createLowerRightUpperPanel() {
+//        JPanel panel = new JPanel(new SpringLayout());
+//
+//        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+////        layoutGenerator.addLabelWidgetPair("Major Pollutant:", majorPollutantTextField(), panel);
+//
+//        // Lay out the panel.
+//        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
+//                5, 5, // initialX, initialY
+//                10, 10);// xPad, yPad
+//
+//        return panel;
+//    }
 
     private TextField majorPollutantTextField() {
         majorPollutant = new TextField("majorPollutant", 20);
@@ -356,21 +379,37 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         panel.setBorder(BorderFactory.createTitledBorder("Results"));
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        JLabel costValue = new JLabel("  -   ");
+        String startDateString = getFormmatedDate(controlStrategy.getStartDate());
+        startDate = new JLabel(startDateString == null?
+                "Not started" : startDateString + " by user " + controlStrategy.getCreator().getName());
+        startDate.setBackground(Color.white);
+        
+        String completionDateString = getFormmatedDate(controlStrategy.getCompletionDate());
+        completionDate = new JLabel(completionDateString == null?
+                "" : completionDateString);
+        completionDate.setBackground(Color.white);
+
+        costValue = new JLabel("");
         costValue.setBackground(Color.white);
 
-        JLabel emissionReductionValue = new JLabel("  -   ");
+        emissionReductionValue = new JLabel("");
         emissionReductionValue.setBackground(Color.white);
 
+        layoutGenerator.addLabelWidgetPair("Start Date:", startDate, panel);
+        layoutGenerator.addLabelWidgetPair("Completion Date:", completionDate, panel);
         layoutGenerator.addLabelWidgetPair("Total Annualized Cost:", costValue, panel);
         layoutGenerator.addLabelWidgetPair("Major Pollutant Reduction:", emissionReductionValue, panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
                 5, 5, // initialX, initialY
                 10, 10);// xPad, yPad
 
         return panel;
+    }
+
+    private String getFormmatedDate(Date date) {
+        return date == null ? null:DATE_FORMATTER.format(date);
     }
 
     public void save(ControlStrategy controlStrategy) throws EmfException {
@@ -381,12 +420,13 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setDatasetType(selectedDatasetType());
         isDatasetSelected(controlStrategy);
         controlStrategy.setDatasetVersion(versionPanel.datasetVersion());
-        controlStrategy.setDiscountRate(discountRate.getValue());
+        //controlStrategy.setDiscountRate(discountRate.getValue());
         controlStrategy.setCostYear(costYear.getValue());
         controlStrategy.setAnalysisYear(analysisYear.getValue());
         updateRegion();
         controlStrategy.setMajorPollutant(majorPollutant.getText());
-
+        controlStrategy.setStartDate(this.controlStrategy.getStartDate());
+        controlStrategy.setRunStatus(this.controlStrategy.getRunStatus());
     }
 
     private void isDatasetSelected(ControlStrategy controlStrategy) throws EmfException {
@@ -427,6 +467,19 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     private Project project(String projectName) {
         return new Projects(allProjects).get(projectName);
+    }
+    
+    public void setResults() {
+        Date start = controlStrategy.getStartDate();
+        if(start == null) {
+            start = new Date();
+            controlStrategy.setStartDate(start);
+            startDate.setText(getFormmatedDate(start));
+        }
+        
+        controlStrategy.setRunStatus("In process");
+        
+        completionDate.setText("Running...");
     }
 
 }

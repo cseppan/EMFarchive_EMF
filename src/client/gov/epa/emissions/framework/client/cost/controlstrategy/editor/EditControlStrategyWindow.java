@@ -41,7 +41,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
-        super("Edit a Control Strategy", new Dimension(650, 490), desktopManager);
+        super("Edit Control Strategy", new Dimension(650, 490), desktopManager);
         this.session = session;
         this.parentConsole = parentConsole;
     }
@@ -52,8 +52,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
 
     public void display(ControlStrategy controlStrategy) {
-        super.setLabel("Edit a ControlStrategy");
-
+        super.setLabel(super.getTitle() + ": " + controlStrategy.getName());
+        
         doLayout(controlStrategy);
         pack();
         super.display();
@@ -142,7 +142,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private Action runAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                //TODO:
+                presenter.setResults();
             }
         };
     }

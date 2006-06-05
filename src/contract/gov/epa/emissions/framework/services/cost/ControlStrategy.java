@@ -34,12 +34,18 @@ public class ControlStrategy implements Lockable {
     private User creator;
 
     private Date lastModifiedDate;
+    
+    private Date startDate;
 
+    private Date completionDate;
+    
     private DatasetType datasetType;
 
     private List datasetsList;
 
     private String majorPollutant;
+
+    private String runStatus;
 
     private double majorPollutantControlEfficiency;
 
@@ -226,6 +232,30 @@ public class ControlStrategy implements Lockable {
 
     public void setDatasetVersion(int datasetVersion) {
         this.datasetVersion = datasetVersion;
+    }
+
+    public Date getCompletionDate() {
+        return completionDate;
+    }
+
+    public void setCompletionDate(Date completionDate) {
+        this.completionDate = completionDate;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getRunStatus() {
+        return runStatus;
+    }
+
+    public void setRunStatus(String runStatus) {
+        this.runStatus = runStatus;
     }
 
 }

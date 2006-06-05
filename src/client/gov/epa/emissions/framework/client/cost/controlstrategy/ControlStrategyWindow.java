@@ -34,6 +34,8 @@ public class ControlStrategyWindow extends DisposableInteralFrame implements Con
 
     private TextArea description;
 
+    private static int count = 1;
+
     public ControlStrategyWindow(DesktopManager desktopManager) {
         super("Create a Control Strategy", new Dimension(500, 200), desktopManager);
         layout = new JPanel();
@@ -46,7 +48,7 @@ public class ControlStrategyWindow extends DisposableInteralFrame implements Con
     }
 
     public void display() {
-        super.setLabel("Create a ControlStrategy");
+        super.setLabel("Create New Control Strategy " + count++);
         layout.removeAll();
         doLayout(layout);
 
@@ -126,6 +128,7 @@ public class ControlStrategyWindow extends DisposableInteralFrame implements Con
                 // pass throud display()
                 ControlStrategy newControlStrategy = new ControlStrategy(name.getText());
                 newControlStrategy.setDescription(description.getText());
+                newControlStrategy.setRunStatus("Not started");
                 try {
                     presenter.doSave(newControlStrategy);
                 } catch (EmfException e) {

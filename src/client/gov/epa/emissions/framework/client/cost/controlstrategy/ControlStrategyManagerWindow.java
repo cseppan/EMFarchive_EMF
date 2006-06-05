@@ -29,6 +29,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -37,6 +38,8 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
 
     private ControlStrategiesManagerPresenter presenter;
 
+    private ControlStrategiesTableData tableData;
+    
     private SortFilterSelectModel selectModel;
 
     private EmfTableModel model;
@@ -78,7 +81,8 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     }
 
     private void doLayout(ControlStrategy[] controlStrategies) {
-        model = new EmfTableModel(new ControlStrategiesTableData(controlStrategies));
+        tableData = new ControlStrategiesTableData(controlStrategies);
+        model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         SortFilterSelectionPanel sortFilterSelectPanel = new SortFilterSelectionPanel(parentConsole, selectModel);
 
@@ -150,7 +154,11 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
 
         Button removeButton = new Button("Remove", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                removeSelectedCases();
+                try {
+                    doRemove();
+                } catch (EmfException exception) {
+                    messagePanel.setError(exception.getMessage());
+                }
             }
         });
         crudPanel.add(removeButton);
@@ -196,11 +204,28 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
             try {
                 presenter.doEdit(view, controlStrategy);
             } catch (EmfException e) {
-                e.printStackTrace();
                 messagePanel.setError(e.getMessage());
             }
         }
+    }
+    
+    protected void doRemove() throws EmfException {
+        messagePanel.clear();
+        ControlStrategy[] records = (ControlStrategy[])selected().toArray(new ControlStrategy[0]);
 
+        if (records.length == 0)
+            return;
+
+        String title = "Warning";
+        String message = "Are you sure you want to remove the selected row(s)?";
+        int selection = JOptionPane.showConfirmDialog(parentConsole, message, title, JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (selection == JOptionPane.YES_OPTION) {
+            tableData.remove(records);
+            refresh(tableData.sources());
+            presenter.doRemove(tableData.sources());
+        }
     }
 
     private List selected() {
@@ -210,10 +235,6 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
     private void createNewCase() {
         ControlStrategyView view = new ControlStrategyWindow(desktopManager);
         presenter.doNew(view);
-    }
-
-    private void removeSelectedCases() {
-        tempMessage();
     }
 
     public EmfConsole getParentConsole() {

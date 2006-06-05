@@ -84,7 +84,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
     public ControlStrategy updateControlStrategy(ControlStrategy element) throws EmfException {
         try {
             Session session = sessionFactory.getSession();
-            
+
             if (!dao.canUpdate(element, session))
                 throw new EmfException("Control Strategy name already in use");
 
@@ -96,6 +96,26 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             LOG.error("Could not update Control Strategy: " + element, e);
             throw new EmfException("Could not update ControlStrategy: " + element);
         }
+    }
+
+    public void removeControlStrategies(ControlStrategy[] elements) throws EmfException {
+        try {
+            for (int i = 0; i < elements.length; i++)
+                remove(elements[i]);
+
+        } catch (RuntimeException e) {
+            LOG.error("Could not update Control Strategy: " + elements, e);
+            throw new EmfException("Could not update ControlStrategy: " + elements);
+        }
+    }
+
+    private void remove(ControlStrategy element) throws EmfException {
+        Session session = sessionFactory.getSession();
+        if (!dao.canUpdate(element, session))
+            throw new EmfException("Control Strategy name already in use");
+
+        dao.remove(element, session);
+        session.close();
     }
 
 }

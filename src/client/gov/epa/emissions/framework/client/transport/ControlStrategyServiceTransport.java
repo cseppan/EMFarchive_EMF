@@ -70,6 +70,16 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 
         return (ControlStrategy) call.requestResponse(new Object[] { element });
     }
+
+    public void removeControlStrategies(ControlStrategy[] elements) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("removeControlStrategies");
+        call.addParam("elements", mappings.controlStrategies());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { elements });
+    }
     
     
 

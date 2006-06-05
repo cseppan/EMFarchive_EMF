@@ -12,4 +12,6 @@ public interface EditControlStrategyPresenter {
 
     void set(EditControlStrategySummaryTabView view);
 
+    void setResults();
+
 }

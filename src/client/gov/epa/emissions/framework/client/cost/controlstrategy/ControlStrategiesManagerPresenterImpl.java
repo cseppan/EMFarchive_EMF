@@ -52,4 +52,8 @@ public class ControlStrategiesManagerPresenterImpl implements RefreshObserver, C
         presenter.doDisplay();
     }
 
+    public void doRemove(ControlStrategy[] strategies) throws EmfException {
+        service().removeControlStrategies(strategies);
+    }
+
 }

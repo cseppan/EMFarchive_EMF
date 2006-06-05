@@ -16,4 +16,6 @@ public interface ControlStrategiesManagerPresenter {
 
     void doEdit(EditControlStrategyView view, ControlStrategy controlStrategy) throws EmfException;
 
+    void doRemove(ControlStrategy[] strategies) throws EmfException;
+
 }

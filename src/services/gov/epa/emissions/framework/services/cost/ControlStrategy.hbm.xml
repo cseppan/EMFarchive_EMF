@@ -10,6 +10,7 @@
  	</id>
 	<property name="name"	column="name"	type="java.lang.String"	not-null="true"/>
 	<property name="description"	column="description"	type="java.lang.String"/>
+	<property name="runStatus"	column="run_status"	type="java.lang.String"/>
 	
 	<many-to-one cascade="save-update"
             name="region" 
@@ -31,6 +32,8 @@
             column="creator_id"/> 
             
   	<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
+  	<property name="startDate" column="start_date" type="java.util.Date" not-null="false" length="4"/>
+  	<property name="completionDate" column="completion_date" type="java.util.Date" not-null="false" length="4"/>
 
   	<array name="datasets" table="datasets_control_strategies" >
     	<key column="control_strategy_id" not-null="true"/>

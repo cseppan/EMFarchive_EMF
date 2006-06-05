@@ -73,4 +73,8 @@ public class ControlStrategyDAO {
     public boolean exists(int id, Class clazz, Session session) {
         return hibernateFacade.exists(id, clazz, session);
     }
+    
+    public void remove(ControlStrategy strategy, Session session) {
+        hibernateFacade.remove(strategy, session);
+    }
 }
