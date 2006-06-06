@@ -35,11 +35,11 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
 
         measure.setName(name.getText());
         measure.setDescription(description.getText());
-        measure.setMinUncontrolledEmissions(minUnctrldEmiss);
-        measure.setMaxUncontrolledEmissions(maxUnctrldEmiss);
+        if (minUncontrolledEmission.getText().length() > 0) measure.setMinUncontrolledEmissions(minUnctrldEmiss);
+        if (maxUncontrolledEmission.getText().length() > 0) measure.setMaxUncontrolledEmissions(maxUnctrldEmiss);
         measure.setCreator(session.user());
-        measure.setDeviceCode(deviceId);
-        measure.setEquipmentLife(life);
+        if (deviceCode.getText().length() > 0) measure.setDeviceCode(deviceId);
+        if (equipmentLife.getText().length() > 0) measure.setEquipmentLife(life);
         measure.setMajorPollutant(majorPollutant.getSelectedItem() + "");
         measure.setRuleEffectiveness((float)(effectivness/100.0));
         measure.setRulePenetration((float)(penetratrion/100.0));
