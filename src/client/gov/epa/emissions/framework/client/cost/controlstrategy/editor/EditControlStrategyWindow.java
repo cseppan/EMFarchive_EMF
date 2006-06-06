@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.*;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -124,16 +125,16 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         layout.setVgap(15);
         container.setLayout(layout);
 
-        Button saveButton = new Button("Save", saveAction());
+        Button saveButton = new SaveButton("Save", saveAction());
         container.add(saveButton);
-        Button copyButton = new Button("Copy", saveAction());
+        Button copyButton = new CopyButton("Copy", saveAction());
         container.add(copyButton);
-        container.add(new Button("Close", closeAction()));
+        container.add(new CloseButton("Close", closeAction()));
         getRootPane().setDefaultButton(saveButton);
 
         container.add(Box.createHorizontalStrut(20));
-        container.add(new Button("Run", runAction()));
-        container.add(new Button("Stop", stopAction()));
+        container.add(new RunButton("Run", runAction()));
+        container.add(new StopButton("Stop", stopAction()));
         
         panel.add(container, BorderLayout.CENTER);
 

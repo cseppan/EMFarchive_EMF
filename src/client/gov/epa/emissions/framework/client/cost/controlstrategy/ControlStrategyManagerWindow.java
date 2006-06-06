@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.*;
 import gov.epa.emissions.commons.gui.ConfirmDialog;
 import gov.epa.emissions.commons.gui.SelectAwareButton;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
@@ -145,14 +146,14 @@ public class ControlStrategyManagerWindow extends ReusableInteralFrame implement
         crudPanel.add(viewButton(confirmDialog));
         crudPanel.add(editButton(confirmDialog));
 
-        Button newButton = new Button("New", new AbstractAction() {
+        Button newButton = new NewButton("New", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 createNewCase();
             }
         });
         crudPanel.add(newButton);
 
-        Button removeButton = new Button("Remove", new AbstractAction() {
+        Button removeButton = new RemoveButton("Remove", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     doRemove();

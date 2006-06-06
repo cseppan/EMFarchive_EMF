@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.*;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -92,9 +93,9 @@ public class ControlStrategyWindow extends DisposableInteralFrame implements Con
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button saveButton = new Button("Save", saveAction());
+        Button saveButton = new SaveButton("Save", saveAction());
         container.add(saveButton);
-        container.add(new Button("Close", closeAction()));
+        container.add(new CloseButton("Close", closeAction()));
         getRootPane().setDefaultButton(saveButton);
 
         panel.add(container, BorderLayout.CENTER);
