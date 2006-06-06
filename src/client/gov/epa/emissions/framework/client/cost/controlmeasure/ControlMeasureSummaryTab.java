@@ -82,7 +82,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     protected int deviceId, year;
 
-    protected float cost, life, effectivness, penetratrion, minUnctrldEmiss, maxUnctrldEmiss;
+    protected float cost, life, effectivness, penetration, minUnctrldEmiss, maxUnctrldEmiss;
 
     public ControlMeasureSummaryTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel,
             ManageChangeables changeablesList) {
