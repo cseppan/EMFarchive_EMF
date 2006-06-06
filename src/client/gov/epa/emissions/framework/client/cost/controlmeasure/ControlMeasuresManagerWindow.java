@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.*;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
@@ -67,7 +68,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
             throws EmfException {
-        super("Control Measures Manager", new Dimension(850, 350), desktopManager);
+        super("Control Measures Manager", new Dimension(825, 350), desktopManager);
         super.setName("controlMeasures");
         super.setMinimumSize(new Dimension(10, 10));
         this.session = session;
@@ -138,17 +139,17 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private JPanel createLeftControlPanel() {
         JPanel panel = new JPanel();
 
-        Button view = new Button("View", viewAction());
+        Button view = new ViewButton("View", viewAction());
         panel.add(view);
 
-        Button edit = new Button("Edit", editAction());
+        Button edit = new EditButton("Edit", editAction());
         panel.add(edit);
 
-        Button copy = new Button("Copy", copyAction());
+        Button copy = new CopyButton("Copy", copyAction());
         panel.add(copy);
         copy.setEnabled(false);
 
-        Button newControlMeasure = new Button("New", newControlMeasureAction());
+        Button newControlMeasure = new NewButton("New", newControlMeasureAction());
         panel.add(newControlMeasure);
 
         return panel;
@@ -167,7 +168,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                 }
             }
         });
-        panel.add(getItem("Pollutant", pollutant));
+        panel.add(getItem("Pollutant:", pollutant));
 
         costYear = new EditableComboBox(years);
         costYear.addActionListener(new AbstractAction(){
@@ -179,13 +180,13 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
                 }
             }
         });
-        panel.add(getItem("Cost Year", costYear));
+        panel.add(getItem("Cost Year:", costYear));
 
         Button importButton = new Button("Import", viewAction());
         panel.add(importButton);
         importButton.setEnabled(false);
         
-        Button closeButton = new Button("Close", new AbstractAction() {
+        Button closeButton = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 presenter.doClose();
             }
