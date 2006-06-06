@@ -46,5 +46,15 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
                 measure, window, session, this);
         presenter.doDisplay();
     }
+    
+    public ControlMeasure[] doFilterEfficiencyAndCost(String pollutant, int costYear, ControlMeasure[] measures) {
+        //List filteredMeasures = new ArrayList();
+        
+        for(int i = 0; i < measures.length; i++) {
+           // me
+        }
+        
+        return null;
+    }
 
 }

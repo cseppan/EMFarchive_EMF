@@ -48,6 +48,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     private EmfSession session;
 
     private EmfTableModel model;
+    
+    private ControlMeasureTableData tableData;
 
     private JPanel browserPanel;
     
@@ -57,15 +59,15 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     private DesktopManager desktopManager;
     
-    private String[] pollutants = { "NOx", "PM10", "PM2.5", "SO2", "VOC", "CO",
+    private String[] pollutants = { "Major", "NOx", "PM10", "PM2.5", "SO2", "VOC", "CO",
             "CO2", "EC", "OC", "NH3", "Hg" };
 
-    private String[] years = { "1999", "2000", "2001", "2002", "2003", "2004",
+    private String[] years = { "Default", "1999", "2000", "2001", "2002", "2003", "2004",
             "2005", "2006" };
 
     public ControlMeasuresManagerWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
             throws EmfException {
-        super("Control Measures Manager", new Dimension(700, 350), desktopManager);
+        super("Control Measures Manager", new Dimension(850, 350), desktopManager);
         super.setName("controlMeasures");
         super.setMinimumSize(new Dimension(10, 10));
         this.session = session;
@@ -73,7 +75,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         this.desktopManager = desktopManager;
 
         CostService service = session.costService();
-        model = new EmfTableModel(new ControlMeasureTableData(service.getMeasures()));
+        tableData = new ControlMeasureTableData(service.getMeasures());
+        model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
 
         this.getContentPane().add(createLayout(parentConsole));
@@ -155,14 +158,39 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         JPanel panel = new JPanel();
 
         pollutant = new ComboBox(pollutants);
+        pollutant.addActionListener(new AbstractAction(){
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    getEfficiencyAndCost();
+                } catch (EmfException e1) {
+                    messagePanel.setError(e1.getMessage());
+                }
+            }
+        });
         panel.add(getItem("Pollutant", pollutant));
 
         costYear = new EditableComboBox(years);
+        costYear.addActionListener(new AbstractAction(){
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    getEfficiencyAndCost();
+                } catch (EmfException e1) {
+                    messagePanel.setError(e1.getMessage());
+                }
+            }
+        });
         panel.add(getItem("Cost Year", costYear));
 
         Button importButton = new Button("Import", viewAction());
         panel.add(importButton);
         importButton.setEnabled(false);
+        
+        Button closeButton = new Button("Close", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                presenter.doClose();
+            }
+        });
+        panel.add(closeButton);
 
         return panel;
     }
@@ -315,6 +343,12 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
     public void doRefresh() throws EmfException {
         presenter.doRefresh();
+    }
+
+    public void getEfficiencyAndCost() throws EmfException {
+        tableData.setPollutantAndYear(pollutant.getSelectedItem().toString().trim(),
+                costYear.getSelectedItem().toString().trim());
+        doRefresh();
     }
 
 }
