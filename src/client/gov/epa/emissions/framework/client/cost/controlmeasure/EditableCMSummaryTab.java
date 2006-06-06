@@ -22,8 +22,8 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
     }
     
     public void populateDefaultValues() {
-        ruleEffectiveness.setText("1.0");
-        rulePenetration.setText("1.0");
+        ruleEffectiveness.setText("100.0");
+        rulePenetration.setText("100.0");
     }
     
     public void populateValues() {
@@ -58,11 +58,11 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
         }
 
         //year = verifier.parseInteger(costYear);
-        deviceId = verifier.parseInteger(deviceCode);
+        if (deviceCode.getText().length() > 0) deviceId = verifier.parseInteger(deviceCode);
         effectivness = verifier.parseFloat(ruleEffectiveness);
-        minUnctrldEmiss = verifier.parseFloat(minUncontrolledEmission);
-        maxUnctrldEmiss = verifier.parseFloat(maxUncontrolledEmission);
-        life = verifier.parseFloat(equipmentLife);
+        if (minUncontrolledEmission.getText().length() > 0) minUnctrldEmiss = verifier.parseFloat(minUncontrolledEmission);
+        if (maxUncontrolledEmission.getText().length() > 0) maxUnctrldEmiss = verifier.parseFloat(maxUncontrolledEmission);
+        if (equipmentLife.getText().length() > 0) life = verifier.parseFloat(equipmentLife);
         penetratrion = verifier.parseFloat(rulePenetration);
         if ((effectivness < 0) || (effectivness > 100))
         {

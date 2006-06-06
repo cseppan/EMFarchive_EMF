@@ -36,7 +36,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     //private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public NewControlMeasureWindow(EmfConsole parent, EmfSession session, DesktopManager desktopManager) {
-        super("New Control Measure", new Dimension(700, 510), desktopManager);
+        super("New Control Measure", new Dimension(750, 510), desktopManager);
         this.desktopManager = desktopManager;
         this.session = session;
         this.parent = parent;
