@@ -24,6 +24,7 @@ public class RefreshButton extends Button {
         super.setIcon(refreshIcon(message));
         super.setToolTipText(message);
         super.setBorderPainted(false);
+        this.setMnemonic('R');
     }
 
     private ImageIcon refreshIcon(String message) {
