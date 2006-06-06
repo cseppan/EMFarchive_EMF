@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
+import gov.epa.emissions.commons.gui.buttons.*;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -123,7 +124,7 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
-        Button save = new Button("Save", new AbstractAction() {
+        Button save = new SaveButton("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
             }
@@ -131,7 +132,7 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
 
         buttonsPanel.add(save);
 
-        Button close = new Button("Close", new AbstractAction() {
+        Button close = new CloseButton("Close", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doClose();
             }
