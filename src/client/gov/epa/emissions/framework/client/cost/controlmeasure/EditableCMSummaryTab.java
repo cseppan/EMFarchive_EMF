@@ -42,7 +42,7 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
         if (equipmentLife.getText().length() > 0) measure.setEquipmentLife(life);
         measure.setMajorPollutant(majorPollutant.getSelectedItem() + "");
         measure.setRuleEffectiveness((float)(effectivness/100.0));
-        measure.setRulePenetration((float)(penetratrion/100.0));
+        measure.setRulePenetration((float)(penetration/100.0));
         measure.setCmClass(cmClass.getSelectedItem() + "");
         measure.setRegion((Region)region.getSelectedItem());
         measure.setLastModifiedTime(new Date());
@@ -63,14 +63,18 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
         if (minUncontrolledEmission.getText().length() > 0) minUnctrldEmiss = verifier.parseFloat(minUncontrolledEmission);
         if (maxUncontrolledEmission.getText().length() > 0) maxUnctrldEmiss = verifier.parseFloat(maxUncontrolledEmission);
         if (equipmentLife.getText().length() > 0) life = verifier.parseFloat(equipmentLife);
-        penetratrion = verifier.parseFloat(rulePenetration);
+        penetration = verifier.parseFloat(rulePenetration);
         if ((effectivness < 0) || (effectivness > 100))
         {
             throw new EmfException("Rule Effectiveness must be between 0 and 100");
         }
-        if ((penetratrion < 0) || (penetratrion > 100))
+        if ((penetration < 0) || (penetration > 100))
         {
             throw new EmfException("Rule Penetration must be between 0 and 100");
+        }
+        if (abbreviation.getText().length() < 1)
+        {
+            throw new EmfException("An abbreviation must be specified");            
         }
     }
     
