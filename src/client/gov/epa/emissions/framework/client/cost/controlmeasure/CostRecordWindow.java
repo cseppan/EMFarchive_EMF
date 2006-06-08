@@ -33,6 +33,8 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
     
     private EditableComboBox pollutant;
     
+    private Button ok;
+    
     private int costYear;
     
     private float cost;
@@ -63,6 +65,7 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
         super.setLabel(super.getTitle() + " " + ++count + " for Control Measure: " + name);
         JPanel layout = createLayout(measure);
         super.getContentPane().add(layout);
+        
         super.display();
         this.record = record;
         
@@ -128,12 +131,11 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = new Button("OK", new AbstractAction() {
+        ok = new Button("OK", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doOK();
             }
         });
-        getRootPane().setDefaultButton(ok);
         panel.add(ok);
 
         Button cancel = new Button("Cancel", new AbstractAction() {
@@ -142,7 +144,8 @@ public class CostRecordWindow extends DisposableInteralFrame implements CostReco
             }
         });
         panel.add(cancel);
-
+        getRootPane().setDefaultButton(ok);
+        
         return panel;
     }
 

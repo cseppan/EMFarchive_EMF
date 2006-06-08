@@ -42,7 +42,7 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
     private ManageChangeables changeables;
 
     public EditableCMSCCTab(ControlMeasure measure, EmfSession session, ManageChangeables changeables,
-            MessagePanel messagePanel, EmfConsole parent) throws EmfException {
+            MessagePanel messagePanel, EmfConsole parent) {
         this.parent = parent;
         this.messagePanel = messagePanel;
         this.session = session;
@@ -51,13 +51,17 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
         doLayout(measure, changeables);
     }
 
-    private void doLayout(ControlMeasure measure, ManageChangeables changeables) throws EmfException {
+    private void doLayout(ControlMeasure measure, ManageChangeables changeables) {
         this.changeables = changeables;
-        Scc[] sccObjs = createSccs(measure);
-        tableData = new SCCTableData(sccObjs);
-        SortFilterSelectionPanel sortFilterSelectionPanel = sortFilterPanel();
-        mainPanel.removeAll();
-        mainPanel.add(sortFilterSelectionPanel);
+        try {
+            Scc[] sccObjs = createSccs(measure);
+            tableData = new SCCTableData(sccObjs);
+            SortFilterSelectionPanel sortFilterSelectionPanel = sortFilterPanel();
+            mainPanel.removeAll();
+            mainPanel.add(sortFilterSelectionPanel);
+        } catch (Exception e) {
+            messagePanel.setError(e.getMessage());
+        }
 
         setLayout(new BorderLayout());
         add(mainPanel, BorderLayout.CENTER);

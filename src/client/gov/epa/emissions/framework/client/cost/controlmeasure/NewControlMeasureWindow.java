@@ -1,14 +1,14 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.buttons.*;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.ui.ErrorPanel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
@@ -78,13 +78,9 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
 
     private JPanel createSCCTab(ControlMeasure measure, MessagePanel messagePanel) {
         EditableCMTabView view;
-        try {
-            view = new EditableCMSCCTab(measure, session,this, messagePanel, parent);
-            presenter.set(view);
-            return (JPanel) view;
-        } catch (EmfException e) {
-            return new ErrorPanel("Could not create SCC tab\n"+e.getMessage());
-        }
+        view = new EditableCMSCCTab(measure, session,this, messagePanel, parent);
+        presenter.set(view);
+        return (JPanel) view;
     }
 
     private Component createEfficiencyTab(ControlMeasure measure, MessagePanel messagePanel) {
@@ -128,7 +124,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
                 doSave();
             }
         });
-
+        getRootPane().setDefaultButton(save);
         buttonsPanel.add(save);
 
         Button close = new CloseButton("Close", new AbstractAction() {
@@ -136,9 +132,8 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
                 doClose();
             }
         });
-        getRootPane().setDefaultButton(close);
         buttonsPanel.add(close);
-
+        
         return buttonsPanel;
     }
 
