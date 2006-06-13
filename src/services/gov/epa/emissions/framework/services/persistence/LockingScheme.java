@@ -99,6 +99,11 @@ public class LockingScheme {
         return releaseLock(target, session);
     }
 
+    public Lockable keepLockOnUpdate(Lockable target, Session session, List all) throws EmfException {
+        doUpdate(target, session, all);
+        return target;
+    }
+
     private void doUpdate(Lockable target, Session session, List all) throws EmfException {
         Lockable current = current(target, all);
         if (!current.isLocked(target.getLockOwner()))

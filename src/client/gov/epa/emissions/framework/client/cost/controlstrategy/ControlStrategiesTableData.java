@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.cost.controlstrategy;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -21,7 +22,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Name", "Last Modified", "Region", "Project", "Analysis Type","Inv. Dataset",
+        return new String[] { "Name", "Last Modified", "Region", "Project", "Strategy Type","Inv. Dataset",
                 "Version", "Inventory Type", "Major Pollutant", "Cost Year", "Inv. Year",
                 "Total Cost", "Reduction", "Run Status", "Completion Date", "Creator" };
 
@@ -68,7 +69,8 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     private String analysisType(ControlStrategy element) {
-        return "" + element.getAnalysisType();
+        StrategyType type = element.getStrategyType();
+        return type != null ? type.getName() : "";
     }
 
     private String datasetType(ControlStrategy element) {

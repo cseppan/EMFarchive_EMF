@@ -48,6 +48,11 @@
             class="gov.epa.emissions.commons.data.DatasetType"
             column="dataset_type_id"/> 
 
+	<many-to-one cascade="save-update"
+            name="strategyType" 
+            class="gov.epa.emissions.framework.services.cost.StrategyType"
+            column="strategy_type_id"/> 
+
 	<property name="majorPollutant"	column="major_pollutant"	type="java.lang.String"/>
 	<property name="majorPollutantControlEfficiency"	column="major_pollutant_control_efficiency"	type="java.lang.Double"/>
 	<property name="analysisType"	column="analysis_type"	type="java.lang.Integer"/>

@@ -56,7 +56,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
         assertEquals("Last Modified", columns[1]);
         assertEquals("Region", columns[2]);
         assertEquals("Project", columns[3]);
-        assertEquals("Analysis Type", columns[4]);
+        assertEquals("Strategy Type", columns[4]);
         assertEquals("Inv. Dataset", columns[5]);
         assertEquals("Version", columns[6]);
         assertEquals("Inventory Type", columns[7]);
@@ -97,7 +97,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
         assertEquals(format(controlStrategy1.getLastModifiedDate()), row.getValueAt(1));
         assertEquals("region1", row.getValueAt(2));
         assertEquals("project1", row.getValueAt(3));
-        assertEquals("0", row.getValueAt(4));
+        assertEquals("", row.getValueAt(4));
         assertEquals("datasetType1", row.getValueAt(7));
         assertEquals("2000", row.getValueAt(9));
 

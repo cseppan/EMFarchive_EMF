@@ -4,6 +4,8 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
+import gov.epa.emissions.framework.services.cost.StrategyType;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public class ControlStrategyServiceTransport implements ControlStrategyService {
 
@@ -70,7 +72,17 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 
         return (ControlStrategy) call.requestResponse(new Object[] { element });
     }
+    
+    public ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException {
+        EmfCall call = call();
 
+        call.setOperation("updateControlStrategyWithLock");
+        call.addParam("element", mappings.controlStrategy());
+        call.setReturnType(mappings.controlStrategy());
+
+        return (ControlStrategy) call.requestResponse(new Object[] { element });
+    }
+    
     public void removeControlStrategies(ControlStrategy[] elements) throws EmfException {
         EmfCall call = call();
 
@@ -80,7 +92,26 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
 
         call.request(new Object[] { elements });
     }
-    
-    
+
+    public void runStrategy(User user, ControlStrategy strategy, EmfDataset dataset) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("runStrategy");
+        call.addParam("user", mappings.user());
+        call.addParam("strategy", mappings.controlStrategy());
+        call.addParam("dataset", mappings.dataset());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, strategy, dataset });
+    }
+
+    public StrategyType[] getStrategyTypes() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getStrategyTypes");
+        call.setReturnType(mappings.strategyTypes());
+
+        return (StrategyType[]) call.requestResponse(new Object[] {});
+    }
 
 }

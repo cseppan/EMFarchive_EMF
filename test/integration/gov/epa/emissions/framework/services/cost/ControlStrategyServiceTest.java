@@ -22,7 +22,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
 
     protected void doSetUp() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory(configFile());
-        service = new ControlStrategyServiceImpl(sessionFactory);
+        service = new ControlStrategyServiceImpl(super.emf(), super.dbServer(), sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
     }
 

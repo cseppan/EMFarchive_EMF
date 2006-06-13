@@ -33,6 +33,10 @@ public class ControlStrategyDAO {
     public List all(Session session) {
         return hibernateFacade.getAll(ControlStrategy.class, Order.asc("name"), session);
     }
+    
+    public List getAllStrategyTypes(Session session) {
+        return hibernateFacade.getAll(StrategyType.class, Order.asc("name"), session);
+    }
 
     // TODO: gettig all the strategies to obtain the lock--- is it a good idea?
     public ControlStrategy obtainLocked(User owner, ControlStrategy element, Session session) {
@@ -45,6 +49,10 @@ public class ControlStrategyDAO {
 
     public ControlStrategy update(ControlStrategy locked, Session session) throws EmfException {
         return (ControlStrategy) lockingScheme.releaseLockOnUpdate(locked, session, all(session));
+    }
+
+    public ControlStrategy updateWithLock(ControlStrategy locked, Session session) throws EmfException {
+        return (ControlStrategy) lockingScheme.keepLockOnUpdate(locked, session, all(session));
     }
 
     public boolean canUpdate(ControlStrategy controlStrategy, Session session) {

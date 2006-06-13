@@ -62,10 +62,10 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         controlStrategy.setCreator(session.user());
         controlStrategy.setLastModifiedDate(new Date());
         
-        service().updateControlStrategy(controlStrategy);
-        closeView();
+        service().updateControlStrategyWithLock(controlStrategy);
         managerPresenter.doRefresh();
     }
+
     private void saveTabs() throws EmfException {
         for (Iterator iter = presenters.iterator(); iter.hasNext();) {
             EditControlStrategyTabPresenter element = (EditControlStrategyTabPresenter) iter.next();
@@ -105,12 +105,16 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         presenters.add(presenter);
     }
 
-    public void setResults() {
-        summaryTabView.setResults();
+    public void setResults(ControlStrategy controlStrategy) {
+        summaryTabView.setResults(controlStrategy);
     }
 
     public void stopRun() {
         summaryTabView.stopRun();
+    }
+
+    public void runStrategy() throws EmfException {
+        service().runStrategy(session.user(), controlStrategy, controlStrategy.getDatasets()[0]);
     }
 
 }

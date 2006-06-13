@@ -19,6 +19,7 @@ import gov.epa.emissions.framework.client.data.Projects;
 import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.IntTextField;
@@ -84,6 +85,8 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private VersionPanel versionPanel;
     
     private JLabel startDate, completionDate, costValue,  emissionReductionValue;
+
+    private ComboBox strategyTypeCombo;
 
     public EditControlStrategySummaryTab(ControlStrategy controlStrategy, EmfSession session,
             ManageChangeables changeablesList, MessagePanel messagePanel, EmfConsole parentConsole) throws EmfException {
@@ -212,11 +215,16 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private ComboBox typeOfAnalysis() {
-        // FIXME: temp values
-        String[] analysis = { "Maximum Emissions Reduction" };
-        ComboBox combo = new ComboBox("Choose a type of analysis", analysis);
-
-        return combo;
+        strategyTypeCombo = null;
+        try {
+            StrategyType[] types = session.controlStrategyService().getStrategyTypes();
+            strategyTypeCombo = new ComboBox("Choose a type of analysis", types);
+            strategyTypeCombo.setSelectedItem(controlStrategy.getStrategyType());
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+        
+        return strategyTypeCombo;
     }
 
     private JPanel createMiddleSection() throws EmfException {
@@ -427,6 +435,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setMajorPollutant(majorPollutant.getText());
         controlStrategy.setStartDate(this.controlStrategy.getStartDate());
         controlStrategy.setRunStatus(this.controlStrategy.getRunStatus());
+        controlStrategy.setStrategyType((StrategyType)this.strategyTypeCombo.getSelectedItem());
     }
 
     private void isDatasetSelected(ControlStrategy controlStrategy) throws EmfException {
@@ -469,7 +478,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         return new Projects(allProjects).get(projectName);
     }
     
-    public void setResults() {
+    public void setResults(ControlStrategy controlStrategy) {
         Date start = controlStrategy.getStartDate();
         if(start == null) {
             start = new Date();
@@ -479,12 +488,12 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         
         controlStrategy.setRunStatus("Running");
         
-        completionDate.setText("Running...");
+        completionDate.setText("Running " + controlStrategy.getStrategyType().getName() + "...");
     }
 
     public void stopRun() {
         controlStrategy.setRunStatus("Stopped");
-        completionDate.setText("");
+        completionDate.setText("Stopped running strategy.");
     }
 
 }

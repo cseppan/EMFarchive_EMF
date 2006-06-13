@@ -78,6 +78,7 @@ CREATE TABLE emf.control_strategies
   start_date timestamp,
   completion_date timestamp,
   dataset_type_id int4 REFERENCES emf.dataset_types(id),
+  strategy_type_id int4 REFERENCES emf.strategy_types(id),
   major_pollutant varchar(255),
   major_pollutant_control_efficiency real,
   analysis_type int4,
@@ -127,4 +128,18 @@ CREATE TABLE emf.cm_efficiency_records
 ) 
 WITHOUT OIDS;
 -- emf.cm_efficiency_records
+
+-- emf.strategy_types
+CREATE TABLE emf.strategy_types
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE,
+  description text NOT NULL,
+  default_sortorder text NULL DEFAULT '',
+  strategy_classname varchar(255),
+  lock_owner varchar(255),
+  lock_date timestamp
+) 
+WITHOUT OIDS;
+-- emf.strategy_types
 --------------------------------------------------------------------------------

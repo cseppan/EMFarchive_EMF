@@ -250,6 +250,7 @@ public class ManageMenu extends JMenu implements ManageMenuView {
             presenter.doDisplayControlStrategies(view);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
+            e.printStackTrace();
         }
     }
 

@@ -7,3 +7,4 @@ DROP TABLE emf.cmcost_costrecords CASCADE;
 DROP TABLE emf.control_measure_sccs CASCADE;
 DROP TABLE emf.control_measure_efficiency CASCADE;
 DROP TABLE emf.cm_efficiency_records CASCADE;
+DROP TABLE emf.strategy_types;

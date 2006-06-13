@@ -3,10 +3,13 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EMFService;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public interface ControlStrategyService extends EMFService {
 
     ControlStrategy[] getControlStrategies() throws EmfException;
+    
+    StrategyType[] getStrategyTypes() throws EmfException;
     
     void addControlStrategy(ControlStrategy element) throws EmfException;
     
@@ -17,4 +20,8 @@ public interface ControlStrategyService extends EMFService {
     ControlStrategy releaseLocked(ControlStrategy locked) throws EmfException;
 
     ControlStrategy updateControlStrategy(ControlStrategy element) throws EmfException;
+    
+    ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException;
+    
+    void runStrategy (User user, ControlStrategy strategy, EmfDataset dataset) throws EmfException;
 }

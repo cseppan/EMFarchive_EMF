@@ -8,7 +8,7 @@ public interface EditControlStrategySummaryTabView {
     // update with the view contents
     void save(ControlStrategy controlStrategy) throws EmfException;
     
-    void setResults();
+    void setResults(ControlStrategy controlStrategy);
 
     void stopRun();
 

@@ -1,31 +1,66 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfServiceImpl;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.List;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
-public class ControlStrategyServiceImpl implements ControlStrategyService {
+import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
+
+public class ControlStrategyServiceImpl extends EmfServiceImpl implements ControlStrategyService {
 
     private static Log LOG = LogFactory.getLog(ControlStrategyServiceImpl.class);
 
+    private PooledExecutor threadPool;
+    
     private HibernateSessionFactory sessionFactory;
+    
+    private RunControlStrategy runStrategy;
 
     private ControlStrategyDAO dao;
 
-    public ControlStrategyServiceImpl() {
-        this(HibernateSessionFactory.get());
+    public ControlStrategyServiceImpl() throws Exception {
+        super("Control Strategy Service");
+        init(dbServer, HibernateSessionFactory.get());
     }
 
-    public ControlStrategyServiceImpl(HibernateSessionFactory sessionFactory) {
+    public ControlStrategyServiceImpl(DataSource datasource, DbServer dbServer, HibernateSessionFactory sessionFactory) {
+        super(datasource, dbServer);
+        init(dbServer, sessionFactory);
+    }
+    
+    private void init(DbServer dbServer, HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         dao = new ControlStrategyDAO();
+        threadPool = createThreadPool();
+        
+        StrategyFactory factory = new StrategyFactory(dbServer, dbServer.getSqlDataTypes());
+        runStrategy = new RunControlStrategy(factory, sessionFactory, threadPool);
+    }
+    
+    protected void finalize() throws Throwable {
+        threadPool.shutdownAfterProcessingCurrentlyQueuedTasks();
+        threadPool.awaitTerminationAfterShutdown();
+        super.finalize();
+    }
+    
+    private PooledExecutor createThreadPool() {
+        PooledExecutor threadPool = new PooledExecutor(20);
+        threadPool.setMinimumPoolSize(1);
+        threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
+
+        return threadPool;
     }
 
     public ControlStrategy[] getControlStrategies() throws EmfException {
@@ -98,6 +133,23 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         }
     }
 
+    public ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            
+            if (!dao.canUpdate(element, session))
+                throw new EmfException("Control Strategy name already in use");
+            
+            ControlStrategy released = dao.updateWithLock(element, session);
+            session.close();
+            
+            return released;
+        } catch (RuntimeException e) {
+            LOG.error("Could not update Control Strategy: " + element, e);
+            throw new EmfException("Could not update ControlStrategy: " + element);
+        }
+    }
+
     public void removeControlStrategies(ControlStrategy[] elements) throws EmfException {
         try {
             for (int i = 0; i < elements.length; i++)
@@ -116,6 +168,20 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
         dao.remove(element, session);
         session.close();
+    }
+
+    public void runStrategy(User user, ControlStrategy strategy, EmfDataset dataset) throws EmfException {
+        runStrategy.run(user, strategy, dataset);
+    }
+
+    public StrategyType[] getStrategyTypes() throws EmfException {
+        try {
+            List st = dao.getAllStrategyTypes(sessionFactory.getSession());
+            return (StrategyType[]) st.toArray(new StrategyType[0]);
+        } catch (HibernateException e) {
+            LOG.error("could not retrieve all control strategy types. " + e.getMessage());
+            throw new EmfException("could not retrieve all control strategy types. " + e.getMessage());
+        }
     }
 
 }
