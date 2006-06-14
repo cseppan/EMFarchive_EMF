@@ -34,14 +34,15 @@ public class ConcurrentTaskRunner implements TaskRunner {
         public void run() {
             synchronized (mutex) {
                 while (alive) {
-                    task.run();
                     try {
                         // FIXME: what's a reasonable polling time ?
-                        long pollInterval = 2 * 60 * 1000;
+                        long pollInterval = 1 * 15 * 1000;
                         mutex.wait(pollInterval);
                     } catch (InterruptedException e) {
                         alive = false;
                     }
+                    
+                    task.run();
                 }
             }
         }

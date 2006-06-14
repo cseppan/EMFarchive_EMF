@@ -71,6 +71,8 @@ CREATE TABLE emf.control_strategies
   region_id int4 REFERENCES emf.regions(id),
   project_id int4 REFERENCES emf.projects (id),
   discount_rate real,
+  total_cost real,
+  reduction real,
   cost_year int4,
   analysis_year int4,
   creator_id int4 REFERENCES emf.users(id),
@@ -80,8 +82,6 @@ CREATE TABLE emf.control_strategies
   dataset_type_id int4 REFERENCES emf.dataset_types(id),
   strategy_type_id int4 REFERENCES emf.strategy_types(id),
   major_pollutant varchar(255),
-  major_pollutant_control_efficiency real,
-  analysis_type int4,
   dataset_version int4,
   lock_owner varchar(255),
   lock_date timestamp
@@ -142,4 +142,22 @@ CREATE TABLE emf.strategy_types
 ) 
 WITHOUT OIDS;
 -- emf.strategy_types
+
+-- emf.strategy_results
+CREATE TABLE emf.strategy_results
+(
+  id SERIAL PRIMARY KEY,
+  source_id int4 NOT NULL,
+  dataset_id int4 NOT NULL,
+  control_measure_id int4 NOT NULL,
+  control_measure_abbr varchar(255),
+  pollutant_reduced varchar(255),
+  control_strategy varchar(255),
+  scc varchar(255),
+  cost real,
+  cost_per_ton real,
+  reduced_emissions real
+) 
+WITHOUT OIDS;
+-- emf.strategy_results
 --------------------------------------------------------------------------------

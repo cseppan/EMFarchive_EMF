@@ -34,16 +34,20 @@ public class RunControlStrategy {
         this.services = services();
     }
 
-    public void run(User user, ControlStrategy controlStrategy, EmfDataset dataset) throws EmfException {
+    public void run(User user, ControlStrategy controlStrategy, EmfDataset dataset, ControlStrategyService service) throws EmfException {
         try {
             Strategy strategy = factory.create(dataset, controlStrategy);
             
-            StrategyTask task = new StrategyTask(dataset, strategy, user, services, sessionFactory);
-            threadPool.execute(new GCEnforcerTask("Run Strategy: " + dataset.getName(), task));
+            StrategyTask task = new StrategyTask(dataset, strategy, user, services, sessionFactory, service);
+            threadPool.execute(new GCEnforcerTask("Run Strategy: " + controlStrategy.getName(), task));
         } catch (Exception e) {
-            log.error("Error in running control strategy: " + controlStrategy.getName(), e);
-            throw new EmfException("Run strategy failed: " + e.getMessage());
+            log.error("Error running control strategy: " + controlStrategy.getName(), e);
+            throw new EmfException(e.getMessage());
         }
+    }
+    
+    public void stop() {
+        threadPool.shutdownNow();
     }
     
     private Services services() {

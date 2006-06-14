@@ -26,15 +26,20 @@ public class StrategyTask implements Runnable {
     private HibernateSessionFactory sessionFactory;
 
     private Services services;
+    
+    private ControlStrategyDAO dao;
+    
+    private ControlStrategyService csService;
 
     public StrategyTask(EmfDataset dataset, Strategy strategy, User user, Services services,
-            HibernateSessionFactory sessionFactory) {
+            HibernateSessionFactory sessionFactory, ControlStrategyService service) {
         this.user = user;
         this.dataset = dataset;
         this.services = services;
         this.sessionFactory = sessionFactory;
-
         this.strategy = strategy;
+        this.csService = service;
+        this.dao = new ControlStrategyDAO();
     }
 
     public void run() {
@@ -45,10 +50,12 @@ public class StrategyTask implements Runnable {
             
             prepare(session);
             strategy.run();
+            dao.add(strategy.getResult(), session);
+            csService.updateControlStrategyWithLock(strategy.getControlStrategy());
             complete(session);
         } catch (Exception e) {
             logError("Failed to run strategy : ", e);
-            setStatus("Failed to run strategy on dataset: " + dataset.getName() + ".Reason: " + e.getMessage());
+            setStatus("Failed to run strategy: " + "Reason: " + e.getMessage());
         } finally {
             if (session != null)
                 session.flush();
@@ -69,11 +76,11 @@ public class StrategyTask implements Runnable {
     }
 
     private void addStartStatus() {
-        setStatus("Started running strategy on dataset: " + dataset.getName() + "[" + dataset.getDatasetTypeName() + "]");
+        setStatus("Started running control strategy: " + strategy.getControlStrategy().getName());
     }
 
     private void addCompletedStatus() {
-        setStatus("Completed running strategy on dataset: " + dataset.getName() + "[" + dataset.getDatasetTypeName() + "]");
+        setStatus("Completed running control strategy: " + strategy.getControlStrategy().getName());
     }
 
     private void setStatus(String message) {

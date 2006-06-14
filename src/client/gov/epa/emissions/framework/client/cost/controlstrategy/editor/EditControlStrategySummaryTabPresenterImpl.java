@@ -19,7 +19,11 @@ public class EditControlStrategySummaryTabPresenterImpl implements EditControlSt
     }
 
     public void setResults(ControlStrategy controlStrategy) {
-        view.setResults(controlStrategy);
+        view.setRunMessage(controlStrategy);
+    }
+    
+    public void doRefresh() {
+        view.doRefresh();
     }
 
 }

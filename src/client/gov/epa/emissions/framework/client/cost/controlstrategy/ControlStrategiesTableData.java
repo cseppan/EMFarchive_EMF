@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -48,15 +49,32 @@ public class ControlStrategiesTableData extends AbstractTableData {
         for (int i = 0; i < controlStrategies.length; i++) {
             ControlStrategy element = controlStrategies[i];
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), region(element),
-                    project(element), analysisType(element), "", "", datasetType(element), element.getMajorPollutant(),
-                    costYear(element), "" + element.getAnalysisYear(), "",
-                    "", element.getRunStatus(), format(element.getCompletionDate()),
+                    project(element), analysisType(element), dataset(element), version(element), 
+                    datasetType(element), element.getMajorPollutant(),
+                    costYear(element), "" + element.getAnalysisYear(), "" + element.getTotalCost(),
+                    "" + element.getReduction(), element.getRunStatus(), format(element.getCompletionDate()),
                     element.getCreator().getName()};
             Row row = new ViewableRow(element, values);
             rows.add(row);
         }
 
         return rows;
+    }
+
+    private String version(ControlStrategy element) {
+        return "" + element.getDatasetVersion();
+    }
+
+    private String dataset(ControlStrategy element) {
+        Dataset[] datasets = element.getDatasets();
+        if (datasets.length == 0)
+            return "";
+        
+        String name = datasets[0].getName();
+        if (datasets.length > 1)
+            name += "...";
+        
+        return  name;
     }
 
     private String project(ControlStrategy element) {

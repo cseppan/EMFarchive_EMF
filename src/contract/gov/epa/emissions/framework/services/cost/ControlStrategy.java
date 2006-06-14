@@ -26,6 +26,10 @@ public class ControlStrategy implements Lockable {
     private Project project;
 
     private double discountRate;
+    
+    private double totalCost;
+    
+    private double reduction;
 
     private int costYear;
 
@@ -47,10 +51,6 @@ public class ControlStrategy implements Lockable {
 
     private String runStatus;
 
-    private double majorPollutantControlEfficiency;
-
-    private int analysisType;
-    
     private StrategyType strategyType;
     
     private int datasetVersion;
@@ -78,14 +78,6 @@ public class ControlStrategy implements Lockable {
 
     public int hashCode() {
         return name.hashCode();
-    }
-
-    public int getAnalysisType() {
-        return analysisType;
-    }
-
-    public void setAnalysisType(int analysisType) {
-        this.analysisType = analysisType;
     }
 
     public int getAnalysisYear() {
@@ -166,14 +158,6 @@ public class ControlStrategy implements Lockable {
 
     public void setMajorPollutant(String majorPollutant) {
         this.majorPollutant = majorPollutant;
-    }
-
-    public double getMajorPollutantControlEfficiency() {
-        return majorPollutantControlEfficiency;
-    }
-
-    public void setMajorPollutantControlEfficiency(double majorPollutantControlEfficiency) {
-        this.majorPollutantControlEfficiency = majorPollutantControlEfficiency;
     }
 
     public String getName() {
@@ -266,6 +250,22 @@ public class ControlStrategy implements Lockable {
 
     public void setStrategyType(StrategyType strategyType) {
         this.strategyType = strategyType;
+    }
+
+    public double getReduction() {
+        return reduction;
+    }
+
+    public void setReduction(double reduction) {
+        this.reduction = reduction;
+    }
+
+    public double getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(double totalCost) {
+        this.totalCost = totalCost;
     }
 
 }

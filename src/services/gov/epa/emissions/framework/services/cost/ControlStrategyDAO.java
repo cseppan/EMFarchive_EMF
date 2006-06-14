@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.cost.data.StrategyResult;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
@@ -22,6 +23,10 @@ public class ControlStrategyDAO {
     }
 
     public void add(ControlStrategy element, Session session) {
+        addObject(element, session);
+    }
+
+    public void add(StrategyResult element, Session session) {
         addObject(element, session);
     }
 

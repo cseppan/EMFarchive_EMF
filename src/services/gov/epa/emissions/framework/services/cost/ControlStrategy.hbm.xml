@@ -8,10 +8,22 @@
  	<id name="id" type="integer" column="id">
 	  <generator class="identity"/>
  	</id>
-	<property name="name"	column="name"	type="java.lang.String"	not-null="true"/>
-	<property name="description"	column="description"	type="java.lang.String"/>
-	<property name="runStatus"	column="run_status"	type="java.lang.String"/>
-	
+	<property name="name" column="name"	type="java.lang.String"	not-null="true"/>
+	<property name="description" column="description" type="java.lang.String"/>
+	<property name="runStatus" column="run_status"	type="java.lang.String"/>
+	<property name="discountRate" column="discount_rate" type="double"/>
+	<property name="reduction" column="reduction" type="double"/>
+	<property name="totalCost" column="total_cost" type="double"/>
+	<property name="costYear" column="cost_year" type="integer" not-null="false"/>
+	<property name="analysisYear" column="analysis_year" type="integer" not-null="false"/>
+	<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
+  	<property name="startDate" column="start_date" type="java.util.Date" not-null="false" length="4"/>
+  	<property name="completionDate" column="completion_date" type="java.util.Date" not-null="false" length="4"/>
+	<property name="datasetVersion" column="dataset_version" type="integer" not-null="true"/>
+	<property name="majorPollutant"	column="major_pollutant" type="java.lang.String"/>
+	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
+  	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
+		
 	<many-to-one cascade="save-update"
             name="region" 
             class="gov.epa.emissions.commons.data.Region"
@@ -22,27 +34,11 @@
             class="gov.epa.emissions.commons.data.Project"
             column="project_id"/> 
 
-	<property name="discountRate"	column="discount_rate"	type="java.lang.Double"/>
-	<property name="costYear"	column="cost_year"	type="java.lang.Integer"/>
-	<property name="analysisYear"	column="analysis_year"	type="java.lang.Integer"/>
-		
-	 <many-to-one
+	<many-to-one cascade="save-update"
             name="creator" 
             class="gov.epa.emissions.commons.security.User"
             column="creator_id"/> 
             
-  	<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
-  	<property name="startDate" column="start_date" type="java.util.Date" not-null="false" length="4"/>
-  	<property name="completionDate" column="completion_date" type="java.util.Date" not-null="false" length="4"/>
-
-  	<array name="datasets" table="datasets_control_strategies" >
-    	<key column="control_strategy_id" not-null="true"/>
-	    <list-index column="list_index"/>
-    	<many-to-many class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>
-	</array>
-	
-	<property name="datasetVersion" column="dataset_version" type="integer" not-null="true"/>
-		
 	<many-to-one cascade="save-update"
             name="datasetType" 
             class="gov.epa.emissions.commons.data.DatasetType"
@@ -52,13 +48,12 @@
             name="strategyType" 
             class="gov.epa.emissions.framework.services.cost.StrategyType"
             column="strategy_type_id"/> 
-
-	<property name="majorPollutant"	column="major_pollutant"	type="java.lang.String"/>
-	<property name="majorPollutantControlEfficiency"	column="major_pollutant_control_efficiency"	type="java.lang.Double"/>
-	<property name="analysisType"	column="analysis_type"	type="java.lang.Integer"/>
-	
-	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
-  	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
+            
+   	<array name="datasets" table="datasets_control_strategies" >
+    	<key column="control_strategy_id" not-null="true"/>
+	    <list-index column="list_index"/>
+    	<many-to-many class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>
+	</array>
 
   </class> 
 </hibernate-mapping>  

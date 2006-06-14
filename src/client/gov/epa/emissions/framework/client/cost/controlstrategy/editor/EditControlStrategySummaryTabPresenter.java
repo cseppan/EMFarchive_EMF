@@ -6,4 +6,6 @@ public interface EditControlStrategySummaryTabPresenter extends EditControlStrat
     // tagging interface
     
     void setResults(ControlStrategy controlStrategy);
+    
+    void doRefresh();
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false">
+    <class name="gov.epa.emissions.framework.services.cost.data.StrategyResult" table="strategy_results" schema="emf">
+        <id name="id" type="integer" column="id">
+            <generator class="identity"/>
+        </id>
+        <property name="datasetId"	column="dataset_id"	type="integer" not-null="true"/>
+        <property name="sourceId"	column="source_id"	type="integer" not-null="true"/>
+        <property name="controlMeasureID"	column="control_measure_id"	type="integer" not-null="true"/>
+        <property name="controlMeasureAbbr" column="control_measure_abbr" type="java.lang.String" not-null="false"/>
+        <property name="pollutant" column="pollutant_reduced" type="java.lang.String" not-null="false"/>
+        <property name="controlStrategy" column="control_strategy" type="java.lang.String" not-null="false"/>
+        <property name="scc" column="scc" type="java.lang.String" not-null="false"/>
+        <property name="cost"	column="cost"	type="java.lang.Double"/>
+        <property name="costPerTon"	column="cost_per_ton"	type="java.lang.Double"/>
+        <property name="redEmissions"	column="reduced_emissions"	type="java.lang.Double"/>
+        
+    </class>
+</hibernate-mapping>

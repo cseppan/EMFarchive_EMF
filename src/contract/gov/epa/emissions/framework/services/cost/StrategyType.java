@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.services.cost;
 
-import gov.epa.emissions.commons.data.DatasetType;
-
 import java.io.Serializable;
 
 public class StrategyType implements Serializable, Comparable {
@@ -104,10 +102,18 @@ public class StrategyType implements Serializable, Comparable {
 //    }
 
     public int compareTo(Object o) {
-        return name.compareTo(((DatasetType) o).getName());
+        return name.compareTo(((StrategyType) o).getName());
     }
     
     public String toString() {
-        return name;
+        return getName();
+    }
+    
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    public boolean equals(Object other) {
+        return (other instanceof StrategyType && ((StrategyType) other).id == id);
     }
 }

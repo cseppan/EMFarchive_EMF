@@ -171,7 +171,7 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
     }
 
     public void runStrategy(User user, ControlStrategy strategy, EmfDataset dataset) throws EmfException {
-        runStrategy.run(user, strategy, dataset);
+        runStrategy.run(user, strategy, dataset, this);
     }
 
     public StrategyType[] getStrategyTypes() throws EmfException {

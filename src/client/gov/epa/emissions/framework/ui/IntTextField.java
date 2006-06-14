@@ -12,7 +12,7 @@ public class IntTextField extends TextField implements Changeable {
 
     public IntTextField(String name, int min, int max, int size) {
         super(name, size);
-        super.setText("" + min);
+        //super.setText("" + min);
         this.min = min;
         this.max = max;
     }

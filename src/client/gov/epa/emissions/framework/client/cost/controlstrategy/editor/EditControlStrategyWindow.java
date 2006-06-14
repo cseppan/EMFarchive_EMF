@@ -45,6 +45,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
         super("Edit Control Strategy", new Dimension(650, 490), desktopManager);
+        super.setMinimumSize(new Dimension(10, 10));
         this.session = session;
         this.parentConsole = parentConsole;
     }
@@ -158,10 +159,10 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
             public void actionPerformed(ActionEvent event) {
                 try {
                     presenter.doSave();
-                    presenter.runStrategy();
                     presenter.setResults(controlStrategy);
+                    presenter.runStrategy();
                 } catch (EmfException e) {
-                    messagePanel.setError("Error in running strategy.");
+                    messagePanel.setError("Error running strategy: " + e.getMessage());
                 }
             }
         };
@@ -212,6 +213,10 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     private String format(Date lockDate) {
         return dateFormat.format(lockDate);
+    }
+    
+    public void windowClosing() {
+        doClose();
     }
 
 }
