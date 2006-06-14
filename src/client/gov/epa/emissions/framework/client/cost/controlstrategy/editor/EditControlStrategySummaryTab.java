@@ -262,7 +262,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         layoutGenerator.addLabelWidgetPair("Cost Year:", costYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Inventory Year:", analysisYearTextField(), panel);
         layoutGenerator.addLabelWidgetPair("Region:", regions(), panel);
-        layoutGenerator.addLabelWidgetPair("Major Pollutant:", majorPollutants(), panel);
+        layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutants(), panel);
 
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, 4, 2, // rows, cols
@@ -434,6 +434,10 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setMajorPollutant((String) majorPollutant.getSelectedItem());
         controlStrategy.setStartDate(this.controlStrategy.getStartDate());
         controlStrategy.setRunStatus(this.controlStrategy.getRunStatus());
+        if (strategyTypeCombo.getSelectedIndex() == 0)
+        {
+            throw new EmfException("Please select a strategy type");
+        }
         controlStrategy.setStrategyType((StrategyType) this.strategyTypeCombo.getSelectedItem());
     }
 
