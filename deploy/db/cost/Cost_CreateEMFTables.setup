@@ -1,26 +1,4 @@
 -- -------------CoST Tables--------------
--- emf.strategy_types
--- emf.control_measure_costs
-CREATE TABLE emf.control_measure_costs
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255),
-  lock_owner varchar(255),
-  lock_date timestamp
-)
-WITHOUT OIDS;
--- emf.control_measure_costs
-
--- emf.control_measure_efficiency
-CREATE TABLE emf.control_measure_efficiency
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255),
-  lock_owner varchar(255),
-  lock_date timestamp
-)
-WITHOUT OIDS;
--- emf.control_measure_efficiency
 
 -- emf.control_measures
 CREATE TABLE emf.control_measures
@@ -35,8 +13,6 @@ CREATE TABLE emf.control_measures
   major_pollutant varchar(255),
   creator int4  REFERENCES emf.users(id),
   region int4  REFERENCES emf.regions(id),
-  cost int4 REFERENCES emf.control_measure_costs (id),
-  efficiency int4 REFERENCES emf.control_measure_efficiency (id),
   rule_effectiveness real,
   rule_penetration real,
   min_uncontrolled_emissions real,
@@ -60,20 +36,6 @@ CREATE TABLE emf.control_measure_sccs
 )
 WITHOUT OIDS;
 -- emf.control_measure_sccs
-
-
--- emf.strategy_types
-CREATE TABLE emf.strategy_types
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE,
-  description text NOT NULL,
-  default_sortorder text NULL DEFAULT '',
-  strategy_classname varchar(255),
-  lock_owner varchar(255),
-  lock_date timestamp
-) 
-WITHOUT OIDS;
 
 -- emf.control_strategies
 CREATE TABLE emf.control_strategies
@@ -114,34 +76,48 @@ CREATE TABLE emf.datasets_control_strategies
 WITHOUT OIDS;
 -- emf.datasets_control_strategies
 
--- emf.cmcost_costrecords
-CREATE TABLE emf.cmcost_costrecords
+-- emf.control_measure_costrecords
+CREATE TABLE emf.control_measure_costrecords
 (
   id SERIAL PRIMARY KEY,
-  cmcost_id int4 NOT NULL REFERENCES emf.control_measure_costs(id),
+  control_measures_id int4 NOT NULL REFERENCES emf.control_measures(id),
   list_index int4,
   name varchar(255),
   pollutant varchar(255),
   cost_year int4,
   cost_per_ton real,
-  UNIQUE (cmcost_id, list_index)
+  UNIQUE (control_measures_id, list_index)
 ) 
 WITHOUT OIDS;
--- emf.cmcost_costrecords
+-- emf.control_measure_costrecords
 
--- emf.cm_efficiency_records
-CREATE TABLE emf.cm_efficiency_records
+-- emf.control_measure_efficiencyrecords
+CREATE TABLE emf.control_measure_efficiencyrecords
 (
   id SERIAL PRIMARY KEY,
-  cm_efficiency_id int4 NOT NULL REFERENCES emf.control_measure_efficiency(id),
+  control_measures_id int4 NOT NULL REFERENCES emf.control_measures(id),
   list_index int4,
   name varchar(255),
   pollutant varchar(255),
   efficiency real,
-  UNIQUE (cm_efficiency_id, list_index)
+  UNIQUE (control_measures_id, list_index)
 ) 
 WITHOUT OIDS;
--- emf.cm_efficiency_records
+-- emf.control_measure_efficiencyrecords
+
+-- emf.strategy_types
+CREATE TABLE emf.strategy_types
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE,
+  description text NOT NULL,
+  default_sortorder text NULL DEFAULT '',
+  strategy_classname varchar(255),
+  lock_owner varchar(255),
+  lock_date timestamp
+) 
+WITHOUT OIDS;
+-- emf.strategy_types
 
 -- emf.strategy_results
 CREATE TABLE emf.strategy_results
