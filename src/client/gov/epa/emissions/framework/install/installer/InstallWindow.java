@@ -320,7 +320,12 @@ public class InstallWindow extends JFrame implements InstallView  {
         public void actionPerformed(ActionEvent e) {	
             int option = checkDirs();
             if(option == JOptionPane.OK_OPTION) {
-                presenter.initModels(url.getText(), Constants.FILE_LIST, installDirField.getText());
+                try {
+                    presenter.initModels(url.getText(), Constants.FILE_LIST, installDirField.getText());
+                } catch (InstallException e1) {
+                    return;
+                }
+                
                 if(new File(installDirField.getText(), Constants.UPDATE_FILE).exists())
                     checkUpdates();
                 else {

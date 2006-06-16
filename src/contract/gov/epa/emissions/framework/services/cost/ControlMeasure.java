@@ -4,8 +4,8 @@ import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
-import gov.epa.emissions.framework.services.cost.data.ControlMeasureEfficiency;
+import gov.epa.emissions.framework.services.cost.data.CostRecord;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,10 +41,6 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private Region region;
     
-    private ControlMeasureCost cost;
-    
-    private ControlMeasureEfficiency efficiency;
-
     private String cmClass;
 
     private String abbreviation;
@@ -54,10 +50,16 @@ public class ControlMeasure implements Lockable, Serializable {
     private Mutex lock;
 
     private List sccsList;
+    
+    private List costRecords;
+    
+    private List efficiencyRecords;
 
     public ControlMeasure() {
         this.lock = new Mutex();
-        sccsList = new ArrayList();
+        this.sccsList = new ArrayList();
+        this.costRecords = new ArrayList();
+        this.efficiencyRecords = new ArrayList();
     }
 
     public ControlMeasure(String name) {
@@ -250,20 +252,21 @@ public class ControlMeasure implements Lockable, Serializable {
     public void setSccs(String[] sccs) {
         this.sccsList = Arrays.asList(sccs);
     }
-
-    public ControlMeasureCost getCost() {
-        return cost;
+    
+    public CostRecord[] getCostRecords() {
+        return (CostRecord[]) costRecords.toArray(new CostRecord[0]);
+    }
+    
+    public EfficiencyRecord[] getEfficiencyRecords() {
+        return (EfficiencyRecord[]) efficiencyRecords.toArray(new EfficiencyRecord[0]);
     }
 
-    public void setCost(ControlMeasureCost cost) {
-        this.cost = cost;
+    public void setCostRecords(CostRecord[] costRecords) {
+        this.costRecords = Arrays.asList(costRecords);
     }
 
-    public ControlMeasureEfficiency getEfficiency() {
-        return efficiency;
+    public void setEfficiencyRecords(EfficiencyRecord[] efficiencyRecords) {
+        this.efficiencyRecords = Arrays.asList(efficiencyRecords);
     }
 
-    public void setEfficiency(ControlMeasureEfficiency efficiency) {
-        this.efficiency = efficiency;
-    }
 }

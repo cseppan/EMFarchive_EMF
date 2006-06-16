@@ -3,8 +3,9 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.EmfProperty;
 import gov.epa.emissions.framework.services.EmfServiceImpl;
-import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.List;
@@ -29,23 +30,33 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
     private RunControlStrategy runStrategy;
 
     private ControlStrategyDAO dao;
+    
+    private DataSource datasource;
 
     public ControlStrategyServiceImpl() throws Exception {
         super("Control Strategy Service");
         init(dbServer, HibernateSessionFactory.get());
     }
 
-    public ControlStrategyServiceImpl(DataSource datasource, DbServer dbServer, HibernateSessionFactory sessionFactory) {
+    public ControlStrategyServiceImpl(DataSource datasource, DbServer dbServer, HibernateSessionFactory sessionFactory) throws Exception {
         super(datasource, dbServer);
+        this.datasource = datasource;
         init(dbServer, sessionFactory);
     }
     
-    private void init(DbServer dbServer, HibernateSessionFactory sessionFactory) {
+    private void init(DbServer dbServer, HibernateSessionFactory sessionFactory) throws EmfException {
         this.sessionFactory = sessionFactory;
         dao = new ControlStrategyDAO();
         threadPool = createThreadPool();
         
-        StrategyFactory factory = new StrategyFactory(dbServer, dbServer.getSqlDataTypes());
+        StrategyFactory factory;
+        try {
+            factory = new StrategyFactory(dbServer, new CostServiceImpl(datasource, dbServer, sessionFactory), 
+                    batchSize());
+        } catch (Exception e) {
+            LOG.error("could not access control measure service.");
+            throw new EmfException("could not access control measure service.");
+        }
         runStrategy = new RunControlStrategy(factory, sessionFactory, threadPool);
     }
     
@@ -170,8 +181,8 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
         session.close();
     }
 
-    public void runStrategy(User user, ControlStrategy strategy, EmfDataset dataset) throws EmfException {
-        runStrategy.run(user, strategy, dataset, this);
+    public void runStrategy(User user, ControlStrategy strategy) throws EmfException {
+        runStrategy.run(user, strategy, this);
     }
 
     public StrategyType[] getStrategyTypes() throws EmfException {
@@ -181,6 +192,16 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
         } catch (HibernateException e) {
             LOG.error("could not retrieve all control strategy types. " + e.getMessage());
             throw new EmfException("could not retrieve all control strategy types. " + e.getMessage());
+        }
+    }
+    
+    private int batchSize() {
+        Session session = sessionFactory.getSession();
+        try {
+            EmfProperty property = new EmfPropertiesDAO().getProperty("export-batch-size", session);
+            return Integer.parseInt(property.getValue());
+        } finally {
+            session.close();
         }
     }
 

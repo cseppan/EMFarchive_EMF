@@ -125,7 +125,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     public void runStrategy() throws EmfException {
-        service().runStrategy(session.user(), controlStrategy, controlStrategy.getDatasets()[0]);
+        service().runStrategy(session.user(), controlStrategy);
         runner.start(monitor);
     }
     

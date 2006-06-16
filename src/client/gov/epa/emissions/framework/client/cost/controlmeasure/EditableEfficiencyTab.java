@@ -7,7 +7,6 @@ import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.data.ControlMeasureEfficiency;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -33,8 +32,6 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
 
     private ControlMeasureEfficiencyTableData tableData;
 
-    private ControlMeasureEfficiency efficiency;
-
     private JPanel mainPanel;
 
     private ControlMeasure measure;
@@ -57,14 +54,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
 
     private void doLayout(ControlMeasure measure) {
         this.measure = measure;
-        this.efficiency = measure.getEfficiency();
-        EfficiencyRecord[] records = null;
-        if (efficiency != null)
-            records = efficiency.getEfficiencyRecords();
-        else {
-            this.efficiency = new ControlMeasureEfficiency("");
-            records = new EfficiencyRecord[0];
-        }
+        EfficiencyRecord[] records = measure.getEfficiencyRecords();
         updateMainPanel(records);
 
         setLayout(new BorderLayout());
@@ -170,8 +160,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
     }
 
     public void save(ControlMeasure measure) {
-        efficiency.setEfficiencyRecords(tableData.sources());
-        measure.setEfficiency(efficiency);
+        measure.setEfficiencyRecords(tableData.sources());
     }
 
     public void add(EfficiencyRecord record) {

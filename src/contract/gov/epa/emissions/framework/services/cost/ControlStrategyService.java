@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EMFService;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 
 public interface ControlStrategyService extends EMFService {
 
@@ -23,5 +22,5 @@ public interface ControlStrategyService extends EMFService {
     
     ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException;
     
-    void runStrategy (User user, ControlStrategy strategy, EmfDataset dataset) throws EmfException;
+    void runStrategy (User user, ControlStrategy strategy) throws EmfException;
 }

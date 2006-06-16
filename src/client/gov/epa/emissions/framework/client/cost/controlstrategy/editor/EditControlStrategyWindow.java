@@ -149,6 +149,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private Action stopAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
+                clearMessage();
                 presenter.stopRun();
             }
         };
@@ -158,6 +159,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         return new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 try {
+                    clearMessage();
                     presenter.doSave();
                     presenter.setResults(controlStrategy);
                     presenter.runStrategy();
@@ -171,6 +173,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private Action closeAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
+                clearMessage();
                 doClose();
             }
         };
@@ -193,6 +196,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                 resetChanges();
 
                 try {
+                    clearMessage();
                     presenter.doSave();
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
@@ -217,6 +221,15 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     
     public void windowClosing() {
         doClose();
+    }
+    
+    private void clearMessage() {
+        messagePanel.clear();
+    }
+    
+    public void signalChanges() {
+        clearMessage();
+        super.signalChanges();
     }
 
 }

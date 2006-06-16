@@ -3,8 +3,6 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
-import gov.epa.emissions.framework.services.cost.data.ControlMeasureEfficiency;
 import gov.epa.emissions.framework.services.cost.data.CostRecord;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.ui.AbstractTableData;
@@ -58,11 +56,10 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     private Float getCostPerTon(ControlMeasure measure) {
-        ControlMeasureCost cost = measure.getCost();
+        CostRecord[] records = measure.getCostRecords();
         String localPollutant = getLocalPollutant(measure);
 
-        if (cost != null) {
-            CostRecord[] records = cost.getCostRecords();
+        if (records.length != 0) {
             for (int i = 0; i < records.length; i++)
                 if (records[i].getPollutant().equalsIgnoreCase(localPollutant)) {
                     if (year == -9999)
@@ -77,11 +74,10 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     private Float getControlEfficiency(ControlMeasure measure) {
-        ControlMeasureEfficiency eff = measure.getEfficiency();
+        EfficiencyRecord[] records = measure.getEfficiencyRecords();
         String localPollutant = getLocalPollutant(measure);
 
-        if (eff != null) {
-            EfficiencyRecord[] records = eff.getEfficiencyRecords();
+        if (records.length != 0) {
             for (int i = 0; i < records.length; i++) {
                 if (records[i].getPollutant().equalsIgnoreCase(localPollutant))
                     return new Float(records[i].getEfficiency());

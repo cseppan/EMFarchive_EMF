@@ -33,20 +33,33 @@
             name="region" 
             class="gov.epa.emissions.commons.data.Region"
             column="region"/> 
-        <many-to-one cascade="save-update"
-            name="cost" 
-            class="gov.epa.emissions.framework.services.cost.data.ControlMeasureCost"
-            column="cost"/> 
-        <many-to-one cascade="save-update"
-            name="efficiency" 
-            class="gov.epa.emissions.framework.services.cost.data.ControlMeasureEfficiency"
-            column="efficiency"/> 
             
        <array name="sccs" table="control_measure_sccs" >
     	<key column="control_measures_id" not-null="true"/>
 	    <list-index column="list_index"/>
 		<element column="name" type="string"/>
 	   </array>
+
+       	<array name="costRecords" table="control_measure_costrecords" cascade="save-update">
+      		<key column="control_measures_id" not-null="true"/>
+      		<list-index column="list_index"/>
+		    <composite-element class="gov.epa.emissions.framework.services.cost.data.CostRecord">
+				<property name="name" column="name" type="java.lang.String" not-null="false"/>
+				<property name="pollutant" column="pollutant" type="java.lang.String" not-null="true"/>
+        		<property name="costYear" column="cost_year" type="integer" not-null="false"/>
+        		<property name="costPerTon" column="cost_per_ton" type="float" not-null="false"/>
+      		</composite-element>
+ 		</array>
+ 		
+ 		<array name="efficiencyRecords" table="control_measure_efficiencyrecords" cascade="save-update">
+      		<key column="control_measures_id" not-null="true"/>
+      		<list-index column="list_index"/>
+		    <composite-element class="gov.epa.emissions.framework.services.cost.data.EfficiencyRecord">
+				<property name="name" column="name" type="java.lang.String" not-null="false"/>
+				<property name="pollutant" column="pollutant" type="java.lang.String" not-null="true"/>
+        		<property name="efficiency" column="efficiency" type="float" not-null="false"/>
+      		</composite-element>
+ 		</array>
             
     </class>
 </hibernate-mapping>  

@@ -396,10 +396,10 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         completionDate = new JLabel(completionDateString == null ? "" : completionDateString);
         completionDate.setBackground(Color.white);
 
-        costValue = new JLabel("");
+        costValue = new JLabel("" + controlStrategy.getTotalCost());
         costValue.setBackground(Color.white);
 
-        emissionReductionValue = new JLabel("");
+        emissionReductionValue = new JLabel("" + controlStrategy.getReduction());
         emissionReductionValue.setBackground(Color.white);
 
         layoutGenerator.addLabelWidgetPair("Start Date:", startDate, panel);
@@ -518,5 +518,5 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
             messagePanel.setError(e.getMessage());
         }
     }
-
+    
 }

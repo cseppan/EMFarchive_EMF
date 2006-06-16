@@ -7,7 +7,6 @@ import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.data.ControlMeasureCost;
 import gov.epa.emissions.framework.services.cost.data.CostRecord;
 import gov.epa.emissions.framework.ui.EditableEmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -32,8 +31,6 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     private EditableEmfTableModel model;
 
     private ControlMeasureCostTableData tableData;
-
-    private ControlMeasureCost cost;
 
     private JPanel mainPanel;
 
@@ -61,14 +58,7 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
 
     private void doLayout(ControlMeasure measure) {
         this.measure = measure;
-        this.cost = measure.getCost();
-        CostRecord[] costRecords = null;
-        if (cost != null)
-            costRecords = cost.getCostRecords();
-        else {
-            this.cost = new ControlMeasureCost("");
-            costRecords = new CostRecord[0];
-        }
+        CostRecord[] costRecords = measure.getCostRecords();
         updateMainPanel(costRecords);
 
         setLayout(new BorderLayout());
@@ -218,8 +208,7 @@ public class EditableCostsTab extends JPanel implements EditableCostsTabView {
     }
 
     public void save(ControlMeasure measure) {
-        cost.setCostRecords(tableData.sources());
-        measure.setCost(cost);
+        measure.setCostRecords(tableData.sources());
     }
 
     public void add(CostRecord record) {

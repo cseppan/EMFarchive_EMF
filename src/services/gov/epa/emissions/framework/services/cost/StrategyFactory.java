@@ -1,9 +1,8 @@
 package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.db.DbServer;
-import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.framework.services.EmfException;
-import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.cost.analysis.Strategy;
 
 import java.lang.reflect.Constructor;
 
@@ -14,28 +13,35 @@ public class StrategyFactory {
     private static Log log = LogFactory.getLog(StrategyFactory.class);
 
     private DbServer dbServer;
+    
+    private CostService costService;
+    
+    private int batchSize;
 
-    public StrategyFactory(DbServer dbServer, SqlDataTypes sqlDataTypes) {
+    public StrategyFactory(DbServer dbServer, CostService costService, int batchSize) {
         this.dbServer = dbServer;
+        this.costService = costService;
+        this.batchSize = batchSize;
     }
 
-    public Strategy create(EmfDataset dataset, ControlStrategy controlStrategy) throws EmfException {
+    public Strategy create(ControlStrategy controlStrategy) throws EmfException {
         try {
-            return doCreate(dataset, controlStrategy);
+            return doCreate(controlStrategy);
         } catch (Exception e) {
             log.error("Failed to create strategy. Cause: " + e.getMessage());
             throw new EmfException(e.getMessage());
         }
     }
 
-    private Strategy doCreate(EmfDataset dataset, ControlStrategy controlStrategy) throws Exception {
+    private Strategy doCreate(ControlStrategy controlStrategy) throws Exception {
         String strategyClassName = controlStrategy.getStrategyType().getStrategyClassName();
         Class strategyClass = Class.forName(strategyClassName);
 
-        Class[] classParams = new Class[] { DbServer.class, ControlStrategy.class };
-        Object[] params = new Object[] { dbServer, controlStrategy };
+        Class[] classParams = new Class[] { DbServer.class, CostService.class, ControlStrategy.class, Integer.class };
+        Object[] params = new Object[] { costService, dbServer, controlStrategy, new Integer(batchSize) };
         
         Constructor strategyConstructor = strategyClass.getDeclaredConstructor(classParams);
         return (Strategy) strategyConstructor.newInstance(params);
     }
+    
 }

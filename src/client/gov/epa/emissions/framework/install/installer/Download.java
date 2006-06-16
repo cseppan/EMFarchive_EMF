@@ -28,7 +28,7 @@ public class Download extends Thread {
     
     private File2Download[] todownload;
 
-	public void initialize(String url, String filelist, String installhome) {
+	public void initialize(String url, String filelist, String installhome) throws InstallException {
         this.urlbase = url;
         this.installhome = installhome;
         this.filelist = filelist;
@@ -37,6 +37,7 @@ public class Download extends Thread {
             downloadFileList();
         } catch (IOException e) {
             setErrMsg("Downloading files list failed.");
+            throw new InstallException("Downloading files list failed.");
         }
         this.todownload = getFiles2Download();
     }	

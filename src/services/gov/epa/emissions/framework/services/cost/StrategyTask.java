@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.Status;
-import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.cost.analysis.Strategy;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Date;
@@ -21,8 +21,6 @@ public class StrategyTask implements Runnable {
 
     private Strategy strategy;
 
-    private EmfDataset dataset;
-
     private HibernateSessionFactory sessionFactory;
 
     private Services services;
@@ -31,10 +29,9 @@ public class StrategyTask implements Runnable {
     
     private ControlStrategyService csService;
 
-    public StrategyTask(EmfDataset dataset, Strategy strategy, User user, Services services,
-            HibernateSessionFactory sessionFactory, ControlStrategyService service) {
+    public StrategyTask(Strategy strategy, User user, Services services, HibernateSessionFactory sessionFactory,
+            ControlStrategyService service) {
         this.user = user;
-        this.dataset = dataset;
         this.services = services;
         this.sessionFactory = sessionFactory;
         this.strategy = strategy;
@@ -48,11 +45,11 @@ public class StrategyTask implements Runnable {
             session = sessionFactory.getSession();
             session.setFlushMode(FlushMode.NEVER);
             
-            prepare(session);
+            prepare();
             strategy.run();
             dao.add(strategy.getResult(), session);
             csService.updateControlStrategyWithLock(strategy.getControlStrategy());
-            complete(session);
+            complete();
         } catch (Exception e) {
             logError("Failed to run strategy : ", e);
             setStatus("Failed to run strategy: " + "Reason: " + e.getMessage());
@@ -63,14 +60,14 @@ public class StrategyTask implements Runnable {
         }
     }
 
-    private void prepare(Session session) {
+    private void prepare() {
         addStartStatus();
-        dataset.setStatus("Started running strategy");
+        strategy.getControlStrategy().setRunStatus("Started running strategy");
     }
 
-    private void complete(Session session) {
-        dataset.setStatus("Finished running strategy");
-        dataset.setModifiedDateTime(new Date());
+    private void complete() {
+        strategy.getControlStrategy().setRunStatus("Finished running strategy");
+        strategy.getControlStrategy().setLastModifiedDate(new Date());
 
         addCompletedStatus();
     }

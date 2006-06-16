@@ -6,8 +6,8 @@ import gov.epa.emissions.framework.services.GCEnforcerTask;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.LoggingServiceImpl;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
+import gov.epa.emissions.framework.services.cost.analysis.Strategy;
 import gov.epa.emissions.framework.services.data.DataServiceImpl;
-import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import org.apache.commons.logging.Log;
@@ -34,11 +34,11 @@ public class RunControlStrategy {
         this.services = services();
     }
 
-    public void run(User user, ControlStrategy controlStrategy, EmfDataset dataset, ControlStrategyService service) throws EmfException {
+    public void run(User user, ControlStrategy controlStrategy, ControlStrategyService service) throws EmfException {
         try {
-            Strategy strategy = factory.create(dataset, controlStrategy);
+            Strategy strategy = factory.create(controlStrategy);
             
-            StrategyTask task = new StrategyTask(dataset, strategy, user, services, sessionFactory, service);
+            StrategyTask task = new StrategyTask(strategy, user, services, sessionFactory, service);
             threadPool.execute(new GCEnforcerTask("Run Strategy: " + controlStrategy.getName(), task));
         } catch (Exception e) {
             log.error("Error running control strategy: " + controlStrategy.getName(), e);
