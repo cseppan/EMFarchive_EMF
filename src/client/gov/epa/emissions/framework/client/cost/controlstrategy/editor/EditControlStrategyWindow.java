@@ -44,7 +44,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public EditControlStrategyWindow(DesktopManager desktopManager, EmfSession session, EmfConsole parentConsole) {
-        super("Edit Control Strategy", new Dimension(650, 750), desktopManager);
+        super("Edit Control Strategy", new Dimension(650, 490), desktopManager);
         super.setMinimumSize(new Dimension(10, 10));
         this.session = session;
         this.parentConsole = parentConsole;

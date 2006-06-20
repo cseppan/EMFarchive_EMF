@@ -109,6 +109,10 @@ public class CreateDownloadFilesList {
         String absFilePath = file.getAbsolutePath();
         String relativePath = "/lib/" + file.getName();
         
+        if (absFilePath.indexOf("epa-commons") >= 0)
+            relativePath = "/lib/epa-commons.jar";
+        
+        
         if(absFilePath.equalsIgnoreCase(Constants.SCC_FILE))
             relativePath = "/config/ref/delimited/" + file.getName();
         
