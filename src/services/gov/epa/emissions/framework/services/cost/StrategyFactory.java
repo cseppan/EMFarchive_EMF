@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,15 +34,46 @@ public class StrategyFactory {
         }
     }
 
-    private Strategy doCreate(ControlStrategy controlStrategy) throws Exception {
+    private Strategy doCreate(ControlStrategy controlStrategy)  {
         String strategyClassName = controlStrategy.getStrategyType().getStrategyClassName();
-        Class strategyClass = Class.forName(strategyClassName);
-
+        Class strategyClass = null;
+        try {
+            strategyClass = Class.forName(strategyClassName);
+        } catch (ClassNotFoundException e2) {
+            // NOTE Auto-generated catch block
+            e2.printStackTrace();
+        }
+       
         Class[] classParams = new Class[] { DbServer.class, CostService.class, ControlStrategy.class, Integer.class };
-        Object[] params = new Object[] { costService, dbServer, controlStrategy, new Integer(batchSize) };
+        Object[] params = new Object[] { dbServer, costService, controlStrategy, new Integer(batchSize) };
+        Constructor strategyConstructor = null;
+        try {
+            strategyConstructor = strategyClass.getDeclaredConstructor(classParams);
+        } catch (SecurityException e1) {
+            // NOTE Auto-generated catch block
+            e1.printStackTrace();
+        } catch (NoSuchMethodException e1) {
+            // NOTE Auto-generated catch block
+            e1.printStackTrace();
+        }
         
-        Constructor strategyConstructor = strategyClass.getDeclaredConstructor(classParams);
-        return (Strategy) strategyConstructor.newInstance(params);
+        try {
+            return (Strategy) strategyConstructor.newInstance(params);
+        } catch (IllegalArgumentException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            // NOTE Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        return null;
     }
     
 }

@@ -25,8 +25,6 @@ public class StrategyTask implements Runnable {
 
     private Services services;
     
-    private ControlStrategyDAO dao;
-    
     private ControlStrategyService csService;
 
     public StrategyTask(Strategy strategy, User user, Services services, HibernateSessionFactory sessionFactory,
@@ -36,7 +34,6 @@ public class StrategyTask implements Runnable {
         this.sessionFactory = sessionFactory;
         this.strategy = strategy;
         this.csService = service;
-        this.dao = new ControlStrategyDAO();
     }
 
     public void run() {
@@ -47,7 +44,6 @@ public class StrategyTask implements Runnable {
             
             prepare();
             strategy.run();
-            dao.add(strategy.getResult(), session);
             csService.updateControlStrategyWithLock(strategy.getControlStrategy());
             complete();
         } catch (Exception e) {

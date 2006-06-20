@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
 public class RunControlStrategy {
-    
+
     private static Log log = LogFactory.getLog(RunControlStrategy.class);
 
     private StrategyFactory factory;
@@ -24,7 +24,7 @@ public class RunControlStrategy {
     private HibernateSessionFactory sessionFactory;
 
     private PooledExecutor threadPool;
-    
+
     private Services services;
 
     public RunControlStrategy(StrategyFactory factory, HibernateSessionFactory sessionFactory, PooledExecutor threadPool) {
@@ -37,19 +37,23 @@ public class RunControlStrategy {
     public void run(User user, ControlStrategy controlStrategy, ControlStrategyService service) throws EmfException {
         try {
             Strategy strategy = factory.create(controlStrategy);
-            
+            System.out.println("run c.s.: strategy: " + strategy.getClass());
+
             StrategyTask task = new StrategyTask(strategy, user, services, sessionFactory, service);
             threadPool.execute(new GCEnforcerTask("Run Strategy: " + controlStrategy.getName(), task));
         } catch (Exception e) {
             log.error("Error running control strategy: " + controlStrategy.getName(), e);
+
+            if (controlStrategy.getStrategyType().getName().equalsIgnoreCase("Least Cost"))
+                throw new EmfException("Least Cost Analysis is not supported.");
             throw new EmfException(e.getMessage());
         }
     }
-    
+
     public void stop() {
         threadPool.shutdownNow();
     }
-    
+
     private Services services() {
         Services services = new Services();
         services.setLoggingService(new LoggingServiceImpl(sessionFactory));
