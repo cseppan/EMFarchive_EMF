@@ -491,13 +491,13 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
         controlStrategy.setRunStatus("Running");
 
-        completionDate.setText("Running " + controlStrategy.getStrategyType().getName() + "...");
+        completionDate.setText("Running...");
         clearResultPanel();
     }
 
     public void stopRun() {
         controlStrategy.setRunStatus("Stopped");
-        completionDate.setText("Stopped running strategy.");
+        completionDate.setText("Stopped.");
         clearResultPanel();
     }
     
