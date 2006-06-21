@@ -37,6 +37,21 @@ CREATE TABLE emf.control_measure_sccs
 WITHOUT OIDS;
 -- emf.control_measure_sccs
 
+-- emf.strategy_types
+CREATE TABLE emf.strategy_types
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE,
+  description text NOT NULL,
+  default_sortorder text NULL DEFAULT '',
+  strategy_classname varchar(255),
+  lock_owner varchar(255),
+  lock_date timestamp
+) 
+WITHOUT OIDS;
+-- emf.strategy_types
+
+
 -- emf.control_strategies
 CREATE TABLE emf.control_strategies
 (
@@ -105,19 +120,6 @@ CREATE TABLE emf.control_measure_efficiencyrecords
 WITHOUT OIDS;
 -- emf.control_measure_efficiencyrecords
 
--- emf.strategy_types
-CREATE TABLE emf.strategy_types
-(
-  id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE,
-  description text NOT NULL,
-  default_sortorder text NULL DEFAULT '',
-  strategy_classname varchar(255),
-  lock_owner varchar(255),
-  lock_date timestamp
-) 
-WITHOUT OIDS;
--- emf.strategy_types
 
 -- emf.strategy_results
 CREATE TABLE emf.strategy_results
