@@ -81,7 +81,7 @@ public class EmfCall {
 
     public void enableSession() {
         call.setMaintainSession(true);
-        call.setTimeout(new Integer(60)); // should time out after 60 minutes 
+        call.setTimeout(new Integer(0));  
     }
 
     public void addIntegerParam(String id) {
