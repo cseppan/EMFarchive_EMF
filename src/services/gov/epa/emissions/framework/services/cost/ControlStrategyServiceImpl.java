@@ -48,10 +48,8 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
         
         StrategyFactory factory;
         try {
-            factory = new StrategyFactory(dbServer, null, 
+            factory = new StrategyFactory(dbServer, new CostServiceImpl(datasource, dbServer, sessionFactory), 
                     batchSize());
-//            factory = new StrategyFactory(dbServer, new CostServiceImpl(datasource, dbServer, sessionFactory), 
-//                    batchSize());
         } catch (Exception e) {
             LOG.error("could not access control measure service.");
             throw new EmfException("could not access control measure service.");
@@ -102,8 +100,7 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
 
             return locked;
         } catch (RuntimeException e) {
-            LOG
-                    .error("Could not obtain lock for Control Strategy: " + element + " by owner: "
+            LOG.error("Could not obtain lock for Control Strategy: " + element + " by owner: "
                             + owner.getUsername(), e);
             throw new EmfException("Could not obtain lock for Control Strategy: " + element + " by owner: "
                     + owner.getUsername());
@@ -118,9 +115,8 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
 
             return released;
         } catch (RuntimeException e) {
-            LOG.error(
-                    "Could not release lock for Control Strategy : " + locked + " by owner: " + locked.getLockOwner(),
-                    e);
+            LOG.error("Could not release lock for Control Strategy : " + locked + 
+                    " by owner: " + locked.getLockOwner(), e);
             throw new EmfException("Could not release lock for Control Strategy: " + locked + " by owner: "
                     + locked.getLockOwner());
         }

@@ -50,7 +50,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
             ControlStrategy element = controlStrategies[i];
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), region(element),
                     project(element), analysisType(element), dataset(element), version(element), 
-                    datasetType(element), element.getMajorPollutant(),
+                    datasetType(element), element.getTargetPollutant(),
                     costYear(element), "" + element.getAnalysisYear(), "" + element.getTotalCost(),
                     "" + element.getReduction(), element.getRunStatus(), format(element.getCompletionDate()),
                     element.getCreator().getName()};

@@ -6,6 +6,7 @@ import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.cost.data.StrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.util.ArrayList;
@@ -46,8 +47,10 @@ public class ControlStrategy implements Lockable {
     private DatasetType datasetType;
 
     private List datasetsList;
+    
+    private List strategyResults;
 
-    private String majorPollutant;
+    private String targetPollutant;
 
     private String runStatus;
 
@@ -60,6 +63,7 @@ public class ControlStrategy implements Lockable {
     public ControlStrategy() {
         this.lock = new Mutex();
         this.datasetsList = new ArrayList();
+        this.strategyResults = new ArrayList();
     }
 
     public ControlStrategy(String name) {
@@ -152,12 +156,12 @@ public class ControlStrategy implements Lockable {
         this.lastModifiedDate = lastModifiedDate;
     }
 
-    public String getMajorPollutant() {
-        return majorPollutant;
+    public String getTargetPollutant() {
+        return targetPollutant;
     }
 
-    public void setMajorPollutant(String majorPollutant) {
-        this.majorPollutant = majorPollutant;
+    public void setTargetPollutant(String targetPollutant) {
+        this.targetPollutant = targetPollutant;
     }
 
     public String getName() {
@@ -266,6 +270,19 @@ public class ControlStrategy implements Lockable {
 
     public void setTotalCost(double totalCost) {
         this.totalCost = totalCost;
+    }
+
+    public StrategyResult[] getStrategyResults() {
+        return (StrategyResult[])strategyResults.toArray(new StrategyResult[0]);
+    }
+
+    public void setStrategyResults(StrategyResult[] strategyResults) {
+        this.strategyResults.clear();
+        this.strategyResults.addAll(Arrays.asList(strategyResults));
+    }
+    
+    public void addStrategyResult(StrategyResult strategyResult) {
+        this.strategyResults.add(strategyResult);
     }
 
 }

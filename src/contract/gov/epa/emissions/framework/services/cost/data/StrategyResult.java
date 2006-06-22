@@ -1,73 +1,48 @@
 package gov.epa.emissions.framework.services.cost.data;
 
 import java.io.Serializable;
+import java.util.regex.Pattern;
 
 public class StrategyResult implements Serializable {
     
     private int id;
     
+    private String table;
+
+    private String[] cols;
+    
+    private String type;
+    
     private int datasetId;
     
-    private int sourceId;
+    private String datasetName;
     
-    private int controlMeasureID;
-    
-    private String controlMeasureAbbr;
-    
-    private double cost;
-    
-    private double costPerTon;
-    
-    private double redEmissions;
-    
-    private String pollutant;
-    
-    private String controlStrategy;
-    
-    private String scc;
-    
+    public int getDatasetId() {
+        return datasetId;
+    }
+
+    public void setDatasetId(int datasetId) {
+        this.datasetId = datasetId;
+    }
+
+    public String getDatasetName() {
+        return datasetName;
+    }
+
+    public void setDatasetName(String datasetName) {
+        this.datasetName = datasetName;
+    }
+
     public StrategyResult() {
         //
     }
 
-    public String getControlStrategy() {
-        return controlStrategy;
+    public String[] getCols() {
+        return cols;
     }
 
-    public void setControlStrategy(String controlStrategy) {
-        this.controlStrategy = controlStrategy;
-    }
-
-    public double getCostPerTon() {
-        return costPerTon;
-    }
-
-    public void setCostPerTon(double costPerTon) {
-        this.costPerTon = costPerTon;
-    }
-
-    public String getPollutant() {
-        return pollutant;
-    }
-
-    public void setPollutant(String pollutant) {
-        this.pollutant = pollutant;
-    }
-
-    public double getRedEmissions() {
-        return redEmissions;
-    }
-
-    public void setRedEmissions(double redEmissions) {
-        this.redEmissions = redEmissions;
-    }
-
-    public String getScc() {
-        return scc;
-    }
-
-    public void setScc(String scc) {
-        this.scc = scc;
+    public void setCols(String[] cols) {
+        this.cols = cols;
     }
 
     public int getId() {
@@ -78,43 +53,36 @@ public class StrategyResult implements Serializable {
         this.id = id;
     }
 
-    public String getControlMeasureAbbr() {
-        return controlMeasureAbbr;
+    public String getTable() {
+        return table;
     }
 
-    public void setControlMeasureAbbr(String controlMeasureAbbr) {
-        this.controlMeasureAbbr = controlMeasureAbbr;
+    public void setTable(String table) {
+        this.table = table;
     }
 
-    public int getControlMeasureID() {
-        return controlMeasureID;
+    public String getType() {
+        return type;
     }
 
-    public void setControlMeasureID(int controlMeasureID) {
-        this.controlMeasureID = controlMeasureID;
+    public void setType(String type) {
+        this.type = type;
+    }
+    
+    public String getColsList() {
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < cols.length; i++) {
+            buf.append(cols[i]);
+            if ((i + 1) < cols.length)
+                buf.append(", ");
+        }
+
+        return buf.toString();
     }
 
-    public double getCost() {
-        return cost;
+    public void setColsList(String colsList) {
+        Pattern p = Pattern.compile(", ");
+        cols = p.split(colsList);
     }
 
-    public void setCost(double cost) {
-        this.cost = cost;
-    }
-
-    public int getDatasetId() {
-        return datasetId;
-    }
-
-    public void setDatasetId(int datasetId) {
-        this.datasetId = datasetId;
-    }
-
-    public int getSourceId() {
-        return sourceId;
-    }
-
-    public void setSourceId(int sourceId) {
-        this.sourceId = sourceId;
-    }
 }

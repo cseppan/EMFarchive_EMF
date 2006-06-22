@@ -20,7 +20,7 @@
   	<property name="startDate" column="start_date" type="java.util.Date" not-null="false" length="4"/>
   	<property name="completionDate" column="completion_date" type="java.util.Date" not-null="false" length="4"/>
 	<property name="datasetVersion" column="dataset_version" type="integer" not-null="true"/>
-	<property name="majorPollutant"	column="major_pollutant" type="java.lang.String"/>
+	<property name="targetPollutant" column="target_pollutant" type="java.lang.String"/>
 	<property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
   	<property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
 		
@@ -54,6 +54,18 @@
 	    <list-index column="list_index"/>
     	<many-to-many class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>
 	</array>
+	
+	<array name="strategyResults" table="strategy_results">
+    	<key column="control_strategy_id"/>
+    	<list-index column="list_index"/>
+    	<composite-element class="gov.epa.emissions.framework.services.cost.data.StrategyResult">
+			<property name="table" column="table_name" not-null="true"/>
+			<property name="type" column="table_type" not-null="true"/>
+			<property name="colsList" column="table_columns" not-null="true"/>
+			<property name="datasetName" column="dataset_name" not-null="true"/>
+			<property name="datasetId" column="dataset_id" not-null="true"/>
+    	</composite-element>
+  	</array>
 
   </class> 
 </hibernate-mapping>  

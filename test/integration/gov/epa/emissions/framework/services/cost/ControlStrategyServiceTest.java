@@ -99,7 +99,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         ControlStrategy released = null;
         try {
             ControlStrategy locked = service.obtainLocked(owner, element);
-            
+
             session.clear();
             locked.setName("TEST");
             locked.setDescription("TEST control strategy");
@@ -112,6 +112,15 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         } finally {
             remove(element);
         }
+    }
+
+    public void testShouldGetStrategyTypes() throws Exception {
+        StrategyType[] types = service.getStrategyTypes();
+        session.clear();
+
+        assertEquals(2, types.length);
+        assertEquals("Max Emissions Reduction", types[1].getName());
+        assertEquals("Least Cost", types[0].getName());
     }
 
     private ControlStrategy load(ControlStrategy controlStrategy) {

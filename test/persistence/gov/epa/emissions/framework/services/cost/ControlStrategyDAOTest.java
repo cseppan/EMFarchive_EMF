@@ -58,5 +58,22 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
             remove(element);
         }
     }
+    
+    public void testShouldRemoveControlStrategy() {
+        int totalBeforeAdd = dao.all(session).size();
+        ControlStrategy element = newControlStrategy();
+        session.clear();
+        int totalAfterAdd = dao.all(session).size();
+        
+        assertEquals(totalAfterAdd, totalBeforeAdd + 1);
+
+        try {
+            dao.remove(element, session);
+            int totalAfterRemove = dao.all(session).size();
+            assertEquals(totalBeforeAdd, totalAfterRemove);
+        } catch (Exception e) {
+            remove(element);
+        }
+    }
 
 }

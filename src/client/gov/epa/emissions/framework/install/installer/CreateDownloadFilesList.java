@@ -111,7 +111,9 @@ public class CreateDownloadFilesList {
         
         if (absFilePath.indexOf("epa-commons") >= 0)
             relativePath = "/lib/epa-commons.jar";
-        
+
+        if (absFilePath.indexOf("analysis-engine") >= 0)
+            relativePath = "/lib/analysis-engine.jar";
         
         if(absFilePath.equalsIgnoreCase(Constants.SCC_FILE))
             relativePath = "/config/ref/delimited/" + file.getName();
@@ -119,7 +121,7 @@ public class CreateDownloadFilesList {
         if(absFilePath.equalsIgnoreCase(Constants.CLIENT_JAR_FILE))
             relativePath = File.separatorChar + file.getName();
         
-       return relativePath;
+        return relativePath;
     }
 
     private void printHeader() {

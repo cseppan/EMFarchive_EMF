@@ -30,7 +30,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
         controlStrategy1.setDiscountRate(0.5);
         controlStrategy1.setCostYear(2000);
         controlStrategy1.setAnalysisYear(2001);
-        controlStrategy1.setMajorPollutant("NoX");
+        controlStrategy1.setTargetPollutant("NoX");
         controlStrategy1.setLastModifiedDate(new Date());
         controlStrategy1.setCreator(new User("test user 1", "sss", "123-4567", "email@xxx.com", "xxx", "xxxxx123", false, false));
 
@@ -42,7 +42,7 @@ public class ControlStrategiesTableDataTest extends TestCase {
         controlStrategy2.setDiscountRate(0.5);
         controlStrategy2.setCostYear(2000);
         controlStrategy2.setAnalysisYear(2001);
-        controlStrategy2.setMajorPollutant("PM3");
+        controlStrategy2.setTargetPollutant("PM3");
         controlStrategy2.setLastModifiedDate(new Date());
         controlStrategy2.setCreator(new User("test user 2", "sss", "123-4567", "email@xxx.com", "xxx", "xxxxx123", false, false));
         

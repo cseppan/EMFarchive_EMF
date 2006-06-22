@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.services.cost.analysis;
 
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.data.CostRecord;
+import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,16 +12,28 @@ import java.util.Map;
 public class SCCControlMeasureMap {
    
     private Map map;
+    
+    private String pollutant;
+    
+    private int costYear;
 
-    public SCCControlMeasureMap(String[] sccs, ControlMeasure[] measures) {
+    public SCCControlMeasureMap(String[] sccs, ControlMeasure[] measures, String pollutant, int costYear) {
         this.map = new HashMap();
+        this.pollutant = pollutant;
+        this.costYear = costYear;
         
         setMaps(sccs, measures);
     }
     
     private void setMaps(String[] sccs, ControlMeasure[] measures) {
-        for (int i = 0; i < sccs.length; i++)
-            map.put(sccs[i], getControlMeasuresList(sccs[i], measures));
+        for (int i = 0; i < sccs.length; i++) {
+            List measuresList = getControlMeasuresList(sccs[i], measures);
+            ControlMeasure seed = calculateMaxMeasure(measuresList);
+            ControlMeasure maxRedMeasure = calculateTargetMeasure(seed, measuresList);
+            System.out.println("scc map: sccs[" + i + "]: " + sccs[i] + " max measure: " +
+                    maxRedMeasure);
+            map.put(sccs[i], maxRedMeasure);
+        }
     }
 
     private List getControlMeasuresList(String scc, ControlMeasure[] measures) {
@@ -42,8 +56,78 @@ public class SCCControlMeasureMap {
         return false;
     }
     
-    public List getMappedControlMeasuresList(String scc) {
-        return (List) map.get(scc);
+    public ControlMeasure getMaxRedControlMeasure(String scc) {
+        return (ControlMeasure) map.get(scc);
+    }
+    
+    private ControlMeasure calculateTargetMeasure(ControlMeasure seed, List measures) {
+        ControlMeasure previous = seed;
+        if (previous == null)
+            return previous;
+        measures.remove(previous);
+
+        ControlMeasure next = calculateMaxMeasure(measures);
+        if (next == null)
+            return previous;
+        measures.remove(next);
+
+        // Recursively check if there are two control measures that have the same control
+        // efficiency
+        float previousEff = getEfficiency(previous);
+        float nextEff = getEfficiency(next);
+        
+        if ( previousEff > nextEff)
+            return previous;
+        
+        if (previousEff == nextEff)
+            seed = getMeasureWithSmallerCost(previous, next); 
+        
+        if (previousEff < nextEff)
+            seed = next;
+        
+        return calculateTargetMeasure(seed, measures);
+    }
+
+    private ControlMeasure getMeasureWithSmallerCost(ControlMeasure previous, ControlMeasure next) {
+        return getCostPerTon(previous) <= getCostPerTon(next) ? previous : next;
+    }
+    
+    private float getCostPerTon(ControlMeasure measure) {
+        CostRecord[] records = measure.getCostRecords();
+
+        for (int i = 0; i < records.length; i++) {
+            String pollutant = records[i].getPollutant();
+            if (pollutant.equalsIgnoreCase(pollutant) && costYear == records[i].getCostYear())
+                return records[i].getCostPerTon();
+        }
+
+        return 0; // assume cost per ton >= 0;
+    }
+
+    private ControlMeasure calculateMaxMeasure(List measureList) {
+        if (measureList.size() == 0)
+            return null;
+
+        ControlMeasure temp = (ControlMeasure) measureList.get(0);
+
+        for (int i = 1; i < measureList.size(); i++) {
+            if (getEfficiency(temp) < getEfficiency((ControlMeasure) measureList.get(i)))
+                temp = (ControlMeasure) measureList.get(i);
+        }
+        
+        return temp;
+    }
+
+    private float getEfficiency(ControlMeasure measure) {
+        EfficiencyRecord[] records = measure.getEfficiencyRecords();
+
+        for (int i = 0; i < records.length; i++) {
+            String pollutant = records[i].getPollutant();
+            if (pollutant.equalsIgnoreCase(this.pollutant))
+                return records[i].getEfficiency();
+        }
+
+        return 0; // assume efficiency >= 0;
     }
     
 }

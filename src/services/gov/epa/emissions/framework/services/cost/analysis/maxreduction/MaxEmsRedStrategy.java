@@ -8,6 +8,7 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.OptimizedQuery;
 import gov.epa.emissions.commons.db.OptimizedTableModifier;
+import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.framework.services.EmfException;
@@ -17,6 +18,7 @@ import gov.epa.emissions.framework.services.cost.CostService;
 import gov.epa.emissions.framework.services.cost.analysis.ResultTable;
 import gov.epa.emissions.framework.services.cost.analysis.SCCControlMeasureMap;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
+import gov.epa.emissions.framework.services.cost.data.StrategyResult;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,6 +41,8 @@ public class MaxEmsRedStrategy implements Strategy {
     private ControlMeasure[] measures;
 
     private SCCControlMeasureMap map;
+    
+    private ResultTable resultTable;
 
     private int batchSize;
 
@@ -53,12 +57,10 @@ public class MaxEmsRedStrategy implements Strategy {
         this.costService = costService;
         this.tableFormat = new MaxEmsRedTableFormat(dbServer.getSqlDataTypes());
 
-        //setup();
-        if (1 == -1) 
-            throw new EmfException("this will never happen.");
+        setup();
     }
 
-    public void setup() throws EmfException {
+    private void setup() throws EmfException {
         try {
             this.sccs = getSCCs(datasets, datasource);
         } catch (SQLException e) {
@@ -66,51 +68,61 @@ public class MaxEmsRedStrategy implements Strategy {
         }
 
         this.measures = costService.getMeasures();
-        this.map = new SCCControlMeasureMap(sccs, measures);
+        this.map = new SCCControlMeasureMap(sccs, measures, controlStrategy.getTargetPollutant(), controlStrategy.getCostYear());
     }
 
     public void run() throws EmfException {
-//        try {
-//            calculateResult(datasets, datasource);
-//        } catch (Exception e) {
-//            throw new EmfException(e.getMessage());
-//        }
-//
-//        setControlStrategy();
-        if (1 == -1) 
-            throw new EmfException("this will never happen.");
+        try {
+            calculateResult(datasets, datasource);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
+
+        setCompletionDate();
     }
 
-    public void calculateResult(Dataset[] datasets, Datasource datasource) throws Exception {
-        for (int i = 0; i < datasets.length; i++)
+    private void calculateResult(Dataset[] datasets, Datasource datasource) throws Exception {
+        for (int i = 0; i < datasets.length; i++) {
             calculateResultForSingleDataset(datasets[i], datasource);
+            StrategyResult result = setStrategyResult(datasets[i]);
+            controlStrategy.addStrategyResult(result);
+        }
     }
 
     private void calculateResultForSingleDataset(Dataset dataset, Datasource datasource) throws Exception {
         String query = getSourceQueryString(dataset, datasource);
-        OptimizedQuery runner = datasource.optimizedQuery(query, batchSize);
+        OptimizedQuery runner = runner = datasource.optimizedQuery(query, batchSize);
 
-        OptimizedTableModifier modifier = createResultTable("MaxEmsRedStrategy_" + dataset.getName());
+        OptimizedTableModifier modifier = createResultTable(getResultTableName(dataset));
 
-        while (runner.execute()) {
-            ResultSet resultSet = runner.getResultSet();
-            writeBatchOfData(dataset.getId(), resultSet, modifier);
-            resultSet.close();
+        try {
+            while (runner.execute()) {
+                ResultSet resultSet = runner.getResultSet();
+                writeBatchOfData(dataset.getId(), resultSet, modifier);
+                resultSet.close();
+            }
+
+            runner.close();
+            closeResultTable(modifier);
+        } catch (Exception e) {
+            resultTable.drop();
         }
+    }
 
-        runner.close();
-        closeResultTable(modifier);
+    private String getResultTableName(Dataset dataset) {
+        return "MaxEmsRedStrategy_dataset_" + dataset.getId();
     }
 
     private OptimizedTableModifier createResultTable(String table) throws Exception {
         OptimizedTableModifier modifier = null;
-        ResultTable resultTable = new ResultTable(table, datasource);
+        resultTable = new ResultTable(table, datasource);
         try {
             resultTable.create(tableFormat);
             modifier = dataModifier(datasource, table);
             modifier.start();
         } catch (Exception e) {
             resultTable.drop();
+            throw new EmfException(e.getMessage());
         }
 
         return modifier;
@@ -126,13 +138,8 @@ public class MaxEmsRedStrategy implements Strategy {
 
     private void writeBatchOfData(int datasetId, ResultSet resultSet, OptimizedTableModifier modifier) throws Exception {
         while (resultSet.next()) {
-            String scc = resultSet.getString("scc");
-            int sourceId = resultSet.getInt("Record_Id");
-            List measures = map.getMappedControlMeasuresList(scc);
-            float ann_emis = resultSet.getFloat("ANN_EMIS");
-            MaxRedControlMeasureFinder finder = new MaxRedControlMeasureFinder(datasetId, sourceId, measures, scc, 
-                    ann_emis, controlStrategy);
-            Record record = finder.getRecord();
+            RecordGenerator generator = new RecordGenerator(datasetId, resultSet, map, controlStrategy);
+            Record record = generator.getRecord();
             insertRecord(record, modifier);
         }
     }
@@ -152,9 +159,11 @@ public class MaxEmsRedStrategy implements Strategy {
 
     private void closeResultTable(OptimizedTableModifier modifier) throws EmfException {
         try {
-            if (modifier != null)
-                modifier.close();
+            if (modifier == null)
+                return;
+
             modifier.finish();
+            modifier.close();
         } catch (SQLException e) {
             throw new EmfException(e.getMessage());
         }
@@ -167,7 +176,7 @@ public class MaxEmsRedStrategy implements Strategy {
         ResultSet resultSet = dq.executeQuery(query);
         if (resultSet == null)
             return new String[0];
-        
+
         String[] sccs = extractSCCs(resultSet);
         resultSet.close();
 
@@ -185,15 +194,14 @@ public class MaxEmsRedStrategy implements Strategy {
 
     private String getSCCQueryString(Dataset[] datasets, Datasource datasource) {
         String queryBase = "SELECT DISTINCT scc FROM ";
-        String whereClause = "WHERE poll=" + "\'50000\'";
-//        String whereClause = "WHERE poll=" + "\'" + controlStrategy.getMajorPollutant() + "\'";
+        String whereClause = "WHERE poll=" + "\'" + controlStrategy.getTargetPollutant() + "\'";
 
         return getQueryString(datasets, datasource, queryBase, whereClause);
     }
 
     private String getSourceQueryString(Dataset dataset, Datasource datasource) {
         String queryBase = "SELECT * FROM ";
-        String whereClause = "WHERE poll=" + "\'" + controlStrategy.getMajorPollutant() + "\'";
+        String whereClause = "WHERE poll=" + "\'" + controlStrategy.getTargetPollutant() + "\'";
 
         return getQueryString(new Dataset[] { dataset }, datasource, queryBase, whereClause);
     }
@@ -210,7 +218,7 @@ public class MaxEmsRedStrategy implements Strategy {
 
             qualifiedTables += getTableNames(datasource, sources) + ", ";
         }
-        System.out.println("max strategy: scc query: " + queryBase + qualifiedTables + whereClause);
+
         return queryBase + qualifiedTables + whereClause;
     }
 
@@ -226,12 +234,31 @@ public class MaxEmsRedStrategy implements Strategy {
         return null;
     }
 
-    public void setControlStrategy() {
+    public void setCompletionDate() {
         controlStrategy.setCompletionDate(new Date());
     }
 
     public ControlStrategy getControlStrategy() {
         return controlStrategy;
+    }
+    
+    private StrategyResult setStrategyResult(Dataset dataset) {
+        StrategyResult result = new StrategyResult();
+        result.setTable(getResultTableName(dataset));
+        result.setCols(colNames(this.tableFormat.cols()));
+        result.setType(this.tableFormat.identify());
+        result.setDatasetId(dataset.getId());
+        result.setDatasetName(dataset.getName());
+        
+        return result;
+    }
+
+    private String[] colNames(Column[] cols) {
+        List names = new ArrayList();
+        for (int i = 0; i < cols.length; i++)
+            names.add(cols[i].name());
+
+        return (String[]) names.toArray(new String[0]);
     }
 
 }

@@ -363,7 +363,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private ComboBox majorPollutants() {
         String[] pollutants = { "NOx", "PM10", "PM2.5", "SO2", "VOC", "CO", "CO2", "EC", "OC", "NH3", "Hg" };
         majorPollutant = new ComboBox(pollutants);
-        majorPollutant.setSelectedItem(controlStrategy.getMajorPollutant());
+        majorPollutant.setSelectedItem(controlStrategy.getTargetPollutant());
         majorPollutant.setPreferredSize(comboSize);
 
         changeablesList.addChangeable(majorPollutant);
@@ -431,7 +431,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setCostYear(costYear.getValue());
         controlStrategy.setAnalysisYear(analysisYear.getValue());
         updateRegion();
-        controlStrategy.setMajorPollutant((String) majorPollutant.getSelectedItem());
+        controlStrategy.setTargetPollutant((String) majorPollutant.getSelectedItem());
         controlStrategy.setStartDate(this.controlStrategy.getStartDate());
         controlStrategy.setRunStatus(this.controlStrategy.getRunStatus());
         if (strategyTypeCombo.getSelectedIndex() == 0)

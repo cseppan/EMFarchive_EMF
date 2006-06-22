@@ -37,8 +37,6 @@ public class RunControlStrategy {
     public void run(User user, ControlStrategy controlStrategy, ControlStrategyService service) throws EmfException {
         try {
             Strategy strategy = factory.create(controlStrategy);
-            System.out.println("run c.s.: strategy: " + strategy.getClass());
-
             StrategyTask task = new StrategyTask(strategy, user, services, sessionFactory, service);
             threadPool.execute(new GCEnforcerTask("Run Strategy: " + controlStrategy.getName(), task));
         } catch (Exception e) {
