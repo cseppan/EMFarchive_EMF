@@ -310,7 +310,8 @@
 		
 	</target>
 
-	<target name="client-installer-dist" depends="clean, init, compile-client, client-env, client-dist-sandbox" description="Builds the EMF Client installer distribution files excluding dependent jar file">
+	<target name="client-installer-dist" depends="clean, init, compile-client, client-env, client-dist-sandbox, commons-dist" 
+		description="Builds the EMF Client installer distribution files excluding dependent jar file">
 		<jar jarfile="${client.dist.dir}/${app.name}-client.jar">
 			<fileset dir="${build.classes.dir}" includes="**/*" />
 			<fileset dir="." includes="${scc.ref.dir}/scc.txt" />
@@ -324,6 +325,11 @@
                     value="gov.epa.emissions.framework.install.installer.EMFClient" />
             </manifest>
 		</jar>
+		
+		<ant dir="${commons.basedir}" target="do-dist" inheritall="false" />
+		<copy tofile="${client.dist.dir}/epa-commons.jar">
+			<fileset dir="${commons.basedir}/build/sandbox" includes="*.jar" />
+		</copy>
 		
 		<java classname="gov.epa.emissions.framework.install.installer.CreateDownloadFilesList" fork="true" failonerror="true">
 			<classpath>
