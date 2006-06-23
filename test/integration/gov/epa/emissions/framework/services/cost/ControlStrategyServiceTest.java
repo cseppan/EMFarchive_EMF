@@ -14,14 +14,18 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
+import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
+
 public class ControlStrategyServiceTest extends ServiceTestCase {
 
     private ControlStrategyService service;
 
     private UserServiceImpl userService;
 
+    private HibernateSessionFactory sessionFactory;
+
     protected void doSetUp() throws Exception {
-        HibernateSessionFactory sessionFactory = sessionFactory(configFile());
+        sessionFactory = sessionFactory(configFile());
         service = new ControlStrategyServiceImpl(super.emf(), super.dbServer(), sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
     }
@@ -114,6 +118,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         }
     }
 
+    // Need to populate the test database table emf.strategy_type to pass this test.
     public void testShouldGetStrategyTypes() throws Exception {
         StrategyType[] types = service.getStrategyTypes();
         session.clear();
@@ -121,6 +126,45 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         assertEquals(2, types.length);
         assertEquals("Max Emissions Reduction", types[1].getName());
         assertEquals("Least Cost", types[0].getName());
+    }
+
+    public void testShouldUpdateControlStrategyWithLock() throws Exception {
+        User owner = userService.getUser("emf");
+        ControlStrategy element = controlStrategy();
+        ControlStrategy csWithLock = null;
+        try {
+            ControlStrategy locked = service.obtainLocked(owner, element);
+
+            session.clear();
+            locked.setName("TEST");
+            locked.setDescription("TEST control strategy");
+
+            csWithLock = service.updateControlStrategyWithLock(locked);
+            assertEquals("TEST", csWithLock.getName());
+            assertEquals("TEST control strategy", csWithLock.getDescription());
+            assertEquals(csWithLock.getLockOwner(), owner.getUsername());
+            assertTrue("Lock should be kept on update", csWithLock.isLocked());
+        } finally {
+            remove(element);
+        }
+    }
+
+    public void testShouldRunControlStrategyWithoutError() throws Exception {
+        User owner = userService.getUser("emf");
+        ControlStrategy element = new ControlStrategy("test" + Math.random());
+        StrategyType type = new StrategyType("max red emissions");
+        type.setStrategyClassName("gov.epa.emissions.framework.services.cost.analysis.maxreduction.DummyMaxEmsRedStrategyForTest");
+        element.setStrategyType(type);
+
+        CostServiceImpl costService = new CostServiceImpl(super.emf(), super.dbServer(), sessionFactory);
+        StrategyFactory strategyFactory = new StrategyFactory(dbServer(), costService, 10000);
+        PooledExecutor threadPool = new PooledExecutor(20);
+        threadPool.setMinimumPoolSize(1);
+        threadPool.setKeepAliveTime(1000 * 60 * 3);
+        RunControlStrategy runStrategy = new RunControlStrategy(strategyFactory, sessionFactory, threadPool);
+        strategyFactory.create(element);
+        runStrategy.run(owner, element, service);
+        service.runStrategy(owner, element);
     }
 
     private ControlStrategy load(ControlStrategy controlStrategy) {

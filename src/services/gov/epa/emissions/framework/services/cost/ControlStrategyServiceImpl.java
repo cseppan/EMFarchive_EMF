@@ -146,10 +146,10 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
             if (!dao.canUpdate(element, session))
                 throw new EmfException("Control Strategy name already in use");
             
-            ControlStrategy released = dao.updateWithLock(element, session);
+            ControlStrategy csWithLock = dao.updateWithLock(element, session);
             session.close();
             
-            return released;
+            return csWithLock;
         } catch (RuntimeException e) {
             LOG.error("Could not update Control Strategy: " + element, e);
             throw new EmfException("Could not update ControlStrategy: " + element);

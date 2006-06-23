@@ -35,11 +35,11 @@ public class StrategyFactory {
 
     private Strategy doCreate(ControlStrategy controlStrategy) throws Exception {
         String strategyClassName = controlStrategy.getStrategyType().getStrategyClassName();
-        Class strategyClass = strategyClass = Class.forName(strategyClassName);
+        Class strategyClass  = Class.forName(strategyClassName);
 
         Class[] classParams = new Class[] { DbServer.class, CostService.class, ControlStrategy.class, Integer.class };
         Object[] params = new Object[] { dbServer, costService, controlStrategy, new Integer(batchSize) };
-        Constructor strategyConstructor = strategyConstructor = strategyClass.getDeclaredConstructor(classParams);
+        Constructor strategyConstructor = strategyClass.getDeclaredConstructor(classParams);
         
         return (Strategy) strategyConstructor.newInstance(params);
     }
