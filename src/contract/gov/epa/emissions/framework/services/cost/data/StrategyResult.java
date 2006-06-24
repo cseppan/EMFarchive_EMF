@@ -17,6 +17,18 @@ public class StrategyResult implements Serializable {
     
     private String datasetName;
     
+    private double totalCost;
+    
+    private double totalReduction;
+    
+    public double getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(double totalCost) {
+        this.totalCost = totalCost;
+    }
+
     public int getDatasetId() {
         return datasetId;
     }
@@ -83,6 +95,14 @@ public class StrategyResult implements Serializable {
     public void setColsList(String colsList) {
         Pattern p = Pattern.compile(", ");
         cols = p.split(colsList);
+    }
+
+    public double getTotalReduction() {
+        return totalReduction;
+    }
+
+    public void setTotalReduction(double totalReduction) {
+        this.totalReduction = totalReduction;
     }
 
 }

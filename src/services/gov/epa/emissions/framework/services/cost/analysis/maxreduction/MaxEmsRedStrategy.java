@@ -47,6 +47,10 @@ public class MaxEmsRedStrategy implements Strategy {
     private int batchSize;
 
     private CostService costService;
+    
+    private double totalCost;
+    
+    private double totalReduction;
 
     public MaxEmsRedStrategy(DbServer dbServer, CostService costService, ControlStrategy strategy, Integer batchSize)
             throws EmfException {
@@ -110,7 +114,7 @@ public class MaxEmsRedStrategy implements Strategy {
     }
 
     private String getResultTableName(Dataset dataset) {
-        return "MaxEmsRedStrategy_dataset_" + dataset.getId();
+        return "MaxEmsRedStrategy_ID_" + controlStrategy.getId() + "_datasetID_" + dataset.getId();
     }
 
     private OptimizedTableModifier createResultTable(String table) throws Exception {
@@ -140,6 +144,8 @@ public class MaxEmsRedStrategy implements Strategy {
         while (resultSet.next()) {
             RecordGenerator generator = new RecordGenerator(datasetId, resultSet, map, controlStrategy);
             Record record = generator.getRecord();
+            totalCost += generator.getCost();
+            totalReduction += generator.getReducedEmissions();
             insertRecord(record, modifier);
         }
     }
@@ -249,8 +255,16 @@ public class MaxEmsRedStrategy implements Strategy {
         result.setType(this.tableFormat.identify());
         result.setDatasetId(dataset.getId());
         result.setDatasetName(dataset.getName());
+        result.setTotalCost(this.totalCost);
+        result.setTotalReduction(this.totalReduction);
+        resetTotalCostAndReduction();
         
         return result;
+    }
+
+    private void resetTotalCostAndReduction() {
+        this.totalCost = 0;
+        this.totalReduction = 0;
     }
 
     private String[] colNames(Column[] cols) {

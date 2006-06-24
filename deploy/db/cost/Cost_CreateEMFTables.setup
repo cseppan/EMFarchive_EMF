@@ -127,6 +127,8 @@ CREATE TABLE emf.strategy_results
   id SERIAL PRIMARY KEY,
   control_strategy_id int4 NOT NULL REFERENCES emf.control_strategies(id),
   list_index int4,
+  total_cost real,
+  total_reduction real,
   dataset_id int4,
   dataset_name varchar(255) NOT NULL,
   table_name varchar(255) NOT NULL,

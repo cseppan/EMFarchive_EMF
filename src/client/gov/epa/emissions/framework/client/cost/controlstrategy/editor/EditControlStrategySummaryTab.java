@@ -20,6 +20,7 @@ import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
+import gov.epa.emissions.framework.services.cost.data.StrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.IntTextField;
@@ -396,10 +397,10 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         completionDate = new JLabel(completionDateString == null ? "" : completionDateString);
         completionDate.setBackground(Color.white);
 
-        costValue = new JLabel("" + controlStrategy.getTotalCost());
+        costValue = new JLabel("" + getTotalCost(controlStrategy));
         costValue.setBackground(Color.white);
 
-        emissionReductionValue = new JLabel("" + controlStrategy.getReduction());
+        emissionReductionValue = new JLabel("" + getReduction(controlStrategy));
         emissionReductionValue.setBackground(Color.white);
 
         layoutGenerator.addLabelWidgetPair("Start Date:", startDate, panel);
@@ -413,6 +414,28 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
                 10, 10);// xPad, yPad
 
         return panel;
+    }
+
+    private double getReduction(ControlStrategy cs) {
+        StrategyResult[] results = cs.getStrategyResults();
+        double totalReduction = 0;
+        
+        if(results.length > 0)
+            for (int i = 0; i < results.length; i++)
+                totalReduction += results[i].getTotalReduction();
+        
+        return totalReduction;
+    }
+
+    private double getTotalCost(ControlStrategy cs) {
+        StrategyResult[] results = cs.getStrategyResults();
+        double totalCost = 0;
+        
+        if(results.length > 0)
+            for (int i = 0; i < results.length; i++)
+                totalCost += results[i].getTotalCost();
+        
+        return totalCost;
     }
 
     private String getFormmatedDate(Date date) {
@@ -508,12 +531,12 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
 
     public void doRefresh() {
         try {
-            ControlStrategy cs = session.controlStrategyService().obtainLocked(session.user(), controlStrategy);
+            ControlStrategy cs = session.controlStrategyService().updateControlStrategyWithLock(controlStrategy);
             Date date = cs.getCompletionDate();
             if (date != null)
                 completionDate.setText(DATE_FORMATTER.format(date));
-            costValue.setText("" + cs.getTotalCost());
-            emissionReductionValue.setText("" + cs.getReduction());
+            costValue.setText("" + getTotalCost(cs));
+            emissionReductionValue.setText("" + getReduction(cs));
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }

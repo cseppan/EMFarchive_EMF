@@ -25,7 +25,7 @@ public class RecordGenerator {
 
     private ControlMeasure maxRedMeasure;
 
-    private float annEmissions;
+    private double annEmissions;
 
     public RecordGenerator(int datasetId, ResultSet resultSet, SCCControlMeasureMap map, 
             ControlStrategy controlStrategy) throws SQLException {
@@ -34,7 +34,7 @@ public class RecordGenerator {
         
         this.scc = resultSet.getString("scc");
         this.sourceId = resultSet.getInt("Record_Id");
-        this.annEmissions = resultSet.getFloat("ANN_EMIS");
+        this.annEmissions = resultSet.getDouble("ANN_EMIS");
         this.maxRedMeasure = map.getMaxRedControlMeasure(scc);
     }
     
@@ -68,9 +68,9 @@ public class RecordGenerator {
             tokens.add(4, maxRedMeasure.getAbbreviation());
             tokens.add(5, controlStrategy.getName());
             tokens.add(6, scc);
-            tokens.add(7, "" + getCost(maxRedMeasure));
+            tokens.add(7, "" + getCost());
             tokens.add(8, "" + getCostPerTon(maxRedMeasure));
-            tokens.add(9, "" + getReducedEmissions(maxRedMeasure));
+            tokens.add(9, "" + getReducedEmissions());
         }
         
         return (String[]) tokens.toArray(new String[0]);
@@ -103,12 +103,12 @@ public class RecordGenerator {
         return 0; // assume cost per ton >= 0;
     }
 
-    private float getCost(ControlMeasure measure) {
-        return annEmissions * getCostPerTon(measure);
+    public double getCost() {
+        return annEmissions * getCostPerTon(maxRedMeasure);
     }
 
-    private float getReducedEmissions(ControlMeasure measure) {
-        return annEmissions * getEfficiency(measure);
+    public double getReducedEmissions() {
+        return annEmissions * getEfficiency(maxRedMeasure);
     }
-    
+
 }

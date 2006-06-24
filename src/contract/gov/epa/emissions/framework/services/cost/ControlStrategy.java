@@ -28,10 +28,6 @@ public class ControlStrategy implements Lockable {
 
     private double discountRate;
     
-    private double totalCost;
-    
-    private double reduction;
-
     private int costYear;
 
     private int analysisYear;
@@ -254,22 +250,6 @@ public class ControlStrategy implements Lockable {
 
     public void setStrategyType(StrategyType strategyType) {
         this.strategyType = strategyType;
-    }
-
-    public double getReduction() {
-        return reduction;
-    }
-
-    public void setReduction(double reduction) {
-        this.reduction = reduction;
-    }
-
-    public double getTotalCost() {
-        return totalCost;
-    }
-
-    public void setTotalCost(double totalCost) {
-        this.totalCost = totalCost;
     }
 
     public StrategyResult[] getStrategyResults() {

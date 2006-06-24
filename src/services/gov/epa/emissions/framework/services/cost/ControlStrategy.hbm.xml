@@ -12,8 +12,6 @@
 	<property name="description" column="description" type="java.lang.String"/>
 	<property name="runStatus" column="run_status"	type="java.lang.String"/>
 	<property name="discountRate" column="discount_rate" type="double"/>
-	<property name="reduction" column="reduction" type="double"/>
-	<property name="totalCost" column="total_cost" type="double"/>
 	<property name="costYear" column="cost_year" type="integer" not-null="false"/>
 	<property name="analysisYear" column="analysis_year" type="integer" not-null="false"/>
 	<property name="lastModifiedDate" column="last_modified_date" type="java.util.Date" not-null="false" length="4"/>
@@ -64,6 +62,8 @@
 			<property name="colsList" column="table_columns" not-null="true"/>
 			<property name="datasetName" column="dataset_name" not-null="true"/>
 			<property name="datasetId" column="dataset_id" not-null="true"/>
+			<property name="totalCost" column="total_cost" not-null="true"/>
+			<property name="totalReduction" column="total_reduction" not-null="true"/>
     	</composite-element>
   	</array>
 

@@ -5,6 +5,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
+import gov.epa.emissions.framework.services.cost.data.StrategyResult;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -51,14 +52,36 @@ public class ControlStrategiesTableData extends AbstractTableData {
             Object[] values = { element.getName(), format(element.getLastModifiedDate()), region(element),
                     project(element), analysisType(element), dataset(element), version(element), 
                     datasetType(element), element.getTargetPollutant(),
-                    costYear(element), "" + element.getAnalysisYear(), "" + element.getTotalCost(),
-                    "" + element.getReduction(), element.getRunStatus(), format(element.getCompletionDate()),
+                    costYear(element), "" + element.getAnalysisYear(), "" + getTotalCost(element),
+                    "" + getReduction(element), element.getRunStatus(), format(element.getCompletionDate()),
                     element.getCreator().getName()};
             Row row = new ViewableRow(element, values);
             rows.add(row);
         }
 
         return rows;
+    }
+
+    private double getReduction(ControlStrategy element) {
+        StrategyResult[] results = element.getStrategyResults();
+        double totalReduction = 0;
+        
+        if(results.length > 0)
+            for (int i = 0; i < results.length; i++)
+                totalReduction += results[i].getTotalReduction();
+        
+        return totalReduction;
+    }
+
+    private double getTotalCost(ControlStrategy element) {
+        StrategyResult[] results = element.getStrategyResults();
+        double totalCost = 0;
+        
+        if(results.length > 0)
+            for (int i = 0; i < results.length; i++)
+                totalCost += results[i].getTotalCost();
+        
+        return totalCost;
     }
 
     private String version(ControlStrategy element) {
