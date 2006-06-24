@@ -14,8 +14,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
-
 public class ControlStrategyServiceTest extends ServiceTestCase {
 
     private ControlStrategyService service;
@@ -156,14 +154,6 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         type.setStrategyClassName("gov.epa.emissions.framework.services.cost.analysis.maxreduction.DummyMaxEmsRedStrategyForTest");
         element.setStrategyType(type);
 
-        CostServiceImpl costService = new CostServiceImpl(super.emf(), super.dbServer(), sessionFactory);
-        StrategyFactory strategyFactory = new StrategyFactory(dbServer(), costService, 10000);
-        PooledExecutor threadPool = new PooledExecutor(20);
-        threadPool.setMinimumPoolSize(1);
-        threadPool.setKeepAliveTime(1000 * 60 * 3);
-        RunControlStrategy runStrategy = new RunControlStrategy(strategyFactory, sessionFactory, threadPool);
-        strategyFactory.create(element);
-        runStrategy.run(owner, element, service);
         service.runStrategy(owner, element);
     }
 
