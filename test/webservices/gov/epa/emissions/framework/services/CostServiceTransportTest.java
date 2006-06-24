@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.CostService;
 import gov.epa.emissions.framework.services.cost.CostServiceImpl;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.rmi.RemoteException;
@@ -92,6 +93,29 @@ public class CostServiceTransportTest extends ServiceTestCase {
         } finally {
             service.removeMeasure(released);
         }
+    }
+
+    public void testShouldGetCorrectSCCs() throws EmfException {
+        ControlMeasure cm = new ControlMeasure();
+        cm.setEquipmentLife(12);
+        cm.setName("cm test added" + Math.random());
+        cm.setAbbreviation("12345678");
+        
+        //These scc numbers have to exist in the reference.scc table
+        cm.setSccs(new String[] {"10100224", "10100225", "10100226"} ); 
+        service.addMeasure(cm);
+        int measuresAfterAddOne = service.getMeasures().length;
+        
+        Scc[] sccs = service.getSccs(cm);
+        service.removeMeasure(cm);
+        
+
+        assertEquals(3, sccs.length);
+        assertEquals("10100224", sccs[0].getCode());
+        assertEquals("10100225", sccs[1].getCode());
+        assertEquals("10100226", sccs[2].getCode());
+        
+        assertEquals(measuresAfterAddOne, service.getMeasures().length + 1);
     }
 
     protected void doTearDown() throws Exception {// no op
