@@ -107,9 +107,8 @@ public class MaxEmsRedStrategy implements Strategy {
             }
 
             runner.close();
+        } finally {
             closeResultTable(modifier);
-        } catch (Exception e) {
-            resultTable.drop();
         }
     }
 

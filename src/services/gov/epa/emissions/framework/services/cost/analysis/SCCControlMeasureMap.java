@@ -30,8 +30,6 @@ public class SCCControlMeasureMap {
             List measuresList = getControlMeasuresList(sccs[i], measures);
             ControlMeasure seed = calculateMaxMeasure(measuresList);
             ControlMeasure maxRedMeasure = calculateTargetMeasure(seed, measuresList);
-            System.out.println("scc map: sccs[" + i + "]: " + sccs[i] + " max measure: " +
-                    maxRedMeasure);
             map.put(sccs[i], maxRedMeasure);
         }
     }

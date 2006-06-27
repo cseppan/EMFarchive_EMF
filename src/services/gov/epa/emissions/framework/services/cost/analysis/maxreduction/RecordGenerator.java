@@ -10,7 +10,6 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class RecordGenerator {
@@ -27,29 +26,29 @@ public class RecordGenerator {
 
     private double annEmissions;
 
-    public RecordGenerator(int datasetId, ResultSet resultSet, SCCControlMeasureMap map, 
-            ControlStrategy controlStrategy) throws SQLException {
+    public RecordGenerator(int datasetId, ResultSet resultSet, SCCControlMeasureMap map, ControlStrategy controlStrategy)
+            throws SQLException {
         this.datasetId = datasetId;
         this.controlStrategy = controlStrategy;
-        
+
         this.scc = resultSet.getString("scc");
         this.sourceId = resultSet.getInt("Record_Id");
         this.annEmissions = resultSet.getDouble("ANN_EMIS");
         this.maxRedMeasure = map.getMaxRedControlMeasure(scc);
     }
-    
+
     public ControlMeasure getMaxEmsRedMeasure() {
         return this.maxRedMeasure;
     }
 
     public Record getRecord() {
         Record record = new Record();
-        record.add(Arrays.asList(tokens()));
+        record.add(tokens());
 
         return record;
     }
 
-    private String[] tokens() {
+    private List tokens() {
         List tokens = new ArrayList();
         tokens.add(0, ""); // record id
         tokens.add(1, "" + sourceId);
@@ -72,8 +71,8 @@ public class RecordGenerator {
             tokens.add(8, "" + getCostPerTon(maxRedMeasure));
             tokens.add(9, "" + getReducedEmissions());
         }
-        
-        return (String[]) tokens.toArray(new String[0]);
+
+        return tokens;
     }
 
     private float getEfficiency(ControlMeasure measure) {
@@ -96,6 +95,7 @@ public class RecordGenerator {
 
         for (int i = 0; i < records.length; i++) {
             String pollutant = records[i].getPollutant();
+
             if (pollutant.equalsIgnoreCase(targetPollutant) && costYear == records[i].getCostYear())
                 return records[i].getCostPerTon();
         }
@@ -104,11 +104,17 @@ public class RecordGenerator {
     }
 
     public double getCost() {
-        return annEmissions * getCostPerTon(maxRedMeasure);
+        if (maxRedMeasure != null)
+            return annEmissions * getCostPerTon(maxRedMeasure);
+
+        return 0;
     }
 
     public double getReducedEmissions() {
-        return annEmissions * getEfficiency(maxRedMeasure);
+        if (maxRedMeasure != null)
+            return annEmissions * getEfficiency(maxRedMeasure);
+        
+        return 0;
     }
 
 }
