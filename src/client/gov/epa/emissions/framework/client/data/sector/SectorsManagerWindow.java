@@ -137,7 +137,7 @@ public class SectorsManagerWindow extends ReusableInteralFrame implements Sector
 
         };
 
-        String message = "Opening too many windows. Do you want proceed?";
+        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
         SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
         crudPanel.add(viewButton);

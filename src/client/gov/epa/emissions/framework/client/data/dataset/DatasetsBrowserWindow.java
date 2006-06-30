@@ -61,7 +61,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
 
     public DatasetsBrowserWindow(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager)
             throws EmfException {
-        super("Datasets Manager", new Dimension(850, 450), desktopManager);
+        super("Dataset Manager", new Dimension(850, 450), desktopManager);
         super.setName("datasetsBrowser");
         this.session = session;
         this.parentConsole = parentConsole;
@@ -142,7 +142,7 @@ public class DatasetsBrowserWindow extends ReusableInteralFrame implements Datas
                 selectedOption(selected);
             }
         };
-        String message = "Opening too many windows. Do you want proceed?";
+        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
         SelectAwareButton goButton = new SelectAwareButton("Go", dataAction, selectModel, confirmDialog);
         panel.add(goButton);

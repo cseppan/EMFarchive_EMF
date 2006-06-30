@@ -43,7 +43,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     private EmfConsole parentConsole;
 
     public DatasetTypesManagerWindow(EmfConsole parentConsole, DesktopManager desktopManager) {
-        super("Dataset Type Manager", new Dimension(600, 300), desktopManager);
+        super("Dataset Type Manager", new Dimension(700, 350), desktopManager);
         super.setName("datasetTypeManager");
 
         this.parentConsole = parentConsole;
@@ -119,7 +119,7 @@ public class DatasetTypesManagerWindow extends ReusableInteralFrame implements D
     }
 
     private JPanel createCrudPanel() {
-        String message = "Opening too many windows. Do you want proceed?";
+        String message = "You have asked to open a lot of windows. Do you wish to proceed?";
         ConfirmDialog confirmDialog = new ConfirmDialog(message, "Warning", this);
 
         Action viewAction = new AbstractAction() {
