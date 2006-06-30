@@ -170,5 +170,9 @@ public class QAStep {
     public void setConfiguration(String configuration) {
         this.configuration = configuration;
     }
+    
+    public String toString() {
+        return name;
+    }
 
 }
