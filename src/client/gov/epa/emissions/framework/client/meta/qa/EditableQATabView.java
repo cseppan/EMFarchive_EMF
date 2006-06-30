@@ -6,7 +6,7 @@ import gov.epa.emissions.framework.services.data.QAStep;
 
 public interface EditableQATabView {
 
-    void display(QAStep[] steps, Version[] versions);
+    void display(int datasetID, QAStep[] steps, Version[] versions);
 
     void observe(EditableQATabPresenter presenter);
 
