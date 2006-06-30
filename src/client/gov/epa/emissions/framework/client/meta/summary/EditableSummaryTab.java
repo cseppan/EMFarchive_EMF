@@ -41,7 +41,7 @@ public class EditableSummaryTab extends JPanel implements EditableSummaryTabView
 
     private EmfDataset dataset;
 
-    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
+    public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
 
     private TextField name;
 

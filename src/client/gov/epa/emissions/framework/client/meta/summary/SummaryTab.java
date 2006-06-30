@@ -26,7 +26,7 @@ public class SummaryTab extends JPanel implements SummaryTabView {
 
     private EmfDataset dataset;
 
-    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
+    public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
 
     public SummaryTab(EmfDataset dataset) {
         super.setName("summary");

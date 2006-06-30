@@ -25,15 +25,14 @@ public class StatusTableModel extends AbstractTableModel {
 
     private List rows;
 
-    private DateFormat dateFormat;
+    private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public StatusTableModel() {
         this.header = new TableHeader(new String[] { "Message Type", "Message", "Timestamp" });
         this.statusList = new ArrayList();
 
         this.rows = new ArrayList();
-        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
-    }
+     }
 
     public int getRowCount() {
         return rows.size();

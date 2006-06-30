@@ -35,7 +35,7 @@ public class ImportService {
 
     private ImporterFactory importerFactory;
 
-    public final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MMddyy_HHmmss");
+    public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MMddyy_HHmmss");
 
     private Services services;
 

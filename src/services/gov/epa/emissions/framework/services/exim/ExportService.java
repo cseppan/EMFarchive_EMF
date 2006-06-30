@@ -39,6 +39,10 @@ public class ExportService {
 
     private PooledExecutor threadPool;
 
+    private static String timeformat = "ddMMMyyyy";
+    
+    private static final SimpleDateFormat sdf = new SimpleDateFormat(timeformat);
+
     public ExportService(DbServer dbServer, PooledExecutor threadPool,
             HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
@@ -102,8 +106,6 @@ public class ExportService {
         String name = dataset.getName();
         String prefix = "", suffix = "";
         KeyVal[] keyvals = dataset.getKeyVals();
-        String timeformat = "ddMMMyyyy";
-        SimpleDateFormat sdf = new SimpleDateFormat(timeformat);
         String date = sdf.format(new Date());
 
         for (int i = 0; i < keyvals.length; i++) {
