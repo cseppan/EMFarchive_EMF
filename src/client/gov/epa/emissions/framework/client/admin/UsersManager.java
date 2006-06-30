@@ -160,7 +160,7 @@ public class UsersManager extends ReusableInteralFrame implements UsersManagerVi
         };
         Button deleteButton = new Button("Delete", deleteAction);
 
-        String messageTooManyWindows = "Opening too many windows. Do you want proceed?";
+        String messageTooManyWindows = "You have asked to open a lot of windows. Do you wish to proceed?";
         ConfirmDialog confirmUpdateDialog = new ConfirmDialog(messageTooManyWindows, "Warning", this);
         Action updateAction = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
