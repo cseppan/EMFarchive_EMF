@@ -50,7 +50,7 @@ public class QAStepTemplatePanel extends JPanel {
     private JPanel inputPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-        String[] defaultProgram = { "EmisView", "Smkreport", "Smkinven" };
+        String[] defaultProgram = { "None", "EmisView", "Smkreport", "Smkinven" };
 
         name = new TextField("", 40);
         changeablesList.addChangeable(name);
@@ -158,6 +158,7 @@ public class QAStepTemplatePanel extends JPanel {
 
     public void setFields(QAStepTemplate template) {
         name.setText(template.getName());
+        program.setSelectedItem(template.getProgram());
         programParameters.setText(template.getProgramArguments());
         required.setSelected(template.isRequired());
         order.setText(template.getOrder() + "");
