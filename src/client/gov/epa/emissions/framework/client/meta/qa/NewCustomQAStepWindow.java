@@ -87,7 +87,7 @@ public class NewCustomQAStepWindow extends DisposableInteralFrame implements New
         name = new TextField("", 40);
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
-        program = new EditableComboBox(new QAProperties().programs());
+        program = new EditableComboBox(QAProperties.programs());
         program.setSelectedItem("");
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
         layoutGenerator.addLabelWidgetPair("Program:", program, panel);
