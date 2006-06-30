@@ -137,8 +137,8 @@ public class EditQAStepTemplatesPanel extends JPanel implements QAStepTemplatesP
     protected void doEdit() {
         QAStepTemplate[] selected = tableData.getSelected();
         for (int i = 0; i < selected.length; i++) {
-            EditQAStepTemplateWindow view = new EditQAStepTemplateWindow((i + 1) + "<>" + selected[i].getName(),
-                    desktopManager);
+            EditQAStepTemplateWindow view = new EditQAStepTemplateWindow(selected[i].getName()+ 
+                    " - "+type.getName(), desktopManager);
             presenter.doEdit(view, selected[i]);
         }
     }

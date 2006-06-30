@@ -54,7 +54,7 @@ public class ImportTask implements Runnable {
             complete(session);
         } catch (Exception e) {
             logError("Failed to import file(s) : " + filesList(), e);
-            setStatus("Failed to import dataset " + dataset.getName() + ".Reason: " + e.getMessage());
+            setStatus("Failed to import dataset " + dataset.getName() + ". Reason: " + e.getMessage());
             removeDataset(dataset);
         } finally {
             if (session != null)

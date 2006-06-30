@@ -25,7 +25,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
     private AdminOption adminOption;
 
     public UpdateUserWindow(AdminOption adminOption, DesktopManager desktopManager) {
-        super("Update User", desktopManager);
+        super("Edit User", desktopManager);
         this.adminOption = adminOption;
 
         super.setResizable(false);
@@ -50,7 +50,7 @@ public abstract class UpdateUserWindow extends EmfInternalFrame implements Updat
     }
 
     private void setEmbellishments(User user) {
-        super.setTitle("Update User: " + user.getUsername());
+        super.setTitle("Edit User: " + user.getUsername());
         super.setName("updateUser" + user.getId());
     }
 

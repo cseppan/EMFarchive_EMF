@@ -62,7 +62,7 @@ public class SetReferencesDialog extends Dialog {
     private JPanel controlPanel() {
         JPanel panel = new JPanel();
 
-        Button okButton = new Button("Ok", new AbstractAction() {
+        Button okButton = new Button("OK", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 List selectedValues = Arrays.asList(list.getSelectedValues());
                 selected = (Note[]) selectedValues.toArray(new Note[0]);

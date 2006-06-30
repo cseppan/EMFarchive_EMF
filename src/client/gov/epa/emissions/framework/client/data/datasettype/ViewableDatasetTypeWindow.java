@@ -42,6 +42,8 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
     private SingleLineMessagePanel messagePanel;
     
     private DesktopManager desktopManager;
+    
+    private DatasetType type;
 
     public ViewableDatasetTypeWindow(DesktopManager desktopManager) {
         super("View Dataset Type", new Dimension(600, 500), desktopManager);
@@ -59,7 +61,7 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
     public void display(DatasetType type) {
         super.setTitle("View Dataset Type: " + type.getName());
         super.setName("datasetTypeView:" + type.getId());
-
+        this.type = type;
         layout.removeAll();
         doLayout(layout, type);
 
@@ -167,7 +169,8 @@ public class ViewableDatasetTypeWindow extends DisposableInteralFrame implements
         QAStepTemplate[] selected = data.getSelected();
         
         for(int i = 0; i < selected.length; i++) {
-            ViewableQAStepTemplateView view = new ViewableQAStepTemplateWindow((i + 1) + "<>" + selected[i].getName(), desktopManager);
+            ViewableQAStepTemplateView view = new ViewableQAStepTemplateWindow(selected[i].getName()+
+                    " - "+type.getName(), desktopManager);
             ViewableQAStepTemplatePresenter presenter = new ViewableQAStepTemplatePresenter(view, selected[i]);
             presenter.display();
         }
