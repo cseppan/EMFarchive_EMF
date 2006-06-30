@@ -43,7 +43,7 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
     private JList optional;
 
     public NewQAStepDialog(EmfConsole parent, Version[] versions) {
-        super("New QA Step", parent);
+        super("Add QA Steps", parent);
         super.setSize(new Dimension(550, 350));
         super.center();
 
