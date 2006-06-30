@@ -57,7 +57,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private ComboBox status;
 
-    private final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
 
     private FormattedDateField date;
 
@@ -67,8 +67,6 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
 
     private TextField config;
     
-    private static int count = 0;
-
     public EditQAStepWindow(DesktopManager desktopManager) {
         super("Edit QA Step", new Dimension(600, 625), desktopManager);
     }
@@ -77,8 +75,8 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         this.step = step;
         this.user = user;
 
-        super.setLabel(super.getTitle() + ": " + (++count) + " " 
-                + step.getName() + " - " + dataset.getName());
+        super.setLabel(super.getTitle() + ": " +  
+                step.getName() + " - " + dataset.getName()+" (v"+step.getVersion()+")");
 
         JPanel layout = createLayout(step, versionName);
         super.getContentPane().add(layout);
@@ -152,7 +150,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     private ComboBox status(QAStep step) {
-        ComboBox status = new ComboBox(statusValue(step), new QAProperties().status());
+        ComboBox status = new ComboBox(statusValue(step), QAProperties.status());
         status.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 date.setValue(new Date());
@@ -164,7 +162,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     private String statusValue(QAStep step) {
-        return step.getStatus() != null ? step.getStatus() : new QAProperties().initialStatus();
+        return step.getStatus() != null ? step.getStatus() : QAProperties.initialStatus();
     }
 
     private JPanel upperPanel(QAStep step, String versionName) {
@@ -175,7 +173,7 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
         layoutGenerator.addLabelWidgetPair("Name:", new Label(step.getName()), panel);
         layoutGenerator.addLabelWidgetPair("Version:", new Label(versionName + " (" + step.getVersion() + ")"), panel);
 
-        program = new EditableComboBox(new QAProperties().programs());
+        program = new EditableComboBox(QAProperties.programs());
         program.setPrototypeDisplayValue("To make the combobox a bit wider");
         program.setSelectedItem(step.getProgram());
         addChangeable(program);
