@@ -24,6 +24,7 @@ import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -43,7 +44,7 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
 
     private SingleLineMessagePanel messagePanel;
 
-    private final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
 
     private QASteps steps;
 
@@ -51,8 +52,10 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
 
     private SetQAStatusPresenter presenter;
 
-    public SetQAStatusWindow(DesktopManager desktop) {
-        super("Status for Selected QA Steps", new Dimension(550, 350), desktop);
+    public SetQAStatusWindow(DesktopManager desktop, int datasetID) {
+        super("Set Status for QA Steps ("+datasetID+")", 
+                new Dimension(550, 400), desktop);
+        // would rather have dataset name, but ID will keep window name unique
     }
 
     public void display(QAStep[] steps, User user) {
@@ -80,8 +83,14 @@ public class SetQAStatusWindow extends DisposableInteralFrame implements SetQASt
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        layoutGenerator.addLabelWidgetPair("Steps", new Label(steps.namesList()), panel);
-
+        //layoutGenerator.addLabelWidgetPair("Steps", new Label(steps.namesList()), panel);
+        
+        JList stepList = new JList(steps.all());
+        JScrollPane scrollList = new JScrollPane(stepList);
+        stepList.setMinimumSize(new Dimension(350,80));
+        scrollList.setMinimumSize(new Dimension(350,80));
+        layoutGenerator.addWidgetPair(new Label("Steps"), scrollList, panel);
+      
         layoutGenerator.addLabelWidgetPair("Status", status(), panel);
 
         date = new FormattedDateField("When", new Date(), DATE_FORMATTER, messagePanel);
