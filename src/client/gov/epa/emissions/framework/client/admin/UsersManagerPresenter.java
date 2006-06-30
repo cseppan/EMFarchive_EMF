@@ -18,6 +18,8 @@ public class UsersManagerPresenter implements RefreshObserver {
 
     private EmfSession session;
 
+    private static DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
+
     public UsersManagerPresenter(EmfSession session, UserService service) {
         this.session = session;
         this.service = service;
@@ -56,7 +58,6 @@ public class UsersManagerPresenter implements RefreshObserver {
     private void delete(User userToDelete) throws EmfException {
         userToDelete = service.obtainLocked(session.user(), userToDelete);
         if (!userToDelete.isLocked(session.user())) {// locked by another user
-            DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
             String message = "Locked by " + userToDelete.getLockOwner() + " at "
                     + dateFormat.format(userToDelete.getLockDate());
             throw new EmfException(message);

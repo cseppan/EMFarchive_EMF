@@ -25,6 +25,8 @@ public abstract class ViewUserWindow extends EmfInternalFrame implements UserVie
 
     private SingleLineMessagePanel messagePanel;
 
+    private static DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
+
     public ViewUserWindow(DesktopManager desktopManager) {
         super("User: ", new Dimension(350, 425), desktopManager);
         
@@ -56,7 +58,6 @@ public abstract class ViewUserWindow extends EmfInternalFrame implements UserVie
         if (!user.isLocked())
             return "";
 
-        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         return "Locked by " + user.getLockOwner() + " at " + dateFormat.format(user.getLockDate());
     }
 

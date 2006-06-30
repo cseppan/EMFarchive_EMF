@@ -37,6 +37,8 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
 
     private SingleLineMessagePanel messagePanel;
 
+    private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
+ 
     public ViewSectorWindow(DesktopManager desktopManager) {
         super("View Sector", new Dimension(550, 400), desktopManager);
 
@@ -74,7 +76,6 @@ public class ViewSectorWindow extends DisposableInteralFrame implements Viewable
         if (!sector.isLocked())
             return "";
 
-        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         return "Locked by " + sector.getLockOwner() + " at " + dateFormat.format(sector.getLockDate());
     }
 

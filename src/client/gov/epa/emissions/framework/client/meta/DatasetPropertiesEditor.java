@@ -48,6 +48,8 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
 
     private EditableKeywordsTab keywordsTab;
 
+    private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
+
     public DatasetPropertiesEditor(EmfSession session, EmfConsole parentConsole, DesktopManager desktopManager) {
         super("Dataset Properties Editor", new Dimension(700, 510), desktopManager);
         this.session = session;
@@ -196,6 +198,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
                 doSave();
             }
         });
+        save.setMnemonic('S');
         buttonsPanel.add(save);
 
         Button close = new Button("Close", new AbstractAction() {
@@ -203,6 +206,7 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
                 doClose();
             }
         });
+        close.setMnemonic('L');
         getRootPane().setDefaultButton(close);
         buttonsPanel.add(close);
 
@@ -228,7 +232,6 @@ public class DatasetPropertiesEditor extends DisposableInteralFrame implements D
     }
 
     private String format(Date lockDate) {
-        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         return dateFormat.format(lockDate);
     }
 
