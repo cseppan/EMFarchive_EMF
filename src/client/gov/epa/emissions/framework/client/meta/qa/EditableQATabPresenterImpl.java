@@ -25,7 +25,7 @@ public class EditableQATabPresenterImpl implements EditableQATabPresenter {
 
     public void display() throws EmfException {
         QAStep[] steps = qaService().getQASteps(dataset);
-        view.display(steps, versions());
+        view.display(dataset.getId(), steps, versions());
         view.observe(this);
     }
 
