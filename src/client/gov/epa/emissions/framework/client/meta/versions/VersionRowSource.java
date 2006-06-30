@@ -14,12 +14,11 @@ public class VersionRowSource implements RowSource {
 
     private Boolean selected;
 
-    private DateFormat dateFormat;
+    private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
     public VersionRowSource(Version source) {
         this.source = source;
         this.selected = Boolean.FALSE;
-        dateFormat = new SimpleDateFormat(EmfDateFormat.format());
     }
 
     public Object[] values() {
