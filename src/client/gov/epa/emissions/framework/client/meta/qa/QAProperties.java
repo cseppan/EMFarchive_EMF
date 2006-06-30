@@ -2,15 +2,15 @@ package gov.epa.emissions.framework.client.meta.qa;
 
 public class QAProperties {
 
-    public String[] status() {
-        return new String[] { initialStatus(), "Skipped", "In Progress", "Complete", "Failure" };
+    public static String[] status() {
+        return new String[] { initialStatus(), "Skipped", "In Progress", "Complete", "Failed" };
     }
 
-    public String[] programs() {
+    public static String[] programs() {
         return new String[] { "EmisView", "Smkreport", "Smkinven" };
     }
 
-    public String initialStatus() {
+    public static String initialStatus() {
         return "Not Started";
     }
 }
