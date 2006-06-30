@@ -46,6 +46,8 @@ public class EditableQATab extends JPanel implements EditableQATabView {
     private MessagePanel messagePanel;
 
     private DesktopManager desktop;
+    
+    private int datasetID;
 
     public EditableQATab(EmfConsole parent, DesktopManager desktop, ManageChangeables changeables,
             MessagePanel messagePanel) {
@@ -55,7 +57,8 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         this.messagePanel = messagePanel;
     }
 
-    public void display(QAStep[] steps, Version[] versions) {
+    public void display(int datasetID, QAStep[] steps, Version[] versions) {
+        this.datasetID = datasetID; // for uniqueness of window naming
         this.versions = new VersionsSet(versions);
         super.setLayout(new BorderLayout());
         super.add(tablePanel(steps), BorderLayout.CENTER);
@@ -196,7 +199,7 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         List selected = selectModel.selected();
         QAStep[] steps = (QAStep[]) selected.toArray(new QAStep[0]);
         if (steps.length > 0)
-            presenter.doSetStatus(new SetQAStatusWindow(desktop), steps);
+            presenter.doSetStatus(new SetQAStatusWindow(desktop, datasetID), steps);
         else
             messagePanel.setMessage("Please select a QA step.");
     }
