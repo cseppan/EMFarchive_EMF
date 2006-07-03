@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.meta.qa;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.gui.BorderlessButton;
@@ -57,8 +58,8 @@ public class EditableQATab extends JPanel implements EditableQATabView {
         this.messagePanel = messagePanel;
     }
 
-    public void display(int datasetID, QAStep[] steps, Version[] versions) {
-        this.datasetID = datasetID; // for uniqueness of window naming
+    public void display(Dataset dataset, QAStep[] steps, Version[] versions) {
+        this.datasetID = dataset.getId(); // for uniqueness of window naming
         this.versions = new VersionsSet(versions);
         super.setLayout(new BorderLayout());
         super.add(tablePanel(steps), BorderLayout.CENTER);
