@@ -24,16 +24,19 @@ public class RetrieveSCC {
 
         ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(query(id));
         Scc[] sccs = values(set);
-        dbServer.disconnect();
 
         return sccs;
     }
 
     private Scc[] values(ResultSet rs) throws SQLException {
         List sccs = new ArrayList();
-        while (rs.next()) {
-            Scc scc = new Scc(rs.getString(1), rs.getString(2));
-            sccs.add(scc);
+        try {
+            while (rs.next()) {
+                Scc scc = new Scc(rs.getString(1), rs.getString(2));
+                sccs.add(scc);
+            }
+        }finally{
+            rs.close();
         }
         return (Scc[]) sccs.toArray(new Scc[0]);
     }

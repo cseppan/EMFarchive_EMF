@@ -1,8 +1,12 @@
 package gov.epa.emissions.framework.services;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import gov.epa.emissions.commons.PerformanceMetrics;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.postgres.PostgresDbServer;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.persistence.DataSourceFactory;
 
 import javax.sql.DataSource;
@@ -19,6 +23,8 @@ public abstract class EmfServiceImpl {
 
     private String name;
 
+    private SimpleDateFormat dateFormat;
+
     public static final String EMF_EMISSIONS_SCHEMA = "emissions";
 
     public static final String EMF_REFERENCE_SCHEMA = "reference";
@@ -26,12 +32,14 @@ public abstract class EmfServiceImpl {
     public EmfServiceImpl(String name) throws Exception {
         this.name = name;
         datasource = new DataSourceFactory().get();
-
+        
         // FIXME: we should not hard-code the db server. Also, read the
         // datasource names from properties
+        this.dateFormat = new SimpleDateFormat(EmfDateFormat.format());
         dbServer = new PostgresDbServer(datasource.getConnection(), EmfServiceImpl.EMF_REFERENCE_SCHEMA,
                 EmfServiceImpl.EMF_EMISSIONS_SCHEMA);
         LOG.debug("Starting  " + name + "(" + this.hashCode() + ")");
+        System.out.println("Starting  " + name + "(" + this.hashCode() + "): "+dateFormat.format(new Date()));
     }
 
     public EmfServiceImpl(DataSource datasource, DbServer dbServer) {
@@ -42,6 +50,7 @@ public abstract class EmfServiceImpl {
     protected void finalize() throws Throwable {
         dbServer.disconnect();
         new PerformanceMetrics().gc("Shutting down " + name + "(" + this.hashCode() + ")");
+        System.out.println("Shutting down  " + name + "(" + this.hashCode() + "): "+dateFormat.format(new Date()));
         super.finalize();
     }
 

@@ -8,17 +8,17 @@ import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 
 public class CostServiceTransport implements CostService {
 
-    private CallFactory callFactory;
-
     private DataMappings mappings;
 
-    public CostServiceTransport(String endpoint) {
-        callFactory = new CallFactory(endpoint);
+    private EmfCall emfCall;
+
+    public CostServiceTransport(EmfCall controlMeasureCall) {
+        this.emfCall = controlMeasureCall;
         mappings = new DataMappings();
     }
 
-    private EmfCall call() throws EmfException {
-        return callFactory.createCall("CostService");
+    private EmfCall call() {
+        return emfCall;
     }
 
     public ControlMeasure[] getMeasures() throws EmfException {
