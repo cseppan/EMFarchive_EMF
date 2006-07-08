@@ -68,5 +68,17 @@
 	      <name>url</name>
 	      <value>jdbc:postgresql://localhost:5432/EMF?autoReconnect=true</value>
 	    </parameter>
+	    <parameter>
+              <name>removeAbandoned</name>
+              <value>true</value>
+        </parameter>
+	    <parameter>
+              <name>removeAbandonedTimeout</name>
+              <value>60</value>
+        </parameter>
+	    <parameter>
+              <name>logAbandoned</name>
+              <value>true</value>
+        </parameter>
 	  </ResourceParams>
 	</Context>
