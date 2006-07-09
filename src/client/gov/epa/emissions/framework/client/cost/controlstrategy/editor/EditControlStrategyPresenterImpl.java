@@ -114,6 +114,11 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         presenters.add(summaryTabPresenter);
         this.monitor = new SummaryMonitor();
     }
+    
+    public void set(EditControlStrategyTabView view) {
+        presenters.add(summaryTabPresenter);
+        this.monitor = new SummaryMonitor();
+    }
 
     public void setResults(ControlStrategy controlStrategy) {
         summaryTabView.setRunMessage(controlStrategy);

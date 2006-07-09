@@ -511,7 +511,6 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
             controlStrategy.setStartDate(start);
             startDate.setText(getFormmatedDate(start));
         }
-
         controlStrategy.setRunStatus("Running");
 
         completionDate.setText("Running...");

@@ -1,7 +1,11 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.buttons.*;
+import gov.epa.emissions.commons.gui.buttons.CloseButton;
+import gov.epa.emissions.commons.gui.buttons.CopyButton;
+import gov.epa.emissions.commons.gui.buttons.RunButton;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
+import gov.epa.emissions.commons.gui.buttons.StopButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -97,17 +101,17 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
 
     private JPanel createSummaryTab(ControlStrategy controlStrategy) {
         try {
-            EditControlStrategySummaryTab view = new EditControlStrategySummaryTab(controlStrategy, session, this,
+            EditControlStrategySummaryTabView view = new EditControlStrategySummaryTab(controlStrategy, session, this,
                     messagePanel, parentConsole);
             this.presenter.set(view);
-            return view;
+            return (JPanel) view;
         } catch (EmfException e) {
             showError("Could not load Summary Tab." + e.getMessage());
             return createErrorTab("Could not load Summary Tab." + e.getMessage());
         }
 
     }
-
+    
     private JPanel createErrorTab(String message) {// TODO
         JPanel panel = new JPanel(false);
         JLabel label = new JLabel(message);
