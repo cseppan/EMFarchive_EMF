@@ -151,7 +151,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         User owner = userService.getUser("emf");
         ControlStrategy element = new ControlStrategy("test" + Math.random());
         StrategyType type = new StrategyType("max red emissions");
-        type.setStrategyClassName("gov.epa.emissions.framework.services.cost.analysis.maxreduction.DummyMaxEmsRedStrategyForTest");
+        type.setStrategyClassName("gov.epa.emissions.framework.services.cost.analysis.maxreduction.DummyMaxEmsRedStrategy");
         element.setStrategyType(type);
 
         service.runStrategy(owner, element);

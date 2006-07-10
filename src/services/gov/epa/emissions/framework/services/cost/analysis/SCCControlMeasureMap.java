@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//FIXME: Rename ???
 public class SCCControlMeasureMap {
    
     private Map map;

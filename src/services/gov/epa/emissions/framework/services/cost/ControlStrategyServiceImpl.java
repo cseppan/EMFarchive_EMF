@@ -33,23 +33,22 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
     
     public ControlStrategyServiceImpl() throws Exception {
         super("Control Strategy Service");
-        init(dbServer, HibernateSessionFactory.get());
+        init(HibernateSessionFactory.get());
     }
 
     public ControlStrategyServiceImpl(DataSource datasource, DbServer dbServer, HibernateSessionFactory sessionFactory) throws Exception {
         super(datasource, dbServer);
-        init(dbServer, sessionFactory);
+        init(sessionFactory);
     }
     
-    private void init(DbServer dbServer, HibernateSessionFactory sessionFactory) throws EmfException {
+    private void init(HibernateSessionFactory sessionFactory) throws EmfException {
         this.sessionFactory = sessionFactory;
         dao = new ControlStrategyDAO();
         threadPool = createThreadPool();
         
         StrategyFactory factory;
         try {
-            factory = new StrategyFactory(dbServer, new CostServiceImpl(datasource, dbServer, sessionFactory), 
-                    batchSize());
+            factory = new StrategyFactory(batchSize());
         } catch (Exception e) {
             LOG.error("could not access control measure service.");
             throw new EmfException("could not access control measure service.");

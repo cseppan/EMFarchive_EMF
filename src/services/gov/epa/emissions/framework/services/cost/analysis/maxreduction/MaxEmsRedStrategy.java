@@ -5,16 +5,17 @@ import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DataQuery;
 import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.HibernateSessionFactory;
 import gov.epa.emissions.commons.db.OptimizedQuery;
 import gov.epa.emissions.commons.db.OptimizedTableModifier;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.importer.ImporterException;
+import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.ControlMeasuresDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
-import gov.epa.emissions.framework.services.cost.CostService;
 import gov.epa.emissions.framework.services.cost.analysis.ResultTable;
 import gov.epa.emissions.framework.services.cost.analysis.SCCControlMeasureMap;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
@@ -25,6 +26,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.hibernate.Session;
 
 public class MaxEmsRedStrategy implements Strategy {
 
@@ -46,22 +49,30 @@ public class MaxEmsRedStrategy implements Strategy {
 
     private int batchSize;
 
-    private CostService costService;
-    
     private double totalCost;
     
     private double totalReduction;
 
-    public MaxEmsRedStrategy(DbServer dbServer, CostService costService, ControlStrategy strategy, Integer batchSize)
+    private EmfDbServer emfDbServer;
+
+    public MaxEmsRedStrategy(ControlStrategy strategy, Integer batchSize)
             throws EmfException {
         this.controlStrategy = strategy;
-        this.datasource = dbServer.getEmissionsDatasource();
+        this.datasource = getDatasource();
         this.datasets = strategy.getDatasets();
         this.batchSize = batchSize.intValue();
-        this.costService = costService;
-        this.tableFormat = new MaxEmsRedTableFormat(dbServer.getSqlDataTypes());
-
+        
+        this.tableFormat = new MaxEmsRedTableFormat(emfDbServer.getSqlDataTypes());
         setup();
+    }
+
+    private Datasource getDatasource() throws EmfException {
+        try {
+            emfDbServer = new EmfDbServer();
+            return emfDbServer.getEmissionsDatasource();
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
     }
 
     private void setup() throws EmfException {
@@ -71,18 +82,42 @@ public class MaxEmsRedStrategy implements Strategy {
             throw new EmfException(e.getMessage());
         }
 
-        this.measures = costService.getMeasures();
+        this.measures = getMeasures();
         this.map = new SCCControlMeasureMap(sccs, measures, controlStrategy.getTargetPollutant(), controlStrategy.getCostYear());
     }
+
+    public ControlMeasure[] getMeasures() throws EmfException {
+        try {
+            ControlMeasuresDAO dao = new ControlMeasuresDAO();
+            Session session = HibernateSessionFactory.get().getSession();
+            List all = dao.all(session);
+            session.close();
+            session.disconnect();
+
+            return (ControlMeasure[]) all.toArray(new ControlMeasure[0]);
+        } catch (RuntimeException e) {
+            throw new EmfException("could not retrieve control measures.");
+        }
+    }
+
 
     public void run() throws EmfException {
         try {
             calculateResult(datasets, datasource);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
+        }finally{
+            closeConnection();
         }
-
         setCompletionDate();
+    }
+
+    private void closeConnection() throws EmfException {
+        try {
+            emfDbServer.disconnect();
+        } catch (SQLException e) {
+            throw new EmfException(e.getMessage());
+        }
     }
 
     private void calculateResult(Dataset[] datasets, Datasource datasource) throws Exception {
