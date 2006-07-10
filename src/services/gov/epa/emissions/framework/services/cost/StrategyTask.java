@@ -50,9 +50,10 @@ public class StrategyTask implements Runnable {
             logError("Failed to run strategy : ", e);
             setStatus("Failed to run strategy: " + "Reason: " + e.getMessage());
         } finally {
-            if (session != null)
+            if (session != null) {
                 session.flush();
                 session.close();
+            }
         }
     }
 

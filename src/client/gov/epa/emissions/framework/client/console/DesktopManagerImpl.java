@@ -35,6 +35,7 @@ public class DesktopManagerImpl implements DesktopManager {
             newWindowOpened(manageView, name);
         } else {
             // enforces one window per object TODO: think abt a better way to do this
+            manageView=null;
             ManagedView cachedView = (ManagedView) windowNames.get(name);
             cachedView.bringToFront();
         }
