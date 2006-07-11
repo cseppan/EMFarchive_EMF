@@ -24,7 +24,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
 
     protected void doSetUp() throws Exception {
         sessionFactory = sessionFactory(configFile());
-        service = new ControlStrategyServiceImpl(super.emf(), super.dbServer(), sessionFactory);
+        service = new ControlStrategyServiceImpl(sessionFactory);
         userService = new UserServiceImpl(sessionFactory);
     }
 

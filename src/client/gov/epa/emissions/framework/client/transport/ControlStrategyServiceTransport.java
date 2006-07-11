@@ -8,17 +8,17 @@ import gov.epa.emissions.framework.services.cost.StrategyType;
 
 public class ControlStrategyServiceTransport implements ControlStrategyService {
 
-    private DataMappings mappings;
-    
-    private EmfCall emfCall;
+    private CallFactory callFactory;
 
-    public ControlStrategyServiceTransport(EmfCall controlStrategyCall) {
-        emfCall = controlStrategyCall;
+    private DataMappings mappings;
+
+    public ControlStrategyServiceTransport(String endpoint) {
+        callFactory = new CallFactory(endpoint);
         mappings = new DataMappings();
     }
 
-    private EmfCall call() {
-        return emfCall;
+    private EmfCall call() throws EmfException {
+        return callFactory.createCall("ControlStrategy Service");
     }
 
     public ControlStrategy[] getControlStrategies() throws EmfException {

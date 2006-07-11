@@ -1,16 +1,12 @@
 package gov.epa.emissions.framework.services.cost;
 
-import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
-import gov.epa.emissions.framework.services.EmfServiceImpl;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.List;
-
-import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,33 +15,31 @@ import org.hibernate.Session;
 
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
-public class ControlStrategyServiceImpl extends EmfServiceImpl implements ControlStrategyService {
+public class ControlStrategyServiceImpl implements ControlStrategyService {
 
     private static Log LOG = LogFactory.getLog(ControlStrategyServiceImpl.class);
 
     private PooledExecutor threadPool;
-    
+
     private HibernateSessionFactory sessionFactory;
-    
+
     private RunControlStrategy runStrategy;
 
     private ControlStrategyDAO dao;
-    
+
     public ControlStrategyServiceImpl() throws Exception {
-        super("Control Strategy Service");
         init(HibernateSessionFactory.get());
     }
 
-    public ControlStrategyServiceImpl(DataSource datasource, DbServer dbServer, HibernateSessionFactory sessionFactory) throws Exception {
-        super(datasource, dbServer);
+    public ControlStrategyServiceImpl(HibernateSessionFactory sessionFactory) throws Exception {
         init(sessionFactory);
     }
-    
+
     private void init(HibernateSessionFactory sessionFactory) throws EmfException {
         this.sessionFactory = sessionFactory;
         dao = new ControlStrategyDAO();
         threadPool = createThreadPool();
-        
+
         StrategyFactory factory;
         try {
             factory = new StrategyFactory(batchSize());
@@ -55,13 +49,13 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
         }
         runStrategy = new RunControlStrategy(factory, sessionFactory, threadPool);
     }
-    
+
     protected void finalize() throws Throwable {
         threadPool.shutdownAfterProcessingCurrentlyQueuedTasks();
         threadPool.awaitTerminationAfterShutdown();
         super.finalize();
     }
-    
+
     private PooledExecutor createThreadPool() {
         PooledExecutor threadPool = new PooledExecutor(20);
         threadPool.setMinimumPoolSize(1);
@@ -71,87 +65,96 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
     }
 
     public ControlStrategy[] getControlStrategies() throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            List cs = dao.all(sessionFactory.getSession());
+            List cs = dao.all(session);
             return (ControlStrategy[]) cs.toArray(new ControlStrategy[0]);
         } catch (HibernateException e) {
             LOG.error("could not retrieve all control strategies.");
             throw new EmfException("could not retrieve all control strategies.");
+        }finally{
+            session.close();
         }
     }
 
     public void addControlStrategy(ControlStrategy element) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             dao.add(element, session);
             session.close();
         } catch (RuntimeException e) {
             LOG.error("Could not add Control Strategy: " + element, e);
             throw new EmfException("Could not add Control Strategy: " + element);
+        } finally {
+            session.close();
         }
     }
 
     public ControlStrategy obtainLocked(User owner, ControlStrategy element) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             ControlStrategy locked = dao.obtainLocked(owner, element, session);
-            session.close();
 
             return locked;
         } catch (RuntimeException e) {
-            LOG.error("Could not obtain lock for Control Strategy: " + element + " by owner: "
+            LOG
+                    .error("Could not obtain lock for Control Strategy: " + element + " by owner: "
                             + owner.getUsername(), e);
             throw new EmfException("Could not obtain lock for Control Strategy: " + element + " by owner: "
                     + owner.getUsername());
+        } finally {
+            session.close();
         }
     }
 
     public ControlStrategy releaseLocked(ControlStrategy locked) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
             ControlStrategy released = dao.releaseLocked(locked, session);
-            session.close();
 
             return released;
         } catch (RuntimeException e) {
-            LOG.error("Could not release lock for Control Strategy : " + locked + 
-                    " by owner: " + locked.getLockOwner(), e);
+            LOG.error(
+                    "Could not release lock for Control Strategy : " + locked + " by owner: " + locked.getLockOwner(),
+                    e);
             throw new EmfException("Could not release lock for Control Strategy: " + locked + " by owner: "
                     + locked.getLockOwner());
+        } finally {
+            session.close();
         }
     }
 
     public ControlStrategy updateControlStrategy(ControlStrategy element) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
-
             if (!dao.canUpdate(element, session))
                 throw new EmfException("Control Strategy name already in use");
 
             ControlStrategy released = dao.update(element, session);
-            session.close();
 
             return released;
         } catch (RuntimeException e) {
             LOG.error("Could not update Control Strategy: " + element, e);
             throw new EmfException("Could not update ControlStrategy: " + element);
+        } finally {
+            session.close();
         }
     }
 
     public ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
-            Session session = sessionFactory.getSession();
-            
             if (!dao.canUpdate(element, session))
                 throw new EmfException("Control Strategy name already in use");
-            
+
             ControlStrategy csWithLock = dao.updateWithLock(element, session);
-            session.close();
-            
+
             return csWithLock;
         } catch (RuntimeException e) {
             LOG.error("Could not update Control Strategy: " + element, e);
             throw new EmfException("Could not update ControlStrategy: " + element);
+        } finally {
+            session.close();
         }
     }
 
@@ -168,11 +171,13 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
 
     private void remove(ControlStrategy element) throws EmfException {
         Session session = sessionFactory.getSession();
-        if (!dao.canUpdate(element, session))
-            throw new EmfException("Control Strategy name already in use");
-
-        dao.remove(element, session);
-        session.close();
+        try {
+            if (!dao.canUpdate(element, session))
+                throw new EmfException("Control Strategy name already in use");
+            dao.remove(element, session);
+        } finally {
+            session.close();
+        }
     }
 
     public void runStrategy(User user, ControlStrategy strategy) throws EmfException {
@@ -188,7 +193,7 @@ public class ControlStrategyServiceImpl extends EmfServiceImpl implements Contro
             throw new EmfException("could not retrieve all control strategy types. " + e.getMessage());
         }
     }
-    
+
     private int batchSize() {
         Session session = sessionFactory.getSession();
         try {

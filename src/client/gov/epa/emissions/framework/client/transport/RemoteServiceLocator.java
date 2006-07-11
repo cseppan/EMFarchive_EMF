@@ -23,8 +23,6 @@ public class RemoteServiceLocator implements ServiceLocator {
 
     private EmfCall eximCall;
     
-    private EmfCall controlStrategyCall;
-
     public RemoteServiceLocator(String baseUrl) throws Exception {
         this.baseUrl = baseUrl;
         editCall = this.createSessionEnabledCall("DataEditor Service", baseUrl
@@ -32,8 +30,6 @@ public class RemoteServiceLocator implements ServiceLocator {
         viewCall = this.createSessionEnabledCall("DataView Service", baseUrl
                 + "/gov.epa.emf.services.editor.DataViewService");
         eximCall = this.createSessionEnabledCall("ExIm Service", baseUrl + "/gov.epa.emf.services.exim.ExImService");
-        
-        controlStrategyCall = this.createSessionEnabledCall("Control Strategy Service",baseUrl + "/gov.epa.emissions.framework.services.cost.ControlStrategyService");
     }
 
     public UserService userService() {
@@ -77,7 +73,7 @@ public class RemoteServiceLocator implements ServiceLocator {
     }
     
     public ControlStrategyService controlStrategyService() {
-        return new ControlStrategyServiceTransport(controlStrategyCall);
+        return new ControlStrategyServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.cost.ControlStrategyService");
     }
 
     /*
