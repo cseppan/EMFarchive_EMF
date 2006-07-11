@@ -14,7 +14,7 @@ public class RetrieveSCC {
 
     private DbServer dbServer;
 
-    public RetrieveSCC(ControlMeasure measure, DbServer dbServer) {
+    public RetrieveSCC(ControlMeasure measure, DbServer dbServer) throws Exception {
         this.measure = measure;
         this.dbServer = dbServer;
     }
@@ -22,8 +22,15 @@ public class RetrieveSCC {
     public Scc[] sccs() throws SQLException {
         int id = measure.getId();
 
-        ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(query(id));
-        Scc[] sccs = values(set);
+        Scc[] sccs;
+        try {
+            ResultSet set = dbServer.getReferenceDatasource().query().executeQuery(query(id));
+            sccs = values(set);
+        } catch (SQLException e) {
+            throw e;
+        }finally{
+            dbServer.disconnect();
+        }
 
         return sccs;
     }

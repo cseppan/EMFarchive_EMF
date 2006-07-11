@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.services.basic.LoggingService;
 import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
-import gov.epa.emissions.framework.services.cost.CostService;
+import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
@@ -25,8 +25,6 @@ public class RemoteServiceLocator implements ServiceLocator {
     
     private EmfCall controlStrategyCall;
 
-    private EmfCall controlMeasureCall;
-    
     public RemoteServiceLocator(String baseUrl) throws Exception {
         this.baseUrl = baseUrl;
         editCall = this.createSessionEnabledCall("DataEditor Service", baseUrl
@@ -36,8 +34,6 @@ public class RemoteServiceLocator implements ServiceLocator {
         eximCall = this.createSessionEnabledCall("ExIm Service", baseUrl + "/gov.epa.emf.services.exim.ExImService");
         
         controlStrategyCall = this.createSessionEnabledCall("Control Strategy Service",baseUrl + "/gov.epa.emissions.framework.services.cost.ControlStrategyService");
-        controlMeasureCall = this.createSessionEnabledCall("Control Measure Service",baseUrl + "/gov.epa.emf.services.cost.CostService");
-        
     }
 
     public UserService userService() {
@@ -76,8 +72,8 @@ public class RemoteServiceLocator implements ServiceLocator {
         return new CaseServiceTransport(baseUrl + "/gov.epa.emissions.framework.services.casemanagement.CaseService");
     }
     
-    public CostService costService() {
-        return new CostServiceTransport(controlMeasureCall);
+    public ControlMeasureService costService() {
+        return new ControlMeasureServiceTransport(baseUrl + "/gov.epa.emf.services.cost.ControlMeasureService");
     }
     
     public ControlStrategyService controlStrategyService() {

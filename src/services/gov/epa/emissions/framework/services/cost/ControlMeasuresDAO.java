@@ -1,13 +1,12 @@
 package gov.epa.emissions.framework.services.cost;
 
-import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -91,14 +90,13 @@ public class ControlMeasuresDAO {
         hibernateFacade.add(measures, session);
     }
 
-    public Scc[] geSccs(ControlMeasure measure, Session session, DbServer dbServer) throws EmfException {
-        RetrieveSCC retrieveSCC = new RetrieveSCC(measure, dbServer);
+    public Scc[] geSccs(ControlMeasure measure) throws EmfException {
         try {
+            RetrieveSCC retrieveSCC = new RetrieveSCC(measure, new EmfDbServer());
             return retrieveSCC.sccs();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new EmfException(e.getMessage());
         }
-
     }
 
 }

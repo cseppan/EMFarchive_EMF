@@ -7,7 +7,7 @@ import gov.epa.emissions.framework.services.basic.LoggingService;
 import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.cost.ControlStrategyService;
-import gov.epa.emissions.framework.services.cost.CostService;
+import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
 import gov.epa.emissions.framework.services.data.DataService;
 import gov.epa.emissions.framework.services.editor.DataEditorService;
@@ -45,7 +45,7 @@ public interface EmfSession {
 
     CaseService caseService();
     
-    CostService costService();
+    ControlMeasureService costService();
 
     ControlStrategyService controlStrategyService();
 }

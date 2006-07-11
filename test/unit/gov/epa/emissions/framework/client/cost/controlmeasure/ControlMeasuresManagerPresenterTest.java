@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.transport.ServiceLocator;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.CostService;
+import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -25,7 +25,7 @@ public class ControlMeasuresManagerPresenterTest extends MockObjectTestCase {
     protected void setUp() {
         view = mock(ControlMeasuresManagerView.class);
 
-        costService = mock(CostService.class);
+        costService = mock(ControlMeasureService.class);
         serviceLocator = mock(ServiceLocator.class);
         serviceLocator.stubs().method("costService").withNoArguments().will(returnValue(costService.proxy()));
 

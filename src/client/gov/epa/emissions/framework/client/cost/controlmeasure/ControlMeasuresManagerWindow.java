@@ -13,7 +13,7 @@ import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.CostService;
+import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.RefreshButton;
@@ -75,7 +75,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
 
-        CostService service = session.costService();
+        ControlMeasureService service = session.costService();
         tableData = new ControlMeasureTableData(service.getMeasures());
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);

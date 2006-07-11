@@ -5,7 +5,7 @@ import gov.epa.emissions.framework.services.EMFService;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 
-public interface CostService extends EMFService{
+public interface ControlMeasureService extends EMFService{
     
         ControlMeasure[] getMeasures() throws EmfException;
         

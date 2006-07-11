@@ -4,8 +4,8 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.transport.RemoteServiceLocator;
 import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.CostService;
-import gov.epa.emissions.framework.services.cost.CostServiceImpl;
+import gov.epa.emissions.framework.services.cost.ControlMeasureService;
+import gov.epa.emissions.framework.services.cost.ControlMeasureServiceImpl;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -14,15 +14,15 @@ import java.rmi.RemoteException;
 public class CostServiceTransportTest extends ServiceTestCase {
     private static final String DEFAULT_URL = "http://localhost:8080/emf/services";// default
 
-    private CostService service = null;
+    private ControlMeasureService service = null;
 
-    private CostService help;
+    private ControlMeasureService help;
     
     private UserService userService;
     
     protected void doSetUp() throws Exception {
         HibernateSessionFactory sessionFactory = sessionFactory();
-        help = new CostServiceImpl(sessionFactory);
+        help = new ControlMeasureServiceImpl(sessionFactory);
 
         RemoteServiceLocator rl = new RemoteServiceLocator(DEFAULT_URL);
         service = rl.costService();

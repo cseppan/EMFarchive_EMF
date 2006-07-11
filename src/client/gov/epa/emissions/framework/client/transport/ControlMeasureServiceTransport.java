@@ -3,22 +3,22 @@ package gov.epa.emissions.framework.client.transport;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.CostService;
+import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 
-public class CostServiceTransport implements CostService {
+public class ControlMeasureServiceTransport implements ControlMeasureService {
+
+    private CallFactory callFactory;
 
     private DataMappings mappings;
 
-    private EmfCall emfCall;
-
-    public CostServiceTransport(EmfCall controlMeasureCall) {
-        this.emfCall = controlMeasureCall;
+    public ControlMeasureServiceTransport(String endpoint) {
+        callFactory = new CallFactory(endpoint);
         mappings = new DataMappings();
     }
 
-    private EmfCall call() {
-        return emfCall;
+    private EmfCall call() throws EmfException {
+        return callFactory.createCall("ControlMeasureService");
     }
 
     public ControlMeasure[] getMeasures() throws EmfException {

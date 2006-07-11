@@ -3,7 +3,7 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.CostService;
+import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
         save(measure, session.costService(), presenters, view);
     }
 
-    void save(ControlMeasure measure, CostService service, List presenters, ControlMeasureView view)
+    void save(ControlMeasure measure, ControlMeasureService service, List presenters, ControlMeasureView view)
             throws EmfException {
         for (Iterator iter = presenters.iterator(); iter.hasNext();) {
             ControlMeasureTabPresenter element = (ControlMeasureTabPresenter) iter.next();

@@ -117,12 +117,12 @@
 			value="gov.epa.emissions.framework.services.editor.DataViewServiceImpl"/>
 	</service>
 	
-	<service name="gov.epa.emf.services.cost.CostService" provider="java:RPC"
+	<service name="gov.epa.emf.services.cost.ControlMeasureService" provider="java:RPC"
 		style="RPC" use="encoded">
 		<parameter name="allowedMethods" value="*"/>
-		<parameter name="scope" value="session"/>
+		<parameter name="scope" value="request"/>
 		<parameter name="className"
-			value="gov.epa.emissions.framework.services.cost.CostServiceImpl"/>
+			value="gov.epa.emissions.framework.services.cost.ControlMeasureServiceImpl"/>
 	</service>
 	
 	<service name="gov.epa.emissions.framework.services.cost.ControlStrategyService" provider="java:RPC"
@@ -466,7 +466,7 @@
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<arrayMapping qname="ns1:ControlMeasures"
-		xmlns:ns1="urn:gov.epa.services.CostService"
+		xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasure[]"
 		innerType="ns1:ControlMeasure"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>

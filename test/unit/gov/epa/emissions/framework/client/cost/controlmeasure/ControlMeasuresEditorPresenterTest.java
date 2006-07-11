@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.CostService;
+import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.ui.RefreshObserver;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
         measure = new ControlMeasure();
         measure.setName("");
         view = mock(ControlMeasureView.class);
-        costService = mock(CostService.class);
+        costService = mock(ControlMeasureService.class);
         
         managerPresenter = mock(RefreshObserver.class);
         managerPresenter.stubs().method("doRefresh");
@@ -67,7 +67,7 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() throws Exception {
         costService.expects(once()).method("updateMeasure").with(eq(measure));
         expects(view, "disposeView");
-        presenter.save(measure, (CostService) costService.proxy(), presenters(), (ControlMeasureView) view
+        presenter.save(measure, (ControlMeasureService) costService.proxy(), presenters(), (ControlMeasureView) view
                 .proxy());
     }
 
