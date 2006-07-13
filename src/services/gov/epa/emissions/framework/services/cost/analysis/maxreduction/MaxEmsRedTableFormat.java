@@ -47,10 +47,11 @@ public class MaxEmsRedTableFormat implements TableFormat {
         Column recordId = recordID(types);
         Column sourceId = new Column("Source_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
         Column datasetId = new Column("Dataset_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
+        Column controlStrategyId = new Column("Control_Strategy_Id", types.intType(), new IntegerFormatter());
         Column controlMeasureId = new Column("Control_Measure_Id", types.intType(), new IntegerFormatter());
         Column controlMeasureAbbr = new Column("Control_Measure_Abbr", types.text(), new NullFormatter(), "DEFAULT ''::text");
-
-        return new Column[] { recordId, sourceId, datasetId, controlMeasureId, controlMeasureAbbr };
+        
+        return new Column[] { recordId, sourceId, datasetId, controlStrategyId, controlMeasureId, controlMeasureAbbr };
     }
 
     private Column recordID(SqlDataTypes types) {
@@ -61,13 +62,20 @@ public class MaxEmsRedTableFormat implements TableFormat {
     }
 
     private Column[] baseCols() {
-        Column strategy = new Column("control_strategy", types.stringType(255), new StringFormatter(255));
+        Column pollutant = new Column("pollutant", types.stringType(20), new StringFormatter(20));
         Column scc = new Column("scc", types.stringType(10), new StringFormatter(10));
-        Column cost = new Column("cost", types.realType(), new RealFormatter());
+        Column fips = new Column("FIPS", types.stringType(6), new StringFormatter(6));
+        Column totalCost = new Column("total_cost", types.realType(), new RealFormatter());
         Column costPerTon = new Column("cost_per_ton", types.realType(), new RealFormatter());
-        Column reducedEmissions = new Column("reduced_emissions", types.realType(), new RealFormatter());
+        Column controlEfficiency = new Column("control_efficiency", types.realType(), new RealFormatter());
+        Column controlledEmission = new Column("cntrld_emission", types.realType(), new RealFormatter());
+        Column totalReduction = new Column("total_reduction", types.realType(), new RealFormatter());
+        Column originalEmissions = new Column("original_emissions", types.realType(), new RealFormatter());
+        Column disable = new Column("disable", types.booleanType(), new StringFormatter(5));
+        Column comment = new Column("comment", types.stringType(50), new StringFormatter(50));
         
-        return new Column[] { strategy, scc, cost, costPerTon, reducedEmissions };
+        return new Column[] { pollutant, scc, fips, totalCost, costPerTon, controlEfficiency, 
+                controlledEmission, totalReduction, originalEmissions, disable, comment };
     }
 
 }

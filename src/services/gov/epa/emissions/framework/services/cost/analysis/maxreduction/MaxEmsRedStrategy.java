@@ -105,6 +105,7 @@ public class MaxEmsRedStrategy implements Strategy {
         try {
             calculateResult(datasets, datasource);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new EmfException(e.getMessage());
         }finally{
             closeConnection();
@@ -176,10 +177,14 @@ public class MaxEmsRedStrategy implements Strategy {
 
     private void writeBatchOfData(int datasetId, ResultSet resultSet, OptimizedTableModifier modifier) throws Exception {
         while (resultSet.next()) {
-            RecordGenerator generator = new RecordGenerator(datasetId, resultSet, map, controlStrategy);
+            ControlMeasure cm = map.getMaxRedControlMeasure(resultSet.getString("scc"));
+            if ( cm == null)
+                continue;
+            
+            RecordGenerator generator = new RecordGenerator(datasetId, resultSet, cm, controlStrategy);
             Record record = generator.getRecord();
             totalCost += generator.getCost();
-            totalReduction += generator.getReducedEmissions();
+            totalReduction += generator.getReducedEmissions("", "");
             insertRecord(record, modifier);
         }
     }
