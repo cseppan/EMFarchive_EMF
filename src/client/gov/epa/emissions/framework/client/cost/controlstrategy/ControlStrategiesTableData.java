@@ -5,7 +5,7 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
-import gov.epa.emissions.framework.services.cost.data.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
@@ -63,7 +63,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     private double getReduction(ControlStrategy element) {
-        StrategyResult[] results = element.getStrategyResults();
+        StrategyResult[] results = {};//FIXME:element.getStrategyResults();
         double totalReduction = 0;
         
         if(results.length > 0)
@@ -74,7 +74,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     private double getTotalCost(ControlStrategy element) {
-        StrategyResult[] results = element.getStrategyResults();
+        StrategyResult[] results = {};// FIXME:element.getStrategyResults();
         double totalCost = 0;
         
         if(results.length > 0)
@@ -89,7 +89,7 @@ public class ControlStrategiesTableData extends AbstractTableData {
     }
 
     private String dataset(ControlStrategy element) {
-        Dataset[] datasets = element.getDatasets();
+        Dataset[] datasets = element.getInputDatasets();
         if (datasets.length == 0)
             return "";
         

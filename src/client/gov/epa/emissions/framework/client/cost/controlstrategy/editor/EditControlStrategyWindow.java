@@ -94,10 +94,11 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         tabbedPane.addTab("SCCs", new JPanel());
         tabbedPane.addTab("Counties", new JPanel());
         tabbedPane.addTab("Filters", new JPanel());
-        tabbedPane.addTab("Outputs", new JPanel());
+        tabbedPane.addTab("Outputs", outputPanel());
 
         return tabbedPane;
     }
+
 
     private JPanel createSummaryTab(ControlStrategy controlStrategy) {
         try {
@@ -110,6 +111,12 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
             return createErrorTab("Could not load Summary Tab." + e.getMessage());
         }
 
+    }
+    
+    private JPanel outputPanel() {
+        EditControlStrategyTabView view = new EditControlStrategyOutputTab(controlStrategy,session,messagePanel,parentConsole);
+        this.presenter.set(view);
+        return (JPanel) view ;
     }
     
     private JPanel createErrorTab(String message) {// TODO

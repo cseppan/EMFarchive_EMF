@@ -80,8 +80,8 @@ CREATE TABLE emf.control_strategies
 WITHOUT OIDS;
 -- emf.control_strategies
 
--- emf.datasets_control_strategies
-CREATE TABLE emf.datasets_control_strategies
+-- emf.input_datasets_control_strategies
+CREATE TABLE emf.input_datasets_control_strategies
 (
   id SERIAL PRIMARY KEY,
   control_strategy_id int4 NOT NULL REFERENCES emf.control_strategies(id),
@@ -120,21 +120,20 @@ CREATE TABLE emf.control_measure_efficiencyrecords
 WITHOUT OIDS;
 -- emf.control_measure_efficiencyrecords
 
-
 -- emf.strategy_results
 CREATE TABLE emf.strategy_results
 (
   id SERIAL PRIMARY KEY,
   control_strategy_id int4 NOT NULL REFERENCES emf.control_strategies(id),
+  detailed_result_dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
   list_index int4,
   total_cost real,
   total_reduction real,
   dataset_id int4,
-  dataset_name varchar(255) NOT NULL,
-  table_name varchar(255) NOT NULL,
-  table_type varchar(255) NOT NULL,
-  table_columns text NOT NULL,
-  UNIQUE (control_strategy_id, table_name)
+  completion_time timestamp,
+  run_status VARCHAR(50),
+  
+  UNIQUE (control_strategy_id,detailed_result_dataset_id)
 ) 
 WITHOUT OIDS;
 -- emf.strategy_results

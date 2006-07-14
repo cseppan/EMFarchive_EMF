@@ -20,7 +20,7 @@ import gov.epa.emissions.framework.client.data.Regions;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
-import gov.epa.emissions.framework.services.cost.data.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.IntTextField;
@@ -145,7 +145,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     private JPanel datasetPanel() {
         datasetTextField = new TextField("datasets", 25);
         datasetTextField.setEditable(false);
-        datasetTextField.setText(selectedDatasets(controlStrategy.getDatasets()));
+        datasetTextField.setText(selectedDatasets(controlStrategy.getInputDatasets()));
         changeablesList.addChangeable(datasetTextField);
 
         Button chooseButton = new Button("Choose", chooseDatasetAction());
@@ -167,7 +167,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
                     EmfDataset dataset = dialog.dataset();
                     if (dataset != null) {
                         datasetTextField.setText(dataset.getName());
-                        controlStrategy.setDatasets(new EmfDataset[] { dataset });
+                        controlStrategy.setInputDatasets(new EmfDataset[] { dataset });
                         Version[] versions = session.dataEditorService().getVersions(dataset.getId());
                         versionPanel.update(versions);
                     }
@@ -417,7 +417,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private double getReduction(ControlStrategy cs) {
-        StrategyResult[] results = cs.getStrategyResults();
+        StrategyResult[] results ={} ;//FIXME: cs.getStrategyResults();
         double totalReduction = 0;
         
         if(results.length > 0)
@@ -428,7 +428,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private double getTotalCost(ControlStrategy cs) {
-        StrategyResult[] results = cs.getStrategyResults();
+        StrategyResult[] results ={} ;//FIXME: cs.getStrategyResults();
         double totalCost = 0;
         
         if(results.length > 0)
@@ -465,7 +465,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private void isDatasetSelected(ControlStrategy controlStrategy) throws EmfException {
-        if (controlStrategy.getDatasets().length == 0) {
+        if (controlStrategy.getInputDatasets().length == 0) {
             throw new EmfException("Please select a dataset");
         }
     }

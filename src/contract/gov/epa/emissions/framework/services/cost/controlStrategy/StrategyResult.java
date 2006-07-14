@@ -1,0 +1,85 @@
+package gov.epa.emissions.framework.services.cost.controlStrategy;
+
+import gov.epa.emissions.commons.data.Dataset;
+
+import java.io.Serializable;
+import java.util.Date;
+
+public class StrategyResult implements Serializable {
+
+    private int id;
+
+    private int datasetId;
+
+    private double totalCost;
+
+    private double totalReduction;
+
+    private String runStatus;
+
+    private Date completionTime;
+
+    private Dataset detailedResultDataset;
+
+    public StrategyResult() {
+        //
+    }
+    
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+
+    public double getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(double totalCost) {
+        this.totalCost = totalCost;
+    }
+
+    public int getDatasetId() {
+        return datasetId;
+    }
+
+    public void setDatasetId(int datasetId) {
+        this.datasetId = datasetId;
+    }
+
+    public double getTotalReduction() {
+        return totalReduction;
+    }
+
+    public void setTotalReduction(double totalReduction) {
+        this.totalReduction = totalReduction;
+    }
+
+    public Date getCompletionTime() {
+        return completionTime;
+    }
+
+    public void setCompletionTime(Date completionTime) {
+        this.completionTime = completionTime;
+    }
+
+    public Dataset getDetailedResultDataset() {
+        return detailedResultDataset;
+    }
+
+    public void setDetailedResultDataset(Dataset detailedResultDataset) {
+        this.detailedResultDataset = detailedResultDataset;
+    }
+
+    public String getRunStatus() {
+        return runStatus;
+    }
+
+    public void setRunStatus(String runStatus) {
+        this.runStatus = runStatus;
+    }
+
+}

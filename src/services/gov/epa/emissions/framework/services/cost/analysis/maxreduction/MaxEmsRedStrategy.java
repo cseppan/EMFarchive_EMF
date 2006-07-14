@@ -8,7 +8,6 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.HibernateSessionFactory;
 import gov.epa.emissions.commons.db.OptimizedQuery;
 import gov.epa.emissions.commons.db.OptimizedTableModifier;
-import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.framework.services.EmfDbServer;
@@ -19,7 +18,7 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.analysis.ResultTable;
 import gov.epa.emissions.framework.services.cost.analysis.SCCControlMeasureMap;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
-import gov.epa.emissions.framework.services.cost.data.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -44,24 +43,23 @@ public class MaxEmsRedStrategy implements Strategy {
     private ControlMeasure[] measures;
 
     private SCCControlMeasureMap map;
-    
+
     private ResultTable resultTable;
 
     private int batchSize;
 
     private double totalCost;
-    
+
     private double totalReduction;
 
     private EmfDbServer emfDbServer;
 
-    public MaxEmsRedStrategy(ControlStrategy strategy, Integer batchSize)
-            throws EmfException {
+    public MaxEmsRedStrategy(ControlStrategy strategy, Integer batchSize) throws EmfException {
         this.controlStrategy = strategy;
         this.datasource = getDatasource();
-        this.datasets = strategy.getDatasets();
+        this.datasets = strategy.getInputDatasets();
         this.batchSize = batchSize.intValue();
-        
+
         this.tableFormat = new MaxEmsRedTableFormat(emfDbServer.getSqlDataTypes());
         setup();
     }
@@ -83,7 +81,8 @@ public class MaxEmsRedStrategy implements Strategy {
         }
 
         this.measures = getMeasures();
-        this.map = new SCCControlMeasureMap(sccs, measures, controlStrategy.getTargetPollutant(), controlStrategy.getCostYear());
+        this.map = new SCCControlMeasureMap(sccs, measures, controlStrategy.getTargetPollutant(), controlStrategy
+                .getCostYear());
     }
 
     public ControlMeasure[] getMeasures() throws EmfException {
@@ -100,14 +99,13 @@ public class MaxEmsRedStrategy implements Strategy {
         }
     }
 
-
     public void run() throws EmfException {
         try {
             calculateResult(datasets, datasource);
         } catch (Exception e) {
             e.printStackTrace();
             throw new EmfException(e.getMessage());
-        }finally{
+        } finally {
             closeConnection();
         }
         setCompletionDate();
@@ -124,8 +122,9 @@ public class MaxEmsRedStrategy implements Strategy {
     private void calculateResult(Dataset[] datasets, Datasource datasource) throws Exception {
         for (int i = 0; i < datasets.length; i++) {
             calculateResultForSingleDataset(datasets[i], datasource);
-            StrategyResult result = setStrategyResult(datasets[i]);
-            controlStrategy.addStrategyResult(result);
+            setStrategyResult(datasets[i]);
+            // FIXMEStrategyResult result = setStrategyResult(datasets[i]);
+            // FIXME: controlStrategy.addStrategyResult(result);
         }
     }
 
@@ -178,9 +177,9 @@ public class MaxEmsRedStrategy implements Strategy {
     private void writeBatchOfData(int datasetId, ResultSet resultSet, OptimizedTableModifier modifier) throws Exception {
         while (resultSet.next()) {
             ControlMeasure cm = map.getMaxRedControlMeasure(resultSet.getString("scc"));
-            if ( cm == null)
+            if (cm == null)
                 continue;
-            
+
             RecordGenerator generator = new RecordGenerator(datasetId, resultSet, cm, controlStrategy);
             Record record = generator.getRecord();
             totalCost += generator.getCost();
@@ -286,18 +285,18 @@ public class MaxEmsRedStrategy implements Strategy {
     public ControlStrategy getControlStrategy() {
         return controlStrategy;
     }
-    
+
     private StrategyResult setStrategyResult(Dataset dataset) {
         StrategyResult result = new StrategyResult();
-        result.setTable(getResultTableName(dataset));
-        result.setCols(colNames(this.tableFormat.cols()));
-        result.setType(this.tableFormat.identify());
+        // FIXME: result.setTable(getResultTableName(dataset));
+        // FIXME: result.setCols(colNames(this.tableFormat.cols()));
+        // FIXME: result.setType(this.tableFormat.identify());
         result.setDatasetId(dataset.getId());
-        result.setDatasetName(dataset.getName());
+        // FIXME: result.setDatasetName(dataset.getName());
         result.setTotalCost(this.totalCost);
         result.setTotalReduction(this.totalReduction);
         resetTotalCostAndReduction();
-        
+
         return result;
     }
 
@@ -306,6 +305,7 @@ public class MaxEmsRedStrategy implements Strategy {
         this.totalReduction = 0;
     }
 
+    /*
     private String[] colNames(Column[] cols) {
         List names = new ArrayList();
         for (int i = 0; i < cols.length; i++)
@@ -313,5 +313,5 @@ public class MaxEmsRedStrategy implements Strategy {
 
         return (String[]) names.toArray(new String[0]);
     }
-
+*/
 }

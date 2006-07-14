@@ -83,7 +83,7 @@ public class VersionPanel extends JPanel {
     }
 
     private void initialize() throws EmfException {
-        EmfDataset[] datasets = controlStrategy.getDatasets();
+        EmfDataset[] datasets = controlStrategy.getInputDatasets();
         if (datasets.length == 0) {// new control strategy
             comboBox.setEnabled(false);
         } else {

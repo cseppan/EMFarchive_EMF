@@ -23,10 +23,11 @@ import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.services.cost.data.CostRecord;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
-import gov.epa.emissions.framework.services.cost.data.StrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
 import gov.epa.emissions.framework.services.data.Note;
@@ -96,6 +97,7 @@ public class DataMappings extends Mappings {
         bean(call, CostRecord.class, costRecord());
         bean(call, EfficiencyRecord.class, efficiencyRecord());
         bean(call, Scc.class, scc());
+        bean(call, ControlStrategyResultsSummary.class, controlStrategyResultsSummary());
     }
 
     private void registerArrays(Call call) {
@@ -369,5 +371,10 @@ public class DataMappings extends Mappings {
     public QName strategyResults() {
         return qname("StrategyResults");
     }
+    
+    private QName controlStrategyResultsSummary() {
+        return qname("ControlStrategyResultsSummary");
+    }
+
 
 }

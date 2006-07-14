@@ -47,25 +47,26 @@
             class="gov.epa.emissions.framework.services.cost.StrategyType"
             column="strategy_type_id"/> 
             
-   	<array name="datasets" table="datasets_control_strategies" >
+   	<array name="inputDatasets" table="input_datasets_control_strategies" >
     	<key column="control_strategy_id" not-null="true"/>
 	    <list-index column="list_index"/>
     	<many-to-many class="gov.epa.emissions.framework.services.data.EmfDataset" column="dataset_id"/>
 	</array>
 	
-	<array name="strategyResults" table="strategy_results">
-    	<key column="control_strategy_id"/>
+	<array name="strategyResults" table="strategy_results" >
+    	<key column="control_strategy_id" not-null="true"/>
     	<list-index column="list_index"/>
-    	<composite-element class="gov.epa.emissions.framework.services.cost.data.StrategyResult">
-			<property name="table" column="table_name" not-null="true"/>
-			<property name="type" column="table_type" not-null="true"/>
-			<property name="colsList" column="table_columns" not-null="true"/>
-			<property name="datasetName" column="dataset_name" not-null="true"/>
-			<property name="datasetId" column="dataset_id" not-null="true"/>
+    	<composite-element class="gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult">
+			<property name="datasetId" column="dataset_id" />
 			<property name="totalCost" column="total_cost" not-null="true"/>
-			<property name="totalReduction" column="total_reduction" not-null="true"/>
+			<property name="totalReduction" column="total_reduction" type="double"  not-null="true" />
+			<property name="runStatus" column="run_status"	type="java.lang.String"	/>
+			<property name="completionTime" column="completion_time" type="java.util.Date" not-null="false" length="4"/>
+			<many-to-one cascade="save-update" name="detailedResultDataset"
+				 class ="gov.epa.emissions.framework.services.data.EmfDataset"
+				 column="detailed_result_dataset_id" unique="true" not-null="true"/>
     	</composite-element>
   	</array>
-
+	
   </class> 
 </hibernate-mapping>  

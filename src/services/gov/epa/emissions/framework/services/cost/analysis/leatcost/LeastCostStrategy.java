@@ -4,7 +4,7 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
-import gov.epa.emissions.framework.services.cost.data.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 
 public class LeastCostStrategy implements Strategy {
 

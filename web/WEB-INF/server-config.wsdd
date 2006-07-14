@@ -237,7 +237,8 @@
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.commons.db.version.ChangeSet"
 		qname="ns1:ChangeSet" xmlns:ns1="urn:gov.epa.services.EmfService"/>
-		
+
+	<!-- COST Mappings-->
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.ControlMeasure"
 		qname="ns1:ControlMeasure" xmlns:ns1="urn:gov.epa.services.EmfService"/>
@@ -265,6 +266,10 @@
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.StrategyResult"
 		qname="ns1:StrategyResult" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary"
+		qname="ns1:ControlStrategyResultsSummary" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 		
 	<!-- CASE MANAGEMENT -->
 	<beanMapping
@@ -333,6 +338,8 @@
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Speciation"
 		qname="ns1:Speciation" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+		
 		
 	<arrayMapping qname="ns1:Speciations" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Speciation[]"
