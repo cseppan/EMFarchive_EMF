@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.EmfMockObjectTestCase;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyPresenter;
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyPresenterImpl;
+import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategySummaryTabView;
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
@@ -37,6 +38,9 @@ public class EditControlStrategyPresenterTest extends EmfMockObjectTestCase {
         Mock view = mock(EditControlStrategyView.class);
         expects(view, 1, "disposeView");
 
+        Mock summaryTabView = mock(EditControlStrategySummaryTabView.class);
+        expects(summaryTabView, 1, "stopRun");
+
         Mock service = mock(ControlStrategyService.class);
         Mock session = mock(EmfSession.class);
         stub(session, "controlStrategyService", service.proxy());
@@ -44,6 +48,7 @@ public class EditControlStrategyPresenterTest extends EmfMockObjectTestCase {
 
         EditControlStrategyPresenter p = new EditControlStrategyPresenterImpl(null, (EmfSession) session.proxy(), (EditControlStrategyView) view
                 .proxy(), null);
+        p.set((EditControlStrategySummaryTabView)summaryTabView.proxy());
 
         p.doClose();
     }

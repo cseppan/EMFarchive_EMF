@@ -113,6 +113,7 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
             efficiencyValue = verifier.parseFloat(efficiency);
             if (efficiencyValue > 100)
                 throw new EmfException("Percent reduction must be less than or equal to 100.0");
+            efficiencyValue = efficiencyValue / 100;
             verified = true;
         } catch (EmfException e) {
             verified = false;

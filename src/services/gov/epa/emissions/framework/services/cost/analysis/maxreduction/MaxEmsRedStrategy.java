@@ -155,6 +155,9 @@ public class MaxEmsRedStrategy implements Strategy {
         OptimizedTableModifier modifier = null;
         resultTable = new ResultTable(table, datasource);
         try {
+            if (resultTable.exists(table))
+                resultTable.drop(table);
+            
             resultTable.create(tableFormat);
             modifier = dataModifier(datasource, table);
             modifier.start();
@@ -305,13 +308,4 @@ public class MaxEmsRedStrategy implements Strategy {
         this.totalReduction = 0;
     }
 
-    /*
-    private String[] colNames(Column[] cols) {
-        List names = new ArrayList();
-        for (int i = 0; i < cols.length; i++)
-            names.add(cols[i].name());
-
-        return (String[]) names.toArray(new String[0]);
-    }
-*/
 }
