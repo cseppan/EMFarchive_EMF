@@ -116,6 +116,12 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         this.monitor = new SummaryMonitor();
     }
     
+    public void set(EditControlStrategyOutputTabView view) {
+        EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(view,session);
+        view.observe(presenter);
+        presenters.add(presenter);
+    }
+    
     public void set(EditControlStrategyTabView view) {
         EditControlStrategyTabPresenter presenter = new EditControlStrategyTabPresenterImpl(controlStrategy,view);
         presenters.add(presenter);
@@ -140,5 +146,6 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             summaryTabPresenter.doRefresh();
         }
     }
+
 
 }

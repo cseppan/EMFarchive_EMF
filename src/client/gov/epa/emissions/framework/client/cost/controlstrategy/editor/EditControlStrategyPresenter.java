@@ -14,6 +14,8 @@ public interface EditControlStrategyPresenter {
     void set(EditControlStrategyTabView view);
 
     void set(EditControlStrategySummaryTabView view);
+    
+    void set(EditControlStrategyOutputTabView view);
 
     void runStrategy() throws EmfException;
 

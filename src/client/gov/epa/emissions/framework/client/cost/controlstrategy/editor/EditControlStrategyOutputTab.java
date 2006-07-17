@@ -6,14 +6,17 @@ import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.ui.EmfTableModel;
-import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
+import gov.epa.emissions.framework.ui.FileChooser;
+import gov.epa.emissions.framework.ui.MessagePanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -23,13 +26,21 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-public class EditControlStrategyOutputTab extends JPanel implements EditControlStrategyTabView {
+public class EditControlStrategyOutputTab extends JPanel implements EditControlStrategyOutputTabView {
 
-    private TextField folderName;
+    private TextField folder;
+
+    private EditControlStrategyOutputTabPresenter presenter;
+
+    private ControlStrategy controlStrategy;
+
+    private MessagePanel messagePanel;
 
     public EditControlStrategyOutputTab(ControlStrategy controlStrategy, EmfSession session,
-            SingleLineMessagePanel messagePanel, EmfConsole parentConsole) {
+            MessagePanel messagePanel, EmfConsole parentConsole) {
         super.setName("output");
+        this.controlStrategy = controlStrategy;
+        this.messagePanel = messagePanel;
         setLayout(controlStrategy);
     }
 
@@ -39,15 +50,34 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         add(outputPanel(controlStrategy));
     }
 
+    public void save(ControlStrategy controlStrategy) {
+        // TODO: output settings
+    }
+
+    public void observe(EditControlStrategyOutputTabPresenter presenter) {
+        this.presenter = presenter;
+    }
+
+    public void export() {
+        presenter.doExport(controlStrategy);
+    }
+
+    public void analyze() {
+        try {
+            presenter.doAnalyze(controlStrategy,folder.getText());
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
     private JPanel topPanel() {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(productPanel());
         topPanel.add(bottomPanel(), BorderLayout.SOUTH);
-        
-        topPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(5,5,5,5),
+
+        topPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createTitledBorder("Output Settings")));
-        
+
         return topPanel;
     }
 
@@ -55,18 +85,17 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(folderPanel());
         JPanel createPanel = createButtonPanel();
-        panel.add(createPanel,BorderLayout.SOUTH);
+        panel.add(createPanel, BorderLayout.SOUTH);
         return panel;
     }
 
     private JPanel createButtonPanel() {
-        Button button = new Button("Create",null);
+        Button button = new Button("Create", null);
         button.setEnabled(false);
         JPanel createPanel = new JPanel();
         createPanel.add(button);
         return createPanel;
     }
-
 
     private JPanel productPanel() {
         JPanel productPanel = new JPanel();
@@ -81,40 +110,29 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private JPanel folderPanel() {
         JLabel folderLabel = new JLabel("Folder: ");
-        folderName = new TextField("folderName", 30);
-        folderName.setEnabled(false);
-        
+        folder = new TextField("folderName", 30);
+
         Button browseButton = new Button("Browse", browseAction());
-        browseButton.setEnabled(false);
-        
+
         JPanel panel = new JPanel();
         panel.add(folderLabel);
-        panel.add(folderName);
+        panel.add(folder);
         panel.add(browseButton);
 
         return panel;
     }
 
-    private Action browseAction() {
-        return new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                //
-            }
-        };
-    }
-
     private JPanel outputPanel(ControlStrategy controlStrategy) {
         JPanel tablePanel = tablePanel(controlStrategy);
-        JPanel buttonPanel= buttonPanel();
+        JPanel buttonPanel = buttonPanel();
 
         JPanel outputPanel = new JPanel(new BorderLayout());
         outputPanel.add(tablePanel);
-        outputPanel.add(buttonPanel,BorderLayout.SOUTH);
-        
-        outputPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(5,5,5,5),
+        outputPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        outputPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createTitledBorder("Results")));
-        
+
         return outputPanel;
     }
 
@@ -125,45 +143,65 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         SortFilterSelectModel selectModel = new SortFilterSelectModel(model);
         JTable table = new JTable(selectModel);
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(300,200));
+        scrollPane.setPreferredSize(new Dimension(300, 200));
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.add(scrollPane);
         return tablePanel;
     }
-    
-    private JPanel buttonPanel(){
-       Button exportButton = new Button("Export",exportAction());
-       exportButton.setEnabled(false);
-       Button analysisButton = new Button("Analysis",analysisAction());
-       
-       JPanel buttonPanel = new JPanel();
-       buttonPanel.add(exportButton);
-       buttonPanel.add(analysisButton);
-       return buttonPanel;
+
+    private JPanel buttonPanel() {
+        Button exportButton = new Button("Export", exportAction());
+        exportButton.setEnabled(false);
+        Button analysisButton = new Button("Analyze", analysisAction());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(exportButton);
+        buttonPanel.add(analysisButton);
+        return buttonPanel;
     }
 
     private Action exportAction() {
-        return new AbstractAction(){
+        return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 // NOTE Auto-generated method stub
             }
-            
+
         };
     }
-    
+
     private Action analysisAction() {
-        return new AbstractAction(){
+        return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // NOTE Auto-generated method stub
+                // analyze();
             }
-            
+
         };
     }
 
+    private Action browseAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                selectFolder();
+            }
+        };
+    }
 
-    public void save(ControlStrategy controlStrategy) {
-        // NOTE Auto-generated method stub
+    private void selectFolder() {
+        FileChooser chooser = new FileChooser("Select Folder", new File(folder.getText()),
+                EditControlStrategyOutputTab.this);
 
+        chooser.setTitle("Select a folder");
+        File[] file = chooser.choose();
+        if (file == null)
+            return;
+
+        if (file[0].isDirectory()) {
+            folder.setText(file[0].getAbsolutePath());
+        }
+
+        if (file[0].isFile()) {
+            folder.setText(file[0].getParent());
+        }
     }
 
 }
