@@ -4,6 +4,7 @@ import java.util.List;
 
 import gov.epa.emissions.framework.services.ServiceTestCase;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
@@ -27,11 +28,13 @@ public class ControlStrategyResultsTest extends ServiceTestCase {
     //FIXME: save dataset indirrectly when saving control strategy
     public void testShouldSaveControlStrategyWithResultsSummary(){
         ControlStrategy element = new ControlStrategy("test" + Math.random());
-
+        
         StrategyResult result = new StrategyResult();
         EmfDataset dataset = dataset();
         result.setDetailedResultDataset(dataset);
         
+        StrategyResultType detailedStrategyResultType = controlStrategydao.getDetailedStrategyResultType(session);
+        result.setStrategyResultType(detailedStrategyResultType);
         element.setStrategyResults(new StrategyResult[]{result});
         
         try{
@@ -45,6 +48,11 @@ public class ControlStrategyResultsTest extends ServiceTestCase {
             controlStrategydao.remove(element,session);
             datasetDAO.remove(dataset,session);
         }
+    }
+    
+    public void testShouldGetDetailedStrategyResultType(){
+        StrategyResultType detailedStrategyResultType = controlStrategydao.getDetailedStrategyResultType(session);
+        assertEquals("Detailed Strategy Result",detailedStrategyResultType.getName());
     }
 
     private EmfDataset dataset() {

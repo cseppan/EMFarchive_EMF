@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.persistence.HibernateFacade;
 import gov.epa.emissions.framework.services.persistence.LockingScheme;
 
@@ -38,7 +39,7 @@ public class ControlStrategyDAO {
     public List all(Session session) {
         return hibernateFacade.getAll(ControlStrategy.class, Order.asc("name"), session);
     }
-    
+
     public List getAllStrategyTypes(Session session) {
         return hibernateFacade.getAll(StrategyType.class, Order.asc("name"), session);
     }
@@ -86,8 +87,18 @@ public class ControlStrategyDAO {
     public boolean exists(int id, Class clazz, Session session) {
         return hibernateFacade.exists(id, clazz, session);
     }
-    
+
     public void remove(ControlStrategy strategy, Session session) {
         hibernateFacade.remove(strategy, session);
+    }
+
+    public StrategyResultType getDetailedStrategyResultType(Session session) {
+        List all = hibernateFacade.getAll(StrategyResultType.class, Order.asc("name"), session);
+        for (int i = 0; i < all.size(); i++) {
+            StrategyResultType type = (StrategyResultType) all.get(i);
+            if (type.getName().equals("Detailed Strategy Result"))
+                return type;
+        }
+        return null;
     }
 }

@@ -120,11 +120,21 @@ CREATE TABLE emf.control_measure_efficiencyrecords
 WITHOUT OIDS;
 -- emf.control_measure_efficiencyrecords
 
+-- emf.strategy_result_types
+CREATE TABLE emf.strategy_result_types
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- emf.strategy_result_types
+
 -- emf.strategy_results
 CREATE TABLE emf.strategy_results
 (
   id SERIAL PRIMARY KEY,
   control_strategy_id int4 NOT NULL REFERENCES emf.control_strategies(id),
+  strategy_result_type_id int4 NOT NULL REFERENCES emf.strategy_result_types(id),
   detailed_result_dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
   list_index int4,
   total_cost real,
@@ -137,4 +147,6 @@ CREATE TABLE emf.strategy_results
 ) 
 WITHOUT OIDS;
 -- emf.strategy_results
+
+
 --------------------------------------------------------------------------------

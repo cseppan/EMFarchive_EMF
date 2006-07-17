@@ -24,6 +24,7 @@ import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.services.cost.data.CostRecord;
@@ -98,6 +99,7 @@ public class DataMappings extends Mappings {
         bean(call, EfficiencyRecord.class, efficiencyRecord());
         bean(call, Scc.class, scc());
         bean(call, ControlStrategyResultsSummary.class, controlStrategyResultsSummary());
+        bean(call, StrategyResultType.class, strategyResultType());
     }
 
     private void registerArrays(Call call) {
@@ -374,6 +376,10 @@ public class DataMappings extends Mappings {
     
     private QName controlStrategyResultsSummary() {
         return qname("ControlStrategyResultsSummary");
+    }
+    
+    private QName strategyResultType() {
+        return qname("StrategyResultType");
     }
 
 

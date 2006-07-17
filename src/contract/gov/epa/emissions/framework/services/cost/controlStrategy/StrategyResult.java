@@ -20,6 +20,8 @@ public class StrategyResult implements Serializable {
     private Date completionTime;
 
     private Dataset detailedResultDataset;
+    
+    private StrategyResultType strategyResultType;
 
     public StrategyResult() {
         //
@@ -33,6 +35,14 @@ public class StrategyResult implements Serializable {
         this.id = id;
     }
 
+
+    public StrategyResultType getStrategyResultType() {
+        return strategyResultType;
+    }
+
+    public void setStrategyResultType(StrategyResultType resultType) {
+        this.strategyResultType = resultType;
+    }
 
     public double getTotalCost() {
         return totalCost;

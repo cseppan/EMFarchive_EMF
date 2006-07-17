@@ -62,6 +62,9 @@
 			<property name="totalReduction" column="total_reduction" type="double"  not-null="true" />
 			<property name="runStatus" column="run_status"	type="java.lang.String"	/>
 			<property name="completionTime" column="completion_time" type="java.util.Date" not-null="false" length="4"/>
+			<many-to-one cascade="save-update" name="strategyResultType"
+				 class ="gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType"
+				 column="strategy_result_type_id" unique="true" not-null="true"/>
 			<many-to-one cascade="save-update" name="detailedResultDataset"
 				 class ="gov.epa.emissions.framework.services.data.EmfDataset"
 				 column="detailed_result_dataset_id" unique="true" not-null="true"/>
