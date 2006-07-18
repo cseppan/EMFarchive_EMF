@@ -117,7 +117,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
     
     public void set(EditControlStrategyOutputTabView view) {
-        EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(view,session);
+        EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(session);
         view.observe(presenter);
         presenters.add(presenter);
     }

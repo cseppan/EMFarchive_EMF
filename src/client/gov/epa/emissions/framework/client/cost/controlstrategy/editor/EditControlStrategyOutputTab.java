@@ -36,8 +36,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private MessagePanel messagePanel;
 
-    public EditControlStrategyOutputTab(ControlStrategy controlStrategy, EmfSession session,
-            MessagePanel messagePanel, EmfConsole parentConsole) {
+    public EditControlStrategyOutputTab(ControlStrategy controlStrategy, EmfSession session, MessagePanel messagePanel,
+            EmfConsole parentConsole) {
         super.setName("output");
         this.controlStrategy = controlStrategy;
         this.messagePanel = messagePanel;
@@ -59,12 +59,16 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     public void export() {
-        presenter.doExport(controlStrategy);
+        try {
+            presenter.doExport(controlStrategy, folder.getText());
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
     }
 
     public void analyze() {
         try {
-            presenter.doAnalyze(controlStrategy,folder.getText());
+            presenter.doAnalyze(controlStrategy, folder.getText());
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -174,7 +178,6 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             public void actionPerformed(ActionEvent e) {
                 // analyze();
             }
-
         };
     }
 

@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.AbstractTableData;
@@ -27,28 +26,9 @@ public class StrategyResultsTableData extends AbstractTableData {
             Row row = new ViewableRow(result, values);
             rows.add(row);
         }
-        //FIXME: remove this
-        rows.add(result());
         return rows;
     }
     
-    private Row result(){
-        StrategyResult sr = new StrategyResult();
-        sr.setDatasetId(104);
-        StrategyResultType type = new StrategyResultType();
-        type.setName("Detailed Strategy Result");
-        sr.setStrategyResultType(type);
-        EmfDataset outputDataset = new EmfDataset();
-        outputDataset.setName("test output104");
-        outputDataset.setStatus("Created By Control Strategy");
-        sr.setDetailedResultDataset(outputDataset );
-        
-        return new ViewableRow(sr,new Object[]{""+sr.getDatasetId(),
-                sr.getDetailedResultDataset().getName(),
-                ((EmfDataset) sr.getDetailedResultDataset()).getStatus(),
-                sr.getStrategyResultType().getName()});
-    }
-
     public String[] columns() {
         return new String[] { "Input Dataset Id", "Output Dataset", "Status", "Product" };
     }
