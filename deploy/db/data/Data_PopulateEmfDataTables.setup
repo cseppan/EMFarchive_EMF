@@ -80,6 +80,9 @@ insert into emf.dataset_types values(DEFAULT,'Mobile Source Codes (Line-based)',
 insert into emf.dataset_types values(DEFAULT,'NonHAP VOC Calculation Exclusions (Line-based)','NonHAP VOC Calculation Exclusions (Line-based)', '1', '1', false,'', 'gov.epa.emissions.commons.io.generic.LineImporter', 'gov.epa.emissions.commons.io.generic.LineExporter');
 insert into emf.dataset_types values(DEFAULT,'SIC Descriptions (Line-based)','SIC Descriptions (Line-based)', '1', '1', false,'', 'gov.epa.emissions.commons.io.generic.LineImporter', 'gov.epa.emissions.commons.io.generic.LineExporter');
 insert into emf.dataset_types values(DEFAULT,'SCC Descriptions (Line-based)','SCC Descriptions (Line-based)', '1', '1', false,'', 'gov.epa.emissions.commons.io.generic.LineImporter', 'gov.epa.emissions.commons.io.generic.LineExporter');
+-- for control strategy result
+insert into emf.dataset_types values(DEFAULT,'Control Strategy Detailed Result','Control Strategy Detailed Result', '1', '1', false,'', '', '');
+
  
 -- emf.dataset_types
 --

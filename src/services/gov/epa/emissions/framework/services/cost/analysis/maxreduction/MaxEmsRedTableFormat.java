@@ -47,11 +47,12 @@ public class MaxEmsRedTableFormat implements TableFormat {
         Column recordId = recordID(types);
         Column sourceId = new Column("Source_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
         Column datasetId = new Column("Dataset_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
+        Column resultDatasetId = new Column("Result_Dataset_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
         Column controlStrategyId = new Column("Control_Strategy_Id", types.intType(), new IntegerFormatter());
         Column controlMeasureId = new Column("Control_Measure_Id", types.intType(), new IntegerFormatter());
         Column controlMeasureAbbr = new Column("Control_Measure_Abbr", types.text(), new NullFormatter(), "DEFAULT ''::text");
         
-        return new Column[] { recordId, sourceId, datasetId, controlStrategyId, controlMeasureId, controlMeasureAbbr };
+        return new Column[] { recordId, sourceId, datasetId, resultDatasetId, controlStrategyId, controlMeasureId, controlMeasureAbbr };
     }
 
     private Column recordID(SqlDataTypes types) {

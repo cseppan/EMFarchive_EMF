@@ -22,7 +22,7 @@ public class StrategyResultsTableData extends AbstractTableData {
         for (int i = 0; i < strategyResults.length; i++) {
             StrategyResult result = strategyResults[i];
             EmfDataset outputDataset = (EmfDataset) result.getDetailedResultDataset();
-            Object[] values = {""+result.getDatasetId(), outputDataset.getName(), outputDataset.getStatus(),result.getStrategyResultType().getName() };
+            Object[] values = {""+result.getInputDatasetId(), outputDataset.getName(), outputDataset.getStatus(),result.getStrategyResultType().getName() };
             Row row = new ViewableRow(result, values);
             rows.add(row);
         }

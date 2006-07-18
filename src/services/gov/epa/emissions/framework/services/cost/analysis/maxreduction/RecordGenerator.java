@@ -25,9 +25,12 @@ public class RecordGenerator {
 
     private double annEmissions;
 
-    public RecordGenerator(int datasetId, ResultSet resultSet, ControlMeasure measure, ControlStrategy controlStrategy)
+    private int resultDatasetId;
+
+    public RecordGenerator(int datasetId, int resultDatasetId, ResultSet resultSet, ControlMeasure measure, ControlStrategy controlStrategy)
             throws SQLException {
         this.datasetId = datasetId;
+        this.resultDatasetId = resultDatasetId;
         this.controlStrategy = controlStrategy;
         this.resultSet = resultSet;
 
@@ -54,6 +57,7 @@ public class RecordGenerator {
         tokens.add(index++, ""); // record id
         tokens.add(index++, "" + resultSet.getInt("Record_Id"));
         tokens.add(index++, "" + datasetId);
+        tokens.add(index++, "" + resultDatasetId);
         tokens.add(index++, "" + controlStrategy.getId());
 
         String controlMeasureId = "";
@@ -109,9 +113,7 @@ public class RecordGenerator {
     }
 
     private float getCostPerTon(ControlMeasure measure) {
-        System.out.println("record generator: " + measure.getName());
         CostRecord[] records = measure.getCostRecords();
-        System.out.println("record generator: records:" + records.length);
         String targetPollutant = controlStrategy.getTargetPollutant();
         int costYear = controlStrategy.getCostYear();
 

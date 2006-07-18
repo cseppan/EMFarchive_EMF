@@ -9,7 +9,7 @@ public class StrategyResult implements Serializable {
 
     private int id;
 
-    private int datasetId;
+    private int inputDatasetId;
 
     private double totalCost;
 
@@ -52,12 +52,12 @@ public class StrategyResult implements Serializable {
         this.totalCost = totalCost;
     }
 
-    public int getDatasetId() {
-        return datasetId;
+    public int getInputDatasetId() {
+        return inputDatasetId;
     }
 
-    public void setDatasetId(int datasetId) {
-        this.datasetId = datasetId;
+    public void setInputDatasetId(int datasetId) {
+        this.inputDatasetId = datasetId;
     }
 
     public double getTotalReduction() {

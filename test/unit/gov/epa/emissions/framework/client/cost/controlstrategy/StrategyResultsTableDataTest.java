@@ -20,12 +20,12 @@ public class StrategyResultsTableDataTest extends TestCase {
 
     protected void setUp() {
         result1 = new StrategyResult();
-        result1.setDatasetId(101);
+        result1.setInputDatasetId(101);
         result1.setDetailedResultDataset(detailDataset("dataset1"));
         result1.setStrategyResultType(type());
         
         result2 = new StrategyResult();
-        result2.setDatasetId(102);
+        result2.setInputDatasetId(102);
         result2.setDetailedResultDataset(detailDataset("dataset2"));
         result2.setStrategyResultType(type());
         
