@@ -34,7 +34,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
     public void testShouldGetControlStrategies() throws Exception {
         int totalBeforeAdd = service.getControlStrategies().length;
         ControlStrategy element = controlStrategy();
-
+        session.close();
         try {
             List list = Arrays.asList(service.getControlStrategies());
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -47,6 +47,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
     private ControlStrategy controlStrategy() {
         ControlStrategy element = new ControlStrategy("test" + Math.random());
         add(element);
+        session.clear();
         return element;
     }
 
@@ -126,7 +127,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         assertEquals("Least Cost", types[0].getName());
     }
 
-    public void FIXME_testShouldUpdateControlStrategyWithLock() throws Exception {
+    public void testShouldUpdateControlStrategyWithLock() throws Exception {
         
         User owner = userService.getUser("emf");
         ControlStrategy element = controlStrategy();

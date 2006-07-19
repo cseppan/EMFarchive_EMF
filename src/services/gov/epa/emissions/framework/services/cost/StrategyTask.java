@@ -4,11 +4,14 @@ import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.Services;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 
 public class StrategyTask implements Runnable {
 
@@ -22,16 +25,20 @@ public class StrategyTask implements Runnable {
 
     private ControlStrategyService csService;
 
-    public StrategyTask(Strategy strategy, User user, Services services, ControlStrategyService service) {
+    private HibernateSessionFactory sessionFactory;
+
+    public StrategyTask(Strategy strategy, User user, Services services, ControlStrategyService service, HibernateSessionFactory factory) {
         this.user = user;
         this.services = services;
         this.strategy = strategy;
         this.csService = service;
+        this.sessionFactory = factory;
     }
 
     public void run() {
+        Session session = sessionFactory.getSession();
         try {
-
+            session.setFlushMode(FlushMode.NEVER);
             prepare();
             strategy.run();
             csService.updateControlStrategyWithLock(strategy.getControlStrategy());
@@ -39,6 +46,9 @@ public class StrategyTask implements Runnable {
         } catch (Exception e) {
             logError("Failed to run strategy : ", e);
             setStatus("Failed to run strategy: " + "Reason: " + e.getMessage());
+        } finally {
+            session.flush();
+            session.close();
         }
     }
 

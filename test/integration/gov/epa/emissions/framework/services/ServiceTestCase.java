@@ -135,10 +135,15 @@ public abstract class ServiceTestCase extends TestCase {
 
     protected void remove(Object object) {
         session.clear();// flush cached objects
-
-        Transaction tx = session.beginTransaction();
-        session.delete(object);
-        tx.commit();
+        Transaction tx = null;
+        try{
+            tx = session.beginTransaction();
+            session.delete(object);
+            tx.commit();
+        }catch (Exception e) {
+            tx.rollback();
+            e.printStackTrace();
+        }
     }
 
     protected void add(Object object) {
