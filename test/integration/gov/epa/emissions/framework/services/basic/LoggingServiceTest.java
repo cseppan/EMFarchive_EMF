@@ -47,32 +47,15 @@ public class LoggingServiceTest extends ServiceTestCase {
         AccessLog returnAlog = null;
 
         try {
-            user = new User("Giovanni Falcone", "UNC", "919-966-9572", "falcone@unc.edu", "falcone" + id, "falcone123",
-                    false, false);
-
+            user = user(id);
             userService.createUser(user);
 
-            dataset = new EmfDataset();
-            dataset.setName(user.getUsername() + "_" + id);
-            dataset.setAccessedDateTime(new Date());
-            dataset.setCreatedDateTime(new Date());
-            dataset.setCreator(user.getUsername());
-            dataset.setDatasetType(getDatasetType("External File (External)"));
-            dataset.setDescription("DESCRIPTION");
-            dataset.setModifiedDateTime(new Date());
-            dataset.setStartDateTime(new Date());
-            dataset.setStatus("imported");
-            dataset.setYear(42);
-            dataset.setUnits("orl");
-            dataset.setTemporalResolution("t1");
-            dataset.setStopDateTime(new Date());
-
+            dataset = dataset(id, user);
             super.add(dataset);
 
             datasetFromDB = getDataset(dataset);
 
-            alog = new AccessLog(user.getUsername(), datasetFromDB.getId(), new Date(), "0", "description",
-                    "folderPath");
+            alog = accessLog(user, datasetFromDB, "folderPath");
 
             logService.setAccessLog(alog);
 
@@ -86,6 +69,50 @@ public class LoggingServiceTest extends ServiceTestCase {
             remove(dataset);
             remove(user);
         }
+    }
+
+    private User user(long id) {
+        User user;
+        user = new User("Giovanni Falcone", "UNC", "919-966-9572", "falcone@unc.edu", "falcone" + id, "falcone123",
+                false, false);
+        return user;
+    }
+
+
+    public void testShouldGiveLastExportedFileName() throws Exception {
+        Random rando = new Random();
+        long id = Math.abs(rando.nextInt());
+        
+        User user = null;
+        EmfDataset dataset = null;
+        EmfDataset datasetFromDB = null;
+        AccessLog alog1 = null;
+        AccessLog alog2 = null;
+        try {
+            user = user(id);
+            userService.createUser(user);
+
+            dataset = dataset(id, user);
+            super.add(dataset);
+
+            datasetFromDB = getDataset(dataset);
+
+            alog1 = accessLog(user, datasetFromDB, "folderPath1");
+            alog2 = accessLog(user, datasetFromDB, "folderPath2");
+
+            logService.setAccessLog(alog1);
+            logService.setAccessLog(alog2);
+
+            String folderName = logService.getLastExportedFileName(datasetFromDB.getId());
+            assertEquals("folderPath2", folderName);
+        } finally {
+            remove(alog1);
+            remove(alog2);
+            remove(dataset);
+            remove(user);
+        }
+            
+        
     }
 
     private EmfDataset getDataset(EmfDataset dataset) throws EmfException {
@@ -102,6 +129,32 @@ public class LoggingServiceTest extends ServiceTestCase {
 
         return datasetFromDB;
     }
+    
+    private AccessLog accessLog(User user, EmfDataset datasetFromDB, String folder) {
+        AccessLog alog;
+        alog = new AccessLog(user.getUsername(), datasetFromDB.getId(), new Date(), "0", "description", folder);
+        return alog;
+    }
+
+    private EmfDataset dataset(long id, User user) throws EmfException {
+        EmfDataset dataset;
+        dataset = new EmfDataset();
+        dataset.setName(user.getUsername() + "_" + id);
+        dataset.setAccessedDateTime(new Date());
+        dataset.setCreatedDateTime(new Date());
+        dataset.setCreator(user.getUsername());
+        dataset.setDatasetType(getDatasetType("External File (External)"));
+        dataset.setDescription("DESCRIPTION");
+        dataset.setModifiedDateTime(new Date());
+        dataset.setStartDateTime(new Date());
+        dataset.setStatus("imported");
+        dataset.setYear(42);
+        dataset.setUnits("orl");
+        dataset.setTemporalResolution("t1");
+        dataset.setStopDateTime(new Date());
+        return dataset;
+    }
+
 
     private DatasetType getDatasetType(String string) throws EmfException {
         DatasetType aDST = null;

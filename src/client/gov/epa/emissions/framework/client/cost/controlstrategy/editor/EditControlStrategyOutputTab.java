@@ -142,6 +142,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private JPanel tablePanel(ControlStrategy controlStrategy) {
         StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
+        System.out.println("strategy results length -"+strategyResults.length);
         StrategyResultsTableData tableData = new StrategyResultsTableData(strategyResults);
         EmfTableModel model = new EmfTableModel(tableData);
         SortFilterSelectModel selectModel = new SortFilterSelectModel(model);
@@ -176,7 +177,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private Action analysisAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // analyze();
+                analyze();
             }
         };
     }
@@ -194,16 +195,16 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
                 EditControlStrategyOutputTab.this);
 
         chooser.setTitle("Select a folder");
-        File[] file = chooser.choose();
-        if (file == null)
+        File[] files = chooser.choose();
+        if (files == null)
             return;
 
-        if (file[0].isDirectory()) {
-            folder.setText(file[0].getAbsolutePath());
+        if (files[0].isDirectory()) {
+            folder.setText(files[0].getAbsolutePath());
         }
 
-        if (file[0].isFile()) {
-            folder.setText(file[0].getParent());
+        if (files[0].isFile()) {
+            folder.setText(files[0].getParent());
         }
     }
 

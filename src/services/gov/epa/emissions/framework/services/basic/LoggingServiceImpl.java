@@ -52,4 +52,21 @@ public class LoggingServiceImpl implements LoggingService {
 
     }
 
+    public String getLastExportedFileName(int datasetId) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            String fileName = dao.getLastExportedFileName(datasetId, session);
+            session.close();
+
+            return fileName;
+            
+        } catch(EmfException e){
+            throw e;
+        }catch (RuntimeException e) {
+            LOG.error("Could not get Last Exported File", e);
+            throw new EmfException("Could not get all access logs");
+        }
+
+    }
+
 }

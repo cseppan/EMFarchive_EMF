@@ -6,6 +6,8 @@ import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExImService;
+import gov.epa.mims.analysisengine.table.FileImportGUI;
+import gov.epa.mims.analysisengine.table.TableApp;
 
 
 public class EditControlStrategyOutputTabPresenter implements EditControlStrategyTabPresenter {
@@ -38,6 +40,12 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
 
     public void doAnalyze(ControlStrategy controlStrategy, String folder) throws EmfException {
         doExport(controlStrategy,folder);
+        StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
+        for (int i = 0; i < strategyResults.length; i++) {
+            int datasetId = strategyResults[i].getDetailedResultDataset().getId();
+            String lastExportedFileName = session.loggingService().getLastExportedFileName(datasetId);
+            new TableApp(new String[]{lastExportedFileName},FileImportGUI.GENERIC_FILE,",",1);
+        }
         
     }
 

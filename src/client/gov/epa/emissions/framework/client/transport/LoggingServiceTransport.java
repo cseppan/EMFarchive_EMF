@@ -29,4 +29,13 @@ public class LoggingServiceTransport implements LoggingService {
         return (AccessLog[]) call.requestResponse(new Object[] { new Integer(datasetid) });
     }
 
+    public String getLastExportedFileName(int datasetId) throws EmfException {
+        EmfCall call = call();
+       
+        call.setOperation("getLastExportedFileName");
+        call.addIntegerParam("datasetId");
+        call.setReturnType(mappings.string());
+        return (String) call.requestResponse(new Object[]{new Integer(datasetId)});
+    }
+
 }
