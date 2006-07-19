@@ -1,9 +1,0 @@
--- emf.strategy_types
-insert into emf.strategy_types values(DEFAULT,'Max Emissions Reduction','Max Emissions Reduction', '', 'gov.epa.emissions.framework.services.cost.analysis.maxreduction.MaxEmsRedStrategy');
-insert into emf.strategy_types values(DEFAULT,'Least Cost','Least Cost', '', 'gov.epa.emissions.framework.services.cost.analysis.leatcost.LeastCostStrategy');
--- emf.strategy_types
-
-
--- emf.strategy_result_types
-insert into emf.strategy_result_types values(DEFAULT,'Detailed Strategy Result');
--- emf.strategy_result_types
