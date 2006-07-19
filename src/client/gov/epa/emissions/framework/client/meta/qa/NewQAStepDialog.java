@@ -51,7 +51,7 @@ public class NewQAStepDialog extends Dialog implements NewQAStepView {
     }
 
     public void display(EmfDataset dataset, DatasetType type) {
-        super.setTitle(super.getTitle() + ": " + type.getName());
+        super.setTitle(super.getTitle() + ": " + dataset.getName());
 
         this.dataset = dataset;
         templates = new QAStepTemplates(type.getQaStepTemplates());
