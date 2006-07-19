@@ -42,6 +42,11 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         JTabbedPane tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Summary", createSummaryTab(caseObj, messagePanel));
+        tabbedPane.addTab("Parameters", new JPanel());
+        tabbedPane.addTab("Inputs", new JPanel());
+        tabbedPane.addTab("Programs", new JPanel());
+        tabbedPane.addTab("Outputs", new JPanel());
+        tabbedPane.addTab("History", new JPanel());
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         return tabbedPane;
