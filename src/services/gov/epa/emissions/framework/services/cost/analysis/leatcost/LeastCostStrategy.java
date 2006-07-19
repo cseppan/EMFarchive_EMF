@@ -20,7 +20,6 @@ public class LeastCostStrategy implements Strategy {
         //if (1 == -1) // FIXME: delete it
             throw new EmfException("LeastCostStrategy: under construction");
         
-        //System.out.println("Running Least Cost Strategy...");
     }
 
     public StrategyResult getResult() {

@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
@@ -72,7 +73,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         } catch (HibernateException e) {
             LOG.error("could not retrieve all control strategies.");
             throw new EmfException("could not retrieve all control strategies.");
-        }finally{
+        } finally {
             session.close();
         }
     }
@@ -143,6 +144,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
     public ControlStrategy updateControlStrategyWithLock(ControlStrategy element) throws EmfException {
         Session session = sessionFactory.getSession();
+        session.setFlushMode(FlushMode.NEVER);
         try {
             if (!dao.canUpdate(element, session))
                 throw new EmfException("Control Strategy name already in use");
@@ -154,6 +156,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             LOG.error("Could not update Control Strategy: " + element, e);
             throw new EmfException("Could not update ControlStrategy: " + element);
         } finally {
+            session.flush();
             session.close();
         }
     }

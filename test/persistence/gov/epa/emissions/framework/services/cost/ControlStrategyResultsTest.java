@@ -26,7 +26,7 @@ public class ControlStrategyResultsTest extends ServiceTestCase {
     }
     
     //FIXME: save dataset indirrectly when saving control strategy
-    public void testShouldSaveControlStrategyWithResultsSummary(){
+    public void FIXME_testShouldSaveControlStrategyWithResultsSummary(){
         ControlStrategy element = new ControlStrategy("test" + Math.random());
         
         StrategyResult result = new StrategyResult();

@@ -29,7 +29,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     
     private EditControlStrategySummaryTabPresenter summaryTabPresenter;
     
-    private SummaryMonitor monitor;
+    //private SummaryMonitor monitor;
     
     private TaskRunner runner;
 
@@ -113,7 +113,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         this.summaryTabView = view;
         this.summaryTabPresenter = new EditControlStrategySummaryTabPresenterImpl(controlStrategy,view);
         presenters.add(summaryTabPresenter);
-        this.monitor = new SummaryMonitor();
+        //this.monitor = new SummaryMonitor();
     }
     
     public void set(EditControlStrategyOutputTabView view) {
@@ -138,7 +138,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     public void runStrategy() throws EmfException {
         service().runStrategy(session.user(), controlStrategy);
-        runner.start(monitor);
+        //runner.start(monitor);
     }
     
     public class SummaryMonitor implements Runnable {

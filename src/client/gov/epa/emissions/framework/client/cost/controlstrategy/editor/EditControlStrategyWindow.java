@@ -176,7 +176,6 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
                     presenter.runStrategy();
                 } catch (EmfException e) {
                     messagePanel.setError("Error running strategy: " + e.getMessage());
-                    e.printStackTrace();
                 }
             }
         };

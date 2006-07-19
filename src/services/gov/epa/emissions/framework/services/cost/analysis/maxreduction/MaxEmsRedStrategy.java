@@ -10,8 +10,8 @@ import gov.epa.emissions.commons.db.HibernateSessionFactory;
 import gov.epa.emissions.commons.db.OptimizedQuery;
 import gov.epa.emissions.commons.db.OptimizedTableModifier;
 import gov.epa.emissions.commons.db.TableModifier;
+import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
-import gov.epa.emissions.commons.io.importer.DatasetLoader;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
@@ -28,7 +28,6 @@ import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
-import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -116,7 +115,6 @@ public class MaxEmsRedStrategy implements Strategy {
         try {
             calculateResult(datasets, datasource);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new EmfException(e.getMessage());
         } finally {
             closeConnection();
@@ -143,9 +141,10 @@ public class MaxEmsRedStrategy implements Strategy {
         String query = getSourceQueryString(dataset, datasource);
         OptimizedQuery runner = runner = datasource.optimizedQuery(query, batchSize);
 
-        String tableName = getResultTableName();
-        OptimizedTableModifier modifier = createResultTable("CSDR_" + tableName);
-        StrategyResult strategyResult = createStrategyResult(tableName, dataset);
+        String resultDatasetName = getResultDatasetName();
+        String resultTableName = "CSDR_" + resultDatasetName;
+        OptimizedTableModifier modifier = createResultTable(resultTableName);
+        StrategyResult strategyResult = createStrategyResult(resultDatasetName,resultTableName,dataset);
         Dataset resultDataset = strategyResult.getDetailedResultDataset();
         this.strategyResults.add(strategyResult);
 
@@ -159,11 +158,11 @@ public class MaxEmsRedStrategy implements Strategy {
             runner.close();
         } finally {
             closeResultTable(modifier);
-            resetResultDataset(resultDataset, tableName);
+            resetResultDataset(resultDataset, resultDatasetName);
         }
     }
 
-    private String getResultTableName() {
+    private String getResultDatasetName() {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("MMddyyyy_HHmmss");
         String prefix = controlStrategy.getName().replace(' ', '_');
         String timestamp = dateFormatter.format(new Date());
@@ -284,23 +283,23 @@ public class MaxEmsRedStrategy implements Strategy {
         for (int i = 0; i < datasets.length; i++) {
             InternalSource[] sources = datasets[i].getInternalSources();
             if (i == datasets.length - 1) {
-                qualifiedTables += getTableNames(datasource, sources) + " ";
+                qualifiedTables += getTableName(datasource, sources) + " ";
                 break;
             }
 
-            qualifiedTables += getTableNames(datasource, sources) + ", ";
+            qualifiedTables += getTableName(datasource, sources) + ", ";
         }
 
         return queryBase + qualifiedTables + whereClause;
     }
 
-    private String getTableNames(Datasource datasource, InternalSource[] sources) {
-        String tableNames = "";
+    private String getTableName(Datasource datasource, InternalSource[] sources) {
+        String tableName = "";
         for (int i = 0; i < sources.length; i++) {
             if (i == sources.length - 1)
-                return tableNames += datasource.getName() + "." + sources[i].getTable();
+                return tableName += datasource.getName() + "." + sources[i].getTable();
 
-            tableNames += datasource.getName() + "." + sources[i].getTable() + ", ";
+            tableName += datasource.getName() + "." + sources[i].getTable() + ", ";
         }
 
         return null;
@@ -324,7 +323,6 @@ public class MaxEmsRedStrategy implements Strategy {
             dao.add(dataset, session);
             session.close();
         } catch (RuntimeException e) {
-            e.printStackTrace();
             throw new EmfException("Could not add dataset: " + dataset.getName());
         }
     }
@@ -361,7 +359,7 @@ public class MaxEmsRedStrategy implements Strategy {
         }
     }
 
-    private StrategyResult createStrategyResult(String datasetName, Dataset inputDataset) throws EmfException {
+    private StrategyResult createStrategyResult(String datasetName, String tableName, Dataset inputDataset) throws EmfException {
         EmfDataset dataset = new EmfDataset();
 
         dataset.setName(datasetName);
@@ -371,7 +369,7 @@ public class MaxEmsRedStrategy implements Strategy {
         dataset.setModifiedDateTime(new Date());
         dataset.setAccessedDateTime(new Date());
         dataset.setStatus("Created by control strategy");
-        setDatasetInternalSource(dataset, inputDataset);
+        setDatasetInternalSource(dataset, tableName,inputDataset);
         addDataset(dataset);
 
         try {
@@ -387,10 +385,21 @@ public class MaxEmsRedStrategy implements Strategy {
         return result;
     }
 
-    private void setDatasetInternalSource(Dataset dataset, Dataset inputDataset) {
-        DatasetLoader loader = new DatasetLoader(dataset);
-        loader.internalSource(new File(inputDataset.getInternalSources()[0].getSource()), dataset.getName(),
-                tableFormat);
+    private void setDatasetInternalSource(Dataset dataset, String tableName, Dataset inputDataset) {
+        InternalSource source = new InternalSource();
+        source.setTable(tableName);
+        source.setType(tableFormat.identify());
+        source.setCols(colNames(tableFormat.cols()));
+        source.setSource(inputDataset.getName());
+        dataset.setInternalSources(new InternalSource[]{source});
+    }
+
+    private String[] colNames(Column[] cols) {
+        List names = new ArrayList();
+        for (int i = 0; i < cols.length; i++)
+            names.add(cols[i].name());
+
+        return (String[]) names.toArray(new String[0]);
     }
 
     private void addVersionZeroEntryToVersionsTable(Dataset dataset) throws Exception {

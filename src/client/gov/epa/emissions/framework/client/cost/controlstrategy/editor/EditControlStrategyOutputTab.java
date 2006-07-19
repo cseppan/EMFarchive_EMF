@@ -142,7 +142,6 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private JPanel tablePanel(ControlStrategy controlStrategy) {
         StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
-        System.out.println("strategy results length -"+strategyResults.length);
         StrategyResultsTableData tableData = new StrategyResultsTableData(strategyResults);
         EmfTableModel model = new EmfTableModel(tableData);
         SortFilterSelectModel selectModel = new SortFilterSelectModel(model);

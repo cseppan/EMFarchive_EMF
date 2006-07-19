@@ -44,7 +44,7 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         for (int i = 0; i < strategyResults.length; i++) {
             int datasetId = strategyResults[i].getDetailedResultDataset().getId();
             String lastExportedFileName = session.loggingService().getLastExportedFileName(datasetId);
-            new TableApp(new String[]{lastExportedFileName},FileImportGUI.GENERIC_FILE,",",1);
+            new TableApp(new String[]{lastExportedFileName},FileImportGUI.GENERIC_FILE,";",1);
         }
         
     }
