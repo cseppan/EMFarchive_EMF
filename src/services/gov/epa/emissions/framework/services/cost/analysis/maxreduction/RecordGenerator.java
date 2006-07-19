@@ -15,7 +15,7 @@ public class RecordGenerator {
 
     private ControlStrategy controlStrategy;
 
-    private int datasetId;
+    private int inputDatasetId;
 
     private String scc;
 
@@ -27,9 +27,9 @@ public class RecordGenerator {
 
     private int resultDatasetId;
 
-    public RecordGenerator(int datasetId, int resultDatasetId, ResultSet resultSet, ControlMeasure measure, ControlStrategy controlStrategy)
+    public RecordGenerator(int inputDatasetId, int resultDatasetId, ResultSet resultSet, ControlMeasure measure, ControlStrategy controlStrategy)
             throws SQLException {
-        this.datasetId = datasetId;
+        this.inputDatasetId = inputDatasetId;
         this.resultDatasetId = resultDatasetId;
         this.controlStrategy = controlStrategy;
         this.resultSet = resultSet;
@@ -55,45 +55,30 @@ public class RecordGenerator {
         List tokens = new ArrayList();
 
         tokens.add(index++, ""); // record id
-        tokens.add(index++, "" + resultSet.getInt("Record_Id"));
-        tokens.add(index++, "" + datasetId);
         tokens.add(index++, "" + resultDatasetId);
+        tokens.add(index++, "" + 0);
+        tokens.add(index++, "");
+        tokens.add(index++, "" + resultSet.getInt("Record_Id"));
+        tokens.add(index++, "" + inputDatasetId);
         tokens.add(index++, "" + controlStrategy.getId());
+        tokens.add(index++, "" + maxRedMeasure.getId());
+        tokens.add(index++, maxRedMeasure.getAbbreviation());
 
-        String controlMeasureId = "";
-        String controlMeasureAbbr = "";
-        String pollutant = resultSet.getString("poll");
-        String fips = resultSet.getString("fips");
-        String totalCost = "";
-        String costPerTon = "";
         String controlEfficiency = "";
-        String controlledEmission = "";
-        String totalReduction = "";
-        String originalEmissions = "";
-        String disable = "false";
         String comment = "";
-
         double reducedEmission = getReducedEmissions(comment, controlEfficiency);
-        controlMeasureId += maxRedMeasure.getId();
-        controlMeasureAbbr += maxRedMeasure.getAbbreviation();
-        totalCost += getCost();
-        costPerTon += getCostPerTon(maxRedMeasure);
-        totalReduction += reducedEmission;
-        originalEmissions += annEmissions;
-        controlledEmission += annEmissions - reducedEmission;
+        String controlledEmission = "" + (annEmissions - reducedEmission);
 
-        tokens.add(index++, controlMeasureId);
-        tokens.add(index++, controlMeasureAbbr);
-        tokens.add(index++, pollutant);
+        tokens.add(index++, resultSet.getString("poll"));
         tokens.add(index++, scc);
-        tokens.add(index++, fips);
-        tokens.add(index++, totalCost);
-        tokens.add(index++, costPerTon);
+        tokens.add(index++, resultSet.getString("fips"));
+        tokens.add(index++, "" + getCost());
+        tokens.add(index++, "" + getCostPerTon(maxRedMeasure));
         tokens.add(index++, controlEfficiency);
         tokens.add(index++, controlledEmission);
-        tokens.add(index++, totalReduction);
-        tokens.add(index++, originalEmissions);
-        tokens.add(index++, disable);
+        tokens.add(index++, "" + reducedEmission);
+        tokens.add(index++, "" + annEmissions);
+        tokens.add(index++, "false");
         tokens.add(index++, comment);
 
         return tokens;
@@ -135,7 +120,6 @@ public class RecordGenerator {
         float newEfficiency = getEfficiency(maxRedMeasure);
         float oldEfficiency = resultSet.getFloat("CEFF");
         controlEfficiency = "" + newEfficiency;
-        System.out.println("record generator: " + oldEfficiency);
 
         if (oldEfficiency == 0) {
             return annEmissions * newEfficiency;

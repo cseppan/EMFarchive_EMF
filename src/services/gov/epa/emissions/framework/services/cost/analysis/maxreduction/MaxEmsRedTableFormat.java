@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.IntegerFormatter;
+import gov.epa.emissions.commons.io.LongFormatter;
 import gov.epa.emissions.commons.io.NullFormatter;
 import gov.epa.emissions.commons.io.RealFormatter;
 import gov.epa.emissions.commons.io.StringFormatter;
@@ -45,14 +46,17 @@ public class MaxEmsRedTableFormat implements TableFormat {
     
     private Column[] referenceCols() {
         Column recordId = recordID(types);
+        Column datasetId = new Column("Dataset_Id", types.longType(), new LongFormatter(), "NOT NULL");
+        Column version = new Column("Version", types.intType(), new NullFormatter(), "NULL DEFAULT 0");
+        Column deleteVersions = new Column("Delete_Versions", types.text(), new NullFormatter(), "DEFAULT ''::text");
         Column sourceId = new Column("Source_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
-        Column datasetId = new Column("Dataset_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
-        Column resultDatasetId = new Column("Result_Dataset_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
+        Column inputDatasetId = new Column("Input_Dataset_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
         Column controlStrategyId = new Column("Control_Strategy_Id", types.intType(), new IntegerFormatter());
         Column controlMeasureId = new Column("Control_Measure_Id", types.intType(), new IntegerFormatter());
         Column controlMeasureAbbr = new Column("Control_Measure_Abbr", types.text(), new NullFormatter(), "DEFAULT ''::text");
         
-        return new Column[] { recordId, sourceId, datasetId, resultDatasetId, controlStrategyId, controlMeasureId, controlMeasureAbbr };
+        return new Column[] { recordId, datasetId, version, deleteVersions, sourceId, inputDatasetId, 
+                controlStrategyId, controlMeasureId, controlMeasureAbbr };
     }
 
     private Column recordID(SqlDataTypes types) {

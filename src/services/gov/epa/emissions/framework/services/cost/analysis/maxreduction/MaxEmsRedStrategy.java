@@ -9,7 +9,9 @@ import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.HibernateSessionFactory;
 import gov.epa.emissions.commons.db.OptimizedQuery;
 import gov.epa.emissions.commons.db.OptimizedTableModifier;
+import gov.epa.emissions.commons.db.TableModifier;
 import gov.epa.emissions.commons.io.TableFormat;
+import gov.epa.emissions.commons.io.importer.DatasetLoader;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
@@ -26,6 +28,7 @@ import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -43,7 +46,7 @@ public class MaxEmsRedStrategy implements Strategy {
     private Datasource datasource;
 
     private Dataset[] datasets;
-    
+
     private List strategyResults;
 
     private String[] sccs;
@@ -131,8 +134,8 @@ public class MaxEmsRedStrategy implements Strategy {
     private void calculateResult(Dataset[] datasets, Datasource datasource) throws Exception {
         for (int i = 0; i < datasets.length; i++)
             calculateResultForSingleDataset(datasets[i], datasource);
-        
-        controlStrategy.setStrategyResults((StrategyResult[])strategyResults.toArray(new StrategyResult[0]));
+
+        controlStrategy.setStrategyResults((StrategyResult[]) strategyResults.toArray(new StrategyResult[0]));
     }
 
     private void calculateResultForSingleDataset(Dataset dataset, Datasource datasource) throws Exception {
@@ -141,10 +144,10 @@ public class MaxEmsRedStrategy implements Strategy {
 
         String tableName = getResultTableName();
         OptimizedTableModifier modifier = createResultTable(tableName);
-        StrategyResult strategyResult = createStrategyResult(tableName);
+        StrategyResult strategyResult = createStrategyResult(tableName, dataset);
         Dataset resultDataset = strategyResult.getDetailedResultDataset();
         this.strategyResults.add(strategyResult);
-        
+
         try {
             while (runner.execute()) {
                 ResultSet resultSet = runner.getResultSet();
@@ -162,10 +165,10 @@ public class MaxEmsRedStrategy implements Strategy {
     private String getResultTableName() {
         String prefix = "MaxEmsRedStrategy_" + controlStrategy.getName().replace(' ', '_');
         String timestamp = "_time_" + new Date().getTime();
-        
+
         return prefix + timestamp;
     }
-    
+
     private void resetResultDataset(Dataset dataset, String tableName) {
         dataset.setName(tableName);
     }
@@ -176,7 +179,7 @@ public class MaxEmsRedStrategy implements Strategy {
         try {
             if (resultTable.exists(table))
                 resultTable.drop(table);
-            
+
             resultTable.create(tableFormat);
             modifier = dataModifier(datasource, table);
             modifier.start();
@@ -196,7 +199,8 @@ public class MaxEmsRedStrategy implements Strategy {
         }
     }
 
-    private void writeBatchOfData(int datasetId, int resultDatasetId, ResultSet resultSet, OptimizedTableModifier modifier) throws Exception {
+    private void writeBatchOfData(int datasetId, int resultDatasetId, ResultSet resultSet,
+            OptimizedTableModifier modifier) throws Exception {
         while (resultSet.next()) {
             ControlMeasure cm = map.getMaxRedControlMeasure(resultSet.getString("scc"));
             if (cm == null)
@@ -312,9 +316,9 @@ public class MaxEmsRedStrategy implements Strategy {
         try {
             DatasetDAO dao = new DatasetDAO();
             Session session = HibernateSessionFactory.get().getSession();
-            if (dao.nameUsed(dataset.getName(), EmfDataset.class, session)) 
+            if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))
                 throw new EmfException("The selected dataset name is already in use.");
-            
+
             dao.add(dataset, session);
             session.close();
         } catch (RuntimeException e) {
@@ -328,34 +332,34 @@ public class MaxEmsRedStrategy implements Strategy {
             DataCommonsDAO dao = new DataCommonsDAO();
             Session session = HibernateSessionFactory.get().getSession();
             List types = dao.getDatasetTypes(session);
-            
+
             for (int i = 0; i < types.size(); i++) {
-                DatasetType type = (DatasetType)types.get(i);
+                DatasetType type = (DatasetType) types.get(i);
                 if (type.getName().equalsIgnoreCase("Control Strategy Detailed Result"))
-                        return type;
+                    return type;
             }
-            
+
             session.close();
             return null;
         } catch (RuntimeException e) {
             throw new EmfException("Could not get dataset types");
         }
     }
-    
+
     private StrategyResultType getDetailedStrategyResultType() throws EmfException {
         try {
             ControlStrategyDAO dao = new ControlStrategyDAO();
             Session session = HibernateSessionFactory.get().getSession();
             StrategyResultType resultType = dao.getDetailedStrategyResultType(session);
             session.close();
-            
+
             return resultType;
         } catch (RuntimeException e) {
             throw new EmfException("Could not get detailed strategy result type");
         }
     }
-    
-    private StrategyResult createStrategyResult(String datasetName) throws EmfException {
+
+    private StrategyResult createStrategyResult(String datasetName, Dataset inputDataset) throws EmfException {
         EmfDataset dataset = new EmfDataset();
 
         dataset.setName(datasetName);
@@ -365,13 +369,32 @@ public class MaxEmsRedStrategy implements Strategy {
         dataset.setModifiedDateTime(new Date());
         dataset.setAccessedDateTime(new Date());
         dataset.setStatus("Created by control strategy");
+        setDatasetInternalSource(dataset, inputDataset);
         addDataset(dataset);
-        
+
+        try {
+            addVersionZeroEntryToVersionsTable(dataset);
+        } catch (Exception e) {
+            throw new EmfException("Cannot add version zero entry to versions table for dataset: " + dataset.getName());
+        }
+    
         StrategyResult result = new StrategyResult();
         result.setStrategyResultType(getDetailedStrategyResultType());
         result.setDetailedResultDataset(dataset);
-        
+
         return result;
+    }
+
+    private void setDatasetInternalSource(Dataset dataset, Dataset inputDataset) {
+        DatasetLoader loader = new DatasetLoader(dataset);
+        loader.internalSource(new File(inputDataset.getInternalSources()[0].getSource()), dataset.getName(),
+                tableFormat);
+    }
+
+    private void addVersionZeroEntryToVersionsTable(Dataset dataset) throws Exception {
+        TableModifier modifier = new TableModifier(datasource, "versions");
+        String[] data = { null, dataset.getId() + "", "0", "Initial Version", "", "true", null };
+        modifier.insertOneRow(data);
     }
 
 }
