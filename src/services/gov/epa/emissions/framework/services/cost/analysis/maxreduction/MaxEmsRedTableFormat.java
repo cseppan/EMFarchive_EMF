@@ -38,25 +38,19 @@ public class MaxEmsRedTableFormat implements TableFormat {
     private Column[] createCols() {
         List cols = new ArrayList();
 
-        cols.addAll(Arrays.asList(referenceCols()));
+        cols.addAll(Arrays.asList(versionCols()));
         cols.addAll(Arrays.asList(baseCols()));
 
         return (Column[]) cols.toArray(new Column[0]);
     }
     
-    private Column[] referenceCols() {
+    private Column[] versionCols() {
         Column recordId = recordID(types);
         Column datasetId = new Column("Dataset_Id", types.longType(), new LongFormatter(), "NOT NULL");
         Column version = new Column("Version", types.intType(), new NullFormatter(), "NULL DEFAULT 0");
         Column deleteVersions = new Column("Delete_Versions", types.text(), new NullFormatter(), "DEFAULT ''::text");
-        Column sourceId = new Column("Source_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
-        Column inputDatasetId = new Column("Input_Dataset_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
-        Column controlStrategyId = new Column("Control_Strategy_Id", types.intType(), new IntegerFormatter());
-        Column controlMeasureId = new Column("Control_Measure_Id", types.intType(), new IntegerFormatter());
-        Column controlMeasureAbbr = new Column("Control_Measure_Abbr", types.text(), new NullFormatter(), "DEFAULT ''::text");
-        
-        return new Column[] { recordId, datasetId, version, deleteVersions, sourceId, inputDatasetId, 
-                controlStrategyId, controlMeasureId, controlMeasureAbbr };
+
+        return new Column[] { recordId, datasetId, version, deleteVersions};
     }
 
     private Column recordID(SqlDataTypes types) {
@@ -67,20 +61,27 @@ public class MaxEmsRedTableFormat implements TableFormat {
     }
 
     private Column[] baseCols() {
-        Column pollutant = new Column("pollutant", types.stringType(20), new StringFormatter(20));
-        Column scc = new Column("scc", types.stringType(10), new StringFormatter(10));
+        Column disable = new Column("Disable", types.booleanType(), new StringFormatter(5));
+        Column controlMeasureAbbr = new Column("CM_Abbrev", types.stringType(10), new StringFormatter(10), "DEFAULT ''");
+        Column pollutant = new Column("Pollutant", types.stringType(20), new StringFormatter(20));
+        Column scc = new Column("SCC", types.stringType(10), new StringFormatter(10));
         Column fips = new Column("FIPS", types.stringType(6), new StringFormatter(6));
-        Column totalCost = new Column("total_cost", types.realType(), new RealFormatter());
-        Column costPerTon = new Column("cost_per_ton", types.realType(), new RealFormatter());
-        Column controlEfficiency = new Column("control_efficiency", types.realType(), new RealFormatter());
-        Column controlledEmission = new Column("cntrld_emission", types.realType(), new RealFormatter());
-        Column totalReduction = new Column("total_reduction", types.realType(), new RealFormatter());
-        Column originalEmissions = new Column("original_emissions", types.realType(), new RealFormatter());
-        Column disable = new Column("disable", types.booleanType(), new StringFormatter(5));
-        Column comment = new Column("comment", types.stringType(50), new StringFormatter(50));
+        Column totalCost = new Column("Cost", types.realType(), new RealFormatter());
+        Column costPerTon = new Column("Cost_per_Ton", types.realType(), new RealFormatter());
+        Column controlEfficiency = new Column("Control_Eff", types.realType(), new RealFormatter());
+        Column controlledEmission = new Column("CNTRLD_Emissions", types.realType(), new RealFormatter());
+        Column totalReduction = new Column("Emis_Reduction", types.realType(), new RealFormatter());
+        Column originalEmissions = new Column("Original_Emis", types.realType(), new RealFormatter());
         
-        return new Column[] { pollutant, scc, fips, totalCost, costPerTon, controlEfficiency, 
-                controlledEmission, totalReduction, originalEmissions, disable, comment };
+        Column sourceId = new Column("Source_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
+        Column inputDatasetId = new Column("Input_DS_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
+        Column controlStrategyId = new Column("CS_Id", types.intType(), new IntegerFormatter());
+        Column controlMeasureId = new Column("CM_Id", types.intType(), new IntegerFormatter());
+        Column comment = new Column("Comment", types.stringType(50), new StringFormatter(50));
+        
+        return new Column[] { disable, controlMeasureAbbr, pollutant, scc, fips, totalCost, costPerTon, controlEfficiency, 
+                controlledEmission, totalReduction, originalEmissions, sourceId, inputDatasetId, controlStrategyId,
+                controlMeasureId, comment };
     }
 
 }

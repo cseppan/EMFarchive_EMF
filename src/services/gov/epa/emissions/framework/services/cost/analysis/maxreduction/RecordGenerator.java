@@ -62,10 +62,7 @@ public class RecordGenerator {
         tokens.add(index++, "" + resultDatasetId);
         tokens.add(index++, "" + 0);
         tokens.add(index++, "");
-        tokens.add(index++, "" + resultSet.getInt("Record_Id"));
-        tokens.add(index++, "" + inputDatasetId);
-        tokens.add(index++, "" + controlStrategy.getId());
-        tokens.add(index++, "" + maxRedMeasure.getId());
+        tokens.add(index++, "false");
         tokens.add(index++, maxRedMeasure.getAbbreviation());
 
         double reducedEmission = getReducedEmissions();
@@ -80,7 +77,10 @@ public class RecordGenerator {
         tokens.add(index++, controlledEmission);
         tokens.add(index++, "" + reducedEmission);
         tokens.add(index++, "" + annEmissions);
-        tokens.add(index++, "false");
+        tokens.add(index++, "" + resultSet.getInt("Record_Id"));
+        tokens.add(index++, "" + inputDatasetId);
+        tokens.add(index++, "" + controlStrategy.getId());
+        tokens.add(index++, "" + maxRedMeasure.getId());
         tokens.add(index++, comment);
 
         return tokens;
