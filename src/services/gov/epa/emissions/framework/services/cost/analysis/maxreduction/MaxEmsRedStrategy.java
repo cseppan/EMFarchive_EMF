@@ -31,6 +31,7 @@ import gov.epa.emissions.framework.services.data.EmfDataset;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -143,7 +144,7 @@ public class MaxEmsRedStrategy implements Strategy {
         OptimizedQuery runner = runner = datasource.optimizedQuery(query, batchSize);
 
         String tableName = getResultTableName();
-        OptimizedTableModifier modifier = createResultTable(tableName);
+        OptimizedTableModifier modifier = createResultTable("CSDR_" + tableName);
         StrategyResult strategyResult = createStrategyResult(tableName, dataset);
         Dataset resultDataset = strategyResult.getDetailedResultDataset();
         this.strategyResults.add(strategyResult);
@@ -163,10 +164,11 @@ public class MaxEmsRedStrategy implements Strategy {
     }
 
     private String getResultTableName() {
-        String prefix = "MaxEmsRedStrategy_" + controlStrategy.getName().replace(' ', '_');
-        String timestamp = "_time_" + new Date().getTime();
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("MMddyyyy_HHmmss");
+        String prefix = controlStrategy.getName().replace(' ', '_');
+        String timestamp = dateFormatter.format(new Date());
 
-        return prefix + timestamp;
+        return prefix + "_" + timestamp;
     }
 
     private void resetResultDataset(Dataset dataset, String tableName) {
@@ -209,7 +211,7 @@ public class MaxEmsRedStrategy implements Strategy {
             RecordGenerator generator = new RecordGenerator(datasetId, resultDatasetId, resultSet, cm, controlStrategy);
             Record record = generator.getRecord();
             totalCost += generator.getCost();
-            totalReduction += generator.getReducedEmissions("", "");
+            totalReduction += generator.getReducedEmissions();
             insertRecord(record, modifier);
         }
     }

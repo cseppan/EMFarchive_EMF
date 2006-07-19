@@ -26,6 +26,10 @@ public class RecordGenerator {
     private double annEmissions;
 
     private int resultDatasetId;
+    
+    private String controlEfficiency;
+    
+    private String comment;
 
     public RecordGenerator(int inputDatasetId, int resultDatasetId, ResultSet resultSet, ControlMeasure measure, ControlStrategy controlStrategy)
             throws SQLException {
@@ -64,9 +68,7 @@ public class RecordGenerator {
         tokens.add(index++, "" + maxRedMeasure.getId());
         tokens.add(index++, maxRedMeasure.getAbbreviation());
 
-        String controlEfficiency = "";
-        String comment = "";
-        double reducedEmission = getReducedEmissions(comment, controlEfficiency);
+        double reducedEmission = getReducedEmissions();
         String controlledEmission = "" + (annEmissions - reducedEmission);
 
         tokens.add(index++, resultSet.getString("poll"));
@@ -116,7 +118,7 @@ public class RecordGenerator {
         return annEmissions * getCostPerTon(maxRedMeasure);
     }
 
-    public double getReducedEmissions(String comment, String controlEfficiency) throws SQLException {
+    public double getReducedEmissions() throws SQLException {
         float newEfficiency = getEfficiency(maxRedMeasure);
         float oldEfficiency = resultSet.getFloat("CEFF");
         controlEfficiency = "" + newEfficiency;
