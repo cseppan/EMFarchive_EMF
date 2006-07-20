@@ -21,6 +21,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.StrategyType;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.Border;
 import gov.epa.emissions.framework.ui.IntTextField;
@@ -417,24 +418,24 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
     }
 
     private double getReduction(ControlStrategy cs) {
-        StrategyResult[] results ={} ;//FIXME: cs.getStrategyResults();
+        StrategyResult[] results = {};// FIXME: cs.getStrategyResults();
         double totalReduction = 0;
-        
-        if(results.length > 0)
+
+        if (results.length > 0)
             for (int i = 0; i < results.length; i++)
                 totalReduction += results[i].getTotalReduction();
-        
+
         return totalReduction;
     }
 
     private double getTotalCost(ControlStrategy cs) {
-        StrategyResult[] results ={} ;//FIXME: cs.getStrategyResults();
+        StrategyResult[] results = {};// FIXME: cs.getStrategyResults();
         double totalCost = 0;
-        
-        if(results.length > 0)
+
+        if (results.length > 0)
             for (int i = 0; i < results.length; i++)
                 totalCost += results[i].getTotalCost();
-        
+
         return totalCost;
     }
 
@@ -457,8 +458,7 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         controlStrategy.setTargetPollutant((String) majorPollutant.getSelectedItem());
         controlStrategy.setStartDate(this.controlStrategy.getStartDate());
         controlStrategy.setRunStatus(this.controlStrategy.getRunStatus());
-        if (strategyTypeCombo.getSelectedIndex() == 0)
-        {
+        if (strategyTypeCombo.getSelectedIndex() == 0) {
             throw new EmfException("Please select a strategy type");
         }
         controlStrategy.setStrategyType((StrategyType) this.strategyTypeCombo.getSelectedItem());
@@ -522,23 +522,22 @@ public class EditControlStrategySummaryTab extends JPanel implements EditControl
         completionDate.setText("Stopped.");
         clearResultPanel();
     }
-    
+
     private void clearResultPanel() {
         costValue.setText("");
         emissionReductionValue.setText("");
     }
 
     public void doRefresh() {
-        try {
-            ControlStrategy cs = session.controlStrategyService().updateControlStrategyWithLock(controlStrategy);
-            Date date = cs.getCompletionDate();
-            if (date != null)
-                completionDate.setText(DATE_FORMATTER.format(date));
-            costValue.setText("" + getTotalCost(cs));
-            emissionReductionValue.setText("" + getReduction(cs));
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
+        StrategyResult[] results = controlStrategy.getStrategyResults();
+        if (results.length == 0) {
+            completionDate.setText("");
+            return;
         }
+
+        ControlStrategyResultsSummary summary = new ControlStrategyResultsSummary(results);
+        costValue.setText("" + summary.getStrategyTotalCost());
+        emissionReductionValue.setText("" + summary.getStrategyTotalReduction());
     }
-    
+
 }

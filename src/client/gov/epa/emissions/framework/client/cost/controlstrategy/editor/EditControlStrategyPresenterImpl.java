@@ -111,6 +111,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         this.summaryTabView = view;
         this.summaryTabPresenter = new EditControlStrategySummaryTabPresenterImpl(controlStrategy,view);
         presenters.add(summaryTabPresenter);
+        summaryTabPresenter.doRefresh();
         //this.monitor = new SummaryMonitor();
     }
     

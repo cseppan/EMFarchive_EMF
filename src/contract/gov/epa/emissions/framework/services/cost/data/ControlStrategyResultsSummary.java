@@ -36,11 +36,33 @@ public class ControlStrategyResultsSummary {
     }
     
     public String getStartTime() {
-        return dateFormatter.format(strategyResults[0].getStartTime());
+        int earliestStartIndex = 0;
+        long earliestStartTime = strategyResults[earliestStartIndex].getStartTime().getTime();
+        
+        for (int i = 0; i < strategyResults.length; i++) {
+            long laterTime = strategyResults[i].getStartTime().getTime();
+            if (laterTime < earliestStartTime) {
+                earliestStartTime = laterTime;
+                earliestStartIndex = i;
+            }
+        }
+            
+        return dateFormatter.format(strategyResults[earliestStartIndex].getStartTime());
     }
     
     public String getCompletionTime() {
-        return dateFormatter.format(strategyResults[strategyResults.length - 1].getCompletionTime());
+        int latestCompletionIndex = strategyResults.length - 1;
+        long latestCompletionTime = strategyResults[latestCompletionIndex].getStartTime().getTime();
+        
+        for (int i = 0; i < strategyResults.length; i++) {
+            long laterTime = strategyResults[i].getCompletionTime().getTime();
+            if (laterTime > latestCompletionTime) {
+                latestCompletionTime = laterTime;
+                latestCompletionIndex = i;
+            }
+        }
+        
+        return dateFormatter.format(strategyResults[latestCompletionIndex].getCompletionTime());
     }
     
     public void setUser(User user) {
