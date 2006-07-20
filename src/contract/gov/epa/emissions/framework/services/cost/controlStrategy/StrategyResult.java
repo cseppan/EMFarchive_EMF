@@ -19,6 +19,8 @@ public class StrategyResult implements Serializable {
 
     private Date completionTime;
 
+    private Date startTime;
+
     private Dataset detailedResultDataset;
     
     private StrategyResultType strategyResultType;
@@ -90,6 +92,14 @@ public class StrategyResult implements Serializable {
 
     public void setRunStatus(String runStatus) {
         this.runStatus = runStatus;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
 }

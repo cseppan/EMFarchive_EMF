@@ -156,6 +156,15 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         service.runStrategy(owner, element);
     }
 
+    public void testShouldStopRunControlStrategyWithoutError() throws Exception {
+        try {
+            service.stopRunStrategy();
+        } catch (Exception e) {
+            throw e;
+        }
+        
+    }
+
     private ControlStrategy load(ControlStrategy controlStrategy) {
         Transaction tx = null;
         session.clear();

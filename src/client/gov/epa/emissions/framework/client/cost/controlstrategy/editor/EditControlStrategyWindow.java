@@ -161,7 +161,11 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         return new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 clearMessage();
-                presenter.stopRun();
+                try {
+                    presenter.stopRun();
+                } catch (EmfException e) {
+                    messagePanel.setError("Error stopping running strategy: " + e.getMessage());
+                }
             }
         };
     }

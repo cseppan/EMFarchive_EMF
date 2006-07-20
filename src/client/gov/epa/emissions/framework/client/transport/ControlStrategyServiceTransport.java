@@ -112,4 +112,13 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         return (StrategyType[]) call.requestResponse(new Object[] {});
     }
 
+    public void stopRunStrategy() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("stopRunStrategy");
+        call.setVoidReturnType();
+
+        call.request(new Object[] { });
+    }
+
 }

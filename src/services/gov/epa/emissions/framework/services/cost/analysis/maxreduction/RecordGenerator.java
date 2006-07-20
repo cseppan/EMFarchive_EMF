@@ -114,8 +114,8 @@ public class RecordGenerator {
         return 0; // assume cost per ton >= 0;
     }
 
-    public double getCost() {
-        return annEmissions * getCostPerTon(maxRedMeasure);
+    public double getCost() throws SQLException {
+        return getReducedEmissions() * getCostPerTon(maxRedMeasure);
     }
 
     public double getReducedEmissions() throws SQLException {

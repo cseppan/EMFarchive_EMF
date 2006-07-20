@@ -184,6 +184,10 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
         runStrategy.run(user, strategy, this);
     }
 
+    public void stopRunStrategy() {
+        runStrategy.stop();
+    }
+
     public StrategyType[] getStrategyTypes() throws EmfException {
         try {
             List st = dao.getAllStrategyTypes(sessionFactory.getSession());

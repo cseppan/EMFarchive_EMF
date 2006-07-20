@@ -45,6 +45,7 @@ public class EditControlStrategyPresenterTest extends EmfMockObjectTestCase {
         Mock session = mock(EmfSession.class);
         stub(session, "controlStrategyService", service.proxy());
         expects(service, 1, "releaseLocked");
+        expects(service, 1, "stopRunStrategy");
 
         EditControlStrategyPresenter p = new EditControlStrategyPresenterImpl(null, (EmfSession) session.proxy(), (EditControlStrategyView) view
                 .proxy(), null);

@@ -59,10 +59,6 @@ public class MaxEmsRedStrategy implements Strategy {
 
     private int batchSize;
 
-    private double totalCost;
-
-    private double totalReduction;
-
     private EmfDbServer emfDbServer;
 
     public MaxEmsRedStrategy(ControlStrategy strategy, Integer batchSize) throws EmfException {
@@ -137,28 +133,33 @@ public class MaxEmsRedStrategy implements Strategy {
         controlStrategy.setStrategyResults((StrategyResult[]) strategyResults.toArray(new StrategyResult[0]));
     }
 
-    private void calculateResultForSingleDataset(Dataset dataset, Datasource datasource) throws Exception {
-        String query = getSourceQueryString(dataset, datasource);
+    private void calculateResultForSingleDataset(Dataset inputDataset, Datasource datasource) throws Exception {
+        String query = getSourceQueryString(inputDataset, datasource);
         OptimizedQuery runner = runner = datasource.optimizedQuery(query, batchSize);
 
         String resultDatasetName = getResultDatasetName();
         String resultTableName = "CSDR_" + resultDatasetName;
         OptimizedTableModifier modifier = createResultTable(resultTableName);
-        StrategyResult strategyResult = createStrategyResult(resultDatasetName,resultTableName,dataset);
+        StrategyResult strategyResult = createStrategyResult(resultDatasetName,resultTableName,inputDataset);
         Dataset resultDataset = strategyResult.getDetailedResultDataset();
         this.strategyResults.add(strategyResult);
 
         try {
             while (runner.execute()) {
                 ResultSet resultSet = runner.getResultSet();
-                writeBatchOfData(dataset.getId(), resultDataset.getId(), resultSet, modifier);
+                writeBatchOfData(inputDataset, resultDataset.getId(), resultSet, modifier, strategyResult);
                 resultSet.close();
             }
 
             runner.close();
+            strategyResult.setRunStatus("Completed. Inutput dataset: " + inputDataset.getName() + ".");
+        } catch (Exception e) {
+            strategyResult.setRunStatus("Failed. Error in processing input dataset: " + inputDataset.getName()
+                    + ". " + strategyResult.getRunStatus());
         } finally {
             closeResultTable(modifier);
             resetResultDataset(resultDataset, resultDatasetName);
+            strategyResult.setCompletionTime(new Date());
         }
     }
 
@@ -200,19 +201,32 @@ public class MaxEmsRedStrategy implements Strategy {
         }
     }
 
-    private void writeBatchOfData(int datasetId, int resultDatasetId, ResultSet resultSet,
-            OptimizedTableModifier modifier) throws Exception {
+    private void writeBatchOfData(Dataset inputDataset, int resultDatasetId, ResultSet resultSet,
+            OptimizedTableModifier modifier, StrategyResult strategyResult) throws Exception {
+        double totalCost = 0;
+        double totalReduction = 0;
+        int sourceCount = 0;
+
         while (resultSet.next()) {
+            sourceCount = resultSet.getInt("Record_Id");
             ControlMeasure cm = map.getMaxRedControlMeasure(resultSet.getString("scc"));
             if (cm == null)
                 continue;
 
-            RecordGenerator generator = new RecordGenerator(datasetId, resultDatasetId, resultSet, cm, controlStrategy);
-            Record record = generator.getRecord();
-            totalCost += generator.getCost();
-            totalReduction += generator.getReducedEmissions();
-            insertRecord(record, modifier);
+            try {
+                RecordGenerator generator = new RecordGenerator(inputDataset.getId(), resultDatasetId, resultSet, cm, controlStrategy);
+                Record record = generator.getRecord();
+                totalCost += generator.getCost();
+                totalReduction += generator.getReducedEmissions();
+                insertRecord(record, modifier);
+            } catch (SQLException e) {
+                strategyResult.setRunStatus("Failed. Error in processing record for result table. Input dataset: " + inputDataset.getName() 
+                        + ". Source record: " + sourceCount + ".");
+            }
         }
+        
+        strategyResult.setTotalCost(totalCost);
+        strategyResult.setTotalReduction(totalReduction);
     }
 
     private void insertRecord(Record record, OptimizedTableModifier dataModifier) throws Exception {
@@ -361,13 +375,14 @@ public class MaxEmsRedStrategy implements Strategy {
 
     private StrategyResult createStrategyResult(String datasetName, String tableName, Dataset inputDataset) throws EmfException {
         EmfDataset dataset = new EmfDataset();
+        Date start = new Date();
 
         dataset.setName(datasetName);
         dataset.setCreator(controlStrategy.getCreator().getUsername());
         dataset.setDatasetType(getDetailedResultDatasetType());
-        dataset.setCreatedDateTime(new Date());
-        dataset.setModifiedDateTime(new Date());
-        dataset.setAccessedDateTime(new Date());
+        dataset.setCreatedDateTime(start);
+        dataset.setModifiedDateTime(start);
+        dataset.setAccessedDateTime(start);
         dataset.setStatus("Created by control strategy");
         setDatasetInternalSource(dataset, tableName,inputDataset);
         addDataset(dataset);
@@ -381,6 +396,8 @@ public class MaxEmsRedStrategy implements Strategy {
         StrategyResult result = new StrategyResult();
         result.setStrategyResultType(getDetailedStrategyResultType());
         result.setDetailedResultDataset(dataset);
+        result.setStartTime(start);
+        result.setRunStatus("Created for input dataset: " + inputDataset.getName());
 
         return result;
     }

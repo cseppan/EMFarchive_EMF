@@ -1,7 +1,5 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
-import gov.epa.emissions.framework.ConcurrentTaskRunner;
-import gov.epa.emissions.framework.TaskRunner;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.cost.controlstrategy.ControlStrategiesManagerPresenter;
 import gov.epa.emissions.framework.services.EmfException;
@@ -31,7 +29,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     
     //private SummaryMonitor monitor;
     
-    private TaskRunner runner;
+    //private TaskRunner runner;
 
     public EditControlStrategyPresenterImpl(ControlStrategy controlStrategy, EmfSession session,
             EditControlStrategyView view, ControlStrategiesManagerPresenter controlStrategiesManagerPresenter) {
@@ -40,7 +38,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         this.view = view;
         this.managerPresenter = controlStrategiesManagerPresenter;
         this.presenters = new ArrayList();
-        this.runner = new ConcurrentTaskRunner();
+        //this.runner = new ConcurrentTaskRunner();
     }
 
     public void doDisplay() throws EmfException {
@@ -131,8 +129,9 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         summaryTabView.setRunMessage(controlStrategy);
     }
 
-    public void stopRun() {
-        runner.stop();
+    public void stopRun() throws EmfException {
+        //runner.stop();
+        service().stopRunStrategy();
         summaryTabView.stopRun();
     }
 

@@ -21,6 +21,6 @@ public interface EditControlStrategyPresenter {
 
     void setResults(ControlStrategy controlStrategy);
 
-    void stopRun();
+    void stopRun() throws EmfException;
 
 }
