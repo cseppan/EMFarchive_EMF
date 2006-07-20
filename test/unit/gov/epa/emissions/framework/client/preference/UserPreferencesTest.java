@@ -49,4 +49,15 @@ public class UserPreferencesTest extends TestCase {
         assertEquals("/data/emf_output/orl", pref.mapLocalOutputPathToRemote("d:\\emf_output\\orl"));
         assertEquals("/data/emf_output/orl/nc/ch", pref.mapLocalOutputPathToRemote("d:\\emf_output\\orl\\nc\\ch"));
     }
+    
+    public void testMapRemoteOutputPathToLocal(){
+        Properties props = new Properties();
+        props.put("local.output.drive", "d:\\");
+        props.put("default.output.folder", "emf_output");
+        props.put("remote.output.drive", "/data/");
+        
+        UserPreference pref = new DefaultUserPreferences(props);
+        
+        assertEquals("d:\\emf_output\\orl.csv", pref.mapRemoteOutputPathToLocal("/data/emf_output/orl.csv"));
+    }
 }

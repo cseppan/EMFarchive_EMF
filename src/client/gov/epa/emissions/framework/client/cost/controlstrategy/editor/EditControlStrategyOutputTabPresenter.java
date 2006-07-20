@@ -1,15 +1,14 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
-import java.io.File;
-
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExImService;
-import gov.epa.mims.analysisengine.table.FileImportGUI;
-import gov.epa.mims.analysisengine.table.TableApp;
+
+import java.io.File;
 
 public class EditControlStrategyOutputTabPresenter implements EditControlStrategyTabPresenter {
 
@@ -43,15 +42,16 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         return session.preferences().mapLocalOutputPathToRemote(dir);
     }
 
-    public void doAnalyze(ControlStrategy controlStrategy, String folder) throws EmfException {
-        doExport(controlStrategy, folder);
+    public void doAnalyze(ControlStrategy controlStrategy) throws EmfException {
         StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
+        String[]  fileNames = new String[strategyResults.length];
+        UserPreference preference = session.preferences();
         for (int i = 0; i < strategyResults.length; i++) {
             int datasetId = strategyResults[i].getDetailedResultDataset().getId();
-            String lastExportedFileName = session.loggingService().getLastExportedFileName(datasetId);
-            new TableApp(new String[] { lastExportedFileName }, FileImportGUI.GENERIC_FILE, ",", 1);
+            String fileNameOnServer = session.loggingService().getLastExportedFileName(datasetId);
+            fileNames[i] = preference.mapRemoteOutputPathToLocal(fileNameOnServer);
         }
-
+        view.displayAnalyzeTable(fileNames);
     }
 
     private void validateFolder(String folder) throws EmfException {

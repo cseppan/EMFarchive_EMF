@@ -9,4 +9,6 @@ public interface EditControlStrategyOutputTabView extends EditControlStrategyTab
     void analyze();
     
     void recentExportFolder(String folder);
+
+    void displayAnalyzeTable(String[] fileNames);
 }

@@ -12,6 +12,8 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.mims.analysisengine.table.FileImportGUI;
+import gov.epa.mims.analysisengine.table.TableApp;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -68,7 +70,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     public void analyze() {
         try {
-            presenter.doAnalyze(controlStrategy, folder.getText());
+            presenter.doAnalyze(controlStrategy);
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
         }
@@ -155,7 +157,6 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private JPanel buttonPanel() {
         Button exportButton = new Button("Export", exportAction());
-        exportButton.setEnabled(false);
         Button analysisButton = new Button("Analyze", analysisAction());
 
         JPanel buttonPanel = new JPanel();
@@ -167,7 +168,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private Action exportAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                // NOTE Auto-generated method stub
+                messagePanel.clear();
+                export();
             }
 
         };
@@ -176,6 +178,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private Action analysisAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                messagePanel.clear();
                 analyze();
             }
         };
@@ -210,6 +213,10 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     public void recentExportFolder(String recentfolder) {
         if (recentfolder != null)
             this.folder.setText(recentfolder);
+    }
+
+    public void displayAnalyzeTable(String[] fileNames) {
+        new TableApp(fileNames, FileImportGUI.GENERIC_FILE, ",", 1);
     }
 
 }

@@ -11,5 +11,7 @@ public interface UserPreference {
     String mapLocalInputPathToRemote(String localPath);
 
     String mapLocalOutputPathToRemote(String localPath);
+    
+    String mapRemoteOutputPathToLocal(String remotePath); 
 
 }

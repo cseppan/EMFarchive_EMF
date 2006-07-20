@@ -85,4 +85,12 @@ public class DefaultUserPreferences implements UserPreference {
         String path = remote + localPath.substring(local.length());
         return path.replace('\\', '/');
     }
+    
+    public String mapRemoteOutputPathToLocal(String remotePath) {
+        String remote = property(REMOTE_OUTPUT_DRIVE);
+        String local = property(LOCAL_OUTPUT_DRIVE);
+        
+        String path = local + remotePath.substring(remote.length());
+        return path.replace('/', '\\');
+    }
 }
