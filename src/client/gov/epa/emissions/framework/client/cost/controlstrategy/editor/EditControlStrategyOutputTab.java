@@ -207,4 +207,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         }
     }
 
+    public void recentExportFolder(String recentfolder) {
+        if (recentfolder != null)
+            this.folder.setText(recentfolder);
+    }
+
 }

@@ -56,8 +56,9 @@ public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCas
 
         session.stubs().method("user").withNoArguments().will(returnValue(user));
         session.stubs().method("eximService").withNoArguments().will(returnValue(model.proxy()));
+        session.stubs().method("setMostRecentExportFolder").with(eq(folder));
 
-        EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter((EmfSession) session.proxy());
+        EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter((EmfSession) session.proxy(),null);
 
         presenter.doExport(controlStrategy, folder);
     }

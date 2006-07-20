@@ -7,4 +7,6 @@ public interface EditControlStrategyOutputTabView extends EditControlStrategyTab
     void export();
     
     void analyze();
+    
+    void recentExportFolder(String folder);
 }
