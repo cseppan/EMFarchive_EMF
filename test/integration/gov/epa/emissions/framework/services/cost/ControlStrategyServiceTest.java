@@ -34,7 +34,6 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
     public void testShouldGetControlStrategies() throws Exception {
         int totalBeforeAdd = service.getControlStrategies().length;
         ControlStrategy element = controlStrategy();
-        session.close();
         try {
             List list = Arrays.asList(service.getControlStrategies());
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -47,7 +46,6 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
     private ControlStrategy controlStrategy() {
         ControlStrategy element = new ControlStrategy("test" + Math.random());
         add(element);
-        session.clear();
         return element;
     }
 
