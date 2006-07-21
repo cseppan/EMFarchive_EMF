@@ -328,16 +328,17 @@ public class MaxEmsRedStrategy implements Strategy {
     }
 
     private void addDataset(EmfDataset dataset) throws EmfException {
+        Session session = HibernateSessionFactory.get().getSession();
         try {
             DatasetDAO dao = new DatasetDAO();
-            Session session = HibernateSessionFactory.get().getSession();
             if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))
                 throw new EmfException("The selected dataset name is already in use.");
 
             dao.add(dataset, session);
-            session.close();
         } catch (RuntimeException e) {
             throw new EmfException("Could not add dataset: " + dataset.getName());
+        }finally{
+            session.close();
         }
     }
 
@@ -385,8 +386,9 @@ public class MaxEmsRedStrategy implements Strategy {
         dataset.setAccessedDateTime(start);
         dataset.setStatus("Created by control strategy");
         setDatasetInternalSource(dataset, tableName,inputDataset);
+        
         addDataset(dataset);
-
+        
         try {
             addVersionZeroEntryToVersionsTable(dataset);
         } catch (Exception e) {
@@ -394,8 +396,10 @@ public class MaxEmsRedStrategy implements Strategy {
         }
     
         StrategyResult result = new StrategyResult();
+        result.setInputDatasetId(inputDataset.getId());
         result.setStrategyResultType(getDetailedStrategyResultType());
         result.setDetailedResultDataset(dataset);
+        
         result.setStartTime(start);
         result.setRunStatus("Created for input dataset: " + inputDataset.getName());
 

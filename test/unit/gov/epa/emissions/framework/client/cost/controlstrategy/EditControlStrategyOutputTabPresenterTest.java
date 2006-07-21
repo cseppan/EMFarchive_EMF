@@ -94,7 +94,7 @@ public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCas
         EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(
                 (EmfSession) session.proxy(), (EditControlStrategyOutputTabView) view.proxy());
 
-        presenter.doAnalyze(controlStrategy);
+        presenter.doAnalyze(controlStrategy.getName(),controlStrategy.getStrategyResults());
     }
 
 }

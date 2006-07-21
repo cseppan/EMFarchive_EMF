@@ -104,5 +104,11 @@ public class DatasetDAO {
         Order order = Order.asc("name");
         return hibernateFacade.get(EmfDataset.class, criterion, order, session);
     }
+    
+    public EmfDataset getDataset(Session session, String name) {
+        Criterion criterion = Restrictions.eq("name", name);
+        Order order = Order.asc("name");
+        return (EmfDataset) hibernateFacade.get(EmfDataset.class, criterion, order, session).get(0);
+    }
 
 }

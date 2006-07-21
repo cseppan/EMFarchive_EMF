@@ -13,7 +13,10 @@ public class StrategyResultsTableData extends AbstractTableData {
 
     private List rows;
 
-    public StrategyResultsTableData(StrategyResult[] strategyResults) {
+    private EmfDataset[] inputDatasets;
+
+    public StrategyResultsTableData(EmfDataset[] inputDatasets, StrategyResult[] strategyResults) {
+        this.inputDatasets = inputDatasets;
         this.rows = createRows(strategyResults);
     }
 
@@ -22,15 +25,24 @@ public class StrategyResultsTableData extends AbstractTableData {
         for (int i = 0; i < strategyResults.length; i++) {
             StrategyResult result = strategyResults[i];
             EmfDataset outputDataset = (EmfDataset) result.getDetailedResultDataset();
-            Object[] values = {""+result.getInputDatasetId(), outputDataset.getName(), outputDataset.getStatus(),result.getStrategyResultType().getName() };
+            Object[] values = { inputDatasetName(result.getInputDatasetId()), outputDataset.getName(),
+                    result.getStrategyResultType().getName() };
             Row row = new ViewableRow(result, values);
             rows.add(row);
         }
         return rows;
     }
-    
+
+    private String inputDatasetName(int inputDatasetId) {
+        for (int i = 0; i < inputDatasets.length; i++) {
+            if (inputDatasetId == inputDatasets[i].getId())
+                return inputDatasets[i].getName();
+        }
+        return "";
+    }
+
     public String[] columns() {
-        return new String[] { "Input Dataset Id", "Output Dataset", "Status", "Product" };
+        return new String[] { "Input Dataset", "Output Dataset", "Product" };
     }
 
     public Class getColumnClass(int col) {

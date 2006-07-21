@@ -42,8 +42,10 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         return session.preferences().mapLocalOutputPathToRemote(dir);
     }
 
-    public void doAnalyze(ControlStrategy controlStrategy) throws EmfException {
-        StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
+    public void doAnalyze(String controlStrategyName, StrategyResult[] strategyResults) throws EmfException {
+        if(strategyResults.length==0){
+            throw new EmfException("Please select one or more result datasets");
+        }
         String[]  fileNames = new String[strategyResults.length];
         UserPreference preference = session.preferences();
         for (int i = 0; i < strategyResults.length; i++) {
@@ -51,7 +53,7 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
             String fileNameOnServer = session.loggingService().getLastExportedFileName(datasetId);
             fileNames[i] = preference.mapRemoteOutputPathToLocal(fileNameOnServer);
         }
-        view.displayAnalyzeTable(controlStrategy.getName(),fileNames);
+        view.displayAnalyzeTable(controlStrategyName,fileNames);
     }
 
     private void validateFolder(String folder) throws EmfException {

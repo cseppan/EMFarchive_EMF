@@ -10,6 +10,7 @@ import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTab
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
+import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -18,6 +19,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -40,6 +42,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private DesktopManager desktopManager;
 
     private EmfConsole parentConsole;
+
+    private SortFilterSelectModel selectModel;
 
     public EditControlStrategyOutputTab(ControlStrategy controlStrategy, MessagePanel messagePanel, DesktopManager desktopManager, EmfConsole parentConsole) {
         super.setName("output");
@@ -68,15 +72,17 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         try {
             presenter.doExport(controlStrategy, folder.getText());
         } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
+            messagePanel.setMessage(e.getMessage());
         }
     }
 
     public void analyze() {
         try {
-            presenter.doAnalyze(controlStrategy);
+            List list = selectModel.selected();
+            StrategyResult[] results =(StrategyResult[]) list.toArray(new StrategyResult[0]);
+            presenter.doAnalyze(controlStrategy.getName(),results);
         } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
+            messagePanel.setMessage(e.getMessage());
         }
     }
 
@@ -148,9 +154,10 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private JPanel tablePanel(ControlStrategy controlStrategy) {
         StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
-        StrategyResultsTableData tableData = new StrategyResultsTableData(strategyResults);
+        EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
+        StrategyResultsTableData tableData = new StrategyResultsTableData(inputDatasets,strategyResults);
         EmfTableModel model = new EmfTableModel(tableData);
-        SortFilterSelectModel selectModel = new SortFilterSelectModel(model);
+        selectModel = new SortFilterSelectModel(model);
         JTable table = new JTable(selectModel);
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setPreferredSize(new Dimension(300, 200));
@@ -220,8 +227,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     public void displayAnalyzeTable(String controlStrategyName,String[] fileNames) {
-        AnalysisEngineTableApp app = new AnalysisEngineTableApp(desktopManager, parentConsole);
-        app.display(controlStrategyName,fileNames);
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp(controlStrategyName,desktopManager, parentConsole);
+        app.display(fileNames);
     }
 
 }

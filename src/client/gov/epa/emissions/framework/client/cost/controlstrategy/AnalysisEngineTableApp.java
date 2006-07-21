@@ -28,14 +28,12 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
 
     private static int counter=0;
 
-    public AnalysisEngineTableApp(DesktopManager desktopManager, EmfConsole parentConsole) {
-        super("Dataset Results Analysis", desktopManager);
+    public AnalysisEngineTableApp(String controlStrategyName, DesktopManager desktopManager, EmfConsole parentConsole) {
+        super("Analyze Control Strategy: "+controlStrategyName+counter++, desktopManager);
         this.parentConsole = parentConsole;
     }
 
-    public void display(String controlStrategtName, String[] fileNames) {
-        setTitle(controlStrategtName);
-        setName(controlStrategtName + counter++);
+    public void display(String[] fileNames) {
         setLayout(fileNames);
         super.display();
     }
