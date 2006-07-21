@@ -89,7 +89,7 @@ public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCas
         
         
         Mock view = mock(EditControlStrategyOutputTabView.class);
-        view.expects(once()).method("displayAnalyzeTable").with(eq(new String[]{fileNameOnLocalDrive}));
+        view.expects(once()).method("displayAnalyzeTable").with(eq(controlStrategy.getName()),eq(new String[]{fileNameOnLocalDrive}));
         
         EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(
                 (EmfSession) session.proxy(), (EditControlStrategyOutputTabView) view.proxy());

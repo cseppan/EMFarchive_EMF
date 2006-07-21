@@ -51,7 +51,7 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
             String fileNameOnServer = session.loggingService().getLastExportedFileName(datasetId);
             fileNames[i] = preference.mapRemoteOutputPathToLocal(fileNameOnServer);
         }
-        view.displayAnalyzeTable(fileNames);
+        view.displayAnalyzeTable(controlStrategy.getName(),fileNames);
     }
 
     private void validateFolder(String folder) throws EmfException {

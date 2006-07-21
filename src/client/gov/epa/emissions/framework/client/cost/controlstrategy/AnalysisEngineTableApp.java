@@ -26,12 +26,16 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
 
     private EmfConsole parentConsole;
 
-    public AnalysisEngineTableApp(String title, DesktopManager desktopManager, EmfConsole parentConsole) {
-        super(title, desktopManager);
+    private static int counter=0;
+
+    public AnalysisEngineTableApp(DesktopManager desktopManager, EmfConsole parentConsole) {
+        super("Dataset Results Analysis", desktopManager);
         this.parentConsole = parentConsole;
     }
 
-    public void display(String[] fileNames) {
+    public void display(String controlStrategtName, String[] fileNames) {
+        setTitle(controlStrategtName);
+        setName(controlStrategtName + counter++);
         setLayout(fileNames);
         super.display();
     }
