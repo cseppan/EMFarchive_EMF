@@ -66,22 +66,29 @@ public class MaxEmsRedTableFormat implements TableFormat {
         Column pollutant = new Column("Pollutant", types.stringType(20), new StringFormatter(20));
         Column scc = new Column("SCC", types.stringType(10), new StringFormatter(10));
         Column fips = new Column("FIPS", types.stringType(6), new StringFormatter(6));
-        Column totalCost = new Column("Cost", types.realType(), new RealFormatter());
-        Column costPerTon = new Column("Cost_per_Ton", types.realType(), new RealFormatter());
+        Column annualCost = new Column("Annual_Cost", types.realType(), new RealFormatter());
+        Column annualCostPerTon = new Column("Ann_Cost_per_Ton", types.realType(), new RealFormatter());
         Column controlEfficiency = new Column("Control_Eff", types.realType(), new RealFormatter());
-        Column controlledEmission = new Column("CNTRLD_Emissions", types.realType(), new RealFormatter());
-        Column totalReduction = new Column("Emis_Reduction", types.realType(), new RealFormatter());
-        Column originalEmissions = new Column("Original_Emis", types.realType(), new RealFormatter());
+        Column rulePenetration = new Column("Rule_Pen", types.realType(), new RealFormatter());
+        Column ruleEffectiveness = new Column("Rule_Eff", types.realType(), new RealFormatter());
+        Column percentReduction = new Column("Percent_Reduction", types.realType(), new RealFormatter());
+        Column inventoryControlEfficiency = new Column("Inv_Ctrl_Eff", types.realType(), new RealFormatter());
+        Column inventoryRulePenetration = new Column("Inv_Rule_Pen", types.realType(), new RealFormatter());
+        Column inventoryRuleEffectiveness = new Column("Inv_Rule_Eff", types.realType(), new RealFormatter());
+        Column finalEmissions = new Column("Final_emissions", types.realType(), new RealFormatter());
+        Column emissionsReduction = new Column("Emis_Reduction", types.realType(), new RealFormatter());
+        Column inventoryEmissions = new Column("Inv_emissions", types.realType(), new RealFormatter());
         
         Column sourceId = new Column("Source_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
         Column inputDatasetId = new Column("Input_DS_Id", types.intType(), new IntegerFormatter(), "NOT NULL");
         Column controlStrategyId = new Column("CS_Id", types.intType(), new IntegerFormatter());
         Column controlMeasureId = new Column("CM_Id", types.intType(), new IntegerFormatter());
-        Column comment = new Column("Comment", types.stringType(50), new StringFormatter(50));
+        Column comment = new Column("Comment", types.stringType(128), new StringFormatter(128));
         
-        return new Column[] { disable, controlMeasureAbbr, pollutant, scc, fips, totalCost, costPerTon, controlEfficiency, 
-                controlledEmission, totalReduction, originalEmissions, sourceId, inputDatasetId, controlStrategyId,
-                controlMeasureId, comment };
+        return new Column[] { disable, controlMeasureAbbr, pollutant, scc, fips, annualCost, annualCostPerTon, controlEfficiency, 
+                rulePenetration, ruleEffectiveness, percentReduction, inventoryControlEfficiency, inventoryRulePenetration,
+                inventoryRuleEffectiveness, finalEmissions, emissionsReduction, inventoryEmissions, sourceId, inputDatasetId, 
+                controlStrategyId, controlMeasureId, comment };
     }
 
 }

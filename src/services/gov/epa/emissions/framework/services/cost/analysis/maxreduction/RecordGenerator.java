@@ -23,13 +23,23 @@ public class RecordGenerator {
 
     private ControlMeasure maxRedMeasure;
 
-    private double annEmissions;
+    private float inventoryEmissions;
+    
+    private float percentReduction;
+
+    private float inventoryCE;
+    
+    private float inventoryRE;
+    
+    private float inventoryRP;
 
     private int resultDatasetId;
     
     private String controlEfficiency;
     
     private String comment;
+
+    private float originalEmissions;
 
     public RecordGenerator(int inputDatasetId, int resultDatasetId, ResultSet resultSet, ControlMeasure measure, ControlStrategy controlStrategy)
             throws SQLException {
@@ -39,7 +49,11 @@ public class RecordGenerator {
         this.resultSet = resultSet;
 
         this.scc = resultSet.getString("scc");
-        this.annEmissions = resultSet.getDouble("ANN_EMIS");
+        this.inventoryEmissions = resultSet.getFloat("ANN_EMIS");
+        this.inventoryCE = resultSet.getFloat("CEFF");
+        this.inventoryRE = resultSet.getFloat("REFF");
+        this.inventoryRP = resultSet.getFloat("RPEN");
+        this.originalEmissions = inventoryEmissions;
         this.maxRedMeasure = measure;
     }
 
@@ -66,7 +80,7 @@ public class RecordGenerator {
         tokens.add(index++, maxRedMeasure.getAbbreviation());
 
         double reducedEmission = getReducedEmissions();
-        String controlledEmission = "" + (annEmissions - reducedEmission);
+        String finalEmissions = "" + (originalEmissions - reducedEmission);
 
         tokens.add(index++, resultSet.getString("poll"));
         tokens.add(index++, scc);
@@ -74,9 +88,15 @@ public class RecordGenerator {
         tokens.add(index++, "" + getCost());
         tokens.add(index++, "" + getCostPerTon(maxRedMeasure));
         tokens.add(index++, controlEfficiency);
-        tokens.add(index++, controlledEmission);
+        tokens.add(index++, "" + maxRedMeasure.getRulePenetration());
+        tokens.add(index++, "" + maxRedMeasure.getRuleEffectiveness());
+        tokens.add(index++, "" + percentReduction);
+        tokens.add(index++, "" + inventoryCE);
+        tokens.add(index++, "" + inventoryRP);
+        tokens.add(index++, "" + inventoryRE);
+        tokens.add(index++, finalEmissions);
         tokens.add(index++, "" + reducedEmission);
-        tokens.add(index++, "" + annEmissions);
+        tokens.add(index++, "" + inventoryEmissions);
         tokens.add(index++, "" + resultSet.getInt("Record_Id"));
         tokens.add(index++, "" + inputDatasetId);
         tokens.add(index++, "" + controlStrategy.getId());
@@ -114,29 +134,34 @@ public class RecordGenerator {
         return 0; // assume cost per ton >= 0;
     }
 
-    public double getCost() throws SQLException {
+    public double getCost() {
         return getReducedEmissions() * getCostPerTon(maxRedMeasure);
     }
 
-    public double getReducedEmissions() throws SQLException {
+    public float getReducedEmissions() {
         float newEfficiency = getEfficiency(maxRedMeasure);
-        float oldEfficiency = resultSet.getFloat("CEFF");
-        controlEfficiency = "" + newEfficiency;
+        this.controlEfficiency = "" + newEfficiency;
+        this.percentReduction = getPercentReduction(newEfficiency);
 
-        if (oldEfficiency == 0) {
-            return annEmissions * newEfficiency;
+        if (inventoryCE == 0) {
+            return inventoryEmissions * percentReduction;
         }
 
-        if (oldEfficiency < newEfficiency) {
-            comment += "Existing control replaced; ";
-            annEmissions = annEmissions / oldEfficiency;
-            return annEmissions * newEfficiency;
+        if (inventoryCE < newEfficiency) {
+            this.comment += "Existing control measure replaced; ";
+            originalEmissions = inventoryEmissions / inventoryCE;
+            return originalEmissions * percentReduction;
         }
 
-        comment += "Not controlled; ";
-        controlEfficiency = "";
+        this.comment += "Controlled with existing control measure; ";
+        this.controlEfficiency = "" + inventoryCE;
+        this.percentReduction = inventoryCE * inventoryRE * inventoryRP;
 
         return 0;
+    }
+
+    private float getPercentReduction(float newEfficiency) {
+        return newEfficiency * maxRedMeasure.getRuleEffectiveness() * maxRedMeasure.getRulePenetration();
     }
 
 }
