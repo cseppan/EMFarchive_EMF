@@ -4,16 +4,15 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.CheckBox;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.TextField;
-import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.client.cost.controlstrategy.AnalysisEngineTableApp;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.ui.EmfTableModel;
 import gov.epa.emissions.framework.ui.FileChooser;
 import gov.epa.emissions.framework.ui.MessagePanel;
-import gov.epa.mims.analysisengine.table.FileImportGUI;
-import gov.epa.mims.analysisengine.table.TableApp;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -38,11 +37,16 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private MessagePanel messagePanel;
 
-    public EditControlStrategyOutputTab(ControlStrategy controlStrategy, EmfSession session, MessagePanel messagePanel,
-            EmfConsole parentConsole) {
+    private DesktopManager desktopManager;
+
+    private EmfConsole parentConsole;
+
+    public EditControlStrategyOutputTab(ControlStrategy controlStrategy, MessagePanel messagePanel, DesktopManager desktopManager, EmfConsole parentConsole) {
         super.setName("output");
         this.controlStrategy = controlStrategy;
         this.messagePanel = messagePanel;
+        this.desktopManager = desktopManager;
+        this.parentConsole = parentConsole;
         setLayout(controlStrategy);
     }
 
@@ -216,7 +220,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     public void displayAnalyzeTable(String[] fileNames) {
-        new TableApp(fileNames, FileImportGUI.GENERIC_FILE, ",", 1);
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp("Detailed Dataset", desktopManager,parentConsole);
+        app.display(fileNames);
     }
 
 }

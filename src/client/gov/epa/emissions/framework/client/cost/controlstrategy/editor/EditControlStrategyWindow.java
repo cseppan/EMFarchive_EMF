@@ -44,6 +44,8 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private EmfConsole parentConsole;
 
     private ControlStrategy controlStrategy;
+    
+    private DesktopManager desktopManager;
 
     private static final DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
@@ -51,6 +53,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         super("Edit Control Strategy", new Dimension(650, 490), desktopManager);
         super.setMinimumSize(new Dimension(10, 10));
         this.session = session;
+        this.desktopManager = desktopManager;
         this.parentConsole = parentConsole;
     }
 
@@ -114,7 +117,7 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     }
     
     private JPanel outputPanel() {
-        EditControlStrategyOutputTabView view = new EditControlStrategyOutputTab(controlStrategy,session,messagePanel,parentConsole);
+        EditControlStrategyOutputTabView view = new EditControlStrategyOutputTab(controlStrategy,messagePanel,desktopManager, parentConsole);
         this.presenter.set(view);
         return (JPanel) view ;
     }
