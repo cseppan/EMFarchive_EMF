@@ -3,7 +3,6 @@ package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
-import gov.epa.emissions.framework.services.cost.data.CostRecord;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 import java.sql.ResultSet;
@@ -88,8 +87,8 @@ public class RecordGenerator {
         tokens.add(index++, "" + getCost());
         tokens.add(index++, "" + getCostPerTon(maxRedMeasure));
         tokens.add(index++, controlEfficiency);
-        tokens.add(index++, "" + maxRedMeasure.getRulePenetration());
-        tokens.add(index++, "" + maxRedMeasure.getRuleEffectiveness());
+        tokens.add(index++, "");
+        tokens.add(index++, "");
         tokens.add(index++, "" + percentReduction);
         tokens.add(index++, "" + inventoryCE);
         tokens.add(index++, "" + inventoryRP);
@@ -120,16 +119,16 @@ public class RecordGenerator {
     }
 
     private float getCostPerTon(ControlMeasure measure) {
-        CostRecord[] records = measure.getCostRecords();
-        String targetPollutant = controlStrategy.getTargetPollutant();
-        int costYear = controlStrategy.getCostYear();
-
-        for (int i = 0; i < records.length; i++) {
-            String pollutant = records[i].getPollutant();
-
-            if (pollutant.equalsIgnoreCase(targetPollutant) && costYear == records[i].getCostYear())
-                return records[i].getCostPerTon();
-        }
+//        CostRecord[] records = measure.getCostRecords();
+//        String targetPollutant = controlStrategy.getTargetPollutant();
+//        int costYear = controlStrategy.getCostYear();
+//
+//        for (int i = 0; i < records.length; i++) {
+//            String pollutant = records[i].getPollutant();
+//
+//            if (pollutant.equalsIgnoreCase(targetPollutant) && costYear == records[i].getCostYear())
+//                return records[i].getCostPerTon();
+//        }
 
         return 0; // assume cost per ton >= 0;
     }
@@ -161,7 +160,8 @@ public class RecordGenerator {
     }
 
     private float getPercentReduction(float newEfficiency) {
-        return newEfficiency * maxRedMeasure.getRuleEffectiveness() * maxRedMeasure.getRulePenetration();
+//        return newEfficiency * maxRedMeasure.getRuleEffectiveness() * maxRedMeasure.getRulePenetration();
+        return 0;
     }
 
 }

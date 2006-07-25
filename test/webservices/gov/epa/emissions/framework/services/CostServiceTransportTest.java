@@ -102,7 +102,7 @@ public class CostServiceTransportTest extends ServiceTestCase {
         cm.setAbbreviation("12345678");
         
         //These scc numbers have to exist in the reference.scc table
-        cm.setSccs(new String[] {"10100224", "10100225", "10100226"} ); 
+        cm.setSccs(new Scc[] {new Scc("10100224", ""), new Scc("10100225", ""), new Scc("10100226", "")} ); 
         service.addMeasure(cm);
         int measuresAfterAddOne = service.getMeasures().length;
         

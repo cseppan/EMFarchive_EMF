@@ -5,22 +5,21 @@ CREATE TABLE emf.control_measures
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE,
-  abbreviation varchar(255) NOT NULL UNIQUE,
-  cm_class varchar(255),
+  abbreviation varchar(10) NOT NULL UNIQUE,
+  cm_class varchar(64),
   description text,
   device_code int4,
   equipment_life real,
-  major_pollutant varchar(255),
+  major_pollutant varchar(128),
+  control_technology varchar(128),
+  source_group varchar(128),
+  data_souce varchar(128),
   creator int4  REFERENCES emf.users(id),
-  region int4  REFERENCES emf.regions(id),
-  rule_effectiveness real,
-  rule_penetration real,
-  min_uncontrolled_emissions real,
-  max_uncontrolled_emissions real,
   cost_year int4,
   last_modified_time timestamp,
-  lock_owner varchar(255),
-  lock_date timestamp
+  lock_owner varchar(64),
+  lock_date timestamp,
+  date_reviewed timestamp
 ) 
 WITHOUT OIDS;
 -- emf.control_measures
@@ -32,7 +31,8 @@ CREATE TABLE emf.control_measure_sccs
    id SERIAL PRIMARY KEY,
    control_measures_id  int4 NOT NULL REFERENCES emf.control_measures(id),
    list_index int4,
-   name varchar(255)
+   name varchar(15),
+   status varchar(255)
 )
 WITHOUT OIDS;
 -- emf.control_measure_sccs
@@ -91,30 +91,26 @@ CREATE TABLE emf.input_datasets_control_strategies
 WITHOUT OIDS;
 -- emf.datasets_control_strategies
 
--- emf.control_measure_costrecords
-CREATE TABLE emf.control_measure_costrecords
-(
-  id SERIAL PRIMARY KEY,
-  control_measures_id int4 NOT NULL REFERENCES emf.control_measures(id),
-  list_index int4,
-  name varchar(255),
-  pollutant varchar(255),
-  cost_year int4,
-  cost_per_ton real,
-  UNIQUE (control_measures_id, list_index)
-) 
-WITHOUT OIDS;
--- emf.control_measure_costrecords
-
 -- emf.control_measure_efficiencyrecords
 CREATE TABLE emf.control_measure_efficiencyrecords
 (
   id SERIAL PRIMARY KEY,
   control_measures_id int4 NOT NULL REFERENCES emf.control_measures(id),
   list_index int4,
-  name varchar(255),
-  pollutant varchar(255),
+  pollutant varchar(128),
+  existing_measure_abbr varchar(10),
+  existing_dev_code int4,
+  locale varchar(10),
   efficiency real,
+  percent_reduction real,
+  cost_year int4,
+  cost_per_ton real,
+  rule_effectiveness real,
+  rule_penetration real,
+  equation_type varchar(128),
+  cap_rec_factor real,
+  discount_rate real,
+  reference varchar(128),
   UNIQUE (control_measures_id, list_index)
 ) 
 WITHOUT OIDS;
@@ -149,5 +145,15 @@ CREATE TABLE emf.strategy_results
 WITHOUT OIDS;
 -- emf.strategy_results
 
-
+-- emf control_measurs_sectors
+CREATE TABLE emf.control_measurs_sectors
+(
+  id SERIAL PRIMARY KEY,
+  control_measure_id int4 NOT NULL REFERENCES emf.control_measures(id) ,
+  list_index int4,
+  sector_id int4 REFERENCES emf.sectors (id),
+  UNIQUE (control_measure_id,sector_id) 
+) 
+WITHOUT OIDS;
+-- emf control_measurs_sectors
 --------------------------------------------------------------------------------

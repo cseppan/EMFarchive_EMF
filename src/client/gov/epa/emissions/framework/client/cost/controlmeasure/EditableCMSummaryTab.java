@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
-import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
@@ -35,16 +34,11 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
 
         measure.setName(name.getText());
         measure.setDescription(description.getText());
-        if (minUncontrolledEmission.getText().length() > 0) measure.setMinUncontrolledEmissions(minUnctrldEmiss);
-        if (maxUncontrolledEmission.getText().length() > 0) measure.setMaxUncontrolledEmissions(maxUnctrldEmiss);
         measure.setCreator(session.user());
         if (deviceCode.getText().length() > 0) measure.setDeviceCode(deviceId);
         if (equipmentLife.getText().length() > 0) measure.setEquipmentLife(life);
         measure.setMajorPollutant(majorPollutant.getSelectedItem() + "");
-        measure.setRuleEffectiveness((float)(effectivness/100.0));
-        measure.setRulePenetration((float)(penetration/100.0));
         measure.setCmClass(cmClass.getSelectedItem() + "");
-        measure.setRegion((Region)region.getSelectedItem());
         measure.setLastModifiedTime(new Date());
         measure.setAbbreviation(abbreviation.getText());
         //measure.setCostYear(year);

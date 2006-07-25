@@ -71,8 +71,6 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
 
         tabbedPane.addTab("SCCs", createSCCTab(measure, messagePanel));
 
-        tabbedPane.addTab("Costs", createCostsTab(measure, messagePanel));
-
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         return tabbedPane;
@@ -85,12 +83,6 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
         return (JPanel) view;
     }
     
-    private Component createCostsTab(ControlMeasure measure, MessagePanel messagePanel) {
-        EditableCostsTabView view = new EditableCostsTab(measure, this, parent, desktopManager, messagePanel);
-        presenter.set(view);
-        return (JPanel) view;
-    }
-
     private Component createEfficiencyTab(ControlMeasure measure, MessagePanel messagePanel) {
         EditableEfficiencyTab view = new EditableEfficiencyTab(measure, this, parent, desktopManager, messagePanel);
         presenter.set(view);

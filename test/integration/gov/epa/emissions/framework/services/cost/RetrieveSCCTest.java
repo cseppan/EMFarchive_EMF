@@ -23,7 +23,7 @@ public class RetrieveSCCTest extends ServiceTestCase {
         cm.setName("cm test added" + Math.random());
         cm.setAbbreviation("12345678");
         // These scc numbers have to exist in the reference.scc table
-        cm.setSccs(new String[] { "10100101", "10100225", "10100226" });
+        cm.setSccs(new Scc[] { new Scc("10100101", ""), new Scc("10100225", ""), new Scc("10100226", "") });
 
         ControlMeasuresDAO dao = null;
         Scc[] sccs = null;

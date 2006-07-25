@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.services.cost.analysis;
 
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.data.CostRecord;
+import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 import java.util.ArrayList;
@@ -16,12 +16,9 @@ public class SCCControlMeasureMap {
     
     private String pollutant;
     
-    private int costYear;
-
     public SCCControlMeasureMap(String[] sccs, ControlMeasure[] measures, String pollutant, int costYear) {
         this.map = new HashMap();
         this.pollutant = pollutant;
-        this.costYear = costYear;
         
         setMaps(sccs, measures);
     }
@@ -46,10 +43,10 @@ public class SCCControlMeasureMap {
     }
 
     private boolean contains(ControlMeasure measure, String scc) {
-        String[] sccs = measure.getSccs();
+        Scc[] sccs = measure.getSccs();
         
         for (int i = 0; i < sccs.length; i++)
-            if (scc.equalsIgnoreCase(sccs[i]))
+            if (scc.equalsIgnoreCase((sccs[i]).getCode()))
                 return true;
         
         return false;
@@ -92,13 +89,13 @@ public class SCCControlMeasureMap {
     }
     
     private float getCostPerTon(ControlMeasure measure) {
-        CostRecord[] records = measure.getCostRecords();
-
-        for (int i = 0; i < records.length; i++) {
-            String pollutant = records[i].getPollutant();
-            if (pollutant.equalsIgnoreCase(pollutant) && costYear == records[i].getCostYear())
-                return records[i].getCostPerTon();
-        }
+//        CostRecord[] records = measure.getCostRecords();
+//
+//        for (int i = 0; i < records.length; i++) {
+//            String pollutant = records[i].getPollutant();
+//            if (pollutant.equalsIgnoreCase(pollutant) && costYear == records[i].getCostYear())
+//                return records[i].getCostPerTon();
+//        }
 
         return 0; // assume cost per ton >= 0;
     }

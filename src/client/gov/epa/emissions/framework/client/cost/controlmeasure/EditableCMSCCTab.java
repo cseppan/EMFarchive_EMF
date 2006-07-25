@@ -142,11 +142,11 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
 
     public void save(ControlMeasure measure) {
         List sccs = tableData.rows();
-        String[] newSccs = new String[sccs.size()];
+        Scc[] newSccs = new Scc[sccs.size()];
         for (int i = 0; i < sccs.size(); i++) {
             ViewableRow row = (ViewableRow) sccs.get(i);
             Scc scc = (Scc) row.source();
-            newSccs[i] = scc.getCode();
+            newSccs[i] = new Scc(scc.getCode(), ""); //FIXME: get scc description
         }
         measure.setSccs(newSccs);
     }

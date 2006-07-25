@@ -1,9 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
-import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
-import gov.epa.emissions.framework.services.cost.data.CostRecord;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
@@ -21,15 +19,13 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     private static String pollutant = "Major";
 
-    private static int year = -9999;
-
     public ControlMeasureTableData(ControlMeasure[] measures) {
         this.rows = createRows(measures);
     }
 
     public String[] columns() {
         return new String[] { "Name", "Creator", "Abbreviation", "Control Eff.", "Cost per Ton", "Rule Eff.",
-                "Rule Pen.", "Major Poll.", "Description", "Region", "Equipment Life", "Class", "Last Modified Time",
+                "Rule Pen.", "Major Poll.", "Description", "Equipment Life", "Class", "Last Modified Time",
                 "NEI Device Code" };
     }
 
@@ -43,9 +39,9 @@ public class ControlMeasureTableData extends AbstractTableData {
         for (int i = 0; i < measures.length; i++) {
             ControlMeasure measure = measures[i];
             Object[] values = { measure.getName(), measure.getCreator().getName(), measure.getAbbreviation(),
-                    getControlEfficiency(measure), getCostPerTon(measure), new Float(measure.getRuleEffectiveness()),
-                    new Float(measure.getRulePenetration()), measure.getMajorPollutant(), measure.getDescription(),
-                    getRegionName(measure), new Float(measure.getEquipmentLife()), measure.getCmClass(),
+                    getControlEfficiency(measure), getCostPerTon(measure), new Float(0),
+                    new Float(0), measure.getMajorPollutant(), measure.getDescription(),
+                    new Float(measure.getEquipmentLife()), measure.getCmClass(),
                     getLastModifiedTime(measure), new Integer(measure.getDeviceCode()) };
 
             Row row = new ViewableRow(measure, values);
@@ -56,21 +52,21 @@ public class ControlMeasureTableData extends AbstractTableData {
     }
 
     private Float getCostPerTon(ControlMeasure measure) {
-        CostRecord[] records = measure.getCostRecords();
-        String localPollutant = getLocalPollutant(measure);
+//        CostRecord[] records = measure.getCostRecords();
+//        String localPollutant = getLocalPollutant(measure);
+//
+//        if (records.length != 0) {
+//            for (int i = 0; i < records.length; i++)
+//                if (records[i].getPollutant().equalsIgnoreCase(localPollutant)) {
+//                    if (year == -9999)
+//                        return new Float(records[i].getCostPerTon());
+//                    if (records[i].getCostYear() == year)
+//                        return new Float(records[i].getCostPerTon());
+//                }
+//
+//        }
 
-        if (records.length != 0) {
-            for (int i = 0; i < records.length; i++)
-                if (records[i].getPollutant().equalsIgnoreCase(localPollutant)) {
-                    if (year == -9999)
-                        return new Float(records[i].getCostPerTon());
-                    if (records[i].getCostYear() == year)
-                        return new Float(records[i].getCostPerTon());
-                }
-
-        }
-
-        return null;
+        return new Float(0);
     }
 
     private Float getControlEfficiency(ControlMeasure measure) {
@@ -99,12 +95,6 @@ public class ControlMeasureTableData extends AbstractTableData {
         DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
         return dateFormat.format(measure.getLastModifiedTime());
-    }
-
-    private String getRegionName(ControlMeasure measure) {
-        Region cmRegion = measure.getRegion();
-
-        return cmRegion == null ? null : cmRegion.getName();
     }
 
     public boolean isEditable(int col) {
@@ -145,10 +135,6 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     public void setPollutantAndYear(String pollutant, String year) {
         this.pollutant = pollutant;
-        
-        this.year = -9999;
-        if (!year.equalsIgnoreCase("Default"))
-            this.year = Integer.parseInt(year);
         
         refresh();
     }

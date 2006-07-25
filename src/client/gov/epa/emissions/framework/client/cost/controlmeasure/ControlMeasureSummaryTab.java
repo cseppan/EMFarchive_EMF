@@ -1,6 +1,5 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
-import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
@@ -100,7 +99,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     protected void populateFields() {
         String cmName = measure.getName();
         Date modifiedTime = measure.getLastModifiedTime();
-        Region cmRegion = measure.getRegion();
         name.setText(getText(cmName));
         description.setText(getText(measure.getDescription()));
         creator.setText(getText(measure.getCreator().getName()));
@@ -109,14 +107,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         //costYear.setText(measure.getCostYear() + "");
         deviceCode.setText(measure.getDeviceCode() + "");
         equipmentLife.setText(measure.getEquipmentLife() + "");
-        ruleEffectiveness.setText((measure.getRuleEffectiveness()*100) + "");
-        rulePenetration.setText((measure.getRulePenetration()*100) + "");
         if (modifiedTime != null)
             lastModifiedTime.setText(DATE_FORMATTER.format(modifiedTime));
-        if (cmRegion != null)
-            region.setSelectedItem(cmRegion);
-        minUncontrolledEmission.setText(measure.getMinUncontrolledEmissions() + "");
-        maxUncontrolledEmission.setText(measure.getMaxUncontrolledEmissions() + "");
         abbreviation.setText(getText(measure.getAbbreviation()));
     }
     

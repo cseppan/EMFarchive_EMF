@@ -13,53 +13,58 @@
         <property name="description" column="description" type="java.lang.String" not-null="false"/>
         <property name="abbreviation" column="abbreviation" type="java.lang.String" not-null="false"/>
         <property name="cmClass" column="cm_class" type="java.lang.String" not-null="false"/>
-        <property name="deviceCode" column="device_code" type="integer" not-null="true"/>
-        <property name="costYear" column="cost_year" type="integer" not-null="true"/>
+        <property name="controlTechnology" column="control_technology" type="java.lang.String" not-null="false"/>
+        <property name="sourceGroup" column="source_group" type="java.lang.String" not-null="false"/>
+        <property name="dataSouce" column="data_souce" type="java.lang.String" not-null="false"/>
+        <property name="deviceCode" column="device_code" type="integer" not-null="false"/>
+        <property name="costYear" column="cost_year" type="integer" not-null="false"/>
         <property name="equipmentLife" column="equipment_life" type="float" not-null="false"/>
         <property name="majorPollutant" column="major_pollutant" type="java.lang.String" not-null="false"/>
-        <property name="ruleEffectiveness" column="rule_effectiveness" type="float" not-null="false"/>
-        <property name="rulePenetration" column="rule_penetration" type="float" not-null="false"/>
-        <property name="minUncontrolledEmissions" column="min_uncontrolled_emissions" type="float" not-null="false"/>
-        <property name="maxUncontrolledEmissions" column="max_uncontrolled_emissions" type="float" not-null="false"/>
         <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
         <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
         <property name="lastModifiedTime" column="last_modified_time" type="java.util.Date" not-null="false" length="4"/>
+        <property name="dateReviewed" column="date_reviewed" type="java.util.Date" not-null="false" length="4"/>
         
         <many-to-one cascade="save-update"
             name="creator" 
             class="gov.epa.emissions.commons.security.User"
             column="creator"/> 
-        <many-to-one cascade="save-update"
-            name="region" 
-            class="gov.epa.emissions.commons.data.Region"
-            column="region"/> 
             
        <array name="sccs" table="control_measure_sccs" >
-    	<key column="control_measures_id" not-null="true"/>
-	    <list-index column="list_index"/>
-		<element column="name" type="string"/>
+    		<key column="control_measures_id" not-null="true"/>
+	    	<list-index column="list_index"/>
+	    	 <composite-element class="gov.epa.emissions.framework.services.cost.controlmeasure.Scc">
+				<property name="code" column="name" type="string" not-null="true"/>
+				<property name="status" column="status" type="string" not-null="false"/>
+			</composite-element>
 	   </array>
 
-       	<array name="costRecords" table="control_measure_costrecords" cascade="save-update">
-      		<key column="control_measures_id" not-null="true"/>
-      		<list-index column="list_index"/>
-		    <composite-element class="gov.epa.emissions.framework.services.cost.data.CostRecord">
-				<property name="name" column="name" type="java.lang.String" not-null="false"/>
-				<property name="pollutant" column="pollutant" type="java.lang.String" not-null="true"/>
-        		<property name="costYear" column="cost_year" type="integer" not-null="false"/>
-        		<property name="costPerTon" column="cost_per_ton" type="float" not-null="false"/>
-      		</composite-element>
- 		</array>
- 		
- 		<array name="efficiencyRecords" table="control_measure_efficiencyrecords" cascade="save-update">
+ 	   <array name="efficiencyRecords" table="control_measure_efficiencyrecords" cascade="save-update">
       		<key column="control_measures_id" not-null="true"/>
       		<list-index column="list_index"/>
 		    <composite-element class="gov.epa.emissions.framework.services.cost.data.EfficiencyRecord">
-				<property name="name" column="name" type="java.lang.String" not-null="false"/>
 				<property name="pollutant" column="pollutant" type="java.lang.String" not-null="true"/>
+				<property name="existingMeasureAbbr" column="existing_measure_abbr" type="java.lang.String" not-null="false"/>
+				<property name="existingDevCode" column="existing_dev_code" type="integer" not-null="false"/>
+				<property name="locale" column="locale" type="java.lang.String" not-null="false"/>
         		<property name="efficiency" column="efficiency" type="float" not-null="false"/>
+        		<property name="percentReduction" column="percent_reduction" type="float" not-null="false"/>
+        		<property name="costYear" column="cost_year" type="integer" not-null="false"/>
+        		<property name="costPerTon" column="cost_per_ton" type="float" not-null="false"/>
+        	    <property name="ruleEffectiveness" column="rule_effectiveness" type="float" not-null="false"/>
+                <property name="rulePenetration" column="rule_penetration" type="float" not-null="false"/>
+                <property name="equationType" column="equation_type" type="java.lang.String" not-null="false"/>
+                <property name="capRecFactor" column="cap_rec_factor" type="float" not-null="false"/>
+                <property name="discountRate" column="discount_rate" type="float" not-null="false"/>
+                <property name="reference" column="reference" type="java.lang.String" not-null="false"/>
       		</composite-element>
- 		</array>
+ 	   </array>
+ 	   
+ 	   <array name="sectors" table="control_measurs_sectors" cascade="save-update">
+    		<key column="control_measure_id" not-null="true"/>
+    		<list-index column="list_index"/>
+    		<many-to-many class="gov.epa.emissions.commons.data.Sector" column="sector_id"/>
+  	   </array>
             
     </class>
 </hibernate-mapping>  

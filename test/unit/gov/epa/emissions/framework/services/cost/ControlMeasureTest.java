@@ -20,8 +20,6 @@ public class ControlMeasureTest extends TestCase {
         cm.setLockDate(date);
         cm.setLockOwner(user.getName());
         cm.setMajorPollutant("CO");
-        cm.setRuleEffectiveness(100);
-        cm.setRulePenetration(0);
 
         assertEquals("cm one modified", cm.getName());
         assertEquals(new Float(1000), new Float(cm.getAnnualizedCost()));
@@ -33,8 +31,6 @@ public class ControlMeasureTest extends TestCase {
         assertEquals(date, cm.getLockDate());
         assertEquals(user.getName(), cm.getLockOwner());
         assertEquals("CO", cm.getMajorPollutant());
-        assertEquals(new Float(100), new Float(cm.getRuleEffectiveness()));
-        assertEquals(new Float(0), new Float(cm.getRulePenetration()));
     }
 
 }

@@ -9,3 +9,4 @@ DELETE FROM emf.control_measure_efficiencyrecords;
 DELETE FROM emf.strategy_types;
 DELETE FROM emf.strategy_results;
 DELETE FROM emf.strategy_result_types;
+DELETE FROM emf.control_measurs_sectors;
