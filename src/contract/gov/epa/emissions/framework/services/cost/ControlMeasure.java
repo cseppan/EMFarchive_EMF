@@ -2,9 +2,12 @@ package gov.epa.emissions.framework.services.cost;
 
 import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 import java.io.Serializable;
@@ -27,7 +30,7 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private float equipmentLife;
 
-    private String majorPollutant;
+    private Pollutant majorPollutant;
 
     private User creator;
 
@@ -37,9 +40,9 @@ public class ControlMeasure implements Lockable, Serializable {
 
     private String abbreviation;
 
-    private String controlTechnology;
+    private ControlTechnology controlTechnology;
     
-    private String sourceGroup;
+    private SourceGroup sourceGroup;
 
     private String dataSouce;
 
@@ -107,11 +110,11 @@ public class ControlMeasure implements Lockable, Serializable {
         this.equipmentLife = equipmentLife;
     }
 
-    public String getMajorPollutant() {
+    public Pollutant getMajorPollutant() {
         return majorPollutant;
     }
 
-    public void setMajorPollutant(String majorPollutant) {
+    public void setMajorPollutant(Pollutant majorPollutant) {
         this.majorPollutant = majorPollutant;
     }
 
@@ -213,11 +216,11 @@ public class ControlMeasure implements Lockable, Serializable {
         this.efficiencyRecords = Arrays.asList(efficiencyRecords);
     }
 
-    public String getControlTechnology() {
+    public ControlTechnology getControlTechnology() {
         return controlTechnology;
     }
 
-    public void setControlTechnology(String controlTechnology) {
+    public void setControlTechnology(ControlTechnology controlTechnology) {
         this.controlTechnology = controlTechnology;
     }
 
@@ -237,11 +240,11 @@ public class ControlMeasure implements Lockable, Serializable {
         this.dateReviewed = dateReviewed;
     }
 
-    public String getSourceGroup() {
+    public SourceGroup getSourceGroup() {
         return sourceGroup;
     }
 
-    public void setSourceGroup(String sourceGroup) {
+    public void setSourceGroup(SourceGroup sourceGroup) {
         this.sourceGroup = sourceGroup;
     }
 

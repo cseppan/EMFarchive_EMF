@@ -86,7 +86,7 @@ public class ControlMeasureTableData extends AbstractTableData {
     private String getLocalPollutant(ControlMeasure measure) {
         String localPollutant = pollutant;
         if (pollutant.equalsIgnoreCase("Major"))
-            localPollutant = measure.getMajorPollutant().trim();
+            localPollutant = measure.getMajorPollutant().getName().trim();
         
         return localPollutant;
     }

@@ -102,7 +102,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         name.setText(getText(cmName));
         description.setText(getText(measure.getDescription()));
         creator.setText(getText(measure.getCreator().getName()));
-        majorPollutant.setSelectedItem(getText(measure.getMajorPollutant()));
+        majorPollutant.setSelectedItem(getText(measure.getMajorPollutant().getName()));
         cmClass.setSelectedItem(getText(measure.getCmClass()));
         //costYear.setText(measure.getCostYear() + "");
         deviceCode.setText(measure.getDeviceCode() + "");

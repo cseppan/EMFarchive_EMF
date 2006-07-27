@@ -2,9 +2,11 @@ package gov.epa.emissions.framework.services.data;
 
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -33,12 +35,18 @@ public class DataCommonsDAO {
     private KeywordsDAO keywordsDAO;
 
     private DatasetTypesDAO datasetTypesDAO;
+    
+    private PollutantsDAO pollutantsDAO;
+    
+    private SourceGroupsDAO sourceGroupsDAO;
 
     public DataCommonsDAO() {
         sectorsDao = new SectorsDAO();
         hibernateFacade = new HibernateFacade();
         keywordsDAO = new KeywordsDAO();
         datasetTypesDAO = new DatasetTypesDAO();
+        pollutantsDAO = new PollutantsDAO();
+        sourceGroupsDAO = new SourceGroupsDAO();
     }
 
     public List getKeywords(Session session) {
@@ -96,7 +104,39 @@ public class DataCommonsDAO {
     public DatasetType releaseLockedDatasetType(DatasetType locked, Session session) {
         return datasetTypesDAO.releaseLocked(locked, session);
     }
+    
+    public List getPollutants(Session session) {
+        return pollutantsDAO.getAll(session);
+    }
+    
+    public Pollutant updatePollutant(Pollutant pollutant, Session session) throws EmfException {
+        return pollutantsDAO.update(pollutant, session);
+    }
+    
+    public Pollutant obtainLockedPollutant(User user, Pollutant pollutant, Session session) {
+        return pollutantsDAO.obtainLocked(user, pollutant, session);
+    }
 
+    public Pollutant releaseLockedPollutant(Pollutant locked, Session session)  {
+        return pollutantsDAO.releaseLocked(locked, session);
+    }
+
+    public List getSourceGroups(Session session) {
+        return sourceGroupsDAO.getAll(session);
+    }
+    
+    public SourceGroup updateSourceGroup(SourceGroup sourcegrp, Session session) throws EmfException {
+        return sourceGroupsDAO.update(sourcegrp, session);
+    }
+    
+    public SourceGroup obtainLockedSourceGroup(User user, SourceGroup sourcegrp, Session session) {
+        return sourceGroupsDAO.obtainLocked(user, sourcegrp, session);
+    }
+    
+    public SourceGroup releaseLockedSourceGroup(SourceGroup locked, Session session)  {
+        return sourceGroupsDAO.releaseLocked(locked, session);
+    }
+    
     public List getStatuses(String username, Session session) {
         removeReadStatus(username, session);
 
@@ -180,6 +220,14 @@ public class DataCommonsDAO {
 
     public void add(Note note, Session session) {
         addObject(note, session);
+    }
+
+    public void add(Pollutant pollutant, Session session) {
+        addObject(pollutant, session);
+    }
+    
+    public void add(SourceGroup sourcegrp, Session session) {
+        addObject(sourcegrp, session);
     }
 
     public List getRevisions(int datasetId, Session session) {

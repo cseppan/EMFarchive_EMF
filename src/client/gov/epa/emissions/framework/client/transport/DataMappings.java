@@ -6,11 +6,13 @@ import gov.epa.emissions.commons.data.ExternalSource;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.QAStepTemplate;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SectorCriteria;
+import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.db.Page;
 import gov.epa.emissions.commons.db.version.ChangeSet;
 import gov.epa.emissions.commons.db.version.Version;
@@ -27,6 +29,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.ControlStrategyResultsSummary;
+import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.data.IntendedUse;
@@ -79,6 +82,8 @@ public class DataMappings extends Mappings {
         bean(call, Note.class, note());
         bean(call, NoteType.class, notetype());
         bean(call, Revision.class, revision());
+        bean(call, Pollutant.class, pollutant());
+        bean(call, SourceGroup.class, sourceGroup());
 
         bean(call, QAStepTemplate.class, qaStepTemplate());
         bean(call, QAStep.class, qaStep());
@@ -91,6 +96,7 @@ public class DataMappings extends Mappings {
 
     private void controlBeans(Call call) {
         bean(call, ControlMeasure.class, controlMeasure());
+        bean(call, ControlTechnology.class, controlTechnology());
         bean(call, ControlStrategy.class, controlStrategy());
         bean(call, StrategyType.class, strategyType());
         bean(call, StrategyResult.class, strategyResult());
@@ -130,12 +136,15 @@ public class DataMappings extends Mappings {
         array(call, Note[].class, notes());
         array(call, NoteType[].class, notetypes());
         array(call, Revision[].class, revisions());
+        array(call, Pollutant[].class, pollutants());
+        array(call, SourceGroup[].class, sourceGroups());
         array(call, ColumnMetaData[].class, columnmetadatas());
 
         array(call, QAStepTemplate[].class, qaStepTemplates());
         array(call, QAStep[].class, qaSteps());
 
         array(call, ControlMeasure[].class, controlMeasures());
+        array(call, ControlTechnology[].class, controlTechnologies());
         array(call, ControlStrategy[].class, controlStrategies());
         array(call, StrategyType[].class, strategyTypes());
         array(call, StrategyResult[].class, strategyResults());
@@ -339,11 +348,11 @@ public class DataMappings extends Mappings {
         return qname("StrategyTypes");
     }
 
-    private QName efficiencyRecord() {
+    public QName efficiencyRecord() {
         return qname("EfficiencyRecord");
     }
 
-    private QName efficiencyRecords() {
+    public QName efficiencyRecords() {
         return qname("EfficiencyRecords");
     }
 
@@ -363,13 +372,36 @@ public class DataMappings extends Mappings {
         return qname("StrategyResults");
     }
     
-    private QName controlStrategyResultsSummary() {
+    public QName controlStrategyResultsSummary() {
         return qname("ControlStrategyResultsSummary");
     }
     
-    private QName strategyResultType() {
+    public QName strategyResultType() {
         return qname("StrategyResultType");
     }
 
+    public QName pollutant() {
+        return qname("Pollutant");
+    }
+    
+    public QName pollutants() {
+        return qname("Pollutants");
+    }
+    
+    public QName sourceGroup() {
+        return qname("SourceGroup");
+    }
 
+    public QName sourceGroups() {
+        return qname("SourceGroups");
+    }
+    
+    public QName controlTechnology() {
+        return qname("ControlTechnology");
+    }
+    
+    public QName controlTechnologies() {
+        return qname("ControlTechnologies");
+    }
+    
 }

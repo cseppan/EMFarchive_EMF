@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasureService;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 
 public class ControlMeasureServiceTransport implements ControlMeasureService {
 
@@ -91,6 +92,27 @@ public class ControlMeasureServiceTransport implements ControlMeasureService {
         Scc[] sccs = (Scc[]) call.requestResponse(new Object[] { measure });
         
         return sccs;
+    }
+
+    public ControlTechnology[] getControlTechnologies() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getControlTechnologies");
+        call.setReturnType(mappings.controlTechnologies());
+
+        ControlTechnology[] technologies = (ControlTechnology[]) call.requestResponse(new Object[] {});
+        
+        return technologies;
+    }
+
+    public void addControlTechnology(ControlTechnology technology) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("addControlTechnology");
+        call.addParam("technology", mappings.controlTechnology());
+        call.setVoidReturnType();
+        
+        call.request(new Object[] { technology });
     }
 
 }

@@ -13,13 +13,10 @@
         <property name="description" column="description" type="java.lang.String" not-null="false"/>
         <property name="abbreviation" column="abbreviation" type="java.lang.String" not-null="false"/>
         <property name="cmClass" column="cm_class" type="java.lang.String" not-null="false"/>
-        <property name="controlTechnology" column="control_technology" type="java.lang.String" not-null="false"/>
-        <property name="sourceGroup" column="source_group" type="java.lang.String" not-null="false"/>
         <property name="dataSouce" column="data_souce" type="java.lang.String" not-null="false"/>
         <property name="deviceCode" column="device_code" type="integer" not-null="false"/>
         <property name="costYear" column="cost_year" type="integer" not-null="false"/>
         <property name="equipmentLife" column="equipment_life" type="float" not-null="false"/>
-        <property name="majorPollutant" column="major_pollutant" type="java.lang.String" not-null="false"/>
         <property name="lockOwner" column="lock_owner" type="java.lang.String" not-null="false"/>
         <property name="lockDate" column="lock_date" type="java.util.Date" not-null="false" length="4"/>
         <property name="lastModifiedTime" column="last_modified_time" type="java.util.Date" not-null="false" length="4"/>
@@ -29,6 +26,21 @@
             name="creator" 
             class="gov.epa.emissions.commons.security.User"
             column="creator"/> 
+ 
+        <many-to-one cascade="save-update"
+            name="majorPollutant" 
+            class="gov.epa.emissions.commons.data.Pollutant"
+            column="major_pollutant"/> 
+            
+        <many-to-one cascade="save-update"
+            name="sourceGroup" 
+            class="gov.epa.emissions.commons.data.SourceGroup"
+            column="source_group"/> 
+            
+        <many-to-one cascade="save-update"
+            name="controlTechnology" 
+            class="gov.epa.emissions.framework.services.cost.data.ControlTechnology"
+            column="control_technology"/> 
             
        <array name="sccs" table="control_measure_sccs" >
     		<key column="control_measures_id" not-null="true"/>

@@ -3,7 +3,20 @@ insert into emf.strategy_types values(DEFAULT,'Max Emissions Reduction','Max Emi
 insert into emf.strategy_types values(DEFAULT,'Least Cost','Least Cost', '', 'gov.epa.emissions.framework.services.cost.analysis.leatcost.LeastCostStrategy');
 -- emf.strategy_types
 
-
 -- emf.strategy_result_types
 insert into emf.strategy_result_types values(DEFAULT,'Detailed Strategy Result');
 -- emf.strategy_result_types
+
+--emf.control_technologies
+insert into emf.control_technologies values (DEFAULT, 'Vacuum Sweeping', 'Vacuum Sweeping');
+insert into emf.control_technologies values (DEFAULT, 'Chemical Stabilization', 'Chemical Stabilization');
+insert into emf.control_technologies values (DEFAULT, 'Hot Asphalt Paving', 'Hot Asphalt Paving');
+insert into emf.control_technologies values (DEFAULT, 'Bale Stack/Propane Burning', 'Bale Stack/Propane Burning');
+insert into emf.control_technologies values (DEFAULT, 'Soil Conservation Plans', 'Soil Conservation Plans');
+insert into emf.control_technologies values (DEFAULT, 'Watering', 'Watering');
+insert into emf.control_technologies values (DEFAULT, 'Dust Control Plan', 'Dust Control Plan');
+insert into emf.control_technologies values (DEFAULT, 'Increase Fuel Moisture', 'Increase Fuel Moisture');
+insert into emf.control_technologies values (DEFAULT, 'NSPS Compliant Wood Stove', 'NSPS Compliant Wood Stove');
+insert into emf.control_technologies values (DEFAULT, 'Catalytic Oxidizer', 'Catalytic Oxidizer');
+insert into emf.control_technologies values (DEFAULT, 'ESP for Commercial Cooking', 'ESP for Commercial Cooking');
+--emf.control_technologies

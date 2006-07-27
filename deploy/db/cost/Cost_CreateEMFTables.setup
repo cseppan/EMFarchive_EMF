@@ -1,5 +1,17 @@
 -- -------------CoST Tables--------------
 
+-- emf control_technologies
+CREATE TABLE emf.control_technologies
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(128) UNIQUE NOT NULL,
+  description text,
+  lock_owner varchar(64),
+  lock_date timestamp
+) 
+WITHOUT OIDS;
+-- emf control_technologies
+
 -- emf.control_measures
 CREATE TABLE emf.control_measures
 (
@@ -10,9 +22,9 @@ CREATE TABLE emf.control_measures
   description text,
   device_code int4,
   equipment_life real,
-  major_pollutant varchar(128),
-  control_technology varchar(128),
-  source_group varchar(128),
+  major_pollutant int4 REFERENCES emf.pollutants(id),
+  control_technology int4 REFERENCES emf.control_technologies(id),
+  source_group int4 REFERENCES emf.source_groups(id),
   data_souce varchar(128),
   creator int4  REFERENCES emf.users(id),
   cost_year int4,
@@ -156,4 +168,5 @@ CREATE TABLE emf.control_measurs_sectors
 ) 
 WITHOUT OIDS;
 -- emf control_measurs_sectors
+
 --------------------------------------------------------------------------------

@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
+import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     private HibernateSessionFactory sessionFactory;
 
     private ControlMeasuresDAO dao;
+    
+    private ControlTechnologiesDAO controlTechnologiesDAO;
 
     public ControlMeasureServiceImpl() throws Exception {
         this(HibernateSessionFactory.get());
@@ -30,6 +33,7 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
     private void init(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         dao = new ControlMeasuresDAO();
+        controlTechnologiesDAO = new ControlTechnologiesDAO();
     }
 
     public ControlMeasure[] getMeasures() throws EmfException {
@@ -136,6 +140,48 @@ public class ControlMeasureServiceImpl implements ControlMeasureService {
             LOG.error("Could not get SCCs for ControlMeasure: " + measure.getName(), e);
             throw new EmfException("Could not get SCCs for ControlMeasure: " + measure.getName());
         }
+    }
+
+    public ControlTechnology[] getControlTechnologies() throws EmfException {
+        Session session = null;
+        try {
+            session = sessionFactory.getSession();
+            List all = controlTechnologiesDAO.getAll(session);
+
+            return (ControlTechnology[]) all.toArray(new ControlTechnology[0]);
+        } catch (RuntimeException e) {
+            LOG.error("could not retrieve control technologies.", e);
+            throw new EmfException("could not retrieve control technologies.");
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+
+    public void addControlTechnology(ControlTechnology technology) throws EmfException {
+        Session session = null;
+        try {
+            session = sessionFactory.getSession();
+            controlTechnologiesDAO.addControlTechnology(technology, session);
+        } catch (RuntimeException e) {
+            LOG.error("Could not add control technology: " + technology.getName(), e);
+            throw new EmfException("Could not add control technology: " + technology.getName());
+        } finally {
+            if (session != null)
+                session.close();
+        }
+    }
+    
+    public ControlTechnology updateControlTechnology(ControlTechnology technology, Session session) throws EmfException {
+        return controlTechnologiesDAO.update(technology, session);
+    }
+    
+    public ControlTechnology obtainLockedControlTechnology(User user, ControlTechnology technology, Session session) {
+        return controlTechnologiesDAO.obtainLocked(user, technology, session);
+    }
+
+    public ControlTechnology releaseLockedControlTechnology(ControlTechnology locked, Session session)  {
+        return controlTechnologiesDAO.releaseLocked(locked, session);
     }
 
 }

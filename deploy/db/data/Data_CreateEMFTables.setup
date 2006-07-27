@@ -323,4 +323,28 @@ CREATE TABLE emf.qa_steps
 ) 
 WITHOUT OIDS;
 -- emf.qa_steps
-
+--
+-- emf.pollutants
+CREATE TABLE emf.pollutants
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) UNIQUE NOT NULL,
+  description text,
+  lock_owner varchar(64),
+  lock_date timestamp
+) 
+WITHOUT OIDS;
+-- emf.pollutants
+--
+-- emf.source_groups
+CREATE TABLE emf.source_groups
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) UNIQUE NOT NULL,
+  description text,
+  lock_owner varchar(64),
+  lock_date timestamp
+) 
+WITHOUT OIDS;
+-- emf.source_groups
+--

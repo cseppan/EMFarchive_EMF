@@ -3,9 +3,11 @@ package gov.epa.emissions.framework.services.data;
 import gov.epa.emissions.commons.data.Country;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.Keyword;
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
 import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
@@ -407,6 +409,62 @@ public class DataCommonsServiceImpl implements DataCommonsService {
         } catch (RuntimeException e) {
             LOG.error("Could not add revision", e);
             throw new EmfException("Could not add revision");
+        }
+    }
+
+    public Pollutant[] getPollutants() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List pollutants = dao.getPollutants(session);
+            session.close();
+
+            return (Pollutant[]) pollutants.toArray(new Pollutant[pollutants.size()]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all pollutants", e);
+            throw new EmfException("Could not get all pollutants");
+        }
+    }
+
+    public void addPollutant(Pollutant pollutant) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+
+            if (dao.nameUsed(pollutant.getName(), Pollutant.class, session))
+                throw new EmfException("Pollutant name already in use");
+
+            dao.add(pollutant, session);
+            session.close();
+        } catch (RuntimeException e) {
+            LOG.error("Could not add new pollutant.", e);
+            throw new EmfException("Pollutant name already in use");
+        }
+    }
+
+    public SourceGroup[] getSourceGroups() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List sourcegrp = dao.getSourceGroups(session);
+            session.close();
+
+            return (SourceGroup[]) sourcegrp.toArray(new SourceGroup[sourcegrp.size()]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all source groups", e);
+            throw new EmfException("Could not get all source groups");
+        }
+    }
+
+    public void addSourceGroup(SourceGroup sourcegrp) throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+
+            if (dao.nameUsed(sourcegrp.getName(), SourceGroup.class, session))
+                throw new EmfException("Source group name already in use");
+
+            dao.add(sourcegrp, session);
+            session.close();
+        } catch (RuntimeException e) {
+            LOG.error("Could not add new source group.", e);
+            throw new EmfException("Source group name already in use");
         }
     }
 

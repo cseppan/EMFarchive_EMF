@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost;
 
 import java.util.Date;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.security.User;
 import junit.framework.TestCase;
 
@@ -19,7 +20,7 @@ public class ControlMeasureTest extends TestCase {
         cm.setId(1);
         cm.setLockDate(date);
         cm.setLockOwner(user.getName());
-        cm.setMajorPollutant("CO");
+        cm.setMajorPollutant(new Pollutant("CO", "CO"));
 
         assertEquals("cm one modified", cm.getName());
         assertEquals(new Float(1000), new Float(cm.getAnnualizedCost()));
@@ -30,7 +31,7 @@ public class ControlMeasureTest extends TestCase {
         assertEquals(new Integer(1), new Integer(cm.getId()));
         assertEquals(date, cm.getLockDate());
         assertEquals(user.getName(), cm.getLockOwner());
-        assertEquals("CO", cm.getMajorPollutant());
+        assertEquals("CO", cm.getMajorPollutant().getName());
     }
 
 }
