@@ -271,6 +271,11 @@ public class EditQAStepWindow extends DisposableInteralFrame implements EditQASt
     }
 
     public void doEdit() {
+        if(order.getText().equals("")) {
+            messagePanel.setError("Order should be a floating point number");
+            return;
+        }
+        
         step.setProgram((String) program.getSelectedItem());
         step.setProgramArguments(programArguments.getText());
         step.setOrder(Float.parseFloat(order.getText()));
