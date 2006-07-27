@@ -9,7 +9,6 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
-import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -22,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
+//import javax.swing.JButton;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -42,32 +42,28 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     protected EditableComboBox majorPollutant;
 
+    protected EditableComboBox sourceGroup;
+    
+    protected EditableComboBox controlTechnology;
+    
     protected TextField deviceCode;
 
-    protected TextField ruleEffectiveness;
-
-    protected TextField rulePenetration;
-
+    protected TextField dateReviewed;
+    
     protected TextField equipmentLife;
 
     protected TextField costYear;
 
     protected TextField abbreviation;
 
-    protected TextField minUncontrolledEmission;
-
-    protected TextField maxUncontrolledEmission;
-
     protected JLabel lastModifiedTime;
-
-    protected ComboBox region;
 
     protected ComboBox cmClass;
 
     protected ListWidget sectors;
 
-    protected ListWidget controlPrograms;
-
+    protected ListWidget dataSources;
+    
     protected MessagePanel messagePanel;
 
     private ManageChangeables changeablesList;
@@ -116,15 +112,15 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         name.setEditable(false);
         description.setEditable(false);
         majorPollutant.setEnabled(false);
+        controlTechnology.setEnabled(false);
+        sourceGroup.setEnabled(false);
         costYear.setEditable(false);
         deviceCode.setEditable(false);
+        dateReviewed.setEditable(false);
         equipmentLife.setEditable(false);
-        ruleEffectiveness.setEditable(false);
-        rulePenetration.setEditable(false);
-        region.setEnabled(false);
         cmClass.setEnabled(false);
         sectors.setEnabled(false);
-        controlPrograms.setEnabled(false);
+        dataSources.setEnabled(false);
     }
 
     private String getText(String value) {
@@ -156,6 +152,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         ScrollableComponent descPane = new ScrollableComponent(description);
         descPane.setPreferredSize(new Dimension(300, 50));
         layoutGenerator.addLabelWidgetPair("Description:", descPane, panel);
+        
+        
 
         widgetLayout(2, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
@@ -165,16 +163,14 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     private JPanel createRightOverview() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-
+               
         abbreviation = new TextField("Abbreviation", 12);
         changeablesList.addChangeable(abbreviation);
         layoutGenerator.addLabelWidgetPair("Abbreviation:", abbreviation, panel);
 
-        cmClass = new ComboBox("Choose a class", classes);
-        cmClass.setPreferredSize(new Dimension(135, 20));
-        changeablesList.addChangeable(cmClass);
-        layoutGenerator.addLabelWidgetPair("Class:", cmClass, panel);
-
+        creator = new JLabel(session.user().getName());
+        layoutGenerator.addLabelWidgetPair("Creator:", creator, panel);
+        
         lastModifiedTime = new JLabel("");
         layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
 
@@ -199,38 +195,31 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        creator = new JLabel(session.user().getName());
-        layoutGenerator.addLabelWidgetPair("Creator:", creator, panel);
-
         majorPollutant = new EditableComboBox(pollutants);
         majorPollutant.setSelectedIndex(0);
         changeablesList.addChangeable(majorPollutant);
-        layoutGenerator.addLabelWidgetPair("Major pollutant:", majorPollutant, panel);
+        layoutGenerator.addLabelWidgetPair("Major Pollutant:", majorPollutant, panel);
+    
+        controlTechnology = new EditableComboBox(pollutants);
+        controlTechnology.setSelectedIndex(0);
+        changeablesList.addChangeable(controlTechnology);
+        layoutGenerator.addLabelWidgetPair("Control Technology:", controlTechnology, panel);
+ 
+        deviceCode = new TextField("NEI Device code", 15);
+        changeablesList.addChangeable(deviceCode);
+        layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
         
-        try {
-            region = new ComboBox("Choose a region", session.dataCommonsService().getRegions());
-        } catch (EmfException e) {
-            messagePanel.setError(e.getMessage());
-        }
-        region.setPreferredSize(new Dimension(168, 20));
-        changeablesList.addChangeable(region);
-        layoutGenerator.addLabelWidgetPair("Region:", region, panel);
+        dateReviewed = new TextField("Date Reviewed", 15);
+        changeablesList.addChangeable(dateReviewed);
+        layoutGenerator.addLabelWidgetPair("Date Reviewed:", dateReviewed, panel);
         
-        ruleEffectiveness = new TextField("Rule Effectiveness (%)", 15);
-        changeablesList.addChangeable(ruleEffectiveness);
-        layoutGenerator.addLabelWidgetPair("Rule Effectiveness (%):", ruleEffectiveness, panel);
-
-        rulePenetration = new TextField("Rule Penetration (%)", 15);
-        changeablesList.addChangeable(rulePenetration);
-        layoutGenerator.addLabelWidgetPair("Rule Penetration (%):", rulePenetration, panel);
-
-        sectors = new ListWidget(new String[] { "               " }, new String[] { "" });
-        JScrollPane listScroller = new JScrollPane(sectors);
+        dataSources = new ListWidget(new String[] { "               " }, new String[] { "" });
+        JScrollPane listScroller = new JScrollPane(dataSources);
         listScroller.setPreferredSize(new Dimension(170, 60));
-        layoutGenerator.addLabelWidgetPair("Sectors:", listScroller, panel);
-
+        layoutGenerator.addLabelWidgetPair("Data Sources:", listScroller, panel);
+      
         layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
-        widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(6, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -241,31 +230,29 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
 //        costYear = new TextField("Cost year", 15);
 //        changeablesList.addChangeable(costYear);
-        layoutGenerator.addLabelWidgetPair(" ", new JLabel(" "), panel); // to hold the place
+//        layoutGenerator.addLabelWidgetPair(" ", new JLabel(" "), panel); // to hold the place
 
-        minUncontrolledEmission = new TextField("Min Uncntrld. Emissions (T/yr)", 15);
-        changeablesList.addChangeable(minUncontrolledEmission);
-        layoutGenerator.addLabelWidgetPair("Min Uncntrld. Emissions (T/yr):", minUncontrolledEmission, panel);
-
-        maxUncontrolledEmission = new TextField("Max Uncntrld. Emissions (T/yr)", 15);
-        changeablesList.addChangeable(maxUncontrolledEmission);
-        layoutGenerator.addLabelWidgetPair("Max Uncntrld. Emissions (T/yr):", maxUncontrolledEmission, panel);
-
+        cmClass = new ComboBox("Choose a class", classes);
+        cmClass.setPreferredSize(new Dimension(168, 20));
+        changeablesList.addChangeable(cmClass);
+        layoutGenerator.addLabelWidgetPair("Class:", cmClass, panel);
+                
+        sourceGroup = new EditableComboBox(pollutants);
+        sourceGroup.setSelectedIndex(0);
+        changeablesList.addChangeable(sourceGroup);
+        layoutGenerator.addLabelWidgetPair("Source Group:", sourceGroup, panel);
+        
         equipmentLife = new TextField("Equipment life", 15);
         changeablesList.addChangeable(equipmentLife);
-        layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);
-
-        deviceCode = new TextField("NEI Device code", 15);
-        changeablesList.addChangeable(deviceCode);
-        layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
-        
-        controlPrograms = new ListWidget(new String[] { "               " }, new String[] { "" });
-        JScrollPane listScroller = new JScrollPane(controlPrograms);
+        layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);     
+      
+        sectors = new ListWidget(new String[] { "               " }, new String[] { "" });
+        JScrollPane listScroller = new JScrollPane(sectors);
         listScroller.setPreferredSize(new Dimension(170, 60));
-        layoutGenerator.addLabelWidgetPair("Control programs:", listScroller, panel);
+        layoutGenerator.addLabelWidgetPair("Sectors:", listScroller, panel);
 
         layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
-        widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(5, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }

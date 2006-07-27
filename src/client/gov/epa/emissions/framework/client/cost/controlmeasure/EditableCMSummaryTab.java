@@ -21,11 +21,6 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
         this.verifier = new NumberFieldVerifier("Summary tab: ");
     }
     
-    public void populateDefaultValues() {
-        ruleEffectiveness.setText("100.0");
-        rulePenetration.setText("100.0");
-    }
-    
     public void populateValues() {
         super.populateFields();
     }
@@ -54,19 +49,7 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
 
         //year = verifier.parseInteger(costYear);
         if (deviceCode.getText().length() > 0) deviceId = verifier.parseInteger(deviceCode);
-        effectivness = verifier.parseFloat(ruleEffectiveness);
-        if (minUncontrolledEmission.getText().length() > 0) minUnctrldEmiss = verifier.parseFloat(minUncontrolledEmission);
-        if (maxUncontrolledEmission.getText().length() > 0) maxUnctrldEmiss = verifier.parseFloat(maxUncontrolledEmission);
         if (equipmentLife.getText().length() > 0) life = verifier.parseFloat(equipmentLife);
-        penetration = verifier.parseFloat(rulePenetration);
-        if ((effectivness < 0) || (effectivness > 100))
-        {
-            throw new EmfException("Rule Effectiveness must be between 0 and 100");
-        }
-        if ((penetration < 0) || (penetration > 100))
-        {
-            throw new EmfException("Rule Penetration must be between 0 and 100");
-        }
         if (abbreviation.getText().length() < 1)
         {
             throw new EmfException("An abbreviation must be specified");            
