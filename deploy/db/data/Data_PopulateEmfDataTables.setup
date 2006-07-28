@@ -40,15 +40,15 @@ insert into emf.pollutants values (DEFAULT, 'Hg', 'Hg');
 --emf.pollutants
 
 --emf.source_groups
-insert into emf.emf.source_groups values (DEFAULT, 'Paved Road', 'Paved Road');
-insert into emf.emf.source_groups values (DEFAULT, 'Unpaved Road', 'Unpaved Road');
-insert into emf.emf.source_groups values (DEFAULT, 'Agricultural Burning', 'Agricultural Burning');
-insert into emf.emf.source_groups values (DEFAULT, 'Agricultural Tilling', 'Agricultural Tilling');
-insert into emf.emf.source_groups values (DEFAULT, 'Beef Cattle Feedlots', 'Beef Cattle Feedlots');
-insert into emf.emf.source_groups values (DEFAULT, 'Construction Activities', 'Construction Activities');
-insert into emf.emf.source_groups values (DEFAULT, 'Prescribed Burning', 'Prescribed Burning');
-insert into emf.emf.source_groups values (DEFAULT, 'Residential Wood Combustion', 'Residential Wood Combustion');
-insert into emf.emf.source_groups values (DEFAULT, 'Conveyorized Charbroilers', 'Conveyorized Charbroilers');
+insert into emf.source_groups values (DEFAULT, 'Paved Road', 'Paved Road');
+insert into emf.source_groups values (DEFAULT, 'Unpaved Road', 'Unpaved Road');
+insert into emf.source_groups values (DEFAULT, 'Agricultural Burning', 'Agricultural Burning');
+insert into emf.source_groups values (DEFAULT, 'Agricultural Tilling', 'Agricultural Tilling');
+insert into emf.source_groups values (DEFAULT, 'Beef Cattle Feedlots', 'Beef Cattle Feedlots');
+insert into emf.source_groups values (DEFAULT, 'Construction Activities', 'Construction Activities');
+insert into emf.source_groups values (DEFAULT, 'Prescribed Burning', 'Prescribed Burning');
+insert into emf.source_groups values (DEFAULT, 'Residential Wood Combustion', 'Residential Wood Combustion');
+insert into emf.source_groups values (DEFAULT, 'Conveyorized Charbroilers', 'Conveyorized Charbroilers');
 --emf.source_groups
 
 --emf.properties
