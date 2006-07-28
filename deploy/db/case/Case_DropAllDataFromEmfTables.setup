@@ -1,13 +1,13 @@
 ------------------------------ Case Management tables ----------------------------
 
-DELETE FROM emf.cases;
-DELETE FROM emf.emissions_years;
-DELETE FROM emf.meteorlogical_years;
-DELETE FROM emf.speciations;
-DELETE FROM emf.grids;
-DELETE FROM emf.air_quality_models;
-DELETE FROM emf.case_categories;
-DELETE FROM emf.case_abbreviations;
+DELETE FROM cases.cases;
+DELETE FROM cases.emissions_years;
+DELETE FROM cases.meteorlogical_years;
+DELETE FROM cases.speciations;
+DELETE FROM cases.grids;
+DELETE FROM cases.air_quality_models;
+DELETE FROM cases.case_categories;
+DELETE FROM cases.case_abbreviations;
 
 
 

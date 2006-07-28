@@ -2,91 +2,91 @@
 --  CASE MANAGEMENT
 -------------------------------------------------------------------------------
 
--- emf.case_abbreviations
-CREATE TABLE emf.case_abbreviations
+-- cases.case_abbreviations
+CREATE TABLE cases.case_abbreviations
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE
 ) 
 WITHOUT OIDS;
--- emf.case_abbreviations
+-- cases.case_abbreviations
 
--- emf.case_categories
-CREATE TABLE emf.case_categories
+-- cases.case_categories
+CREATE TABLE cases.case_categories
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE
 ) 
 WITHOUT OIDS;
--- emf.case_categories
+-- cases.case_categories
 
--- emf.air_quality_models
-CREATE TABLE emf.air_quality_models
+-- cases.air_quality_models
+CREATE TABLE cases.air_quality_models
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE
 ) 
 WITHOUT OIDS;
--- emf.air_quality_models
+-- cases.air_quality_models
 
--- emf.grids
-CREATE TABLE emf.grids
+-- cases.grids
+CREATE TABLE cases.grids
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE
 ) 
 WITHOUT OIDS;
--- emf.grids
+-- cases.grids
 
--- emf.speciations
-CREATE TABLE emf.speciations
+-- cases.speciations
+CREATE TABLE cases.speciations
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE
 ) 
 WITHOUT OIDS;
--- emf.speciations
+-- cases.speciations
 
--- emf.meteorlogical_years
-CREATE TABLE emf.meteorlogical_years
+-- cases.meteorlogical_years
+CREATE TABLE cases.meteorlogical_years
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE
 ) 
 WITHOUT OIDS;
--- emf.meteorlogical_years
+-- cases.meteorlogical_years
 
--- emf.emissions_years
-CREATE TABLE emf.emissions_years
+-- cases.emissions_years
+CREATE TABLE cases.emissions_years
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE
 ) 
 WITHOUT OIDS;
--- emf.emissions_years
+-- cases.emissions_years
 
--- emf.cases
-CREATE TABLE emf.cases
+-- cases.cases
+CREATE TABLE cases.cases
 (
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL UNIQUE,
-  abbreviation_id int4 REFERENCES emf.case_abbreviations(id),
+  abbreviation_id int4 REFERENCES cases.case_abbreviations(id),
   description text,
   creator_id int4  REFERENCES emf.users(id),
-  air_quality_model_id int4  REFERENCES emf.air_quality_models(id),
-  category_id int4  REFERENCES emf.case_categories(id),
+  air_quality_model_id int4  REFERENCES cases.air_quality_models(id),
+  category_id int4  REFERENCES cases.case_categories(id),
   project_id int4  REFERENCES emf.projects(id),
   region_id int4  REFERENCES emf.regions(id),
   run_status varchar(255),
-  grid_id int4 REFERENCES emf.grids(id),
-  speciation_id int4 REFERENCES emf.speciations(id),
-  meteorlogical_year_id int4 REFERENCES emf.meteorlogical_years(id),
-  emissions_year_id int4 REFERENCES emf.emissions_years(id),
+  grid_id int4 REFERENCES cases.grids(id),
+  speciation_id int4 REFERENCES cases.speciations(id),
+  meteorlogical_year_id int4 REFERENCES cases.meteorlogical_years(id),
+  emissions_year_id int4 REFERENCES cases.emissions_years(id),
   last_modified_date timestamp,
   copied_from varchar(255),
   lock_owner varchar(255),
   lock_date timestamp
 ) 
 WITHOUT OIDS;
--- emf.cases
+-- cases.cases
 
