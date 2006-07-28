@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
@@ -9,6 +10,7 @@ import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.ui.ListWidget;
 import gov.epa.emissions.framework.ui.MessagePanel;
@@ -30,7 +32,7 @@ import javax.swing.SpringLayout;
 
 public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTabView {
 
-    private ControlMeasure measure;
+    protected ControlMeasure measure;
 
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat(EmfDateFormat.format());
 
@@ -70,14 +72,13 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     protected EmfSession session;
 
-    private String[] pollutants = { "NOx                                      ", "PM10", "PM2.5", "SO2", "VOC", "CO",
-            "CO2", "EC", "OC", "NH3", "Hg" };
-
     private String[] classes = { "Production", "Developmental", "Hypothetical", "Obselete" };
 
     protected int deviceId, year;
 
     protected float cost, life, effectivness, penetration, minUnctrldEmiss, maxUnctrldEmiss;
+
+    protected Pollutant[] allPollutants;
 
     public ControlMeasureSummaryTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel,
             ManageChangeables changeablesList) {
@@ -98,7 +99,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         name.setText(getText(cmName));
         description.setText(getText(measure.getDescription()));
         creator.setText(getText(measure.getCreator().getName()));
-        majorPollutant.setSelectedItem(getText(measure.getMajorPollutant().getName()));
+        majorPollutant.setSelectedItem(measure.getMajorPollutant());
         cmClass.setSelectedItem(getText(measure.getCmClass()));
         //costYear.setText(measure.getCostYear() + "");
         deviceCode.setText(measure.getDeviceCode() + "");
@@ -195,13 +196,22 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        majorPollutant = new EditableComboBox(pollutants);
-        majorPollutant.setSelectedIndex(0);
+        try {
+            allPollutants = session.dataCommonsService().getPollutants();
+            majorPollutant = new EditableComboBox(allPollutants);
+        } catch (EmfException e1) {
+            messagePanel.setError("Could not retrieve Pollutants");
+        }
+        //majorPollutant.setSelectedIndex(0);
         changeablesList.addChangeable(majorPollutant);
-        layoutGenerator.addLabelWidgetPair("Major Pollutant:", majorPollutant, panel);
+        layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutant, panel);
     
-        controlTechnology = new EditableComboBox(pollutants);
-        controlTechnology.setSelectedIndex(0);
+        try {
+            controlTechnology = new EditableComboBox(session.costService().getControlTechnologies());
+        } catch (EmfException e) {
+            messagePanel.setError("Could not retrieve Control Technology");
+        }
+        //controlTechnology.setSelectedIndex(0);
         changeablesList.addChangeable(controlTechnology);
         layoutGenerator.addLabelWidgetPair("Control Technology:", controlTechnology, panel);
  
@@ -237,8 +247,12 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         changeablesList.addChangeable(cmClass);
         layoutGenerator.addLabelWidgetPair("Class:", cmClass, panel);
                 
-        sourceGroup = new EditableComboBox(pollutants);
-        sourceGroup.setSelectedIndex(0);
+        try {
+            sourceGroup = new EditableComboBox(session.dataCommonsService().getSourceGroups());
+        } catch (EmfException e) {
+            messagePanel.setError("Could not retrieve Source Groups");
+        }
+        //sourceGroup.setSelectedIndex(0);
         changeablesList.addChangeable(sourceGroup);
         layoutGenerator.addLabelWidgetPair("Source Group:", sourceGroup, panel);
         

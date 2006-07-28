@@ -7,6 +7,7 @@ import gov.epa.emissions.commons.security.User;
 import junit.framework.TestCase;
 
 public class ControlMeasureTest extends TestCase {
+    
     public void testShouldSetAndGetAttributesCorrectly() {
         Date date = new Date();
         User user = new User("test user", "xxx", "xxx", "xxx@xxx.com", "xxx", "xxxxx1234", true, true);
@@ -20,7 +21,7 @@ public class ControlMeasureTest extends TestCase {
         cm.setId(1);
         cm.setLockDate(date);
         cm.setLockOwner(user.getName());
-        cm.setMajorPollutant(new Pollutant("CO", "CO"));
+        cm.setMajorPollutant(new Pollutant("CO"));
 
         assertEquals("cm one modified", cm.getName());
         assertEquals(new Float(1000), new Float(cm.getAnnualizedCost()));

@@ -1,7 +1,10 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.commons.data.Sector;
+import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 import gov.epa.emissions.framework.ui.AbstractTableData;
 import gov.epa.emissions.framework.ui.Row;
@@ -10,6 +13,7 @@ import gov.epa.emissions.framework.ui.ViewableRow;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,7 +30,7 @@ public class ControlMeasureTableData extends AbstractTableData {
     public String[] columns() {
         return new String[] { "Name", "Creator", "Abbreviation", "Control Eff.", "Cost per Ton", "Rule Eff.",
                 "Rule Pen.", "Major Poll.", "Description", "Equipment Life", "Class", "Last Modified Time",
-                "NEI Device Code" };
+                "NEI Device Code", "Control Technology", "Source Group", "Date Reviewed", "Sectors", "Data Source"};
     }
 
     public List rows() {
@@ -42,13 +46,50 @@ public class ControlMeasureTableData extends AbstractTableData {
                     getControlEfficiency(measure), getCostPerTon(measure), new Float(0),
                     new Float(0), measure.getMajorPollutant(), measure.getDescription(),
                     new Float(measure.getEquipmentLife()), measure.getCmClass(),
-                    getLastModifiedTime(measure), new Integer(measure.getDeviceCode()) };
+                    getLastModifiedTime(measure), new Integer(measure.getDeviceCode()),
+                    getControlTechnology(measure), getSourceGroup(measure),
+                    getDateReviewed(measure), getSectors(measure), measure.getDataSouce()};
 
             Row row = new ViewableRow(measure, values);
             rows.add(row);
         }
 
         return rows;
+    }
+
+    private String getSectors(ControlMeasure measure) {
+        Sector[] sectors = measure.getSectors();
+        if (sectors.length == 0)
+            return null;
+        
+        
+        return sectors[0].getName() + "...";
+    }
+
+    private Object getDateReviewed(ControlMeasure measure) {
+        Date datereviewed = measure.getDateReviewed();
+        if (datereviewed == null)
+        return null;
+        
+        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
+
+        return dateFormat.format(datereviewed);
+    }
+
+    private Object getSourceGroup(ControlMeasure measure) {
+        SourceGroup sourcegroup = measure.getSourceGroup();
+        if (sourcegroup == null)
+        return null;
+        
+        return sourcegroup.getName();
+    }
+
+    private String getControlTechnology(ControlMeasure measure) {
+        ControlTechnology technology = measure.getControlTechnology();
+        if (technology == null)
+            return null;
+        
+        return technology.getName();
     }
 
     private Float getCostPerTon(ControlMeasure measure) {

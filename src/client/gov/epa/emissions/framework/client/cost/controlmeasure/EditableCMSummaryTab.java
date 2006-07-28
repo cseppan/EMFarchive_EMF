@@ -1,13 +1,19 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.data.Pollutant;
+import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.data.EmfDateFormat;
+import gov.epa.emissions.framework.client.data.Pollutants;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
+import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
 import gov.epa.emissions.framework.ui.MessagePanel;
 import gov.epa.emissions.framework.ui.NumberFieldVerifier;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements EditableCMTabView{
@@ -27,19 +33,44 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
 
     public void save(ControlMeasure measure) throws EmfException {
         validateFields();
-
+        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
+        
         measure.setName(name.getText());
         measure.setDescription(description.getText());
         measure.setCreator(session.user());
         if (deviceCode.getText().length() > 0) measure.setDeviceCode(deviceId);
         if (equipmentLife.getText().length() > 0) measure.setEquipmentLife(life);
-        measure.setMajorPollutant((Pollutant)majorPollutant.getSelectedItem());
+        updatePollutant();
+        measure.setControlTechnology((ControlTechnology)controlTechnology.getSelectedItem());
+        measure.setSourceGroup((SourceGroup)sourceGroup.getSelectedItem());
+        try {
+            measure.setDateReviewed(dateFormat.parse(dateReviewed.getText()));
+        } catch (Exception e) {
+            throw new EmfException("Correct Date Format MM/dd/yyyy HH:mm");
+        }
         measure.setCmClass(cmClass.getSelectedItem() + "");
         measure.setLastModifiedTime(new Date());
         measure.setAbbreviation(abbreviation.getText());
         //measure.setCostYear(year);
     }
 
+    private void updatePollutant() {
+        Object selected = majorPollutant.getSelectedItem();
+        if (selected instanceof String) {
+            String pollutantName = (String) selected;
+            if (pollutantName.length() > 0) {
+                Pollutant pollutant = pollutant(pollutantName);// checking for duplicates
+                measure.setMajorPollutant(pollutant);
+            }
+        } else if (selected instanceof Pollutant) {
+            measure.setMajorPollutant((Pollutant) selected);
+        }
+    }
+
+    private Pollutant pollutant(String name) {
+        return new Pollutants(allPollutants).get(name);
+    }
+    
     private void validateFields() throws EmfException {
         messagePanel.clear();
 

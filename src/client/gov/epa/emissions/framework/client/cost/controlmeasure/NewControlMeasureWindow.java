@@ -155,6 +155,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
             presenter.doSave();
             resetChanges();
         } catch (EmfException e) {
+            e.printStackTrace();
             showError(e.getMessage());
         }
     }
