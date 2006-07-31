@@ -25,7 +25,9 @@ public class Pollutants {
             if (item.getName().equalsIgnoreCase(name))
                 return item;
         }
-        return new Pollutant(name);
+        Pollutant p = new Pollutant();
+        p.setName(name);
+        return p;
     }
 
     public String[] names() {

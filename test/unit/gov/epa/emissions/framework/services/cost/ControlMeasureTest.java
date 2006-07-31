@@ -21,7 +21,9 @@ public class ControlMeasureTest extends TestCase {
         cm.setId(1);
         cm.setLockDate(date);
         cm.setLockOwner(user.getName());
-        cm.setMajorPollutant(new Pollutant("CO"));
+        Pollutant p = new Pollutant();
+        p.setName("CO");
+        cm.setMajorPollutant(p);
 
         assertEquals("cm one modified", cm.getName());
         assertEquals(new Float(1000), new Float(cm.getAnnualizedCost()));
