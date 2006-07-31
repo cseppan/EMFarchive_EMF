@@ -25,32 +25,6 @@ insert into emf.sectors values (DEFAULT, 'On Road','On Road');
 insert into emf.sectors values (DEFAULT, 'Biogenic','Biogenic');
 --emf.sectors
 
---emf.pollutants
-insert into emf.pollutants values (DEFAULT, 'NOx', 'NOx');
-insert into emf.pollutants values (DEFAULT, 'PM10', 'PM10');
-insert into emf.pollutants values (DEFAULT, 'PM2.5', 'PM2.5');
-insert into emf.pollutants values (DEFAULT, 'SO2', 'SO2');
-insert into emf.pollutants values (DEFAULT, 'VOC', 'VOC');
-insert into emf.pollutants values (DEFAULT, 'CO', 'CO');
-insert into emf.pollutants values (DEFAULT, 'CO2', 'CO2');
-insert into emf.pollutants values (DEFAULT, 'EC', 'EC');
-insert into emf.pollutants values (DEFAULT, 'OC', 'OC');
-insert into emf.pollutants values (DEFAULT, 'NH3', 'NH3');
-insert into emf.pollutants values (DEFAULT, 'Hg', 'Hg');
---emf.pollutants
-
---emf.source_groups
-insert into emf.source_groups values (DEFAULT, 'Paved Road', 'Paved Road');
-insert into emf.source_groups values (DEFAULT, 'Unpaved Road', 'Unpaved Road');
-insert into emf.source_groups values (DEFAULT, 'Agricultural Burning', 'Agricultural Burning');
-insert into emf.source_groups values (DEFAULT, 'Agricultural Tilling', 'Agricultural Tilling');
-insert into emf.source_groups values (DEFAULT, 'Beef Cattle Feedlots', 'Beef Cattle Feedlots');
-insert into emf.source_groups values (DEFAULT, 'Construction Activities', 'Construction Activities');
-insert into emf.source_groups values (DEFAULT, 'Prescribed Burning', 'Prescribed Burning');
-insert into emf.source_groups values (DEFAULT, 'Residential Wood Combustion', 'Residential Wood Combustion');
-insert into emf.source_groups values (DEFAULT, 'Conveyorized Charbroilers', 'Conveyorized Charbroilers');
---emf.source_groups
-
 --emf.properties
 insert into emf.properties values(DEFAULT, 'lock.time-interval', '3600000');
 insert into emf.properties values(DEFAULT, 'page-size', '100');
