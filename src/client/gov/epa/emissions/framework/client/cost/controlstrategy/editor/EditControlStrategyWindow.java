@@ -93,9 +93,6 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
         tabbedPane.addTab("Summary", createSummaryTab(controlStrategy));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         // These are just added to illustrate what is coming later
-        tabbedPane.addTab("Pollutants", new JPanel());
-        tabbedPane.addTab("SCCs", new JPanel());
-        tabbedPane.addTab("Counties", new JPanel());
         tabbedPane.addTab("Filters", new JPanel());
         tabbedPane.addTab("Outputs", outputPanel());
 
