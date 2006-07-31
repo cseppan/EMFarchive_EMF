@@ -22,14 +22,10 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     private ControlStrategy controlStrategy;
 
     private List presenters;
-    
+
     private EditControlStrategySummaryTabView summaryTabView;
-    
+
     private EditControlStrategySummaryTabPresenter summaryTabPresenter;
-    
-    //private SummaryMonitor monitor;
-    
-    //private TaskRunner runner;
 
     public EditControlStrategyPresenterImpl(ControlStrategy controlStrategy, EmfSession session,
             EditControlStrategyView view, ControlStrategiesManagerPresenter controlStrategiesManagerPresenter) {
@@ -38,7 +34,6 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
         this.view = view;
         this.managerPresenter = controlStrategiesManagerPresenter;
         this.presenters = new ArrayList();
-        //this.runner = new ConcurrentTaskRunner();
     }
 
     public void doDisplay() throws EmfException {
@@ -66,10 +61,10 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     public void doSave() throws EmfException {
         saveTabs();
         validateName(controlStrategy);
-        
+
         controlStrategy.setCreator(session.user());
         controlStrategy.setLastModifiedDate(new Date());
-        
+
         service().updateControlStrategyWithLock(controlStrategy);
         managerPresenter.doRefresh();
     }
@@ -109,20 +104,19 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
 
     public void set(EditControlStrategySummaryTabView view) {
         this.summaryTabView = view;
-        this.summaryTabPresenter = new EditControlStrategySummaryTabPresenterImpl(controlStrategy,view);
+        this.summaryTabPresenter = new EditControlStrategySummaryTabPresenterImpl(controlStrategy, view);
         presenters.add(summaryTabPresenter);
         summaryTabPresenter.doRefresh();
-        //this.monitor = new SummaryMonitor();
     }
-    
+
     public void set(EditControlStrategyOutputTabView view) {
-        EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(session,view);
+        EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(session, view);
         presenter.doDisplay();
         presenters.add(presenter);
     }
-    
+
     public void set(EditControlStrategyTabView view) {
-        EditControlStrategyTabPresenter presenter = new EditControlStrategyTabPresenterImpl(controlStrategy,view);
+        EditControlStrategyTabPresenter presenter = new EditControlStrategyTabPresenterImpl(controlStrategy, view);
         presenters.add(presenter);
     }
 
@@ -131,21 +125,12 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
     }
 
     public void stopRun() throws EmfException {
-        //runner.stop();
         service().stopRunStrategy();
         summaryTabView.stopRun();
     }
 
     public void runStrategy() throws EmfException {
         service().runStrategy(session.user(), controlStrategy);
-        //runner.start(monitor);
     }
-    
-    public class SummaryMonitor implements Runnable {
-        public void run() {
-            summaryTabPresenter.doRefresh();
-        }
-    }
-
 
 }

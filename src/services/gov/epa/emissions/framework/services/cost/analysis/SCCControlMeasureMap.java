@@ -15,11 +15,13 @@ public class SCCControlMeasureMap {
     private Map map;
     
     private String pollutant;
+
+    private int costYear;
     
     public SCCControlMeasureMap(String[] sccs, ControlMeasure[] measures, String pollutant, int costYear) {
         this.map = new HashMap();
         this.pollutant = pollutant;
-        
+        this.costYear  = costYear;
         setMaps(sccs, measures);
     }
     
@@ -89,13 +91,13 @@ public class SCCControlMeasureMap {
     }
     
     private float getCostPerTon(ControlMeasure measure) {
-//        CostRecord[] records = measure.getCostRecords();
-//
-//        for (int i = 0; i < records.length; i++) {
-//            String pollutant = records[i].getPollutant();
-//            if (pollutant.equalsIgnoreCase(pollutant) && costYear == records[i].getCostYear())
-//                return records[i].getCostPerTon();
-//        }
+        EfficiencyRecord [] records = measure.getEfficiencyRecords();
+        
+        for (int i = 0; i < records.length; i++) {
+            String controlMeasurePollutant = records[i].getPollutant();
+            if (pollutant.equalsIgnoreCase(controlMeasurePollutant) && costYear == records[i].getCostYear())
+                return records[i].getCostPerTon();
+        }
 
         return 0; // assume cost per ton >= 0;
     }

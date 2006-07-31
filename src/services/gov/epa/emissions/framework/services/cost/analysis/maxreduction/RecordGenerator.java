@@ -23,25 +23,25 @@ public class RecordGenerator {
     private ControlMeasure maxRedMeasure;
 
     private float inventoryEmissions;
-    
+
     private float percentReduction;
 
     private float inventoryCE;
-    
+
     private float inventoryRE;
-    
+
     private float inventoryRP;
 
     private int resultDatasetId;
-    
+
     private String controlEfficiency;
-    
+
     private String comment;
 
     private float originalEmissions;
 
-    public RecordGenerator(int inputDatasetId, int resultDatasetId, ResultSet resultSet, ControlMeasure measure, ControlStrategy controlStrategy)
-            throws SQLException {
+    public RecordGenerator(int inputDatasetId, int resultDatasetId, ResultSet resultSet, ControlMeasure measure,
+            ControlStrategy controlStrategy) throws SQLException {
         this.inputDatasetId = inputDatasetId;
         this.resultDatasetId = resultDatasetId;
         this.controlStrategy = controlStrategy;
@@ -119,16 +119,17 @@ public class RecordGenerator {
     }
 
     private float getCostPerTon(ControlMeasure measure) {
-//        CostRecord[] records = measure.getCostRecords();
-//        String targetPollutant = controlStrategy.getTargetPollutant();
-//        int costYear = controlStrategy.getCostYear();
-//
-//        for (int i = 0; i < records.length; i++) {
-//            String pollutant = records[i].getPollutant();
-//
-//            if (pollutant.equalsIgnoreCase(targetPollutant) && costYear == records[i].getCostYear())
-//                return records[i].getCostPerTon();
-//        }
+        EfficiencyRecord[] records = measure.getEfficiencyRecords();
+
+        String targetPollutant = controlStrategy.getTargetPollutant();
+        int costYear = controlStrategy.getCostYear();
+
+        for (int i = 0; i < records.length; i++) {
+            String pollutant = records[i].getPollutant();
+
+            if (pollutant.equalsIgnoreCase(targetPollutant) && costYear == records[i].getCostYear())
+                return records[i].getCostPerTon();
+        }
 
         return 0; // assume cost per ton >= 0;
     }
@@ -140,7 +141,7 @@ public class RecordGenerator {
     public float getReducedEmissions() {
         float newEfficiency = getEfficiency(maxRedMeasure);
         this.controlEfficiency = "" + newEfficiency;
-        this.percentReduction = getPercentReduction(newEfficiency);
+        this.percentReduction = getPercentReduction();
 
         if (inventoryCE == 0) {
             return inventoryEmissions * percentReduction;
@@ -159,8 +160,17 @@ public class RecordGenerator {
         return 0;
     }
 
-    private float getPercentReduction(float newEfficiency) {
-//        return newEfficiency * maxRedMeasure.getRuleEffectiveness() * maxRedMeasure.getRulePenetration();
+    private float getPercentReduction() {
+        EfficiencyRecord[] records = maxRedMeasure.getEfficiencyRecords();
+        String targetPollutant = controlStrategy.getTargetPollutant();
+        for (int i = 0; i < records.length; i++) {
+            if (targetPollutant.equalsIgnoreCase(records[i].getPollutant()))
+                // FIXME: include cost year constraint && costYear==records[i].getCostYear()){
+                // FIXME: default values for the rule effectiveness and penetration is 0;
+                // return
+                // records[i].getRuleEffectiveness()*records[i].getRulePenetration()*records[i].getPercentReduction();
+                return records[i].getEfficiency();
+        }
         return 0;
     }
 
