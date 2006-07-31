@@ -42,7 +42,7 @@ public class NewControlMeasurePresenterImpl implements ControlMeasurePresenter {
     }
 
     public void doSave() throws EmfException {
-        save(measure, session.costService(), presenters, view);
+        save(measure, session.controlMeasureService(), presenters, view);
     }
 
     void save(ControlMeasure measure, ControlMeasureService service, List presenters, ControlMeasureView view)

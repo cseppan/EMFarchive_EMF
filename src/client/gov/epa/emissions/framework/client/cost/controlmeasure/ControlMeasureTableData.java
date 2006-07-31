@@ -73,7 +73,7 @@ public class ControlMeasureTableData extends AbstractTableData {
         if (datereviewed == null)
             return null;
 
-        DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
         return dateFormat.format(datereviewed);
     }

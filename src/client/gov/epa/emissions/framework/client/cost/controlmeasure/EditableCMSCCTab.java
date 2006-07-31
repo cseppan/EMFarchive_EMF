@@ -134,7 +134,7 @@ public class EditableCMSCCTab extends JPanel implements EditableCMTabView, CMSCC
     }
 
     private Scc[] createSccs(ControlMeasure measure) throws EmfException {
-        ControlMeasureService service = session.costService();
+        ControlMeasureService service = session.controlMeasureService();
         Scc[] sccs = service.getSccs(measure);
         
         return sccs;

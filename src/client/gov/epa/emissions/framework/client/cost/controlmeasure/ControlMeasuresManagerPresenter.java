@@ -29,7 +29,7 @@ public class ControlMeasuresManagerPresenter implements RefreshObserver {
     }
 
     public void doRefresh() throws EmfException {
-        view.refresh(session.costService().getMeasures());
+        view.refresh(session.controlMeasureService().getMeasures());
         view.clearMessage();
     }
 

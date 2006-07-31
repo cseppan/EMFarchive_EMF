@@ -21,7 +21,7 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
 
     private ControlMeasure measure;
 
-    private Mock costService;
+    private Mock controlMeasureService;
 
     private Mock session;
     
@@ -31,13 +31,13 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
         measure = new ControlMeasure();
         measure.setName("");
         view = mock(ControlMeasureView.class);
-        costService = mock(ControlMeasureService.class);
+        controlMeasureService = mock(ControlMeasureService.class);
         
         managerPresenter = mock(RefreshObserver.class);
         managerPresenter.stubs().method("doRefresh");
 
         session = mock(EmfSession.class);
-        session.stubs().method("costService").withNoArguments().will(returnValue(costService.proxy()));
+        session.stubs().method("controlMeasureService").withNoArguments().will(returnValue(controlMeasureService.proxy()));
 
         ControlMeasureView viewProxy = (ControlMeasureView) view.proxy();
         EmfSession sessionProxy = (EmfSession) session.proxy();
@@ -50,7 +50,7 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
         measure.setLockOwner(owner.getUsername());
         measure.setLockDate(new Date());
         
-        costService.stubs().method("obtainLockedMeasure").with(eq(owner), eq(measure)).will(returnValue(measure));
+        controlMeasureService.stubs().method("obtainLockedMeasure").with(eq(owner), eq(measure)).will(returnValue(measure));
 
         session.stubs().method("user").withNoArguments().will(returnValue(owner));
 
@@ -65,9 +65,9 @@ public class ControlMeasuresEditorPresenterTest extends EmfMockObjectTestCase {
     }
 
     public void testShouldUpdateDatasetRefreshDatasetsBrowserAndCloseWindowOnSave() throws Exception {
-        costService.expects(once()).method("updateMeasure").with(eq(measure));
+        controlMeasureService.expects(once()).method("updateMeasure").with(eq(measure));
         expects(view, "disposeView");
-        presenter.save(measure, (ControlMeasureService) costService.proxy(), presenters(), (ControlMeasureView) view
+        presenter.save(measure, (ControlMeasureService) controlMeasureService.proxy(), presenters(), (ControlMeasureView) view
                 .proxy());
     }
 

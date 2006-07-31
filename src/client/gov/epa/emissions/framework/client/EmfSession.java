@@ -45,7 +45,7 @@ public interface EmfSession {
 
     CaseService caseService();
     
-    ControlMeasureService costService();
+    ControlMeasureService controlMeasureService();
 
     ControlStrategyService controlStrategyService();
 }

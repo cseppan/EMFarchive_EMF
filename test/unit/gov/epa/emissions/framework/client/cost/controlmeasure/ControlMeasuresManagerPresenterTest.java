@@ -16,18 +16,19 @@ public class ControlMeasuresManagerPresenterTest extends MockObjectTestCase {
 
     private ControlMeasuresManagerPresenter presenter;
 
-    private Mock costService;
+    private Mock controlMeasureService;
 
     private Mock serviceLocator;
 
     private Mock session;
 
+    
     protected void setUp() {
         view = mock(ControlMeasuresManagerView.class);
 
-        costService = mock(ControlMeasureService.class);
+        controlMeasureService = mock(ControlMeasureService.class);
         serviceLocator = mock(ServiceLocator.class);
-        serviceLocator.stubs().method("costService").withNoArguments().will(returnValue(costService.proxy()));
+        serviceLocator.stubs().method("costService").withNoArguments().will(returnValue(controlMeasureService.proxy()));
 
         session = mock(EmfSession.class);
         session.stubs().method("user").withNoArguments().will(returnValue(new User()));
@@ -48,12 +49,12 @@ public class ControlMeasuresManagerPresenterTest extends MockObjectTestCase {
 
     public void testShouldRefreshViewOnClickOfRefreshButton() throws EmfException {
         ControlMeasure[] measures = new ControlMeasure[0];
-        costService.stubs().method("getMeasures").withNoArguments().will(returnValue(measures));
+        controlMeasureService.stubs().method("getMeasures").withNoArguments().will(returnValue(measures));
 
         view.expects(once()).method("refresh").with(eq(measures));
 
         Mock session = mock(EmfSession.class);
-        session.stubs().method("costService").will(returnValue(costService.proxy()));
+        session.stubs().method("controlMeasureService").will(returnValue(controlMeasureService.proxy()));
 
         ControlMeasuresManagerPresenter presenter = new ControlMeasuresManagerPresenter((EmfSession) session.proxy());
         view.expects(once()).method("observe").with(eq(presenter));

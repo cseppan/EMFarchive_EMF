@@ -33,7 +33,7 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
 
     public void doDisplay() throws EmfException {
         view.observe(this);
-        measure = session.costService().obtainLockedMeasure(session.user(), measure);
+        measure = session.controlMeasureService().obtainLockedMeasure(session.user(), measure);
         if (!measure.isLocked(session.user())) {// view mode, locked by another user
             view.notifyLockFailure(measure);
             return;
@@ -46,13 +46,13 @@ public class EditorControlMeasurePresenterImpl implements ControlMeasurePresente
     }
 
     public void doClose() throws EmfException {
-        session.costService().releaseLockedControlMeasure(measure);
+        session.controlMeasureService().releaseLockedControlMeasure(measure);
         view.disposeView();
         parent.doRefresh();
     }
     
     public void doSave() throws EmfException {
-        save(measure, session.costService(), presenters, view);
+        save(measure, session.controlMeasureService(), presenters, view);
     }
 
     void save(ControlMeasure measure, ControlMeasureService service, List presenters, ControlMeasureView view)

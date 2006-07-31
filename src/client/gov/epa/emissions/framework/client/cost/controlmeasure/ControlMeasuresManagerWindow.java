@@ -73,7 +73,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         this.parentConsole = parentConsole;
         this.desktopManager = desktopManager;
 
-        ControlMeasureService service = session.costService();
+        ControlMeasureService service = session.controlMeasureService();
         tableData = new ControlMeasureTableData(service.getMeasures());
         model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
@@ -295,7 +295,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
         // FIXME: update only control measures that user selected
         List updatedMeasures = new ArrayList();
         try {
-            ControlMeasure[] updatedAllMeasures1 = session.costService().getMeasures();
+            ControlMeasure[] updatedAllMeasures1 = session.controlMeasureService().getMeasures();
             for (int i = 0; i < selectedMeasures.size(); i++) {
                 ControlMeasure selMeasure = (ControlMeasure) selectedMeasures.get(i);
                 for (int j = 0; j < updatedAllMeasures1.length; j++) {

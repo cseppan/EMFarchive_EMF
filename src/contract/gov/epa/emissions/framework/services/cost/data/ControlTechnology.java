@@ -20,9 +20,8 @@ public class ControlTechnology implements Serializable, Lockable {
         this.lock = new Mutex();
     }
 
-    public ControlTechnology(String description, String name) {
+    public ControlTechnology(String name) {
         this();
-        this.description = description;
         this.name = name;
     }
 

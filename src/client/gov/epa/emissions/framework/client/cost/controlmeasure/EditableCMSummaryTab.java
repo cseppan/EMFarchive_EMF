@@ -4,7 +4,9 @@ import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.data.ControlTechnologies;
 import gov.epa.emissions.framework.client.data.Pollutants;
+import gov.epa.emissions.framework.client.data.SourceGroups;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.ControlTechnology;
@@ -38,8 +40,8 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
         if (equipmentLife.getText().length() > 0)
             measure.setEquipmentLife(life);
         updatePollutant();
-        measure.setControlTechnology((ControlTechnology) controlTechnology.getSelectedItem());
-        measure.setSourceGroup((SourceGroup) sourceGroup.getSelectedItem());
+        updateControlTechnology();
+        updateSourceGroup();
         updateDateReviewed(measure);
         measure.setCmClass(selectedClass(cmClass.getSelectedItem()));
         measure.setLastModifiedTime(new Date());
@@ -64,6 +66,40 @@ public class EditableCMSummaryTab extends ControlMeasureSummaryTab implements Ed
         return selectedItem == null ? "" : selectedItem + "";
     }
 
+    private void updateControlTechnology() {
+        Object selected = controlTechnology.getSelectedItem();
+        if (selected instanceof String) {
+            String controltechnologyName = (String) selected;
+            if (controltechnologyName.length() > 0) {
+                ControlTechnology controltechnology = controltechnology(controltechnologyName);// checking for duplicates
+                measure.setControlTechnology(controltechnology);
+            }
+        } else if (selected instanceof ControlTechnology) {
+            measure.setControlTechnology((ControlTechnology) selected);
+        }
+    }
+
+    private ControlTechnology controltechnology(String name) {
+        return new ControlTechnologies(allControlTechnologies).get(name);
+    }
+    
+    private void updateSourceGroup() {
+        Object selected = sourceGroup.getSelectedItem();
+        if (selected instanceof String) {
+            String sourcegroupName = (String) selected;
+            if (sourcegroupName.length() > 0) {
+                SourceGroup sourcegroup = sourcegroup(sourcegroupName);// checking for duplicates
+                measure.setSourceGroup(sourcegroup);
+            }
+        } else if (selected instanceof SourceGroup) {
+            measure.setSourceGroup((SourceGroup) selected);
+        }
+    }
+
+    private SourceGroup sourcegroup(String name) {
+        return new SourceGroups(allSourceGroups).get(name);
+    }
+    
     private void updatePollutant() {
         Object selected = majorPollutant.getSelectedItem();
         if (selected instanceof String) {

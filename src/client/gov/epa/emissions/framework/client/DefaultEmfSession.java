@@ -89,7 +89,7 @@ public class DefaultEmfSession implements EmfSession {
         return serviceLocator.caseService();
     }
 
-    public ControlMeasureService costService() {
+    public ControlMeasureService controlMeasureService() {
         return serviceLocator.costService();
     }
 
