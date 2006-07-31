@@ -72,7 +72,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
 
     protected EmfSession session;
 
-    private String[] classes = { "Production", "Developmental", "Hypothetical", "Obselete" };
+    private String[] classes = { "Known", "Emerging", "Hypothetical", "Obselete" };
 
     protected int deviceId, year;
 
@@ -178,8 +178,11 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         creator = new JLabel(session.user().getName());
         layoutGenerator.addLabelWidgetPair("Creator:", creator, panel);
 
-        lastModifiedTime = new JLabel("");
-        layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
+        // AME: Moved temporarily to improve symmetry
+        //lastModifiedTime = new JLabel("");
+        //layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
+        JPanel tempPanel = new JPanel();
+        layoutGenerator.addLabelWidgetPair("", tempPanel, panel);
 
         widgetLayout(3, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
@@ -202,6 +205,9 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
+        lastModifiedTime = new JLabel("");
+        layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
+
         try {
             allPollutants = session.dataCommonsService().getPollutants();
             majorPollutant = new EditableComboBox(allPollutants);
@@ -211,15 +217,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         // majorPollutant.setSelectedIndex(0);
         changeablesList.addChangeable(majorPollutant);
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutant, panel);
-
-        try {
-            controlTechnology = new EditableComboBox(session.costService().getControlTechnologies());
-        } catch (EmfException e) {
-            messagePanel.setError("Could not retrieve Control Technology");
-        }
-        // controlTechnology.setSelectedIndex(0);
-        changeablesList.addChangeable(controlTechnology);
-        layoutGenerator.addLabelWidgetPair("Control Technology:", controlTechnology, panel);
 
         deviceCode = new TextField("NEI Device code", 15);
         changeablesList.addChangeable(deviceCode);
@@ -254,6 +251,15 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         layoutGenerator.addLabelWidgetPair("Class:", cmClass, panel);
 
         try {
+            controlTechnology = new EditableComboBox(session.costService().getControlTechnologies());
+        } catch (EmfException e) {
+            messagePanel.setError("Could not retrieve all Control Technologies");
+        }
+        // controlTechnology.setSelectedIndex(0);
+        changeablesList.addChangeable(controlTechnology);
+        layoutGenerator.addLabelWidgetPair("Control Technology:", controlTechnology, panel);
+
+        try {
             sourceGroup = new EditableComboBox(session.dataCommonsService().getSourceGroups());
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve Source Groups");
@@ -272,7 +278,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         layoutGenerator.addLabelWidgetPair("Sectors:", listScroller, panel);
 
         layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
-        widgetLayout(5, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(6, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
