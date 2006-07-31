@@ -1,4 +1,28 @@
 -- -------------CoST Tables--------------
+-- emf.pollutants
+CREATE TABLE emf.pollutants
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) UNIQUE NOT NULL,
+  description text,
+  lock_owner varchar(64),
+  lock_date timestamp
+) 
+WITHOUT OIDS;
+-- emf.pollutants
+--
+-- emf.source_groups
+CREATE TABLE emf.source_groups
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) UNIQUE NOT NULL,
+  description text,
+  lock_owner varchar(64),
+  lock_date timestamp
+) 
+WITHOUT OIDS;
+-- emf.source_groups
+--
 
 -- emf control_technologies
 CREATE TABLE emf.control_technologies
