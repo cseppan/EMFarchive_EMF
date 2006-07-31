@@ -112,7 +112,6 @@ public class AnalysisEngineTableApp extends DisposableInteralFrame {
                     importFileStatus.add(get50Lines(fileNames[i]));
                 }
                 System.out.println("Error reading the file " + e.getMessage());
-                e.printStackTrace();
             }// catch
         }
         importStatus(allSuccessful, importFileStatus, warningWindow);

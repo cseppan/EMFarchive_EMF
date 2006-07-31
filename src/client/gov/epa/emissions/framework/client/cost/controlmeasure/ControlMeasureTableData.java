@@ -30,7 +30,7 @@ public class ControlMeasureTableData extends AbstractTableData {
     public String[] columns() {
         return new String[] { "Name", "Creator", "Abbreviation", "Control Eff.", "Cost per Ton", "Rule Eff.",
                 "Rule Pen.", "Major Poll.", "Description", "Equipment Life", "Class", "Last Modified Time",
-                "NEI Device Code", "Control Technology", "Source Group", "Date Reviewed", "Sectors", "Data Source"};
+                "NEI Device Code", "Control Technology", "Source Group", "Date Reviewed", "Sectors", "Data Source" };
     }
 
     public List rows() {
@@ -43,12 +43,11 @@ public class ControlMeasureTableData extends AbstractTableData {
         for (int i = 0; i < measures.length; i++) {
             ControlMeasure measure = measures[i];
             Object[] values = { measure.getName(), measure.getCreator().getName(), measure.getAbbreviation(),
-                    getControlEfficiency(measure), getCostPerTon(measure), new Float(0),
-                    new Float(0), measure.getMajorPollutant(), measure.getDescription(),
-                    new Float(measure.getEquipmentLife()), measure.getCmClass(),
-                    getLastModifiedTime(measure), new Integer(measure.getDeviceCode()),
-                    getControlTechnology(measure), getSourceGroup(measure),
-                    getDateReviewed(measure), getSectors(measure), measure.getDataSouce()};
+                    getControlEfficiency(measure), getCostPerTon(measure), new Float(0), new Float(0),
+                    measure.getMajorPollutant(), measure.getDescription(), new Float(measure.getEquipmentLife()),
+                    measureClass(measure.getCmClass()), getLastModifiedTime(measure),
+                    new Integer(measure.getDeviceCode()), getControlTechnology(measure), getSourceGroup(measure),
+                    getDateReviewed(measure), getSectors(measure), measure.getDataSouce() };
 
             Row row = new ViewableRow(measure, values);
             rows.add(row);
@@ -57,20 +56,23 @@ public class ControlMeasureTableData extends AbstractTableData {
         return rows;
     }
 
+    private String measureClass(String cmClass) {
+        return (cmClass == null) ? "" : cmClass;
+    }
+
     private String getSectors(ControlMeasure measure) {
         Sector[] sectors = measure.getSectors();
         if (sectors.length == 0)
             return null;
-        
-        
+
         return sectors[0].getName() + "...";
     }
 
     private Object getDateReviewed(ControlMeasure measure) {
         Date datereviewed = measure.getDateReviewed();
         if (datereviewed == null)
-        return null;
-        
+            return null;
+
         DateFormat dateFormat = new SimpleDateFormat(EmfDateFormat.format());
 
         return dateFormat.format(datereviewed);
@@ -79,8 +81,8 @@ public class ControlMeasureTableData extends AbstractTableData {
     private Object getSourceGroup(ControlMeasure measure) {
         SourceGroup sourcegroup = measure.getSourceGroup();
         if (sourcegroup == null)
-        return null;
-        
+            return null;
+
         return sourcegroup.getName();
     }
 
@@ -88,24 +90,24 @@ public class ControlMeasureTableData extends AbstractTableData {
         ControlTechnology technology = measure.getControlTechnology();
         if (technology == null)
             return null;
-        
+
         return technology.getName();
     }
 
     private Float getCostPerTon(ControlMeasure measure) {
-//        CostRecord[] records = measure.getCostRecords();
-//        String localPollutant = getLocalPollutant(measure);
-//
-//        if (records.length != 0) {
-//            for (int i = 0; i < records.length; i++)
-//                if (records[i].getPollutant().equalsIgnoreCase(localPollutant)) {
-//                    if (year == -9999)
-//                        return new Float(records[i].getCostPerTon());
-//                    if (records[i].getCostYear() == year)
-//                        return new Float(records[i].getCostPerTon());
-//                }
-//
-//        }
+        // CostRecord[] records = measure.getCostRecords();
+        // String localPollutant = getLocalPollutant(measure);
+        //
+        // if (records.length != 0) {
+        // for (int i = 0; i < records.length; i++)
+        // if (records[i].getPollutant().equalsIgnoreCase(localPollutant)) {
+        // if (year == -9999)
+        // return new Float(records[i].getCostPerTon());
+        // if (records[i].getCostYear() == year)
+        // return new Float(records[i].getCostPerTon());
+        // }
+        //
+        // }
 
         return new Float(0);
     }
@@ -128,7 +130,7 @@ public class ControlMeasureTableData extends AbstractTableData {
         String localPollutant = pollutant;
         if (pollutant.equalsIgnoreCase("Major"))
             localPollutant = measure.getMajorPollutant().getName().trim();
-        
+
         return localPollutant;
     }
 
@@ -154,7 +156,7 @@ public class ControlMeasureTableData extends AbstractTableData {
         }
         return String.class;
     }
-    
+
     public ControlMeasure[] sources() {
         List sources = sourcesList();
         return (ControlMeasure[]) sources.toArray(new ControlMeasure[0]);
@@ -166,7 +168,7 @@ public class ControlMeasureTableData extends AbstractTableData {
             ViewableRow row = (ViewableRow) iter.next();
             sources.add(row.source());
         }
-        
+
         return sources;
     }
 
@@ -176,7 +178,7 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     public void setPollutantAndYear(String pollutant, String year) {
         this.pollutant = pollutant;
-        
+
         refresh();
     }
 

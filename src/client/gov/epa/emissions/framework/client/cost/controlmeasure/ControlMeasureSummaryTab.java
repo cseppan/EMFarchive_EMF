@@ -19,11 +19,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
-//import javax.swing.JButton;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -45,13 +45,13 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     protected EditableComboBox majorPollutant;
 
     protected EditableComboBox sourceGroup;
-    
+
     protected EditableComboBox controlTechnology;
-    
+
     protected TextField deviceCode;
 
     protected TextField dateReviewed;
-    
+
     protected TextField equipmentLife;
 
     protected TextField costYear;
@@ -65,7 +65,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     protected ListWidget sectors;
 
     protected ListWidget dataSources;
-    
+
     protected MessagePanel messagePanel;
 
     private ManageChangeables changeablesList;
@@ -79,6 +79,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     protected float cost, life, effectivness, penetration, minUnctrldEmiss, maxUnctrldEmiss;
 
     protected Pollutant[] allPollutants;
+
+    protected static DateFormat dateReviewedFormat = new SimpleDateFormat("MM/dd/yyyy");
 
     public ControlMeasureSummaryTab(ControlMeasure measure, EmfSession session, MessagePanel messagePanel,
             ManageChangeables changeablesList) {
@@ -101,14 +103,20 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         creator.setText(getText(measure.getCreator().getName()));
         majorPollutant.setSelectedItem(measure.getMajorPollutant());
         cmClass.setSelectedItem(getText(measure.getCmClass()));
-        //costYear.setText(measure.getCostYear() + "");
+        // costYear.setText(measure.getCostYear() + "");
         deviceCode.setText(measure.getDeviceCode() + "");
         equipmentLife.setText(measure.getEquipmentLife() + "");
         if (modifiedTime != null)
             lastModifiedTime.setText(DATE_FORMATTER.format(modifiedTime));
         abbreviation.setText(getText(measure.getAbbreviation()));
+        dateReviewed.setText(formatDateReviewed());
     }
-    
+
+    private String formatDateReviewed() {
+        Date dateReviewed = measure.getDateReviewed();
+        return dateReviewed == null ? "" : dateReviewedFormat.format(dateReviewed);
+    }
+
     protected void disableFields() {
         name.setEditable(false);
         description.setEditable(false);
@@ -153,8 +161,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         ScrollableComponent descPane = new ScrollableComponent(description);
         descPane.setPreferredSize(new Dimension(300, 50));
         layoutGenerator.addLabelWidgetPair("Description:", descPane, panel);
-        
-        
 
         widgetLayout(2, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
@@ -164,14 +170,14 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
     private JPanel createRightOverview() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
-               
+
         abbreviation = new TextField("Abbreviation", 12);
         changeablesList.addChangeable(abbreviation);
         layoutGenerator.addLabelWidgetPair("Abbreviation:", abbreviation, panel);
 
         creator = new JLabel(session.user().getName());
         layoutGenerator.addLabelWidgetPair("Creator:", creator, panel);
-        
+
         lastModifiedTime = new JLabel("");
         layoutGenerator.addLabelWidgetPair("Last Modified Time:", lastModifiedTime, panel);
 
@@ -202,32 +208,32 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         } catch (EmfException e1) {
             messagePanel.setError("Could not retrieve Pollutants");
         }
-        //majorPollutant.setSelectedIndex(0);
+        // majorPollutant.setSelectedIndex(0);
         changeablesList.addChangeable(majorPollutant);
         layoutGenerator.addLabelWidgetPair("Target Pollutant:", majorPollutant, panel);
-    
+
         try {
             controlTechnology = new EditableComboBox(session.costService().getControlTechnologies());
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve Control Technology");
         }
-        //controlTechnology.setSelectedIndex(0);
+        // controlTechnology.setSelectedIndex(0);
         changeablesList.addChangeable(controlTechnology);
         layoutGenerator.addLabelWidgetPair("Control Technology:", controlTechnology, panel);
- 
+
         deviceCode = new TextField("NEI Device code", 15);
         changeablesList.addChangeable(deviceCode);
         layoutGenerator.addLabelWidgetPair("NEI Device code:", deviceCode, panel);
-        
+
         dateReviewed = new TextField("Date Reviewed", 15);
         changeablesList.addChangeable(dateReviewed);
         layoutGenerator.addLabelWidgetPair("Date Reviewed:", dateReviewed, panel);
-        
+
         dataSources = new ListWidget(new String[] { "               " }, new String[] { "" });
         JScrollPane listScroller = new JScrollPane(dataSources);
         listScroller.setPreferredSize(new Dimension(170, 60));
         layoutGenerator.addLabelWidgetPair("Data Sources:", listScroller, panel);
-      
+
         layoutGenerator.addLabelWidgetPair("", addRemoveButtonPanel(), panel);
         widgetLayout(6, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
@@ -238,28 +244,28 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-//        costYear = new TextField("Cost year", 15);
-//        changeablesList.addChangeable(costYear);
-//        layoutGenerator.addLabelWidgetPair(" ", new JLabel(" "), panel); // to hold the place
+        // costYear = new TextField("Cost year", 15);
+        // changeablesList.addChangeable(costYear);
+        // layoutGenerator.addLabelWidgetPair(" ", new JLabel(" "), panel); // to hold the place
 
         cmClass = new ComboBox("Choose a class", classes);
         cmClass.setPreferredSize(new Dimension(168, 20));
         changeablesList.addChangeable(cmClass);
         layoutGenerator.addLabelWidgetPair("Class:", cmClass, panel);
-                
+
         try {
             sourceGroup = new EditableComboBox(session.dataCommonsService().getSourceGroups());
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve Source Groups");
         }
-        //sourceGroup.setSelectedIndex(0);
+        // sourceGroup.setSelectedIndex(0);
         changeablesList.addChangeable(sourceGroup);
         layoutGenerator.addLabelWidgetPair("Source Group:", sourceGroup, panel);
-        
+
         equipmentLife = new TextField("Equipment life", 15);
         changeablesList.addChangeable(equipmentLife);
-        layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);     
-      
+        layoutGenerator.addLabelWidgetPair("Equipment life (yrs):", equipmentLife, panel);
+
         sectors = new ListWidget(new String[] { "               " }, new String[] { "" });
         JScrollPane listScroller = new JScrollPane(sectors);
         listScroller.setPreferredSize(new Dimension(170, 60));
@@ -271,8 +277,8 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         return panel;
     }
 
-    private void widgetLayout(int rows, int cols, int initX, int initY, int xPad, int yPad, SpringLayoutGenerator layoutGenerator,
-            JPanel panel) {
+    private void widgetLayout(int rows, int cols, int initX, int initY, int xPad, int yPad,
+            SpringLayoutGenerator layoutGenerator, JPanel panel) {
         // Lay out the panel.
         layoutGenerator.makeCompactGrid(panel, rows, cols, // rows, cols
                 initX, initY, // initialX, initialY
@@ -291,7 +297,7 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         panel.add(addButton);
         panel.add(removeButton);
         // for now, disable these
-        
+
         return panel;
     }
 
