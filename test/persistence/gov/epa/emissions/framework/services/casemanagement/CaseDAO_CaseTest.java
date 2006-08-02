@@ -73,7 +73,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         element.setDescription("desc");
         element.setRunStatus("started");
         element.setLastModifiedDate(new Date());
-        element.setCopiedFrom("another dataset");
+        element.setTemplateUsed("another dataset");
         
         dao.add(element, session);
 
@@ -85,7 +85,7 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
             assertEquals(element.getDescription(), added.getDescription());
             assertEquals(element.getRunStatus(), added.getRunStatus());
             assertEquals(element.getLastModifiedDate(), added.getLastModifiedDate());
-            assertEquals(element.getCopiedFrom(), added.getCopiedFrom());
+            assertEquals(element.getTemplateUsed(), added.getTemplateUsed());
         } finally {
             remove(element);
         }
@@ -214,14 +214,14 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         Case element = new Case("test" + Math.random());
         UserDAO userDAO = new UserDAO();
         User creator = userDAO.get("emf", session);
-        element.setCreator(creator);
+        element.setLastModifiedBy(creator);
 
         dao.add(element, session);
 
         session.clear();
         try {
             List list = dao.getCases(session);
-            assertEquals(creator, ((Case) list.get(0)).getCreator());
+            assertEquals(creator, ((Case) list.get(0)).getLastModifiedBy());
         } finally {
             remove(element);
         }
@@ -248,14 +248,14 @@ public class CaseDAO_CaseTest extends ServiceTestCase {
         Case element = new Case("test" + Math.random());
         Region attrib = new Region("test" + Math.random());
         add(attrib);
-        element.setRegion(attrib);
+        element.setControlRegion(attrib);
         
         dao.add(element, session);
         
         session.clear();
         try {
             List list = dao.getCases(session);
-            assertEquals(attrib, ((Case) list.get(0)).getRegion());
+            assertEquals(attrib, ((Case) list.get(0)).getControlRegion());
         } finally {
             remove(element);
         }

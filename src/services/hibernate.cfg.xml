@@ -49,6 +49,7 @@
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/MeteorlogicalYear.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/Speciation.hbm.xml"/>
     	<mapping resource="gov/epa/emissions/framework/services/casemanagement/Case.hbm.xml"/>
+    	<mapping resource="gov/epa/emissions/framework/services/casemanagement/GridResolution.hbm.xml"/>
 
 		<!-- Mappings : CoST -->
 	   	<mapping resource="gov/epa/emissions/framework/services/cost/ControlStrategy.hbm.xml"/>

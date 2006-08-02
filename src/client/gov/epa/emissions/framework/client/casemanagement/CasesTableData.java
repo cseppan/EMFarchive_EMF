@@ -76,7 +76,7 @@ public class CasesTableData extends AbstractTableData {
     }
 
     private String region(Case element) {
-        return element.getRegion() != null ? element.getRegion().getName() : "";
+        return element.getControlRegion() != null ? element.getControlRegion().getName() : "";
     }
 
     private String caseCategory(Case element) {
@@ -88,7 +88,7 @@ public class CasesTableData extends AbstractTableData {
     }
 
     private String creator(Case element) {
-        return element.getCreator() != null ? element.getCreator().getName() : "";
+        return element.getLastModifiedBy() != null ? element.getLastModifiedBy().getName() : "";
     }
 
 }

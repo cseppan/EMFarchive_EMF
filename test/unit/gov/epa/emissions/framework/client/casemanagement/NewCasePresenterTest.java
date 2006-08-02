@@ -52,7 +52,7 @@ public class NewCasePresenterTest extends EmfMockObjectTestCase {
 
         p.doSave(newCase);
         
-        assertSame(user , newCase.getCreator());
+        assertSame(user , newCase.getLastModifiedBy());
         assertNotNull(newCase.getLastModifiedDate());
     }
 

@@ -12,6 +12,8 @@ public interface CaseService {
     CaseCategory[] getCaseCategories() throws EmfException;
 
     EmissionsYear[] getEmissionsYears() throws EmfException;
+    
+    GridResolution[] getGridResolutions() throws EmfException;
 
     Grid[] getGrids() throws EmfException;
 

@@ -37,7 +37,7 @@ public class NewCasePresenter {
         if (isDuplicate(newCase))
             throw new EmfException("Duplicate name - '" + newCase.getName() + "'.");
 
-        newCase.setCreator(session.user());
+        newCase.setLastModifiedBy(session.user());
         newCase.setLastModifiedDate(new Date());
         
         service().addCase(newCase);

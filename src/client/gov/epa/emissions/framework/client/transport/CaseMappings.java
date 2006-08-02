@@ -8,6 +8,7 @@ import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
 import gov.epa.emissions.framework.services.casemanagement.Grid;
+import gov.epa.emissions.framework.services.casemanagement.GridResolution;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 
@@ -27,6 +28,7 @@ public class CaseMappings extends Mappings {
         bean(call, CaseCategory.class, caseCategory());
         bean(call, EmissionsYear.class, emissionsYear());
         bean(call, Grid.class, grid());
+        bean(call, GridResolution.class, gridResolution());
         bean(call, MeteorlogicalYear.class, meteorlogicalYear());
         bean(call, Speciation.class, speciation());
     }
@@ -38,6 +40,7 @@ public class CaseMappings extends Mappings {
         array(call, CaseCategory[].class, caseCategories());
         array(call, EmissionsYear[].class, emissionsYears());
         array(call, Grid[].class, grids());
+        array(call, GridResolution[].class, gridResolutions());
         array(call, MeteorlogicalYear[].class, meteorlogicalYears());
         array(call, Speciation[].class, speciations());
     }
@@ -90,6 +93,14 @@ public class CaseMappings extends Mappings {
         return qname("Grids");
     }
 
+    public QName gridResolution() {
+        return qname("GridResolution");
+    }
+    
+    public QName gridResolutions() {
+        return qname("GridResolutions");
+    }
+    
     public QName meteorlogicalYear() {
         return qname("MeteorlogicalYear");
     }

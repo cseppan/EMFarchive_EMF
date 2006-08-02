@@ -30,7 +30,7 @@ public class CasesTableDataTest extends TestCase {
         case1 = new Case();
         case1.setName("name1");
         case1.setCaseCategory(new CaseCategory("category1"));
-        case1.setRegion(new Region("region1"));
+        case1.setControlRegion(new Region("region1"));
         case1.setEmissionsYear(new EmissionsYear("2003"));
         case1.setMeteorlogicalYear(new MeteorlogicalYear("2002"));
         case1.setLastModifiedDate(new Date());
@@ -38,7 +38,7 @@ public class CasesTableDataTest extends TestCase {
         case1.setProject(new Project("projec1"));
         User user1 = new User();
         user1.setName("user1");
-        case1.setCreator(user1);
+        case1.setLastModifiedBy(user1);
         case1.setAbbreviation(new Abbreviation("abb1"));
         case1.setAirQualityModel(new AirQualityModel("aqm1"));
         case1.setSpeciation(new Speciation("sp1"));
@@ -46,7 +46,7 @@ public class CasesTableDataTest extends TestCase {
         case2 = new Case();
         case2.setName("name2");
         case2.setCaseCategory(new CaseCategory("category2"));
-        case2.setRegion(new Region("region2"));
+        case2.setControlRegion(new Region("region2"));
         case2.setEmissionsYear(new EmissionsYear("2003"));
         case2.setMeteorlogicalYear(new MeteorlogicalYear("2002"));
         case2.setLastModifiedDate(new Date());
@@ -54,7 +54,7 @@ public class CasesTableDataTest extends TestCase {
         case2.setProject(new Project("projec1"));
         User user2 = new User();
         user2.setName("user2");
-        case2.setCreator(user2);
+        case2.setLastModifiedBy(user2);
         case2.setAbbreviation(new Abbreviation("abb2"));
         case2.setAirQualityModel(new AirQualityModel("aqm2"));
         case2.setSpeciation(new Speciation("sp2"));

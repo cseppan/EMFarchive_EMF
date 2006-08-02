@@ -4,9 +4,13 @@ import gov.epa.emissions.commons.data.Lockable;
 import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.commons.data.Project;
 import gov.epa.emissions.commons.data.Region;
+import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.security.User;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class Case implements Comparable, Lockable {
 
@@ -29,26 +33,53 @@ public class Case implements Comparable, Lockable {
     private Speciation speciation;
 
     private String description;
+    
+    private String inputFileDir;
 
-    private User creator;
+    private String outputFileDir;
 
     private Project project;
 
     private Mutex lock;
 
-    private Region region;
+    private Region modelingRegion;
+
+    private Region controlRegion;
 
     private String runStatus;
 
     private Date lastModifiedDate;
 
-    private String copiedFrom;
+    private User lastModifiedBy;
+    
+    private boolean caseTemplate;
+    
+    private GridResolution gridResolution;
+    
+    private int numMetLayers;
+
+    private int numEmissionsLayers;
+    
+    private int baseYear;
+    
+    private int futureYear;
+    
+    private Date startDate;
+    
+    private Date endDate;
+    
+    private List sectors;
+    
+    private boolean isFinal;
+    
+    private String templateUsed;
 
     /*
      * Default constructor needed for hibernate and axis serialization
      */
     public Case() {
         lock = new Mutex();
+        this.sectors = new ArrayList();
     }
 
     public Case(String name) {
@@ -155,24 +186,12 @@ public class Case implements Comparable, Lockable {
         return description;
     }
 
-    public void setCreator(User creator) {
-        this.creator = creator;
-    }
-
-    public User getCreator() {
-        return creator;
-    }
-
     public void setProject(Project project) {
         this.project = project;
     }
 
     public Project getProject() {
         return project;
-    }
-
-    public Region getRegion() {
-        return region;
     }
 
     public Date getLockDate() {
@@ -203,10 +222,6 @@ public class Case implements Comparable, Lockable {
         return lock.isLocked();
     }
 
-    public void setRegion(Region region) {
-        this.region = region;
-    }
-
     public void setRunStatus(String runStatus) {
         this.runStatus = runStatus;
     }
@@ -223,12 +238,140 @@ public class Case implements Comparable, Lockable {
         return lastModifiedDate;
     }
 
-    public void setCopiedFrom(String copiedFrom) {
-        this.copiedFrom = copiedFrom;
+    public int getBaseYear() {
+        return baseYear;
     }
 
-    public String getCopiedFrom() {
-        return copiedFrom;
+    public void setBaseYear(int baseYear) {
+        this.baseYear = baseYear;
+    }
+
+    public boolean isCaseTemplate() {
+        return caseTemplate;
+    }
+
+    public void setCaseTemplate(boolean caseTemplate) {
+        this.caseTemplate = caseTemplate;
+    }
+
+    public Region getControlRegion() {
+        return controlRegion;
+    }
+
+    public void setControlRegion(Region controlRegion) {
+        this.controlRegion = controlRegion;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public int getFutureYear() {
+        return futureYear;
+    }
+
+    public void setFutureYear(int futureYear) {
+        this.futureYear = futureYear;
+    }
+
+    public GridResolution getGridResolution() {
+        return gridResolution;
+    }
+
+    public void setGridResolution(GridResolution gridResolution) {
+        this.gridResolution = gridResolution;
+    }
+
+    public boolean getIsFinal() {
+        return isFinal;
+    }
+
+    public void setIsFinal(boolean isFinal) {
+        this.isFinal = isFinal;
+    }
+
+    public User getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(User lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Mutex getLock() {
+        return lock;
+    }
+
+    public void setLock(Mutex lock) {
+        this.lock = lock;
+    }
+
+    public Region getModelingRegion() {
+        return modelingRegion;
+    }
+
+    public void setModelingRegion(Region modelingRegion) {
+        this.modelingRegion = modelingRegion;
+    }
+
+    public int getNumEmissionsLayers() {
+        return numEmissionsLayers;
+    }
+
+    public void setNumEmissionsLayers(int numEmissionsLayers) {
+        this.numEmissionsLayers = numEmissionsLayers;
+    }
+
+    public int getNumMetLayers() {
+        return numMetLayers;
+    }
+
+    public void setNumMetLayers(int numMetLayers) {
+        this.numMetLayers = numMetLayers;
+    }
+
+    public Sector[] getSectors() {
+        return (Sector[])sectors.toArray(new Sector[0]);
+    }
+
+    public void setSectors(Sector[] sectors) {
+        this.sectors = Arrays.asList(sectors);
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getTemplateUsed() {
+        return templateUsed;
+    }
+
+    public void setTemplateUsed(String templateUsed) {
+        this.templateUsed = templateUsed;
+    }
+
+    public String getInputFileDir() {
+        return inputFileDir;
+    }
+
+    public void setInputFileDir(String inputFileDir) {
+        this.inputFileDir = inputFileDir;
+    }
+
+    public String getOutputFileDir() {
+        return outputFileDir;
+    }
+
+    public void setOutputFileDir(String outputFileDir) {
+        this.outputFileDir = outputFileDir;
     }
 
 }

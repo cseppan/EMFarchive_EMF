@@ -127,6 +127,20 @@ public class CaseServiceTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldGetGridResolutions() throws Exception {
+        int totalBeforeAdd = service.getGridResolutions().length;
+        GridResolution element = new GridResolution("test" + Math.random());
+        add(element);
+        
+        try {
+            List list = Arrays.asList(service.getGridResolutions());
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(element));
+        } finally {
+            remove(element);
+        }
+    }
+
     public void testShouldGetCases() throws Exception {
         int totalBeforeAdd = service.getCases().length;
         Case element = newCase();

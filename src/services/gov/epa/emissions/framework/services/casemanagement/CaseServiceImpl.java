@@ -35,6 +35,7 @@ public class CaseServiceImpl implements CaseService {
             return (Case[]) cases.toArray(new Case[0]);
         } catch (RuntimeException e) {
             LOG.error("Could not get all Cases", e);
+            e.printStackTrace();
             throw new EmfException("Could not get all Cases");
         }
     }
@@ -101,6 +102,19 @@ public class CaseServiceImpl implements CaseService {
         } catch (RuntimeException e) {
             LOG.error("Could not get all Grids", e);
             throw new EmfException("Could not get all Grids");
+        }
+    }
+
+    public GridResolution[] getGridResolutions() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List results = dao.getGridResolutions(session);
+            session.close();
+            
+            return (GridResolution[]) results.toArray(new GridResolution[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Grid Resolutions", e);
+            throw new EmfException("Could not get all Grid Resolutions");
         }
     }
 

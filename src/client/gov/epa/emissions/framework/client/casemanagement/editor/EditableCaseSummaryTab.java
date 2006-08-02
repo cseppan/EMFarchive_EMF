@@ -182,7 +182,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
     }
 
     private JLabel creator() {
-        return createLeftAlignedLabel(caseObj.getCreator().getName());
+        return createLeftAlignedLabel(caseObj.getLastModifiedBy().getName());
     }
 
     private TextArea description() {
@@ -217,7 +217,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         regions = new Regions(session.dataCommonsService().getRegions());
         regionsCombo = new EditableComboBox(regions.names());
 
-        String name = caseObj.getRegion() != null ? caseObj.getRegion().getName() : "";
+        String name = caseObj.getControlRegion() != null ? caseObj.getControlRegion().getName() : "";
         regionsCombo.setSelectedItem(name);
         regionsCombo.setPreferredSize(new Dimension(250, 20));
 
@@ -344,7 +344,7 @@ public class EditableCaseSummaryTab extends JPanel implements EditableCaseSummar
         caseObj.setDescription(description.getText());
 
         caseObj.setProject(projects.get((String) projectsCombo.getSelectedItem()));
-        caseObj.setRegion(regions.get((String) regionsCombo.getSelectedItem()));
+        caseObj.setControlRegion(regions.get((String) regionsCombo.getSelectedItem()));
         caseObj.setAbbreviation(abbreviations.get((String) abbreviationsCombo.getSelectedItem()));
         caseObj.setAirQualityModel(airQualityModels.get((String) airQualityModelsCombo.getSelectedItem()));
         caseObj.setCaseCategory(categories.get((String) categoriesCombo.getSelectedItem()));

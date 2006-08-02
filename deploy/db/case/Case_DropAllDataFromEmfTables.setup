@@ -8,6 +8,8 @@ DELETE FROM cases.grids;
 DELETE FROM cases.air_quality_models;
 DELETE FROM cases.case_categories;
 DELETE FROM cases.case_abbreviations;
+DELETE FROM cases.casesectors;
+DELETE FROM cases.grid_resolutions;
 
 
 

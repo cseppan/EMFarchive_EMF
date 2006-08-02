@@ -9,6 +9,7 @@ import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
 import gov.epa.emissions.framework.services.casemanagement.Grid;
+import gov.epa.emissions.framework.services.casemanagement.GridResolution;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 
@@ -151,6 +152,15 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.caseObject());
 
         return (Case) call.requestResponse(new Object[] { element });
+    }
+
+    public GridResolution[] getGridResolutions() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getGridResolutions");
+        call.setReturnType(caseMappings.gridResolutions());
+
+        return (GridResolution[]) call.requestResponse(new Object[] {});
     }
 
 }

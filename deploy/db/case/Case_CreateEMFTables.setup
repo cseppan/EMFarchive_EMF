@@ -38,6 +38,15 @@ CREATE TABLE cases.grids
 WITHOUT OIDS;
 -- cases.grids
 
+-- cases.grid_resolutions
+CREATE TABLE cases.grid_resolutions
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(128) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- cases.grid_resolutions
+
 -- cases.speciations
 CREATE TABLE cases.speciations
 (
@@ -69,24 +78,47 @@ WITHOUT OIDS;
 CREATE TABLE cases.cases
 (
   id SERIAL PRIMARY KEY,
-  name varchar(255) NOT NULL UNIQUE,
+  name varchar(128) NOT NULL UNIQUE,
   abbreviation_id int4 REFERENCES cases.case_abbreviations(id),
   description text,
-  creator_id int4  REFERENCES emf.users(id),
+  user_id int4  REFERENCES emf.users(id),
   air_quality_model_id int4  REFERENCES cases.air_quality_models(id),
   category_id int4  REFERENCES cases.case_categories(id),
   project_id int4  REFERENCES emf.projects(id),
-  region_id int4  REFERENCES emf.regions(id),
-  run_status varchar(255),
+  modeling_region_id int4  REFERENCES emf.regions(id),
+  control_region_id int4  REFERENCES emf.regions(id),
+  run_status varchar(128),
+  input_file_dir varchar(255),
+  output_file_dir varchar(255),
+  case_template bool DEFAULT false,
+  is_final bool DEFAULT false,
+  template_used varchar(128),
   grid_id int4 REFERENCES cases.grids(id),
+  grid_resolution_id int4 REFERENCES cases.grid_resolutions(id),
   speciation_id int4 REFERENCES cases.speciations(id),
   meteorlogical_year_id int4 REFERENCES cases.meteorlogical_years(id),
   emissions_year_id int4 REFERENCES cases.emissions_years(id),
+  num_met_layers int4,
+  num_emissions_layers int4,
+  base_year int4,
+  future_year int4,
   last_modified_date timestamp,
-  copied_from varchar(255),
-  lock_owner varchar(255),
-  lock_date timestamp
+  lock_owner varchar(64),
+  lock_date timestamp,
+  start_date timestamp,
+  end_date timestamp
 ) 
 WITHOUT OIDS;
 -- cases.cases
 
+-- cases.casesectors
+CREATE TABLE cases.casesectors
+(
+  id SERIAL PRIMARY KEY,
+  case_id int4 NOT NULL REFERENCES cases.cases(id) ,
+  list_index int4,
+  sector_id int4 REFERENCES emf.sectors(id),
+  UNIQUE (case_id,sector_id) 
+) 
+WITHOUT OIDS;
+-- cases.casesectors

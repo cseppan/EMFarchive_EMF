@@ -29,6 +29,10 @@ public class CaseDAO {
         addObject(object, session);
     }
 
+    public void add(GridResolution object, Session session) {
+        addObject(object, session);
+    }
+
     public void add(CaseCategory object, Session session) {
         addObject(object, session);
     }
@@ -75,6 +79,10 @@ public class CaseDAO {
 
     public List getGrids(Session session) {
         return hibernateFacade.getAll(Grid.class, Order.asc("name"), session);
+    }
+
+    public List getGridResolutions(Session session) {
+        return hibernateFacade.getAll(GridResolution.class, Order.asc("name"), session);
     }
 
     public List getMeteorlogicalYears(Session session) {

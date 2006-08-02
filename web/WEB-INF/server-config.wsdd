@@ -327,10 +327,19 @@
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Grid"
 		qname="ns1:Grid" xmlns:ns1="urn:gov.epa.services.EmfService"/>
-		
+
 	<arrayMapping qname="ns1:Grids" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Grid[]"
 		innerType="ns1:Grid"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.GridResolution"
+		qname="ns1:GridResolution" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<arrayMapping qname="ns1:GridResolutions" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.GridResolution[]"
+		innerType="ns1:GridResolution"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<beanMapping
