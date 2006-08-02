@@ -139,9 +139,19 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
         Button view = new ViewButton("View", viewAction());
         panel.add(view);
+        view.setEnabled(false);
 
         Button edit = new EditButton("Edit", editAction());
         panel.add(edit);
+        
+        Button exportButton = new Button("Export", getAction()); //{
+            //public void actionPerformed(ActionEvent event) {
+            //    exportSelectedDatasets();
+            //}
+        //});
+        exportButton.setToolTipText("Export existing Control Measure(s)");
+        panel.add(exportButton);
+        exportButton.setEnabled(false);
 
         Button copy = new CopyButton("Copy", copyAction());
         panel.add(copy);

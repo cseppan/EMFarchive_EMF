@@ -70,6 +70,8 @@ public class ControlMeasureEditor extends DisposableInteralFrame implements Cont
         tabbedPane.addTab("Efficiencies", createEfficiencyTab(measure, messagePanel));
 
         tabbedPane.addTab("SCCs", createSCCTab(measure, messagePanel));
+        
+        tabbedPane.addTab("Data Sources", new JPanel());
 
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 

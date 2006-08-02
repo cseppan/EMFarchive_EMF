@@ -22,7 +22,9 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Pollutant", "Percent Reduction" };
+        return new String[] { "Pollutant", "Percent Reduction", "Locale", "Cost Year", "Cost Per Ton",
+                "Rule Effectiveness", "Rule Penetration", "Equation Type", "CapRecFactor", "Discount Rate",
+                "Details", "Effective Date"};
     }
 
     public List rows() {
@@ -34,7 +36,10 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     private Row row(EfficiencyRecord record) {
-        Object[] values = { record.getPollutant(), new Float(record.getEfficiency()) };
+        Object[] values = { record.getPollutant(), ""+record.getPercentReduction(), record.getLocale(),
+                ""+record.getCostYear(), ""+record.getCostPerTon(), ""+record.getRuleEffectiveness(),
+                ""+record.getRulePenetration(), record.getEquationType(), ""+record.getCapRecFactor(),
+                ""+record.getDiscountRate(), record.getDetail(), record.getEffectiveDate().toString()};
 
         return new ViewableRow(record, values);
     }

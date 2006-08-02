@@ -92,16 +92,23 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
 
     private JPanel controlPanel() {
         Button addButton = new Button("Add", addAction());
+        Button editButton = new Button("Edit", editAction());
         Button removeButton = new Button("Remove", removeAction());
 
         JPanel panel = new JPanel();
         panel.add(addButton);
+        panel.add(editButton);
         panel.add(removeButton);
 
         JPanel container = new JPanel(new BorderLayout());
         container.add(panel, BorderLayout.LINE_START);
 
         return container;
+    }
+
+    private Action editAction() {
+        // NOTE Auto-generated method stub
+        return null;
     }
 
     private Action addAction() {

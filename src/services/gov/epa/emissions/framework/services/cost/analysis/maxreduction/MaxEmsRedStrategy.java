@@ -135,7 +135,7 @@ public class MaxEmsRedStrategy implements Strategy {
 
     private void calculateResultForSingleDataset(Dataset inputDataset, Datasource datasource) throws Exception {
         String query = getSourceQueryString(inputDataset, datasource);
-        OptimizedQuery runner = runner = datasource.optimizedQuery(query, batchSize);
+        OptimizedQuery runner = datasource.optimizedQuery(query, batchSize);
 
         String resultDatasetName = getResultDatasetName();
         String resultTableName = "CSDR_" + resultDatasetName;
