@@ -146,7 +146,8 @@ CREATE TABLE emf.control_measure_efficiencyrecords
   equation_type varchar(128),
   cap_rec_factor real,
   discount_rate real,
-  reference varchar(128),
+  detail varchar(128),
+  effective_date timestamp,
   UNIQUE (control_measures_id, list_index)
 ) 
 WITHOUT OIDS;

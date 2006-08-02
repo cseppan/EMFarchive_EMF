@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class EfficiencyRecord implements Serializable {
 
@@ -16,7 +17,7 @@ public class EfficiencyRecord implements Serializable {
     
     private String equationType;
 
-    private String reference;
+    private String detail;
     
     private float percentReduction;
 
@@ -33,6 +34,8 @@ public class EfficiencyRecord implements Serializable {
     private float discountRate;
 
     private float efficiency;
+    
+    private Date effectiveDate;
 
     public float getCapRecFactor() {
         return capRecFactor;
@@ -130,12 +133,12 @@ public class EfficiencyRecord implements Serializable {
         this.pollutant = pollutant;
     }
 
-    public String getReference() {
-        return reference;
+    public String getDetail() {
+        return detail;
     }
 
-    public void setReference(String reference) {
-        this.reference = reference;
+    public void setDetail(String detail) {
+        this.detail = detail;
     }
 
     public float getRuleEffectiveness() {
@@ -152,6 +155,14 @@ public class EfficiencyRecord implements Serializable {
 
     public void setRulePenetration(float rulePenetration) {
         this.rulePenetration = rulePenetration;
+    }
+
+    public Date getEffectiveDate() {
+        return effectiveDate;
+    }
+
+    public void setEffectiveDate(Date effectiveDate) {
+        this.effectiveDate = effectiveDate;
     }
 
 }
