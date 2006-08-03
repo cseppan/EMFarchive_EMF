@@ -218,8 +218,11 @@
 	<target name="ci-build" depends="compile, unit-tests, app-dist" description="Continuous Integration build" />
 
 	<!-- DEFAULT target-->
-	<target name="nirvana" description="Deploys application to Tomcat, runs ALL (except UAT) tests, and stops Tomcat" depends="clean, init, all-dev-tests" />
-
+	<target name="nirvana" description="Runs ALL (except UAT AND Webservices) tests" depends="clean, init, all-dev-tests" />
+	
+	<!-- Runs Integration & Persistance Test !-->
+	<target name="Integration AND Persistane Tests" description="runs Intergration AND Persistance Test" depends="clean, init, integration-tests, persistence-tests" />
+	
 	<target name="moksha" description="Deploys application to Tomcat, runs ALL tests, and stops Tomcat">
 		<antcall target="run-webservice-tests">
 			<param name="tests-target" value="all-tests" />
