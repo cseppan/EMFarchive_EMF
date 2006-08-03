@@ -6,6 +6,7 @@ import gov.epa.emissions.framework.ui.Row;
 import gov.epa.emissions.framework.ui.ViewableRow;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,8 +24,8 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
 
     public String[] columns() {
         return new String[] { "Pollutant", "Percent Reduction", "Locale", "Cost Year", "Cost Per Ton",
-                "Rule Effectiveness", "Rule Penetration", "Equation Type", "CapRecFactor", "Discount Rate",
-                "Details", "Effective Date"};
+                "Rule Effectiveness", "Rule Penetration", "Equation Type", "CapRecFactor", "Discount Rate", "Details",
+                "Effective Date" };
     }
 
     public List rows() {
@@ -36,12 +37,16 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     private Row row(EfficiencyRecord record) {
-        Object[] values = { record.getPollutant(), ""+record.getPercentReduction(), record.getLocale(),
-                ""+record.getCostYear(), ""+record.getCostPerTon(), ""+record.getRuleEffectiveness(),
-                ""+record.getRulePenetration(), record.getEquationType(), ""+record.getCapRecFactor(),
-                ""+record.getDiscountRate(), record.getDetail(), record.getEffectiveDate().toString()};
+        Object[] values = { record.getPollutant(), "" + record.getPercentReduction(), record.getLocale(),
+                "" + record.getCostYear(), "" + record.getCostPerTon(), "" + record.getRuleEffectiveness(),
+                "" + record.getRulePenetration(), record.getEquationType(), "" + record.getCapRecFactor(),
+                "" + record.getDiscountRate(), record.getDetail(), effectiveDate(record.getEffectiveDate()) };
 
         return new ViewableRow(record, values);
+    }
+
+    private String effectiveDate(Date effectiveDate) {
+        return effectiveDate == null ? "" : effectiveDate + "";//TODO: format the date
     }
 
     private List createRows(EfficiencyRecord[] records) {
@@ -76,7 +81,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
             ViewableRow row = (ViewableRow) iter.next();
             sources.add(row.source());
         }
-        
+
         return sources;
     }
 

@@ -8,33 +8,33 @@ public class EfficiencyRecord implements Serializable {
     private int id;
 
     private int existingDevCode;
-    
+
     private String pollutant;
 
     private String existingMeasureAbbr;
-    
+
     private String locale;
-    
+
     private String equationType;
 
     private String detail;
-    
+
     private float percentReduction;
 
     private int costYear;
-    
+
     private float costPerTon;
-    
+
     private float ruleEffectiveness;
-    
+
     private float rulePenetration;
-    
+
     private float capRecFactor;
-    
+
     private float discountRate;
 
     private float efficiency;
-    
+
     private Date effectiveDate;
 
     public float getCapRecFactor() {

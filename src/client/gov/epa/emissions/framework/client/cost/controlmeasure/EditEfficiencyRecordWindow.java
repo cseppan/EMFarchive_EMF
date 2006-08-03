@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
+import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
@@ -23,32 +24,31 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-public class EfficiencyRecordWindow extends DisposableInteralFrame implements EfficiencyRecordView {
+public class EditEfficiencyRecordWindow extends DisposableInteralFrame implements EditEfficiencyRecordView {
 
     private MessagePanel messagePanel;
 
-    private EfficiencyRecordPresenter presenter;
-
     private TextField efficiency;
-    
+
     private EditableComboBox pollutant;
-    
+
     private float efficiencyValue;
 
     private ManageChangeables changeablesList;
 
     private NumberFieldVerifier verifier;
-    
-    private boolean verified = false;
-    
-    private EfficiencyRecord record;
-    
-    private static int count = 0;
-    
-    private String[] pollutants = { "NOx", "PM10", "PM2.5", "SO2", "VOC", "CO",
-            "CO2", "EC", "OC", "NH3", "Hg" };
 
-    public EfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager) {
+    private boolean verified = false;
+
+    private EfficiencyRecord record;
+
+    private static int count = 0;
+
+    private String[] pollutants = { "NOx", "PM10", "PM2.5", "SO2", "VOC", "CO", "CO2", "EC", "OC", "NH3", "Hg" };
+
+    private EditEfficiencyRecordPresenter presenter;
+
+    public EditEfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager) {
         super("Add Efficiency Record", new Dimension(400, 180), desktopManager);
         this.changeablesList = changeablesList;
         this.verifier = new NumberFieldVerifier("");
@@ -56,15 +56,15 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
 
     public void display(ControlMeasure measure, EfficiencyRecord record) {
         String name = measure.getName();
-        if(name == null)
+        if (name == null)
             name = "New Control Measure";
         super.setLabel(super.getTitle() + " " + ++count + " for Control Measure: " + name);
         JPanel layout = createLayout();
         super.getContentPane().add(layout);
         super.display();
         this.record = record;
-        
-        if(record != null)
+
+        if (record != null)
             populateFields();
     }
 
@@ -102,10 +102,10 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
 
         return panel;
     }
-    
+
     private void populateFields() {
         pollutant.setSelectedItem(record.getPollutant());
-        efficiency.setText(record.getEfficiency()+"");
+        efficiency.setText(record.getEfficiency() + "");
     }
 
     protected void verifyInput() {
@@ -123,13 +123,13 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
 
     private JPanel buttonsPanel() {
         JPanel panel = new JPanel();
-        Button ok = new Button("OK", new AbstractAction() {
+        Button save = new SaveButton(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                doNew();
+                doSave();
             }
         });
-        getRootPane().setDefaultButton(ok);
-        panel.add(ok);
+        getRootPane().setDefaultButton(save);
+        panel.add(save);
 
         Button cancel = new Button("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -141,29 +141,33 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
         return panel;
     }
 
-    private void doNew() {
+    private void doSave() {
         verifyInput();
         if(verified == false)
             return;
+        // update the efficiency record
+        record.setPollutant((String)pollutant.getSelectedItem());
         
-        presenter.addNew(efficiencyRecord());
+        record.setEfficiency((Float.parseFloat(efficiency.getText().trim())));
+        
+        presenter.refresh();
         disposeView();
     }
-    
+
     public EfficiencyRecord efficiencyRecord() {
         EfficiencyRecord record = new EfficiencyRecord();
-        
+
         return setRecord(record);
     }
 
     private EfficiencyRecord setRecord(EfficiencyRecord record) {
-        record.setPollutant(pollutant.getSelectedItem()+"");
+        record.setPollutant(pollutant.getSelectedItem() + "");
         record.setEfficiency(efficiencyValue);
-        
+
         return record;
     }
 
-    public void observe(EfficiencyRecordPresenter presenter) {
+    public void observe(EditEfficiencyRecordPresenter presenter) {
         this.presenter = presenter;
     }
 

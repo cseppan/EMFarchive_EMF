@@ -143,12 +143,8 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
 
         Button edit = new EditButton("Edit", editAction());
         panel.add(edit);
-        
-        Button exportButton = new Button("Export", getAction()); //{
-            //public void actionPerformed(ActionEvent event) {
-            //    exportSelectedDatasets();
-            //}
-        //});
+
+        Button exportButton = new Button("Export", exportAction());
         exportButton.setToolTipText("Export existing Control Measure(s)");
         panel.add(exportButton);
         exportButton.setEnabled(false);
@@ -218,7 +214,7 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     private Action viewAction() {
-        return getAction();
+        return exportAction();
     }
 
     private Action editAction() {
@@ -260,32 +256,17 @@ public class ControlMeasuresManagerWindow extends ReusableInteralFrame implement
     }
 
     private Action copyAction() {
-        return getAction();
+        return exportAction();
     }
 
-    private Action getAction() {
+    private Action exportAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                actions();
+                // TODO: Add Export Action
             }
         };
+
         return action;
-    }
-
-    private void actions() {
-        clearMessage();
-
-        ControlMeasure[] measures = (ControlMeasure[]) getSelectedMeasures().toArray(new ControlMeasure[0]);
-        if (measures.length == 0)
-            showError("Please select a control measure.");
-
-        try {
-            for (int i = 0; i < measures.length; i++) {
-                presenter.doEdit(parentConsole, measures[i], desktopManager);
-            }
-        } catch (EmfException e) {
-            showError(e.getMessage());
-        }
     }
 
     private List getSelectedMeasures() {

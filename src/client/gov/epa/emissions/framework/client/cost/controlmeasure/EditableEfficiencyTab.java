@@ -15,6 +15,7 @@ import gov.epa.mims.analysisengine.table.SortCriteria;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -107,8 +108,16 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
     }
 
     private Action editAction() {
-        // NOTE Auto-generated method stub
-        return null;
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                List list = selectModel.selected();
+                EfficiencyRecord[] records = (EfficiencyRecord[]) list.toArray(new EfficiencyRecord[0]);
+                for (int i = 0; i < records.length; i++) {
+                    doEdit(records[i]);
+                }
+                
+            }
+        };
     }
 
     private Action addAction() {
@@ -153,6 +162,13 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
         presenter.display(measure, null);
     }
 
+    private void doEdit(EfficiencyRecord record) {
+        messagePanel.clear();
+        EditEfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager);
+        EditEfficiencyRecordPresenter presenter = new EditEfficiencyRecordPresenter(this, view);
+        presenter.display(measure, record);
+    }
+    
     private EfficiencyRecord[] getSelectedRecords() {
         return (EfficiencyRecord[]) selectModel.selected().toArray(new EfficiencyRecord[0]);
     }
@@ -175,8 +191,8 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
         refreshPanel();
     }
 
-    public void edit(EfficiencyRecord record) {
-        refreshPanel();
+    public void refresh() {
+       refreshPanel();
     }
 
 }
