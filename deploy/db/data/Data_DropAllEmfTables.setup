@@ -61,9 +61,3 @@ DROP TABLE emf.note_types CASCADE;
 -- emf revisions
 DROP TABLE emf.revisions;
 --
--- emf pollutants
-DROP TABLE emf.pollutants;
---
--- emf source_groups
-DROP TABLE emf.source_groups;
---
