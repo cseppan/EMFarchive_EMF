@@ -82,7 +82,7 @@ public class NewControlMeasureWindow extends DisposableInteralFrame implements C
     }
 
     private Component createEfficiencyTab(ControlMeasure measure, MessagePanel messagePanel) {
-        EditableEfficiencyTab view = new EditableEfficiencyTab(measure, this, parent, desktopManager, messagePanel);
+        EditableEfficiencyTab view = new EditableEfficiencyTab(measure, this, parent, session, desktopManager, messagePanel);
         presenter.set(view);
         
         return view;

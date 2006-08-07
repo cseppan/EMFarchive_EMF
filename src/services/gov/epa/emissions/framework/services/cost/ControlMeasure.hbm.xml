@@ -55,12 +55,14 @@
       		<key column="control_measures_id" not-null="true"/>
       		<list-index column="list_index"/>
 		    <composite-element class="gov.epa.emissions.framework.services.cost.data.EfficiencyRecord">
-				<property name="pollutant" column="pollutant" type="java.lang.String" not-null="true"/>
+			<many-to-one cascade="save-update"
+                 name="pollutant" 
+             	 class="gov.epa.emissions.commons.data.Pollutant"
+             	 column="pollutant_id"/> 
 				<property name="existingMeasureAbbr" column="existing_measure_abbr" type="java.lang.String" not-null="false"/>
 				<property name="existingDevCode" column="existing_dev_code" type="integer" not-null="false"/>
 				<property name="locale" column="locale" type="java.lang.String" not-null="false"/>
         		<property name="efficiency" column="efficiency" type="float" not-null="false"/>
-        		<property name="percentReduction" column="percent_reduction" type="float" not-null="false"/>
         		<property name="costYear" column="cost_year" type="integer" not-null="false"/>
         		<property name="costPerTon" column="cost_per_ton" type="float" not-null="false"/>
         	    <property name="ruleEffectiveness" column="rule_effectiveness" type="float" not-null="false"/>

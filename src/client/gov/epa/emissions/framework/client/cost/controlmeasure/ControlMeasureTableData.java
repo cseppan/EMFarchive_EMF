@@ -118,7 +118,7 @@ public class ControlMeasureTableData extends AbstractTableData {
 
         if (records.length != 0) {
             for (int i = 0; i < records.length; i++) {
-                if (records[i].getPollutant().equalsIgnoreCase(localPollutant))
+                if (records[i].getPollutant().getName().equalsIgnoreCase(localPollutant))
                     return new Float(records[i].getEfficiency());
             }
         }

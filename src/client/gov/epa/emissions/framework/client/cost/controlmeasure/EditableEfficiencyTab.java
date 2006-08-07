@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.SortFilterSelectModel;
 import gov.epa.emissions.commons.gui.SortFilterSelectionPanel;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
@@ -43,12 +44,15 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
 
     private MessagePanel messagePanel;
 
+    private EmfSession session;
+
     public EditableEfficiencyTab(ControlMeasure measure, ManageChangeables changeablesList, EmfConsole parent,
-            DesktopManager desktopManager, MessagePanel messagePanel) {
+            EmfSession session, DesktopManager desktopManager, MessagePanel messagePanel) {
         this.mainPanel = new JPanel(new BorderLayout());
         this.parentConsole = parent;
         this.changeablesList = changeablesList;
         this.desktopManager = desktopManager;
+        this.session = session;
         this.messagePanel = messagePanel;
         doLayout(measure);
     }
@@ -94,11 +98,13 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
     private JPanel controlPanel() {
         Button addButton = new Button("Add", addAction());
         Button editButton = new Button("Edit", editAction());
+        Button copyButton = new Button("Copy", copyAction());
         Button removeButton = new Button("Remove", removeAction());
 
         JPanel panel = new JPanel();
         panel.add(addButton);
         panel.add(editButton);
+        panel.add(copyButton);
         panel.add(removeButton);
 
         JPanel container = new JPanel(new BorderLayout());
@@ -128,6 +134,18 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
         };
     }
 
+    private Action copyAction() {
+        return new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                List list = selectModel.selected();
+                EfficiencyRecord[] records = (EfficiencyRecord[]) list.toArray(new EfficiencyRecord[0]);
+                for (int i = 0; i < records.length; i++) {
+                    doCopy(records[i]);
+                }
+            }
+        };
+    }
+    
     private Action removeAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -135,6 +153,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
             }
         };
     }
+    
 
     protected void doRemove() {
         messagePanel.clear();
@@ -154,33 +173,45 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
             refreshPanel();
         }
     }
+    
 
     protected void doAdd() {
         messagePanel.clear();
-        EfficiencyRecordView view = new EfficiencyRecordWindow(changeablesList, desktopManager);
+        EfficiencyRecordView view = new EfficiencyRecordWindow(changeablesList, desktopManager, session);
         EfficiencyRecordPresenter presenter = new EfficiencyRecordPresenter(this, view);
         presenter.display(measure, null);
     }
-
-    private void doEdit(EfficiencyRecord record) {
+    
+    protected void doCopy(EfficiencyRecord record) {
         messagePanel.clear();
-        EditEfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager);
+        EditEfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager, session);
         EditEfficiencyRecordPresenter presenter = new EditEfficiencyRecordPresenter(this, view);
         presenter.display(measure, record);
     }
     
+    private void doEdit(EfficiencyRecord record) {
+        messagePanel.clear();
+        EditEfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager, session);
+        EditEfficiencyRecordPresenter presenter = new EditEfficiencyRecordPresenter(this, view);
+        presenter.display(measure, record);
+    }
+    
+    
     private EfficiencyRecord[] getSelectedRecords() {
         return (EfficiencyRecord[]) selectModel.selected().toArray(new EfficiencyRecord[0]);
     }
+    
 
     public void refreshData() {
         tableData.refresh();
     }
+    
 
     public void refreshPanel() {
         refreshData();
         updateMainPanel(tableData.sources());
     }
+    
 
     public void save(ControlMeasure measure) {
         measure.setEfficiencyRecords(tableData.sources());

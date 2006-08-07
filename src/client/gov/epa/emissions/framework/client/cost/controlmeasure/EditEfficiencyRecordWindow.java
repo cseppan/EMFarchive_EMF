@@ -1,11 +1,13 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
@@ -26,6 +28,10 @@ import javax.swing.SpringLayout;
 
 public class EditEfficiencyRecordWindow extends DisposableInteralFrame implements EditEfficiencyRecordView {
 
+    protected ControlMeasure measure;
+    
+    protected EmfSession session;
+    
     private MessagePanel messagePanel;
 
     private TextField efficiency;
@@ -44,13 +50,14 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
 
     private static int count = 0;
 
-    private String[] pollutants = { "NOx", "PM10", "PM2.5", "SO2", "VOC", "CO", "CO2", "EC", "OC", "NH3", "Hg" };
+    protected Pollutant[] allPollutants;
 
     private EditEfficiencyRecordPresenter presenter;
 
-    public EditEfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager) {
+    public EditEfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager, EmfSession session) {
         super("Add Efficiency Record", new Dimension(400, 180), desktopManager);
         this.changeablesList = changeablesList;
+        this.session = session;
         this.verifier = new NumberFieldVerifier("");
     }
 
@@ -84,21 +91,26 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        pollutant = new EditableComboBox(pollutants);
-        pollutant.setName("Pollutant");
+        try {
+            allPollutants = session.dataCommonsService().getPollutants();
+            pollutant = new EditableComboBox(allPollutants);
+        } catch (EmfException e) {
+            messagePanel.setError("Could not retrieve Pollutants");
+        }
+        // majorPollutant.setSelectedIndex(0);
         changeablesList.addChangeable(pollutant);
         layoutGenerator.addLabelWidgetPair("Pollutant:", pollutant, panel);
-
+        
         efficiency = new TextField("", 10);
-        efficiency.setName("Percent Reduction");
+        efficiency.setName("Control Efficiency");
         changeablesList.addChangeable(efficiency);
-        layoutGenerator.addLabelWidgetPair("Percent Reduction (%):", efficiency, panel);
+        layoutGenerator.addLabelWidgetPair("Percent Red (%):", efficiency, panel);
         efficiency.setToolTipText("Enter the percent reduction as a percentage (e.g., 90%, or -10% for a disbenefit)");
 
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
+        
+        
+        
+        widgetLayout(2, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -146,7 +158,7 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
         if(verified == false)
             return;
         // update the efficiency record
-        record.setPollutant((String)pollutant.getSelectedItem());
+        record.setPollutant((Pollutant) pollutant.getSelectedItem());
         
         record.setEfficiency((Float.parseFloat(efficiency.getText().trim())));
         
@@ -154,21 +166,15 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
         disposeView();
     }
 
-    public EfficiencyRecord efficiencyRecord() {
-        EfficiencyRecord record = new EfficiencyRecord();
-
-        return setRecord(record);
-    }
-
-    private EfficiencyRecord setRecord(EfficiencyRecord record) {
-        record.setPollutant(pollutant.getSelectedItem() + "");
-        record.setEfficiency(efficiencyValue);
-
-        return record;
-    }
-
     public void observe(EditEfficiencyRecordPresenter presenter) {
         this.presenter = presenter;
     }
 
+    private void widgetLayout(int rows, int cols, int initX, int initY, int xPad, int yPad,
+        SpringLayoutGenerator layoutGenerator, JPanel panel) {
+    // Lay out the panel.
+    layoutGenerator.makeCompactGrid(panel, rows, cols, // rows, cols
+            initX, initY, // initialX, initialY
+            xPad, yPad);// xPad, yPad
+    }
 }

@@ -133,7 +133,7 @@ CREATE TABLE emf.control_measure_efficiencyrecords
   id SERIAL PRIMARY KEY,
   control_measures_id int4 NOT NULL REFERENCES emf.control_measures(id),
   list_index int4,
-  pollutant varchar(128),
+  pollutant_id int4 NOT NULL REFERENCES emf.pollutants(id),
   existing_measure_abbr varchar(10),
   existing_dev_code int4,
   locale varchar(10),

@@ -1,10 +1,12 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.commons.gui.EditableComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
+import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.SpringLayoutGenerator;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.services.EmfException;
@@ -25,6 +27,8 @@ import javax.swing.SpringLayout;
 
 public class EfficiencyRecordWindow extends DisposableInteralFrame implements EfficiencyRecordView {
 
+    private EmfSession session;
+    
     private MessagePanel messagePanel;
 
     private EfficiencyRecordPresenter presenter;
@@ -45,12 +49,12 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
     
     private static int count = 0;
     
-    private String[] pollutants = { "NOx", "PM10", "PM2.5", "SO2", "VOC", "CO",
-            "CO2", "EC", "OC", "NH3", "Hg" };
+    protected Pollutant[] allPollutants;
 
-    public EfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager) {
+    public EfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager, EmfSession session) {
         super("Add Efficiency Record", new Dimension(400, 180), desktopManager);
         this.changeablesList = changeablesList;
+        this.session = session;
         this.verifier = new NumberFieldVerifier("");
     }
 
@@ -84,8 +88,13 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        pollutant = new EditableComboBox(pollutants);
-        pollutant.setName("Pollutant");
+        try {
+            allPollutants = session.dataCommonsService().getPollutants();
+            pollutant = new EditableComboBox(allPollutants);
+        } catch (EmfException e) {
+            messagePanel.setError("Could not retrieve Pollutants");
+        }
+        // majorPollutant.setSelectedIndex(0);
         changeablesList.addChangeable(pollutant);
         layoutGenerator.addLabelWidgetPair("Pollutant:", pollutant, panel);
 
@@ -157,7 +166,7 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
     }
 
     private EfficiencyRecord setRecord(EfficiencyRecord record) {
-        record.setPollutant(pollutant.getSelectedItem()+"");
+        record.setPollutant((Pollutant) pollutant.getSelectedItem());
         record.setEfficiency(efficiencyValue);
         
         return record;

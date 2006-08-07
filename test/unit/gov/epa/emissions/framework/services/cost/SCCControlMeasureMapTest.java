@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.framework.services.cost.analysis.SCCControlMeasureMap;
 import gov.epa.emissions.framework.services.cost.controlmeasure.Scc;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
@@ -111,7 +112,7 @@ public class SCCControlMeasureMapTest extends TestCase {
         cm.setName(name);
         
         EfficiencyRecord efficiencyRecord = new EfficiencyRecord();
-        efficiencyRecord.setPollutant("NOx");
+        efficiencyRecord.setPollutant(new Pollutant("NOx"));
         efficiencyRecord.setEfficiency((float) (50+addEfficiency));
         cm.setEfficiencyRecords(new EfficiencyRecord[]{efficiencyRecord});
         

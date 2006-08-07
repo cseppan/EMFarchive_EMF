@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.cost.data;
 
+import gov.epa.emissions.commons.data.Pollutant;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -9,7 +11,7 @@ public class EfficiencyRecord implements Serializable {
 
     private int existingDevCode;
 
-    private String pollutant;
+    private Pollutant pollutant;
 
     private String existingMeasureAbbr;
 
@@ -18,8 +20,6 @@ public class EfficiencyRecord implements Serializable {
     private String equationType;
 
     private String detail;
-
-    private float percentReduction;
 
     private int costYear;
 
@@ -117,19 +117,11 @@ public class EfficiencyRecord implements Serializable {
         this.locale = locale;
     }
 
-    public float getPercentReduction() {
-        return percentReduction;
-    }
-
-    public void setPercentReduction(float percentReduction) {
-        this.percentReduction = percentReduction;
-    }
-
-    public String getPollutant() {
+   public Pollutant getPollutant() {
         return pollutant;
     }
 
-    public void setPollutant(String pollutant) {
+    public void setPollutant(Pollutant pollutant) {
         this.pollutant = pollutant;
     }
 

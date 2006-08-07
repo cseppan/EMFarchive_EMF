@@ -94,7 +94,7 @@ public class SCCControlMeasureMap {
         EfficiencyRecord [] records = measure.getEfficiencyRecords();
         
         for (int i = 0; i < records.length; i++) {
-            String controlMeasurePollutant = records[i].getPollutant();
+            String controlMeasurePollutant = records[i].getPollutant().getName();//FIXME: don't use the name to compare use pollutants
             if (pollutant.equalsIgnoreCase(controlMeasurePollutant) && costYear == records[i].getCostYear())
                 return records[i].getCostPerTon();
         }
@@ -120,7 +120,7 @@ public class SCCControlMeasureMap {
         EfficiencyRecord[] records = measure.getEfficiencyRecords();
 
         for (int i = 0; i < records.length; i++) {
-            String pollutant = records[i].getPollutant();
+            String pollutant = records[i].getPollutant().getName();
             if (pollutant.equalsIgnoreCase(this.pollutant))
                 return records[i].getEfficiency();
         }

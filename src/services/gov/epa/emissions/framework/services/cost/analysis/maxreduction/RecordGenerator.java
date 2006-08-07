@@ -110,7 +110,7 @@ public class RecordGenerator {
         String targetPollutant = controlStrategy.getTargetPollutant();
 
         for (int i = 0; i < records.length; i++) {
-            String pollutant = records[i].getPollutant();
+            String pollutant = records[i].getPollutant().getName();
             if (pollutant.equalsIgnoreCase(targetPollutant))
                 return records[i].getEfficiency();
         }
@@ -125,7 +125,7 @@ public class RecordGenerator {
         int costYear = controlStrategy.getCostYear();
 
         for (int i = 0; i < records.length; i++) {
-            String pollutant = records[i].getPollutant();
+            String pollutant = records[i].getPollutant().getName();
 
             if (pollutant.equalsIgnoreCase(targetPollutant) && costYear == records[i].getCostYear())
                 return records[i].getCostPerTon();
@@ -164,7 +164,7 @@ public class RecordGenerator {
         EfficiencyRecord[] records = maxRedMeasure.getEfficiencyRecords();
         String targetPollutant = controlStrategy.getTargetPollutant();
         for (int i = 0; i < records.length; i++) {
-            if (targetPollutant.equalsIgnoreCase(records[i].getPollutant()))
+            if (targetPollutant.equalsIgnoreCase(records[i].getPollutant().getName()))
                 // FIXME: include cost year constraint && costYear==records[i].getCostYear()){
                 // FIXME: default values for the rule effectiveness and penetration is 0;
                 // return

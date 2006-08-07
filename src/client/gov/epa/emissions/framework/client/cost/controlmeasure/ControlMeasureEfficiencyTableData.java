@@ -37,7 +37,7 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     private Row row(EfficiencyRecord record) {
-        Object[] values = { record.getPollutant(), "" + record.getPercentReduction(), record.getLocale(),
+        Object[] values = { record.getPollutant()+"", "" + record.getEfficiency(), record.getLocale(),
                 "" + record.getCostYear(), "" + record.getCostPerTon(), "" + record.getRuleEffectiveness(),
                 "" + record.getRulePenetration(), record.getEquationType(), "" + record.getCapRecFactor(),
                 "" + record.getDiscountRate(), record.getDetail(), effectiveDate(record.getEffectiveDate()) };
