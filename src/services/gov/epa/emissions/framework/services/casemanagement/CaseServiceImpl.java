@@ -206,4 +206,56 @@ public class CaseServiceImpl implements CaseService {
         }
     }
 
+    public CaseInput[] getCaseInputs() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List results = dao.getCaseInputs(session);
+            session.close();
+
+            return (CaseInput[]) results.toArray(new CaseInput[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all CaseInputs", e);
+            throw new EmfException("Could not get all CaseInputs");
+        }
+    }
+
+    public InputName[] getInputNames() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List results = dao.getInputNames(session);
+            session.close();
+
+            return (InputName[]) results.toArray(new InputName[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all InputNames", e);
+            throw new EmfException("Could not get all InputNames");
+        }
+    }
+
+    public InputEnvtVar[] getInputEnvtVars() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List results = dao.getInputEnvtVars(session);
+            session.close();
+
+            return (InputEnvtVar[]) results.toArray(new InputEnvtVar[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all InputEnvtVars", e);
+            throw new EmfException("Could not get all InputEnvtVars");
+        }
+    }
+
+    public Program[] getPrograms() throws EmfException {
+        try {
+            Session session = sessionFactory.getSession();
+            List results = dao.getPrograms(session);
+            session.close();
+
+            return (Program[]) results.toArray(new Program[0]);
+        } catch (RuntimeException e) {
+            LOG.error("Could not get all Programs", e);
+            throw new EmfException("Could not get all Programs");
+        }
+    }
+
 }

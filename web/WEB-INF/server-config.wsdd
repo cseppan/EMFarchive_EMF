@@ -353,13 +353,47 @@
 
 	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Speciation"
-		qname="ns1:Speciation" xmlns:ns1="urn:gov.epa.services.EmfService"/>
-		
-		
+		qname="ns1:Speciation" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
 		
 	<arrayMapping qname="ns1:Speciations" xmlns:ns1="urn:gov.epa.services.EmfService"
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Speciation[]"
 		innerType="ns1:Speciation"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.CaseInput"
+		qname="ns1:CaseInput" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:CaseInputs" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.CaseInput[]"
+		innerType="ns1:CaseInput"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.InputEnvtVar"
+		qname="ns1:InputEnvtVar" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:InputEnvtVars" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.InputEnvtVar[]"
+		innerType="ns1:InputEnvtVar"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.InputName"
+		qname="ns1:InputName" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:InputNames" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.InputName[]"
+		innerType="ns1:InputName"
+		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+
+	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Program"
+		qname="ns1:Program" xmlns:ns1="urn:gov.epa.services.EmfService"/>	
+		
+	<arrayMapping qname="ns1:Programs" xmlns:ns1="urn:gov.epa.services.EmfService"
+		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Program[]"
+		innerType="ns1:Program"
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 	
 	<!-- ================================================================= -->

@@ -141,10 +141,93 @@ public class CaseServiceTest extends ServiceTestCase {
         }
     }
 
+    public void testShouldGetCaseInputs() throws Exception {
+        int totalBeforeAdd = service.getCaseInputs().length;
+        CaseInput caseinput = new CaseInput("test one");
+        Case element = new Case("test" + Math.random());
+        element.setCaseInputs(new CaseInput[]{caseinput});
+        add(element);
+        
+        try {
+            List list = Arrays.asList(service.getCaseInputs());
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(caseinput));
+        } finally {
+            remove(element);
+            remove(caseinput);
+        }
+    }
+    
+    public void testShouldGetInputNames() throws Exception {
+        int totalBeforeAdd = service.getInputNames().length;
+        
+        CaseInput caseinput = new CaseInput("input one");
+        InputName inputname = new InputName("input name one");
+        Case element = new Case("test" + Math.random());
+        
+        caseinput.setInputName(inputname);
+        element.setCaseInputs(new CaseInput[]{caseinput});
+        add(element);
+        
+        try {
+            List list = Arrays.asList(service.getInputNames());
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(inputname));
+        } finally {
+            remove(element);
+            remove(caseinput);
+            remove(inputname);
+        }
+    }
+    
+    public void testShouldGetInputEnvtVars() throws Exception {
+        int totalBeforeAdd = service.getInputEnvtVars().length;
+        
+        CaseInput caseinput = new CaseInput("input one");
+        InputEnvtVar envtVar = new InputEnvtVar("envt var one");
+        Case element = new Case("test" + Math.random());
+        
+        caseinput.setEnvtVars(envtVar);
+        element.setCaseInputs(new CaseInput[]{caseinput});
+        add(element);
+        
+        try {
+            List list = Arrays.asList(service.getInputEnvtVars());
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(envtVar));
+        } finally {
+            remove(element);
+            remove(caseinput);
+            remove(envtVar);
+        }
+    }
+ 
+    public void testShouldGetPrograms() throws Exception {
+        int totalBeforeAdd = service.getPrograms().length;
+        
+        CaseInput caseinput = new CaseInput("input one");
+        Program program = new Program("input name one");
+        Case element = new Case("test" + Math.random());
+        
+        caseinput.setProgram(program);
+        element.setCaseInputs(new CaseInput[]{caseinput});
+        add(element);
+        
+        try {
+            List list = Arrays.asList(service.getPrograms());
+            assertEquals(totalBeforeAdd + 1, list.size());
+            assertTrue(list.contains(program));
+        } finally {
+            remove(element);
+            remove(caseinput);
+            remove(program);
+        }
+    }
+
     public void testShouldGetCases() throws Exception {
         int totalBeforeAdd = service.getCases().length;
         Case element = newCase();
-
+        
         try {
             List list = Arrays.asList(service.getCases());
             assertEquals(totalBeforeAdd + 1, list.size());
@@ -163,14 +246,27 @@ public class CaseServiceTest extends ServiceTestCase {
     public void testShouldAddCase() throws Exception {
         int totalBeforeAdd = service.getCases().length;
         Case element = new Case("test" + Math.random());
+        
+        CaseInput input1 = new CaseInput("input one");
+        CaseInput input2 = new CaseInput("input two");
+        CaseInput input3 = new CaseInput("input three");
+        element.setCaseInputs(new CaseInput[]{input1, input2, input3}); 
         service.addCase(element);
 
         try {
             List list = Arrays.asList(service.getCases());
+            Case retrieved = (Case)list.get(totalBeforeAdd);
+            
             assertEquals(totalBeforeAdd + 1, list.size());
             assertTrue(list.contains(element));
+            assertEquals("input one", retrieved.getCaseInputs()[0].getName());
+            assertEquals("input two", retrieved.getCaseInputs()[1].getName());
+            assertEquals("input three", retrieved.getCaseInputs()[2].getName());
         } finally {
             remove(element);
+            remove(input1);
+            remove(input2);
+            remove(input3);
         }
     }
 

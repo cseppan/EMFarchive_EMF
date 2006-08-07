@@ -56,6 +56,33 @@ CREATE TABLE cases.speciations
 WITHOUT OIDS;
 -- cases.speciations
 
+-- cases.programs
+CREATE TABLE cases.programs
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- cases.programs
+
+-- cases.inputnames
+CREATE TABLE cases.inputnames
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- cases.inputnames
+
+-- cases.input_envt_vars
+CREATE TABLE cases.input_envt_vars
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(255) NOT NULL UNIQUE
+) 
+WITHOUT OIDS;
+-- cases.input_envt_vars
+
 -- cases.meteorlogical_years
 CREATE TABLE cases.meteorlogical_years
 (
@@ -73,6 +100,25 @@ CREATE TABLE cases.emissions_years
 ) 
 WITHOUT OIDS;
 -- cases.emissions_years
+
+-- cases.case_inputs
+CREATE TABLE cases.case_inputs
+(
+  id SERIAL PRIMARY KEY,
+  name varchar(128) NOT NULL UNIQUE,
+  sub_dir varchar(255),
+  required bool DEFAULT false,
+  show bool DEFAULT false,
+  sector_id int4  REFERENCES emf.sectors(id),
+  program_id int4  REFERENCES cases.programs(id),
+  envt_vars_id int4  REFERENCES cases.input_envt_vars(id),
+  input_name_id int4  REFERENCES cases.inputnames(id),
+  dataset_id int4  REFERENCES emf.datasets(id),
+  version_id int4  REFERENCES emissions.versions(id),
+  dataset_type_id int4  REFERENCES emf.dataset_types(id)
+) 
+WITHOUT OIDS;
+-- cases.case_inputs
 
 -- cases.cases
 CREATE TABLE cases.cases
@@ -111,8 +157,8 @@ CREATE TABLE cases.cases
 WITHOUT OIDS;
 -- cases.cases
 
--- cases.casesectors
-CREATE TABLE cases.casesectors
+-- cases.case_sectors
+CREATE TABLE cases.case_sectors
 (
   id SERIAL PRIMARY KEY,
   case_id int4 NOT NULL REFERENCES cases.cases(id) ,
@@ -121,4 +167,16 @@ CREATE TABLE cases.casesectors
   UNIQUE (case_id,sector_id) 
 ) 
 WITHOUT OIDS;
--- cases.casesectors
+-- cases.case_sectors
+
+-- cases.cases_caseinputs
+CREATE TABLE cases.cases_caseinputs
+(
+  id SERIAL PRIMARY KEY,
+  case_id int4 NOT NULL REFERENCES cases.cases(id) ,
+  list_index int4,
+  caseinputs_id int4 REFERENCES cases.case_inputs(id),
+  UNIQUE (case_id,caseinputs_id) 
+) 
+WITHOUT OIDS;
+-- cases.cases_caseinputs

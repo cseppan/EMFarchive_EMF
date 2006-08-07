@@ -87,10 +87,16 @@
             class="gov.epa.emissions.commons.data.Region"
             column="control_region_id"/> 
            
-    <array name="sectors" table="casesectors" schema="cases" cascade="save-update">
+    <array name="sectors" table="case_sectors" schema="cases" cascade="save-update">
     		<key column="case_id" not-null="true"/>
     		<list-index column="list_index"/>
     		<many-to-many class="gov.epa.emissions.commons.data.Sector" column="sector_id"/>
+  	</array>
+
+    <array name="caseInputs" table="cases_caseinputs" schema="cases" cascade="save-update">
+    		<key column="case_id" not-null="true"/>
+    		<list-index column="list_index"/>
+    		<many-to-many class="gov.epa.emissions.framework.services.casemanagement.CaseInput" column="caseinputs_id"/>
   	</array>
 
   </class> 

@@ -21,6 +21,14 @@ public interface CaseService {
 
     Speciation[] getSpeciations() throws EmfException;
 
+    CaseInput[] getCaseInputs() throws EmfException;
+
+    InputName[] getInputNames() throws EmfException;
+
+    InputEnvtVar[] getInputEnvtVars() throws EmfException;
+ 
+    Program[] getPrograms() throws EmfException;
+
     Case[] getCases() throws EmfException;
 
     void addCase(Case element) throws EmfException;

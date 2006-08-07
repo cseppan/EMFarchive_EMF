@@ -52,6 +52,22 @@ public class CaseDAO {
     public void add(Speciation object, Session session) {
         addObject(object, session);
     }
+ 
+    public void add(Program object, Session session) {
+        addObject(object, session);
+    }
+
+    public void add(InputName object, Session session) {
+        addObject(object, session);
+    }
+
+    public void add(InputEnvtVar object, Session session) {
+        addObject(object, session);
+    }
+
+    public void add(CaseInput object, Session session) {
+        addObject(object, session);
+    }
 
     public void add(Case object, Session session) {
         addObject(object, session);
@@ -95,6 +111,22 @@ public class CaseDAO {
 
     public List getCases(Session session) {
         return hibernateFacade.getAll(Case.class, Order.asc("name"), session);
+    }
+
+    public List getCaseInputs(Session session) {
+        return hibernateFacade.getAll(CaseInput.class, Order.asc("name"), session);
+    }
+ 
+    public List getPrograms(Session session) {
+        return hibernateFacade.getAll(Program.class, Order.asc("name"), session);
+    }
+ 
+    public List getInputNames(Session session) {
+        return hibernateFacade.getAll(InputName.class, Order.asc("name"), session);
+    }
+ 
+    public List getInputEnvtVars(Session session) {
+        return hibernateFacade.getAll(InputEnvtVar.class, Order.asc("name"), session);
     }
 
     public void remove(Case element, Session session) {

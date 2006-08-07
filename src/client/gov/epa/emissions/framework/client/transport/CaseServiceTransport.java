@@ -6,11 +6,15 @@ import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
 import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
+import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
 import gov.epa.emissions.framework.services.casemanagement.Grid;
 import gov.epa.emissions.framework.services.casemanagement.GridResolution;
+import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
+import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
+import gov.epa.emissions.framework.services.casemanagement.Program;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 
 public class CaseServiceTransport implements CaseService {
@@ -161,6 +165,42 @@ public class CaseServiceTransport implements CaseService {
         call.setReturnType(caseMappings.gridResolutions());
 
         return (GridResolution[]) call.requestResponse(new Object[] {});
+    }
+
+    public CaseInput[] getCaseInputs() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getCaseInputs");
+        call.setReturnType(caseMappings.caseinputs());
+
+        return (CaseInput[]) call.requestResponse(new Object[] {});
+    }
+
+    public InputName[] getInputNames() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getInputNames");
+        call.setReturnType(caseMappings.inputnames());
+
+        return (InputName[]) call.requestResponse(new Object[] {});
+    }
+
+    public InputEnvtVar[] getInputEnvtVars() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getInputEnvtVars");
+        call.setReturnType(caseMappings.inputEnvtVars());
+
+        return (InputEnvtVar[]) call.requestResponse(new Object[] {});
+    }
+
+    public Program[] getPrograms() throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("getPrograms");
+        call.setReturnType(caseMappings.programs());
+
+        return (Program[]) call.requestResponse(new Object[] {});
     }
 
 }

@@ -6,10 +6,14 @@ import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
 import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseCategory;
+import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.casemanagement.EmissionsYear;
 import gov.epa.emissions.framework.services.casemanagement.Grid;
 import gov.epa.emissions.framework.services.casemanagement.GridResolution;
+import gov.epa.emissions.framework.services.casemanagement.InputEnvtVar;
+import gov.epa.emissions.framework.services.casemanagement.InputName;
 import gov.epa.emissions.framework.services.casemanagement.MeteorlogicalYear;
+import gov.epa.emissions.framework.services.casemanagement.Program;
 import gov.epa.emissions.framework.services.casemanagement.Speciation;
 
 import org.apache.axis.client.Call;
@@ -31,6 +35,10 @@ public class CaseMappings extends Mappings {
         bean(call, GridResolution.class, gridResolution());
         bean(call, MeteorlogicalYear.class, meteorlogicalYear());
         bean(call, Speciation.class, speciation());
+        bean(call, Program.class, program());
+        bean(call, InputName.class, inputname());
+        bean(call, InputEnvtVar.class, inputEnvtVar());
+        bean(call, CaseInput.class, caseinput());
     }
 
     private void arrays(Call call) {
@@ -43,6 +51,10 @@ public class CaseMappings extends Mappings {
         array(call, GridResolution[].class, gridResolutions());
         array(call, MeteorlogicalYear[].class, meteorlogicalYears());
         array(call, Speciation[].class, speciations());
+        array(call, Program[].class, programs());
+        array(call, InputName[].class, inputnames());
+        array(call, InputEnvtVar[].class, inputEnvtVars());
+        array(call, CaseInput[].class, caseinputs());
     }
 
     public QName caseObject() {
@@ -115,6 +127,38 @@ public class CaseMappings extends Mappings {
 
     public QName speciations() {
         return qname("Speciations");
+    }
+
+    public QName caseinput() {
+        return qname("CaseInput");
+    }
+
+    public QName caseinputs() {
+        return qname("CaseInputs");
+    }
+
+    public QName inputEnvtVar() {
+        return qname("InputEnvtVar");
+    }
+
+    public QName inputEnvtVars() {
+        return qname("InputEnvtVars");
+    }
+
+    public QName inputname() {
+        return qname("InputName");
+    }
+ 
+    public QName inputnames() {
+        return qname("InputNames");
+    }
+ 
+    public QName program() {
+        return qname("Program");
+    }
+
+    public QName programs() {
+        return qname("Programs");
     }
 
 }

@@ -47,13 +47,14 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
 
         ControlStrategy element = newControlStrategy();
         session.clear();
+        
+        EmfDataset dataset = dataset("detailed dataset");
         try {
             ControlStrategy locked = dao.obtainLocked(owner, element, session);
             
             assertEquals(locked.getLockOwner(), owner.getUsername());
             locked.setName("TEST");
             
-            EmfDataset dataset = dataset("detailed dataset");
             setupControlStrategy(dataset,locked);
             session.clear();
             ControlStrategy modified = dao.update(locked, session);
@@ -66,6 +67,7 @@ public class ControlStrategyDAOTest extends ServiceTestCase {
             assertEquals(101,strategyResults[0].getInputDatasetId());
         } finally {
             remove(element);
+            remove(dataset);
         }
     }
     

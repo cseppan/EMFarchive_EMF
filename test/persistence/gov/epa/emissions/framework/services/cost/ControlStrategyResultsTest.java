@@ -41,9 +41,9 @@ public class ControlStrategyResultsTest extends ServiceTestCase {
             controlStrategydao.add(element, session);
             
         List list = controlStrategydao.all(session);
-        ControlStrategy retreivedCS = (ControlStrategy) list.get(0);
-        assertEquals(element,retreivedCS);
-        
+        //ControlStrategy retreivedCS = (ControlStrategy) list.get(0);
+        //assertEquals(element,retreivedCS);
+        assertTrue(list.contains(element));
         }finally{
             controlStrategydao.remove(element,session);
             datasetDAO.remove(dataset,session);

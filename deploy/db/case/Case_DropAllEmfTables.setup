@@ -7,6 +7,11 @@ DROP TABLE cases.grids CASCADE;
 DROP TABLE cases.air_quality_models CASCADE;
 DROP TABLE cases.case_categories CASCADE;
 DROP TABLE cases.case_abbreviations CASCADE;
-DROP TABLE cases.casesectors CASCADE;
+DROP TABLE cases.case_sectors CASCADE;
 DROP TABLE cases.grid_resolutions CASCADE;
+DROP TABLE cases.cases.programs CASCADE;
+DROP TABLE cases.inputnames CASCADE;
+DROP TABLE cases.input_envt_vars CASCADE;
+DROP TABLE cases.case_inputs CASCADE;
+DROP TABLE cases.cases_caseinputs CASCADE;
 
