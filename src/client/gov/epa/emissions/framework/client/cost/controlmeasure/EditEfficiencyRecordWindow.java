@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.EditableComboBox;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.SaveButton;
@@ -29,22 +29,28 @@ import javax.swing.SpringLayout;
 public class EditEfficiencyRecordWindow extends DisposableInteralFrame implements EditEfficiencyRecordView {
 
     protected ControlMeasure measure;
-    
+
     protected EmfSession session;
-    
+
     private MessagePanel messagePanel;
 
     private TextField efficiency;
 
-    private EditableComboBox pollutant;
+    protected TextField costYear;
 
-    private float efficiencyValue;
+    protected TextField costperTon;
+
+    protected TextField locale;
+    
+    protected TextField ruleEffectiveness;
+    
+    protected TextField rulePenetration;
+
+    private ComboBox pollutant;
 
     private ManageChangeables changeablesList;
 
     private NumberFieldVerifier verifier;
-
-    private boolean verified = false;
 
     private EfficiencyRecord record;
 
@@ -54,7 +60,8 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
 
     private EditEfficiencyRecordPresenter presenter;
 
-    public EditEfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager, EmfSession session) {
+    public EditEfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager,
+            EmfSession session) {
         super("Add Efficiency Record", new Dimension(400, 180), desktopManager);
         this.changeablesList = changeablesList;
         this.session = session;
@@ -81,36 +88,54 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
 
         messagePanel = new SingleLineMessagePanel();
         panel.add(messagePanel);
-        panel.add(recordPanel());
+        panel.add(LeftRecordPanel());
         panel.add(buttonsPanel());
 
         return panel;
     }
 
-    private Component recordPanel() {
+    private Component LeftRecordPanel() {
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
         try {
             allPollutants = session.dataCommonsService().getPollutants();
-            pollutant = new EditableComboBox(allPollutants);
+            pollutant = new ComboBox(allPollutants);
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve Pollutants");
         }
         // majorPollutant.setSelectedIndex(0);
         changeablesList.addChangeable(pollutant);
         layoutGenerator.addLabelWidgetPair("Pollutant:", pollutant, panel);
-        
+
         efficiency = new TextField("", 10);
         efficiency.setName("Control Efficiency");
         changeablesList.addChangeable(efficiency);
-        layoutGenerator.addLabelWidgetPair("Percent Red (%):", efficiency, panel);
-        efficiency.setToolTipText("Enter the percent reduction as a percentage (e.g., 90%, or -10% for a disbenefit)");
+        layoutGenerator.addLabelWidgetPair("Control Efficiency (% Red):", efficiency, panel);
+        efficiency.setToolTipText("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
+
+        costYear = new TextField("Cost Year", 10);
+        changeablesList.addChangeable(costYear);
+        layoutGenerator.addLabelWidgetPair("Cost Year:", costYear, panel);
+
+        costperTon = new TextField("Cost Per Ton Reduced", 10);
+        changeablesList.addChangeable(costperTon);
+        layoutGenerator.addLabelWidgetPair("Cost Per Ton Reduced:", costperTon, panel);
+
+        locale = new TextField("Locale", 10);
+        changeablesList.addChangeable(locale);
+        layoutGenerator.addLabelWidgetPair("Locale:", locale, panel);
+        
+        ruleEffectiveness = new TextField("Rule Effectiveness", 10);
+        changeablesList.addChangeable(ruleEffectiveness);
+        layoutGenerator.addLabelWidgetPair("Rule Effectiveness (%):", ruleEffectiveness, panel);
+
+        rulePenetration = new TextField("Rule Penetration", 10);
+        changeablesList.addChangeable(rulePenetration);
+        layoutGenerator.addLabelWidgetPair("Rule Penetration (%):", rulePenetration, panel);
 
         
-        
-        
-        widgetLayout(2, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -118,19 +143,11 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
     private void populateFields() {
         pollutant.setSelectedItem(record.getPollutant());
         efficiency.setText(record.getEfficiency() + "");
-    }
-
-    protected void verifyInput() {
-        try {
-            efficiencyValue = verifier.parseFloat(efficiency);
-            if (efficiencyValue > 100)
-                throw new EmfException("Percent reduction must be less than or equal to 100.0");
-            efficiencyValue = efficiencyValue / 100;
-            verified = true;
-        } catch (EmfException e) {
-            verified = false;
-            messagePanel.setError(e.getMessage());
-        }
+        costYear.setText(record.getCostYear() + "");
+        costperTon.setText(record.getCostPerTon() + "");
+        locale.setText(record.getLocale());
+        ruleEffectiveness.setText(record.getRuleEffectiveness() + "");
+        rulePenetration.setText(record.getRulePenetration() + "");
     }
 
     private JPanel buttonsPanel() {
@@ -154,16 +171,63 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
     }
 
     private void doSave() {
-        verifyInput();
-        if(verified == false)
+        try {
+            record.setPollutant((Pollutant) pollutant.getSelectedItem());
+            saveEfficiency(efficiency);
+            saveCostYear();
+            saveCostPerTon();
+            saveLocale();
+            saveRuleEffectiveness();
+            saveRulePenetration();
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
             return;
-        // update the efficiency record
-        record.setPollutant((Pollutant) pollutant.getSelectedItem());
-        
-        record.setEfficiency((Float.parseFloat(efficiency.getText().trim())));
-        
+        }
         presenter.refresh();
         disposeView();
+    }
+
+    private void saveRulePenetration() throws EmfException {
+        float value = verifier.parseFloat(rulePenetration);
+        if (value > 100)
+            throw new EmfException("Enter the Rule Penetration as a percent less than 100.  1 = 1%.  0.01 = 0.01%");
+        record.setRulePenetration(value);
+    }
+
+    private void saveRuleEffectiveness() throws EmfException {
+        float value = verifier.parseFloat(ruleEffectiveness);
+        if (value > 100)
+            throw new EmfException("Enter the Rule Effectiveness as a percent less than 100.  1 = 1%.  0.01 = 0.01%");
+        record.setRuleEffectiveness(value);
+    }
+
+    private void saveLocale() throws EmfException {
+        int value = verifier.parseInteger(locale);
+        String string = value + "";
+        if (string.length() == 2 || string.length() == 5 || string.length() == 6)
+            record.setLocale(string);
+        else
+            throw new EmfException("Locale must be a two, five, or six digit integer.");
+    }
+
+    private void saveCostPerTon() throws EmfException {
+        float value = verifier.parseFloat(costperTon);
+        record.setCostPerTon(value);
+    }
+
+    private void saveCostYear() throws EmfException {
+        int value = verifier.parseInteger(costYear);
+        String string = value + "";
+        if (string.length() != 4)
+            throw new EmfException("Cost Year must be a four digit integer.");
+        record.setCostYear(value);
+    }
+
+    private void saveEfficiency(TextField efficiency) throws EmfException {
+        float value = verifier.parseFloat(efficiency);
+        if (value > 100)
+            throw new EmfException("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
+        record.setEfficiency(value);
     }
 
     public void observe(EditEfficiencyRecordPresenter presenter) {
@@ -171,10 +235,10 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
     }
 
     private void widgetLayout(int rows, int cols, int initX, int initY, int xPad, int yPad,
-        SpringLayoutGenerator layoutGenerator, JPanel panel) {
-    // Lay out the panel.
-    layoutGenerator.makeCompactGrid(panel, rows, cols, // rows, cols
-            initX, initY, // initialX, initialY
-            xPad, yPad);// xPad, yPad
+            SpringLayoutGenerator layoutGenerator, JPanel panel) {
+        // Lay out the panel.
+        layoutGenerator.makeCompactGrid(panel, rows, cols, // rows, cols
+                initX, initY, // initialX, initialY
+                xPad, yPad);// xPad, yPad
     }
 }

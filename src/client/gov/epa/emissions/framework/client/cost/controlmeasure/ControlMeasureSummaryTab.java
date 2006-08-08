@@ -125,21 +125,6 @@ public class ControlMeasureSummaryTab extends JPanel implements ControlMeasureTa
         return dateReviewed == null ? "" : dateReviewedFormat.format(dateReviewed);
     }
 
-    protected void disableFields() {
-        name.setEditable(false);
-        description.setEditable(false);
-        majorPollutant.setEnabled(false);
-        controlTechnology.setEnabled(false);
-        sourceGroup.setEnabled(false);
-        costYear.setEditable(false);
-        deviceCode.setEditable(false);
-        dateReviewed.setEditable(false);
-        equipmentLife.setEditable(false);
-        cmClass.setEnabled(false);
-        sectors.setEnabled(false);
-        dataSources.setEnabled(false);
-    }
-
     private String getText(String value) {
         return (value != null) ? value : "";
     }

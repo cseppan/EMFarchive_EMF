@@ -2,7 +2,7 @@ package gov.epa.emissions.framework.client.cost.controlmeasure;
 
 import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.EditableComboBox;
+import gov.epa.emissions.commons.gui.ComboBox;
 import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -35,7 +35,7 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
 
     private TextField efficiency;
     
-    private EditableComboBox pollutant;
+    private ComboBox pollutant;
     
     private float efficiencyValue;
 
@@ -90,7 +90,7 @@ public class EfficiencyRecordWindow extends DisposableInteralFrame implements Ef
 
         try {
             allPollutants = session.dataCommonsService().getPollutants();
-            pollutant = new EditableComboBox(allPollutants);
+            pollutant = new ComboBox(allPollutants);
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve Pollutants");
         }
