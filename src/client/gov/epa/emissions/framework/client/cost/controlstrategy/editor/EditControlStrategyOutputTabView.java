@@ -11,4 +11,5 @@ public interface EditControlStrategyOutputTabView extends EditControlStrategyTab
     void recentExportFolder(String folder);
 
     void displayAnalyzeTable(String controlStrategyName, String[] fileNames);
+    
 }

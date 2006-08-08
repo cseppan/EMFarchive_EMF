@@ -45,6 +45,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private SortFilterSelectModel selectModel;
 
+    private CheckBox inventoryCheckBox;
+
     public EditControlStrategyOutputTab(ControlStrategy controlStrategy, MessagePanel messagePanel, DesktopManager desktopManager, EmfConsole parentConsole) {
         super.setName("output");
         this.controlStrategy = controlStrategy;
@@ -89,7 +91,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private JPanel topPanel() {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(productPanel());
-        topPanel.add(bottomPanel(), BorderLayout.SOUTH);
+        topPanel.add(dirSelectPanel(), BorderLayout.SOUTH);
 
         topPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createTitledBorder("Output Settings")));
@@ -97,7 +99,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         return topPanel;
     }
 
-    private JPanel bottomPanel() {
+    private JPanel dirSelectPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(folderPanel());
         JPanel createPanel = createButtonPanel();
@@ -106,17 +108,33 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     }
 
     private JPanel createButtonPanel() {
-        Button button = new Button("Create", null);
-        button.setEnabled(false);
+        Button button = new Button("Create",createOutputAction());
         JPanel createPanel = new JPanel();
         createPanel.add(button);
         return createPanel;
     }
 
+    private Action createOutputAction() {
+        Action action = new AbstractAction(){
+            public void actionPerformed(ActionEvent e) {
+                doInventory();
+            }
+            
+        };
+        return action ;
+    }
+
+    protected void doInventory() {
+        try {
+            presenter.doInventory(controlStrategy);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
+    }
+
     private JPanel productPanel() {
         JPanel productPanel = new JPanel();
-        CheckBox inventoryCheckBox = new CheckBox("Inventory");
-        inventoryCheckBox.setEnabled(false);
+        inventoryCheckBox = new CheckBox("Inventory");
         CheckBox summaryFIPS = new CheckBox("FIPS Summary");
         summaryFIPS.setEnabled(false);
         productPanel.add(inventoryCheckBox);

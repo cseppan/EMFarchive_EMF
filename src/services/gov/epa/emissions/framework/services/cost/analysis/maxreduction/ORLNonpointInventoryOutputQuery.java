@@ -41,9 +41,9 @@ public class ORLNonpointInventoryOutputQuery implements InventoryOutputQuery {
     }
 
     public String conditionalClause(String inputDatasetTableAlias, String detailResultTableAlias) {
-        return join(inputDatasetTableAlias, "dataset_id", detailResultTableAlias, "input_ds_id") + ", "
-                + join(inputDatasetTableAlias, "FIPS", detailResultTableAlias, "FIPS") + ", "
-                + join(inputDatasetTableAlias, "SCC", detailResultTableAlias, "SCC") + ", "
+        return join(inputDatasetTableAlias, "dataset_id", detailResultTableAlias, "input_ds_id") + " AND "
+                + join(inputDatasetTableAlias, "FIPS", detailResultTableAlias, "FIPS") + " AND "
+                + join(inputDatasetTableAlias, "SCC", detailResultTableAlias, "SCC") + " AND "
                 + join(inputDatasetTableAlias, "POLL", detailResultTableAlias, "POLLUTANT");
     }
 

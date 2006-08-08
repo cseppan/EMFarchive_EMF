@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.services.cost;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfProperty;
+import gov.epa.emissions.framework.services.cost.controlStrategy.ControlStrategyInventoryOutput;
 import gov.epa.emissions.framework.services.persistence.EmfPropertiesDAO;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -205,6 +206,16 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             return Integer.parseInt(property.getValue());
         } finally {
             session.close();
+        }
+    }
+
+    public void createInventory(User user, ControlStrategy controlStrategy) throws EmfException {
+        ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy);
+        try {
+            output.create();
+        } catch (Exception e) {
+            LOG.error("could not create inventory output. " + e.getMessage());
+            throw new EmfException("could not create inventory output. " + e.getMessage());
         }
     }
 

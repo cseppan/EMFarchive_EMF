@@ -14,7 +14,7 @@ public class ORLNonpointInventoryOutputQueryTest extends TestCase {
 
     public void testSelectContditionalClause() {
         ORLNonpointInventoryOutputQuery query = new ORLNonpointInventoryOutputQuery(new PostgresSqlDataTypes());
-        String expected = "a.dataset_id=b.input_ds_id, a.FIPS=b.FIPS, a.SCC=b.SCC, a.POLL=b.POLLUTANT";
+        String expected = "a.dataset_id=b.input_ds_id AND a.FIPS=b.FIPS AND a.SCC=b.SCC AND a.POLL=b.POLLUTANT";
         assertEquals(expected, query.conditionalClause("a", "b"));
     }
 

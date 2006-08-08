@@ -80,4 +80,8 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         return folder;
     }
 
+    public void doInventory(ControlStrategy controlStrategy) throws EmfException {
+        session.controlStrategyService().createInventory(session.user(),controlStrategy);
+    }
+
 }

@@ -121,4 +121,16 @@ public class ControlStrategyServiceTransport implements ControlStrategyService {
         call.request(new Object[] { });
     }
 
+    public void createInventory(User user, ControlStrategy controlStrategy) throws EmfException {
+        EmfCall call = call();
+
+        call.setOperation("createInventory");
+        call.addParam("user", mappings.user());
+        call.addParam("controlStrategy", mappings.controlStrategy());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, controlStrategy });
+        
+    }
+
 }

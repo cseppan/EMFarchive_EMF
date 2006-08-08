@@ -126,7 +126,7 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
     }
 
     public void testShouldUpdateControlStrategyWithLock() throws Exception {
-        
+
         User owner = userService.getUser("emf");
         ControlStrategy element = controlStrategy();
         ControlStrategy csWithLock = null;
@@ -146,23 +146,12 @@ public class ControlStrategyServiceTest extends ServiceTestCase {
         }
     }
 
-    public void testShouldRunControlStrategyWithoutError() throws Exception {
-        User owner = userService.getUser("emf");
-        ControlStrategy element = new ControlStrategy("test" + Math.random());
-        StrategyType type = new StrategyType("max red emissions");
-        type.setStrategyClassName("gov.epa.emissions.framework.services.cost.analysis.maxreduction.DummyMaxEmsRedStrategy");
-        element.setStrategyType(type);
-
-        service.runStrategy(owner, element);
-    }
-
     public void testShouldStopRunControlStrategyWithoutError() throws Exception {
         try {
             service.stopRunStrategy();
         } catch (Exception e) {
             throw e;
         }
-        
     }
 
     private ControlStrategy load(ControlStrategy controlStrategy) {
