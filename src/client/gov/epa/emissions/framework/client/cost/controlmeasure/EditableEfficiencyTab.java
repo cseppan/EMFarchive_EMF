@@ -153,7 +153,6 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
             }
         };
     }
-    
 
     protected void doRemove() {
         messagePanel.clear();
@@ -174,7 +173,6 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
         }
     }
     
-
     protected void doAdd() {
         messagePanel.clear();
         EfficiencyRecordView view = new EfficiencyRecordWindow(changeablesList, desktopManager, session);
@@ -196,23 +194,19 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
         presenter.display(measure, record);
     }
     
-    
     private EfficiencyRecord[] getSelectedRecords() {
         return (EfficiencyRecord[]) selectModel.selected().toArray(new EfficiencyRecord[0]);
     }
-    
 
     public void refreshData() {
         tableData.refresh();
     }
     
-
     public void refreshPanel() {
         refreshData();
         updateMainPanel(tableData.sources());
     }
     
-
     public void save(ControlMeasure measure) {
         measure.setEfficiencyRecords(tableData.sources());
     }
