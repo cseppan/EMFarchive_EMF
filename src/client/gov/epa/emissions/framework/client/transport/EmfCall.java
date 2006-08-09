@@ -87,6 +87,10 @@ public class EmfCall {
     public void addIntegerParam(String id) {
         mappings.addIntegerParam(call, id);
     }
+    
+    public void addIntArrayParam() {
+        mappings.addIntArrayParam(call);
+    }
 
     public void setIntegerReturnType() {
         mappings.setIntegerReturnType(call);

@@ -27,7 +27,7 @@ public class ControlStrategy implements Lockable {
     private Project project;
 
     private double discountRate;
-    
+
     private int costYear;
 
     private int analysisYear;
@@ -35,24 +35,24 @@ public class ControlStrategy implements Lockable {
     private User creator;
 
     private Date lastModifiedDate;
-    
+
     private Date startDate;
 
     private Date completionDate;
-    
+
     private DatasetType datasetType;
 
     private List datasetsList;
-    
+
     private String targetPollutant;
 
     private String runStatus;
 
     private StrategyType strategyType;
-    
+
     private int datasetVersion;
-    
-   private List strategyResults; 
+
+    private List strategyResults;
 
     private Mutex lock;
 

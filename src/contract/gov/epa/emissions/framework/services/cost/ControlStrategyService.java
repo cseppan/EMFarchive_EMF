@@ -27,4 +27,5 @@ public interface ControlStrategyService extends EMFService {
     void stopRunStrategy() throws EmfException;
 
     void createInventory(User user, ControlStrategy controlStrategy) throws EmfException;
+    
 }

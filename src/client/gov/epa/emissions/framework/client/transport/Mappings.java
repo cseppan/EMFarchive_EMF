@@ -89,6 +89,11 @@ public class Mappings {
     public void addLongParam(Call call, String id) {
         call.addParameter(id, Constants.XSD_LONG, ParameterMode.IN);
     }
+    
+    public void addIntArrayParam(Call call){
+        Class cls = int[].class;
+        call.addParameter("intArray",qname("intArray"),cls,ParameterMode.IN);
+    }
 
     public void setIntegerReturnType(Call call) {
         call.setReturnType(Constants.XSD_INT);

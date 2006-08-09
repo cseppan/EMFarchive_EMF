@@ -30,20 +30,17 @@ public class DatasetCreator {
 
     private String outputDatasetName;
 
-    private Datasource datasource;
-
-    public DatasetCreator(String prefix, ControlStrategy strategy, User user, Datasource datasource) {
+    public DatasetCreator(String prefix, ControlStrategy strategy, User user) {
         this.prefix = prefix;
         this.user = user;
         this.outputDatasetName = getResultDatasetName(strategy.getName());
-        this.datasource = datasource;
     }
 
     public String outputTableName() {
         return prefix+outputDatasetName;
     }
     
-    public EmfDataset addDataset(TableFormat tableFormat,String source) throws EmfException{
+    public EmfDataset addDataset(TableFormat tableFormat,Datasource datasource, String source) throws EmfException{
         EmfDataset dataset = new EmfDataset();
         Date start = new Date();
 
@@ -57,7 +54,7 @@ public class DatasetCreator {
         setDatasetInternalSource(dataset, outputTableName(),tableFormat, source);
         add(dataset);
         try {
-            addVersionZeroEntryToVersionsTable(dataset);
+            addVersionZeroEntryToVersionsTable(dataset, datasource);
         } catch (Exception e) {
             throw new EmfException("Cannot add version zero entry to versions table for dataset: " + dataset.getName());
         }
@@ -65,7 +62,7 @@ public class DatasetCreator {
         return dataset;
     }
     
-    private void addVersionZeroEntryToVersionsTable(Dataset dataset) throws Exception {
+    private void addVersionZeroEntryToVersionsTable(Dataset dataset, Datasource datasource) throws Exception {
         TableModifier modifier = new TableModifier(datasource, "versions");
         String[] data = { null, dataset.getId() + "", "0", "Initial Version", "", "true", null };
         modifier.insertOneRow(data);

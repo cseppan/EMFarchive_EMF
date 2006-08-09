@@ -37,7 +37,7 @@ public class ControlStrategyTransportServiceTestCase extends WebServicesTestCase
           //remove(controlStrategies[0]);
         }
     }
-
+    
     private ControlStrategy controlStrategy() {
         return new ControlStrategy("test"+Math.random());
     }
