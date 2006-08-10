@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
@@ -32,10 +33,12 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         ExImService service = session.eximService();
         StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
         EmfDataset[] datasets = new EmfDataset[strategyResults.length];
+        Version[] versions = new Version [datasets.length];
         for (int i = 0; i < strategyResults.length; i++) {
             datasets[i] = (EmfDataset) strategyResults[i].getDetailedResultDataset();
+            versions[i] = service.getVersion(datasets[i], datasets[i].getDefaultVersion());
         }
-        service.exportDatasetsWithOverwrite(session.user(), datasets, mapToRemote(folder), "Exporting datasets");
+        service.exportDatasetsWithOverwrite(session.user(), datasets, versions, mapToRemote(folder), "Exporting datasets");
     }
 
     private String mapToRemote(String dir) {

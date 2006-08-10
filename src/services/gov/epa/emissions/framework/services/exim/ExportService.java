@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.services.exim;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.KeyVal;
 import gov.epa.emissions.commons.db.DbServer;
@@ -129,16 +130,23 @@ public class ExportService {
         return prefix + name + "_" + date.toLowerCase() + suffix;
     }
 
-    void export(User user, EmfDataset[] datasets, String dirName, String purpose, boolean overwrite)
+    void export(User user, EmfDataset[] datasets, Version[] versions, String dirName, String purpose, boolean overwrite)
             throws EmfException {
         File path = validatePath(dirName);
+        
+        if(datasets.length != versions.length) {
+            log.error("Export failed: version numbers doesn't match specified datasets.");
+            throw new EmfException("Export failed: version numbers doesn't match " +
+                    "specified datasets.");
+        }
 
         try {
             for (int i = 0; i < datasets.length; i++) {
                 Services services = services();
                 EmfDataset dataset = datasets[i];
+                Version version = versions[i];
                 if (isExportable(dataset, services, user))
-                    doExport(user, dirName, purpose, overwrite, path, dataset);
+                    doExport(user, dirName, purpose, overwrite, path, dataset, version);
             }
         } catch (Exception e) {
             log.error("Export error- start exporting a file to folder: " + dirName, e);
@@ -146,11 +154,11 @@ public class ExportService {
         }
     }
 
-    private void doExport(User user, String dirName, String purpose, boolean overwrite, File path, EmfDataset dataset)
+    private void doExport(User user, String dirName, String purpose, boolean overwrite, File path, EmfDataset dataset, Version version)
             throws Exception {
         Services services = services();
         File file = validateExportFile(path, getCleanDatasetName(dataset), overwrite);
-        Exporter exporter = exporterFactory.create(dataset, version(dataset));
+        Exporter exporter = exporterFactory.create(dataset, version);
         AccessLog accesslog = new AccessLog(user.getUsername(), dataset.getId(), dataset.getAccessedDateTime(),
                 "Version " + dataset.getDefaultVersion(), purpose, file.getAbsolutePath());
 
@@ -158,11 +166,14 @@ public class ExportService {
         threadPool.execute(new GCEnforcerTask("Export of Dataset: " + dataset.getName(), eximTask));
     }
 
-    private Version version(EmfDataset dataset) {
+    public Version getVersion(Dataset dataset, int version) throws EmfException {
         Session session = sessionFactory.getSession();
         try {
             Versions versions = new Versions();
-            return versions.get(dataset.getId(), dataset.getDefaultVersion(), session);
+            return versions.get(dataset.getId(), version, session);
+        } catch (Exception e) {
+            log.error("Retrieve version error - can't retrieve Version object for dataset: " + dataset.getName(), e);
+            throw new EmfException("Retrieve version error - can't retrieve Version object for dataset: " + dataset.getName() + " " + e.getMessage());
         } finally {
             session.close();
         }

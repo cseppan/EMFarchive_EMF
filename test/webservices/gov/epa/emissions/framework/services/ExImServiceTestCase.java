@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services;
 
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.basic.UserService;
 import gov.epa.emissions.framework.services.data.DataCommonsService;
@@ -78,8 +79,8 @@ public abstract class ExImServiceTestCase extends ServiceTestCase {
         if (!outputFile.exists())
             outputFile.mkdir();
 
-        eximService.exportDatasetsWithOverwrite(user, new EmfDataset[] { dataset }, outputFile.getAbsolutePath(),
-                "Exporting NonPoint file");
+        eximService.exportDatasetsWithOverwrite(user, new EmfDataset[] { dataset }, new Version[] { new Version() },
+                outputFile.getAbsolutePath(), "Exporting NonPoint file");
 
         // FIXME: verify the exported file exists
         Thread.sleep(2000);// wait, until the export is complete
@@ -104,8 +105,8 @@ public abstract class ExImServiceTestCase extends ServiceTestCase {
         if (!outputFile.exists())
             outputFile.mkdir();
 
-        eximService.exportDatasets(user, new EmfDataset[] { dataset }, outputFile.getAbsolutePath(),
-                "Exporting NonPoint file");
+        eximService.exportDatasets(user, new EmfDataset[] { dataset }, new Version[] { new Version()},
+                outputFile.getAbsolutePath(), "Exporting NonPoint file");
 
         // FIXME: verify the exported file exists
         Thread.sleep(2000);// wait, until the export is complete

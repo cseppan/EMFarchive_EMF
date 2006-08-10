@@ -1,7 +1,9 @@
 package gov.epa.emissions.framework.services.exim;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.EmfServiceImpl;
@@ -53,13 +55,13 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
         return threadPool;
     }
 
-    public void exportDatasets(User user, EmfDataset[] datasets, String dirName, String purpose) throws EmfException {
-        exportService.export(user, datasets, dirName, purpose, false);
+    public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String dirName, String purpose) throws EmfException {
+        exportService.export(user, datasets, versions, dirName, purpose, false);
     }
 
-    public void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, String dirName, String purpose)
+    public void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, Version[] versions, String dirName, String purpose)
             throws EmfException {
-        exportService.export(user, datasets, dirName, purpose, true);
+        exportService.export(user, datasets, versions, dirName, purpose, true);
     }
 
     public void importDatasets(User user, String folderPath, String[] filenames, DatasetType datasetType) {
@@ -73,6 +75,10 @@ public class ExImServiceImpl extends EmfServiceImpl implements ExImService {
 
     public String[] getFilenamesFromPattern(String folder, String pattern) throws EmfException {
         return importService.getFilenamesFromPattern(folder, pattern);
+    }
+
+    public Version getVersion(Dataset dataset, int version) throws EmfException {
+        return exportService.getVersion(dataset, version);
     }
 
 }

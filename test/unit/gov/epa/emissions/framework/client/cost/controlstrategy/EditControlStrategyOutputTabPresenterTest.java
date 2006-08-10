@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
 import gov.epa.emissions.commons.data.Dataset;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.cost.controlstrategy.editor.EditControlStrategyOutputTabPresenter;
@@ -13,8 +14,12 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExImService;
 
+import java.util.Date;
+
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.core.Constraint;
+import org.jmock.core.constraint.IsInstanceOf;
 
 public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCase {
 
@@ -34,6 +39,7 @@ public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCas
 
         folder = "foo/blah";
         fileNameOnLocalDrive = "foo";
+        session.stubs().method("getMostRecentExportFolder").withNoArguments().will(returnValue(folder));
         setPreferences(session, folder);
     }
 
@@ -44,21 +50,26 @@ public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCas
         prefs.stubs().method("outputFolder").will(returnValue(folder));
         prefs.stubs().method("mapRemoteOutputPathToLocal").will(returnValue(fileNameOnLocalDrive));
     }
-
-    public void testDoExportSendsRequestToEximServiceOnExport() throws Exception {
+    
+    public void testSendsExportRequestToEximServiceOnExport() throws Exception {
         User user = new User();
         user.setUsername("user");
         user.setName("full name");
-
-        Mock dataset = mock(EmfDataset.class);
+        
+        EmfDataset dataset = new EmfDataset();
         ControlStrategy controlStrategy = setupControlStrategy(dataset);
-
+        
+        Version version = new Version();
+        
         Mock model = mock(ExImService.class);
-        model.expects(once()).method("exportDatasetsWithOverwrite");
-
+        model.expects(once()).method("exportDatasetsWithOverwrite").with(
+                new Constraint[] { eq(user), new IsInstanceOf(EmfDataset[].class), new IsInstanceOf(Version[].class), 
+                        same(folder), new IsInstanceOf(String.class) });
+        model.stubs().method("getVersion").with(eq(dataset), eq(0)).will(returnValue(version));
+        
         session.stubs().method("user").withNoArguments().will(returnValue(user));
         session.stubs().method("eximService").withNoArguments().will(returnValue(model.proxy()));
-        session.stubs().method("setMostRecentExportFolder").with(eq(folder));
+        session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
 
         EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(
                 (EmfSession) session.proxy(), null);
@@ -66,19 +77,21 @@ public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCas
         presenter.doExport(controlStrategy, folder);
     }
 
-    private ControlStrategy setupControlStrategy(Mock dataset) {
+    private ControlStrategy setupControlStrategy(Dataset dataset) {
         StrategyResult result = new StrategyResult();
-        result.setDetailedResultDataset((Dataset) dataset.proxy());
+        result.setDetailedResultDataset(dataset);
         StrategyResult[] results = { result };
         ControlStrategy controlStrategy = new ControlStrategy();
         controlStrategy.setStrategyResults(results);
         return controlStrategy;
     }
-
+    
     public void testDoAnalyzeShouldOpenAnalyzeEngineTableApp() throws EmfException {
-        Mock dataset = mock(EmfDataset.class);
+        EmfDataset dataset = new EmfDataset();
         int id = 201;
-        dataset.expects(once()).method("getId").withNoArguments().will(returnValue(id));
+        dataset.setName("dataset test");
+        dataset.setAccessedDateTime(new Date());
+        dataset.setId(id);
         
         ControlStrategy controlStrategy = setupControlStrategy(dataset);
         

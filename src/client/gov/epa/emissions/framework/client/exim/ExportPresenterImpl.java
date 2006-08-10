@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.exim;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -45,19 +46,24 @@ public class ExportPresenterImpl implements ExportPresenter {
     }
 
     private void doExport(EmfDataset[] datasets, String folder, boolean overwrite, String purpose) throws EmfException {
-        for (int i = 0; i < datasets.length; i++)
+        ExImService services = session.eximService();
+        Version[] versions = new Version[datasets.length];
+        
+        for (int i = 0; i < datasets.length; i++) {
             datasets[i].setAccessedDateTime(new Date());
+            versions[i] = services.getVersion(datasets[i], datasets[i].getDefaultVersion());
+        }
+        
         session.setMostRecentExportFolder(folder);
 
         File dir = new File(folder);
         if (dir.isDirectory())
             lastFolder = folder;
 
-        ExImService services = session.eximService();
         if (overwrite)
-            services.exportDatasetsWithOverwrite(session.user(), datasets, mapToRemote(folder), purpose);
+            services.exportDatasetsWithOverwrite(session.user(), datasets, versions, mapToRemote(folder), purpose);
         else
-            services.exportDatasets(session.user(), datasets, mapToRemote(folder), purpose);
+            services.exportDatasets(session.user(), datasets, versions, mapToRemote(folder), purpose);
     }
 
     private String mapToRemote(String dir) {

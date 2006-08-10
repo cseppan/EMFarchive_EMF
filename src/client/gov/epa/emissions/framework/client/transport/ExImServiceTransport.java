@@ -1,6 +1,8 @@
 package gov.epa.emissions.framework.client.transport;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -17,25 +19,26 @@ public class ExImServiceTransport implements ExImService {
         mappings = new DataMappings();
     }
 
-    public void exportDatasets(User user, EmfDataset[] datasets, String folder, String purpose) throws EmfException {
-        doExport("exportDatasets", user, datasets, folder, purpose);
+    public void exportDatasets(User user, EmfDataset[] datasets, Version[] versions, String folder, String purpose) throws EmfException {
+        doExport("exportDatasets", user, datasets, versions, folder, purpose);
     }
 
-    public void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, String folder, String purpose)
+    public void exportDatasetsWithOverwrite(User user, EmfDataset[] datasets, Version[] versions, String folder, String purpose)
             throws EmfException {
-        doExport("exportDatasetsWithOverwrite", user, datasets, folder, purpose);
+        doExport("exportDatasetsWithOverwrite", user, datasets, versions, folder, purpose);
     }
 
-    private void doExport(String operationName, User user, EmfDataset[] datasets, String folder, String purpose)
+    private void doExport(String operationName, User user, EmfDataset[] datasets, Version[] versions, String folder, String purpose)
             throws EmfException {
         call.setOperation(operationName);
         call.addParam("user", mappings.user());
         call.addParam("datasets", mappings.datasets());
-        call.addStringParam("foldername");
+        call.addParam("versions", mappings.versions());
+        call.addStringParam("folder");
         call.addBooleanParameter("purpose");
         call.setVoidReturnType();
 
-        call.request(new Object[] { user, datasets, folder, purpose });
+        call.request(new Object[] { user, datasets, versions, folder, purpose });
     }
 
     public void importDataset(User user, String folderPath, String[] fileNames, DatasetType datasetType,
@@ -70,6 +73,15 @@ public class ExImServiceTransport implements ExImService {
         call.setReturnType(mappings.strings());
 
         return (String[]) call.requestResponse(new Object[] { folder, pattern });
+    }
+
+    public Version getVersion(Dataset dataset, int version) throws EmfException {
+        call.setOperation("getVersion");
+        call.addIntegerParam("dataset");
+        call.addIntegerParam("version");
+        call.setReturnType(mappings.version());
+
+        return (Version) call.requestResponse(new Object[] { dataset, new Integer(version) });
     }
 
 }

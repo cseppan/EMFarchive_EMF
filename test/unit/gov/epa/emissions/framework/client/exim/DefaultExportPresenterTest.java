@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.exim;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.preference.UserPreference;
@@ -11,7 +12,6 @@ import java.util.Date;
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Constraint;
-import org.jmock.core.constraint.IsInstanceOf;
 
 public class DefaultExportPresenterTest extends MockObjectTestCase {
 
@@ -43,21 +43,28 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         User user = new User();
         user.setUsername("user");
         user.setName("full name");
-        Mock dataset = mock(EmfDataset.class);
-        dataset.expects(once()).method("setAccessedDateTime").with(new IsInstanceOf(Date.class));
+        String description = "HELLO EMF ACCESSLOGS FOR MOCK EXPORT";
+        
+        EmfDataset dataset = new EmfDataset();
+        dataset.setName("dataset test");
+        dataset.setAccessedDateTime(new Date());
 
-        EmfDataset[] datasets = new EmfDataset[] { (EmfDataset) dataset.proxy() };
-
+        EmfDataset[] datasets = new EmfDataset[] { dataset };
+        Version version = new Version();
+        Version[] versions = new Version[] { version };
+        
         Mock model = mock(ExImService.class);
-        model.expects(once()).method("exportDatasetsWithOverwrite");
-
+        model.expects(once()).method("exportDatasetsWithOverwrite").with(
+                new Constraint[] { eq(user), eq(datasets), eq(versions), eq(folder), eq(description) });
+        model.stubs().method("getVersion").with(eq(dataset), eq(0)).will(returnValue(version));
+        
         session.stubs().method("user").withNoArguments().will(returnValue(user));
         session.stubs().method("eximService").withNoArguments().will(returnValue(model.proxy()));
         session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
 
         ExportPresenter presenter = new ExportPresenterImpl((EmfSession) session.proxy());
 
-        presenter.doExportWithOverwrite(datasets, folder, "mock export");
+        presenter.doExportWithOverwrite(datasets, folder, description);
     }
 
     public void testSendsExportRequestToEximServiceOnExportWithoutOverwrite() throws Exception {
@@ -69,11 +76,14 @@ public class DefaultExportPresenterTest extends MockObjectTestCase {
         dataset.setName("dataset test");
 
         EmfDataset[] datasets = new EmfDataset[] { dataset };
+        Version version = new Version();
+        Version[] versions = new Version[] { version };
 
         Mock model = mock(ExImService.class);
         model.expects(once()).method("exportDatasets").with(
-                new Constraint[] { eq(user), eq(datasets), eq(folder), eq(description) });
-
+                new Constraint[] { eq(user), eq(datasets), eq(versions), eq(folder), eq(description) });
+        model.stubs().method("getVersion").with(eq(dataset), eq(0)).will(returnValue(version));
+        
         session.stubs().method("user").withNoArguments().will(returnValue(user));
         session.stubs().method("eximService").withNoArguments().will(returnValue(model.proxy()));
         session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
