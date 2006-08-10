@@ -215,6 +215,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
             output.create();
         } catch (Exception e) {
             LOG.error("could not create inventory output. " + e.getMessage());
+            e.printStackTrace();
             throw new EmfException("could not create inventory output. " + e.getMessage());
         }
     }

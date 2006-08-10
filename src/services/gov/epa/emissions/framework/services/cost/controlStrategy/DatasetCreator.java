@@ -11,7 +11,6 @@ import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.security.User;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
-import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
@@ -40,13 +39,13 @@ public class DatasetCreator {
         return prefix+outputDatasetName;
     }
     
-    public EmfDataset addDataset(TableFormat tableFormat,Datasource datasource, String source) throws EmfException{
+    public EmfDataset addDataset(TableFormat tableFormat,DatasetType type, Datasource datasource, String source) throws EmfException{
         EmfDataset dataset = new EmfDataset();
         Date start = new Date();
 
         dataset.setName(outputDatasetName);
         dataset.setCreator(user.getUsername());
-        dataset.setDatasetType(getDetailedResultDatasetType());
+        dataset.setDatasetType(type);
         dataset.setCreatedDateTime(start);
         dataset.setModifiedDateTime(start);
         dataset.setAccessedDateTime(start);
@@ -108,23 +107,7 @@ public class DatasetCreator {
         }
     }
     
-    private DatasetType getDetailedResultDatasetType() throws EmfException {
-        Session session = HibernateSessionFactory.get().getSession();
-        try {
-            DataCommonsDAO dao = new DataCommonsDAO();
-            List types = dao.getDatasetTypes(session);
-            for (int i = 0; i < types.size(); i++) {
-                DatasetType type = (DatasetType) types.get(i);
-                if (type.getName().equalsIgnoreCase("Control Strategy Detailed Result"))
-                    return type;
-            }
-            return null;
-        } catch (RuntimeException e) {
-            throw new EmfException("Could not get dataset types");
-        } finally {
-            session.close();
-        }
-    }
+
 
     
 

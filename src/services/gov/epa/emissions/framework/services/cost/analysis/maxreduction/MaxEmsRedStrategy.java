@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.services.cost.analysis.maxreduction;
 
 import gov.epa.emissions.commons.Record;
 import gov.epa.emissions.commons.data.Dataset;
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DataQuery;
 import gov.epa.emissions.commons.db.Datasource;
@@ -23,6 +24,7 @@ import gov.epa.emissions.framework.services.cost.analysis.Strategy;
 import gov.epa.emissions.framework.services.cost.controlStrategy.DatasetCreator;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
+import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 
 import java.sql.ResultSet;
@@ -135,7 +137,7 @@ public class MaxEmsRedStrategy implements Strategy {
         OptimizedQuery runner = datasource.optimizedQuery(query, batchSize);
         DatasetCreator creator = new DatasetCreator("CSDR_", controlStrategy, user);
         OptimizedTableModifier modifier = createResultTable(creator.outputTableName());
-        EmfDataset outputDataset = creator.addDataset(tableFormat, datasource, inputDataset.getName());
+        EmfDataset outputDataset = creator.addDataset(tableFormat,getDetailedResultDatasetType(), datasource, inputDataset.getName());
         StrategyResult strategyResult = createStrategyResult(outputDataset, inputDataset);
         Dataset resultDataset = strategyResult.getDetailedResultDataset();
         this.strategyResults.add(strategyResult);
@@ -336,6 +338,24 @@ public class MaxEmsRedStrategy implements Strategy {
         result.setRunStatus("Created for input dataset: " + inputDataset.getName());
 
         return result;
+    }
+    
+    private DatasetType getDetailedResultDatasetType() throws EmfException {
+        Session session = HibernateSessionFactory.get().getSession();
+        try {
+            DataCommonsDAO dao = new DataCommonsDAO();
+            List types = dao.getDatasetTypes(session);
+            for (int i = 0; i < types.size(); i++) {
+                DatasetType type = (DatasetType) types.get(i);
+                if (type.getName().equalsIgnoreCase("Control Strategy Detailed Result"))
+                    return type;
+            }
+            return null;
+        } catch (RuntimeException e) {
+            throw new EmfException("Could not get dataset types");
+        } finally {
+            session.close();
+        }
     }
 
 }
