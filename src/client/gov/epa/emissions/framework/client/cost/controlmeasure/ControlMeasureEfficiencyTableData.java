@@ -23,9 +23,10 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Pollutant", "Control Efficiency", "Locale", "Cost Year", "Cost Per Ton",
-                "Rule Effectiveness", "Rule Penetration", "Equation Type", "CapRecFactor", "Discount Rate", "Details",
-                "Effective Date" };
+        return new String[] { "Pollutant", "Locale", "Effective Date", "Existing Control Measure Abbreviation", 
+                "Existing NEI Device Code", "Cost Year", "Cost Per Ton", "Control Efficiency", "Rule Effectiveness",
+                "Rule Penetration", "Equation Type", "Capital Recovery Factor", "Discount Rate", "Details",
+                 };
     }
 
     public List rows() {
@@ -37,10 +38,11 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     private Row row(EfficiencyRecord record) {
-        Object[] values = { record.getPollutant()+"", "" + record.getEfficiency(), record.getLocale(),
-                "" + record.getCostYear(), "" + record.getCostPerTon(), "" + record.getRuleEffectiveness(),
+        Object[] values = { "" + record.getPollutant(), record.getLocale(), effectiveDate(record.getEffectiveDate()),
+                "" + record.getExistingMeasureAbbr(), "" + record.getExistingDevCode(), "" + record.getCostYear(),
+                "" + record.getCostPerTon(), "" + record.getEfficiency(), "" + record.getRuleEffectiveness(),
                 "" + record.getRulePenetration(), record.getEquationType(), "" + record.getCapRecFactor(),
-                "" + record.getDiscountRate(), record.getDetail(), effectiveDate(record.getEffectiveDate()) };
+                "" + record.getDiscountRate(), record.getDetail() };
 
         return new ViewableRow(record, values);
     }

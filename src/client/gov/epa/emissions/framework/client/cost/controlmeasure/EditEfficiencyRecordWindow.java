@@ -43,6 +43,10 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
     protected TextField costYear;
 
     protected TextField costperTon;
+    
+    protected TextField measureAbbreviation;
+    
+    protected TextField existingdevCode;
 
     protected TextField locale;
     
@@ -80,7 +84,7 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
 
     public EditEfficiencyRecordWindow(ManageChangeables changeablesList, DesktopManager desktopManager,
             EmfSession session) {
-        super("Add Efficiency Record", new Dimension(600, 300), desktopManager);
+        super("Add Efficiency Record", new Dimension(650, 350), desktopManager);
         this.changeablesList = changeablesList;
         this.session = session;
         this.verifier = new NumberFieldVerifier("");
@@ -130,7 +134,7 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
 
         try {
             allPollutants = session.dataCommonsService().getPollutants();
-            pollutant = new ComboBox(allPollutants);
+            pollutant = new ComboBox("Select One", allPollutants);
             pollutant.setPreferredSize(new Dimension(113, 20));
         } catch (EmfException e) {
             messagePanel.setError("Could not retrieve Pollutants");
@@ -139,12 +143,22 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
         changeablesList.addChangeable(pollutant);
         layoutGenerator.addLabelWidgetPair("Pollutant:", pollutant, panel);
 
-        efficiency = new TextField("", 10);
-        efficiency.setName("Control Efficiency");
-        changeablesList.addChangeable(efficiency);
-        layoutGenerator.addLabelWidgetPair("Control Efficiency (% Red):", efficiency, panel);
-        efficiency.setToolTipText("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
-
+        locale = new TextField("Locale", 10);
+        changeablesList.addChangeable(locale);
+        layoutGenerator.addLabelWidgetPair("Locale:", locale, panel);
+        
+        effectiveDate = new TextField("Effective Date", 10);
+        changeablesList.addChangeable(effectiveDate);
+        layoutGenerator.addLabelWidgetPair("Effective Date:", effectiveDate, panel);
+        
+        measureAbbreviation = new TextField("Existing Measure Abbreviation", 10);
+        changeablesList.addChangeable(measureAbbreviation);
+        layoutGenerator.addLabelWidgetPair("Existing Measure Abbreviation", measureAbbreviation, panel);
+        
+        existingdevCode = new TextField("Existing NEI Device Code", 10);
+        changeablesList.addChangeable(existingdevCode);
+        layoutGenerator.addLabelWidgetPair("Existing NEI Device Code", existingdevCode, panel);
+        
         costYear = new TextField("Cost Year", 10);
         changeablesList.addChangeable(costYear);
         layoutGenerator.addLabelWidgetPair("Cost Year:", costYear, panel);
@@ -153,15 +167,7 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
         changeablesList.addChangeable(costperTon);
         layoutGenerator.addLabelWidgetPair("Cost Per Ton Reduced:", costperTon, panel);
 
-        locale = new TextField("Locale", 10);
-        changeablesList.addChangeable(locale);
-        layoutGenerator.addLabelWidgetPair("Locale:", locale, panel);
-        
-        detail = new TextField("Details", 20);
-        changeablesList.addChangeable(detail);
-        layoutGenerator.addLabelWidgetPair("Details:", detail, panel);
-        
-        widgetLayout(6, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
 
         return panel;
     }
@@ -170,10 +176,11 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
         JPanel panel = new JPanel(new SpringLayout());
         SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
 
-        equationType = new ComboBox(equationTypes);
-        equationType.setPreferredSize(new Dimension(113, 20));
-        changeablesList.addChangeable(equationType);
-        layoutGenerator.addLabelWidgetPair("Equation Type", equationType, panel);
+        efficiency = new TextField("", 10);
+        efficiency.setName("Control Efficiency");
+        changeablesList.addChangeable(efficiency);
+        layoutGenerator.addLabelWidgetPair("Control Efficiency (% Red):", efficiency, panel);
+        efficiency.setToolTipText("Enter the Control Efficiency as a percentage (e.g., 90%, or -10% for a disbenefit)");
         
         ruleEffectiveness = new TextField("Rule Effectiveness", 10);
         changeablesList.addChangeable(ruleEffectiveness);
@@ -183,6 +190,11 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
         changeablesList.addChangeable(rulePenetration);
         layoutGenerator.addLabelWidgetPair("Rule Penetration (%):", rulePenetration, panel);
         
+        equationType = new ComboBox(equationTypes);
+        equationType.setPreferredSize(new Dimension(113, 20));
+        changeablesList.addChangeable(equationType);
+        layoutGenerator.addLabelWidgetPair("Equation Type", equationType, panel);
+        
         caprecFactor = new TextField("Capital Recovery Factor", 10);
         changeablesList.addChangeable(caprecFactor);
         layoutGenerator.addLabelWidgetPair("Capital Recovery Factor:", caprecFactor, panel);
@@ -191,11 +203,11 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
         changeablesList.addChangeable(discountRate);
         layoutGenerator.addLabelWidgetPair("Discount Rate:", discountRate, panel);
         
-        effectiveDate = new TextField("Effective Date", 10);
-        changeablesList.addChangeable(effectiveDate);
-        layoutGenerator.addLabelWidgetPair("Effective Date:", effectiveDate, panel);
+        detail = new TextField("Details", 10);
+        changeablesList.addChangeable(detail);
+        layoutGenerator.addLabelWidgetPair("Details:", detail, panel);
         
-        widgetLayout(6, 2, 5, 5, 10, 10, layoutGenerator, panel);
+        widgetLayout(7, 2, 5, 5, 10, 10, layoutGenerator, panel);
         
         return panel;
     }
@@ -213,6 +225,8 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
         discountRate.setText(record.getDiscountRate() + "");
         detail.setText(record.getDetail());
         effectiveDate.setText(formatEffectiveDate());
+        measureAbbreviation.setText(record.getExistingMeasureAbbr());
+        existingdevCode.setText(record.getExistingDevCode() + "");
     }
 
     private String formatEffectiveDate() {
@@ -242,7 +256,7 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
 
     private void doSave() {
         try {
-            record.setPollutant((Pollutant) pollutant.getSelectedItem());
+            savePollutant();
             record.setEquationType(equationType.getSelectedItem() + "");
             saveEfficiency(efficiency);
             saveCostYear();
@@ -254,13 +268,27 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
             saveDiscountRate();
             record.setDetail(detail.getText().trim());
             saveEffectiveDate();
-            
+            record.setExistingMeasureAbbr(measureAbbreviation.getText().trim());
+            saveExistingDevCode();
         } catch (EmfException e) {
             messagePanel.setError(e.getMessage());
             return;
         }
         presenter.refresh();
         disposeView();
+    }
+
+    private void savePollutant() throws EmfException {
+        if (pollutant.getSelectedItem() == null)
+            throw new EmfException("Please Select a Pollutant");
+        record.setPollutant((Pollutant) pollutant.getSelectedItem());        
+    }
+
+    private void saveExistingDevCode() throws EmfException {
+        if (existingdevCode.getText().trim().length() == 0)
+            return;
+        int value = verifier.parseInteger(existingdevCode);
+        record.setExistingDevCode(value);
     }
 
     private void saveEffectiveDate() throws EmfException {
@@ -301,6 +329,10 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
     }
 
     private void saveLocale() throws EmfException {
+        if (locale.getText().trim().length() == 0) {
+            record.setLocale("");
+            return;
+        }
         int value = verifier.parseInteger(locale);
         String string = value + "";
         if (string.length() == 2 || string.length() == 5 || string.length() == 6)
@@ -311,6 +343,8 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
 
     private void saveCostPerTon() throws EmfException {
         float value = verifier.parseFloat(costperTon);
+        if (value == 0)
+            throw new EmfException("Please set the Cost Per Ton");
         record.setCostPerTon(value);
     }
 
@@ -318,7 +352,7 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
         int value = verifier.parseInteger(costYear);
         String string = value + "";
         if (string.length() != 4)
-            throw new EmfException("Cost Year must be a four digit integer.");
+            throw new EmfException("Please enter the Cost Year as a four digit integer.");
         record.setCostYear(value);
     }
 
