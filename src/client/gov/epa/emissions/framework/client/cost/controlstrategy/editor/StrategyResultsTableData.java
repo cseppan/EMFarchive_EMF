@@ -24,13 +24,39 @@ public class StrategyResultsTableData extends AbstractTableData {
         List rows = new ArrayList();
         for (int i = 0; i < strategyResults.length; i++) {
             StrategyResult result = strategyResults[i];
-            EmfDataset outputDataset = (EmfDataset) result.getDetailedResultDataset();
-            Object[] values = { inputDatasetName(result.getInputDatasetId()), outputDataset.getName(),
-                    result.getStrategyResultType().getName() };
-            Row row = new ViewableRow(result, values);
-            rows.add(row);
+            addDetailDatasetRow(rows, result);
+            addControlInvenRow(rows, result);
         }
         return rows;
+    }
+
+    private void addControlInvenRow(List rows, StrategyResult result) {
+        EmfDataset dataset = (EmfDataset) result.getControlledInventoryDataset();
+        if (dataset == null)
+            return;
+        Object[] values = controlInvenValues(result, dataset);
+        Row row = new ViewableRow(result, values);
+        rows.add(row);
+
+    }
+
+    private Object[] controlInvenValues(StrategyResult result, EmfDataset dataset) {
+        Object[] values = { inputDatasetName(result.getInputDatasetId()), dataset.getName(),"Controlled Inventory"
+                 };
+        return values;
+    }
+
+    private void addDetailDatasetRow(List rows, StrategyResult result) {
+        Object[] values = detailValues(result);
+        Row row = new ViewableRow(result, values);
+        rows.add(row);
+    }
+
+    private Object[] detailValues(StrategyResult result) {
+        EmfDataset outputDataset = (EmfDataset) result.getDetailedResultDataset();
+        Object[] values = { inputDatasetName(result.getInputDatasetId()), outputDataset.getName(),
+                result.getStrategyResultType().getName() };
+        return values;
     }
 
     private String inputDatasetName(int inputDatasetId) {

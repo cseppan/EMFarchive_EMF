@@ -1,6 +1,7 @@
 package gov.epa.emissions.framework.services.cost.controlStrategy;
 
 import gov.epa.emissions.commons.data.Dataset;
+import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.TableCreator;
@@ -14,6 +15,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.basic.Status;
 import gov.epa.emissions.framework.services.basic.StatusDAO;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
+import gov.epa.emissions.framework.services.cost.ControlStrategyDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
@@ -38,8 +40,15 @@ public class ControlStrategyInventoryOutput {
         this.controlStrategy = controlStrategy;
         this.user = user;
         creator = new DatasetCreator("CSINVEN_", controlStrategy, user);
-        this.tableFormat = new FileFormatFactory().tableFormat(controlStrategy.getDatasetType());
+        this.tableFormat = new FileFormatFactory().tableFormat(datasetType(controlStrategy));
         this.statusServices = new StatusDAO();
+    }
+
+    private DatasetType datasetType(ControlStrategy strategy) throws EmfException {
+        DatasetType type = strategy.getDatasetType();
+        if(type==null)
+            throw new EmfException("Please select a dataset type");
+        return type;
     }
 
     public void create() throws Exception {
@@ -51,14 +60,15 @@ public class ControlStrategyInventoryOutput {
         doCreateInventory(server, datasource, tableCreator, inputDataset, inputTable);
     }
 
-    private void doCreateInventory(EmfDbServer server, Datasource datasource, TableCreator tableCreator, EmfDataset inputDataset, String inputTable) throws EmfException, Exception, SQLException {
+    private void doCreateInventory(EmfDbServer server, Datasource datasource, TableCreator tableCreator,
+            EmfDataset inputDataset, String inputTable) throws EmfException, Exception, SQLException {
         String outputInventoryTableName = creator.outputTableName();
         createTable(outputInventoryTableName, tableCreator);
         startStatus(statusServices);
         try {
             copyAndUpdateData(server, datasource, inputDataset, inputTable, outputInventoryTableName);
         } catch (Exception e) {
-            failStatus(statusServices,e.getMessage());
+            failStatus(statusServices, e.getMessage());
             tableCreator.drop(outputInventoryTableName);
             throw e;
         } finally {
@@ -67,43 +77,34 @@ public class ControlStrategyInventoryOutput {
         endStatus(statusServices);
     }
 
-    private void endStatus(StatusDAO statusServices) {
-        String end = "Finished creating a controlled inventory";
-        Status status = status(user,end);
-        statusServices.add(status);
-    }
-
-    private void failStatus(StatusDAO statusServices,String message) {
-        String end = "Failed to create a controlled inventory: "+message;
-        Status status = status(user,end);
-        statusServices.add(status);
-    }
-
-    private void startStatus(StatusDAO statusServices) {
-        String start = "Started creating controlled inventory of type '"+controlStrategy.getDatasetType()+"' using control strategy '"+controlStrategy.getName();
-        Status status = status(user,start);
-        statusServices.add(status);
-    }
-
-    private Status status(User user, String message) {
-        Status status = new Status();
-        status.setUsername(user.getUsername());
-        status.setType("Controlled Inventory");
-        status.setMessage(message);
-        status.setTimestamp(new Date());
-        return status;
-    }
-
-    private void copyAndUpdateData(EmfDbServer server, Datasource datasource, EmfDataset inputDataset, String inputTable, String outputInventoryTableName) throws EmfException {
+    private void copyAndUpdateData(EmfDbServer server, Datasource datasource, EmfDataset inputDataset,
+            String inputTable, String outputInventoryTableName) throws EmfException {
         copyDataFromOriginalTable(inputTable, outputInventoryTableName, version(inputDataset, controlStrategy
                 .getDatasetVersion()), datasource);
 
         updateDataWithDetailDatasetTable(outputInventoryTableName, detailDatasetTable(controlStrategy), server
                 .getEmissionsDatasource());
 
-        EmfDataset dataset = creator.addDataset(tableFormat, controlStrategy.getDatasetType(), datasource,
-                inputDataset.getName());
+        EmfDataset dataset = creator.addDataset(tableFormat, controlStrategy.getDatasetType(), datasource, inputDataset
+                .getName());
         updateDatasetIdAndVersion(outputInventoryTableName, server.getEmissionsDatasource(), dataset.getId());
+
+        updateControlStrategyResults(controlStrategy, dataset);
+    }
+
+    private void updateControlStrategyResults(ControlStrategy controlStrategy, EmfDataset dataset) throws EmfException {
+        StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
+        strategyResults[0].setControlledInventoryDataset(dataset);
+        ControlStrategyDAO dao = new ControlStrategyDAO();
+        Session session = HibernateSessionFactory.get().getSession();
+        try {
+            dao.update(controlStrategy, session);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        } finally {
+            session.close();
+        }
+
     }
 
     private Version version(EmfDataset inputDataset, int datasetVersion) {
@@ -155,8 +156,9 @@ public class ControlStrategyInventoryOutput {
     private String updateQuery(String outputTable, String detailResultTable, Datasource datasource) {
         return "UPDATE " + qualifiedTable(outputTable, datasource) + " SET " + "ann_emis=b.final_emissions,"
                 + "ceff=b.control_eff," + "reff=b.rule_eff," + "rpen=b.rule_pen" + " FROM (SELECT "
-                + "final_emissions, control_eff, rule_eff, rule_pen, source_id" + " FROM " + qualifiedTable(detailResultTable, datasource) + ") as b "
-                + " WHERE " + qualifiedTable(outputTable, datasource) + ".record_id=b.source_id";
+                + "final_emissions, control_eff, rule_eff, rule_pen, source_id" + " FROM "
+                + qualifiedTable(detailResultTable, datasource) + ") as b " + " WHERE "
+                + qualifiedTable(outputTable, datasource) + ".record_id=b.source_id";
     }
 
     private String detailDatasetTable(ControlStrategy controlStrategy) {
@@ -194,6 +196,34 @@ public class ControlStrategyInventoryOutput {
         } catch (Exception e) {
             throw new EmfException("Could not create table: " + outputInventoryTableName + "\n" + e.getMessage());
         }
+    }
+
+    private void endStatus(StatusDAO statusServices) {
+        String end = "Finished creating a controlled inventory";
+        Status status = status(user, end);
+        statusServices.add(status);
+    }
+
+    private void failStatus(StatusDAO statusServices, String message) {
+        String end = "Failed to create a controlled inventory: " + message;
+        Status status = status(user, end);
+        statusServices.add(status);
+    }
+
+    private void startStatus(StatusDAO statusServices) {
+        String start = "Started creating controlled inventory of type '" + controlStrategy.getDatasetType()
+                + "' using control strategy '" + controlStrategy.getName();
+        Status status = status(user, start);
+        statusServices.add(status);
+    }
+
+    private Status status(User user, String message) {
+        Status status = new Status();
+        status.setUsername(user.getUsername());
+        status.setType("Controlled Inventory");
+        status.setMessage(message);
+        status.setTimestamp(new Date());
+        return status;
     }
 
 }

@@ -23,6 +23,8 @@ public class StrategyResult implements Serializable {
 
     private Dataset detailedResultDataset;
     
+    private Dataset controlledInventoryDataset;
+    
     private StrategyResultType strategyResultType;
 
     public StrategyResult() {
@@ -100,6 +102,14 @@ public class StrategyResult implements Serializable {
 
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
+    }
+
+    public Dataset getControlledInventoryDataset() {
+        return controlledInventoryDataset;
+    }
+
+    public void setControlledInventoryDataset(Dataset controlledInventoryDataset) {
+        this.controlledInventoryDataset = controlledInventoryDataset;
     }
 
 }

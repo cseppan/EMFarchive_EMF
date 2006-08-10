@@ -169,6 +169,7 @@ CREATE TABLE emf.strategy_results
   control_strategy_id int4 NOT NULL REFERENCES emf.control_strategies(id),
   strategy_result_type_id int4 NOT NULL REFERENCES emf.strategy_result_types(id),
   detailed_result_dataset_id int4 NOT NULL REFERENCES emf.datasets(id),
+  controlled_inven_dataset_id int4 REFERENCES emf.datasets(id),
   list_index int4,
   total_cost real,
   total_reduction real,

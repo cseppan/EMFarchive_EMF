@@ -156,5 +156,15 @@ public class EfficiencyRecord implements Serializable {
     public void setEffectiveDate(Date effectiveDate) {
         this.effectiveDate = effectiveDate;
     }
+    
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof EfficiencyRecord))
+            return false;
+        final EfficiencyRecord record = (EfficiencyRecord) other;
+        boolean equal = record.getPollutant().equals(pollutant) &&
+            record.getLocale().equals(locale);
+        
+        return record.id == id || equal;  
+    } 
 
 }
