@@ -50,23 +50,23 @@ public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCas
         prefs.stubs().method("outputFolder").will(returnValue(folder));
         prefs.stubs().method("mapRemoteOutputPathToLocal").will(returnValue(fileNameOnLocalDrive));
     }
-    
+
     public void testSendsExportRequestToEximServiceOnExport() throws Exception {
         User user = new User();
         user.setUsername("user");
         user.setName("full name");
-        
+
         EmfDataset dataset = new EmfDataset();
         ControlStrategy controlStrategy = setupControlStrategy(dataset);
-        
+
         Version version = new Version();
-        
+
         Mock model = mock(ExImService.class);
         model.expects(once()).method("exportDatasetsWithOverwrite").with(
-                new Constraint[] { eq(user), new IsInstanceOf(EmfDataset[].class), new IsInstanceOf(Version[].class), 
+                new Constraint[] { eq(user), new IsInstanceOf(EmfDataset[].class), new IsInstanceOf(Version[].class),
                         same(folder), new IsInstanceOf(String.class) });
         model.stubs().method("getVersion").with(eq(dataset), eq(0)).will(returnValue(version));
-        
+
         session.stubs().method("user").withNoArguments().will(returnValue(user));
         session.stubs().method("eximService").withNoArguments().will(returnValue(model.proxy()));
         session.expects(once()).method("setMostRecentExportFolder").with(eq(folder));
@@ -74,40 +74,53 @@ public class EditControlStrategyOutputTabPresenterTest extends MockObjectTestCas
         EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(
                 (EmfSession) session.proxy(), null);
 
-        presenter.doExport(controlStrategy, folder);
+        presenter.doExport(datasets(controlStrategy), folder);
+    }
+
+    private EmfDataset[] datasets(ControlStrategy controlStrategy) {
+        EmfDataset[] datasets = new EmfDataset[2];
+        StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
+        datasets[0] = (EmfDataset) strategyResults[0].getDetailedResultDataset();
+        datasets[1] = (EmfDataset) strategyResults[0].getControlledInventoryDataset();
+        return datasets;
     }
 
     private ControlStrategy setupControlStrategy(Dataset dataset) {
         StrategyResult result = new StrategyResult();
         result.setDetailedResultDataset(dataset);
+        result.setControlledInventoryDataset(dataset);
         StrategyResult[] results = { result };
         ControlStrategy controlStrategy = new ControlStrategy();
+        controlStrategy.setName("CS1");
         controlStrategy.setStrategyResults(results);
         return controlStrategy;
     }
-    
+
     public void testDoAnalyzeShouldOpenAnalyzeEngineTableApp() throws EmfException {
         EmfDataset dataset = new EmfDataset();
         int id = 201;
         dataset.setName("dataset test");
         dataset.setAccessedDateTime(new Date());
         dataset.setId(id);
-        
+
         ControlStrategy controlStrategy = setupControlStrategy(dataset);
+        String controlStrategyName = controlStrategy.getName();
         
         Mock loggingService = mock(LoggingService.class);
-        
-        loggingService.expects(once()).method("getLastExportedFileName").with(eq(id)).will(returnValue(fileNameOnLocalDrive));
+
+        loggingService.expects(atLeastOnce()).method("getLastExportedFileName").with(eq(id)).will(
+                returnValue(fileNameOnLocalDrive));
         session.stubs().method("loggingService").withNoArguments().will(returnValue(loggingService.proxy()));
-        
-        
+
         Mock view = mock(EditControlStrategyOutputTabView.class);
-        view.expects(once()).method("displayAnalyzeTable").with(eq(controlStrategy.getName()),eq(new String[]{fileNameOnLocalDrive}));
         
+        view.expects(once()).method("displayAnalyzeTable").with(eq(controlStrategyName),
+                eq(new String[] { fileNameOnLocalDrive,fileNameOnLocalDrive }));
+
         EditControlStrategyOutputTabPresenter presenter = new EditControlStrategyOutputTabPresenter(
                 (EmfSession) session.proxy(), (EditControlStrategyOutputTabView) view.proxy());
 
-        presenter.doAnalyze(controlStrategy.getName(),controlStrategy.getStrategyResults());
+        presenter.doAnalyze(controlStrategyName, datasets(controlStrategy));
     }
 
 }

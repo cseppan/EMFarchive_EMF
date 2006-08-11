@@ -39,13 +39,14 @@ public class DatasetCreator {
         return prefix+outputDatasetName;
     }
     
-    public EmfDataset addDataset(TableFormat tableFormat,DatasetType type, Datasource datasource, String source) throws EmfException{
+    public EmfDataset addDataset(DatasetType type,String description, TableFormat tableFormat, String source, Datasource datasource) throws EmfException{
         EmfDataset dataset = new EmfDataset();
         Date start = new Date();
 
         dataset.setName(outputDatasetName);
         dataset.setCreator(user.getUsername());
         dataset.setDatasetType(type);
+        dataset.setDescription(description);
         dataset.setCreatedDateTime(start);
         dataset.setModifiedDateTime(start);
         dataset.setAccessedDateTime(start);

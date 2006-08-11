@@ -47,7 +47,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private CheckBox inventoryCheckBox;
 
-    public EditControlStrategyOutputTab(ControlStrategy controlStrategy, MessagePanel messagePanel, DesktopManager desktopManager, EmfConsole parentConsole) {
+    public EditControlStrategyOutputTab(ControlStrategy controlStrategy, MessagePanel messagePanel,
+            DesktopManager desktopManager, EmfConsole parentConsole) {
         super.setName("output");
         this.controlStrategy = controlStrategy;
         this.messagePanel = messagePanel;
@@ -72,7 +73,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     public void export() {
         try {
-            presenter.doExport(controlStrategy, folder.getText());
+            List list = selectModel.selected();
+            EmfDataset[] datasets = (EmfDataset[]) list.toArray(new EmfDataset[0]);
+            presenter.doExport(datasets, folder.getText());
         } catch (EmfException e) {
             messagePanel.setMessage(e.getMessage());
         }
@@ -81,8 +84,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     public void analyze() {
         try {
             List list = selectModel.selected();
-            StrategyResult[] results =(StrategyResult[]) list.toArray(new StrategyResult[0]);
-            presenter.doAnalyze(controlStrategy.getName(),results);
+            EmfDataset[] datasets = (EmfDataset[]) list.toArray(new EmfDataset[0]);
+            presenter.doAnalyze(controlStrategy.getName(), datasets);
         } catch (EmfException e) {
             messagePanel.setMessage(e.getMessage());
         }
@@ -91,37 +94,29 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private JPanel topPanel() {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(productPanel());
-        topPanel.add(dirSelectPanel(), BorderLayout.SOUTH);
+        topPanel.add(createButtonPanel(), BorderLayout.SOUTH);
 
         topPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
-                BorderFactory.createTitledBorder("Output Settings")));
+                BorderFactory.createTitledBorder("Outputs")));
 
         return topPanel;
     }
 
-    private JPanel dirSelectPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(folderPanel());
-        JPanel createPanel = createButtonPanel();
-        panel.add(createPanel, BorderLayout.SOUTH);
-        return panel;
-    }
-
     private JPanel createButtonPanel() {
-        Button button = new Button("Create",createOutputAction());
+        Button button = new Button("Create", createOutputAction());
         JPanel createPanel = new JPanel();
         createPanel.add(button);
         return createPanel;
     }
 
     private Action createOutputAction() {
-        Action action = new AbstractAction(){
+        Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 doInventory();
             }
-            
+
         };
-        return action ;
+        return action;
     }
 
     protected void doInventory() {
@@ -135,6 +130,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private JPanel productPanel() {
         JPanel productPanel = new JPanel();
         inventoryCheckBox = new CheckBox("Inventory");
+        inventoryCheckBox.setSelected(true);
         CheckBox summaryFIPS = new CheckBox("FIPS Summary");
         summaryFIPS.setEnabled(false);
         productPanel.add(inventoryCheckBox);
@@ -160,7 +156,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         JPanel tablePanel = tablePanel(controlStrategy);
         JPanel buttonPanel = buttonPanel();
 
-        JPanel outputPanel = new JPanel(new BorderLayout());
+        JPanel outputPanel = new JPanel(new BorderLayout(5,10));
+        outputPanel.add(folderPanel(), BorderLayout.NORTH);
         outputPanel.add(tablePanel);
         outputPanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -173,7 +170,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private JPanel tablePanel(ControlStrategy controlStrategy) {
         StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
         EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
-        StrategyResultsTableData tableData = new StrategyResultsTableData(inputDatasets,strategyResults);
+        ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(inputDatasets, strategyResults[0]);
         EmfTableModel model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         JTable table = new JTable(selectModel);
@@ -244,8 +241,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
             this.folder.setText(recentfolder);
     }
 
-    public void displayAnalyzeTable(String controlStrategyName,String[] fileNames) {
-        AnalysisEngineTableApp app = new AnalysisEngineTableApp(controlStrategyName,desktopManager, parentConsole);
+    public void displayAnalyzeTable(String controlStrategyName, String[] fileNames) {
+        AnalysisEngineTableApp app = new AnalysisEngineTableApp(controlStrategyName, desktopManager, parentConsole);
         app.display(fileNames);
     }
 

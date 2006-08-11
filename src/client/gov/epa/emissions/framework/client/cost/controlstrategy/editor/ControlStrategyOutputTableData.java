@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy.editor;
 
+import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.ui.AbstractTableData;
@@ -9,24 +10,22 @@ import gov.epa.emissions.framework.ui.ViewableRow;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StrategyResultsTableData extends AbstractTableData {
+public class ControlStrategyOutputTableData extends AbstractTableData {
 
     private List rows;
 
     private EmfDataset[] inputDatasets;
 
-    public StrategyResultsTableData(EmfDataset[] inputDatasets, StrategyResult[] strategyResults) {
+    public ControlStrategyOutputTableData(EmfDataset[] inputDatasets, StrategyResult strategyResult) {
         this.inputDatasets = inputDatasets;
-        this.rows = createRows(strategyResults);
+        this.rows = createRows(strategyResult);
     }
 
-    private List createRows(StrategyResult[] strategyResults) {
+    private List createRows(StrategyResult result) {
         List rows = new ArrayList();
-        for (int i = 0; i < strategyResults.length; i++) {
-            StrategyResult result = strategyResults[i];
-            addDetailDatasetRow(rows, result);
-            addControlInvenRow(rows, result);
-        }
+        addDetailDatasetRow(rows, result);
+        addControlInvenRow(rows, result);
+
         return rows;
     }
 
@@ -35,20 +34,22 @@ public class StrategyResultsTableData extends AbstractTableData {
         if (dataset == null)
             return;
         Object[] values = controlInvenValues(result, dataset);
-        Row row = new ViewableRow(result, values);
+        Row row = new ViewableRow(dataset, values);
         rows.add(row);
 
     }
 
     private Object[] controlInvenValues(StrategyResult result, EmfDataset dataset) {
-        Object[] values = { inputDatasetName(result.getInputDatasetId()), dataset.getName(),"Controlled Inventory"
-                 };
+        Object[] values = { inputDatasetName(result.getInputDatasetId()), dataset.getName(), "Controlled Inventory" };
         return values;
     }
 
     private void addDetailDatasetRow(List rows, StrategyResult result) {
+        Dataset detailedResultDataset = result.getDetailedResultDataset();
+        if (detailedResultDataset == null)
+            return;
         Object[] values = detailValues(result);
-        Row row = new ViewableRow(result, values);
+        Row row = new ViewableRow(detailedResultDataset, values);
         rows.add(row);
     }
 

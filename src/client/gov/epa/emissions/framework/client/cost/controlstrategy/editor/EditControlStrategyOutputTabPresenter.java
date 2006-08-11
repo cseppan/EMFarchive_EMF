@@ -5,7 +5,6 @@ import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.preference.UserPreference;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
-import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.data.EmfDataset;
 import gov.epa.emissions.framework.services.exim.ExImService;
 
@@ -27,15 +26,15 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
 
     }
 
-    public void doExport(ControlStrategy controlStrategy, String folder) throws EmfException {
+    public void doExport(EmfDataset[] datasets, String folder) throws EmfException {
+        if(datasets.length==0){
+            throw new EmfException("Please select one or more result datasets");
+        }
         validateFolder(folder);
         session.setMostRecentExportFolder(folder);
         ExImService service = session.eximService();
-        StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
-        EmfDataset[] datasets = new EmfDataset[strategyResults.length];
         Version[] versions = new Version [datasets.length];
-        for (int i = 0; i < strategyResults.length; i++) {
-            datasets[i] = (EmfDataset) strategyResults[i].getDetailedResultDataset();
+        for (int i = 0; i < datasets.length; i++) {
             versions[i] = service.getVersion(datasets[i], datasets[i].getDefaultVersion());
         }
         service.exportDatasetsWithOverwrite(session.user(), datasets, versions, mapToRemote(folder), "Exporting datasets");
@@ -45,14 +44,14 @@ public class EditControlStrategyOutputTabPresenter implements EditControlStrateg
         return session.preferences().mapLocalOutputPathToRemote(dir);
     }
 
-    public void doAnalyze(String controlStrategyName, StrategyResult[] strategyResults) throws EmfException {
-        if(strategyResults.length==0){
+    public void doAnalyze(String controlStrategyName, EmfDataset[] datasets) throws EmfException {
+        if(datasets.length==0){
             throw new EmfException("Please select one or more result datasets");
         }
-        String[]  fileNames = new String[strategyResults.length];
+        String[]  fileNames = new String[datasets.length];
         UserPreference preference = session.preferences();
-        for (int i = 0; i < strategyResults.length; i++) {
-            int datasetId = strategyResults[i].getDetailedResultDataset().getId();
+        for (int i = 0; i < datasets.length; i++) {
+            int datasetId = datasets[i].getId();
             String fileNameOnServer = session.loggingService().getLastExportedFileName(datasetId);
             fileNames[i] = preference.mapRemoteOutputPathToLocal(fileNameOnServer);
         }

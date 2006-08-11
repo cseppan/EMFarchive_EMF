@@ -1,6 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
-import gov.epa.emissions.framework.client.cost.controlstrategy.editor.StrategyResultsTableData;
+import gov.epa.emissions.framework.client.cost.controlstrategy.editor.ControlStrategyOutputTableData;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.EmfDataset;
@@ -10,33 +10,24 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-public class StrategyResultsTableDataTest extends TestCase {
+public class ControlStrategyOutputTableDataTest extends TestCase {
 
-    private StrategyResultsTableData data;
+    private ControlStrategyOutputTableData data;
 
-    private StrategyResult result1;
-
-    private StrategyResult result2;
+    private StrategyResult result;
 
     protected void setUp() {
-        result1 = new StrategyResult();
-        result1.setInputDatasetId(101);
+        result = new StrategyResult();
+        result.setInputDatasetId(101);
         EmfDataset detailDataset1 = detailDataset("detailed dataset1");
-        result1.setDetailedResultDataset(detailDataset1);
-        result1.setStrategyResultType(type());
-
-        result2 = new StrategyResult();
-        result2.setInputDatasetId(102);
-        EmfDataset detailDataset2 = detailDataset("detailed dataset2");
-        result2.setDetailedResultDataset(detailDataset2);
-        result2.setStrategyResultType(type());
+        result.setDetailedResultDataset(detailDataset1);
+        result.setStrategyResultType(type());
 
         EmfDataset dataset1 = dataset("input dataset1");
         dataset1.setId(101);
         EmfDataset dataset2 = dataset("input dataset2");
         dataset2.setId(102);
-        data = new StrategyResultsTableData(new EmfDataset[] { dataset1, dataset2 }, new StrategyResult[] { result1,
-                result2 });
+        data = new ControlStrategyOutputTableData(new EmfDataset[] { dataset1, dataset2 }, result );
     }
 
     private EmfDataset detailDataset(String name) {
@@ -80,8 +71,8 @@ public class StrategyResultsTableDataTest extends TestCase {
 
     public void testShouldReturnTheRowsCorrespondingToCount() {
         List rows = data.rows();
-        assertNotNull("Should have 2 rows", rows);
-        assertEquals(2, rows.size());
+        assertNotNull("Should have 1 rows", rows);
+        assertEquals(1, rows.size());
     }
 
     public void testShouldFillTheColumnsCorrectly() {
@@ -92,15 +83,9 @@ public class StrategyResultsTableDataTest extends TestCase {
         assertEquals("detailed dataset1", row1.getValueAt(1));
         assertEquals("Detailed Strategy Result", row1.getValueAt(2));
 
-        Row row2 = (Row) rows.get(1);
-        assertEquals("input dataset2", row2.getValueAt(0));
-        assertEquals("detailed dataset2", row2.getValueAt(1));
-        assertEquals("Detailed Strategy Result", row2.getValueAt(2));
-
     }
 
     public void testShouldReturnARowRepresentingACaseEntry() {
-        assertEquals(result1, data.element(0));
-        assertEquals(result2, data.element(1));
+        assertEquals(result.getDetailedResultDataset(), data.element(0));
     }
 }

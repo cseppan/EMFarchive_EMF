@@ -137,7 +137,8 @@ public class MaxEmsRedStrategy implements Strategy {
         OptimizedQuery runner = datasource.optimizedQuery(query, batchSize);
         DatasetCreator creator = new DatasetCreator("CSDR_", controlStrategy, user);
         OptimizedTableModifier modifier = createResultTable(creator.outputTableName());
-        EmfDataset outputDataset = creator.addDataset(tableFormat,getDetailedResultDatasetType(), datasource, inputDataset.getName());
+        String description="TODO: add header comments??";
+        EmfDataset outputDataset = creator.addDataset(getDetailedResultDatasetType(),description, tableFormat, inputDataset.getName(), datasource);
         StrategyResult strategyResult = createStrategyResult(outputDataset, inputDataset);
         Dataset resultDataset = strategyResult.getDetailedResultDataset();
         this.strategyResults.add(strategyResult);
