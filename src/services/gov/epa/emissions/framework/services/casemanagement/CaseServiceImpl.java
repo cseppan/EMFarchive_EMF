@@ -1,7 +1,11 @@
 package gov.epa.emissions.framework.services.casemanagement;
 
+import gov.epa.emissions.commons.db.version.Version;
 import gov.epa.emissions.commons.security.User;
+import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
+import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.exim.ExportService;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.util.List;
@@ -10,12 +14,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 
+import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
+
 public class CaseServiceImpl implements CaseService {
     private static Log LOG = LogFactory.getLog(CaseServiceImpl.class);
 
     private CaseDAO dao;
+    
+    private PooledExecutor threadPool;
 
     private HibernateSessionFactory sessionFactory;
+    
+    private EmfDbServer dbServer;
+    
+    private ExportService exportService;
 
     public CaseServiceImpl() {
         this(HibernateSessionFactory.get());
@@ -23,7 +35,31 @@ public class CaseServiceImpl implements CaseService {
 
     public CaseServiceImpl(HibernateSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-        dao = new CaseDAO();
+        this.dao = new CaseDAO();
+        this.threadPool = createThreadPool();
+    }
+    
+    protected void finalize() throws Throwable {
+        threadPool.shutdownAfterProcessingCurrentlyQueuedTasks();
+        threadPool.awaitTerminationAfterShutdown();
+        super.finalize();
+    }
+
+    private PooledExecutor createThreadPool() {
+        PooledExecutor threadPool = new PooledExecutor(20);
+        threadPool.setMinimumPoolSize(1);
+        threadPool.setKeepAliveTime(1000 * 60 * 3);// terminate after 3 (unused) minutes
+
+        return threadPool;
+    }
+    
+    private void createExportService() throws EmfException {
+        try {
+            this.dbServer = new EmfDbServer();
+            this.exportService = new ExportService(dbServer, threadPool, sessionFactory);
+        } catch (Exception e) {
+            throw new EmfException(e.getMessage());
+        }
     }
 
     public Case[] getCases() throws EmfException {
@@ -256,6 +292,31 @@ public class CaseServiceImpl implements CaseService {
             LOG.error("Could not get all Programs", e);
             throw new EmfException("Could not get all Programs");
         }
+    }
+
+    public void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport) throws EmfException {
+        createExportService();
+        exportService.export(user, getInputDatasets(caseToExport), getInputDatasetVersions(caseToExport), dirName, purpose, overWrite);
+    }
+
+    private Version[] getInputDatasetVersions(Case caseToExport) {
+        CaseInput[] inputs = caseToExport.getCaseInputs();
+        Version[] versions = new Version[inputs.length];
+        
+        for (int i = 0; i < inputs.length; i++)
+            versions[i] = inputs[i].getVersion();
+        
+        return versions;
+    }
+
+    private EmfDataset[] getInputDatasets(Case caseToExport) {
+        CaseInput[] inputs = caseToExport.getCaseInputs();
+        EmfDataset[] datasets = new EmfDataset[inputs.length];
+        
+        for (int i = 0; i < inputs.length; i++)
+            datasets[i] = inputs[i].getDataset();
+        
+        return datasets;
     }
 
 }

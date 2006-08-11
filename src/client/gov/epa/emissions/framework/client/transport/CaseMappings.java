@@ -2,6 +2,7 @@ package gov.epa.emissions.framework.client.transport;
 
 import javax.xml.namespace.QName;
 
+import gov.epa.emissions.commons.data.Mutex;
 import gov.epa.emissions.framework.services.casemanagement.Abbreviation;
 import gov.epa.emissions.framework.services.casemanagement.AirQualityModel;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -39,6 +40,7 @@ public class CaseMappings extends Mappings {
         bean(call, InputName.class, inputname());
         bean(call, InputEnvtVar.class, inputEnvtVar());
         bean(call, CaseInput.class, caseinput());
+        bean(call, Mutex.class, mutex());
     }
 
     private void arrays(Call call) {
@@ -161,4 +163,8 @@ public class CaseMappings extends Mappings {
         return qname("Programs");
     }
 
+    public QName mutex() {
+        return qname("Mutex");
+    }
+    
 }

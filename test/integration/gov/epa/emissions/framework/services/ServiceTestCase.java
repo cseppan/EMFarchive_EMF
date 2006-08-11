@@ -6,8 +6,8 @@ import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.io.Column;
+import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.services.data.EmfDataset;
-import gov.epa.emissions.framework.services.data.Note;
 import gov.epa.emissions.framework.services.editor.Revision;
 import gov.epa.emissions.framework.services.persistence.EmfDatabaseSetup;
 import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
@@ -110,7 +110,7 @@ public abstract class ServiceTestCase extends TestCase {
     }
 
     public void deleteAllDatasets() throws Exception {
-        dropAll(Note.class);
+        dropAll(CaseInput.class);
         dropAll(Revision.class);
         dropAll(EmfDataset.class);
     }

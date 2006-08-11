@@ -40,5 +40,7 @@ public interface CaseService {
     Case releaseLocked(Case locked) throws EmfException;
 
     Case updateCase(Case element) throws EmfException;
+    
+    void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport) throws EmfException;
 
 }

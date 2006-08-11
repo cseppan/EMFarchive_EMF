@@ -3,6 +3,7 @@ package gov.epa.emissions.framework.client.casemanagement.editor;
 import gov.epa.emissions.commons.gui.Button;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
+import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTab;
 import gov.epa.emissions.framework.client.console.DesktopManager;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
@@ -43,7 +44,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
         tabbedPane.addTab("Summary", createSummaryTab(caseObj, messagePanel));
         tabbedPane.addTab("Parameters", new JPanel());
-        tabbedPane.addTab("Inputs", new JPanel());
+        tabbedPane.addTab("Inputs", createInputTab());
         tabbedPane.addTab("Programs", new JPanel());
         tabbedPane.addTab("Outputs", new JPanel());
         tabbedPane.addTab("History", new JPanel());
@@ -60,6 +61,17 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         } catch (EmfException e) {
             showError("Could not load Summary Tab." + e.getMessage());
             return createErrorTab("Could not load Summary Tab." + e.getMessage());
+        }
+    }
+    
+    private JPanel createInputTab() {
+        try {
+            EditInputsTab view = new EditInputsTab(null, this, messagePanel, desktopManager);
+            presenter.set(view);
+            return view;
+        } catch (EmfException e) {
+            showError("Could not load Input Tab." + e.getMessage());
+            return createErrorTab("Could not load Input Tab." + e.getMessage());
         }
     }
 

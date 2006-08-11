@@ -130,7 +130,7 @@ public class ExportService {
         return prefix + name + "_" + date.toLowerCase() + suffix;
     }
 
-    void export(User user, EmfDataset[] datasets, Version[] versions, String dirName, String purpose, boolean overwrite)
+    public void export(User user, EmfDataset[] datasets, Version[] versions, String dirName, String purpose, boolean overwrite)
             throws EmfException {
         File path = validatePath(dirName);
         

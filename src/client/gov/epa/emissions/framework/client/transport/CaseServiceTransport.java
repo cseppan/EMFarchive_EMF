@@ -203,4 +203,18 @@ public class CaseServiceTransport implements CaseService {
         return (Program[]) call.requestResponse(new Object[] {});
     }
 
+    public void export(User user, String dirName, String purpose, boolean overWrite, Case caseToExport) throws EmfException {
+        EmfCall call = call();
+        
+        call.setOperation("export");
+        call.addParam("user", dataMappings.user());
+        call.addStringParam("dirName");
+        call.addStringParam("purpose");
+        call.addBooleanParameter("overWrite");
+        call.addParam("caseToExport", caseMappings.caseObject());
+        call.setVoidReturnType();
+
+        call.request(new Object[] { user, dirName, purpose, Boolean.valueOf(overWrite), caseToExport });
+    }
+
 }

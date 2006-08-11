@@ -2,6 +2,9 @@ package gov.epa.emissions.framework.client.casemanagement.editor;
 
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.CaseManagerPresenter;
+import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabPresenter;
+import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabPresenterImpl;
+import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTabView;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseService;
@@ -90,6 +93,13 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
         EditableCaseSummaryTabPresenterImpl summaryPresenter = new EditableCaseSummaryTabPresenterImpl(caseObj,
                 summaryView);
         presenters.add(summaryPresenter);
+    }
+
+    public void set(EditInputsTabView inputsView) throws EmfException {
+        EditInputsTabPresenter inputPresenter = new EditInputsTabPresenterImpl(session, inputsView, caseObj);
+        inputPresenter.display();
+        
+        presenters.add(inputPresenter);
     }
 
 }

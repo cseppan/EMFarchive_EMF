@@ -289,6 +289,10 @@
 		encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
 
 	<beanMapping
+		languageSpecificType="java:gov.epa.emissions.commons.data.Mutex"
+		qname="ns1:Mutex" xmlns:ns1="urn:gov.epa.services.EmfService"/>
+		
+	<beanMapping
 		languageSpecificType="java:gov.epa.emissions.framework.services.casemanagement.Abbreviation"
 		qname="ns1:Abbreviation" xmlns:ns1="urn:gov.epa.services.EmfService"/>
 		
