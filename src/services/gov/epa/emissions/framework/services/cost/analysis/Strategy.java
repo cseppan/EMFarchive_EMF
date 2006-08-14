@@ -9,4 +9,6 @@ public interface Strategy {
     void run(User user) throws EmfException;
     
     ControlStrategy getControlStrategy();
+
+    void close() throws EmfException;
 }

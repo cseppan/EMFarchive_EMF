@@ -1,5 +1,7 @@
 package gov.epa.emissions.framework.services.cost;
 
+import gov.epa.emissions.commons.db.DbServer;
+import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.analysis.Strategy;
 
@@ -28,13 +30,17 @@ public class StrategyFactory {
 
     private Strategy doCreate(ControlStrategy controlStrategy) throws Exception {
         String strategyClassName = controlStrategy.getStrategyType().getStrategyClassName();
-        Class strategyClass  = Class.forName(strategyClassName);
-
-        Class[] classParams = new Class[] {ControlStrategy.class, Integer.class };
-        Object[] params = new Object[] { controlStrategy, new Integer(batchSize) };
+        Class strategyClass = Class.forName(strategyClassName);
+        DbServer dbServer = dbServer();
+        Class[] classParams = new Class[] { ControlStrategy.class, DbServer.class, Integer.class };
+        Object[] params = new Object[] { controlStrategy, dbServer, new Integer(batchSize) };
         Constructor strategyConstructor = strategyClass.getDeclaredConstructor(classParams);
-        
+
         return (Strategy) strategyConstructor.newInstance(params);
+    }
+
+    private DbServer dbServer() throws Exception {
+        return new EmfDbServer();
     }
 
 }

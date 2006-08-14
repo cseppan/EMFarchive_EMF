@@ -4,6 +4,7 @@ import gov.epa.emissions.commons.db.DataModifier;
 import gov.epa.emissions.commons.db.Datasource;
 import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.SqlDataTypes;
+import gov.epa.emissions.commons.db.TableReader;
 import gov.epa.emissions.commons.db.postgres.PostgresDbUpdate;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
@@ -182,6 +183,12 @@ public abstract class ServiceTestCase extends TestCase {
             tx.rollback();
             throw e;
         }
+    }
+    
+    protected int countRecords(String tableName) {
+        Datasource datasource = dbServer().getEmissionsDatasource();
+        TableReader tableReader = dbSetup.tableReader(datasource);
+        return tableReader.count(datasource.getName(), tableName.toLowerCase());
     }
 
 }

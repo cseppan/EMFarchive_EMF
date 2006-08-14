@@ -33,4 +33,9 @@ public class LeastCostStrategy implements Strategy {
         return null;
     }
 
+    public void close() {
+        // NOTE Auto-generated method stub
+        
+    }
+
 }

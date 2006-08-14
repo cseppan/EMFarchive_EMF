@@ -4,7 +4,6 @@ import gov.epa.emissions.commons.data.Dataset;
 import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.db.HibernateSessionFactory;
 import gov.epa.emissions.commons.db.TableModifier;
 import gov.epa.emissions.commons.io.Column;
 import gov.epa.emissions.commons.io.TableFormat;
@@ -13,6 +12,7 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlStrategy;
 import gov.epa.emissions.framework.services.data.DatasetDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,9 +29,12 @@ public class DatasetCreator {
 
     private String outputDatasetName;
 
-    public DatasetCreator(String prefix, ControlStrategy strategy, User user) {
+    private HibernateSessionFactory sessionFactory;
+
+    public DatasetCreator(String prefix, ControlStrategy strategy, User user, HibernateSessionFactory sessionFactory) {
         this.prefix = prefix;
         this.user = user;
+        this.sessionFactory = sessionFactory;
         this.outputDatasetName = getResultDatasetName(strategy.getName());
     }
 
@@ -94,7 +97,7 @@ public class DatasetCreator {
     }
     
     private void add(EmfDataset dataset) throws EmfException {
-        Session session = HibernateSessionFactory.get().getSession();
+        Session session = sessionFactory.getSession();
         try {
             DatasetDAO dao = new DatasetDAO();
             if (dao.nameUsed(dataset.getName(), EmfDataset.class, session))

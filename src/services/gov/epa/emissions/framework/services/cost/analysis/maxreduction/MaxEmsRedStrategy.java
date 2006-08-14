@@ -6,13 +6,12 @@ import gov.epa.emissions.commons.data.DatasetType;
 import gov.epa.emissions.commons.data.InternalSource;
 import gov.epa.emissions.commons.db.DataQuery;
 import gov.epa.emissions.commons.db.Datasource;
-import gov.epa.emissions.commons.db.HibernateSessionFactory;
+import gov.epa.emissions.commons.db.DbServer;
 import gov.epa.emissions.commons.db.OptimizedQuery;
 import gov.epa.emissions.commons.db.OptimizedTableModifier;
 import gov.epa.emissions.commons.io.TableFormat;
 import gov.epa.emissions.commons.io.importer.ImporterException;
 import gov.epa.emissions.commons.security.User;
-import gov.epa.emissions.framework.services.EmfDbServer;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.ControlMeasuresDAO;
@@ -26,6 +25,7 @@ import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResult;
 import gov.epa.emissions.framework.services.cost.controlStrategy.StrategyResultType;
 import gov.epa.emissions.framework.services.data.DataCommonsDAO;
 import gov.epa.emissions.framework.services.data.EmfDataset;
+import gov.epa.emissions.framework.services.persistence.HibernateSessionFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -57,26 +57,21 @@ public class MaxEmsRedStrategy implements Strategy {
 
     private int batchSize;
 
-    private EmfDbServer emfDbServer;
+    private DbServer dbServer;
 
-    public MaxEmsRedStrategy(ControlStrategy strategy, Integer batchSize) throws EmfException {
+    private HibernateSessionFactory sessionFactory;
+
+    public MaxEmsRedStrategy(ControlStrategy strategy, DbServer dbServer, Integer batchSize, HibernateSessionFactory sessionFactory) throws EmfException {
         this.controlStrategy = strategy;
-        this.datasource = getDatasource();
+        this.dbServer = dbServer;
+        this.datasource = dbServer.getEmissionsDatasource();
+        this.sessionFactory = sessionFactory;
         this.datasets = strategy.getInputDatasets();
         this.batchSize = batchSize.intValue();
         this.strategyResults = new ArrayList();
 
-        this.tableFormat = new MaxEmsRedTableFormat(emfDbServer.getSqlDataTypes());
+        this.tableFormat = new MaxEmsRedTableFormat(dbServer.getSqlDataTypes());
         setup();
-    }
-
-    private Datasource getDatasource() throws EmfException {
-        try {
-            emfDbServer = new EmfDbServer();
-            return emfDbServer.getEmissionsDatasource();
-        } catch (Exception e) {
-            throw new EmfException(e.getMessage());
-        }
     }
 
     private void setup() throws EmfException {
@@ -86,22 +81,22 @@ public class MaxEmsRedStrategy implements Strategy {
             throw new EmfException(e.getMessage());
         }
 
-        this.measures = getMeasures();
+        this.measures = getMeasures(sessionFactory);
         this.map = new SCCControlMeasureMap(sccs, measures, controlStrategy.getTargetPollutant(), controlStrategy
                 .getCostYear());
     }
 
-    public ControlMeasure[] getMeasures() throws EmfException {
+    public ControlMeasure[] getMeasures(HibernateSessionFactory sessionFactory) throws EmfException {
+        Session session = sessionFactory.getSession();
         try {
             ControlMeasuresDAO dao = new ControlMeasuresDAO();
-            Session session = HibernateSessionFactory.get().getSession();
             List all = dao.all(session);
-            session.close();
-            session.disconnect();
 
             return (ControlMeasure[]) all.toArray(new ControlMeasure[0]);
         } catch (RuntimeException e) {
             throw new EmfException("could not retrieve control measures.");
+        }finally{
+            session.close();
         }
     }
 
@@ -110,18 +105,8 @@ public class MaxEmsRedStrategy implements Strategy {
             calculateResult(datasets, user, datasource);
         } catch (Exception e) {
             throw new EmfException(e.getMessage());
-        } finally {
-            closeConnection();
-        }
+        } 
         setCompletionDate();
-    }
-
-    private void closeConnection() throws EmfException {
-        try {
-            emfDbServer.disconnect();
-        } catch (SQLException e) {
-            throw new EmfException(e.getMessage());
-        }
     }
 
     private void calculateResult(Dataset[] datasets, User user, Datasource datasource) throws Exception {
@@ -135,7 +120,7 @@ public class MaxEmsRedStrategy implements Strategy {
             throws Exception {
         String query = getSourceQueryString(inputDataset, datasource);
         OptimizedQuery runner = datasource.optimizedQuery(query, batchSize);
-        DatasetCreator creator = new DatasetCreator("CSDR_", controlStrategy, user);
+        DatasetCreator creator = new DatasetCreator("CSDR_", controlStrategy, user,sessionFactory);
         OptimizedTableModifier modifier = createResultTable(creator.outputTableName());
         String description="TODO: add header comments??";
         EmfDataset outputDataset = creator.addDataset(getDetailedResultDatasetType(),description, tableFormat, inputDataset.getName(), datasource);
@@ -315,7 +300,7 @@ public class MaxEmsRedStrategy implements Strategy {
     }
 
     private StrategyResultType getDetailedStrategyResultType() throws EmfException {
-        Session session = HibernateSessionFactory.get().getSession();
+        Session session = sessionFactory.getSession();
         try {
             ControlStrategyDAO dao = new ControlStrategyDAO();
             StrategyResultType resultType = dao.getDetailedStrategyResultType(session);
@@ -342,7 +327,7 @@ public class MaxEmsRedStrategy implements Strategy {
     }
     
     private DatasetType getDetailedResultDatasetType() throws EmfException {
-        Session session = HibernateSessionFactory.get().getSession();
+        Session session = sessionFactory.getSession();
         try {
             DataCommonsDAO dao = new DataCommonsDAO();
             List types = dao.getDatasetTypes(session);
@@ -356,6 +341,14 @@ public class MaxEmsRedStrategy implements Strategy {
             throw new EmfException("Could not get dataset types");
         } finally {
             session.close();
+        }
+    }
+
+    public void close() throws EmfException {
+        try {
+            dbServer.disconnect();
+        } catch (SQLException e) {
+            throw new EmfException(e.getMessage());
         }
     }
 

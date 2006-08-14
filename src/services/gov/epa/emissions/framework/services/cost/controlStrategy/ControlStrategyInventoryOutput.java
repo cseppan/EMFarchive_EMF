@@ -36,10 +36,10 @@ public class ControlStrategyInventoryOutput {
 
     private User user;
 
-    public ControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy) throws Exception {
+    public ControlStrategyInventoryOutput(User user, ControlStrategy controlStrategy, HibernateSessionFactory sessionFactory) throws Exception {
         this.controlStrategy = controlStrategy;
         this.user = user;
-        creator = new DatasetCreator("CSINVEN_", controlStrategy, user);
+        creator = new DatasetCreator("CSINVEN_", controlStrategy, user,sessionFactory);
         this.tableFormat = new FileFormatFactory().tableFormat(datasetType(controlStrategy));
         this.statusServices = new StatusDAO();
     }

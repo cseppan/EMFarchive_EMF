@@ -211,7 +211,7 @@ public class ControlStrategyServiceImpl implements ControlStrategyService {
 
     public void createInventory(User user, ControlStrategy controlStrategy) throws EmfException {
         try {
-            ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy);
+            ControlStrategyInventoryOutput output = new ControlStrategyInventoryOutput(user, controlStrategy,sessionFactory);
             output.create();
         } catch (Exception e) {
             LOG.error("could not create inventory output. " + e.getMessage());

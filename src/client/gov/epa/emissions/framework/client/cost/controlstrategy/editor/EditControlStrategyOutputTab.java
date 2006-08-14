@@ -156,7 +156,7 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         JPanel tablePanel = tablePanel(controlStrategy);
         JPanel buttonPanel = buttonPanel();
 
-        JPanel outputPanel = new JPanel(new BorderLayout(5,10));
+        JPanel outputPanel = new JPanel(new BorderLayout(5, 10));
         outputPanel.add(folderPanel(), BorderLayout.NORTH);
         outputPanel.add(tablePanel);
         outputPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -170,7 +170,9 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
     private JPanel tablePanel(ControlStrategy controlStrategy) {
         StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
         EmfDataset[] inputDatasets = controlStrategy.getInputDatasets();
-        ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(inputDatasets, strategyResults[0]);
+        // TODO: handle multiple strategy results
+        StrategyResult result = (strategyResults.length != 0) ? strategyResults[0] : new StrategyResult();
+        ControlStrategyOutputTableData tableData = new ControlStrategyOutputTableData(inputDatasets, result);
         EmfTableModel model = new EmfTableModel(tableData);
         selectModel = new SortFilterSelectModel(model);
         JTable table = new JTable(selectModel);
