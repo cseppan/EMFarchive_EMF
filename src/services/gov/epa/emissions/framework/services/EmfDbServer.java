@@ -15,13 +15,15 @@ public class EmfDbServer implements DbServer {
     public static final String EMF_EMISSIONS_SCHEMA = "emissions";
 
     public static final String EMF_REFERENCE_SCHEMA = "reference";
+    
+    public static final String EMF_EMF_SCHEMA = "emf";
 
     private PostgresDbServer dbServer;
 
     public EmfDbServer() throws Exception {
         DataSource datasource = new DataSourceFactory().get();
         dbServer = new PostgresDbServer(datasource.getConnection(), EmfDbServer.EMF_REFERENCE_SCHEMA,
-                EmfDbServer.EMF_EMISSIONS_SCHEMA);
+                EmfDbServer.EMF_EMISSIONS_SCHEMA,EmfDbServer.EMF_EMF_SCHEMA);
     }
 
 
@@ -32,6 +34,11 @@ public class EmfDbServer implements DbServer {
     public Datasource getReferenceDatasource() {
         return dbServer.getReferenceDatasource();
     }
+    
+    public Datasource getEmfDatasource() {
+        return dbServer.getEmfDatasource();
+    }
+
 
     public SqlDataTypes getSqlDataTypes() {
         return dbServer.getSqlDataTypes();
