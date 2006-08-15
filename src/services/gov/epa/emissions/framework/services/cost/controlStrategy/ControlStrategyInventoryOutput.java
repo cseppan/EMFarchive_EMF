@@ -85,11 +85,15 @@ public class ControlStrategyInventoryOutput {
         updateDataWithDetailDatasetTable(outputInventoryTableName, detailDatasetTable(controlStrategy), server
                 .getEmissionsDatasource());
 
-        EmfDataset dataset = creator.addDataset(controlStrategy.getDatasetType(), inputDataset.getDescription(), tableFormat, inputDataset
+        EmfDataset dataset = creator.addDataset(controlStrategy.getDatasetType(), description(inputDataset), tableFormat, inputDataset
                 .getName(), datasource);
         updateDatasetIdAndVersion(outputInventoryTableName, server.getEmissionsDatasource(), dataset.getId());
 
         updateControlStrategyResults(controlStrategy, dataset);
+    }
+
+    private String description(EmfDataset inputDataset) {
+        return inputDataset.getDescription()+"#"+"Implements control strategy: "+controlStrategy.getName()+"\n";
     }
 
     private void updateControlStrategyResults(ControlStrategy controlStrategy, EmfDataset dataset) throws EmfException {

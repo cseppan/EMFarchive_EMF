@@ -47,6 +47,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private CheckBox inventoryCheckBox;
 
+    private Button createButton;
+
     public EditControlStrategyOutputTab(ControlStrategy controlStrategy, MessagePanel messagePanel,
             DesktopManager desktopManager, EmfConsole parentConsole) {
         super.setName("output");
@@ -59,8 +61,8 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
 
     private void setLayout(ControlStrategy controlStrategy) {
         setLayout(new BorderLayout());
-        add(topPanel(), BorderLayout.NORTH);
         add(outputPanel(controlStrategy));
+        add(bottomPanel(), BorderLayout.SOUTH);
     }
 
     public void save(ControlStrategy controlStrategy) {
@@ -91,21 +93,30 @@ public class EditControlStrategyOutputTab extends JPanel implements EditControlS
         }
     }
 
-    private JPanel topPanel() {
+    private JPanel bottomPanel() {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(productPanel());
         topPanel.add(createButtonPanel(), BorderLayout.SOUTH);
-
+        disableTopPanel();
         topPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createTitledBorder("Outputs")));
 
         return topPanel;
     }
 
+    private void disableTopPanel() {
+        StrategyResult[] strategyResults = controlStrategy.getStrategyResults();
+        boolean enable = (strategyResults.length == 0) ? false : true;
+        if(enable)
+            return;
+        inventoryCheckBox.setEnabled(enable);
+        createButton.setEnabled(enable);
+    }
+
     private JPanel createButtonPanel() {
-        Button button = new Button("Create", createOutputAction());
+        createButton = new Button("Create", createOutputAction());
         JPanel createPanel = new JPanel();
-        createPanel.add(button);
+        createPanel.add(createButton);
         return createPanel;
     }
 
