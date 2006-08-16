@@ -57,7 +57,7 @@ public class CaseEditorPresenterImpl implements CaseEditorPresenter {
 
     public void doSave() throws EmfException {
         if (isDuplicate(caseObj))
-            throw new EmfException("Duplicate name - '" + caseObj.getName() + "'.");
+            throw new EmfException("A Case named '" + caseObj.getName() + "' already exists.");
 
         updateCase();
         closeView();

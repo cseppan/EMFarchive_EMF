@@ -72,7 +72,7 @@ public class NewCasePresenterTest extends EmfMockObjectTestCase {
         try {
             p.doSave(newCase);
         } catch (EmfException e) {
-            assertEquals("Duplicate name - 'test-case'.", e.getMessage());
+            assertEquals("A Case named 'test-case' already exists.", e.getMessage());
             return;
         }
 
