@@ -153,11 +153,11 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
         
         measureAbbreviation = new TextField("Existing Measure Abbreviation", 10);
         changeablesList.addChangeable(measureAbbreviation);
-        layoutGenerator.addLabelWidgetPair("Existing Measure Abbreviation", measureAbbreviation, panel);
+        layoutGenerator.addLabelWidgetPair("Existing Measure Abbreviation:", measureAbbreviation, panel);
         
         existingdevCode = new TextField("Existing NEI Device Code", 10);
         changeablesList.addChangeable(existingdevCode);
-        layoutGenerator.addLabelWidgetPair("Existing NEI Device Code", existingdevCode, panel);
+        layoutGenerator.addLabelWidgetPair("Existing NEI Device Code:", existingdevCode, panel);
         
         costYear = new TextField("Cost Year", 10);
         changeablesList.addChangeable(costYear);
@@ -193,7 +193,7 @@ public class EditEfficiencyRecordWindow extends DisposableInteralFrame implement
         equationType = new ComboBox(equationTypes);
         equationType.setPreferredSize(new Dimension(113, 20));
         changeablesList.addChangeable(equationType);
-        layoutGenerator.addLabelWidgetPair("Equation Type", equationType, panel);
+        layoutGenerator.addLabelWidgetPair("Equation Type:", equationType, panel);
         
         caprecFactor = new TextField("Capital Recovery Factor", 10);
         changeablesList.addChangeable(caprecFactor);
