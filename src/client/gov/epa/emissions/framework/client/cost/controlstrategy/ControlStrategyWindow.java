@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.cost.controlstrategy;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableComponent;
+//import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.commons.gui.buttons.*;
@@ -38,7 +38,7 @@ public class ControlStrategyWindow extends DisposableInteralFrame implements Con
     private static int count = 1;
 
     public ControlStrategyWindow(DesktopManager desktopManager) {
-        super("Create a Control Strategy", new Dimension(500, 200), desktopManager);
+        super("Create a Control Strategy", new Dimension(450, 150), desktopManager);
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -72,12 +72,12 @@ public class ControlStrategyWindow extends DisposableInteralFrame implements Con
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         description = new TextArea("Description", "", 30, 4);
-        addChangeable(description);
-        layoutGenerator.addLabelWidgetPair("Description:",
-                ScrollableComponent.createWithVerticalScrollBar(description), panel);
+        //addChangeable(description);
+        //layoutGenerator.addLabelWidgetPair("Description:",
+        //        ScrollableComponent.createWithVerticalScrollBar(description), panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 5, 0, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -93,9 +93,9 @@ public class ControlStrategyWindow extends DisposableInteralFrame implements Con
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button saveButton = new SaveButton("Save", saveAction());
+        Button saveButton = new Button("Create", saveAction());
         container.add(saveButton);
-        container.add(new CloseButton("Close", closeAction()));
+        container.add(new CancelButton("Cancel", closeAction()));
         getRootPane().setDefaultButton(saveButton);
 
         panel.add(container, BorderLayout.CENTER);

@@ -75,7 +75,7 @@ public class ControlStrategyPresenterTest extends EmfMockObjectTestCase {
         try {
             p.doSave(newControlStrategy);
         } catch (EmfException e) {
-            assertEquals("Duplicate name - 'test-controlstrategy'.", e.getMessage());
+            assertEquals("A Control Straetgy named 'test-controlstrategy' already exists.", e.getMessage());
             return;
         }
 

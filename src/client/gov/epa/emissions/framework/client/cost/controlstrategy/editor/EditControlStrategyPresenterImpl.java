@@ -83,7 +83,7 @@ public class EditControlStrategyPresenterImpl implements EditControlStrategyPres
             throw new EmfException("Empty string is not allowed for the name.");
 
         if (isDuplicate(controlStrategy))
-            throw new EmfException("Duplicate name - '" + name + "'.");
+            throw new EmfException("A Control Strategy named '" + name + "' already exists.");
     }
 
     private boolean isDuplicate(ControlStrategy controlStrategy) throws EmfException {
