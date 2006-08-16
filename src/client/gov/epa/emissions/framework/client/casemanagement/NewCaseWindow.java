@@ -1,7 +1,7 @@
 package gov.epa.emissions.framework.client.casemanagement;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.ScrollableComponent;
+//import gov.epa.emissions.commons.gui.ScrollableComponent;
 import gov.epa.emissions.commons.gui.TextArea;
 import gov.epa.emissions.commons.gui.TextField;
 import gov.epa.emissions.framework.client.DisposableInteralFrame;
@@ -34,7 +34,7 @@ public class NewCaseWindow extends DisposableInteralFrame implements NewCaseView
     private TextArea description;
 
     public NewCaseWindow(DesktopManager desktopManager) {
-        super("Create a Case", new Dimension(500, 200), desktopManager);
+        super("Create a Case", new Dimension(450, 150), desktopManager);
         layout = new JPanel();
         layout.setLayout(new BoxLayout(layout, BoxLayout.Y_AXIS));
         super.getContentPane().add(layout);
@@ -68,12 +68,12 @@ public class NewCaseWindow extends DisposableInteralFrame implements NewCaseView
         layoutGenerator.addLabelWidgetPair("Name:", name, panel);
 
         description = new TextArea("Description", "", 30, 4);
-        addChangeable(description);
-        layoutGenerator.addLabelWidgetPair("Description:",
-                ScrollableComponent.createWithVerticalScrollBar(description), panel);
+        //addChangeable(description);
+        //layoutGenerator.addLabelWidgetPair("Description:",
+        //        ScrollableComponent.createWithVerticalScrollBar(description), panel);
 
         // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 2, 2, // rows, cols
+        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
                 5, 0, // initialX, initialY
                 10, 10);// xPad, yPad
 
@@ -126,9 +126,9 @@ public class NewCaseWindow extends DisposableInteralFrame implements NewCaseView
         layout.setVgap(25);
         container.setLayout(layout);
 
-        Button saveButton = new Button("Save", saveAction());
+        Button saveButton = new Button("Create", saveAction());
         container.add(saveButton);
-        container.add(new Button("Close", closeAction()));
+        container.add(new Button("Cancel", closeAction()));
         getRootPane().setDefaultButton(saveButton);
 
         panel.add(container, BorderLayout.CENTER);
