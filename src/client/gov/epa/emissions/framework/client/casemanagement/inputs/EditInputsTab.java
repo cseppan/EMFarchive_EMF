@@ -63,10 +63,10 @@ public class EditInputsTab extends JPanel implements EditInputsTabView {
         this.messagePanel = messagePanel;
         this.desktopManager = desktopManager;
         
-        this.inputDir = new JTextField(20);
+        this.inputDir = new JTextField(30);
         inputDir.setName("inputdir");
 
-        this.outputDir = new JTextField(20);
+        this.outputDir = new JTextField(30);
         outputDir.setName("outputdir");
 
         super.setLayout(new BorderLayout());

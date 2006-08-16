@@ -121,7 +121,7 @@ public class InputFieldsPanel extends JPanel implements InputFieldsPanelView {
         qaStatus = new JLabel("");
         layoutGenerator.addLabelWidgetPair("QA Status:", qaStatus, panel);
 
-        subDir = new TextField("subdir", 35);
+        subDir = new TextField("subdir", 30);
         changeablesList.addChangeable(subDir);
         layoutGenerator.addLabelWidgetPair("Subdirectory:", subDir, panel);
 
