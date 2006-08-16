@@ -178,6 +178,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
         };
 
         SelectAwareButton viewButton = new SelectAwareButton("View", viewAction, selectModel, confirmDialog);
+        viewButton.setEnabled(false);
         return viewButton;
     }
 
