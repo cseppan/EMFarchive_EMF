@@ -5,6 +5,7 @@ import gov.epa.emissions.framework.client.DisposableInteralFrame;
 import gov.epa.emissions.framework.client.EmfSession;
 import gov.epa.emissions.framework.client.casemanagement.inputs.EditInputsTab;
 import gov.epa.emissions.framework.client.console.DesktopManager;
+import gov.epa.emissions.framework.client.console.EmfConsole;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
 import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
@@ -33,10 +34,15 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
 
     private EmfSession session;
 
-    public CaseEditor(EmfSession session, DesktopManager desktopManager) {
+    private EmfConsole parentConsole;
+    
+    private Case caseObj;
+
+    public CaseEditor(EmfConsole parentConsole, EmfSession session, DesktopManager desktopManager) {
         super("Case Editor", new Dimension(800, 500), desktopManager);
         this.session = session;
         this.desktopManager = desktopManager;
+        this.parentConsole = parentConsole;
     }
 
     private JTabbedPane createTabbedPane(Case caseObj, MessagePanel messagePanel) {
@@ -66,7 +72,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     
     private JPanel createInputTab() {
         try {
-            EditInputsTab view = new EditInputsTab(null, this, messagePanel, desktopManager);
+            EditInputsTab view = new EditInputsTab(parentConsole, this, messagePanel, desktopManager);
             presenter.set(view);
             return view;
         } catch (EmfException e) {
@@ -83,6 +89,7 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         super.setLabel("Case Editor: " + caseObj);
         Container contentPane = super.getContentPane();
         contentPane.removeAll();
+        this.caseObj = caseObj;
 
         JPanel panel = new JPanel(new BorderLayout());
         messagePanel = new SingleLineMessagePanel();
@@ -104,6 +111,17 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
     private JPanel createControlPanel() {
         JPanel buttonsPanel = new JPanel();
 
+        Button export = new Button("Export", new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    doExport();
+                } catch (EmfException e) {
+                    messagePanel.setError(e.getMessage());
+                }
+            }
+        });
+        buttonsPanel.add(export);
+        
         Button save = new Button("Save", new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
                 doSave();
@@ -120,6 +138,19 @@ public class CaseEditor extends DisposableInteralFrame implements CaseEditorView
         buttonsPanel.add(close);
 
         return buttonsPanel;
+    }
+
+    protected void doExport() throws EmfException {
+        //doSave(); FIXME: needs to save the case object before exporting.
+        String exportDir = caseObj.getInputFileDir();
+        
+        if (exportDir == null || exportDir.equals("")) {
+            messagePanel.setMessage("Please select case input folder.");
+            return;
+        }
+        
+        presenter.doExport(session.user(), exportDir, "To export input datasets",
+                true, caseObj);
     }
 
     public void observe(CaseEditorPresenter presenter) {

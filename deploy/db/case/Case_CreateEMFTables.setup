@@ -105,7 +105,7 @@ WITHOUT OIDS;
 CREATE TABLE cases.case_inputs
 (
   id SERIAL PRIMARY KEY,
-  name varchar(128) NOT NULL UNIQUE,
+  name varchar(128),
   sub_dir varchar(255),
   required bool DEFAULT false,
   show bool DEFAULT false,
@@ -115,7 +115,8 @@ CREATE TABLE cases.case_inputs
   input_name_id int4  REFERENCES cases.inputnames(id),
   dataset_id int4  REFERENCES emf.datasets(id),
   version_id int4  REFERENCES emissions.versions(id),
-  dataset_type_id int4  REFERENCES emf.dataset_types(id)
+  dataset_type_id int4  REFERENCES emf.dataset_types(id),
+  UNIQUE (input_name_id, sector_id, program_id)
 ) 
 WITHOUT OIDS;
 -- cases.case_inputs

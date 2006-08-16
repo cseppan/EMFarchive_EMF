@@ -9,4 +9,6 @@ public interface NewInputView {
     boolean shouldCreate();
 
     CaseInput input();
+    
+    void register(Object presenter);
 }

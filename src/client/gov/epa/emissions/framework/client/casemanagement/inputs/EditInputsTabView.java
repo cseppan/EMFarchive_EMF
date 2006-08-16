@@ -7,8 +7,10 @@ public interface EditInputsTabView {
 
     void display(Case caseObj, EditInputsTabPresenter presenter);
 
-    CaseInput[] additions();
+    CaseInput[] caseInputs();
 
     void addInput(CaseInput input);
+    
+    void refresh();
 
 }

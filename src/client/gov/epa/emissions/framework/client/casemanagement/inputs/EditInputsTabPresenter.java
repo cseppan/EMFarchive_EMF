@@ -10,6 +10,6 @@ public interface EditInputsTabPresenter extends CaseEditorTabPresenter {
 
     void doAddInput(NewInputView view) throws EmfException;
 
-    void doViewInput(CaseInput note, InputView window);
+    void doEditInput(CaseInput input, EditInputView inputEditor) throws EmfException;
 
 }

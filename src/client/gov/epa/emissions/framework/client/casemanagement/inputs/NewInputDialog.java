@@ -1,31 +1,36 @@
 package gov.epa.emissions.framework.client.casemanagement.inputs;
 
 import gov.epa.emissions.commons.gui.Button;
-import gov.epa.emissions.commons.gui.TextField;
-import gov.epa.emissions.framework.client.SpringLayoutGenerator;
+import gov.epa.emissions.commons.gui.Changeable;
+import gov.epa.emissions.commons.gui.ManageChangeables;
 import gov.epa.emissions.framework.client.console.EmfConsole;
+import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.casemanagement.Case;
 import gov.epa.emissions.framework.services.casemanagement.CaseInput;
 import gov.epa.emissions.framework.ui.Dialog;
+import gov.epa.emissions.framework.ui.MessagePanel;
+import gov.epa.emissions.framework.ui.SingleLineMessagePanel;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.SpringLayout;
 
-public class NewInputDialog extends Dialog implements NewInputView {
-
-    private TextField name;
+public class NewInputDialog extends Dialog implements NewInputView, ManageChangeables {
 
     protected boolean shouldCreate;
 
+    protected EditInputsTabPresenterImpl presenter;
+
+    private MessagePanel messagePanel;
+
+    private InputFieldsPanel inputFieldsPanel;
+
     public NewInputDialog(EmfConsole parent) {
         super("Create new Input", parent);
-        super.setSize(new Dimension(550, 120));
+        super.setSize(new Dimension(550, 520));
         super.center();
     }
 
@@ -36,7 +41,7 @@ public class NewInputDialog extends Dialog implements NewInputView {
     private void doDisplay(Case caseObj) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        
+
         panel.add(inputPanel());
         panel.add(buttonsPanel(caseObj.getCaseInputs()));
 
@@ -45,16 +50,18 @@ public class NewInputDialog extends Dialog implements NewInputView {
     }
 
     private JPanel inputPanel() {
-        JPanel panel = new JPanel(new SpringLayout());
-        SpringLayoutGenerator layoutGenerator = new SpringLayoutGenerator();
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        name = new TextField("", 40);
-        layoutGenerator.addLabelWidgetPair("InputName:", name, panel);
+        messagePanel = new SingleLineMessagePanel();
+        panel.add(messagePanel);
+        this.inputFieldsPanel = new InputFieldsPanel(messagePanel, this);
 
-        // Lay out the panel.
-        layoutGenerator.makeCompactGrid(panel, 1, 2, // rows, cols
-                5, 5, // initialX, initialY
-                10, 10);// xPad, yPad
+        try {
+            presenter.doAddInputFields(panel, inputFieldsPanel);
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
 
         return panel;
     }
@@ -81,35 +88,8 @@ public class NewInputDialog extends Dialog implements NewInputView {
     }
 
     private void doNew(CaseInput[] inputs) {
-        if (verifyInput(inputs)) {
-            shouldCreate = true;
-            close();
-        }
-    }
-
-    protected boolean verifyInput(CaseInput[] input) {
-        String inputName = name.getText().trim();
-        if (inputName.length() == 0) {
-            JOptionPane.showMessageDialog(super.getParent(), "Please enter Name", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        if (duplicate(inputName, input)) {
-            JOptionPane.showMessageDialog(super.getParent(), "Name is duplicate. Please enter a different name.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean duplicate(String inputName, CaseInput[] inputs) {
-        for (int i = 0; i < inputs.length; i++) {
-            if (inputs[i].getName().equals(inputName))
-                return true;
-        }
-
-        return false;
+        shouldCreate = true;
+        close();
     }
 
     public boolean shouldCreate() {
@@ -117,10 +97,21 @@ public class NewInputDialog extends Dialog implements NewInputView {
     }
 
     public CaseInput input() {
-        CaseInput input = new CaseInput();
-        input.setName(name.getText());
+        try {
+            inputFieldsPanel.setFields();
+        } catch (EmfException e) {
+            messagePanel.setError(e.getMessage());
+        }
 
-        return input;
+        return inputFieldsPanel.getInput();
+    }
+
+    public void register(Object presenter) {
+        this.presenter = (EditInputsTabPresenterImpl) presenter;
+    }
+
+    public void addChangeable(Changeable changeable) {
+        // NOTE Auto-generated method stub
     }
 
 }

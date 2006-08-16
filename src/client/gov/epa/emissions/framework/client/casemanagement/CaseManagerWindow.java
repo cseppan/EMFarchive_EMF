@@ -194,7 +194,7 @@ public class CaseManagerWindow extends ReusableInteralFrame implements CaseManag
 
         for (Iterator iter = cases.iterator(); iter.hasNext();) {
             Case caseObj = (Case) iter.next();
-            CaseEditor view = new CaseEditor(session, desktopManager);
+            CaseEditor view = new CaseEditor(parentConsole, session, desktopManager);
             try {
                 presenter.doEdit(view, caseObj);
             } catch (EmfException e) {
