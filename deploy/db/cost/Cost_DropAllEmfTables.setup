@@ -8,6 +8,6 @@ DROP TABLE emf.control_measure_efficiencyrecords CASCADE;
 DROP TABLE emf.strategy_results;
 DROP TABLE emf.strategy_result_types;
 DROP TABLE emf.control_measurs_sectors;
-DROP TABLE emf.control_technologies;
+DROP TABLE emf.control_technologies CASCADE;
 DROP TABLE emf.pollutants;
 DROP TABLE emf.source_groups;
