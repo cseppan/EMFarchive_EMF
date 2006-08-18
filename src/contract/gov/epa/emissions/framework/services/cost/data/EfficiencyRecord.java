@@ -7,8 +7,6 @@ import java.util.Date;
 
 public class EfficiencyRecord implements Serializable {
 
-    private int id;
-
     private int existingDevCode;
 
     private Pollutant pollutant;
@@ -36,6 +34,8 @@ public class EfficiencyRecord implements Serializable {
     private float efficiency;
 
     private Date effectiveDate;
+
+    private int recordId;
 
     public float getCapRecFactor() {
         return capRecFactor;
@@ -101,14 +101,6 @@ public class EfficiencyRecord implements Serializable {
         this.existingMeasureAbbr = existingMeasureAbbr;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getLocale() {
         return locale;
     }
@@ -117,7 +109,7 @@ public class EfficiencyRecord implements Serializable {
         this.locale = locale;
     }
 
-   public Pollutant getPollutant() {
+    public Pollutant getPollutant() {
         return pollutant;
     }
 
@@ -156,15 +148,35 @@ public class EfficiencyRecord implements Serializable {
     public void setEffectiveDate(Date effectiveDate) {
         this.effectiveDate = effectiveDate;
     }
-    
+
     public boolean equals(Object other) {
         if (other == null || !(other instanceof EfficiencyRecord))
             return false;
+
         final EfficiencyRecord record = (EfficiencyRecord) other;
-        boolean equal = record.getPollutant().equals(pollutant) &&
-            record.getLocale().equals(locale);
-        
-        return record.id == id || equal;  
-    } 
+        boolean equal = record.getPollutant().equals(pollutant) && record.getLocale().equals(locale)
+                && compareEffectiveDate(record.getEffectiveDate(), effectiveDate)
+                && record.getExistingMeasureAbbr().equals(existingMeasureAbbr);
+
+        return equal;
+    }
+
+    private boolean compareEffectiveDate(Date date1, Date date2) {
+        if (date1 == null && date2 == null)
+            return true;
+        // if either one is null =>not equal
+        if (date1 == null || date2 == null)
+            return false;
+
+        return date1.equals(date2);
+    }
+
+    public void setRecordId(int noOfEfficiencyRecords) {
+        this.recordId = noOfEfficiencyRecords;
+    }
+
+    public int getRecordId() {
+        return recordId;
+    }
 
 }

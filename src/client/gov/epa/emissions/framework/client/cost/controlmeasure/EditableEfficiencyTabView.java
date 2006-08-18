@@ -7,4 +7,6 @@ public interface EditableEfficiencyTabView extends EditableCMTabView {
     void add(EfficiencyRecord record);
 
     void refresh();
+
+    EfficiencyRecord[] records();
 }

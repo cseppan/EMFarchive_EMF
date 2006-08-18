@@ -6,42 +6,42 @@ import gov.epa.emissions.framework.services.EmfException;
 import gov.epa.emissions.framework.services.cost.ControlMeasure;
 import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
-public class EditEfficiencyRecordPresenter {
+public class NewEfficiencyRecordPresenter {
 
     private EfficiencyRecordView view;
 
     private EditableEfficiencyTabView parentView;
 
-    public EditEfficiencyRecordPresenter(EditableEfficiencyTabView parentView, EfficiencyRecordView view) {
+    public NewEfficiencyRecordPresenter(EditableEfficiencyTabView parentView, EfficiencyRecordView view) {
         this.view = view;
         this.parentView = parentView;
     }
 
-    public void display(ControlMeasure measure, EfficiencyRecord record) {
+    public void display(ControlMeasure measure, int noOfEfficiencyRecords) {
         view.observe(this);
-        view.display(measure, record);
+        view.display(measure, newRecord(noOfEfficiencyRecords));
     }
 
-    public void doSave(ControlMeasure measure) throws EmfException {
-        parentView.save(measure);
+    private EfficiencyRecord newRecord(int noOfEfficiencyRecords) {
+        EfficiencyRecord efficiencyRecord = new EfficiencyRecord();
+        efficiencyRecord.setRecordId(++noOfEfficiencyRecords);
+        return efficiencyRecord;
     }
 
-    public void refresh() {
-        parentView.refresh();
-
+    public void addNew(EfficiencyRecord record) {
+        parentView.add(record);
     }
 
-    public void checkForDuplicate(EfficiencyRecord record) throws EmfException {
+    public void checkForDuplicates(EfficiencyRecord record) throws EmfException {
         EfficiencyRecord[] records = parentView.records();
         for (int i = 0; i < records.length; i++) {
-            if(record.getRecordId()!=records[i].getRecordId()){
-                if(same(record,records[i])){
-                    throw new EmfException("Duplicate Record: edit");
-                }
+            if (same(record, records[i])) {
+                throw new EmfException("Duplicate record: ");
             }
         }
+
     }
-    
+
     private boolean same(EfficiencyRecord record1, EfficiencyRecord record2) {
         return record1.getPollutant().equals(record2.getPollutant()) && record1.getLocale().equals(record2.getLocale())
                 && sameEffectiveDate(record1, record2)

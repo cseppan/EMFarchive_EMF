@@ -208,11 +208,10 @@ public class EditControlStrategyWindow extends DisposableInteralFrame implements
     private Action saveAction() {
         Action action = new AbstractAction() {
             public void actionPerformed(ActionEvent event) {
-                resetChanges();
-
                 try {
                     clearMessage();
                     presenter.doSave();
+                    resetChanges();
                 } catch (EmfException e) {
                     messagePanel.setError(e.getMessage());
                 }

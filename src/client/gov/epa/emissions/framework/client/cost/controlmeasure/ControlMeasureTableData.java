@@ -1,5 +1,6 @@
 package gov.epa.emissions.framework.client.cost.controlmeasure;
 
+import gov.epa.emissions.commons.data.Pollutant;
 import gov.epa.emissions.commons.data.Sector;
 import gov.epa.emissions.commons.data.SourceGroup;
 import gov.epa.emissions.framework.client.data.EmfDateFormat;
@@ -114,9 +115,8 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     private Float getControlEfficiency(ControlMeasure measure) {
         EfficiencyRecord[] records = measure.getEfficiencyRecords();
-        String localPollutant = getLocalPollutant(measure);
-
         if (records.length != 0) {
+            String localPollutant = getLocalPollutant(measure);
             for (int i = 0; i < records.length; i++) {
                 if (records[i].getPollutant().getName().equalsIgnoreCase(localPollutant))
                     return new Float(records[i].getEfficiency());
@@ -128,8 +128,9 @@ public class ControlMeasureTableData extends AbstractTableData {
 
     private String getLocalPollutant(ControlMeasure measure) {
         String localPollutant = pollutant;
+        Pollutant majorPollutant = measure.getMajorPollutant();
         if (pollutant.equalsIgnoreCase("Major"))
-            localPollutant = measure.getMajorPollutant().getName().trim();
+            localPollutant = majorPollutant == null ? "" : majorPollutant.getName();
 
         return localPollutant;
     }

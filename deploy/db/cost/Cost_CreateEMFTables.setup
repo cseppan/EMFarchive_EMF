@@ -133,6 +133,7 @@ CREATE TABLE emf.control_measure_efficiencyrecords
   id SERIAL PRIMARY KEY,
   control_measures_id int4 NOT NULL REFERENCES emf.control_measures(id),
   list_index int4,
+  record_id int4,
   pollutant_id int4 NOT NULL REFERENCES emf.pollutants(id),
   existing_measure_abbr varchar(10),
   existing_dev_code int4,
@@ -148,7 +149,7 @@ CREATE TABLE emf.control_measure_efficiencyrecords
   discount_rate real,
   detail varchar(128),
   effective_date timestamp,
-  UNIQUE (control_measures_id, list_index)
+  UNIQUE (pollutant_id,locale,existing_measure_abbr,effective_date)
 ) 
 WITHOUT OIDS;
 -- emf.control_measure_efficiencyrecords

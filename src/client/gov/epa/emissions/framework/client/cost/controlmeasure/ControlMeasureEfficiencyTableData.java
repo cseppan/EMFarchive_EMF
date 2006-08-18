@@ -23,9 +23,9 @@ public class ControlMeasureEfficiencyTableData extends AbstractTableData {
     }
 
     public String[] columns() {
-        return new String[] { "Pollutant", "Locale", "Effective Date", "Existing Control Measure Abbreviation", 
-                "Existing NEI Device Code", "Cost Year", "Cost Per Ton", "Control Efficiency", "Rule Effectiveness",
-                "Rule Penetration", "Equation Type", "Capital Recovery Factor", "Discount Rate", "Details",
+        return new String[] { "Pollutant", "Locale", "Effective Date", "Existing Measure", 
+                "Existing NEI Dev", "Cost Year", "Cost Per Ton", "Control Efficiency", "Rule Effectiveness",
+                "Rule Penetration", "Equation Type", "Capital Rec Fac", "Discount Rate", "Details",
                  };
     }
 

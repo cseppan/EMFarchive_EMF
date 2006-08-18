@@ -6,10 +6,10 @@ import gov.epa.emissions.framework.services.cost.data.EfficiencyRecord;
 
 public interface EfficiencyRecordView extends ManagedView {
     
-    void observe(EfficiencyRecordPresenter presenter);
+    void observe(NewEfficiencyRecordPresenter presenter);
     
     void display(ControlMeasure measure, EfficiencyRecord record);
     
-    EfficiencyRecord efficiencyRecord();
+    void observe(EditEfficiencyRecordPresenter presenter);
 
 }

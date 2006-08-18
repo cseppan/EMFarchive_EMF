@@ -89,9 +89,9 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
 
         return new JScrollPane(panel);
     }
-    
+
     private SortCriteria sortCriteria() {
-        String[] columnNames = { "Pollutant", "Control Efficiency"};
+        String[] columnNames = { "Pollutant", "Control Efficiency" };
         return new SortCriteria(columnNames, new boolean[] { true, true }, new boolean[] { true, true });
     }
 
@@ -121,7 +121,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
                 for (int i = 0; i < records.length; i++) {
                     doEdit(records[i]);
                 }
-                
+
             }
         };
     }
@@ -145,7 +145,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
             }
         };
     }
-    
+
     private Action removeAction() {
         return new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -156,7 +156,7 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
 
     protected void doRemove() {
         messagePanel.clear();
-        
+
         EfficiencyRecord[] records = getSelectedRecords();
 
         if (records.length == 0)
@@ -172,28 +172,27 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
             refreshPanel();
         }
     }
-    
+
     protected void doAdd() {
         messagePanel.clear();
-        EfficiencyRecordView view = new EfficiencyRecordWindow(changeablesList, desktopManager, session);
-        EfficiencyRecordPresenter presenter = new EfficiencyRecordPresenter(this, view);
-        presenter.display(measure, null);
+        EfficiencyRecordView view = new NewEfficiencyRecordWindow(changeablesList, desktopManager, session);
+        NewEfficiencyRecordPresenter presenter = new NewEfficiencyRecordPresenter(this, view);
+        
+        presenter.display(measure,tableData.sources().length);
     }
-    
+
     protected void doCopy(EfficiencyRecord record) {
         messagePanel.clear();
-        EditEfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager, session);
-        EditEfficiencyRecordPresenter presenter = new EditEfficiencyRecordPresenter(this, view);
-        presenter.display(measure, record);
+        messagePanel.setMessage("Copy functionality is not implemented yet");
     }
-    
+
     private void doEdit(EfficiencyRecord record) {
         messagePanel.clear();
-        EditEfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager, session);
+        EfficiencyRecordView view = new EditEfficiencyRecordWindow(changeablesList, desktopManager, session);
         EditEfficiencyRecordPresenter presenter = new EditEfficiencyRecordPresenter(this, view);
         presenter.display(measure, record);
     }
-    
+
     private EfficiencyRecord[] getSelectedRecords() {
         return (EfficiencyRecord[]) selectModel.selected().toArray(new EfficiencyRecord[0]);
     }
@@ -201,12 +200,12 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
     public void refreshData() {
         tableData.refresh();
     }
-    
+
     public void refreshPanel() {
         refreshData();
         updateMainPanel(tableData.sources());
     }
-    
+
     public void save(ControlMeasure measure) {
         measure.setEfficiencyRecords(tableData.sources());
     }
@@ -217,7 +216,12 @@ public class EditableEfficiencyTab extends JPanel implements EditableEfficiencyT
     }
 
     public void refresh() {
-       refreshPanel();
+        refreshPanel();
+    }
+
+    public EfficiencyRecord[] records() {
+       return tableData.sources();
+        
     }
 
 }
